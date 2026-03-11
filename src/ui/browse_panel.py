@@ -1872,10 +1872,10 @@ class BrowsePanel(BasePanel):
         _cl.ALL_SOURCES[:] = sorted({e["source"] for e in new_entries})
 
         # Rebuild source filter options
-        self._src_combo.clear()
-        self._src_combo.addItem("All Sources")
+        self._source_filter.clear()
+        self._source_filter.addItem("All Sources", "")
         for src in _cl.ALL_SOURCES:
-            self._src_combo.addItem(src)
+            self._source_filter.addItem(src, src)
 
         self._clear_filters()
         self.emit_status(f"Catalogue reloaded — {len(new_entries)} entries")

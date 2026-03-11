@@ -3185,7 +3185,8 @@ class TestCatalogueIntegrity(unittest.TestCase):
             )
 
     def test_all_types_are_valid(self):
-        valid_types = {"texture_pack", "pnach", "cover_art", "save_file", "cheat"}
+        from src.models.mod import ModType
+        valid_types = set(ModType)
         for entry in self.catalogue:
             self.assertIn(
                 entry["type"], valid_types,
@@ -3775,9 +3776,10 @@ class TestCCKrizalidEntries(unittest.TestCase):
                           f"{e['id']}: url should contain the thread slug")
 
     def test_all_cckrizalid_entries_are_texture_packs(self):
+        from src.models.mod import ModType
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
         for e in cc:
-            self.assertEqual(e["type"], "texture_pack",
+            self.assertEqual(e["type"], ModType.TEXTURE_PACK,
                              f"{e['id']} type should be texture_pack")
 
     def test_all_cckrizalid_entries_have_serials(self):
@@ -3825,8 +3827,9 @@ class TestCatalogueLoader(unittest.TestCase):
             seen.add(eid)
 
     def test_type_field_injected(self):
-        """Every entry must have a 'type' field (injected from file name)."""
-        valid_types = {"texture_pack", "pnach", "save_file", "cheat", "cover_art"}
+        """Every entry must have a 'type' field (injected from file name) as a ModType enum."""
+        from src.models.mod import ModType
+        valid_types = set(ModType)
         for e in self.catalogue:
             self.assertIn(e.get("type"), valid_types,
                           f"Entry {e['id']} has invalid type {e.get('type')!r}")
@@ -3857,15 +3860,18 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Type counts ─────────────────────────────────────────────────────────
 
     def test_has_texture_pack_entries(self):
-        tp = [e for e in self.catalogue if e["type"] == "texture_pack"]
+        from src.models.mod import ModType
+        tp = [e for e in self.catalogue if e["type"] == ModType.TEXTURE_PACK]
         self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
 
     def test_has_pnach_entries(self):
-        pn = [e for e in self.catalogue if e["type"] == "pnach"]
+        from src.models.mod import ModType
+        pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
         self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
 
     def test_has_save_file_entries(self):
-        sv = [e for e in self.catalogue if e["type"] == "save_file"]
+        from src.models.mod import ModType
+        sv = [e for e in self.catalogue if e["type"] == ModType.SAVE_FILE]
         self.assertGreater(len(sv), 120, "Expected >120 save file entries")
 
     def test_no_generic_placeholder_authors(self):
@@ -3991,9 +3997,10 @@ class TestCatalogueLoader(unittest.TestCase):
                            "Expected >10 60fps PNACH entries")
 
     def test_60fps_patches_are_pnach_type(self):
+        from src.models.mod import ModType
         for e in self.catalogue:
             if "60fps" in e.get("tags", []):
-                self.assertEqual(e["type"], "pnach",
+                self.assertEqual(e["type"], ModType.PNACH,
                                  f"60fps entry {e['id']} should be pnach type")
 
     # ── CCKrizalid coverage ───────────────────────────────────────────────────

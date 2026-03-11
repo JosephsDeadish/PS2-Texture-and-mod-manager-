@@ -36,6 +36,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from src.models.mod import ModType
+
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -101,8 +103,14 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     """
     entry = dict(entry)  # shallow copy — don't mutate the caller's dict
 
-    # Inject type from the file name (callers do not need to repeat it)
-    entry["type"] = type_str
+    # Inject type from the file name as a ModType enum (callers do not need
+    # to repeat it in every record, and the UI compares against enum values).
+    try:
+        entry["type"] = ModType(type_str)
+    except ValueError:
+        raise ValueError(
+            f"[{source_file.name}] unknown mod type {type_str!r}"
+        )
 
     # Check required fields
     for field in _REQUIRED_FIELDS:

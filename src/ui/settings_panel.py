@@ -18,6 +18,7 @@ from src.core.config_manager import save_config
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
+from src.ui.theme import THEME_KEYS, apply_theme
 
 PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
 APP_VERSION = "1.0.0"
@@ -28,6 +29,7 @@ class SettingsPanel(BasePanel):
 
     settings_saved = pyqtSignal(AppConfig)
     rerun_wizard = pyqtSignal()
+    theme_changed = pyqtSignal(str)  # emits the new theme key when changed
 
     def __init__(self, config: AppConfig, parent=None):
         super().__init__("⚙️  Settings", "Configure PS2 Mod Manager", parent=parent)
@@ -116,12 +118,36 @@ class SettingsPanel(BasePanel):
 
         layout.addWidget(_sep())
 
+        # ---- Theme ----
+        layout.addWidget(_section("Appearance"))
+
+        theme_row = QHBoxLayout()
+        theme_row.addWidget(QLabel("Theme:"))
+        self._theme_combo = QComboBox()
+        for key, display in THEME_KEYS.items():
+            self._theme_combo.addItem(display, key)
+        # Select currently active theme
+        current_key = getattr(self.config, "theme", "dark")
+        idx = self._theme_combo.findData(current_key)
+        if idx >= 0:
+            self._theme_combo.setCurrentIndex(idx)
+        self._theme_combo.currentIndexChanged.connect(self._on_theme_changed)
+        theme_row.addWidget(self._theme_combo)
+        theme_row.addStretch()
+        layout.addLayout(theme_row)
+
+        theme_note = QLabel("ℹ  Theme is applied immediately and saved with settings.")
+        theme_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        layout.addWidget(theme_note)
+
+        layout.addWidget(_sep())
+
         # ---- About / Patreon ----
         layout.addWidget(_section("About"))
 
         about_lbl = QLabel(
             f"<b>PS2 Mod Manager</b>  v{APP_VERSION}<br>"
-            "A free, open-source mod manager for PCSX2.<br><br>"
+            "A free mod manager for PCSX2.<br><br>"
             "Manage texture packs, PNACH patches, cover art, memory cards, and cheats "
             "all in one place.<br><br>"
             f'If you enjoy this app, please consider supporting the developer on '
@@ -137,14 +163,6 @@ class SettingsPanel(BasePanel):
         patreon_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         patreon_btn.clicked.connect(self._open_patreon)
         layout.addWidget(patreon_btn)
-
-        github_lbl = QLabel(
-            '<a href="https://github.com/JosephsDeadish/PS2-Texture-and-mod-manager-" '
-            'style="color:#6090d0;">View Source on GitHub</a>'
-        )
-        github_lbl.setOpenExternalLinks(True)
-        github_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(github_lbl)
 
         layout.addStretch()
         scroll.setWidget(container)
@@ -167,11 +185,22 @@ class SettingsPanel(BasePanel):
         self.config.mods_storage_path = self._storage_chooser.get_path()
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
+        self.config.theme = self._theme_combo.currentData() or "dark"
 
         save_config(self.config)
         self.settings_saved.emit(self.config)
         self.emit_status("Settings saved ✅")
         QMessageBox.information(self, "Saved", "Settings have been saved.")
+
+    def _on_theme_changed(self, _index: int):
+        """Apply the newly selected theme immediately (live preview)."""
+        from PyQt6.QtWidgets import QApplication
+        theme_key = self._theme_combo.currentData() or "dark"
+        self.config.theme = theme_key
+        app = QApplication.instance()
+        if app:
+            apply_theme(app, theme_key)
+        self.theme_changed.emit(theme_key)
 
     def _auto_detect(self):
         from src.core.config_manager import detect_pcsx2_paths
@@ -205,6 +234,11 @@ class SettingsPanel(BasePanel):
         self._storage_chooser.set_path(config.mods_storage_path)
         self._conflicts_check.setChecked(config.show_conflict_warnings)
         self._updates_check.setChecked(config.check_updates_on_start)
+        idx = self._theme_combo.findData(getattr(config, "theme", "dark"))
+        if idx >= 0:
+            self._theme_combo.blockSignals(True)
+            self._theme_combo.setCurrentIndex(idx)
+            self._theme_combo.blockSignals(False)
 
 
 def _section(title: str) -> QLabel:

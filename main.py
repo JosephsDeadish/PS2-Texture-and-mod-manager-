@@ -46,8 +46,11 @@ def main():
     font.setHintingPreference(QFont.HintingPreference.PreferDefaultHinting)
     app.setFont(font)
 
-    # Apply dark theme
-    apply_theme(app)
+    # Load configuration (needed for theme selection)
+    config = load_config()
+
+    # Apply selected theme
+    apply_theme(app, config.theme)
 
     # Set application icon (shows in taskbar / Alt+Tab / title bar / Windows Explorer)
     app_icon = _load_app_icon()
@@ -58,9 +61,6 @@ def main():
     splash = create_splash()
     splash.set_message("Loading configuration…", 0.1)
     app.processEvents()
-
-    # Load configuration
-    config = load_config()
 
     splash.set_message("Initialising mod database…", 0.35)
     app.processEvents()
