@@ -66,47 +66,23 @@ def save_config(config: AppConfig):
 def detect_pcsx2_paths(pcsx2_root: str) -> dict:
     """
     Given a PCSX2 install/config directory, auto-detect sub-folders.
-    Returns a dict with keys: textures_path, pnach_path, cover_art_path,
-    memcards_path, cheats_path.
+
+    Uses :func:`src.core.pcsx2_layout.detect_pcsx2_subfolders` for the full
+    platform-aware detection.  Returns a dict with keys:
+    ``textures_path``, ``pnach_path``, ``cover_art_path``, ``memcards_path``,
+    ``cheats_path``, ``partial_textures_path``.
     """
-    root = Path(pcsx2_root)
-    result = {}
+    from src.core.pcsx2_layout import detect_pcsx2_subfolders
+    return detect_pcsx2_subfolders(pcsx2_root)
 
-    candidates = {
-        "textures_path": [
-            root / "textures",
-            root / "Textures",
-        ],
-        "pnach_path": [
-            root / "cheats",
-            root / "Cheats",
-            root / "patches",
-        ],
-        "cover_art_path": [
-            root / "covers",
-            root / "Covers",
-            root / "cover art",
-        ],
-        "memcards_path": [
-            root / "memcards",
-            root / "MemoryCards",
-            root / "memcards",
-        ],
-        "cheats_path": [
-            root / "cheats_ws",
-            root / "Cheats_WS",
-            root / "cheats",
-            root / "Cheats",
-        ],
-    }
 
-    for key, paths in candidates.items():
-        for p in paths:
-            if p.exists():
-                result[key] = str(p)
-                break
-        else:
-            first = paths[0]
-            result[key] = str(first)
+def auto_detect_pcsx2() -> str:
+    """
+    Probe all known platform-specific PCSX2 install locations and return the
+    first valid config directory found, or ``""`` if PCSX2 cannot be located.
 
-    return result
+    Delegates to :func:`src.core.pcsx2_layout.auto_detect_pcsx2`.
+    """
+    from src.core.pcsx2_layout import auto_detect_pcsx2 as _detect
+    return _detect()
+

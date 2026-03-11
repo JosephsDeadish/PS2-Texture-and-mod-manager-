@@ -103,10 +103,12 @@ class AppConfig:
     cover_art_path: str = ""
     memcards_path: str = ""
     cheats_path: str = ""
+    partial_textures_path: str = ""
     mods_storage_path: str = ""
     theme: str = "dark"
     check_updates_on_start: bool = True
     show_conflict_warnings: bool = True
+    auto_deploy: bool = False
     first_run: bool = True
     favorite_authors: list = field(default_factory=list)
 
@@ -118,10 +120,12 @@ class AppConfig:
             "cover_art_path": self.cover_art_path,
             "memcards_path": self.memcards_path,
             "cheats_path": self.cheats_path,
+            "partial_textures_path": self.partial_textures_path,
             "mods_storage_path": self.mods_storage_path,
             "theme": self.theme,
             "check_updates_on_start": self.check_updates_on_start,
             "show_conflict_warnings": self.show_conflict_warnings,
+            "auto_deploy": self.auto_deploy,
             "first_run": self.first_run,
             "favorite_authors": self.favorite_authors,
         }

@@ -76,6 +76,10 @@ class SettingsPanel(BasePanel):
         self._cheats_chooser.set_path(self.config.cheats_path)
         layout.addWidget(self._cheats_chooser)
 
+        self._partial_tex_chooser = PathChooser("Partial Textures Folder:")
+        self._partial_tex_chooser.set_path(self.config.partial_textures_path)
+        layout.addWidget(self._partial_tex_chooser)
+
         self._storage_chooser = PathChooser("Mod Storage Folder:")
         self._storage_chooser.set_path(self.config.mods_storage_path)
         layout.addWidget(self._storage_chooser)
@@ -92,6 +96,12 @@ class SettingsPanel(BasePanel):
         self._updates_check = QCheckBox("Check for mod updates on startup")
         self._updates_check.setChecked(self.config.check_updates_on_start)
         layout.addWidget(self._updates_check)
+
+        self._auto_deploy_check = QCheckBox(
+            "Auto-deploy mods to PCSX2 when enabled/disabled"
+        )
+        self._auto_deploy_check.setChecked(self.config.auto_deploy)
+        layout.addWidget(self._auto_deploy_check)
 
         layout.addWidget(_sep())
 
@@ -151,9 +161,11 @@ class SettingsPanel(BasePanel):
         self.config.cover_art_path = self._covers_chooser.get_path()
         self.config.memcards_path = self._memcards_chooser.get_path()
         self.config.cheats_path = self._cheats_chooser.get_path()
+        self.config.partial_textures_path = self._partial_tex_chooser.get_path()
         self.config.mods_storage_path = self._storage_chooser.get_path()
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
+        self.config.auto_deploy = self._auto_deploy_check.isChecked()
 
         save_config(self.config)
         self.settings_saved.emit(self.config)
@@ -172,6 +184,7 @@ class SettingsPanel(BasePanel):
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
         self._memcards_chooser.set_path(paths.get("memcards_path", ""))
         self._cheats_chooser.set_path(paths.get("cheats_path", ""))
+        self._partial_tex_chooser.set_path(paths.get("partial_textures_path", ""))
 
     def _open_patreon(self):
         from PyQt6.QtGui import QDesktopServices
@@ -187,9 +200,11 @@ class SettingsPanel(BasePanel):
         self._covers_chooser.set_path(config.cover_art_path)
         self._memcards_chooser.set_path(config.memcards_path)
         self._cheats_chooser.set_path(config.cheats_path)
+        self._partial_tex_chooser.set_path(config.partial_textures_path)
         self._storage_chooser.set_path(config.mods_storage_path)
         self._conflicts_check.setChecked(config.show_conflict_warnings)
         self._updates_check.setChecked(config.check_updates_on_start)
+        self._auto_deploy_check.setChecked(config.auto_deploy)
 
 
 def _section(title: str) -> QLabel:

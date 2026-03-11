@@ -233,6 +233,30 @@ class SetupWizard(QDialog):
         note.setWordWrap(True)
         layout.addWidget(note)
 
+        # ── Automatic mode ──
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        layout.addWidget(sep)
+
+        layout.addWidget(_h("Automatic Setup"))
+        layout.addWidget(_p(
+            "Check this option to let PS2 Mod Manager automatically create any\n"
+            "missing PCSX2 sub-folders (textures/, covers/, cheats/, etc.) and\n"
+            "deploy enabled mods whenever you toggle them on."
+        ))
+
+        self._auto_create_dirs_check = QCheckBox(
+            "Create missing PCSX2 folders automatically"
+        )
+        self._auto_create_dirs_check.setChecked(False)
+        layout.addWidget(self._auto_create_dirs_check)
+
+        self._auto_deploy_check = QCheckBox(
+            "Auto-deploy mods to PCSX2 when enabled/disabled"
+        )
+        self._auto_deploy_check.setChecked(self.config.auto_deploy)
+        layout.addWidget(self._auto_deploy_check)
+
         layout.addStretch()
         return w
 
@@ -253,14 +277,14 @@ class SetupWizard(QDialog):
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
-        desc = QLabel(
+        self._done_summary = QLabel(
             "PS2 Mod Manager is ready to use.\n"
             "You can change these settings at any time from the Settings panel."
         )
-        desc.setStyleSheet("color: #9090b0; font-size: 14px;")
-        desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        desc.setWordWrap(True)
-        layout.addWidget(desc)
+        self._done_summary.setStyleSheet("color: #9090b0; font-size: 14px;")
+        self._done_summary.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._done_summary.setWordWrap(True)
+        layout.addWidget(self._done_summary)
         layout.addStretch()
 
         return w
@@ -287,6 +311,8 @@ class SetupWizard(QDialog):
         self._back_btn.setEnabled(self._page_index > 0)
 
         if self._page_index == len(self._PAGES) - 1:
+            # Entering "Done" page — run automatic actions and update summary
+            self._run_automatic_setup()
             self._next_btn.setText("Finish ✓")
             self._next_btn.setObjectName("success_btn")
             self._skip_btn.hide()
@@ -316,6 +342,45 @@ class SetupWizard(QDialog):
             self.config.cheats_path = self._cheats_chooser.get_path()
         elif page == 3:
             self.config.mods_storage_path = self._storage_chooser.get_path()
+            self.config.auto_deploy = self._auto_deploy_check.isChecked()
+
+    def _run_automatic_setup(self):
+        """
+        If the user checked 'Create missing PCSX2 folders', scaffold the
+        standard PCSX2 directory tree now.  Updates the Done-page summary.
+        """
+        summary_lines = []
+
+        if (
+            hasattr(self, "_auto_create_dirs_check")
+            and self._auto_create_dirs_check.isChecked()
+            and self.config.pcsx2_path
+        ):
+            try:
+                from src.core.pcsx2_layout import create_pcsx2_directories
+                created = create_pcsx2_directories(self.config.pcsx2_path)
+                if created:
+                    summary_lines.append(
+                        f"📁 Created {len(created)} missing PCSX2 folder(s)."
+                    )
+                else:
+                    summary_lines.append("📁 All PCSX2 folders already exist.")
+            except Exception as exc:
+                summary_lines.append(f"⚠️  Could not create folders: {exc}")
+
+        if self.config.pcsx2_path:
+            summary_lines.append(f"📂 PCSX2: {self.config.pcsx2_path}")
+        if self.config.textures_path:
+            summary_lines.append(f"🖼  Textures: {self.config.textures_path}")
+        if self.config.pnach_path:
+            summary_lines.append(f"📝 PNACH: {self.config.pnach_path}")
+        if self.config.cover_art_path:
+            summary_lines.append(f"🎨 Covers: {self.config.cover_art_path}")
+        if self.config.auto_deploy:
+            summary_lines.append("⚡ Auto-deploy: enabled")
+
+        if summary_lines:
+            self._done_summary.setText("\n".join(summary_lines))
 
     def _finish(self):
         self._collect_current_page()
@@ -339,6 +404,19 @@ class SetupWizard(QDialog):
             self._auto_fill_from_path(path)
 
     def _auto_detect(self):
+        # Try the new comprehensive detector first
+        try:
+            from src.core.pcsx2_layout import auto_detect_pcsx2
+            found = auto_detect_pcsx2()
+            if found:
+                self._pcsx2_chooser.set_path(found)
+                self._auto_fill_from_path(found)
+                self._pcsx2_status.setText(f"✅ Found: {found}")
+                return
+        except Exception:
+            pass
+
+        # Fallback to legacy candidate list
         candidates = [
             Path.home() / "snap" / "pcsx2" / "current" / ".config" / "PCSX2",
             Path.home() / ".config" / "PCSX2",
@@ -362,6 +440,8 @@ class SetupWizard(QDialog):
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
         self._memcards_chooser.set_path(paths.get("memcards_path", ""))
         self._cheats_chooser.set_path(paths.get("cheats_path", ""))
+        # Store partial_textures_path in config immediately
+        self.config.partial_textures_path = paths.get("partial_textures_path", "")
 
 
 # ---------------------------------------------------------------------------
@@ -379,3 +459,4 @@ def _p(text: str) -> QLabel:
     lbl.setStyleSheet("color: #9090b0; font-size: 13px;")
     lbl.setWordWrap(True)
     return lbl
+

@@ -1653,5 +1653,328 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         self.assertGreaterEqual(len(ids), 40, f"Expected ≥40 entries, got {len(ids)}")
 
 
+# =============================================================================
+# PCSX2 Layout module
+# =============================================================================
+
+class TestPcsx2Layout(unittest.TestCase):
+    """Tests for src.core.pcsx2_layout — PCSX2 hierarchy, deploy paths, scaffolding."""
+
+    # ------------------------------------------------------------------
+    # PCSX2_HIERARCHY constant
+    # ------------------------------------------------------------------
+
+    def test_hierarchy_exported(self):
+        from src.core.pcsx2_layout import PCSX2_HIERARCHY
+        self.assertIsInstance(PCSX2_HIERARCHY, dict)
+        self.assertGreater(len(PCSX2_HIERARCHY), 5)
+
+    def test_hierarchy_contains_standard_folders(self):
+        from src.core.pcsx2_layout import PCSX2_HIERARCHY
+        for folder in ("bios", "cheats", "cheats_ws", "covers", "memcards", "textures"):
+            self.assertIn(folder, PCSX2_HIERARCHY, f"Missing folder: {folder}")
+
+    def test_hierarchy_descriptions_nonempty(self):
+        from src.core.pcsx2_layout import PCSX2_HIERARCHY
+        for folder, desc in PCSX2_HIERARCHY.items():
+            self.assertTrue(desc, f"Empty description for folder: {folder}")
+
+    def test_folder_description(self):
+        from src.core.pcsx2_layout import folder_description
+        self.assertIn("PNACH", folder_description("cheats"))
+        self.assertIn("cover", folder_description("covers").lower())
+        self.assertEqual(folder_description("unknown_xyz"), "")
+
+    # ------------------------------------------------------------------
+    # get_deploy_path
+    # ------------------------------------------------------------------
+
+    def test_get_deploy_path_texture_pack(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig(textures_path="/pcsx2/textures")
+        self.assertEqual(get_deploy_path(cfg, ModType.TEXTURE_PACK), "/pcsx2/textures")
+
+    def test_get_deploy_path_pnach(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig(pnach_path="/pcsx2/cheats")
+        self.assertEqual(get_deploy_path(cfg, ModType.PNACH), "/pcsx2/cheats")
+
+    def test_get_deploy_path_cover_art(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig(cover_art_path="/pcsx2/covers")
+        self.assertEqual(get_deploy_path(cfg, ModType.COVER_ART), "/pcsx2/covers")
+
+    def test_get_deploy_path_save_file(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig(memcards_path="/pcsx2/memcards")
+        self.assertEqual(get_deploy_path(cfg, ModType.SAVE_FILE), "/pcsx2/memcards")
+
+    def test_get_deploy_path_cheat(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig(cheats_path="/pcsx2/cheats_ws")
+        self.assertEqual(get_deploy_path(cfg, ModType.CHEAT), "/pcsx2/cheats_ws")
+
+    def test_get_deploy_path_empty_config_returns_empty(self):
+        from src.core.pcsx2_layout import get_deploy_path
+        cfg = AppConfig()
+        self.assertEqual(get_deploy_path(cfg, ModType.TEXTURE_PACK), "")
+
+    # ------------------------------------------------------------------
+    # Texture replacement path helpers
+    # ------------------------------------------------------------------
+
+    def test_get_texture_replacements_path(self):
+        from src.core.pcsx2_layout import get_texture_replacements_path
+        result = get_texture_replacements_path("/pcsx2/textures", "SLUS-20062")
+        self.assertTrue(result.endswith("SLUS-20062/replacements") or
+                        result.endswith("SLUS-20062\\replacements"))
+
+    def test_get_texture_replacements_path_empty_inputs(self):
+        from src.core.pcsx2_layout import get_texture_replacements_path
+        self.assertEqual(get_texture_replacements_path("", "SLUS-20062"), "")
+        self.assertEqual(get_texture_replacements_path("/textures", ""), "")
+
+    def test_get_texture_dumps_path(self):
+        from src.core.pcsx2_layout import get_texture_dumps_path
+        result = get_texture_dumps_path("/pcsx2/textures", "SCUS-97399")
+        self.assertTrue("dumps" in result)
+        self.assertTrue("SCUS-97399" in result)
+
+    # ------------------------------------------------------------------
+    # create_pcsx2_directories + ensure_texture_game_dirs
+    # ------------------------------------------------------------------
+
+    def test_create_pcsx2_directories(self):
+        from src.core.pcsx2_layout import create_pcsx2_directories, PCSX2_HIERARCHY
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = os.path.join(tmpdir, "pcsx2")
+            created = create_pcsx2_directories(root)
+            # All standard folders should now exist
+            for folder in PCSX2_HIERARCHY:
+                self.assertTrue(
+                    (Path(root) / folder).exists(),
+                    f"Missing folder after scaffold: {folder}",
+                )
+            # Returns list of created paths
+            self.assertIsInstance(created, list)
+
+    def test_create_pcsx2_directories_idempotent(self):
+        from src.core.pcsx2_layout import create_pcsx2_directories
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = os.path.join(tmpdir, "pcsx2")
+            create_pcsx2_directories(root)
+            # Second call should not raise, and nothing new to create
+            created2 = create_pcsx2_directories(root)
+            self.assertEqual(created2, [])
+
+    def test_ensure_texture_game_dirs(self):
+        from src.core.pcsx2_layout import ensure_texture_game_dirs
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = ensure_texture_game_dirs(tmpdir, "SLUS-20062")
+            self.assertIn("replacements", result)
+            self.assertIn("dumps", result)
+            self.assertTrue(Path(result["replacements"]).is_dir())
+            self.assertTrue(Path(result["dumps"]).is_dir())
+            self.assertIn("SLUS-20062", result["replacements"])
+
+    # ------------------------------------------------------------------
+    # detect_pcsx2_subfolders
+    # ------------------------------------------------------------------
+
+    def test_detect_pcsx2_subfolders_returns_all_keys(self):
+        from src.core.pcsx2_layout import detect_pcsx2_subfolders
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = detect_pcsx2_subfolders(tmpdir)
+            for key in ("textures_path", "pnach_path", "cover_art_path",
+                        "memcards_path", "cheats_path", "partial_textures_path"):
+                self.assertIn(key, result, f"Missing key: {key}")
+
+    def test_detect_pcsx2_subfolders_uses_existing(self):
+        from src.core.pcsx2_layout import detect_pcsx2_subfolders
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a non-default sub-folder name that PCSX2 sometimes uses
+            (Path(tmpdir) / "Covers").mkdir()
+            result = detect_pcsx2_subfolders(tmpdir)
+            # Should prefer existing "Covers" over non-existing "covers"
+            self.assertIn("Covers", result["cover_art_path"])
+
+    def test_detect_pcsx2_subfolders_canonical_default(self):
+        from src.core.pcsx2_layout import detect_pcsx2_subfolders
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Nothing exists — should return canonical names
+            result = detect_pcsx2_subfolders(tmpdir)
+            self.assertTrue(result["textures_path"].endswith("textures"))
+
+    # ------------------------------------------------------------------
+    # auto_detect_pcsx2 (mocked — we can't assume PCSX2 is installed)
+    # ------------------------------------------------------------------
+
+    def test_auto_detect_returns_string(self):
+        from src.core.pcsx2_layout import auto_detect_pcsx2
+        result = auto_detect_pcsx2()
+        self.assertIsInstance(result, str)
+
+    def test_auto_detect_returns_existing_path_when_found(self):
+        from src.core.pcsx2_layout import auto_detect_pcsx2, PCSX2_HIERARCHY
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a fake PCSX2 root with enough sub-folders to score highly
+            fake_pcsx2 = Path(tmpdir) / ".config" / "PCSX2"
+            fake_pcsx2.mkdir(parents=True)
+            for sub in ("bios", "textures", "cheats", "covers"):
+                (fake_pcsx2 / sub).mkdir()
+
+            # Patch _candidate_paths to include our fake dir
+            from src.core import pcsx2_layout
+            orig = pcsx2_layout._candidate_paths
+
+            def _fake_candidates():
+                return [fake_pcsx2] + orig()
+
+            pcsx2_layout._candidate_paths = _fake_candidates
+            try:
+                result = auto_detect_pcsx2()
+                self.assertEqual(result, str(fake_pcsx2))
+            finally:
+                pcsx2_layout._candidate_paths = orig
+
+
+# =============================================================================
+# AppConfig new fields
+# =============================================================================
+
+class TestAppConfigNewFields(unittest.TestCase):
+    """Tests for partial_textures_path and auto_deploy fields added to AppConfig."""
+
+    def test_default_partial_textures_path(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.partial_textures_path, "")
+
+    def test_default_auto_deploy(self):
+        cfg = AppConfig()
+        self.assertFalse(cfg.auto_deploy)
+
+    def test_to_dict_includes_new_fields(self):
+        cfg = AppConfig(partial_textures_path="/tex", auto_deploy=True)
+        d = cfg.to_dict()
+        self.assertEqual(d["partial_textures_path"], "/tex")
+        self.assertTrue(d["auto_deploy"])
+
+    def test_from_dict_restores_new_fields(self):
+        cfg = AppConfig(partial_textures_path="/pt", auto_deploy=True)
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(restored.partial_textures_path, "/pt")
+        self.assertTrue(restored.auto_deploy)
+
+    def test_from_dict_old_config_no_crash(self):
+        """Old configs without the new fields should not crash."""
+        old_data = {
+            "pcsx2_path": "/foo",
+            "textures_path": "/tex",
+            "pnach_path": "/cheats",
+            "cover_art_path": "/covers",
+            "memcards_path": "/mc",
+            "cheats_path": "/ws",
+            "mods_storage_path": "/mods",
+            "theme": "dark",
+            "check_updates_on_start": True,
+            "show_conflict_warnings": True,
+            "first_run": False,
+            "favorite_authors": [],
+        }
+        cfg = AppConfig.from_dict(old_data)
+        self.assertEqual(cfg.partial_textures_path, "")
+        self.assertFalse(cfg.auto_deploy)
+
+
+# =============================================================================
+# is_valid_serial
+# =============================================================================
+
+class TestIsValidSerial(unittest.TestCase):
+    """Tests for game_registry.is_valid_serial()."""
+
+    def test_valid_known_serial(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLUS-20062"))
+
+    def test_valid_unknown_but_correct_format(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLUS-99999"))
+
+    def test_valid_underscore_separator(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLUS_99999"))
+
+    def test_valid_no_separator(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLUS99999"))
+
+    def test_valid_pal_serial(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLES-54354"))
+
+    def test_valid_jp_serial(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SLPS-25088"))
+
+    def test_valid_demo_prefix(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("SCED-12345"))
+
+    def test_invalid_unknown_prefix(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertFalse(is_valid_serial("XXXX-12345"))
+
+    def test_invalid_too_few_digits(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertFalse(is_valid_serial("SLUS-1234"))
+
+    def test_invalid_too_many_digits(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertFalse(is_valid_serial("SLUS-123456"))
+
+    def test_invalid_empty_string(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertFalse(is_valid_serial(""))
+
+    def test_invalid_random_text(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertFalse(is_valid_serial("MyTexturePack"))
+
+    def test_invalid_crc_hex(self):
+        from src.core.game_registry import is_valid_serial
+        # CRC-style PNACH filename — not a serial
+        self.assertFalse(is_valid_serial("F0A235B4"))
+
+    def test_case_insensitive(self):
+        from src.core.game_registry import is_valid_serial
+        self.assertTrue(is_valid_serial("slus-20062"))
+        self.assertTrue(is_valid_serial("Slus-20062"))
+
+
+# =============================================================================
+# config_manager.detect_pcsx2_paths delegates to pcsx2_layout
+# =============================================================================
+
+class TestDetectPcsx2Paths(unittest.TestCase):
+    """detect_pcsx2_paths should return all expected keys via pcsx2_layout."""
+
+    def test_returns_all_keys(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = detect_pcsx2_paths(tmpdir)
+            for key in ("textures_path", "pnach_path", "cover_art_path",
+                        "memcards_path", "cheats_path", "partial_textures_path"):
+                self.assertIn(key, result)
+
+    def test_existing_subfolder_preferred(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            (Path(tmpdir) / "Cheats").mkdir()
+            result = detect_pcsx2_paths(tmpdir)
+            self.assertTrue(
+                result["pnach_path"].endswith("Cheats") or
+                "Cheats" in result["pnach_path"]
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

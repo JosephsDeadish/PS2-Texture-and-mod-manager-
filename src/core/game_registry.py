@@ -655,3 +655,28 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
          if frag in title.lower()],
         key=lambda x: x[0],
     )
+
+
+def is_valid_serial(text: str) -> bool:
+    """
+    Return ``True`` if *text* is a syntactically valid PS2 disc serial.
+
+    A valid serial consists of a recognised 4-letter region prefix followed
+    by an optional separator (``-`` or ``_``) and exactly 5 digits.  The
+    serial does not need to be present in the built-in titles registry —
+    this function validates *format only*, so any real PS2 disc that was
+    never added to ``_KNOWN_SERIALS`` is still accepted.
+
+    Examples::
+
+        is_valid_serial("SLUS-20062")  # True  (known title)
+        is_valid_serial("SLUS-99999")  # True  (unknown, but valid format)
+        is_valid_serial("SLUS_99999")  # True  (underscore separator)
+        is_valid_serial("SLUS99999")   # True  (no separator)
+        is_valid_serial("XXXX-12345")  # False (unknown prefix)
+        is_valid_serial("SLUS-1234")   # False (only 4 digits)
+        is_valid_serial("")            # False
+    """
+    if not text:
+        return False
+    return bool(_parse_serial(text.strip()))
