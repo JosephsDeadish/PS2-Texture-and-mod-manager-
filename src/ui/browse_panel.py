@@ -2008,6 +2008,137 @@ CATALOGUE: List[dict] = [
         "download_action": "",
         "upscale_tech": "ESRGAN / xBRZ",
     },
+    # ── The Legend of Spyro: A New Beginning — DurinDragon (GBAtemp) ─────────
+    # Source: https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/
+    # Three separate variants — each has its own MediaFire download link.
+    {
+        "id": "spyro_anb_6x_extra_detail",
+        "name": "The Legend of Spyro: A New Beginning — 6x Upscale + Extra Detail",
+        "description": (
+            "Full HD texture replacement pack for The Legend of Spyro: A New Beginning "
+            "(SLUS-21372) by DurinDragon. "
+            "6× ESRGAN upscale with extra-detail pass for sharper fine features. "
+            "The largest and most detailed of the three available variants. "
+            "Free download on MediaFire."
+        ),
+        "context": (
+            "Download steps: 1) Click '⬇ Install In-App' — the app will resolve the "
+            "MediaFire page and start the download automatically. "
+            "2) Enter Game ID SLUS-21372 when prompted. "
+            "Or visit the GBAtemp thread to see screenshots and pick a variant manually."
+        ),
+        "author": "DurinDragon",
+        "author_url": "https://gbatemp.net/members/durindragon.778677/#recent-content",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "The Legend of Spyro: A New Beginning",
+        "thumbnail_url": "",
+        "tags": ["spyro", "a new beginning", "6x", "esrgan", "extra-detail", "hd", "ps2", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "https://www.mediafire.com/file/y1057yt4l2ndobn/Spyro_ANB_SLUS-21372_HD_TEXTURE_PACK_6xUPSCALE_with_EXTRA_DETAIL.zip/file",
+        "upscale_tech": "ESRGAN 6×",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "spyro_anb_6x_only",
+        "name": "The Legend of Spyro: A New Beginning — 6x Upscale Only",
+        "description": (
+            "HD texture replacement pack for The Legend of Spyro: A New Beginning "
+            "(SLUS-21372) by DurinDragon. "
+            "Pure 6× ESRGAN upscale without the extra-detail pass — smaller file size, "
+            "faithful to the original art style. "
+            "Free download on MediaFire."
+        ),
+        "context": (
+            "Click '⬇ Install In-App' to auto-resolve the MediaFire page and download. "
+            "Enter Game ID SLUS-21372 when prompted. "
+            "Choose this variant if you want a clean upscale without additional sharpening."
+        ),
+        "author": "DurinDragon",
+        "author_url": "https://gbatemp.net/members/durindragon.778677/#recent-content",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "The Legend of Spyro: A New Beginning",
+        "thumbnail_url": "",
+        "tags": ["spyro", "a new beginning", "6x", "esrgan", "clean", "hd", "ps2", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "https://www.mediafire.com/file/vkkkunm8kj09bh3/Spyro_ANB_SLUS-21372_HD_Texture_Pack_ONLY_6x_UPSCALE.zip/file",
+        "upscale_tech": "ESRGAN 6×",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "spyro_anb_4x_anime",
+        "name": "The Legend of Spyro: A New Beginning — 4x Upscale Anime Style",
+        "description": (
+            "HD texture replacement pack for The Legend of Spyro: A New Beginning "
+            "(SLUS-21372) by DurinDragon. "
+            "4× upscale using an anime-tuned ESRGAN model — vivid colours and bold lines. "
+            "Best for players who prefer a stylised look over photorealism. "
+            "Free download on MediaFire."
+        ),
+        "context": (
+            "Click '⬇ Install In-App' to auto-resolve the MediaFire page and download. "
+            "Enter Game ID SLUS-21372 when prompted. "
+            "Choose this variant for a vibrant, cartoon-inspired aesthetic."
+        ),
+        "author": "DurinDragon",
+        "author_url": "https://gbatemp.net/members/durindragon.778677/#recent-content",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "The Legend of Spyro: A New Beginning",
+        "thumbnail_url": "",
+        "tags": ["spyro", "a new beginning", "4x", "anime", "esrgan", "hd", "ps2", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "https://www.mediafire.com/file/3jilfm7ahm6bs62/Spyro_ANB_SLUS-21372_HD_Texture_Pack_4x_UPSCALE_Anime_Textures.zip/file",
+        "upscale_tech": "ESRGAN 4× anime",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "spyro_anb_mediafire_folder",
+        "name": "The Legend of Spyro: A New Beginning — All Variants (MediaFire Folder)",
+        "description": (
+            "MediaFire folder containing all three HD texture variants for "
+            "The Legend of Spyro: A New Beginning (SLUS-21372) by DurinDragon: "
+            "6x Upscale + Extra Detail, 6x Upscale Only, and 4x Anime Upscale. "
+            "Visit the folder to pick and download any combination."
+        ),
+        "context": (
+            "Open the MediaFire folder via '🌐 Visit Source' to browse all files. "
+            "Then install individual ZIPs via the individual variant cards, "
+            "or paste the direct zip URL into '⬇ Download from URL' in this card."
+        ),
+        "author": "DurinDragon",
+        "author_url": "https://gbatemp.net/members/durindragon.778677/#recent-content",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.mediafire.com/folder/jpnyulhtdvd77/Spyro_A_new_Beginning_SLUS-21372",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "The Legend of Spyro: A New Beginning",
+        "thumbnail_url": "",
+        "tags": ["spyro", "a new beginning", "mediafire", "all-variants", "hd", "ps2", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN 4×–6×",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
     {
         "id": "crash_woc_textures",
         "name": "Crash Bandicoot: Wrath of Cortex — HD Textures",
@@ -5554,8 +5685,8 @@ class DownloadInstallDialog(QDialog):
 
         info = QLabel(
             "<b>Paste a direct download URL below.</b><br>"
-            "Supported: HTTPS links to ZIP, 7z, PNACH, PNG.<br>"
-            "Google Drive share links are auto-converted. "
+            "Supported: HTTPS links to ZIP, 7z, PNACH, PNG, Google Drive, "
+            "<span style='color:#60b0e0;'>MediaFire</span> (auto-resolved).<br>"
             "MEGA links must be downloaded manually.<br>"
             "<span style='color:#a08040;'>🔒 Patreon attachments:</span> "
             "log in to Patreon, open the post, download <b>all parts</b> to the same "
@@ -5639,14 +5770,40 @@ class DownloadInstallDialog(QDialog):
         layout.addLayout(btns)
 
     @staticmethod
-    def _convert_url(url: str) -> str:
-        import re
-        m = re.search(r"drive\.google\.com/file/d/([^/?]+)", url)
+    def _convert_url(url: str) -> Optional[str]:
+        """Convert a share-page URL to a direct download URL where possible.
+
+        Handles:
+        * Google Drive share links → direct ``uc?export=download`` URL
+        * MediaFire file-page links → resolved via :func:`resolve_mediafire_url`
+
+        Returns the converted URL, or the original *url* unchanged if no
+        conversion was needed.  Returns ``None`` if a MediaFire page fetch was
+        attempted but failed (so the caller can show an appropriate error).
+        """
+        import re as _re
+        # Google Drive
+        m = _re.search(r"drive\.google\.com/file/d/([^/?]+)", url)
         if m:
             return f"https://drive.google.com/uc?export=download&id={m.group(1)}"
-        m2 = re.search(r"drive\.google\.com/open[?]id=([^&]+)", url)
+        m2 = _re.search(r"drive\.google\.com/open[?]id=([^&]+)", url)
         if m2:
             return f"https://drive.google.com/uc?export=download&id={m2.group(1)}"
+
+        # MediaFire file page — resolve to direct download URL
+        try:
+            import urllib.parse as _up
+            _psd = _up.urlparse(url)
+            _netloc = _psd.netloc.lower()
+            _is_mf = (_netloc in ("www.mediafire.com", "mediafire.com")
+                      and "/file/" in _psd.path.lower())
+        except Exception:
+            _is_mf = False
+        if _is_mf:
+            from src.core.downloader import resolve_mediafire_url
+            resolved = resolve_mediafire_url(url)
+            return resolved  # None if resolution failed
+
         return url
 
     def _download(self):
@@ -5662,7 +5819,41 @@ class DownloadInstallDialog(QDialog):
                 "the ➕ Import button in the relevant mod panel.",
             )
             return
+        try:
+            import urllib.parse as _up
+            _psd2 = _up.urlparse(raw_url)
+            _nl2 = _psd2.netloc.lower()
+            _is_mf_raw = (_nl2 in ("www.mediafire.com", "mediafire.com")
+                          and "/file/" in _psd2.path.lower())
+        except Exception:
+            _is_mf_raw = False
+        if _is_mf_raw:
+            self._dl_btn.setEnabled(False)
+            self._progress.show()
+            self._status.setText("🔍 Resolving MediaFire link…")
+
+            def _resolve_then_download():
+                url = self._convert_url(raw_url)
+                if not url:
+                    def _mf_err():
+                        self._status.setText(
+                            "❌  Could not resolve MediaFire download link.\n"
+                            "Please open the MediaFire page in your browser, click Download,\n"
+                            "and paste the resulting direct URL here."
+                        )
+                        self._progress.hide()
+                        self._dl_btn.setEnabled(True)
+                    QTimer.singleShot(0, _mf_err)
+                    return
+                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
+                self._run_download(raw_url, url)
+
+            threading.Thread(target=_resolve_then_download, daemon=True).start()
+            return
+
         url = self._convert_url(raw_url)
+        if url is None:
+            url = raw_url
         mod_type = self._type_combo.currentData()
         storage = self.config.mods_storage_path
         if not storage:
@@ -5672,6 +5863,20 @@ class DownloadInstallDialog(QDialog):
         self._dl_btn.setEnabled(False)
         self._progress.show()
         self._status.setText("Downloading...")
+        self._run_download(raw_url, url)
+
+    def _run_download(self, raw_url: str, url: str):
+        """Perform the actual file download + install on a background thread."""
+        mod_type = self._type_combo.currentData()
+        storage = self.config.mods_storage_path
+        if not storage:
+            def _no_storage():
+                QMessageBox.warning(self, "Storage Not Configured",
+                    "Please configure a Mod Storage folder in Settings first.")
+                self._progress.hide()
+                self._dl_btn.setEnabled(True)
+            QTimer.singleShot(0, _no_storage)
+            return
 
         def _run():
             try:
@@ -5974,6 +6179,216 @@ class PnachGitHubDialog(QDialog):
 
 
 # ---------------------------------------------------------------------------
+# GBAtemp thread scraper dialog
+# ---------------------------------------------------------------------------
+
+class GBATempScraperDialog(QDialog):
+    """Paste a GBAtemp thread URL to auto-discover author info and download links.
+
+    The dialog:
+    1. Fetches and parses the GBAtemp thread page (via :func:`scrape_gbatemp_thread`)
+    2. Shows the detected title, author, game serial, and every download link found
+    3. Lets the user one-click-install any of the discovered variants
+    """
+
+    def __init__(self, config: AppConfig, db, parent=None):
+        super().__init__(parent)
+        self.config = config
+        self.db = db
+        self.setWindowTitle("🔍 Scrape GBAtemp Thread")
+        self.setMinimumSize(720, 560)
+        self._build()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(18, 18, 18, 18)
+
+        intro = QLabel(
+            "<b>Paste a GBAtemp thread URL</b> to automatically discover the author, "
+            "game serial, and all download links (MediaFire, Google Drive, MEGA, etc.).<br>"
+            "Each discovered link is offered as a one-click install."
+        )
+        intro.setTextFormat(Qt.TextFormat.RichText)
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
+
+        url_row = QHBoxLayout()
+        url_row.addWidget(QLabel("GBAtemp URL:"))
+        self._url_edit = QLineEdit()
+        self._url_edit.setPlaceholderText(
+            "https://gbatemp.net/threads/<thread-name>.<id>/"
+        )
+        url_row.addWidget(self._url_edit, 1)
+        self._scan_btn = QPushButton("🔍 Scan")
+        self._scan_btn.setObjectName("primary_btn")
+        self._scan_btn.clicked.connect(self._scan)
+        url_row.addWidget(self._scan_btn)
+        layout.addLayout(url_row)
+
+        # Results area (hidden until a scan completes)
+        self._results_frame = QFrame()
+        self._results_frame.setObjectName("card")
+        self._results_frame.hide()
+        self._results_layout = QVBoxLayout(self._results_frame)
+        self._results_layout.setContentsMargins(12, 10, 12, 10)
+        self._results_layout.setSpacing(8)
+        layout.addWidget(self._results_frame)
+
+        self._status = QLabel("")
+        self._status.setWordWrap(True)
+        self._status.setStyleSheet("color: #9090b0;")
+        layout.addWidget(self._status)
+
+        self._progress = QProgressBar()
+        self._progress.setRange(0, 0)
+        self._progress.hide()
+        layout.addWidget(self._progress)
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.reject)
+        layout.addWidget(close_btn, 0, Qt.AlignmentFlag.AlignRight)
+
+    # ------------------------------------------------------------------
+    def _scan(self):
+        url = self._url_edit.text().strip()
+        if not url:
+            self._status.setText("⚠  Please enter a GBAtemp thread URL")
+            return
+        if "gbatemp.net" not in url.lower():
+            self._status.setText("⚠  URL does not appear to be a GBAtemp thread")
+            return
+
+        self._scan_btn.setEnabled(False)
+        self._progress.show()
+        self._status.setText("Fetching thread…")
+        # Clear previous results
+        while self._results_layout.count():
+            item = self._results_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        self._results_frame.hide()
+
+        def _run():
+            from src.core.downloader import scrape_gbatemp_thread
+            data = scrape_gbatemp_thread(url)
+            QTimer.singleShot(0, lambda: self._show_results(data))
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _show_results(self, data: dict):
+        self._progress.hide()
+        self._scan_btn.setEnabled(True)
+
+        if not data.get("title") and not data.get("download_urls"):
+            self._status.setText(
+                "❌  Could not parse the thread. "
+                "Check that the URL is a public GBAtemp thread and try again."
+            )
+            return
+
+        self._status.setText("")
+        rl = self._results_layout
+
+        # ── Meta row ────────────────────────────────────────────────────
+        title_lbl = QLabel(f"<b>{data.get('title', '(unknown title)')}</b>")
+        title_lbl.setTextFormat(Qt.TextFormat.RichText)
+        title_lbl.setWordWrap(True)
+        rl.addWidget(title_lbl)
+
+        meta_row = QHBoxLayout()
+        if data.get("author"):
+            author_lbl = QLabel(f"👤 {data['author']}")
+            author_lbl.setStyleSheet("color: #8080c0;")
+            meta_row.addWidget(author_lbl)
+        if data.get("game_serial"):
+            serial_lbl = QLabel(f"🎮 {data['game_serial']}")
+            serial_lbl.setStyleSheet("color: #80b0ff;")
+            meta_row.addWidget(serial_lbl)
+        meta_row.addStretch()
+        rl.addLayout(meta_row)
+
+        download_urls = data.get("download_urls", [])
+        if not download_urls:
+            rl.addWidget(QLabel("ℹ  No recognised download links found in this thread."))
+            self._results_frame.show()
+            return
+
+        rl.addWidget(QLabel(f"Found <b>{len(download_urls)}</b> download link(s):"))
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setMaximumHeight(260)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        links_widget = QWidget()
+        links_layout = QVBoxLayout(links_widget)
+        links_layout.setSpacing(6)
+        links_layout.setContentsMargins(0, 0, 0, 0)
+        scroll.setWidget(links_widget)
+        rl.addWidget(scroll)
+
+        for dl in download_urls:
+            row_frame = QFrame()
+            row_frame.setObjectName("card")
+            row_layout = QHBoxLayout(row_frame)
+            row_layout.setContentsMargins(8, 6, 8, 6)
+
+            host_lbl = QLabel(f"[{dl['host']}]")
+            host_lbl.setStyleSheet("color: #6090c0; font-size: 10px; min-width: 80px;")
+            row_layout.addWidget(host_lbl)
+
+            label_lbl = QLabel(dl["label"])
+            label_lbl.setStyleSheet("color: #c0c0e0; font-size: 11px;")
+            label_lbl.setWordWrap(True)
+            row_layout.addWidget(label_lbl, 1)
+
+            # Open button (browser)
+            open_btn = QPushButton("🌐")
+            open_btn.setFixedSize(28, 26)
+            open_btn.setToolTip("Open in browser")
+            open_btn.setStyleSheet("border: none; background: transparent; font-size: 14px;")
+            dl_url = dl["url"]  # capture for lambda
+            from PyQt6.QtGui import QDesktopServices
+            from PyQt6.QtCore import QUrl
+            open_btn.clicked.connect(
+                lambda _checked, u=dl_url: QDesktopServices.openUrl(QUrl(u))
+            )
+            row_layout.addWidget(open_btn)
+
+            # Install button
+            install_btn = QPushButton("⬇ Install")
+            install_btn.setObjectName("primary_btn")
+            install_btn.setFixedWidth(80)
+            install_btn.setToolTip("Download and install this mod in PS2 Mod Manager")
+            author = data.get("author", "")
+            serial = data.get("game_serial", "")
+            title = data.get("title", "")
+            source = data.get("source_url", "")
+            install_btn.clicked.connect(
+                lambda _checked, u=dl_url, a=author, s=serial, t=title, src=source:
+                    self._install(u, a, s, t, src)
+            )
+            row_layout.addWidget(install_btn)
+
+            links_layout.addWidget(row_frame)
+
+        links_layout.addStretch()
+        self._results_frame.show()
+
+    def _install(self, url: str, author: str, serial: str, title: str, source_url: str):
+        """Open the DownloadInstallDialog pre-filled from a scraped link."""
+        dlg = DownloadInstallDialog(self.config, self.db, self)
+        dlg._url_edit.setText(url)
+        dlg._author_edit.setText(author)
+        if serial:
+            dlg._game_edit.setText(serial)
+        if title:
+            dlg._name_edit.setText(title)
+        dlg._source_url_edit.setText(source_url)
+        dlg.exec()
+
+
+# ---------------------------------------------------------------------------
 # Tab content widget
 # ---------------------------------------------------------------------------
 
@@ -6149,6 +6564,14 @@ class BrowsePanel(BasePanel):
         )
         pnach_btn.clicked.connect(self._open_pnach_github_dialog)
         toolbar.addWidget(pnach_btn)
+
+        gbatemp_btn = QPushButton("🔍 Scan GBAtemp Post")
+        gbatemp_btn.setToolTip(
+            "Paste a GBAtemp thread URL to auto-discover the author, game serial, "
+            "and all download links for one-click in-app installation"
+        )
+        gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
+        toolbar.addWidget(gbatemp_btn)
 
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
@@ -6497,6 +6920,10 @@ class BrowsePanel(BasePanel):
 
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)
+        dlg.exec()
+
+    def _open_gbatemp_scraper(self):
+        dlg = GBATempScraperDialog(self.config, self._db, self)
         dlg.exec()
 
     def _open_url(self, url: str):

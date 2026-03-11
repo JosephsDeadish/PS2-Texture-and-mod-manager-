@@ -2442,6 +2442,301 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
         self.assertEqual(result["crc"], "F0A235B4")
 
 
+# =============================================================================
+# MediaFire URL resolver (mocked network)
+# =============================================================================
+
+class TestMediaFireResolver(unittest.TestCase):
+    """Tests for resolve_mediafire_url()."""
+
+    def test_non_mediafire_url_returns_none(self):
+        from src.core.downloader import resolve_mediafire_url
+        result = resolve_mediafire_url("https://example.com/file.zip")
+        self.assertIsNone(result)
+
+    def test_empty_url_returns_none(self):
+        from src.core.downloader import resolve_mediafire_url
+        self.assertIsNone(resolve_mediafire_url(""))
+        self.assertIsNone(resolve_mediafire_url(None))  # type: ignore[arg-type]
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_download_button_href(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<a id="downloadButton" class="input popsok" '
+            'aria-label="Download file" '
+            'href="https://download1234.mediafire.com/abc123/Spyro.zip">Download (48 MB)</a>'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/y1057yt4l2ndobn/Spyro.zip/file"
+        )
+        self.assertEqual(result, "https://download1234.mediafire.com/abc123/Spyro.zip")
+
+    @patch("src.core.downloader.requests.get")
+    def test_fallback_to_download_domain_href(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        # No id="downloadButton" but has a download*.mediafire.com href
+        mock_resp.text = (
+            '<html><body>'
+            '<a href="https://download99.mediafire.com/xyz/texture.zip">Get file</a>'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertEqual(result, "https://download99.mediafire.com/xyz/texture.zip")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/bad/file.zip/file"
+        )
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+        mock_get.side_effect = Exception("connection refused")
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_no_download_link_in_html_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>No download link here.</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertIsNone(result)
+
+
+# =============================================================================
+# GBAtemp thread scraper (mocked network)
+# =============================================================================
+
+class TestGBAtempScraper(unittest.TestCase):
+    """Tests for scrape_gbatemp_thread()."""
+
+    # Minimal synthetic GBAtemp-like HTML used across tests
+    _SAMPLE_HTML = """
+    <html>
+    <head><title>A New Beginning | GBAtemp</title></head>
+    <body>
+    <h1 class="p-title-value">The Legend of Spyro: A New Beginning — 6x HD Texture Pack</h1>
+    <div class="message-body">
+      <span itemprop="name">DurinDragon</span>
+      <a class="username" href="/members/durindragon.778677/">DurinDragon</a>
+      <p>Download the packs below:</p>
+      <a href="https://www.mediafire.com/file/y1057yt4l2ndobn/Spyro_ANB_SLUS-21372_6x.zip/file">6x Extra</a>
+      <a href="https://www.mediafire.com/file/vkkkunm8kj09bh3/Spyro_ANB_SLUS-21372_6x_only.zip/file">6x Only</a>
+      <a href="https://www.mediafire.com/file/3jilfm7ahm6bs62/Spyro_ANB_SLUS-21372_4x_anime.zip/file">4x Anime</a>
+      <a href="https://www.mediafire.com/folder/jpnyulhtdvd77/Spyro_ANB_SLUS-21372">All Variants</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertIn("Spyro", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author_name(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["author"], "DurinDragon")
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertIn("gbatemp.net", result["author_url"])
+        self.assertIn("durindragon", result["author_url"].lower())
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_mediafire_download_urls(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+        self.assertGreaterEqual(len(result["download_urls"]), 3)
+
+    @patch("src.core.downloader.requests.get")
+    def test_detects_game_serial_in_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        # Serial is in the thread URL
+        result = scrape_gbatemp_thread(
+            "https://gbatemp.net/threads/spyro-SLUS-21372-textures.677477/"
+        )
+        self.assertEqual(result["game_serial"], "SLUS-21372")
+
+    @patch("src.core.downloader.requests.get")
+    def test_detects_game_serial_in_download_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML  # MediaFire links contain SLUS-21372
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        # Serial should be picked up from the MediaFire URLs in the HTML
+        self.assertEqual(result["game_serial"], "SLUS-21372")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 403
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_get.side_effect = Exception("timeout")
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+        self.assertEqual(result["game_serial"], "")
+
+    @patch("src.core.downloader.requests.get")
+    def test_source_url_always_echoed_back(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_get.side_effect = Exception("timeout")
+
+        url = "https://gbatemp.net/threads/some-pack.99999/"
+        result = scrape_gbatemp_thread(url)
+        self.assertEqual(result["source_url"], url)
+
+    @patch("src.core.downloader.requests.get")
+    def test_no_duplicate_download_urls(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        # HTML with the same URL duplicated
+        dup_html = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test</h1>'
+            '<a href="https://www.mediafire.com/file/abc/test.zip/file">Link 1</a>'
+            '<a href="https://www.mediafire.com/file/abc/test.zip/file">Link 2</a>'
+            '</body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = dup_html
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        urls = [dl["url"] for dl in result["download_urls"]]
+        self.assertEqual(len(urls), len(set(urls)), "Duplicate URLs returned")
+
+
+# =============================================================================
+# Spyro: A New Beginning catalogue entries
+# =============================================================================
+
+class TestSpyroANBCatalogueEntries(unittest.TestCase):
+    """The three DurinDragon Spyro: ANB variants must be in the catalogue."""
+
+    def _load_catalogue(self):
+        import ast
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        ids = []
+        for line in src.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('"id":'):
+                val = stripped.split(":", 1)[1].strip().strip('",').strip()
+                ids.append(val)
+        return ids
+
+    def test_all_spyro_anb_variants_present(self):
+        ids = self._load_catalogue()
+        expected = [
+            "spyro_anb_6x_extra_detail",
+            "spyro_anb_6x_only",
+            "spyro_anb_4x_anime",
+            "spyro_anb_mediafire_folder",
+        ]
+        for eid in expected:
+            self.assertIn(eid, ids, f"Missing Spyro ANB catalogue entry: {eid}")
+
+    def test_spyro_anb_direct_download_urls_are_mediafire(self):
+        """Each downloadable variant must have a MediaFire direct_download_url."""
+        import ast, re
+
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        # Verify MediaFire file-page URLs appear for the three variant IDs
+        for variant in ("6x_extra_detail", "6x_only", "4x_anime"):
+            self.assertIn(
+                "mediafire.com/file/",
+                src,
+                f"No MediaFire download URL found for spyro_anb_{variant}",
+            )
+
+    def test_spyro_anb_entries_author_is_durindragon(self):
+        """All Spyro ANB entries should credit DurinDragon."""
+        import ast
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        self.assertIn("DurinDragon", src)
+        self.assertIn("gbatemp.net/members/durindragon", src)
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the browse-panel catalogue.

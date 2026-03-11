@@ -7,6 +7,7 @@ open public APIs (GameTDB, GitHub, etc.) or user-provided URLs.
 
 import json
 import os
+import re
 import threading
 import urllib.parse
 from pathlib import Path
@@ -274,3 +275,232 @@ def search_pcsx2_patches_by_crc(
         return None
     except Exception:
         return None
+
+
+# ---------------------------------------------------------------------------
+# MediaFire URL resolver
+# ---------------------------------------------------------------------------
+
+#: Regex matching a MediaFire file-page URL.
+_MEDIAFIRE_FILE_RE = re.compile(
+    r"https?://(?:www\.)?mediafire\.com/file/[^\s\"'<>]+",
+    re.IGNORECASE,
+)
+
+#: Regex matching the direct-download href found inside MediaFire HTML pages.
+_MEDIAFIRE_DL_RE = re.compile(
+    r'href="(https?://download\d*\.mediafire\.com/[^"]+)"',
+    re.IGNORECASE,
+)
+
+
+def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
+    """Resolve a MediaFire *file* page URL to a direct HTTPS download URL.
+
+    MediaFire file-page URLs look like::
+
+        https://www.mediafire.com/file/<key>/<filename>/file
+
+    The function fetches the page HTML and extracts the ``href`` of the
+    ``<a id="downloadButton">`` element (or any ``download*.mediafire.com``
+    link).  Returns the direct download URL on success, or ``None`` if the
+    page could not be fetched, no link was found, or *page_url* is not a
+    MediaFire file page.
+
+    This function never raises; all errors are silently suppressed.
+    """
+    if not page_url:
+        return None
+    # Validate domain via URL parsing to avoid substring-match bypasses
+    try:
+        _parsed = urllib.parse.urlparse(page_url)
+        netloc = _parsed.netloc.lower()
+        if not (netloc == "www.mediafire.com" or netloc == "mediafire.com"):
+            return None
+        if "/file/" not in _parsed.path.lower():
+            return None
+    except Exception:
+        return None
+    try:
+        resp = requests.get(
+            page_url,
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return None
+        html = resp.text
+
+        # Primary: look for id="downloadButton" with an href
+        m = re.search(
+            r'<a[^>]+id=["\']downloadButton["\'][^>]+href=["\']([^"\']+)["\']',
+            html,
+            re.IGNORECASE,
+        )
+        if m:
+            return m.group(1)
+
+        # Fallback: any download*.mediafire.com href
+        m2 = _MEDIAFIRE_DL_RE.search(html)
+        if m2:
+            return m2.group(1)
+
+        return None
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
+# GBAtemp thread scraper
+# ---------------------------------------------------------------------------
+
+#: PS2 game serial pattern: SLUS-20062, SCES-53133, SCUS-97399 …
+#: Avoids plain \b because filenames use underscores which are \w characters.
+_SERIAL_RE = re.compile(r"(?<![A-Za-z0-9])(S[LC][A-Z]{2}-\d{5})(?![A-Za-z0-9])", re.IGNORECASE)
+
+#: (pattern, host-label) pairs for recognised download hosts.
+_DOWNLOAD_PATTERNS: List[tuple] = [
+    (re.compile(
+        r"https?://(?:www\.)?mediafire\.com/(?:file|folder)/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "MediaFire"),
+    (re.compile(
+        r"https?://drive\.google\.com/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "Google Drive"),
+    (re.compile(
+        r"https?://mega\.nz/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "MEGA"),
+    (re.compile(
+        r"https?://1drv\.ms/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "OneDrive"),
+    (re.compile(
+        r"https?://(?:www\.)?dropbox\.com/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "Dropbox"),
+    (re.compile(
+        r"https?://github\.com/[^\s\"'<>]+\.(?:zip|7z|pnach|rar)[^\s\"'<>]*",
+        re.IGNORECASE,
+    ), "GitHub"),
+    (re.compile(
+        r"https?://archive\.org/(?:download|details)/[^\s\"'<>]+",
+        re.IGNORECASE,
+    ), "Archive.org"),
+]
+
+
+def _make_download_label(url: str) -> str:
+    """Derive a human-readable label from a download URL."""
+    parsed = urllib.parse.urlparse(url)
+    parts = [p for p in parsed.path.split("/") if p]
+    # For MediaFire /file/<key>/<filename>/file → use <filename>
+    netloc = parsed.netloc.lower()
+    if (netloc in ("www.mediafire.com", "mediafire.com")) and len(parts) >= 3:
+        return urllib.parse.unquote(parts[-2]) if parts[-1] == "file" else urllib.parse.unquote(parts[-1])
+    return urllib.parse.unquote(parts[-1]) if parts else url
+
+
+def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
+    """Scrape a GBAtemp thread page and extract mod metadata.
+
+    Fetches *thread_url* (must be a ``gbatemp.net/threads/…`` URL) and
+    parses the HTML to extract:
+
+    * **title** — the thread title
+    * **author** — display name of the thread author (first post)
+    * **author_url** — absolute URL to the author's GBAtemp profile
+    * **download_urls** — list of dicts, each with keys:
+
+      * ``url``   — raw URL found in the page
+      * ``host``  — host label (e.g. ``"MediaFire"``, ``"Google Drive"``)
+      * ``label`` — human-readable file/folder name derived from the URL
+
+    * **game_serial** — first PS2 serial found in the URL, title or post body
+      (upper-cased, e.g. ``"SLUS-21372"``), or ``""`` if none detected
+    * **source_url** — echoes back *thread_url*
+
+    Returns a dict with the above keys (all empty/empty-list on failure).
+    This function never raises; all errors are silently suppressed.
+    """
+    result: Dict = {
+        "title": "",
+        "author": "",
+        "author_url": "",
+        "download_urls": [],
+        "game_serial": "",
+        "source_url": thread_url,
+    }
+    try:
+        resp = requests.get(
+            thread_url,
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return result
+        html = resp.text
+
+        # ── Thread title ────────────────────────────────────────────────────
+        # XenForo: <h1 class="p-title-value">…</h1>
+        m = re.search(
+            r'<h1[^>]+class="[^"]*p-title-value[^"]*"[^>]*>(.*?)</h1>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        )
+        if m:
+            result["title"] = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+
+        # ── Thread author (first post) ───────────────────────────────────────
+        # XenForo: <span class="username"> or itemprop="name" inside first message
+        # Try itemprop="name" first (most reliable)
+        m_name = re.search(
+            r'<span[^>]+itemprop=["\']name["\'][^>]*>(.*?)</span>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        )
+        if m_name:
+            result["author"] = re.sub(r"<[^>]+>", "", m_name.group(1)).strip()
+
+        # ── Author profile URL ───────────────────────────────────────────────
+        # XenForo: <a class="username" href="/members/…"> or similar
+        m_url = re.search(
+            r'<a[^>]+class="[^"]*username[^"]*"[^>]+href="([^"]+)"',
+            html,
+            re.IGNORECASE,
+        )
+        if m_url:
+            href = m_url.group(1)
+            if href.startswith("/"):
+                href = "https://gbatemp.net" + href
+            result["author_url"] = href
+
+        # ── Download links ───────────────────────────────────────────────────
+        seen: set = set()
+        for pattern, host in _DOWNLOAD_PATTERNS:
+            for m_dl in pattern.finditer(html):
+                raw = m_dl.group(0).rstrip(".,;)")
+                if raw in seen:
+                    continue
+                seen.add(raw)
+                result["download_urls"].append({
+                    "url": raw,
+                    "host": host,
+                    "label": _make_download_label(raw),
+                })
+
+        # ── PS2 game serial ──────────────────────────────────────────────────
+        # Check in order: URL, title, then first 64 KB of body
+        for text in (thread_url, result["title"], html[:65536]):
+            m_ser = _SERIAL_RE.search(text)
+            if m_ser:
+                result["game_serial"] = m_ser.group(1).upper()
+                break
+
+    except Exception:
+        pass
+
+    return result
