@@ -193,10 +193,13 @@ class SettingsPanel(BasePanel):
         QMessageBox.information(self, "Saved", "Settings have been saved.")
 
     def _on_theme_changed(self, _index: int):
-        """Apply the newly selected theme immediately (live preview)."""
+        """Apply the newly selected theme immediately as a live preview.
+
+        Note: the config object is *not* updated here — the theme is only
+        persisted when the user clicks "Save Settings".
+        """
         from PyQt6.QtWidgets import QApplication
         theme_key = self._theme_combo.currentData() or "dark"
-        self.config.theme = theme_key
         app = QApplication.instance()
         if app:
             apply_theme(app, theme_key)
