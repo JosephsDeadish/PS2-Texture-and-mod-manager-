@@ -1518,6 +1518,531 @@ CATALOGUE: List[dict] = [
         "direct_download_url": "",
         "upscale_tech": "",
     },
+    # ── More game-specific texture packs ─────────────────────────────────────
+    {
+        "id": "naruto_uzumaki_textures",
+        "name": "Naruto: Uzumaki Chronicles — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Naruto: Uzumaki Chronicles (SLUS-21162). "
+            "Upscaled character, jutsu effect and environment textures."
+        ),
+        "context": "Naruto's distinctive anime art style responds very well to Waifu2x upscaling. Check GBAtemp and LoversLab.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=naruto+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Naruto: Uzumaki Chronicles",
+        "thumbnail_url": "",
+        "tags": ["naruto", "bandai-namco", "anime", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Waifu2x / ESRGAN (anime)",
+    },
+    {
+        "id": "naruto_uns_textures",
+        "name": "Naruto: Ultimate Ninja Storm — HD Textures (PS2 originals)",
+        "description": (
+            "Community HD textures for the PS2 Naruto Ultimate Ninja series. "
+            "Upscaled character portraits, jutsu effects and stage backgrounds."
+        ),
+        "context": "Search GameBanana and GBAtemp for Naruto Ultimate Ninja HD mods. The anime cel-shaded style benefits greatly from Waifu2x.",
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/mods/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "Naruto: Ultimate Ninja series",
+        "thumbnail_url": "",
+        "tags": ["naruto", "bandai-namco", "anime", "fighting", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Waifu2x (anime)",
+    },
+    {
+        "id": "wwe_smackdown_textures",
+        "name": "WWE SmackDown vs. Raw — HD Texture Pack",
+        "description": (
+            "Community HD textures for WWE SmackDown vs. Raw 2006/2007/2008 (SLUS-21358 etc). "
+            "Upscaled wrestler portraits, arena and crowd textures."
+        ),
+        "context": "One of the most popular PS2 wrestling games for modding. Check GameBanana and GBAtemp for packs with specific wrestler rosters.",
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/mods/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "WWE SmackDown vs. Raw",
+        "thumbnail_url": "",
+        "tags": ["wwe", "wrestling", "thq", "sports", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "bully_textures",
+        "name": "Bully — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Bully / Canis Canem Edit (SLUS-21269). "
+            "Upscaled character, campus and town environment textures."
+        ),
+        "context": "Bully's rich open world benefits greatly from HD textures. Check GBAtemp and Reddit for community packs.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=bully+texture+pack",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Reddit",
+        "game": "Bully / Canis Canem Edit",
+        "thumbnail_url": "",
+        "tags": ["bully", "rockstar", "open-world", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "nfs_mw_textures",
+        "name": "Need for Speed: Most Wanted — HD Texture Pack",
+        "description": (
+            "Community HD textures for Need for Speed: Most Wanted (SLUS-21108). "
+            "Upscaled car liveries, city environment and menu textures."
+        ),
+        "context": "NFS Most Wanted is one of the most played PS2 racing games. Check GBAtemp and GameBanana for community texture packs.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=need+for+speed+most+wanted+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Need for Speed: Most Wanted",
+        "thumbnail_url": "",
+        "tags": ["nfs", "most-wanted", "racing", "ea", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "nfs_underground2_textures",
+        "name": "Need for Speed: Underground 2 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for NFS Underground 2 (SLUS-20967). "
+            "Upscaled car customisation, city streets and neon environment textures."
+        ),
+        "context": "NFS Underground 2 has a large modding community. Check GameBanana and GBAtemp for car livery and environment packs.",
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/mods/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "Need for Speed: Underground 2",
+        "thumbnail_url": "",
+        "tags": ["nfs", "underground", "racing", "ea", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "god_hand_textures",
+        "name": "God Hand — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for God Hand (SLUS-21503). "
+            "Upscaled character, demon and environment textures for this cult classic."
+        ),
+        "context": "God Hand's cartoon-ish 3D style upscales nicely. Find packs on PSX-Place and GBAtemp.",
+        "author": "PSX-Place Community",
+        "author_url": "https://www.psx-place.com",
+        "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PSX-Place",
+        "game": "God Hand",
+        "thumbnail_url": "",
+        "tags": ["god-hand", "capcom", "action", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "viewtiful_joe_textures",
+        "name": "Viewtiful Joe — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Viewtiful Joe (SLUS-20590). "
+            "Upscaled cel-shaded character and stage textures."
+        ),
+        "context": "Viewtiful Joe's bold cel-shading style makes it excellent for HD upscaling. Check GBAtemp and LoversLab.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=viewtiful+joe+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Viewtiful Joe",
+        "thumbnail_url": "",
+        "tags": ["viewtiful-joe", "capcom", "cel-shaded", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "xenosaga_textures",
+        "name": "Xenosaga Episode I — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Xenosaga Episode I (SLUS-20469). "
+            "Upscaled character portrait, cutscene and battle textures."
+        ),
+        "context": "Xenosaga's anime-adjacent art style responds very well to Waifu2x. Check GBAtemp and LoversLab for episode I–III packs.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=xenosaga+texture+ps2&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Xenosaga Episode I",
+        "thumbnail_url": "",
+        "tags": ["xenosaga", "bandai-namco", "jrpg", "sci-fi", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Waifu2x / ESRGAN (anime)",
+    },
+    {
+        "id": "dragon_quest_viii_textures",
+        "name": "Dragon Quest VIII — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Dragon Quest VIII (SLUS-21005 / SLUS-21265). "
+            "Upscaled character, environment and monster textures."
+        ),
+        "context": "DQ VIII's vibrant cel-shaded art style benefits enormously from ESRGAN upscaling. Check GBAtemp for community packs.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=dragon+quest+viii+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Dragon Quest VIII",
+        "thumbnail_url": "",
+        "tags": ["dragon-quest", "dq8", "square-enix", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN (anime model)",
+    },
+    {
+        "id": "star_ocean_3_textures",
+        "name": "Star Ocean: Till the End of Time — HD Textures",
+        "description": (
+            "Community HD texture replacements for Star Ocean 3 (SLUS-20362). "
+            "Upscaled character portraits, battle and world map textures."
+        ),
+        "context": "SO3 has very detailed environments that upscale well. Check GBAtemp and PCSX2 Forums for community packs.",
+        "author": "PCSX2 Community",
+        "author_url": "https://forums.pcsx2.net",
+        "url": "https://forums.pcsx2.net/search?q=star+ocean+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PCSX2 Forums",
+        "game": "Star Ocean: Till the End of Time",
+        "thumbnail_url": "",
+        "tags": ["star-ocean", "square-enix", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "sly_cooper_textures",
+        "name": "Sly Cooper — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Sly Cooper and the Thievius Raccoonus (SCUS-97198) "
+            "and its sequels. Upscaled cel-shaded character and environment textures."
+        ),
+        "context": "Sly's bold cartoon style upscales beautifully. Check GBAtemp for packs covering all three PS2 Sly games.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=sly+cooper+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Sly Cooper series",
+        "thumbnail_url": "",
+        "tags": ["sly-cooper", "sucker-punch", "platformer", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "xBRZ / ESRGAN",
+    },
+    {
+        "id": "katamari_textures",
+        "name": "Katamari Damacy — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Katamari Damacy (SLUS-20917). "
+            "Upscaled objects, environment and UI textures for the quirky cult classic."
+        ),
+        "context": "Katamari's colorful distinct art style lends itself perfectly to texture upscaling. Check GBAtemp and Reddit r/ps2.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=katamari+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Reddit",
+        "game": "Katamari Damacy",
+        "thumbnail_url": "",
+        "tags": ["katamari", "bandai-namco", "puzzle", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "xBRZ / ESRGAN",
+    },
+    {
+        "id": "ff12_textures",
+        "name": "Final Fantasy XII — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Final Fantasy XII (SLUS-20963). "
+            "Upscaled characters, Ivalice environment and UI textures."
+        ),
+        "context": "FF12 is a popular target for texture mods due to its large open world. Check GBAtemp and PCSX2 Forums for community packs.",
+        "author": "PCSX2 Community",
+        "author_url": "https://forums.pcsx2.net",
+        "url": "https://forums.pcsx2.net/search?q=final+fantasy+xii+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PCSX2 Forums",
+        "game": "Final Fantasy XII",
+        "thumbnail_url": "",
+        "tags": ["final-fantasy", "ff12", "square-enix", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / Waifu2x",
+    },
+    {
+        "id": "mgs2_textures",
+        "name": "Metal Gear Solid 2: Sons of Liberty — HD Textures",
+        "description": (
+            "Community HD texture replacements for Metal Gear Solid 2 (SLUS-20144). "
+            "Upscaled environment, character and codec textures."
+        ),
+        "context": "MGS2's highly detailed environments respond extremely well to ESRGAN upscaling. Check GBAtemp and LoversLab.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=metal+gear+solid+2+texture&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Metal Gear Solid 2",
+        "thumbnail_url": "",
+        "tags": ["mgs2", "metal-gear", "konami", "stealth", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "tony_hawk_textures",
+        "name": "Tony Hawk's Pro Skater — HD Texture Pack",
+        "description": (
+            "Community HD textures for Tony Hawk's Pro Skater 3/4 on PS2. "
+            "Upscaled skate park environments, character and trick effect textures."
+        ),
+        "context": "THPS games have vibrant environments that upscale nicely. Check GBAtemp and GameBanana for packs.",
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/mods/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "Tony Hawk's Pro Skater series",
+        "thumbnail_url": "",
+        "tags": ["tony-hawk", "activision", "sports", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    # ── More game-specific PNACH patches ─────────────────────────────────────
+    {
+        "id": "okami_widescreen_pnach",
+        "name": "Okami — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for Okami (SLUS-21418). "
+            "Enables true 16:9 output to match the beautiful ink-wash art style."
+        ),
+        "context": "Fetch this patch from the PCSX2 GitHub widescreen patches repo using the 🔧 PNACH button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Okami",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "okami", "capcom", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "bully_widescreen_pnach",
+        "name": "Bully / Canis Canem Edit — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for Bully (SLUS-21269 / SLES-53561). "
+            "Removes black bars for a proper 16:9 experience."
+        ),
+        "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Bully / Canis Canem Edit",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "bully", "rockstar", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "nfs_mw_widescreen_pnach",
+        "name": "Need for Speed: Most Wanted — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for NFS Most Wanted (SLUS-21108). "
+            "Corrects aspect ratio for modern widescreen monitors."
+        ),
+        "context": "Get from the PCSX2 widescreen patches GitHub using the 🔧 button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Need for Speed: Most Wanted",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "nfs", "racing", "ea", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "gta3_widescreen_pnach",
+        "name": "GTA III — Widescreen + 60fps Patches",
+        "description": (
+            "Widescreen and 60fps PNACH patches for GTA III (SLUS-20062). "
+            "Enables 16:9 output and smoother gameplay."
+        ),
+        "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "GTA III",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "gta", "rockstar", "60fps", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "spiderman_2_widescreen_pnach",
+        "name": "Spider-Man 2 — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for Spider-Man 2 (SLUS-20776). "
+            "Corrects the aspect ratio for a proper widescreen experience."
+        ),
+        "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Spider-Man 2",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "spider-man", "activision", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── More cheats/patches ───────────────────────────────────────────────────
+    {
+        "id": "pcsx2_unlock_patches",
+        "name": "PCSX2 Unlock / Debug Patches",
+        "description": (
+            "PNACH patches that unlock hidden content, developer modes, and debug menus "
+            "for various PS2 games. Great for exploring cut content."
+        ),
+        "context": "Found on GBAtemp and the PCSX2 forums. Author notes usually explain what each patch does and its game region.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/3519/?q=unlock+debug&t=file_update",
+        "type": ModType.CHEAT,
+        "source": "GBAtemp",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cheats", "unlock", "debug", "pnach", "hidden-content"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "archive_org_ps2_cheats",
+        "name": "Internet Archive — PS2 Cheat Code Collections",
+        "description": (
+            "The Internet Archive hosts community-preserved PS2 cheat code books, "
+            "GameShark and CodeBreaker code collections in various formats."
+        ),
+        "context": "Raw cheat codes in AR2/CodeBreaker format. The PNACH panel can import and convert many of these.",
+        "author": "Internet Archive",
+        "author_url": "https://archive.org",
+        "url": "https://archive.org/search?query=ps2+cheat+codes&mediatype=texts",
+        "type": ModType.CHEAT,
+        "source": "Archive.org",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cheats", "gameshark", "archive", "collection"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── More save file entries ────────────────────────────────────────────────
+    {
+        "id": "gbatemp_saves",
+        "name": "GBAtemp — PS2 Save Files",
+        "description": (
+            "GBAtemp hosts community-submitted PS2 save files with region and "
+            "version notes. Authors often include completion percentage and unlock info."
+        ),
+        "context": "Check the author's post for region info (NTSC-U / PAL). Save files are region-locked so the right version matters.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/3519/?q=ps2+save&t=file_update",
+        "type": ModType.SAVE_FILE,
+        "source": "GBAtemp",
+        "game": "",
+        "thumbnail_url": "https://gbatemp.net/styles/gbatemp/logo.png",
+        "tags": ["saves", "community", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── Cover art additions ───────────────────────────────────────────────────
+    {
+        "id": "mobygames_covers",
+        "name": "MobyGames — PS2 Cover Art",
+        "description": (
+            "MobyGames maintains a comprehensive database of PS2 game cover art, "
+            "screenshots, and metadata. Excellent for finding regional cover variants."
+        ),
+        "context": "High-resolution box art from multiple regions. Useful for finding Japanese, European and Australian variants.",
+        "author": "MobyGames Community",
+        "author_url": "https://www.mobygames.com",
+        "url": "https://www.mobygames.com/game/platform:ps2/",
+        "type": ModType.COVER_ART,
+        "source": "MobyGames",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["covers", "art", "database", "regional"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "screenscraper_covers",
+        "name": "ScreenScraper — PS2 Media Database",
+        "description": (
+            "ScreenScraper is a community scraping database with PS2 box art, "
+            "screenshots, manuals and fanart. Free API for personal use."
+        ),
+        "context": "Used by EmulationStation and other frontends. Box art is available in multiple resolutions and regional variants.",
+        "author": "ScreenScraper Community",
+        "author_url": "https://www.screenscraper.fr",
+        "url": "https://www.screenscraper.fr/gameinfos.php?plateforme=57",
+        "type": ModType.COVER_ART,
+        "source": "ScreenScraper",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["covers", "art", "screenscraper", "community"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
 ]
 
 # Collect unique sources for the source filter dropdown
@@ -1894,11 +2419,17 @@ class DownloadInstallDialog(QDialog):
         self._author_edit.setPlaceholderText("Author name")
         self._game_edit = QLineEdit()
         self._game_edit.setPlaceholderText("Game name or serial ID (e.g. SLUS-20062)")
+        self._desc_edit = QLineEdit()
+        self._desc_edit.setPlaceholderText("Short description of the mod")
+        self._source_url_edit = QLineEdit()
+        self._source_url_edit.setPlaceholderText("Source page URL (e.g. https://gbatemp.net/threads/…)")
 
         for label, edit in [
             ("Name:", self._name_edit),
             ("Author:", self._author_edit),
             ("Game:", self._game_edit),
+            ("Desc:", self._desc_edit),
+            ("Source:", self._source_url_edit),
         ]:
             row = QHBoxLayout()
             lbl = QLabel(label)
@@ -1986,9 +2517,12 @@ class DownloadInstallDialog(QDialog):
                 name = self._name_edit.text().strip() or Path(fname).stem
                 author = self._author_edit.text().strip()
                 game = self._game_edit.text().strip()
+                description = self._desc_edit.text().strip()
+                source_url = self._source_url_edit.text().strip() or raw_url
                 mod = mgr.install_from_folder(
                     source_path=dest, mod_type=mod_type, dest_base=storage,
                     name=name, author=author, game_id=game,
+                    description=description, source_url=source_url,
                 )
                 import shutil
                 shutil.rmtree(tmpdir, ignore_errors=True)
@@ -2555,6 +3089,9 @@ class BrowsePanel(BasePanel):
         dlg._name_edit.setText(entry.get("name", ""))
         dlg._author_edit.setText(entry.get("author", ""))
         dlg._game_edit.setText(entry.get("game", ""))
+        dlg._desc_edit.setText(entry.get("description", "")[:200])
+        # source_url = the catalogue browse-page URL (where the user found this mod)
+        dlg._source_url_edit.setText(entry.get("url", ""))
         # Set mod type combo
         mod_type = entry.get("type")
         if mod_type is not None:

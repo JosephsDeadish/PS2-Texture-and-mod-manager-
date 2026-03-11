@@ -2279,3 +2279,159 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
 
         result = search_pcsx2_patches_by_crc("f0a235b4")  # lower-case input
         self.assertEqual(result["crc"], "F0A235B4")
+
+
+
+class TestCatalogueIntegrity(unittest.TestCase):
+    """Structural integrity checks for the browse-panel catalogue.
+
+    Uses Python's ``ast`` module to parse the catalogue list without importing
+    any Qt code, so these tests run fine in headless CI environments.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import ast
+
+        src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        tree = ast.parse(src_file.read_text(encoding="utf-8"))
+
+        # Walk the AST to find the CATALOGUE assignment
+        catalogue_node = None
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.AnnAssign)
+                and isinstance(node.target, ast.Name)
+                and node.target.id == "CATALOGUE"
+                and node.value is not None
+            ):
+                catalogue_node = node.value
+                break
+
+        if catalogue_node is None:
+            raise RuntimeError("Could not find CATALOGUE assignment in browse_panel.py")
+
+        # Convert the AST list of dicts to Python dicts.
+        # ModType.TEXTURE_PACK etc. appear as ast.Attribute nodes; convert
+        # them to their .value strings (e.g. "texture_pack").
+        def _literal(node):
+            if isinstance(node, ast.Constant):
+                return node.value
+            if isinstance(node, ast.List):
+                return [_literal(e) for e in node.elts]
+            if isinstance(node, ast.Tuple):
+                return tuple(_literal(e) for e in node.elts)
+            if isinstance(node, ast.Dict):
+                return {_literal(k): _literal(v) for k, v in zip(node.keys, node.values)}
+            # ModType.TEXTURE_PACK → "texture_pack" etc.
+            if isinstance(node, ast.Attribute):
+                return node.attr.lower()
+            # Concatenated strings: ("part1" "part2") → JoinedStr handled as concat
+            if isinstance(node, ast.JoinedStr):
+                return "<f-string>"
+            raise ValueError(f"Unexpected AST node type: {type(node).__name__}")
+
+        cls.catalogue = _literal(catalogue_node)
+
+    # ------------------------------------------------------------------
+    # Structural checks
+    # ------------------------------------------------------------------
+
+    _REQUIRED_FIELDS = {
+        "id", "name", "description", "author", "author_url",
+        "url", "type", "source", "game", "tags",
+        "download_action", "upscale_tech",
+    }
+
+    def test_catalogue_not_empty(self):
+        self.assertGreater(len(self.catalogue), 0, "CATALOGUE must not be empty")
+
+    def test_all_entries_have_required_fields(self):
+        for entry in self.catalogue:
+            for field in self._REQUIRED_FIELDS:
+                self.assertIn(
+                    field, entry,
+                    f"Entry {entry.get('id', '?')} is missing field '{field}'"
+                )
+
+    def test_all_ids_are_unique(self):
+        ids = [e["id"] for e in self.catalogue]
+        duplicates = [eid for eid in ids if ids.count(eid) > 1]
+        self.assertEqual(
+            [], list(set(duplicates)),
+            f"Duplicate catalogue IDs found: {set(duplicates)}"
+        )
+
+    def test_all_ids_are_non_empty_strings(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(entry["id"], str)
+            self.assertTrue(entry["id"].strip(), f"Entry has empty id: {entry}")
+
+    def test_all_names_are_non_empty(self):
+        for entry in self.catalogue:
+            self.assertTrue(
+                entry.get("name", "").strip(),
+                f"Entry {entry['id']} has empty name"
+            )
+
+    def test_all_urls_are_https(self):
+        for entry in self.catalogue:
+            url = entry.get("url", "")
+            self.assertTrue(
+                url.startswith("http://") or url.startswith("https://"),
+                f"Entry {entry['id']} has invalid url: {url!r}"
+            )
+
+    def test_all_types_are_valid(self):
+        valid_types = {"texture_pack", "pnach", "cover_art", "save_file", "cheat"}
+        for entry in self.catalogue:
+            self.assertIn(
+                entry["type"], valid_types,
+                f"Entry {entry['id']} has invalid type: {entry['type']!r}"
+            )
+
+    def test_all_authors_are_non_empty(self):
+        for entry in self.catalogue:
+            self.assertTrue(
+                entry.get("author", "").strip(),
+                f"Entry {entry['id']} has empty author"
+            )
+
+    def test_all_sources_are_non_empty(self):
+        for entry in self.catalogue:
+            self.assertTrue(
+                entry.get("source", "").strip(),
+                f"Entry {entry['id']} has empty source"
+            )
+
+    def test_tags_are_lists(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(
+                entry.get("tags"), list,
+                f"Entry {entry['id']} tags is not a list"
+            )
+
+    def test_direct_download_url_is_string_or_empty(self):
+        """direct_download_url may be absent or empty string, never None."""
+        for entry in self.catalogue:
+            val = entry.get("direct_download_url", "")
+            self.assertIsInstance(
+                val, str,
+                f"Entry {entry['id']} direct_download_url must be a string, got {type(val)}"
+            )
+            if val:
+                self.assertTrue(
+                    val.startswith("http://") or val.startswith("https://"),
+                    f"Entry {entry['id']} has non-empty but invalid direct_download_url: {val!r}"
+                )
+
+    def test_no_duplicate_names(self):
+        names = [e["name"] for e in self.catalogue]
+        seen: dict = {}
+        for entry in self.catalogue:
+            n = entry["name"]
+            seen.setdefault(n, []).append(entry["id"])
+        duplicates = {n: ids for n, ids in seen.items() if len(ids) > 1}
+        for name, ids in duplicates.items():
+            self.fail(f"Duplicate catalogue name {name!r} shared by IDs: {ids}")
+
