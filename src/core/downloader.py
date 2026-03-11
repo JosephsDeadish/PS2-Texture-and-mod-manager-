@@ -132,6 +132,44 @@ def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Option
         return None
 
 
+def gametdb_cover_url(serial: str) -> str:
+    """Return the GameTDB PS2 cover-art URL for *serial*.
+
+    Infers the correct region code from the serial prefix so callers do not
+    need to know the region:
+
+    * ``SLUS`` / ``SCUS`` → ``US``
+    * ``SLES`` / ``SCES`` / ``SLEH`` / ``SCEH`` → ``EN``
+    * ``SLPS`` / ``SCPS`` / ``SLPM`` / ``SCPM`` → ``JA``
+    * Everything else → ``US`` (safe fallback)
+
+    The serial is stripped of hyphens/underscores to match GameTDB's filename
+    convention (e.g. ``SLUS21829`` not ``SLUS-21829``).
+
+    Example::
+
+        gametdb_cover_url("SLUS-21829")
+        # -> "https://art.gametdb.com/ps2/cover/US/SLUS21829.jpg"
+    """
+    if not serial:
+        return ""
+    clean = serial.upper().replace("-", "").replace("_", "")
+    prefix = clean[:4]
+    if prefix in ("SLUS", "SCUS"):
+        region = "US"
+    elif prefix in ("SLES", "SCES", "SLEH", "SCEH"):
+        region = "EN"
+    elif prefix in ("SLPS", "SCPS", "SLPM", "SCPM"):
+        region = "JA"
+    elif prefix in ("SLKA", "SCKA"):
+        region = "KO"
+    elif prefix in ("SLAJ", "SCAJ"):
+        region = "ZHCN"
+    else:
+        region = "US"
+    return f"https://art.gametdb.com/ps2/cover/{region}/{clean}.jpg"
+
+
 # ---------------------------------------------------------------------------
 # Online game title lookup (GameTDB)
 # ---------------------------------------------------------------------------
@@ -468,6 +506,7 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
         "author_url": "",
         "download_urls": [],
         "game_serial": "",
+        "thumbnail_url": "",
         "source_url": thread_url,
     }
     try:
@@ -564,6 +603,21 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                         "label": "Download from GBAtemp (login required)",
                     })
 
+        # ── Post image / thumbnail ───────────────────────────────────────────
+        # Extract the first non-avatar, non-UI image from the post body.
+        # GBAtemp embeds screenshots/cover art in the post with <img> tags.
+        m_img = re.search(
+            r'<img[^>]+src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
+            html,
+            re.IGNORECASE,
+        )
+        if m_img:
+            img_url = m_img.group(1)
+            # Skip GBAtemp avatar / UI images (smileys, banners, buttons)
+            _skip = ("avatar", "smilie", "logo", "banner", "button", "icon", "ads")
+            if not any(s in img_url.lower() for s in _skip):
+                result["thumbnail_url"] = img_url
+
         # ── PS2 game serial ──────────────────────────────────────────────────
         # Check in order: URL, title, then first 64 KB of body
         for text in (thread_url, result["title"], html[:65536]):
@@ -603,6 +657,7 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
         "author_url": "",
         "download_urls": [],
         "game_serial": "",
+        "thumbnail_url": "",
         "source_url": post_url,
     }
     try:
@@ -679,6 +734,19 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 "host": "PS2-Home",
                 "label": label,
             })
+
+        # ── Post image / thumbnail ───────────────────────────────────────────
+        # Extract the first non-avatar image from the post body.
+        m_img = re.search(
+            r'<img[^>]+src="(https?://[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"',
+            html,
+            re.IGNORECASE,
+        )
+        if m_img:
+            img_url = m_img.group(1)
+            _skip = ("avatar", "smilie", "logo", "banner", "button", "icon", "ads", "rank")
+            if not any(s in img_url.lower() for s in _skip):
+                result["thumbnail_url"] = img_url
 
         # ── PS2 game serial ──────────────────────────────────────────────────
         for text in (post_url, result["title"], html[:65536]):

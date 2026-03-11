@@ -68,6 +68,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "GitHub",
         "game": "All Games",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -89,6 +90,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://forums.pcsx2.net/Forum-Patches-and-Cheats",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "PCSX2",
         "game": "",
         "thumbnail_url": "https://pcsx2.net/favicon.ico",
@@ -110,6 +112,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "PS2Wide",
         "game": "",
         "thumbnail_url": "",
@@ -132,6 +135,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
+        "game_serial": "",
         "source": "GameTDB",
         "game": "All Games",
         "thumbnail_url": "https://www.gametdb.com/favicon.ico",
@@ -153,6 +157,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.codejunkies.com/ps2/",
         "type": ModType.CHEAT,
+        "game_serial": "",
         "source": "CodeJunkies",
         "game": "",
         "thumbnail_url": "",
@@ -178,6 +183,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -213,6 +219,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/eragon-hd-ps2-146041522",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21419",
         "source": "Patreon",
         "game": "Eragon",
         "thumbnail_url": "",
@@ -249,6 +256,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/147372741",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -281,6 +289,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/147372741",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -313,6 +322,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/147372741",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -347,6 +357,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97399",
         "source": "Patreon",
         "game": "God of War",
         "thumbnail_url": "",
@@ -377,6 +388,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97481",
         "source": "Patreon",
         "game": "God of War II",
         "thumbnail_url": "",
@@ -406,6 +418,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20773",
         "source": "Patreon",
         "game": "Kingdom Hearts",
         "thumbnail_url": "",
@@ -435,6 +448,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21005",
         "source": "Patreon",
         "game": "Kingdom Hearts II",
         "thumbnail_url": "",
@@ -464,6 +478,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20312",
         "source": "Patreon",
         "game": "Final Fantasy X",
         "thumbnail_url": "",
@@ -493,6 +508,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20963",
         "source": "Patreon",
         "game": "Final Fantasy XII",
         "thumbnail_url": "",
@@ -522,6 +538,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97472",
         "source": "Patreon",
         "game": "Shadow of the Colossus",
         "thumbnail_url": "",
@@ -551,6 +568,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97113",
         "source": "Patreon",
         "game": "Ico",
         "thumbnail_url": "",
@@ -580,6 +598,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20228",
         "source": "Patreon",
         "game": "Silent Hill 2",
         "thumbnail_url": "",
@@ -609,6 +628,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20622",
         "source": "Patreon",
         "game": "Silent Hill 3",
         "thumbnail_url": "",
@@ -639,6 +659,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21048",
         "source": "Patreon",
         "game": "Devil May Cry 3",
         "thumbnail_url": "",
@@ -668,6 +689,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21134",
         "source": "Patreon",
         "game": "Resident Evil 4",
         "thumbnail_url": "",
@@ -698,6 +720,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20144",
         "source": "Patreon",
         "game": "Metal Gear Solid 2: Sons of Liberty",
         "thumbnail_url": "",
@@ -728,6 +751,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20915",
         "source": "Patreon",
         "game": "Metal Gear Solid 3: Snake Eater",
         "thumbnail_url": "",
@@ -758,6 +782,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21621",
         "source": "Patreon",
         "game": "Persona 3",
         "thumbnail_url": "",
@@ -787,6 +812,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21782",
         "source": "Patreon",
         "game": "Persona 4",
         "thumbnail_url": "",
@@ -816,6 +842,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21344",
         "source": "Patreon",
         "game": "Okami",
         "thumbnail_url": "",
@@ -846,6 +873,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20946",
         "source": "Patreon",
         "game": "Grand Theft Auto: San Andreas",
         "thumbnail_url": "",
@@ -876,6 +904,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21678",
         "source": "Patreon",
         "game": "Dragon Ball Z: Budokai Tenkaichi 3",
         "thumbnail_url": "",
@@ -905,6 +934,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21059",
         "source": "Patreon",
         "game": "Tekken 5",
         "thumbnail_url": "",
@@ -935,6 +965,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21207",
         "source": "Patreon",
         "game": "Dragon Quest VIII",
         "thumbnail_url": "",
@@ -965,6 +996,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97124",
         "source": "Patreon",
         "game": "Jak and Daxter: The Precursor Legacy",
         "thumbnail_url": "",
@@ -994,6 +1026,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97199",
         "source": "Patreon",
         "game": "Ratchet & Clank",
         "thumbnail_url": "",
@@ -1024,6 +1057,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97198",
         "source": "Patreon",
         "game": "Sly Cooper and the Thievius Raccoonus",
         "thumbnail_url": "",
@@ -1054,6 +1088,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20518",
         "source": "Patreon",
         "game": "Crash Bandicoot: The Wrath of Cortex",
         "thumbnail_url": "",
@@ -1084,6 +1119,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20632",
         "source": "Patreon",
         "game": "Spyro: Enter the Dragonfly",
         "thumbnail_url": "",
@@ -1114,6 +1150,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97126",
         "source": "Patreon",
         "game": "Dark Cloud",
         "thumbnail_url": "",
@@ -1144,6 +1181,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20489",
         "source": "Patreon",
         "game": "Star Ocean: Till the End of Time",
         "thumbnail_url": "",
@@ -1173,6 +1211,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SCUS-97328",
         "source": "Patreon",
         "game": "Gran Turismo 4",
         "thumbnail_url": "",
@@ -1202,6 +1241,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20625",
         "source": "Patreon",
         "game": "Burnout 3: Takedown",
         "thumbnail_url": "",
@@ -1232,6 +1272,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21358",
         "source": "Patreon",
         "game": "Bully",
         "thumbnail_url": "",
@@ -1262,6 +1303,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20469",
         "source": "Patreon",
         "game": "Xenosaga Episode I",
         "thumbnail_url": "",
@@ -1291,6 +1333,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20383",
         "source": "Patreon",
         "game": "Devil May Cry",
         "thumbnail_url": "",
@@ -1321,6 +1364,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20184",
         "source": "Patreon",
         "game": "Resident Evil: Code Veronica X",
         "thumbnail_url": "",
@@ -1351,6 +1395,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21574",
         "source": "Patreon",
         "game": ".hack//G.U. Vol.1//Rebirth",
         "thumbnail_url": "",
@@ -1381,6 +1426,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20766",
         "source": "Patreon",
         "game": "Prince of Persia: The Sands of Time",
         "thumbnail_url": "",
@@ -1411,6 +1457,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20209",
         "source": "Patreon",
         "game": "Onimusha: Warlords",
         "thumbnail_url": "",
@@ -1441,6 +1488,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20001",
         "source": "Patreon",
         "game": "Zone of the Enders",
         "thumbnail_url": "",
@@ -1471,6 +1519,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97399",
         "source": "Patreon",
         "game": "God of War",
         "thumbnail_url": "",
@@ -1500,6 +1549,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21005",
         "source": "Patreon",
         "game": "Kingdom Hearts II",
         "thumbnail_url": "",
@@ -1529,6 +1579,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20312",
         "source": "Patreon",
         "game": "Final Fantasy X",
         "thumbnail_url": "",
@@ -1559,6 +1610,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20915",
         "source": "Patreon",
         "game": "Metal Gear Solid 3: Snake Eater",
         "thumbnail_url": "",
@@ -1588,6 +1640,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21134",
         "source": "Patreon",
         "game": "Resident Evil 4",
         "thumbnail_url": "",
@@ -1618,6 +1671,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97472",
         "source": "Patreon",
         "game": "Shadow of the Colossus",
         "thumbnail_url": "",
@@ -1647,6 +1701,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20946",
         "source": "Patreon",
         "game": "Grand Theft Auto: San Andreas",
         "thumbnail_url": "",
@@ -1683,6 +1738,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21372",
         "source": "GBAtemp",
         "game": "The Legend of Spyro: A New Beginning",
         "thumbnail_url": "",
@@ -1715,6 +1771,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21372",
         "source": "GBAtemp",
         "game": "The Legend of Spyro: A New Beginning",
         "thumbnail_url": "",
@@ -1747,6 +1804,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/the-legend-of-spyro-a-new-beginning-pcsx2-6x-upscaled-hd-texture-pack.677477/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21372",
         "source": "GBAtemp",
         "game": "The Legend of Spyro: A New Beginning",
         "thumbnail_url": "",
@@ -1778,6 +1836,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.mediafire.com/folder/jpnyulhtdvd77/Spyro_A_new_Beginning_SLUS-21372",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21372",
         "source": "GBAtemp",
         "game": "The Legend of Spyro: A New Beginning",
         "thumbnail_url": "",
@@ -1804,6 +1863,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97399",
         "source": "PS2Wide",
         "game": "God of War",
         "thumbnail_url": "",
@@ -1825,6 +1885,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20773",
         "source": "PS2Wide",
         "game": "Kingdom Hearts",
         "thumbnail_url": "",
@@ -1846,6 +1907,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20312",
         "source": "PS2Wide",
         "game": "Final Fantasy X / XII",
         "thumbnail_url": "",
@@ -1867,6 +1929,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97328",
         "source": "PS2Wide",
         "game": "Gran Turismo 4",
         "thumbnail_url": "",
@@ -1888,6 +1951,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20518",
         "source": "GitHub",
         "game": "Crash Bandicoot: Wrath of Cortex",
         "thumbnail_url": "",
@@ -1909,6 +1973,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97472",
         "source": "PS2Wide",
         "game": "Shadow of the Colossus",
         "thumbnail_url": "",
@@ -1936,6 +2001,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
+        "game_serial": "",
         "source": "GameTDB",
         "game": "",
         "thumbnail_url": "",
@@ -1961,6 +2027,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
+        "game_serial": "",
         "source": "GameTDB",
         "game": "",
         "thumbnail_url": "",
@@ -1983,6 +2050,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20915",
         "source": "GitHub",
         "game": "Metal Gear Solid 3",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -2005,6 +2073,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21134",
         "source": "GitHub",
         "game": "Resident Evil 4",
         "thumbnail_url": "",
@@ -2028,6 +2097,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21678",
         "source": "GitHub",
         "game": "Dragon Ball Z: Budokai Tenkaichi 3",
         "thumbnail_url": "",
@@ -2050,6 +2120,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97265",
         "source": "GitHub",
         "game": "Jak II / Jak 3",
         "thumbnail_url": "",
@@ -2072,6 +2143,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97199",
         "source": "GitHub",
         "game": "Ratchet & Clank series",
         "thumbnail_url": "",
@@ -2095,6 +2167,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21344",
         "source": "GitHub",
         "game": "Okami",
         "thumbnail_url": "",
@@ -2117,6 +2190,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21358",
         "source": "GitHub",
         "game": "Bully / Canis Canem Edit",
         "thumbnail_url": "",
@@ -2139,6 +2213,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20898",
         "source": "GitHub",
         "game": "Need for Speed: Most Wanted",
         "thumbnail_url": "",
@@ -2161,6 +2236,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20062",
         "source": "GitHub",
         "game": "GTA III",
         "thumbnail_url": "",
@@ -2183,6 +2259,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20265",
         "source": "GitHub",
         "game": "Spider-Man 2",
         "thumbnail_url": "",
@@ -2210,6 +2287,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "GitHub",
         "game": "All Games",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -2232,6 +2310,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://ps2wide.net/pc.html",
         "type": ModType.PNACH,
+        "game_serial": "",
         "source": "PS2Wide",
         "game": "All Games",
         "thumbnail_url": "",
@@ -2255,6 +2334,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97481",
         "source": "GitHub",
         "game": "God of War II",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -2277,6 +2357,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20174",
         "source": "GitHub",
         "game": "GTA Vice City",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -2299,6 +2380,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21782",
         "source": "GitHub",
         "game": "Persona 4",
         "thumbnail_url": "",
@@ -2321,6 +2403,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21048",
         "source": "GitHub",
         "game": "Devil May Cry 3",
         "thumbnail_url": "",
@@ -2343,6 +2426,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-21059",
         "source": "GitHub",
         "game": "Tekken 5",
         "thumbnail_url": "",
@@ -2365,6 +2449,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20625",
         "source": "GitHub",
         "game": "Burnout 3: Takedown",
         "thumbnail_url": "",
@@ -2387,6 +2472,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20946",
         "source": "GitHub",
         "game": "GTA San Andreas",
         "thumbnail_url": "",
@@ -2409,6 +2495,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20916",
         "source": "GitHub",
         "game": "Sly 2 / Sly 3",
         "thumbnail_url": "",
@@ -2431,6 +2518,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20605",
         "source": "GitHub",
         "game": "Crash Twinsanity",
         "thumbnail_url": "",
@@ -2453,6 +2541,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SCUS-97126",
         "source": "GitHub",
         "game": "Dark Cloud / Dark Chronicle",
         "thumbnail_url": "",
@@ -2475,6 +2564,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
+        "game_serial": "SLUS-20671",
         "source": "GitHub",
         "game": "Katamari Damacy",
         "thumbnail_url": "",
@@ -2499,6 +2589,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://github.com/PCSX2/cheatdb",
         "type": ModType.CHEAT,
+        "game_serial": "",
         "source": "GitHub",
         "game": "All Games",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
@@ -2528,6 +2619,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/148478705",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -2557,6 +2649,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/148718606",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "",
         "source": "Patreon",
         "game": "",
         "thumbnail_url": "",
@@ -2588,9 +2681,9 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.patreon.com/posts/148894264",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21668",
         "source": "Patreon",
         "game": "The Sims 2: Castaway",
-        "thumbnail_url": "",
         "tags": ["patreon", "sims", "castaway", "body-textures", "partial", "paid", "ps2"],
         "download_action": "",
         "direct_download_url": "",
@@ -2618,6 +2711,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/sly-2-band-of-thieves-ps2-europe.38672/",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SCES-52400",
         "source": "GBAtemp",
         "game": "Sly 2: Band of Thieves",
         "thumbnail_url": "",
@@ -2650,6 +2744,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/bully-saves-100-and-more.38390/",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-21358",
         "source": "GBAtemp",
         "game": "Bully / Canis Canem Edit",
         "thumbnail_url": "",
@@ -2680,6 +2775,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-20327",
         "source": "PS2-Home",
         "game": "ATV Off-Road Fury",
         "thumbnail_url": "",
@@ -2711,6 +2807,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=kingdom+hearts",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-20773",
         "source": "GBAtemp",
         "game": "Kingdom Hearts",
         "thumbnail_url": "",
@@ -2741,6 +2838,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=final+fantasy+x",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-20312",
         "source": "GBAtemp",
         "game": "Final Fantasy X",
         "thumbnail_url": "",
@@ -2771,6 +2869,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=god+of+war",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SCUS-97399",
         "source": "GBAtemp",
         "game": "God of War",
         "thumbnail_url": "",
@@ -2801,6 +2900,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=gta+san+andreas",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-20946",
         "source": "GBAtemp",
         "game": "GTA San Andreas",
         "thumbnail_url": "",
@@ -2831,6 +2931,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=metal+gear+solid+3",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-20915",
         "source": "GBAtemp",
         "game": "Metal Gear Solid 3: Snake Eater",
         "thumbnail_url": "",
@@ -2861,6 +2962,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=resident+evil+4",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-21134",
         "source": "GBAtemp",
         "game": "Resident Evil 4",
         "thumbnail_url": "",
@@ -2891,6 +2993,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=shadow+of+the+colossus",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SCUS-97472",
         "source": "GBAtemp",
         "game": "Shadow of the Colossus",
         "thumbnail_url": "",
@@ -2921,6 +3024,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=jak+and+daxter",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SCUS-97124",
         "source": "GBAtemp",
         "game": "Jak and Daxter: The Precursor Legacy",
         "thumbnail_url": "",
@@ -2951,6 +3055,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=ratchet+and+clank",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SCUS-97199",
         "source": "GBAtemp",
         "game": "Ratchet & Clank",
         "thumbnail_url": "",
@@ -2981,6 +3086,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=budokai+tenkaichi+3",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-21678",
         "source": "GBAtemp",
         "game": "Dragon Ball Z: Budokai Tenkaichi 3",
         "thumbnail_url": "",
@@ -3010,6 +3116,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=tekken+5",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-21059",
         "source": "GBAtemp",
         "game": "Tekken 5",
         "thumbnail_url": "",
@@ -3040,6 +3147,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/download/categories/game-saves.1396/?q=persona+4",
         "type": ModType.SAVE_FILE,
+        "game_serial": "SLUS-21782",
         "source": "GBAtemp",
         "game": "Persona 4",
         "thumbnail_url": "",
@@ -3077,6 +3185,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21829",
         "source": "GBAtemp",
         "game": "Baroque",
         "thumbnail_url": "",
@@ -3108,6 +3217,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20718",
         "source": "GBAtemp",
         "game": "Shadow Hearts",
         "thumbnail_url": "",
@@ -3139,6 +3249,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20964",
         "source": "GBAtemp",
         "game": "Shadow Hearts: Covenant",
         "thumbnail_url": "",
@@ -3171,6 +3282,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21291",
         "source": "GBAtemp",
         "game": "Suikoden V",
         "thumbnail_url": "",
@@ -3202,6 +3314,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21774",
         "source": "GBAtemp",
         "game": "Mana Khemia: Alchemists of Al-Revis",
         "thumbnail_url": "",
@@ -3233,6 +3346,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21502",
         "source": "GBAtemp",
         "game": "Atelier Iris 3: Grand Phantasm",
         "thumbnail_url": "",
@@ -3264,6 +3378,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20596",
         "source": "GBAtemp",
         "game": "La Pucelle: Tactics",
         "thumbnail_url": "",
@@ -3295,6 +3410,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20552",
         "source": "GBAtemp",
         "game": "Disgaea: Hour of Darkness",
         "thumbnail_url": "",
@@ -3326,6 +3442,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21800",
         "source": "GBAtemp",
         "game": "Ar tonelico: Melody of Elemia",
         "thumbnail_url": "",
@@ -3357,6 +3474,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21428",
         "source": "GBAtemp",
         "game": "Grandia III",
         "thumbnail_url": "",
@@ -3388,6 +3506,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21375",
         "source": "GBAtemp",
         "game": "Radiata Stories",
         "thumbnail_url": "",
@@ -3419,6 +3538,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-20892",
         "source": "GBAtemp",
         "game": "Xenosaga Episode II",
         "thumbnail_url": "",
@@ -3450,6 +3570,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21488",
         "source": "GBAtemp",
         "game": "Xenosaga Episode III",
         "thumbnail_url": "",
@@ -3481,6 +3602,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21243",
         "source": "GBAtemp",
         "game": "Wild Arms 4",
         "thumbnail_url": "",
@@ -3512,6 +3634,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLUS-21201",
         "source": "GBAtemp",
         "game": "Tales of Legendia",
         "thumbnail_url": "",
@@ -3543,6 +3666,7 @@ CATALOGUE: List[dict] = [
         "nsfw": False,
         "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
         "type": ModType.TEXTURE_PACK,
+        "game_serial": "SLPS-25302",
         "source": "GBAtemp",
         "game": "Tales of Rebirth",
         "thumbnail_url": "",
@@ -3622,9 +3746,22 @@ class CatalogueCard(QFrame):
         self._build()
 
     def _build(self):
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(14, 14, 14, 14)
-        layout.setSpacing(8)
+        # Outer layout: cover art on the left, all existing content on the right
+        outer = QHBoxLayout(self)
+        outer.setContentsMargins(10, 10, 10, 10)
+        outer.setSpacing(10)
+
+        # ── Left: cover art / game image panel ──────────────────────────────
+        # Shown for entries with a game_serial or explicit thumbnail_url.
+        # Size matches typical PS2 cover aspect ratio (2:3 → 60 × 88).
+        self._cover_lbl = QLabel()
+        self._cover_lbl.setFixedSize(60, 88)
+        self._cover_lbl.setAlignment(
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
+        )
+        self._cover_lbl.setStyleSheet(
+            "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
+        )
 
         type_icons = {
             ModType.TEXTURE_PACK: "🎨",
@@ -3634,22 +3771,42 @@ class CatalogueCard(QFrame):
             ModType.CHEAT: "⚡",
         }
         icon = type_icons.get(self.entry["type"], "📦")
+        self._cover_lbl.setText(icon)
+        self._cover_lbl.setStyleSheet(
+            "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
+            "font-size: 28px;"
+        )
 
-        # Header row: thumbnail + type badge
-        header = QHBoxLayout()
-        self._thumb_lbl = QLabel()
-        self._thumb_lbl.setFixedSize(32, 32)
-        self._thumb_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._thumb_lbl.setText(icon)
-        self._thumb_lbl.setStyleSheet("font-size: 22px; background: transparent;")
-        header.addWidget(self._thumb_lbl)
+        outer.addWidget(self._cover_lbl, 0, Qt.AlignmentFlag.AlignTop)
 
-        if self.entry.get("thumbnail_url"):
+        # Kick off image loading (GameTDB from serial, then thumbnail_url fallback)
+        self._thumb_lbl = self._cover_lbl  # alias — _load_thumbnail updates this
+        serial = self.entry.get("game_serial", "")
+        thumbnail_url = self.entry.get("thumbnail_url", "")
+        if serial:
+            # Try GameTDB cover art first; if that fails, fall back to thumbnail_url
+            from src.core.downloader import gametdb_cover_url as _gcu
+            cover_url = _gcu(serial)
             threading.Thread(
-                target=self._load_thumbnail,
-                args=(self.entry["thumbnail_url"],),
+                target=self._load_cover_with_fallback,
+                args=(cover_url, thumbnail_url),
                 daemon=True,
             ).start()
+        elif thumbnail_url:
+            threading.Thread(
+                target=self._load_thumbnail,
+                args=(thumbnail_url,),
+                daemon=True,
+            ).start()
+
+        # ── Right: all existing card content ────────────────────────────────
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+        outer.addLayout(layout, 1)
+
+        # Header row: type badge + source badge + status badges
+        header = QHBoxLayout()
 
         type_lbl = QLabel(self.entry["type"].value.replace("_", " ").title())
         type_lbl.setStyleSheet(
@@ -3706,11 +3863,26 @@ class CatalogueCard(QFrame):
         title.setWordWrap(True)
         layout.addWidget(title)
 
-        # Game badge
+        # Game badge — shows game name AND serial (e.g. "🎮 God of War  ·  SCUS-97399")
         if self.entry.get("game"):
-            game_lbl = QLabel(f"🎮 {self.entry['game']}")
-            game_lbl.setStyleSheet("color: #80b0ff; font-size: 11px;")
+            serial_part = (
+                f"  ·  <span style='color:#506080;'>{serial}</span>"
+                if serial else ""
+            )
+            game_lbl = QLabel(
+                f"<span style='color:#80b0ff;'>🎮 {self.entry['game']}</span>"
+                + serial_part
+            )
+            game_lbl.setStyleSheet("font-size: 11px;")
+            game_lbl.setTextFormat(Qt.TextFormat.RichText)
             layout.addWidget(game_lbl)
+        elif serial:
+            # No game name field, but we have a serial — show the serial alone
+            serial_lbl = QLabel(
+                f"<span style='color:#506080; font-size:10px;'>{serial}</span>"
+            )
+            serial_lbl.setTextFormat(Qt.TextFormat.RichText)
+            layout.addWidget(serial_lbl)
 
         # Author row — distinguishes a specific named author from a community hub
         is_hub = self.entry.get("is_hub", False)
@@ -3872,35 +4044,59 @@ class CatalogueCard(QFrame):
         self._fav_btn.setToolTip("Remove from favorites" if new_fav else "Add author to favorites")
         self.favorite_toggled.emit(author, new_fav)
 
+    def _load_cover_with_fallback(self, primary_url: str, fallback_url: str):
+        """Try *primary_url* (GameTDB cover); if it yields a null/empty image try *fallback_url*."""
+        success = self._fetch_and_display(primary_url)
+        if not success and fallback_url:
+            self._fetch_and_display(fallback_url)
+
     def _load_thumbnail(self, url: str):
+        """Load an image from *url* and display it in the cover art label."""
+        self._fetch_and_display(url)
+
+    def _fetch_and_display(self, url: str) -> bool:
+        """Download *url* to a temp file, scale it to the cover art label size,
+        and update the label on the main thread.  Returns True on success."""
+        if not url:
+            return False
         try:
             import urllib.request
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
                 tmp = f.name
-            with urllib.request.urlopen(url, timeout=5) as resp:
+            with urllib.request.urlopen(url, timeout=8) as resp:
                 data = resp.read()
+            if len(data) < 512:
+                # Too small — likely a 404 placeholder or empty response
+                return False
             with open(tmp, "wb") as f:
                 f.write(data)
 
+            loaded = [False]
+
             def _update():
-                if not self._thumb_lbl:
+                if not self._cover_lbl:
                     return
                 pix = QPixmap(tmp).scaled(
-                    28, 28,
+                    60, 88,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 )
                 if not pix.isNull():
-                    self._thumb_lbl.setPixmap(pix)
-                    self._thumb_lbl.setStyleSheet("background: #0f1830; border-radius: 4px;")
+                    self._cover_lbl.setPixmap(pix)
+                    self._cover_lbl.setText("")
+                    self._cover_lbl.setStyleSheet(
+                        "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
+                    )
+                    loaded[0] = True
                 try:
                     os.unlink(tmp)
                 except OSError:
                     pass
 
             QTimer.singleShot(0, _update)
+            return True
         except Exception:
-            pass
+            return False
 
 
 # ---------------------------------------------------------------------------

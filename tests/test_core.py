@@ -3196,7 +3196,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
 
     _REQUIRED_FIELDS = {
         "id", "name", "description", "author", "author_url",
-        "url", "type", "source", "game", "tags",
+        "url", "type", "source", "game", "game_serial", "tags",
         "download_action", "upscale_tech",
         "is_hub", "nsfw",
     }
@@ -3570,3 +3570,311 @@ class TestTextureStructureNormalization(unittest.TestCase):
         ModManager._normalize_texture_structure(dest, "SLUS-20062")
         expected = dest / "SLUS-20062" / "replacements"
         self.assertEqual(len(list(expected.iterdir())), 5)
+
+
+# =============================================================================
+# gametdb_cover_url helper
+# =============================================================================
+
+class TestGametdbCoverUrl(unittest.TestCase):
+    """Tests for the gametdb_cover_url() helper in downloader.py."""
+
+    def setUp(self):
+        from src.core.downloader import gametdb_cover_url
+        self.gcu = gametdb_cover_url
+
+    def test_ntsc_us_slus_gives_us_region(self):
+        url = self.gcu("SLUS-21829")
+        self.assertIn("/US/", url)
+        self.assertIn("SLUS21829", url)
+        self.assertTrue(url.startswith("https://art.gametdb.com/ps2/cover/"))
+
+    def test_ntsc_us_scus_gives_us_region(self):
+        url = self.gcu("SCUS-97399")
+        self.assertIn("/US/", url)
+        self.assertIn("SCUS97399", url)
+
+    def test_pal_sles_gives_en_region(self):
+        url = self.gcu("SLES-52400")
+        self.assertIn("/EN/", url)
+        self.assertIn("SLES52400", url)
+
+    def test_pal_sces_gives_en_region(self):
+        url = self.gcu("SCES-52400")
+        self.assertIn("/EN/", url)
+
+    def test_japan_slps_gives_ja_region(self):
+        url = self.gcu("SLPS-25302")
+        self.assertIn("/JA/", url)
+        self.assertIn("SLPS25302", url)
+
+    def test_hyphen_stripped_from_serial(self):
+        url = self.gcu("SLUS-20312")
+        self.assertIn("SLUS20312", url)
+        self.assertNotIn("SLUS-20312", url)
+
+    def test_empty_serial_returns_empty(self):
+        url = self.gcu("")
+        self.assertEqual(url, "")
+
+    def test_lowercase_input_normalised(self):
+        url = self.gcu("slus-21829")
+        self.assertIn("SLUS21829", url)
+        self.assertIn("/US/", url)
+
+    def test_url_ends_with_jpg(self):
+        url = self.gcu("SLUS-20946")
+        self.assertTrue(url.endswith(".jpg"))
+
+    def test_korea_serial_gives_ko_region(self):
+        url = self.gcu("SLKA-25001")
+        self.assertIn("/KO/", url)
+
+    def test_unknown_prefix_defaults_to_us(self):
+        url = self.gcu("XXXX-99999")
+        self.assertIn("/US/", url)
+
+
+# =============================================================================
+# game_serial field in catalogue (AST-based, no Qt import needed)
+# =============================================================================
+
+def _load_catalogue_ast():
+    """Parse browse_panel.py with ast and return the CATALOGUE list of dicts."""
+    import ast as _ast
+
+    src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+    tree = _ast.parse(src_file.read_text(encoding="utf-8"))
+
+    catalogue_node = None
+    for node in _ast.walk(tree):
+        if (
+            isinstance(node, _ast.AnnAssign)
+            and isinstance(node.target, _ast.Name)
+            and node.target.id == "CATALOGUE"
+            and node.value is not None
+        ):
+            catalogue_node = node.value
+            break
+    if catalogue_node is None:
+        raise RuntimeError("CATALOGUE not found")
+
+    def _lit(node, depth=0):
+        if depth > 20:
+            raise ValueError("depth")
+        if isinstance(node, _ast.Constant):
+            return node.value
+        if isinstance(node, _ast.List):
+            return [_lit(e, depth + 1) for e in node.elts]
+        if isinstance(node, _ast.Tuple):
+            return tuple(_lit(e, depth + 1) for e in node.elts)
+        if isinstance(node, _ast.Dict):
+            return {_lit(k, depth + 1): _lit(v, depth + 1) for k, v in zip(node.keys, node.values)}
+        if isinstance(node, _ast.Attribute):
+            return node.attr.lower()
+        if isinstance(node, _ast.JoinedStr):
+            return "<f-string>"
+        raise ValueError(f"Unexpected node: {type(node).__name__}")
+
+    return _lit(catalogue_node)
+
+
+class TestCatalogueGameSerial(unittest.TestCase):
+    """Every entry must have the game_serial field; game-specific entries must
+    have a non-empty, correctly formatted serial (AST-based, no Qt)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.catalogue = _load_catalogue_ast()
+
+    def test_all_entries_have_game_serial_field(self):
+        for entry in self.catalogue:
+            self.assertIn(
+                "game_serial", entry,
+                f"Entry {entry['id']} missing 'game_serial' field",
+            )
+
+    def test_game_serial_is_string(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(
+                entry["game_serial"], str,
+                f"Entry {entry['id']} game_serial must be str",
+            )
+
+    def test_game_specific_entries_have_valid_serial_format(self):
+        """Non-empty serials must follow the XXXX-DDDDD pattern."""
+        import re
+        serial_re = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for entry in self.catalogue:
+            serial = entry.get("game_serial", "")
+            if serial:
+                self.assertRegex(
+                    serial, serial_re,
+                    f"Entry {entry['id']} has malformed serial: {serial!r}",
+                )
+
+    def test_well_known_game_serials(self):
+        by_id = {e["id"]: e for e in self.catalogue}
+        expected = {
+            "doti_gow1_textures":          "SCUS-97399",
+            "doti_kh2_textures":           "SLUS-21005",
+            "doti_ffx_textures":           "SLUS-20312",
+            "doti_sh2_textures":           "SLUS-20228",
+            "cckrizalid_baroque_textures": "SLUS-21829",
+            "spyro_anb_6x_extra_detail":   "SLUS-21372",
+            "sly2_save_gamefiles":         "SCES-52400",
+            "bully_save_moataz":           "SLUS-21358",
+            "god_of_war_save_gbatemp":     "SCUS-97399",
+        }
+        for eid, expected_serial in expected.items():
+            self.assertIn(eid, by_id, f"Entry {eid!r} not found")
+            actual = by_id[eid]["game_serial"]
+            self.assertEqual(actual, expected_serial,
+                             f"{eid!r}: expected {expected_serial!r}, got {actual!r}")
+
+    def test_game_specific_entries_mostly_have_serial(self):
+        no_serial = [
+            e for e in self.catalogue
+            if e.get("game") and not e.get("game_serial")
+        ]
+        self.assertLessEqual(len(no_serial), 8,
+            f"Too many game entries without serial: {[e['id'] for e in no_serial]}")
+
+
+# =============================================================================
+# Scraper thumbnail_url extraction
+# =============================================================================
+
+class TestScraperThumbnailExtraction(unittest.TestCase):
+    """scrape_gbatemp_thread and scrape_ps2home_post should extract
+    thumbnail_url from post images."""
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_extracts_thumbnail_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        img = "https://files.catbox.moe/cover_art.jpg"
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test HD Textures</h1>'
+            '<span itemprop="name">Author</span>'
+            f'<img src="{img}" alt="cover">'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.12345/")
+        self.assertEqual(result["thumbnail_url"], img)
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_skips_avatar_images(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        avatar = "https://gbatemp.net/data/avatars/user_123.jpg"
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test</h1>'
+            f'<img src="{avatar}" alt="av">'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.12345/")
+        self.assertEqual(result["thumbnail_url"], "")
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_result_has_thumbnail_url_key(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><h1 class='p-title-value'>T</h1></body></html>"
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/x.1/")
+        self.assertIn("thumbnail_url", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_ps2home_result_has_thumbnail_url_key(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><h2 class='topic-title'>S</h2></body></html>"
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post(
+            "https://www.ps2-home.com/forum/viewtopic.php?t=1"
+        )
+        self.assertIn("thumbnail_url", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_ps2home_extracts_post_image(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        img = "https://www.ps2-home.com/forum/img/screenshot.jpg"
+        html = (
+            '<html><body>'
+            '<h2 class="topic-title">ATV Save</h2>'
+            f'<img src="{img}" alt="shot">'
+            '</body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = html
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post(
+            "https://www.ps2-home.com/forum/viewtopic.php?t=12165"
+        )
+        self.assertEqual(result["thumbnail_url"], img)
+
+
+# =============================================================================
+# CCKrizalid catalogue entries (AST-based)
+# =============================================================================
+
+class TestCCKrizalidEntries(unittest.TestCase):
+    """Verify CCKrizalid 'Mega Library' texture pack entries."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.entries = {e["id"]: e for e in _load_catalogue_ast()}
+
+    def test_baroque_entry_present(self):
+        self.assertIn("cckrizalid_baroque_textures", self.entries)
+
+    def test_baroque_has_confirmed_mega_link(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertIn("mega.nz/file/Qds2kQAR", e["direct_download_url"])
+
+    def test_baroque_serial_is_slus_21829(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertEqual(e["game_serial"], "SLUS-21829")
+
+    def test_baroque_author_is_cckrizalid(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertEqual(e["author"], "CCKrizalid")
+
+    def test_baroque_author_url_points_to_profile(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertIn("cckrizalid.606805", e["author_url"])
+
+    def test_all_cckrizalid_entries_have_thread_url(self):
+        thread = "mega-library-of-hd-texture-packs-by-cckrizalid.618690"
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        self.assertGreater(len(cc), 1)
+        for e in cc:
+            self.assertIn(thread, e["url"],
+                          f"{e['id']}: url should contain the thread slug")
+
+    def test_all_cckrizalid_entries_are_texture_packs(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        for e in cc:
+            self.assertEqual(e["type"], "texture_pack",
+                             f"{e['id']} type should be texture_pack")
+
+    def test_all_cckrizalid_entries_have_serials(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        for e in cc:
+            self.assertTrue(e.get("game_serial"),
+                            f"{e['id']} missing game_serial")
+
+    def test_minimum_cckrizalid_pack_count(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        self.assertGreaterEqual(len(cc), 15,
+                                "Expected at least 15 CCKrizalid pack entries")
