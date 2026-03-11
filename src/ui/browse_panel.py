@@ -546,6 +546,106 @@ CATALOGUE: List[dict] = [
         "direct_download_url": "",
         "upscale_tech": "ESRGAN",
     },
+    # ── Post 147372741: HD Textures + PNACH + Lights (multi-part zips) ────────
+    {
+        "id": "patreon_147372741_hd_textures",
+        "name": "DeadOnTheInside — PS2 HD Texture Pack (Large, Multi-Part)",
+        "description": (
+            "Large HD texture replacement pack split across multiple ZIP parts. "
+            "Free on Patreon — a free account is required to download attachments. "
+            "Download ALL parts to the same folder, then use ➕ Import → 📦 Archive "
+            "and select Part 1; PS2 Mod Manager will automatically find and extract "
+            "all remaining parts."
+        ),
+        "context": (
+            "Multi-part import steps: 1) Log in to Patreon (free account). "
+            "2) Download every numbered ZIP part from the post to the SAME folder. "
+            "3) In Texture Packs → ➕ Import → 📦 Archive, select the first part. "
+            "4) Enter the Game ID shown in the post. "
+            "The app extracts all parts together and places textures in "
+            "textures/<SERIAL>/replacements/ automatically."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/147372741",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "hd", "esrgan", "ps2", "free", "multi-part", "large"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "patreon_147372741_pnach",
+        "name": "DeadOnTheInside — PNACH Patch (Post 147372741)",
+        "description": (
+            "PNACH patch included with the large HD texture pack post on Patreon. "
+            "May include widescreen, 60 fps, or other game improvements. "
+            "Free on Patreon — a free account is required. "
+            "Download the PNACH file and place it in your PCSX2 cheats folder, "
+            "or import via PS2 Mod Manager's PNACH Patches panel."
+        ),
+        "context": (
+            "Download from the Patreon post, then import via PNACH Patches → ➕ Import → 📄 File. "
+            "The CRC in the filename must match your game disc. "
+            "Check the post description for the correct game serial / CRC."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/147372741",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "pnach", "widescreen", "free", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "patreon_147372741_lights",
+        "name": "DeadOnTheInside — Upscaled Lights & Effects Texture Pack",
+        "description": (
+            "Upscaled lights and effects texture replacement pack included in the "
+            "same Patreon post as the main HD textures. "
+            "Replaces bloom, glow, particle, and lighting textures for an enhanced look. "
+            "Free on Patreon — a free account is required. "
+            "Import separately from the main HD pack using the same Game ID."
+        ),
+        "context": (
+            "Download from the Patreon post, then import via Texture Packs → ➕ Import. "
+            "This is a separate pack from the main HD textures — import both for the "
+            "full visual upgrade. Enter the Game ID shown in the post."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/147372741",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "hd", "lights", "effects", "esrgan", "ps2", "free"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
     # ── Game-Specific Texture Packs ───────────────────────────────────────────
     {
         "id": "spyro_etd_textures",
@@ -3581,9 +3681,9 @@ class DownloadInstallDialog(QDialog):
             "Google Drive share links are auto-converted. "
             "MEGA links must be downloaded manually.<br>"
             "<span style='color:#a08040;'>🔒 Patreon attachments:</span> "
-            "log in to Patreon, open the post, download the file through your "
-            "browser, then use <b>📁 Folder</b> or <b>📦 Archive</b> import "
-            "in the Texture Packs panel instead."
+            "log in to Patreon, open the post, download <b>all parts</b> to the same "
+            "folder, then use <b>📦 Archive</b> import in the Texture Packs panel — "
+            "select Part 1 and the app will find and extract all other parts automatically."
         )
         info.setTextFormat(Qt.TextFormat.RichText)
         info.setWordWrap(True)

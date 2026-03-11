@@ -536,7 +536,133 @@ class TestArchiveExtraction(unittest.TestCase):
             cm.MODS_DB_FILE = orig
 
 
-class TestMemoryCardCreate(unittest.TestCase):
+class TestMultipartArchive(unittest.TestCase):
+    """Tests for multi-part archive detection and extraction."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_zip(self, name: str, files: dict) -> str:
+        import zipfile
+        path = Path(self.tmpdir) / name
+        with zipfile.ZipFile(str(path), "w") as zf:
+            for fname, content in files.items():
+                zf.writestr(fname, content)
+        return str(path)
+
+    # -- is_multipart_archive ------------------------------------------------
+
+    def test_named_parts_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack_Part1.zip"))
+        self.assertTrue(is_multipart_archive("Pack_Part2.zip"))
+        self.assertTrue(is_multipart_archive("MyMod-Part-3.zip"))
+        self.assertTrue(is_multipart_archive("Textures_pt1.7z"))
+
+    def test_7z_volume_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack.7z.001"))
+        self.assertTrue(is_multipart_archive("Pack.7z.002"))
+
+    def test_zip_split_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack.z01"))
+        self.assertTrue(is_multipart_archive("Pack.z02"))
+
+    def test_regular_zip_not_multipart(self):
+        from src.core.archive import is_multipart_archive
+        self.assertFalse(is_multipart_archive("Pack.zip"))
+        self.assertFalse(is_multipart_archive("SLUS-20062.zip"))
+        self.assertFalse(is_multipart_archive("textures.7z"))
+
+    # -- find_multipart_parts ------------------------------------------------
+
+    def test_find_all_named_parts(self):
+        from src.core.archive import find_multipart_parts
+        # Create three part files
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"MyPack_Part{i}.zip").write_bytes(b"data")
+        parts = find_multipart_parts(str(Path(self.tmpdir) / "MyPack_Part1.zip"))
+        names = [Path(p).name for p in parts]
+        self.assertEqual(names, ["MyPack_Part1.zip", "MyPack_Part2.zip", "MyPack_Part3.zip"])
+
+    def test_find_parts_from_any_sibling(self):
+        from src.core.archive import find_multipart_parts
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"Tex_Part{i}.zip").write_bytes(b"data")
+        # Asking from Part2 should still find all three
+        parts = find_multipart_parts(str(Path(self.tmpdir) / "Tex_Part2.zip"))
+        self.assertEqual(len(parts), 3)
+
+    def test_find_returns_empty_for_regular_zip(self):
+        from src.core.archive import find_multipart_parts
+        p = str(Path(self.tmpdir) / "single.zip")
+        Path(p).write_bytes(b"data")
+        self.assertEqual(find_multipart_parts(p), [])
+
+    # -- check_multipart_completeness ----------------------------------------
+
+    def test_complete_set_reports_no_missing(self):
+        from src.core.archive import check_multipart_completeness
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"Pack_Part{i}.zip").write_bytes(b"data")
+        ok, parts, missing = check_multipart_completeness(
+            str(Path(self.tmpdir) / "Pack_Part1.zip")
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(parts), 3)
+        self.assertEqual(missing, 0)
+
+    def test_incomplete_set_reports_missing(self):
+        from src.core.archive import check_multipart_completeness
+        # Only parts 1 and 3 — part 2 is missing
+        for i in (1, 3):
+            Path(self.tmpdir, f"Pack_Part{i}.zip").write_bytes(b"data")
+        ok, parts, missing = check_multipart_completeness(
+            str(Path(self.tmpdir) / "Pack_Part1.zip")
+        )
+        self.assertFalse(ok)
+        self.assertGreater(missing, 0)
+
+    # -- extract_archive with multi-part zips --------------------------------
+
+    def test_extract_named_parts_merges_contents(self):
+        from src.core.archive import extract_archive
+        # Part 1 has textures A, Part 2 has textures B
+        self._make_zip("Set_Part1.zip", {"texA.png": b"A"})
+        self._make_zip("Set_Part2.zip", {"texB.png": b"B"})
+        dest = str(Path(self.tmpdir) / "out")
+        extracted = extract_archive(
+            str(Path(self.tmpdir) / "Set_Part1.zip"), dest
+        )
+        # Both files should be in the output
+        self.assertIn("texA.png", extracted)
+        self.assertIn("texB.png", extracted)
+        self.assertTrue((Path(dest) / "texA.png").exists())
+        self.assertTrue((Path(dest) / "texB.png").exists())
+
+    def test_extract_single_named_part_works(self):
+        from src.core.archive import extract_archive
+        self._make_zip("Solo_Part1.zip", {"file.png": b"data"})
+        dest = str(Path(self.tmpdir) / "out")
+        extracted = extract_archive(
+            str(Path(self.tmpdir) / "Solo_Part1.zip"), dest
+        )
+        self.assertIn("file.png", extracted)
+
+    def test_is_archive_recognises_named_parts(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("Pack_Part1.zip"))
+        self.assertTrue(is_archive("Pack.7z.001"))
+        # Regular archives still work
+        self.assertTrue(is_archive("pack.zip"))
+        self.assertTrue(is_archive("pack.7z"))
+
+
+
     """Tests for create_memcard."""
 
     def setUp(self):

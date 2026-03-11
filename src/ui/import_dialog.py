@@ -132,6 +132,16 @@ class ImportModDialog(QDialog):
         self._replacement_hint.hide()
         form.addRow("", self._replacement_hint)
 
+        # Hint shown when a multi-part archive is detected
+        self._multipart_hint = QLabel("")
+        self._multipart_hint.setStyleSheet(
+            "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+            "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+        )
+        self._multipart_hint.setWordWrap(True)
+        self._multipart_hint.hide()
+        form.addRow("", self._multipart_hint)
+
         self._desc_edit = QTextEdit()
         self._desc_edit.setPlaceholderText("Short description…")
         self._desc_edit.setMaximumHeight(80)
@@ -197,16 +207,20 @@ class ImportModDialog(QDialog):
             self,
             f"Select {_type_label(self.mod_type)} Archive",
             "",
-            "Archives (*.zip *.7z);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
+            "Archives (*.zip *.7z *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
         )
         if path:
             self._src_edit.setText(path)
             if not self._name_edit.text():
-                # Strip extension for default name
+                # Strip extension for default name; handle .7z.001 → stem up to first .7z
                 stem = Path(path).stem
+                if stem.lower().endswith(".7z"):
+                    stem = Path(stem).stem  # strip the inner .7z too
                 self._name_edit.setText(stem)
             # Auto-detect game serial
             self._auto_detect_game_id(path)
+            # Detect multi-part archive and show status
+            self._check_multipart_archive(path)
             # For archives, peek at top-level names to detect replacement pattern
             if self.mod_type == ModType.TEXTURE_PACK:
                 self._check_replacement_pattern(path)
@@ -327,9 +341,75 @@ class ImportModDialog(QDialog):
             self._replacement_hint.hide()
             self._gameid_edit.setStyleSheet("")
 
+    def _check_multipart_archive(self, path: str) -> None:
+        """Detect a multi-part archive and show status in the multipart hint label.
+
+        When the user selects e.g. ``Pack_Part1.zip`` or ``Pack.7z.001``, this
+        method scans the same folder for sibling parts and reports:
+          • How many parts were found.
+          • Which (if any) parts appear to be missing.
+          • An instruction that all parts will be imported together automatically.
+        """
+        if not hasattr(self, '_multipart_hint'):
+            return
+
+        try:
+            from src.core.archive import (
+                is_multipart_archive,
+                find_multipart_parts,
+                check_multipart_completeness,
+            )
+        except ImportError:
+            return
+
+        if not is_multipart_archive(path):
+            self._multipart_hint.hide()
+            return
+
+        is_complete, parts, missing = check_multipart_completeness(path)
+        count = len(parts)
+
+        part_names = [Path(p).name for p in parts]
+        names_preview = ", ".join(part_names[:4])
+        if len(part_names) > 4:
+            names_preview += f", … (+{len(part_names) - 4} more)"
+
+        if is_complete and count > 1:
+            msg = (
+                f"📦  Multi-part archive detected — {count} parts found in the same folder.\n"
+                f"Parts: {names_preview}\n"
+                "✅  All parts are present. They will all be extracted together on import."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+        elif missing > 0:
+            msg = (
+                f"📦  Multi-part archive detected — {count} parts found, ~{missing} missing.\n"
+                f"Parts found: {names_preview}\n"
+                f"⚠  Download all parts to the same folder before importing.\n"
+                "The pack will be incomplete if any parts are missing."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+        else:
+            msg = (
+                "📦  This looks like a multi-part archive.\n"
+                "Make sure all parts are in the same folder, then select Part 1 here.\n"
+                "PS2 Mod Manager will find and extract all other parts automatically."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+
+        self._multipart_hint.setText(msg)
+        self._multipart_hint.show()
 
 
-    def _accept(self):
         if not self._src_edit.text():
             from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(self, "No Source", "Please select a source folder or file.")
