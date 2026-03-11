@@ -153,8 +153,10 @@ def load_catalogue(
     catalogue_dir:
         Override the default ``data/catalogue/`` directory.  Useful in tests.
     strict:
-        When *True*, any schema violation raises ``ValueError`` immediately.
-        When *False* (the default), bad entries are logged and skipped.
+        When *True*, any schema violation (missing required field, duplicate ID,
+        unparseable JSON) raises ``ValueError`` immediately and stops loading.
+        When *False* (the default), bad entries are logged via the module
+        logger and silently skipped so the rest of the catalogue still loads.
 
     Returns
     -------
