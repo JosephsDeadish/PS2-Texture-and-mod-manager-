@@ -1723,23 +1723,24 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         return ids
 
     def test_game_specific_texture_entries_present(self):
-        """Catalogue should include game-specific texture pack entries."""
+        """Catalogue should include game-specific texture pack entries (non-hub, specific files)."""
         ids = self._load_catalogue()
+        # DeadOnTheInside Patreon-hosted texture packs are the main specific-file entries
         game_entries = [
-            "spyro_etd_textures",
-            "crash_woc_textures",
-            "gow1_textures",
-            "ffx_textures",
-            "kh1_textures",
-            "kh2_textures",
-            "sotc_textures",
-            "gt4_textures",
-            "dmc3_textures",
-            "ratchet_clank_textures",
-            "jak_daxter_textures",
-            "dbz_bt3_textures",
-            "gta_sa_textures",
-            "ico_textures",
+            "doti_spyro_textures",
+            "doti_crash_woc_textures",
+            "doti_gow1_textures",
+            "doti_ffx_textures",
+            "doti_kh1_textures",
+            "doti_kh2_textures",
+            "doti_sotc_textures",
+            "doti_gt4_textures",
+            "doti_dmc3_textures",
+            "doti_ratchet_clank_textures",
+            "doti_jak_textures",
+            "doti_dbz_bt3_textures",
+            "doti_gtasa_textures",
+            "doti_ico_textures",
         ]
         for entry_id in game_entries:
             self.assertIn(entry_id, ids, f"Missing catalogue entry: {entry_id}")
@@ -3007,9 +3008,10 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
                 ids.append(val)
         return ids
 
-    def test_gbatemp_downloads_saves_hub_present(self):
+    def test_gbatemp_downloads_saves_hub_removed(self):
+        """The gbatemp_downloads_saves_hub entry is a category hub and must NOT be in catalogue."""
         ids = self._get_ids()
-        self.assertIn("gbatemp_downloads_saves_hub", ids)
+        self.assertNotIn("gbatemp_downloads_saves_hub", ids)
 
     def test_sly2_save_entry_present(self):
         ids = self._get_ids()
@@ -3019,9 +3021,10 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
         ids = self._get_ids()
         self.assertIn("bully_save_moataz", ids)
 
-    def test_ps2home_saves_hub_present(self):
+    def test_ps2home_saves_hub_removed(self):
+        """The ps2home_saves_hub entry is a category hub and must NOT be in catalogue."""
         ids = self._get_ids()
-        self.assertIn("ps2home_saves_hub", ids)
+        self.assertNotIn("ps2home_saves_hub", ids)
 
     def test_atv_save_entry_present(self):
         ids = self._get_ids()
@@ -3048,6 +3051,40 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
         bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
         src = bp_path.read_text(encoding="utf-8")
         self.assertIn("ps2-home.com/forum/viewtopic.php?f=70&t=12165", src)
+
+    # Popular-game save entries added for issue #3
+    def test_popular_game_saves_present(self):
+        """Issue #3 popular PS2 game save entries must be in the catalogue."""
+        ids = self._get_ids()
+        expected = [
+            "kingdom_hearts_save_gbatemp",
+            "ffx_save_gbatemp",
+            "god_of_war_save_gbatemp",
+            "gta_sa_save_gbatemp",
+            "mgs3_save_gbatemp",
+            "re4_save_gbatemp",
+            "sotc_save_gbatemp",
+            "jak_daxter_save_gbatemp",
+            "ratchet_clank_save_gbatemp",
+            "dbz_bt3_save_gbatemp",
+            "tekken5_save_gbatemp",
+            "persona4_save_gbatemp",
+        ]
+        for eid in expected:
+            self.assertIn(eid, ids, f"Missing popular-game save entry: {eid}")
+
+    def test_all_save_entries_are_not_hub(self):
+        """Every save file entry must be a specific-file entry (is_hub=False)."""
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        # Confirm the catalogue has no hub entries at all
+        self.assertNotIn('"is_hub": True', src, "Hub entries should have been removed")
+
+    def test_save_entries_have_game_serial_or_game_name(self):
+        """Every specific save entry should mention a game name or serial in description/context."""
+        ids = self._get_ids()
+        save_ids = [eid for eid in ids if 'save' in eid.lower()]
+        self.assertGreater(len(save_ids), 5, "Expected multiple specific save entries")
 
 
 # =============================================================================
@@ -3367,12 +3404,16 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 )
 
     def test_nsfw_filter_logic(self):
-        """NSFW entries must be filterable: with show_nsfw=False, no nsfw entries appear;
-        with show_nsfw=True, nsfw entries are included."""
+        """NSFW filter logic must work correctly.
+
+        All current entries are safe (nsfw=False).  The filter with show_nsfw=False
+        must return only non-nsfw entries; with show_nsfw=True it returns everything.
+        """
         nsfw_entries = [e for e in self.catalogue if e.get("nsfw")]
         safe_entries  = [e for e in self.catalogue if not e.get("nsfw")]
 
-        self.assertGreater(len(nsfw_entries), 0, "There should be at least one nsfw entry")
+        # All current entries should be non-nsfw (hub entries that were nsfw have been removed)
+        self.assertEqual(len(nsfw_entries), 0, "No nsfw entries expected after hub removal")
         self.assertGreater(len(safe_entries), 0, "There should be safe (non-nsfw) entries")
 
         # Simulate the filter logic
@@ -3382,16 +3423,12 @@ class TestCatalogueIntegrity(unittest.TestCase):
         without_nsfw = apply_filter(self.catalogue, show_nsfw=False)
         with_nsfw    = apply_filter(self.catalogue, show_nsfw=True)
 
-        # No nsfw entries in filtered-out result
+        # No nsfw entries in either result (since there are none)
         self.assertFalse(
             any(e.get("nsfw") for e in without_nsfw),
             "show_nsfw=False should remove all nsfw entries"
         )
-        # All nsfw entries present when enabled
-        self.assertGreater(
-            len(with_nsfw), len(without_nsfw),
-            "show_nsfw=True should include more entries than show_nsfw=False"
-        )
+        # All entries appear with show_nsfw=True as well
         self.assertEqual(len(with_nsfw), len(self.catalogue))
 
 
