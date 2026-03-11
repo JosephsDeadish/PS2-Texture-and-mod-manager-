@@ -3051,6 +3051,509 @@ CATALOGUE: List[dict] = [
         "requires_account": True,
         "is_complete": True,
     },
+    # ── CCKrizalid "Mega Library" HD Texture Packs ───────────────────────────
+    # Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/
+    # All packs are hosted on MEGA. Use the in-app '🔍 Scan GBAtemp/PS2-Home Post' button
+    # to auto-discover each pack's direct MEGA link from the thread.
+    # MEGA links cannot be auto-downloaded — download manually in-browser then import.
+    {
+        "id": "cckrizalid_baroque_textures",
+        "name": "Baroque — HD Texture Pack",
+        "description": (
+            "HD texture pack for Baroque (PS2) by CCKrizalid. "
+            "Baroque is a dungeon-crawling RPG originally released in Japan (1998) "
+            "with a PS2 port in 2008. This pack upscales the game's dark, gothic textures "
+            "using AI upscaling for use with PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Download the MEGA file manually (browser required), "
+            "then import via the Texture Packs panel ➕ Import. "
+            "NTSC-U serial: SLUS-21829. "
+            "Full pack list: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Baroque",
+        "thumbnail_url": "",
+        "tags": ["baroque", "jrpg", "dungeon-crawler", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "https://mega.nz/file/Qds2kQAR#H0axHO4bIWOciSqh0jNkkzwpfHMiZ8AukDQfFClLMuI",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_shadow_hearts_textures",
+        "name": "Shadow Hearts — HD Texture Pack",
+        "description": (
+            "HD texture pack for Shadow Hearts (PS2) by CCKrizalid. "
+            "Shadow Hearts is a dark-fantasy RPG set in early 20th century Europe and Asia. "
+            "Upscaled textures via AI for use with PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link for this pack, then download manually and import. "
+            "NTSC-U serial: SLUS-20718. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Shadow Hearts",
+        "thumbnail_url": "",
+        "tags": ["shadow-hearts", "rpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_shadow_hearts_covenant_textures",
+        "name": "Shadow Hearts: Covenant — HD Texture Pack",
+        "description": (
+            "HD texture pack for Shadow Hearts: Covenant (PS2) by CCKrizalid. "
+            "The acclaimed sequel with one of the best stories in PS2 RPGs. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-20964. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Shadow Hearts: Covenant",
+        "thumbnail_url": "",
+        "tags": ["shadow-hearts", "covenant", "rpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_suikoden5_textures",
+        "name": "Suikoden V — HD Texture Pack",
+        "description": (
+            "HD texture pack for Suikoden V (PS2) by CCKrizalid. "
+            "The last mainline Suikoden title on PS2, featuring 108 Stars of Destiny "
+            "and beloved strategic JRPG combat. AI-upscaled textures for PCSX2. "
+            "Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21291. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Suikoden V",
+        "thumbnail_url": "",
+        "tags": ["suikoden", "rpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_mana_khemia_textures",
+        "name": "Mana Khemia: Alchemists of Al-Revis — HD Texture Pack",
+        "description": (
+            "HD texture pack for Mana Khemia: Alchemists of Al-Revis (PS2) by CCKrizalid. "
+            "A beloved alchemy-based JRPG from Gust. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21774. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Mana Khemia: Alchemists of Al-Revis",
+        "thumbnail_url": "",
+        "tags": ["mana-khemia", "alchemy", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_atelier_iris3_textures",
+        "name": "Atelier Iris 3: Grand Phantasm — HD Texture Pack",
+        "description": (
+            "HD texture pack for Atelier Iris 3: Grand Phantasm (PS2) by CCKrizalid. "
+            "Third entry in Gust's Atelier Iris trilogy, featuring alchemy and exploration. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21502. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Atelier Iris 3: Grand Phantasm",
+        "thumbnail_url": "",
+        "tags": ["atelier-iris", "alchemy", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_la_pucelle_textures",
+        "name": "La Pucelle: Tactics — HD Texture Pack",
+        "description": (
+            "HD texture pack for La Pucelle: Tactics (PS2) by CCKrizalid. "
+            "A tactical RPG from NIS (Nippon Ichi Software) sharing its world with Disgaea. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-20596. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "La Pucelle: Tactics",
+        "thumbnail_url": "",
+        "tags": ["la-pucelle", "tactical-rpg", "nis", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_disgaea_textures",
+        "name": "Disgaea: Hour of Darkness — HD Texture Pack",
+        "description": (
+            "HD texture pack for Disgaea: Hour of Darkness (PS2) by CCKrizalid. "
+            "The iconic tactical RPG by NIS with its beloved over-the-top humour and depth. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-20552. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Disgaea: Hour of Darkness",
+        "thumbnail_url": "",
+        "tags": ["disgaea", "tactical-rpg", "nis", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_ar_tonelico_textures",
+        "name": "Ar tonelico: Melody of Elemia — HD Texture Pack",
+        "description": (
+            "HD texture pack for Ar tonelico: Melody of Elemia (PS2) by CCKrizalid. "
+            "A unique JRPG set on towering structures with musical magic (Reyvateil). "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21800. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Ar tonelico: Melody of Elemia",
+        "thumbnail_url": "",
+        "tags": ["ar-tonelico", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_grandia3_textures",
+        "name": "Grandia III — HD Texture Pack",
+        "description": (
+            "HD texture pack for Grandia III (PS2) by CCKrizalid. "
+            "The third mainline Grandia JRPG, known for its vibrant visuals and "
+            "fast-paced combo battle system. AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21428. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Grandia III",
+        "thumbnail_url": "",
+        "tags": ["grandia", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_radiata_stories_textures",
+        "name": "Radiata Stories — HD Texture Pack",
+        "description": (
+            "HD texture pack for Radiata Stories (PS2) by CCKrizalid. "
+            "A tri-Ace / Square Enix action RPG with 177 recruitable characters. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21375. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Radiata Stories",
+        "thumbnail_url": "",
+        "tags": ["radiata-stories", "jrpg", "tri-ace", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_xenosaga2_textures",
+        "name": "Xenosaga Episode II — HD Texture Pack",
+        "description": (
+            "HD texture pack for Xenosaga Episode II: Jenseits von Gut und Böse (PS2) "
+            "by CCKrizalid. The middle chapter of the Xenosaga sci-fi RPG trilogy. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-20892. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Xenosaga Episode II",
+        "thumbnail_url": "",
+        "tags": ["xenosaga", "jrpg", "sci-fi", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_xenosaga3_textures",
+        "name": "Xenosaga Episode III — HD Texture Pack",
+        "description": (
+            "HD texture pack for Xenosaga Episode III: Also sprach Zarathustra (PS2) "
+            "by CCKrizalid. The conclusion of the Xenosaga trilogy. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21488. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Xenosaga Episode III",
+        "thumbnail_url": "",
+        "tags": ["xenosaga", "jrpg", "sci-fi", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_wild_arms4_textures",
+        "name": "Wild Arms 4 — HD Texture Pack",
+        "description": (
+            "HD texture pack for Wild Arms 4 (PS2) by CCKrizalid. "
+            "The fourth mainline Wild Arms JRPG, set in a post-apocalyptic world. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21243. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Wild Arms 4",
+        "thumbnail_url": "",
+        "tags": ["wild-arms", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_tales_of_legendia_textures",
+        "name": "Tales of Legendia — HD Texture Pack",
+        "description": (
+            "HD texture pack for Tales of Legendia (PS2) by CCKrizalid. "
+            "A PS2-exclusive Tales JRPG with a unique cast and maritime setting. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "NTSC-U serial: SLUS-21201. "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Tales of Legendia",
+        "thumbnail_url": "",
+        "tags": ["tales-of", "legendia", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "cckrizalid_tales_of_rebirth_textures",
+        "name": "Tales of Rebirth — HD Texture Pack",
+        "description": (
+            "HD texture pack for Tales of Rebirth (PS2) by CCKrizalid. "
+            "A Japan-exclusive Tales JRPG playable via fan translation. "
+            "AI-upscaled textures for PCSX2. Hosted on MEGA."
+        ),
+        "context": (
+            "Use '🔍 Scan GBAtemp/PS2-Home Post' with the thread URL to auto-detect "
+            "the MEGA download link, then download manually and import. "
+            "Japanese serial: SLPS-25302 (JP only). "
+            "Thread: https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/"
+        ),
+        "author": "CCKrizalid",
+        "author_url": "https://gbatemp.net/members/cckrizalid.606805/#latest-activity",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Tales of Rebirth",
+        "thumbnail_url": "",
+        "tags": ["tales-of", "rebirth", "jrpg", "hd", "mega", "cckrizalid"],
+        "download_action": "manual_mega",
+        "direct_download_url": "",
+        "upscale_tech": "AI",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
 ]
 
 # Collect unique sources for the source filter dropdown

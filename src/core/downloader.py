@@ -400,7 +400,42 @@ def _make_download_label(url: str) -> str:
     netloc = parsed.netloc.lower()
     if (netloc in ("www.mediafire.com", "mediafire.com")) and len(parts) >= 3:
         return urllib.parse.unquote(parts[-2]) if parts[-1] == "file" else urllib.parse.unquote(parts[-1])
+    # MEGA file links: mega.nz/file/<id>#<key> — the URL path is opaque; return bare "MEGA Download"
+    if "mega.nz" in netloc:
+        return "MEGA Download"
     return urllib.parse.unquote(parts[-1]) if parts else url
+
+
+#: Regex that matches a full anchor tag whose href contains a recognised download URL.
+#: Group 1 = raw href value, Group 2 = anchor inner text (stripped of sub-tags).
+_ANCHOR_HREF_RE = re.compile(
+    r'<a\b[^>]+href="([^"]+)"[^>]*>(.*?)</a>',
+    re.DOTALL | re.IGNORECASE,
+)
+
+#: Maximum length of anchor text we consider as a useful label.
+_MAX_ANCHOR_LABEL = 120
+
+
+def _extract_anchor_label(href: str, html: str) -> Optional[str]:
+    """Search *html* for an ``<a href="…">text</a>`` tag whose href matches *href*.
+
+    Returns the cleaned anchor text if it is short enough to be a useful label
+    (i.e. a game title or "Download" button label), otherwise returns ``None``.
+
+    This allows the scraper to show "Baroque" instead of "MEGA Download" when
+    the HTML looks like ``<a href="https://mega.nz/…">Baroque</a>``.
+    """
+    for m in _ANCHOR_HREF_RE.finditer(html):
+        if href in m.group(1):
+            text = re.sub(r"<[^>]+>", "", m.group(2)).strip()
+            # Skip unhelpful generic labels
+            if text and len(text) <= _MAX_ANCHOR_LABEL and text.lower() not in (
+                "download", "here", "click here", "link", "mega", "mediafire",
+                "google drive", "gdrive", "mirror",
+            ):
+                return text
+    return None
 
 
 def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
@@ -498,10 +533,13 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                 if raw in seen:
                     continue
                 seen.add(raw)
+                # Try to get a meaningful label from the surrounding anchor tag
+                # (e.g. "Baroque" instead of "MEGA Download" for a labelled MEGA link)
+                anchor_label = _extract_anchor_label(raw, html)
                 result["download_urls"].append({
                     "url": raw,
                     "host": host,
-                    "label": _make_download_label(raw),
+                    "label": anchor_label or _make_download_label(raw),
                 })
 
         # For GBAtemp-hosted resource downloads (/download/ pages) also expose
@@ -616,10 +654,11 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 if raw in seen:
                     continue
                 seen.add(raw)
+                anchor_label = _extract_anchor_label(raw, html)
                 result["download_urls"].append({
                     "url": raw,
                     "host": host,
-                    "label": _make_download_label(raw),
+                    "label": anchor_label or _make_download_label(raw),
                 })
 
         # phpBB attachments: <a href="./download/...">filename</a>
