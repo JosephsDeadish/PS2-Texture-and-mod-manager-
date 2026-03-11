@@ -3814,8 +3814,8 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Basic load ──────────────────────────────────────────────────────────
 
     def test_loads_more_than_150_entries(self):
-        self.assertGreater(len(self.catalogue), 600,
-                           "catalogue should have >600 entries after scaling")
+        self.assertGreater(len(self.catalogue), 850,
+                           "catalogue should have >850 entries after scaling")
 
     def test_no_duplicate_ids(self):
         ids = [e["id"] for e in self.catalogue]
@@ -3858,15 +3858,15 @@ class TestCatalogueLoader(unittest.TestCase):
 
     def test_has_texture_pack_entries(self):
         tp = [e for e in self.catalogue if e["type"] == "texture_pack"]
-        self.assertGreater(len(tp), 250, "Expected >250 texture pack entries")
+        self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
 
     def test_has_pnach_entries(self):
         pn = [e for e in self.catalogue if e["type"] == "pnach"]
-        self.assertGreater(len(pn), 200, "Expected >200 PNACH entries")
+        self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
 
     def test_has_save_file_entries(self):
         sv = [e for e in self.catalogue if e["type"] == "save_file"]
-        self.assertGreater(len(sv), 60, "Expected >60 save file entries")
+        self.assertGreater(len(sv), 120, "Expected >120 save file entries")
 
     def test_no_generic_placeholder_authors(self):
         """Every entry should attribute a real person/project, not a generic placeholder."""
