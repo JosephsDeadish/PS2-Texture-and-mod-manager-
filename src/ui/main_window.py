@@ -1,6 +1,6 @@
 """Main application window for PS2 Mod Manager."""
 
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import (
     QFrame,
@@ -28,6 +28,14 @@ from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
 
 PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+
+
+# ---------------------------------------------------------------------------
+# Helper: bridge object so the update checker thread can emit Qt signals
+# ---------------------------------------------------------------------------
+
+class _UpdateSignals(QObject):
+    updates_found = pyqtSignal(int)   # number of mods with updates
 
 
 # ---------------------------------------------------------------------------
@@ -59,8 +67,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PS2 Mod Manager")
         self.setMinimumSize(1100, 720)
         self._nav_buttons: list[NavButton] = []
+        self._update_signals = _UpdateSignals()
+        self._update_signals.updates_found.connect(self._on_updates_found)
         self._build_ui()
         self._check_first_run()
+        self._maybe_start_update_checker()
 
     # ------------------------------------------------------------------
     # UI Construction
@@ -252,3 +263,27 @@ class MainWindow(QMainWindow):
         self._on_settings_saved(config)
         self._settings_panel.reload_config(config)
         self._show_status("Setup complete ✅")
+
+    # ------------------------------------------------------------------
+    # Update checker
+    # ------------------------------------------------------------------
+
+    def _maybe_start_update_checker(self):
+        if not self.config.check_updates_on_start:
+            return
+        try:
+            from src.core.updater import UpdateChecker
+            self._update_checker = UpdateChecker(self.db)
+            self._update_checker.start(
+                on_complete=self._update_signals.updates_found.emit
+            )
+        except Exception:
+            pass  # Never crash the UI over an update check
+
+    def _on_updates_found(self, count: int):
+        if count > 0:
+            self._status_bar.showMessage(
+                f"🔔 {count} mod update(s) available — check individual mod panels for details",
+                10_000,
+            )
+

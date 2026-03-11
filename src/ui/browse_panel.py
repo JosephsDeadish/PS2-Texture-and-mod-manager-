@@ -38,7 +38,12 @@ from src.ui.widgets import DownloadProgressWidget
 # Catalogue entries (public, legal mod sources)
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Catalogue entries (public, legal mod sources)
+# ---------------------------------------------------------------------------
+
 CATALOGUE = [
+    # ── Texture Packs ─────────────────────────────────────────────────────
     {
         "id": "pcsx2_wiki_textures",
         "name": "PCSX2 Texture Replacement Guide",
@@ -49,7 +54,7 @@ CATALOGUE = [
         "url": "https://wiki.pcsx2.net/Texture_Replacement",
         "type": ModType.TEXTURE_PACK,
         "author": "PCSX2 Community",
-        "thumbnail_url": "",
+        "thumbnail_url": "https://wiki.pcsx2.net/images/pcsx2-icon.png",
         "tags": ["guide", "official"],
     },
     {
@@ -62,47 +67,21 @@ CATALOGUE = [
         "url": "https://gbatemp.net/tags/ps2-texture-pack/",
         "type": ModType.TEXTURE_PACK,
         "author": "GBAtemp Community",
-        "thumbnail_url": "",
+        "thumbnail_url": "https://gbatemp.net/styles/gbatemp/logo.png",
         "tags": ["community", "hd"],
     },
     {
-        "id": "pcsx2_cheats",
-        "name": "PCSX2 Cheat/PNACH Archive",
+        "id": "nexusmods_ps2",
+        "name": "Nexus Mods — PS2 Category",
         "description": (
-            "Community-maintained collection of PNACH cheat files for PS2 games. "
-            "Includes widescreen hacks, 60fps patches, and more."
+            "Nexus Mods' PS2 section contains texture packs and mods contributed "
+            "by the community. Browse and download freely."
         ),
-        "url": "https://forums.pcsx2.net/Thread-PNACH-Patches",
-        "type": ModType.PNACH,
-        "author": "PCSX2 Forums",
-        "thumbnail_url": "",
-        "tags": ["patches", "pnach", "widescreen"],
-    },
-    {
-        "id": "pcsx2_widescreen",
-        "name": "PS2 Widescreen Patches (GitHub)",
-        "description": (
-            "Open-source collection of widescreen patches for PS2 games, "
-            "maintained on GitHub."
-        ),
-        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
-        "type": ModType.PNACH,
-        "author": "PCSX2 Team",
-        "thumbnail_url": "",
-        "tags": ["widescreen", "official", "open-source"],
-    },
-    {
-        "id": "gametdb_covers",
-        "name": "GameTDB Cover Art (PS2)",
-        "description": (
-            "GameTDB.com provides free cover art images for PS2 games by game ID. "
-            "Enter your game's serial/ID below to download its cover art."
-        ),
-        "url": "https://www.gametdb.com/PS2",
-        "type": ModType.COVER_ART,
-        "author": "GameTDB",
-        "thumbnail_url": "",
-        "tags": ["covers", "art", "official"],
+        "url": "https://www.nexusmods.com/pcsx2",
+        "type": ModType.TEXTURE_PACK,
+        "author": "Nexus Mods",
+        "thumbnail_url": "https://www.nexusmods.com/favicon.ico",
+        "tags": ["community", "textures", "hd"],
     },
     {
         "id": "reddit_ps2_mods",
@@ -114,10 +93,119 @@ CATALOGUE = [
         "url": "https://reddit.com/r/ps2",
         "type": ModType.TEXTURE_PACK,
         "author": "Reddit Community",
-        "thumbnail_url": "",
+        "thumbnail_url": "https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png",
         "tags": ["community"],
     },
+    # ── PNACH / Patches ───────────────────────────────────────────────────
+    {
+        "id": "pcsx2_cheats",
+        "name": "PCSX2 Cheat/PNACH Archive",
+        "description": (
+            "Community-maintained collection of PNACH cheat files for PS2 games. "
+            "Includes widescreen hacks, 60fps patches, and more."
+        ),
+        "url": "https://forums.pcsx2.net/Thread-PNACH-Patches",
+        "type": ModType.PNACH,
+        "author": "PCSX2 Forums",
+        "thumbnail_url": "https://pcsx2.net/favicon.ico",
+        "tags": ["patches", "pnach", "widescreen"],
+    },
+    {
+        "id": "pcsx2_widescreen",
+        "name": "PS2 Widescreen Patches (GitHub)",
+        "description": (
+            "Open-source collection of widescreen patches for PS2 games, "
+            "maintained on GitHub by the PCSX2 team."
+        ),
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "author": "PCSX2 Team",
+        "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+        "tags": ["widescreen", "official", "open-source"],
+    },
+    {
+        "id": "ps2wide_patches",
+        "name": "PS2Wide — Widescreen Hack Database",
+        "description": (
+            "Community database of widescreen and HD resolution hacks for "
+            "hundreds of PS2 games in PNACH format."
+        ),
+        "url": "https://ps2wide.net",
+        "type": ModType.PNACH,
+        "author": "PS2Wide Community",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "resolution", "pnach"],
+    },
+    # ── Cover Art ─────────────────────────────────────────────────────────
+    {
+        "id": "gametdb_covers",
+        "name": "GameTDB Cover Art (PS2)",
+        "description": (
+            "GameTDB.com provides free cover art images for PS2 games by game ID. "
+            "Enter your game's serial/ID below to download its cover art."
+        ),
+        "url": "https://www.gametdb.com/PS2",
+        "type": ModType.COVER_ART,
+        "author": "GameTDB",
+        "thumbnail_url": "https://www.gametdb.com/favicon.ico",
+        "tags": ["covers", "art", "official"],
+    },
+    {
+        "id": "launchbox_art",
+        "name": "LaunchBox Games Database",
+        "description": (
+            "LaunchBox hosts an extensive database of PS2 game artwork including "
+            "box fronts, backs, screenshots and more — all community-contributed."
+        ),
+        "url": "https://gamesdb.launchbox-app.com/platforms/games/11",
+        "type": ModType.COVER_ART,
+        "author": "LaunchBox Community",
+        "thumbnail_url": "https://www.launchbox-app.com/favicon.ico",
+        "tags": ["covers", "artwork", "community"],
+    },
+    # ── Save Files ────────────────────────────────────────────────────────
+    {
+        "id": "gamefaqs_saves",
+        "name": "GameFAQs PS2 Save Files",
+        "description": (
+            "GameFAQs hosts community-submitted PS2 save files for hundreds of games. "
+            "Download saves to pick up where someone else left off."
+        ),
+        "url": "https://gamefaqs.gamespot.com/ps2/category/929-saves",
+        "type": ModType.SAVE_FILE,
+        "author": "GameFAQs Community",
+        "thumbnail_url": "https://gamefaqs.gamespot.com/favicon.ico",
+        "tags": ["saves", "community"],
+    },
+    {
+        "id": "ps2saves_com",
+        "name": "PS2 Saves Database",
+        "description": (
+            "Collection of PS2 save files shared by the community, organised by "
+            "game title.  Download and import with the Memory Card manager."
+        ),
+        "url": "https://ps2saves.com",
+        "type": ModType.SAVE_FILE,
+        "author": "PS2Saves Community",
+        "thumbnail_url": "",
+        "tags": ["saves", "community"],
+    },
+    # ── Cheats ────────────────────────────────────────────────────────────
+    {
+        "id": "codejunkies_ps2",
+        "name": "Code Junkies PS2 Cheat Codes",
+        "description": (
+            "Code Junkies maintains a database of PS2 cheat codes that can be "
+            "converted to PNACH format for use with PCSX2."
+        ),
+        "url": "https://www.codejunkies.com/ps2/",
+        "type": ModType.CHEAT,
+        "author": "Code Junkies",
+        "thumbnail_url": "",
+        "tags": ["cheats", "codes"],
+    },
 ]
+
 
 
 # ---------------------------------------------------------------------------
@@ -154,9 +242,23 @@ class CatalogueCard(QFrame):
         icon = type_icons.get(self.entry["type"], "📦")
 
         header = QHBoxLayout()
-        icon_lbl = QLabel(icon)
-        icon_lbl.setStyleSheet("font-size: 28px;")
-        header.addWidget(icon_lbl)
+
+        # Thumbnail image (favicon/logo) — loaded synchronously in a thread
+        self._thumb_lbl = QLabel()
+        self._thumb_lbl.setFixedSize(32, 32)
+        self._thumb_lbl.setStyleSheet("background: #0f1830; border-radius: 4px;")
+        self._thumb_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._thumb_lbl.setText(icon)
+        self._thumb_lbl.setStyleSheet("font-size: 22px; background: transparent;")
+        header.addWidget(self._thumb_lbl)
+
+        # Kick off async thumbnail load if URL is present
+        if self.entry.get("thumbnail_url"):
+            threading.Thread(
+                target=self._load_thumbnail,
+                args=(self.entry["thumbnail_url"],),
+                daemon=True,
+            ).start()
 
         type_lbl = QLabel(self.entry["type"].value.replace("_", " ").title())
         type_lbl.setObjectName("badge")
@@ -212,6 +314,39 @@ class CatalogueCard(QFrame):
             dl_btn = QPushButton("🖼 Download Cover by ID")
             dl_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
             layout.addWidget(dl_btn)
+
+    def _load_thumbnail(self, url: str):
+        """Download thumbnail in background and update the label."""
+        try:
+            import urllib.request, tempfile, os
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+                tmp = f.name
+            with urllib.request.urlopen(url, timeout=5) as resp:
+                data = resp.read()
+            with open(tmp, "wb") as f:
+                f.write(data)
+            # Update UI from main thread via QTimer.singleShot
+            from PyQt6.QtCore import QTimer
+            def _update():
+                if not self._thumb_lbl:
+                    return
+                pix = QPixmap(tmp).scaled(
+                    28, 28,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                if not pix.isNull():
+                    self._thumb_lbl.setPixmap(pix)
+                    self._thumb_lbl.setStyleSheet(
+                        "background: #0f1830; border-radius: 4px;"
+                    )
+                try:
+                    os.unlink(tmp)
+                except OSError:
+                    pass
+            QTimer.singleShot(0, _update)
+        except Exception:
+            pass
 
 
 # ---------------------------------------------------------------------------

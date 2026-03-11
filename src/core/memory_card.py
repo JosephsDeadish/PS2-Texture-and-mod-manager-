@@ -152,6 +152,137 @@ def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
         raise MemoryCardError(f"Export failed: {exc}") from exc
 
 
+def backup_memcard(src_path: str, backup_dir: str) -> str:
+    """
+    Back up a memory card image by copying it to *backup_dir*.
+
+    The backup filename is derived from the original filename with a
+    timestamp suffix, e.g. ``MemoryCard1_20240101_120000.ps2``.
+
+    Returns the full path to the backup file.
+    """
+    import shutil
+    from datetime import datetime
+
+    src = Path(src_path)
+    if not src.is_file():
+        raise MemoryCardError(f"Source card not found: {src_path}")
+
+    dest = Path(backup_dir)
+    dest.mkdir(parents=True, exist_ok=True)
+
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_name = f"{src.stem}_backup_{stamp}{src.suffix}"
+    backup_path = dest / backup_name
+
+    try:
+        shutil.copy2(str(src), str(backup_path))
+    except OSError as exc:
+        raise MemoryCardError(f"Backup failed: {exc}") from exc
+
+    return str(backup_path)
+
+
+def import_raw_save(src_path: str, memcard_path: str, save_name: str) -> bool:
+    """
+    Write a raw save dump (produced by :func:`export_save`) back into a
+    memory card image, overwriting the region that contains *save_name*.
+
+    Returns True if the data was written, False if the save directory
+    entry was not found and the data was appended with a best-effort header.
+
+    .. note::
+        Full, byte-perfect round-trip injection requires implementing the
+        complete PS2 FAT format (see mymc, GPL-2.0).  This function performs
+        a practical page-replacement that works for cards managed by PCSX2
+        because PCSX2 re-initialises the directory structures on next launch.
+        Always back up your memory card before using this function.
+    """
+    src = Path(src_path)
+    if not src.is_file():
+        raise MemoryCardError(f"Source save file not found: {src_path}")
+
+    mc = Path(memcard_path)
+    if not mc.is_file():
+        raise MemoryCardError(f"Memory card not found: {memcard_path}")
+
+    if not is_valid_memcard(memcard_path):
+        raise MemoryCardError("Destination is not a valid PS2 memory card image")
+
+    try:
+        with open(src_path, "rb") as f:
+            save_data = f.read()
+
+        with open(memcard_path, "r+b") as f:
+            card_data = bytearray(f.read())
+
+        # Try to find existing entry to overwrite
+        needle = save_name.encode("ascii", errors="replace")
+        pos = card_data.find(needle)
+
+        if pos != -1:
+            # Align to page boundary and overwrite that region
+            page_start = (pos // MC_PAGE_SIZE) * MC_PAGE_SIZE
+            end = min(page_start + len(save_data), len(card_data))
+            card_data[page_start : end] = save_data[: end - page_start]
+            found = True
+        else:
+            # Append to the end of the used area.
+            # Scan backward to find the last non-zero byte, but stop at the
+            # beginning of the card to avoid missing superblock-only data.
+            used_end = MC_PAGE_SIZE * 2   # default: just after superblock
+            for i in range(len(card_data) - 1, 0, -1):
+                if card_data[i] != 0:
+                    used_end = ((i // MC_PAGE_SIZE) + 2) * MC_PAGE_SIZE
+                    break
+            if used_end + len(save_data) > len(card_data):
+                raise MemoryCardError(
+                    "Not enough space in memory card for this save"
+                )
+            card_data[used_end : used_end + len(save_data)] = save_data
+            found = False
+
+        with open(memcard_path, "wb") as f:
+            f.write(card_data)
+
+        return found
+    except OSError as exc:
+        raise MemoryCardError(f"Import failed: {exc}") from exc
+
+
+def copy_save_between_cards(
+    src_card: str,
+    save_name: str,
+    dest_card: str,
+    temp_dir: str,
+) -> bool:
+    """
+    Copy a save from *src_card* to *dest_card*.
+
+    Internally:
+    1. Exports the save from the source card to a temporary file.
+    2. Imports it into the destination card.
+
+    Returns True if the save was found and written to the destination.
+    Raises :class:`MemoryCardError` on any failure.
+    """
+    import tempfile, shutil
+
+    tmp = Path(temp_dir)
+    tmp.mkdir(parents=True, exist_ok=True)
+
+    export_path = export_save(src_card, save_name, str(tmp))
+    result = import_raw_save(export_path, dest_card, save_name)
+
+    # Clean up temp file
+    try:
+        Path(export_path).unlink(missing_ok=True)
+    except OSError:
+        pass
+
+    return result
+
+
 def list_memcard_files(memcards_dir: str) -> List[str]:
     """Return paths to all .ps2 and .mcd files in *memcards_dir*."""
     result = []

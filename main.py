@@ -3,6 +3,7 @@
 
 import sys
 import os
+import time
 
 # Ensure the project root is on the Python path
 _here = os.path.dirname(os.path.abspath(__file__))
@@ -51,13 +52,33 @@ def main():
     app_icon = _load_app_icon()
     app.setWindowIcon(app_icon)
 
+    # ── Splash screen ─────────────────────────────────────────────────────
+    from src.ui.splash import create_splash, destroy_splash
+    splash = create_splash()
+    splash.set_message("Loading configuration…", 0.1)
+    app.processEvents()
+
     # Load configuration
     config = load_config()
 
-    # Create and show main window
+    splash.set_message("Initialising mod database…", 0.35)
+    app.processEvents()
+
+    # ── Create main window ────────────────────────────────────────────────
+    splash.set_message("Building interface…", 0.65)
+    app.processEvents()
+
     window = MainWindow(config)
     window.setWindowIcon(app_icon)
+
+    splash.set_message("Ready!", 1.0)
+    app.processEvents()
+
+    # Small pause so the user sees the "Ready!" state
+    time.sleep(0.3)
+
     window.show()
+    destroy_splash(splash)
 
     sys.exit(app.exec())
 

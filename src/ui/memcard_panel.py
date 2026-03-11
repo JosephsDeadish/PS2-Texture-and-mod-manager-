@@ -22,8 +22,11 @@ from PyQt6.QtWidgets import (
 
 from src.core.memory_card import (
     MemoryCardError,
+    backup_memcard,
+    copy_save_between_cards,
     create_memcard,
     export_save,
+    import_raw_save,
     is_valid_memcard,
     list_memcard_files,
     list_saves,
@@ -99,6 +102,11 @@ class MemoryCardPanel(BasePanel):
         export_all_btn.clicked.connect(self._export_all)
         info_layout.addWidget(export_all_btn)
 
+        backup_btn = QPushButton("🗄 Backup Card")
+        backup_btn.setToolTip("Create a timestamped backup copy of this memory card")
+        backup_btn.clicked.connect(self._backup_card)
+        info_layout.addWidget(backup_btn)
+
         splitter.addWidget(info_frame)
 
         # Right: saves list
@@ -123,6 +131,18 @@ class MemoryCardPanel(BasePanel):
         export_btn = QPushButton("📤 Export Selected")
         export_btn.clicked.connect(self._export_selected)
         save_actions.addWidget(export_btn)
+
+        import_btn = QPushButton("📥 Import Save")
+        import_btn.setToolTip("Import a .bin save dump into this memory card")
+        import_btn.setObjectName("primary_btn")
+        import_btn.clicked.connect(self._import_save)
+        save_actions.addWidget(import_btn)
+
+        copy_btn = QPushButton("📋 Copy to Other Card")
+        copy_btn.setToolTip("Copy selected save to another memory card")
+        copy_btn.clicked.connect(self._copy_save_to_other_card)
+        save_actions.addWidget(copy_btn)
+
         save_actions.addStretch()
         right_layout.addLayout(save_actions)
 
@@ -297,3 +317,127 @@ class MemoryCardPanel(BasePanel):
             QMessageBox.warning(self, "Export Complete with Errors", msg)
         else:
             QMessageBox.information(self, "Export Complete", msg)
+
+    # ------------------------------------------------------------------
+    # Backup card
+    # ------------------------------------------------------------------
+
+    def _backup_card(self):
+        """Back up the current memory card to a timestamped file."""
+        if not self._current_card:
+            QMessageBox.information(self, "No Card", "Please select a memory card first.")
+            return
+
+        dest_dir = QFileDialog.getExistingDirectory(
+            self, "Choose backup destination folder",
+            self.config.memcards_path or "",
+        )
+        if not dest_dir:
+            return
+
+        try:
+            backup_path = backup_memcard(self._current_card, dest_dir)
+            QMessageBox.information(
+                self, "Backup Complete",
+                f"Memory card backed up to:\n{backup_path}"
+            )
+            self.emit_status(f"Backup saved: {Path(backup_path).name}")
+        except MemoryCardError as exc:
+            QMessageBox.critical(self, "Backup Error", str(exc))
+
+    # ------------------------------------------------------------------
+    # Import save into card
+    # ------------------------------------------------------------------
+
+    def _import_save(self):
+        """Import a .bin save dump into the current memory card."""
+        if not self._current_card:
+            QMessageBox.information(self, "No Card", "Please select a memory card first.")
+            return
+
+        src_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Save File to Import",
+            "",
+            "Save Dumps (*.bin);;All Files (*)",
+        )
+        if not src_path:
+            return
+
+        save_name, ok = QInputDialog.getText(
+            self,
+            "Save Name",
+            "Enter the save directory name (e.g. BISLUS-12345):",
+            text=Path(src_path).stem,
+        )
+        if not ok or not save_name.strip():
+            return
+
+        # Warn user before writing
+        reply = QMessageBox.warning(
+            self,
+            "Write to Memory Card",
+            "This will modify your memory card image.\n"
+            "Make sure you have a backup before continuing.\n\n"
+            "Continue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            found = import_raw_save(src_path, self._current_card, save_name.strip())
+            verb = "updated" if found else "appended"
+            QMessageBox.information(
+                self, "Import Complete",
+                f"Save '{save_name.strip()}' has been {verb} in the memory card."
+            )
+            self.emit_status(f"Save imported: {save_name.strip()}")
+            self._load_saves()
+        except MemoryCardError as exc:
+            QMessageBox.critical(self, "Import Error", str(exc))
+
+    # ------------------------------------------------------------------
+    # Copy save to another card
+    # ------------------------------------------------------------------
+
+    def _copy_save_to_other_card(self):
+        """Copy the selected save to a different memory card."""
+        item = self._saves_list.currentItem()
+        if not item:
+            QMessageBox.information(self, "No Selection", "Please select a save to copy.")
+            return
+
+        save_name = item.data(Qt.ItemDataRole.UserRole)
+        if not save_name:
+            return
+
+        dest_card, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Destination Memory Card",
+            self.config.memcards_path or "",
+            "Memory Cards (*.ps2 *.mcd *.mc2);;All Files (*)",
+        )
+        if not dest_card:
+            return
+
+        if dest_card == self._current_card:
+            QMessageBox.warning(self, "Same Card", "Source and destination are the same card.")
+            return
+
+        import tempfile
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                result = copy_save_between_cards(
+                    self._current_card, save_name, dest_card, tmp
+                )
+            verb = "updated" if result else "added"
+            QMessageBox.information(
+                self, "Copy Complete",
+                f"Save '{save_name}' has been {verb} in:\n{dest_card}"
+            )
+            self.emit_status(f"Copied '{save_name}' → {Path(dest_card).name}")
+        except MemoryCardError as exc:
+            QMessageBox.critical(self, "Copy Error", str(exc))
+

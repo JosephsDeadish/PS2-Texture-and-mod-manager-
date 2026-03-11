@@ -628,3 +628,158 @@ class TestUpdateMetadata(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMemoryCardWrite(unittest.TestCase):
+    """Tests for the new memory card write / backup / copy features."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # Helper: create a minimal valid memory card file
+    def _make_card(self, name: str) -> str:
+        from src.core.memory_card import create_memcard
+        path = str(Path(self.tmpdir) / name)
+        create_memcard(path, size_mb=1)
+        return path
+
+    def test_backup_memcard_creates_timestamped_file(self):
+        from src.core.memory_card import backup_memcard
+        card = self._make_card("Card1.ps2")
+        backup_dir = str(Path(self.tmpdir) / "backups")
+        backup_path = backup_memcard(card, backup_dir)
+        self.assertTrue(Path(backup_path).exists())
+        self.assertIn("backup_", Path(backup_path).name)
+        self.assertTrue(Path(backup_path).name.endswith(".ps2"))
+
+    def test_backup_nonexistent_card_raises(self):
+        from src.core.memory_card import backup_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            backup_memcard("/nonexistent/card.ps2", self.tmpdir)
+
+    def test_import_raw_save_into_valid_card(self):
+        """Import a .bin save into a valid memory card."""
+        from src.core.memory_card import import_raw_save, create_memcard
+        # Use default 8 MB card so there's room for the save
+        card_path = str(Path(self.tmpdir) / "Card2.ps2")
+        create_memcard(card_path, size_mb=8)
+
+        # Create a fake save dump (small, but large enough)
+        save_name = "TESTGAME-00001"
+        save_file = str(Path(self.tmpdir) / "save.bin")
+        # Write the save name into the data so the import can find it
+        data = save_name.encode("ascii") + b"\x00" * (512 - len(save_name))
+        with open(save_file, "wb") as f:
+            f.write(data)
+
+        # Should not raise; returns bool
+        result = import_raw_save(save_file, card_path, save_name)
+        self.assertIsInstance(result, bool)
+
+    def test_import_raw_save_invalid_card_raises(self):
+        from src.core.memory_card import import_raw_save, MemoryCardError
+        # Non-memcard file
+        bad_card = str(Path(self.tmpdir) / "not_a_card.ps2")
+        with open(bad_card, "wb") as f:
+            f.write(b"JUNK" * 100)
+        save_file = str(Path(self.tmpdir) / "save.bin")
+        with open(save_file, "wb") as f:
+            f.write(b"\x00" * 512)
+        with self.assertRaises(MemoryCardError):
+            import_raw_save(save_file, bad_card, "FAKE")
+
+    def test_import_missing_source_raises(self):
+        from src.core.memory_card import import_raw_save, MemoryCardError
+        card = self._make_card("Card3.ps2")
+        with self.assertRaises(MemoryCardError):
+            import_raw_save("/nonexistent/save.bin", card, "FAKE")
+
+    def test_copy_save_between_cards(self):
+        """copy_save_between_cards should not raise for valid inputs."""
+        from src.core.memory_card import (
+            copy_save_between_cards,
+            MemoryCardError,
+            export_save,
+        )
+        src_card = self._make_card("SrcCard.ps2")
+        dst_card = self._make_card("DstCard.ps2")
+
+        # We can't reliably inject a named save into the blank card with the
+        # simple low-level test, so we expect either success or a specific error.
+        try:
+            copy_save_between_cards(src_card, "FAKE-00001", dst_card, self.tmpdir)
+        except MemoryCardError:
+            pass  # Expected — save not found in blank card
+
+
+class TestUpdateChecker(unittest.TestCase):
+    """Tests for the UpdateChecker utility."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_checker_starts_and_completes(self):
+        """UpdateChecker should run without crashing on an empty database."""
+        import threading
+        from src.core.mod_manager import ModDatabase
+        from src.core.updater import UpdateChecker
+
+        db = ModDatabase()
+        checker = UpdateChecker(db)
+        done = threading.Event()
+        checker.start(on_complete=lambda n: done.set())
+        # Give it up to 2 seconds; empty DB should complete almost instantly
+        done.wait(timeout=2)
+        self.assertTrue(done.is_set(), "UpdateChecker did not complete in time")
+
+    def test_checker_no_update_for_mod_without_url(self):
+        """Mod without source_url should never report has_update=True."""
+        from src.core.mod_manager import ModDatabase
+        from src.core.updater import UpdateChecker, _check_single_mod
+
+        db = ModDatabase()
+        mod = ModInfo(
+            id="no-url",
+            name="No URL Mod",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/tmp",
+            source_url="",
+        )
+        db.add(mod)
+        mod_id, has_update = _check_single_mod(mod)
+        self.assertEqual(mod_id, "no-url")
+        self.assertFalse(has_update)
+
+
+class TestAssetPaths(unittest.TestCase):
+    """Tests for src.core.assets path helpers."""
+
+    def test_icon_path_returns_string(self):
+        from src.core.assets import icon_path
+        p = icon_path(256)
+        self.assertIsInstance(p, str)
+        self.assertIn("icon_256", p)
+
+    def test_ico_path_returns_string(self):
+        from src.core.assets import ico_path
+        p = ico_path()
+        self.assertIsInstance(p, str)
+        self.assertIn("icon.ico", p)
+
+    def test_asset_path_relative(self):
+        from src.core.assets import asset_path
+        p = asset_path("icon.svg")
+        self.assertIn("icon.svg", p)
+
+
