@@ -108,7 +108,6 @@ class AppConfig:
     theme: str = "dark"
     check_updates_on_start: bool = True
     show_conflict_warnings: bool = True
-    auto_deploy: bool = False
     first_run: bool = True
     favorite_authors: list = field(default_factory=list)
 
@@ -125,7 +124,6 @@ class AppConfig:
             "theme": self.theme,
             "check_updates_on_start": self.check_updates_on_start,
             "show_conflict_warnings": self.show_conflict_warnings,
-            "auto_deploy": self.auto_deploy,
             "first_run": self.first_run,
             "favorite_authors": self.favorite_authors,
         }

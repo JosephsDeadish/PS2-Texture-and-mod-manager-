@@ -1843,30 +1843,30 @@ class TestPcsx2Layout(unittest.TestCase):
 # =============================================================================
 
 class TestAppConfigNewFields(unittest.TestCase):
-    """Tests for partial_textures_path and auto_deploy fields added to AppConfig."""
+    """Tests for partial_textures_path field and auto_deploy removal from AppConfig."""
 
     def test_default_partial_textures_path(self):
         cfg = AppConfig()
         self.assertEqual(cfg.partial_textures_path, "")
 
-    def test_default_auto_deploy(self):
+    def test_no_auto_deploy_field(self):
+        """auto_deploy was removed — deployment is always automatic."""
         cfg = AppConfig()
-        self.assertFalse(cfg.auto_deploy)
+        self.assertFalse(hasattr(cfg, "auto_deploy"))
 
-    def test_to_dict_includes_new_fields(self):
-        cfg = AppConfig(partial_textures_path="/tex", auto_deploy=True)
+    def test_to_dict_includes_partial_textures_path(self):
+        cfg = AppConfig(partial_textures_path="/tex")
         d = cfg.to_dict()
         self.assertEqual(d["partial_textures_path"], "/tex")
-        self.assertTrue(d["auto_deploy"])
+        self.assertNotIn("auto_deploy", d)
 
-    def test_from_dict_restores_new_fields(self):
-        cfg = AppConfig(partial_textures_path="/pt", auto_deploy=True)
+    def test_from_dict_restores_partial_textures_path(self):
+        cfg = AppConfig(partial_textures_path="/pt")
         restored = AppConfig.from_dict(cfg.to_dict())
         self.assertEqual(restored.partial_textures_path, "/pt")
-        self.assertTrue(restored.auto_deploy)
 
     def test_from_dict_old_config_no_crash(self):
-        """Old configs without the new fields should not crash."""
+        """Old configs (including stale auto_deploy key) should not crash."""
         old_data = {
             "pcsx2_path": "/foo",
             "textures_path": "/tex",
@@ -1880,10 +1880,11 @@ class TestAppConfigNewFields(unittest.TestCase):
             "show_conflict_warnings": True,
             "first_run": False,
             "favorite_authors": [],
+            # Stale field from old config — must be silently ignored
+            "auto_deploy": True,
         }
         cfg = AppConfig.from_dict(old_data)
         self.assertEqual(cfg.partial_textures_path, "")
-        self.assertFalse(cfg.auto_deploy)
 
 
 # =============================================================================

@@ -97,11 +97,13 @@ class SettingsPanel(BasePanel):
         self._updates_check.setChecked(self.config.check_updates_on_start)
         layout.addWidget(self._updates_check)
 
-        self._auto_deploy_check = QCheckBox(
-            "Auto-deploy mods to PCSX2 when enabled/disabled"
+        deploy_note = QLabel(
+            "ℹ  Mods are deployed to PCSX2 automatically — enabling a mod\n"
+            "copies it instantly; disabling removes it."
         )
-        self._auto_deploy_check.setChecked(self.config.auto_deploy)
-        layout.addWidget(self._auto_deploy_check)
+        deploy_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        deploy_note.setWordWrap(True)
+        layout.addWidget(deploy_note)
 
         layout.addWidget(_sep())
 
@@ -165,7 +167,6 @@ class SettingsPanel(BasePanel):
         self.config.mods_storage_path = self._storage_chooser.get_path()
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
-        self.config.auto_deploy = self._auto_deploy_check.isChecked()
 
         save_config(self.config)
         self.settings_saved.emit(self.config)
@@ -204,7 +205,6 @@ class SettingsPanel(BasePanel):
         self._storage_chooser.set_path(config.mods_storage_path)
         self._conflicts_check.setChecked(config.show_conflict_warnings)
         self._updates_check.setChecked(config.check_updates_on_start)
-        self._auto_deploy_check.setChecked(config.auto_deploy)
 
 
 def _section(title: str) -> QLabel:

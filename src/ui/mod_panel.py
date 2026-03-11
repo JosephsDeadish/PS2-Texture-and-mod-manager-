@@ -129,12 +129,6 @@ class ModPanel(BasePanel):
         import_btn.clicked.connect(self._import_mod)
         toolbar.addWidget(import_btn)
 
-        # Deploy button
-        deploy_btn = QPushButton("🚀 Deploy")
-        deploy_btn.setToolTip("Copy enabled mods to PCSX2 folder")
-        deploy_btn.clicked.connect(self._deploy)
-        toolbar.addWidget(deploy_btn)
-
         # Conflicts button
         conflict_btn = QPushButton("⚠ Conflicts")
         conflict_btn.clicked.connect(self._show_conflicts)
@@ -316,10 +310,29 @@ class ModPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def _on_toggle(self, mod_id: str, enabled: bool):
-        self.manager.set_enabled(mod_id, enabled)
         mod = self.db.get(mod_id)
-        status = "enabled" if enabled else "disabled"
-        self.emit_status(f"'{mod.name if mod else mod_id}' {status}")
+        name = mod.name if mod else mod_id
+        action = "Enabled" if enabled else "Disabled"
+
+        # set_enabled always deploys/undeploys immediately
+        count, warnings = self.manager.set_enabled(mod_id, enabled, self.config)
+
+        meta = _TYPE_META[self.mod_type]
+        target_path = getattr(self.config, meta["deploy_key"], "")
+
+        if target_path:
+            if warnings:
+                self.emit_status(
+                    f"{action} '{name}' — deployed with {len(warnings)} warning(s)"
+                )
+            else:
+                self.emit_status(
+                    f"{action} '{name}' — deployed {count} {meta['label'].lower()} to PCSX2"
+                )
+        else:
+            self.emit_status(
+                f"{action} '{name}' (configure PCSX2 path in Settings to auto-deploy)"
+            )
 
         # Cover art: warn if multiple art enabled for same game serial
         if enabled and self.mod_type == ModType.COVER_ART:
@@ -445,15 +458,31 @@ class ModPanel(BasePanel):
             self._apply_filter()
 
     def _enable_all(self):
+        meta = _TYPE_META[self.mod_type]
+        target_path = getattr(self.config, meta["deploy_key"], "")
         for mod in self.db.by_type(self.mod_type):
-            self.manager.set_enabled(mod.id, True)
-        self.emit_status("All mods enabled")
+            if not mod.enabled:
+                mod.enabled = True
+                self.db.update(mod)
+        # Single bulk deploy after all flags are set
+        if target_path:
+            count, _ = self.manager.deploy(self.mod_type, target_path)
+            self.emit_status(f"All {meta['label'].lower()} enabled — deployed {count} to PCSX2")
+        else:
+            self.emit_status(f"All {meta['label'].lower()} enabled (configure path in Settings to deploy)")
         self._apply_filter()
 
     def _disable_all(self):
+        meta = _TYPE_META[self.mod_type]
+        target_path = getattr(self.config, meta["deploy_key"], "")
         for mod in self.db.by_type(self.mod_type):
-            self.manager.set_enabled(mod.id, False)
-        self.emit_status("All mods disabled")
+            if mod.enabled:
+                mod.enabled = False
+                self.db.update(mod)
+        # Re-deploy (nothing enabled → clears deployed files via empty deploy)
+        if target_path:
+            self.manager.deploy(self.mod_type, target_path)
+        self.emit_status(f"All {meta['label'].lower()} disabled")
         self._apply_filter()
 
     def _show_conflicts(self):
@@ -572,47 +601,16 @@ class ModPanel(BasePanel):
                 game_id=meta.get("game_id", ""),
                 source_url=meta.get("source_url", ""),
             )
-            # version is now passed directly to install_from_folder
-            self.emit_status(f"Imported '{mod.name}'")
+            # Mod is enabled by default — deploy it immediately
+            type_meta = _TYPE_META[self.mod_type]
+            target_path = getattr(self.config, type_meta["deploy_key"], "")
+            if target_path:
+                count, warnings = self.manager.deploy(self.mod_type, target_path)
+                self.emit_status(f"Imported '{mod.name}' — deployed {count} to PCSX2")
+            else:
+                self.emit_status(
+                    f"Imported '{mod.name}' (configure PCSX2 path in Settings to deploy)"
+                )
             self._apply_filter()
         except Exception as exc:
             QMessageBox.critical(self, "Import Error", str(exc))
-
-    # ------------------------------------------------------------------
-    # Deploy
-    # ------------------------------------------------------------------
-
-    def _deploy(self):
-        meta = _TYPE_META[self.mod_type]
-        target_path = getattr(self.config, meta["deploy_key"], "")
-        if not target_path:
-            QMessageBox.warning(
-                self,
-                "Path Not Configured",
-                f"The {meta['label']} path is not configured in Settings.",
-            )
-            return
-
-        # Check conflicts first
-        conflicts = self.manager.detect_conflicts(self.mod_type)
-        if conflicts and self.config.show_conflict_warnings:
-            reply = QMessageBox.warning(
-                self,
-                "Conflicts Detected",
-                f"{len(conflicts)} conflict(s) found.\n"
-                "Deploy anyway with potential unexpected effects?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No,
-            )
-            if reply != QMessageBox.StandardButton.Yes:
-                return
-
-        count, warnings = self.manager.deploy(self.mod_type, target_path)
-        msg = f"Deployed {count} {meta['label']} to:\n{target_path}"
-        if warnings:
-            msg += "\n\nWarnings:\n" + "\n".join(warnings)
-            QMessageBox.warning(self, "Deploy Complete with Warnings", msg)
-        else:
-            QMessageBox.information(self, "Deploy Complete", msg)
-
-        self.emit_status(f"Deployed {count} {meta['label']}")

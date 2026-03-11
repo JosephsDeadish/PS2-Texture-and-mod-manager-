@@ -215,7 +215,7 @@ class SetupWizard(QDialog):
         layout.addWidget(_h("Mod Storage Location"))
         layout.addWidget(_p(
             "Choose where PS2 Mod Manager will store downloaded/imported mods.\n"
-            "This is separate from PCSX2; only enabled mods are deployed."
+            "Enabling a mod automatically copies it to PCSX2; disabling removes it."
         ))
 
         from src.core.config_manager import get_data_dir
@@ -226,23 +226,22 @@ class SetupWizard(QDialog):
         layout.addWidget(self._storage_chooser)
 
         note = QLabel(
-            "ℹ  Lots of mods can be stored here.\n"
-            "Only mods you enable will actually be deployed to PCSX2."
+            "ℹ  Mods are stored here and deployed automatically.\n"
+            "Toggling a mod ON copies it to PCSX2; toggling OFF removes it."
         )
         note.setStyleSheet("color: #7070a0; font-size: 12px;")
         note.setWordWrap(True)
         layout.addWidget(note)
 
-        # ── Automatic mode ──
+        # ── Automatic folder creation ──
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
         layout.addWidget(sep)
 
-        layout.addWidget(_h("Automatic Setup"))
+        layout.addWidget(_h("Automatic Folder Creation"))
         layout.addWidget(_p(
-            "Check this option to let PS2 Mod Manager automatically create any\n"
-            "missing PCSX2 sub-folders (textures/, covers/, cheats/, etc.) and\n"
-            "deploy enabled mods whenever you toggle them on."
+            "Let PS2 Mod Manager create any missing PCSX2 sub-folders\n"
+            "(textures/, covers/, cheats/, memcards/, etc.) right now."
         ))
 
         self._auto_create_dirs_check = QCheckBox(
@@ -250,12 +249,6 @@ class SetupWizard(QDialog):
         )
         self._auto_create_dirs_check.setChecked(False)
         layout.addWidget(self._auto_create_dirs_check)
-
-        self._auto_deploy_check = QCheckBox(
-            "Auto-deploy mods to PCSX2 when enabled/disabled"
-        )
-        self._auto_deploy_check.setChecked(self.config.auto_deploy)
-        layout.addWidget(self._auto_deploy_check)
 
         layout.addStretch()
         return w
@@ -342,7 +335,6 @@ class SetupWizard(QDialog):
             self.config.cheats_path = self._cheats_chooser.get_path()
         elif page == 3:
             self.config.mods_storage_path = self._storage_chooser.get_path()
-            self.config.auto_deploy = self._auto_deploy_check.isChecked()
 
     def _run_automatic_setup(self):
         """
@@ -376,8 +368,7 @@ class SetupWizard(QDialog):
             summary_lines.append(f"📝 PNACH: {self.config.pnach_path}")
         if self.config.cover_art_path:
             summary_lines.append(f"🎨 Covers: {self.config.cover_art_path}")
-        if self.config.auto_deploy:
-            summary_lines.append("⚡ Auto-deploy: enabled")
+        summary_lines.append("⚡ Mods deploy automatically when toggled on/off")
 
         if summary_lines:
             self._done_summary.setText("\n".join(summary_lines))

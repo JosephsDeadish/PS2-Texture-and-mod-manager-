@@ -155,14 +155,97 @@ class ModManager:
         self.db.remove(mod_id)
 
     # ------------------------------------------------------------------
-    # Enable / Disable
+    # Enable / Disable  (always triggers deploy / undeploy immediately)
     # ------------------------------------------------------------------
 
-    def set_enabled(self, mod_id: str, enabled: bool):
+    def set_enabled(
+        self,
+        mod_id: str,
+        enabled: bool,
+        config=None,
+    ) -> Tuple[int, List[str]]:
+        """
+        Toggle a mod on or off and immediately deploy/undeploy it.
+
+        When *enabled* is ``True`` the mod's type is re-deployed to the
+        appropriate PCSX2 folder (all currently-enabled mods of that type are
+        written, which correctly handles priority ordering and PNACH merging).
+
+        When *enabled* is ``False`` the mod is removed from the PCSX2 target
+        folder and the remaining enabled mods are re-deployed so nothing is lost.
+
+        *config* must be an :class:`~src.models.mod.AppConfig` instance so the
+        target path can be resolved.  If *config* is ``None`` (e.g. in tests
+        that only check the DB state) the method still toggles the flag but
+        skips the filesystem deploy.
+
+        Returns ``(deployed_count, warnings)`` — same as :meth:`deploy`.
+        """
         mod = self.db.get(mod_id)
-        if mod:
-            mod.enabled = enabled
-            self.db.update(mod)
+        if not mod:
+            return 0, []
+
+        mod.enabled = enabled
+        self.db.update(mod)
+
+        if config is None:
+            return 0, []
+
+        from src.core.pcsx2_layout import get_deploy_path
+        target_path = get_deploy_path(config, mod.mod_type)
+        if not target_path:
+            return 0, [
+                f"No target path configured for {mod.mod_type.value}. "
+                "Check Settings → PCSX2 Paths."
+            ]
+
+        if enabled:
+            # Re-deploy all enabled mods of this type (applies priority order)
+            return self.deploy(mod.mod_type, target_path)
+        else:
+            # Remove this mod's files then re-deploy remaining enabled mods
+            return self.undeploy_mod(mod_id, config)
+
+    def undeploy_mod(self, mod_id: str, config) -> Tuple[int, List[str]]:
+        """
+        Remove a single mod's deployed files from the PCSX2 target folder then
+        re-deploy all remaining *enabled* mods so nothing is accidentally lost.
+
+        Returns ``(deployed_count, warnings)`` from the re-deploy step.
+        """
+        mod = self.db.get(mod_id)
+        if not mod:
+            return 0, []
+
+        from src.core.pcsx2_layout import get_deploy_path
+        target_path = get_deploy_path(config, mod.mod_type)
+        if not target_path:
+            return 0, []
+
+        target = Path(target_path)
+        if target.exists():
+            # Remove files that belong to this mod from the target folder
+            mod_src = Path(mod.path)
+            if mod_src.is_dir():
+                for f in mod_src.rglob("*"):
+                    if f.is_file():
+                        rel = f.relative_to(mod_src)
+                        deployed_file = target / rel
+                        if deployed_file.exists():
+                            try:
+                                deployed_file.unlink()
+                            except OSError:
+                                pass
+            elif mod_src.is_file():
+                deployed_file = target / mod_src.name
+                if deployed_file.exists():
+                    try:
+                        deployed_file.unlink()
+                    except OSError:
+                        pass
+
+        # Re-deploy remaining enabled mods so priority ordering is honoured
+        return self.deploy(mod.mod_type, target_path)
 
     def set_priority(self, mod_id: str, priority: int):
         mod = self.db.get(mod_id)
