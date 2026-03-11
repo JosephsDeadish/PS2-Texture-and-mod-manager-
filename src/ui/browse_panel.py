@@ -511,7 +511,40 @@ CATALOGUE: List[dict] = [
         "thumbnail_url": "",
         "tags": ["patreon", "support", "dev"],
         "download_action": "",
+        "direct_download_url": "",
         "upscale_tech": "",
+    },
+    {
+        "id": "eragon_hd_textures",
+        "name": "Eragon — HD Texture Pack (Free on Patreon)",
+        "description": (
+            "HD texture replacement pack for Eragon (SLUS-21228 / SLES-54053). "
+            "Free attachment on the DeadOnTheInside Patreon post. "
+            "Contains upscaled environment, character and dragon textures. "
+            "Folder inside the download is named 'replacement' — the app handles "
+            "this automatically when you enter the Game ID (SLUS-21228)."
+        ),
+        "context": (
+            "Download steps: 1) Log in to Patreon and open the post. "
+            "2) Click the attachment to download the ZIP. "
+            "3) In PS2 Mod Manager go to Texture Packs → ➕ Import. "
+            "4) Select the ZIP and enter Game ID 'SLUS-21228'. "
+            "The app will automatically place files into "
+            "textures/SLUS-21228/replacements/ so PCSX2 can find them."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/eragon-hd-ps2-146041522",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Eragon",
+        "thumbnail_url": "",
+        "tags": ["eragon", "hd", "esrgan", "ps2", "free", "patreon"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
     },
     # ── Game-Specific Texture Packs ───────────────────────────────────────────
     {
@@ -3383,7 +3416,11 @@ class DownloadInstallDialog(QDialog):
             "<b>Paste a direct download URL below.</b><br>"
             "Supported: HTTPS links to ZIP, 7z, PNACH, PNG.<br>"
             "Google Drive share links are auto-converted. "
-            "MEGA links must be downloaded manually."
+            "MEGA links must be downloaded manually.<br>"
+            "<span style='color:#a08040;'>🔒 Patreon attachments:</span> "
+            "log in to Patreon, open the post, download the file through your "
+            "browser, then use <b>📁 Folder</b> or <b>📦 Archive</b> import "
+            "in the Texture Packs panel instead."
         )
         info.setTextFormat(Qt.TextFormat.RichText)
         info.setWordWrap(True)
