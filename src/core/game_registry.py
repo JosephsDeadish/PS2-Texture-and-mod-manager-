@@ -681,6 +681,31 @@ def serial_to_display(serial: str) -> str:
     return serial
 
 
+def serial_to_display_with_online_fallback(serial: str, timeout: int = 5) -> str:
+    """
+    Return a display string for a serial, falling back to an online lookup
+    (GameTDB) if the serial is not in the local registry.
+
+    This function may make a network request for unknown serials. Call it
+    from a background thread to avoid blocking the UI.
+
+    Returns ``"XXXX-NNNNN — Game Title"`` if a title is found, or just
+    the serial if no title is available.
+    """
+    if not serial:
+        return ""
+    # Check local registry first (fast path)
+    title = _KNOWN_SERIALS.get(serial.upper(), "")
+    if title:
+        return f"{serial} — {title}"
+    # Fallback to online lookup
+    from src.core.downloader import lookup_game_title_online
+    online_title = lookup_game_title_online(serial, timeout=timeout)
+    if online_title:
+        return f"{serial} — {online_title}"
+    return serial
+
+
 def normalise_serial(serial: str) -> str:
     """
     Normalise a PS2 serial to ``XXXX-NNNNN`` form (upper-case, dash separator).
@@ -698,6 +723,23 @@ def lookup_game_title(serial: str) -> str:
     Returns an empty string if the serial is not recognised.
     """
     return _KNOWN_SERIALS.get(serial.upper(), "")
+
+
+def lookup_game_title_with_online_fallback(serial: str, timeout: int = 5) -> str:
+    """
+    Look up the game title for *serial*, falling back to an online GameTDB
+    lookup if the serial is not in the local registry.
+
+    This function may make a network request for unknown serials. Call it
+    from a background thread to avoid blocking the UI.
+
+    Returns the title string, or ``""`` if not found.
+    """
+    title = _KNOWN_SERIALS.get(serial.upper(), "")
+    if title:
+        return title
+    from src.core.downloader import lookup_game_title_online
+    return lookup_game_title_online(serial, timeout=timeout)
 
 
 def all_known_serials() -> list[tuple[str, str]]:

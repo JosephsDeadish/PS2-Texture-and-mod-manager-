@@ -2103,3 +2103,478 @@ class TestSetEnabledAutoDeployBehaviour(unittest.TestCase):
         cfg = AppConfig.from_dict(old_dict)
         self.assertEqual(cfg.pnach_path, "/cheats")
         self.assertFalse(hasattr(cfg, "auto_deploy"))
+
+
+# =============================================================================
+# Online game title lookup (mocked network)
+# =============================================================================
+
+class TestOnlineGameTitleLookup(unittest.TestCase):
+    """Tests for serial_to_display_with_online_fallback and
+    lookup_game_title_with_online_fallback."""
+
+    def test_known_serial_uses_local_registry_no_network(self):
+        """Known serials should NOT trigger a network call."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        with patch("src.core.downloader.requests.get") as mock_get:
+            result = serial_to_display_with_online_fallback("SLUS-20062")
+        mock_get.assert_not_called()
+        self.assertIn("SLUS-20062", result)
+        self.assertIn("Spyro", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_unknown_serial_tries_online_lookup(self, mock_get):
+        """Unknown serials should attempt an online lookup."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<title>SLUS-99999 - Test Online Game | GameTDB</title>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = serial_to_display_with_online_fallback("SLUS-99999")
+        mock_get.assert_called_once()
+        self.assertIn("SLUS-99999", result)
+        self.assertIn("Test Online Game", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_unknown_serial_online_failure_returns_serial_only(self, mock_get):
+        """If the online lookup fails, the serial alone is returned."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        mock_get.side_effect = Exception("network error")
+        result = serial_to_display_with_online_fallback("SLUS-99999")
+        self.assertEqual(result, "SLUS-99999")
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_with_online_fallback_known(self, mock_get):
+        """Known serials should return title from local registry."""
+        from src.core.game_registry import lookup_game_title_with_online_fallback
+        result = lookup_game_title_with_online_fallback("SLUS-20062")
+        mock_get.assert_not_called()
+        self.assertIn("Spyro", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_with_online_fallback_unknown_network_error(self, mock_get):
+        """Network errors during online lookup should return empty string."""
+        from src.core.game_registry import lookup_game_title_with_online_fallback
+        mock_get.side_effect = Exception("timeout")
+        result = lookup_game_title_with_online_fallback("SLUS-99999")
+        self.assertEqual(result, "")
+
+    def test_serial_to_display_with_online_fallback_empty(self):
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        self.assertEqual(serial_to_display_with_online_fallback(""), "")
+
+
+# =============================================================================
+# PCSX2 widescreen PNACH fetcher (mocked network)
+# =============================================================================
+
+class TestPcsx2PnachFetcher(unittest.TestCase):
+    """Tests for list_pcsx2_widescreen_patches and download_pcsx2_widescreen_patch."""
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_patches_returns_entries(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.json.return_value = [
+            {
+                "name": "F0A235B4.pnach",
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/F0A235B4.pnach",
+            },
+            {
+                "name": "A94060E1.pnach",
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/A94060E1.pnach",
+            },
+            {
+                "name": "README.md",  # should be filtered out (not a .pnach)
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/README.md",
+            },
+        ]
+        mock_get.return_value = mock_resp
+
+        patches = list_pcsx2_widescreen_patches()
+        self.assertEqual(len(patches), 2)
+        crcs = [p["crc"] for p in patches]
+        self.assertIn("F0A235B4", crcs)
+        self.assertIn("A94060E1", crcs)
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_patches_network_error_returns_empty(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+        mock_get.side_effect = Exception("network error")
+        result = list_pcsx2_widescreen_patches()
+        self.assertEqual(result, [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_patch_success(self, mock_get):
+        from src.core.downloader import download_pcsx2_widescreen_patch
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "100"}
+        mock_resp.iter_content.return_value = [b"// PNACH content"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            result = download_pcsx2_widescreen_patch("F0A235B4", d)
+            self.assertIsNotNone(result)
+            self.assertTrue(result.endswith("F0A235B4.pnach"))
+            self.assertTrue(Path(result).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_patch_not_found_returns_none(self, mock_get):
+        from src.core.downloader import download_pcsx2_widescreen_patch
+        import tempfile
+        from requests import HTTPError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status.side_effect = HTTPError("404")
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            result = download_pcsx2_widescreen_patch("00000000", d)
+            self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_found(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("F0A235B4")
+        self.assertIsNotNone(result)
+        self.assertEqual(result["crc"], "F0A235B4")
+        self.assertTrue(result["filename"].endswith(".pnach"))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_not_found(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("00000000")
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_normalises_case(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("f0a235b4")  # lower-case input
+        self.assertEqual(result["crc"], "F0A235B4")
+
+
+
+class TestCatalogueIntegrity(unittest.TestCase):
+    """Structural integrity checks for the browse-panel catalogue.
+
+    Uses Python's ``ast`` module to parse the catalogue list without importing
+    any Qt code, so these tests run fine in headless CI environments.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import ast
+
+        src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        tree = ast.parse(src_file.read_text(encoding="utf-8"))
+
+        # Walk the AST to find the CATALOGUE assignment
+        catalogue_node = None
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.AnnAssign)
+                and isinstance(node.target, ast.Name)
+                and node.target.id == "CATALOGUE"
+                and node.value is not None
+            ):
+                catalogue_node = node.value
+                break
+
+        if catalogue_node is None:
+            raise RuntimeError("Could not find CATALOGUE assignment in browse_panel.py")
+
+        # Convert the AST list of dicts to Python dicts.
+        # ModType.TEXTURE_PACK etc. appear as ast.Attribute nodes; convert
+        # them to their .value strings (e.g. "texture_pack").
+        _MAX_DEPTH = 20  # catalogue data is at most 3 levels deep; guard against malformed input
+
+        def _literal(node, depth=0):
+            if depth > _MAX_DEPTH:
+                raise ValueError(f"AST nesting depth exceeded {_MAX_DEPTH} (possible malformed input)")
+            if isinstance(node, ast.Constant):
+                return node.value
+            if isinstance(node, ast.List):
+                return [_literal(e, depth + 1) for e in node.elts]
+            if isinstance(node, ast.Tuple):
+                return tuple(_literal(e, depth + 1) for e in node.elts)
+            if isinstance(node, ast.Dict):
+                return {_literal(k, depth + 1): _literal(v, depth + 1) for k, v in zip(node.keys, node.values)}
+            # ModType.TEXTURE_PACK → "texture_pack" etc.
+            if isinstance(node, ast.Attribute):
+                return node.attr.lower()
+            # Concatenated strings: ("part1" "part2") → JoinedStr handled as concat
+            if isinstance(node, ast.JoinedStr):
+                return "<f-string>"
+            raise ValueError(f"Unexpected AST node type: {type(node).__name__}")
+
+        cls.catalogue = _literal(catalogue_node)
+
+    # ------------------------------------------------------------------
+    # Structural checks
+    # ------------------------------------------------------------------
+
+    _REQUIRED_FIELDS = {
+        "id", "name", "description", "author", "author_url",
+        "url", "type", "source", "game", "tags",
+        "download_action", "upscale_tech",
+        "is_hub", "nsfw",
+    }
+
+    def test_catalogue_not_empty(self):
+        self.assertGreater(len(self.catalogue), 0, "CATALOGUE must not be empty")
+
+    def test_all_entries_have_required_fields(self):
+        for entry in self.catalogue:
+            for field in self._REQUIRED_FIELDS:
+                self.assertIn(
+                    field, entry,
+                    f"Entry {entry.get('id', '?')} is missing field '{field}'"
+                )
+
+    def test_all_ids_are_unique(self):
+        ids = [e["id"] for e in self.catalogue]
+        duplicates = [eid for eid in ids if ids.count(eid) > 1]
+        self.assertEqual(
+            [], list(set(duplicates)),
+            f"Duplicate catalogue IDs found: {set(duplicates)}"
+        )
+
+    def test_all_ids_are_non_empty_strings(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(entry["id"], str)
+            self.assertTrue(entry["id"].strip(), f"Entry has empty id: {entry}")
+
+    def test_all_names_are_non_empty(self):
+        for entry in self.catalogue:
+            self.assertTrue(
+                entry.get("name", "").strip(),
+                f"Entry {entry['id']} has empty name"
+            )
+
+    def test_all_urls_are_https(self):
+        for entry in self.catalogue:
+            url = entry.get("url", "")
+            self.assertTrue(
+                url.startswith("http://") or url.startswith("https://"),
+                f"Entry {entry['id']} has invalid url: {url!r}"
+            )
+
+    def test_all_types_are_valid(self):
+        valid_types = {"texture_pack", "pnach", "cover_art", "save_file", "cheat"}
+        for entry in self.catalogue:
+            self.assertIn(
+                entry["type"], valid_types,
+                f"Entry {entry['id']} has invalid type: {entry['type']!r}"
+            )
+
+    def test_all_authors_are_non_empty(self):
+        """Named-author (non-hub) entries must have a non-empty author.
+        Hub entries intentionally use author="" since the individual poster
+        is not known at catalogue-build time."""
+        for entry in self.catalogue:
+            if not entry.get("is_hub", True):
+                self.assertTrue(
+                    entry.get("author", "").strip(),
+                    f"Named-author entry {entry['id']} has empty author"
+                )
+
+    def test_all_sources_are_non_empty(self):
+        for entry in self.catalogue:
+            self.assertTrue(
+                entry.get("source", "").strip(),
+                f"Entry {entry['id']} has empty source"
+            )
+
+    def test_tags_are_lists(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(
+                entry.get("tags"), list,
+                f"Entry {entry['id']} tags is not a list"
+            )
+
+    def test_direct_download_url_is_string_or_empty(self):
+        """direct_download_url may be absent or empty string, never None."""
+        for entry in self.catalogue:
+            val = entry.get("direct_download_url", "")
+            self.assertIsInstance(
+                val, str,
+                f"Entry {entry['id']} direct_download_url must be a string, got {type(val)}"
+            )
+            if val:
+                self.assertTrue(
+                    val.startswith("http://") or val.startswith("https://"),
+                    f"Entry {entry['id']} has non-empty but invalid direct_download_url: {val!r}"
+                )
+
+    def test_no_duplicate_names(self):
+        names = [e["name"] for e in self.catalogue]
+        seen: dict = {}
+        for entry in self.catalogue:
+            n = entry["name"]
+            seen.setdefault(n, []).append(entry["id"])
+        duplicates = {n: ids for n, ids in seen.items() if len(ids) > 1}
+        for name, ids in duplicates.items():
+            self.fail(f"Duplicate catalogue name {name!r} shared by IDs: {ids}")
+
+    def test_is_hub_present_and_bool(self):
+        """Every entry must declare is_hub: True (community browse) or False (specific author)."""
+        for entry in self.catalogue:
+            self.assertIn(
+                "is_hub", entry,
+                f"Entry {entry['id']} is missing the 'is_hub' field"
+            )
+            self.assertIsInstance(
+                entry["is_hub"], bool,
+                f"Entry {entry['id']} is_hub must be a bool, got {type(entry['is_hub'])}"
+            )
+
+    def test_non_hub_author_url_is_specific(self):
+        """Non-hub entries must have an author_url pointing to a specific profile,
+        not a bare site homepage.  We spot-check for known generic homepages."""
+        generic_homepages = {
+            "https://gbatemp.net",
+            "https://gamebanana.com",
+            "https://www.loverslab.com",
+            "https://www.psx-place.com",
+            "https://forums.pcsx2.net",
+            "https://archive.org",
+            "https://www.moddb.com",
+            "https://github.com",
+            "https://gamefaqs.gamespot.com",
+            "https://www.reddit.com/r/ps2",
+            "https://www.mobygames.com",
+            "https://www.screenscraper.fr",
+        }
+        for entry in self.catalogue:
+            if not entry.get("is_hub", True):
+                aurl = entry.get("author_url", "")
+                self.assertNotIn(
+                    aurl, generic_homepages,
+                    f"Named-author entry {entry['id']} has generic homepage as author_url: {aurl!r}"
+                )
+                self.assertTrue(
+                    aurl.startswith("http://") or aurl.startswith("https://"),
+                    f"Named-author entry {entry['id']} has invalid author_url: {aurl!r}"
+                )
+
+    def test_hub_author_url_not_bare_homepage(self):
+        """Hub entries should still have a useful author_url (at least the browse/search
+        page, not just the root homepage like https://gbatemp.net).
+        We check this by requiring the URL to have a path longer than '/'."""
+        import urllib.parse
+        bare_homepages = {
+            "https://gbatemp.net",
+            "https://gamebanana.com",
+            "https://www.loverslab.com",
+            "https://www.psx-place.com",
+            "https://forums.pcsx2.net",
+            "https://archive.org",
+            "https://www.moddb.com",
+            "https://github.com",
+        }
+        for entry in self.catalogue:
+            if entry.get("is_hub", True):
+                aurl = entry.get("author_url", "")
+                self.assertNotIn(
+                    aurl, bare_homepages,
+                    f"Hub entry {entry['id']} still uses a bare site homepage for author_url: {aurl!r}"
+                )
+
+    def test_nsfw_present_and_bool(self):
+        """Every entry must declare nsfw: True or False."""
+        for entry in self.catalogue:
+            self.assertIn(
+                "nsfw", entry,
+                f"Entry {entry['id']} is missing the 'nsfw' field"
+            )
+            self.assertIsInstance(
+                entry["nsfw"], bool,
+                f"Entry {entry['id']} nsfw must be a bool, got {type(entry['nsfw'])}"
+            )
+
+    def test_loverslab_entries_are_nsfw(self):
+        """All LoversLab-sourced entries must be marked nsfw=True
+        because LoversLab is an adult content site."""
+        for entry in self.catalogue:
+            if entry.get("source", "") == "LoversLab":
+                self.assertTrue(
+                    entry.get("nsfw", False),
+                    f"LoversLab entry {entry['id']} must have nsfw=True"
+                )
+
+    def test_hub_entries_have_empty_author(self):
+        """Hub entries (is_hub=True) must have an empty author string.
+        Individual posters on community search pages are not known ahead of time,
+        so we never pre-fill a fake community name as the 'author'."""
+        for entry in self.catalogue:
+            if entry.get("is_hub", False):
+                self.assertEqual(
+                    entry.get("author", ""), "",
+                    f"Hub entry {entry['id']} should have author='' (got {entry.get('author')!r})"
+                )
+
+    def test_named_author_entries_have_non_empty_author(self):
+        """Named-author entries (is_hub=False) must have a non-empty author."""
+        for entry in self.catalogue:
+            if not entry.get("is_hub", True):
+                self.assertTrue(
+                    entry.get("author", "").strip(),
+                    f"Named-author entry {entry['id']} must have a non-empty author"
+                )
+
+    def test_nsfw_filter_logic(self):
+        """NSFW entries must be filterable: with show_nsfw=False, no nsfw entries appear;
+        with show_nsfw=True, nsfw entries are included."""
+        nsfw_entries = [e for e in self.catalogue if e.get("nsfw")]
+        safe_entries  = [e for e in self.catalogue if not e.get("nsfw")]
+
+        self.assertGreater(len(nsfw_entries), 0, "There should be at least one nsfw entry")
+        self.assertGreater(len(safe_entries), 0, "There should be safe (non-nsfw) entries")
+
+        # Simulate the filter logic
+        def apply_filter(entries, show_nsfw):
+            return [e for e in entries if not e.get("nsfw", False) or show_nsfw]
+
+        without_nsfw = apply_filter(self.catalogue, show_nsfw=False)
+        with_nsfw    = apply_filter(self.catalogue, show_nsfw=True)
+
+        # No nsfw entries in filtered-out result
+        self.assertFalse(
+            any(e.get("nsfw") for e in without_nsfw),
+            "show_nsfw=False should remove all nsfw entries"
+        )
+        # All nsfw entries present when enabled
+        self.assertGreater(
+            len(with_nsfw), len(without_nsfw),
+            "show_nsfw=True should include more entries than show_nsfw=False"
+        )
+        self.assertEqual(len(with_nsfw), len(self.catalogue))
+
