@@ -56,7 +56,8 @@
 - Manage widescreen and other `.pnach`-format cheat files
 
 ### 🌐 Browse & Download
-- Curated catalogue of **139 entries** across texture packs, PNACH patches, cover art, cheats, and community hubs — GBAtemp, LoversLab, PS2-Home, PSX-Place, PCSX2 Forums, Archive.org, Reddit, GameTDB, LaunchBox, GameFAQs, Patreon, GitHub, PS2Wide, and more
+- Curated catalogue of **209 entries** across texture packs, PNACH patches, cover art, cheats, and community hubs — GBAtemp, LoversLab, PS2-Home, PSX-Place, PCSX2 Forums, Archive.org, Reddit, GameTDB, LaunchBox, GameFAQs, Patreon, GitHub, PS2Wide, and more
+- **53 DeadOnTheInside Patreon entries** — every known HD texture pack and PNACH patch from the developer, covering 40+ popular PS2 titles (God of War, Kingdom Hearts, Final Fantasy X/XII, Shadow of the Colossus, Silent Hill 2/3, Devil May Cry, Resident Evil 4, Metal Gear Solid 2/3, Okami, and many more)
 - **Browse** is the first panel after Dashboard for quick access
 - Every catalogue card shows both **🌐 Visit Source** and **⬇ Download from URL** buttons
 - **Source**, **author**, and **favorites-only** filter dropdowns

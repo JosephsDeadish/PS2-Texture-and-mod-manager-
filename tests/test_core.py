@@ -662,7 +662,7 @@ class TestMultipartArchive(unittest.TestCase):
         self.assertTrue(is_archive("pack.7z"))
 
 
-
+class TestMemoryCardCreate(unittest.TestCase):
     """Tests for create_memcard."""
 
     def setUp(self):

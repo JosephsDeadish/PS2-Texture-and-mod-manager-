@@ -652,6 +652,1340 @@ CATALOGUE: List[dict] = [
         "requires_account": True,
         "is_complete": True,
     },
+    # ── DeadOnTheInside — Game-Specific Texture Packs ────────────────────────
+    # Each entry links to the creator's Patreon page; open it and search for the
+    # game name to find the exact post containing that pack.
+    {
+        "id": "doti_gow1_textures",
+        "name": "DeadOnTheInside — God of War HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for God of War (SCUS-97399 / SCES-53133). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and UI textures using ESRGAN. "
+            "Free Patreon membership required to download."
+        ),
+        "context": (
+            "Find the post on the creator's page by searching for 'God of War'. "
+            "Download the attachment, then import via Texture Packs → ➕ Import "
+            "with Game ID SCUS-97399 (US) or SCES-53133 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "God of War",
+        "thumbnail_url": "",
+        "tags": ["god of war", "gow", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_gow2_textures",
+        "name": "DeadOnTheInside — God of War II HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for God of War II (SCUS-97481 / SCES-54206). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and boss textures using ESRGAN. "
+            "Free Patreon membership required."
+        ),
+        "context": (
+            "Find the post on the creator's page by searching for 'God of War II'. "
+            "Import with Game ID SCUS-97481 (US) or SCES-54206 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "God of War II",
+        "thumbnail_url": "",
+        "tags": ["god of war 2", "gow2", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_kh1_textures",
+        "name": "DeadOnTheInside — Kingdom Hearts HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Kingdom Hearts (SLUS-20370 / SLES-51150). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Kingdom Hearts' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20370 (US) or SLES-51150 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Kingdom Hearts",
+        "thumbnail_url": "",
+        "tags": ["kingdom hearts", "kh1", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_kh2_textures",
+        "name": "DeadOnTheInside — Kingdom Hearts II HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Kingdom Hearts II (SLUS-21005 / SLES-54114). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Kingdom Hearts II' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21005 (US) or SLES-54114 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Kingdom Hearts II",
+        "thumbnail_url": "",
+        "tags": ["kingdom hearts 2", "kh2", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_ffx_textures",
+        "name": "DeadOnTheInside — Final Fantasy X HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Final Fantasy X (SLUS-20312 / SLES-50490). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and battle textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Final Fantasy X' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20312 (US) or SLES-50490 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Final Fantasy X",
+        "thumbnail_url": "",
+        "tags": ["final fantasy x", "ffx", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_ff12_textures",
+        "name": "DeadOnTheInside — Final Fantasy XII HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Final Fantasy XII (SLUS-21475 / SLES-54354). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and monster textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Final Fantasy XII' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21475 (US) or SLES-54354 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Final Fantasy XII",
+        "thumbnail_url": "",
+        "tags": ["final fantasy xii", "ff12", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_sotc_textures",
+        "name": "DeadOnTheInside — Shadow of the Colossus HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Shadow of the Colossus (SCUS-97472 / SCES-53326). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled landscape, colossus, and sky textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Shadow of the Colossus' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97472 (US) or SCES-53326 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Shadow of the Colossus",
+        "thumbnail_url": "",
+        "tags": ["shadow of the colossus", "sotc", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_ico_textures",
+        "name": "DeadOnTheInside — Ico HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Ico (SCUS-97113 / SCES-50760). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled castle, environment, and character textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Ico' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97113 (US) or SCES-50760 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Ico",
+        "thumbnail_url": "",
+        "tags": ["ico", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_sh2_textures",
+        "name": "DeadOnTheInside — Silent Hill 2 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Silent Hill 2 (SLUS-20228 / SLES-50356). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled fog, environment, monster, and character textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Silent Hill 2' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20228 (US) or SLES-50356 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Silent Hill 2",
+        "thumbnail_url": "",
+        "tags": ["silent hill 2", "sh2", "hd", "esrgan", "horror", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_sh3_textures",
+        "name": "DeadOnTheInside — Silent Hill 3 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Silent Hill 3 (SLUS-20622 / SLES-51434). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, monster, and character textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Silent Hill 3' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20622 (US) or SLES-51434 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Silent Hill 3",
+        "thumbnail_url": "",
+        "tags": ["silent hill 3", "sh3", "hd", "esrgan", "horror", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_dmc3_textures",
+        "name": "DeadOnTheInside — Devil May Cry 3 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Devil May Cry 3: Dante's Awakening "
+            "(SLUS-21087 / SLES-53541). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and demon textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Devil May Cry 3' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21087 (US) or SLES-53541 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Devil May Cry 3",
+        "thumbnail_url": "",
+        "tags": ["devil may cry 3", "dmc3", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_re4_textures",
+        "name": "DeadOnTheInside — Resident Evil 4 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Resident Evil 4 (SLUS-21134 / SLES-53702). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and enemy textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Resident Evil 4' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21134 (US) or SLES-53702 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Resident Evil 4",
+        "thumbnail_url": "",
+        "tags": ["resident evil 4", "re4", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_mgs2_textures",
+        "name": "DeadOnTheInside — Metal Gear Solid 2 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Metal Gear Solid 2: Sons of Liberty "
+            "(SLUS-20144 / SLES-50788). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and HUD textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Metal Gear Solid 2' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20144 (US) or SLES-50788 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Metal Gear Solid 2: Sons of Liberty",
+        "thumbnail_url": "",
+        "tags": ["metal gear solid 2", "mgs2", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_mgs3_textures",
+        "name": "DeadOnTheInside — Metal Gear Solid 3 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Metal Gear Solid 3: Snake Eater "
+            "(SLUS-20718 / SLES-52456). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled jungle, character, and environment textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Metal Gear Solid 3' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20718 (US) or SLES-52456 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Metal Gear Solid 3: Snake Eater",
+        "thumbnail_url": "",
+        "tags": ["metal gear solid 3", "mgs3", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_persona3_textures",
+        "name": "DeadOnTheInside — Persona 3 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Persona 3 / Persona 3 FES "
+            "(SLUS-21621 / SLUS-21751 / SLES-54532). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled dungeon, character, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Persona 3' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21621 (P3 US), SLUS-21751 (P3 FES US), or SLES-54532 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Persona 3",
+        "thumbnail_url": "",
+        "tags": ["persona 3", "p3", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_persona4_textures",
+        "name": "DeadOnTheInside — Persona 4 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Persona 4 (SLUS-21782 US / SLES-55474 EU). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled dungeon, character, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Persona 4' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21782 (US) or SLES-55474 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Persona 4",
+        "thumbnail_url": "",
+        "tags": ["persona 4", "p4", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_okami_textures",
+        "name": "DeadOnTheInside — Okami HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Okami (SLUS-21115 / SLES-54439). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and brushstroke textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Okami' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21115 (US) or SLES-54439 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Okami",
+        "thumbnail_url": "",
+        "tags": ["okami", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_gtasa_textures",
+        "name": "DeadOnTheInside — GTA San Andreas HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Grand Theft Auto: San Andreas "
+            "(SLUS-20946 / SLES-52541). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled building, road, vegetation, and character textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'San Andreas' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20946 (US) or SLES-52541 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Grand Theft Auto: San Andreas",
+        "thumbnail_url": "",
+        "tags": ["gta san andreas", "gta sa", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_dbz_bt3_textures",
+        "name": "DeadOnTheInside — Dragon Ball Z BT3 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Dragon Ball Z: Budokai Tenkaichi 3 "
+            "(SLUS-21678 / SLES-55236). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, stage, and effect textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Budokai Tenkaichi' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21678 (US) or SLES-55236 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Dragon Ball Z: Budokai Tenkaichi 3",
+        "thumbnail_url": "",
+        "tags": ["dragon ball z", "dbz", "budokai tenkaichi 3", "bt3", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_tekken5_textures",
+        "name": "DeadOnTheInside — Tekken 5 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Tekken 5 (SLUS-21059 / SLES-53971). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled fighter, stage, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Tekken 5' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21059 (US) or SLES-53971 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Tekken 5",
+        "thumbnail_url": "",
+        "tags": ["tekken 5", "hd", "esrgan", "fighting", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_dqviii_textures",
+        "name": "DeadOnTheInside — Dragon Quest VIII HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Dragon Quest VIII: Journey of the Cursed King "
+            "(SLUS-21207 / SLES-53974). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and monster textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Dragon Quest VIII' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21207 (US) or SLES-53974 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Dragon Quest VIII",
+        "thumbnail_url": "",
+        "tags": ["dragon quest viii", "dqviii", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_jak_textures",
+        "name": "DeadOnTheInside — Jak and Daxter HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Jak and Daxter: The Precursor Legacy "
+            "(SCUS-97124 / SCES-50361). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and effect textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Jak and Daxter' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97124 (US) or SCES-50361 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Jak and Daxter: The Precursor Legacy",
+        "thumbnail_url": "",
+        "tags": ["jak and daxter", "jak", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_ratchet_clank_textures",
+        "name": "DeadOnTheInside — Ratchet & Clank HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Ratchet & Clank (SCUS-97198 / SCES-50916). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled planet, character, and weapon textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Ratchet Clank' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97198 (US) or SCES-50916 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Ratchet & Clank",
+        "thumbnail_url": "",
+        "tags": ["ratchet clank", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_sly_cooper_textures",
+        "name": "DeadOnTheInside — Sly Cooper HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Sly Cooper and the Thievius Raccoonus "
+            "(SCUS-97199 US / SCES-51040 EU). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and HUD textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Sly Cooper' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97199 (US) or SCES-51040 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Sly Cooper and the Thievius Raccoonus",
+        "thumbnail_url": "",
+        "tags": ["sly cooper", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_crash_woc_textures",
+        "name": "DeadOnTheInside — Crash Bandicoot: WoC HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Crash Bandicoot: Wrath of Cortex "
+            "(SLUS-20466 / SLES-50448). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, level, and environment textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Crash Bandicoot Wrath' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20466 (US) or SLES-50448 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Crash Bandicoot: The Wrath of Cortex",
+        "thumbnail_url": "",
+        "tags": ["crash bandicoot", "wrath of cortex", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_spyro_textures",
+        "name": "DeadOnTheInside — Spyro: Enter the Dragonfly HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Spyro: Enter the Dragonfly "
+            "(SLUS-20309 / SLES-50816). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, world, and effect textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Spyro' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20309 (US) or SLES-50816 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Spyro: Enter the Dragonfly",
+        "thumbnail_url": "",
+        "tags": ["spyro", "enter the dragonfly", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_dark_cloud_textures",
+        "name": "DeadOnTheInside — Dark Cloud HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Dark Cloud (SCUS-97111 US / SCES-50295 EU). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled dungeon, character, and world-building textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Dark Cloud' on the creator's Patreon page. "
+            "Import with the Game ID shown on your disc label or in PCSX2's game list "
+            "(SCUS-97111 US, SCES-50295 EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Dark Cloud",
+        "thumbnail_url": "",
+        "tags": ["dark cloud", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_star_ocean3_textures",
+        "name": "DeadOnTheInside — Star Ocean: Till the End of Time HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Star Ocean: Till the End of Time "
+            "(SLUS-20733 / SLES-51752). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled world, character, and battle textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Star Ocean' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20733 (US) or SLES-51752 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Star Ocean: Till the End of Time",
+        "thumbnail_url": "",
+        "tags": ["star ocean 3", "star ocean", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_gt4_textures",
+        "name": "DeadOnTheInside — Gran Turismo 4 HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Gran Turismo 4 (SCUS-97328 / SCES-51719). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled track, car, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Gran Turismo 4' on the creator's Patreon page. "
+            "Import with Game ID SCUS-97328 (US) or SCES-51719 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Gran Turismo 4",
+        "thumbnail_url": "",
+        "tags": ["gran turismo 4", "gt4", "hd", "esrgan", "racing", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_burnout3_textures",
+        "name": "DeadOnTheInside — Burnout 3: Takedown HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Burnout 3: Takedown (SLUS-20872 / SLES-52456). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled vehicle, road, and environment textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Burnout 3' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20872 (US) or SLES-52456 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Burnout 3: Takedown",
+        "thumbnail_url": "",
+        "tags": ["burnout 3", "burnout", "hd", "esrgan", "racing", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_bully_textures",
+        "name": "DeadOnTheInside — Bully HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Bully / Canis Canem Edit "
+            "(SLUS-21333 / SLES-53561). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, school, and open-world textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Bully' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21333 (US) or SLES-53561 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Bully",
+        "thumbnail_url": "",
+        "tags": ["bully", "canis canem edit", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_xenosaga_textures",
+        "name": "DeadOnTheInside — Xenosaga Episode I HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Xenosaga Episode I: Der Wille zur Macht "
+            "(SLUS-20453 / SLES-51182). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, environment, and cutscene textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Xenosaga' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20453 (US) or SLES-51182 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Xenosaga Episode I",
+        "thumbnail_url": "",
+        "tags": ["xenosaga", "xenosaga episode 1", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_dmc1_textures",
+        "name": "DeadOnTheInside — Devil May Cry HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Devil May Cry (SLUS-20216 / SLES-50291). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled castle, character, and demon textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Devil May Cry' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20216 (US) or SLES-50291 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Devil May Cry",
+        "thumbnail_url": "",
+        "tags": ["devil may cry", "dmc1", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_re_code_veronica_textures",
+        "name": "DeadOnTheInside — Resident Evil: Code Veronica X HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Resident Evil: Code Veronica X "
+            "(SLUS-20184 / SLES-50306). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled environment, character, and horror textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Code Veronica' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20184 (US) or SLES-50306 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Resident Evil: Code Veronica X",
+        "thumbnail_url": "",
+        "tags": ["resident evil code veronica", "re cvx", "hd", "esrgan", "horror", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_hack_gu_textures",
+        "name": "DeadOnTheInside — .hack//G.U. HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for .hack//G.U. Vol.1//Rebirth "
+            "(SLUS-21557 / SLES-54436). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled character, dungeon, and UI textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching '.hack GU' on the creator's Patreon page. "
+            "Import with Game ID SLUS-21557 (US) or SLES-54436 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": ".hack//G.U. Vol.1//Rebirth",
+        "thumbnail_url": "",
+        "tags": ["hack gu", ".hack", "hd", "esrgan", "jrpg", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_pop_sot_textures",
+        "name": "DeadOnTheInside — Prince of Persia: Sands of Time HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Prince of Persia: The Sands of Time "
+            "(SLUS-20550 / SLES-51605). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled palace, character, and environment textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Prince of Persia' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20550 (US) or SLES-51605 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Prince of Persia: The Sands of Time",
+        "thumbnail_url": "",
+        "tags": ["prince of persia", "sands of time", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_onimusha_textures",
+        "name": "DeadOnTheInside — Onimusha HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Onimusha: Warlords "
+            "(SLUS-20018 / SLES-50287). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled samurai, castle, and demon textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Onimusha' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20018 (US) or SLES-50287 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Onimusha: Warlords",
+        "thumbnail_url": "",
+        "tags": ["onimusha", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_zone_of_enders_textures",
+        "name": "DeadOnTheInside — Zone of the Enders HD Texture Pack",
+        "description": (
+            "HD texture replacement pack for Zone of the Enders "
+            "(SLUS-20234 US / SLES-50111 EU). "
+            "Available on the DeadOnTheInside Patreon. "
+            "Upscaled mech, environment, and battle textures. Free membership required."
+        ),
+        "context": (
+            "Find the post by searching 'Zone of the Enders' on the creator's Patreon page. "
+            "Import with Game ID SLUS-20234 (US) or SLES-50111 (EU)."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "Zone of the Enders",
+        "thumbnail_url": "",
+        "tags": ["zone of the enders", "zoe", "mech", "hd", "esrgan", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    # ── DeadOnTheInside — PNACH Patches ───────────────────────────────────────
+    {
+        "id": "doti_gow1_pnach",
+        "name": "DeadOnTheInside — God of War PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for God of War (SCUS-97399). "
+            "Available on the DeadOnTheInside Patreon alongside the HD texture pack. "
+            "May include widescreen fix, frame-rate improvements, or gameplay tweaks."
+        ),
+        "context": (
+            "Find the post by searching 'God of War PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "God of War",
+        "thumbnail_url": "",
+        "tags": ["god of war", "gow", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_kh2_pnach",
+        "name": "DeadOnTheInside — Kingdom Hearts II PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for Kingdom Hearts II (SLUS-21005). "
+            "Available on the DeadOnTheInside Patreon alongside the HD texture pack. "
+            "May include widescreen fix, 60fps patch, or HUD improvements."
+        ),
+        "context": (
+            "Find the post by searching 'Kingdom Hearts II PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Kingdom Hearts II",
+        "thumbnail_url": "",
+        "tags": ["kingdom hearts 2", "kh2", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_ffx_pnach",
+        "name": "DeadOnTheInside — Final Fantasy X PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for Final Fantasy X (SLUS-20312). "
+            "Available on the DeadOnTheInside Patreon. "
+            "May include widescreen fix or frame-rate improvements."
+        ),
+        "context": (
+            "Find the post by searching 'Final Fantasy X PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Final Fantasy X",
+        "thumbnail_url": "",
+        "tags": ["final fantasy x", "ffx", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_mgs3_pnach",
+        "name": "DeadOnTheInside — Metal Gear Solid 3 PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for Metal Gear Solid 3: Snake Eater "
+            "(SLUS-20718). "
+            "Available on the DeadOnTheInside Patreon. "
+            "May include widescreen fix, 60fps patch, or other improvements."
+        ),
+        "context": (
+            "Find the post by searching 'MGS3 PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Metal Gear Solid 3: Snake Eater",
+        "thumbnail_url": "",
+        "tags": ["metal gear solid 3", "mgs3", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_re4_pnach",
+        "name": "DeadOnTheInside — Resident Evil 4 PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for Resident Evil 4 (SLUS-21134). "
+            "Available on the DeadOnTheInside Patreon. "
+            "May include widescreen fix, frame-rate improvements, or aim-assist tweaks."
+        ),
+        "context": (
+            "Find the post by searching 'Resident Evil 4 PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Resident Evil 4",
+        "thumbnail_url": "",
+        "tags": ["resident evil 4", "re4", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_sotc_pnach",
+        "name": "DeadOnTheInside — Shadow of the Colossus PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for Shadow of the Colossus "
+            "(SCUS-97472 / SCES-53326). "
+            "Available on the DeadOnTheInside Patreon. "
+            "May include widescreen fix, 60fps patch, or camera improvements."
+        ),
+        "context": (
+            "Find the post by searching 'Shadow of the Colossus PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Shadow of the Colossus",
+        "thumbnail_url": "",
+        "tags": ["shadow of the colossus", "sotc", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "doti_gtasa_pnach",
+        "name": "DeadOnTheInside — GTA San Andreas PNACH Patch",
+        "description": (
+            "Widescreen and enhancement PNACH patch for GTA: San Andreas (SLUS-20946). "
+            "Available on the DeadOnTheInside Patreon. "
+            "May include widescreen fix, draw-distance improvements, or mission tweaks."
+        ),
+        "context": (
+            "Find the post by searching 'San Andreas PNACH' on the creator's Patreon page. "
+            "Download the .pnach file and import via PNACH Patches → ➕ Import → 📄 File."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.PNACH,
+        "source": "Patreon",
+        "game": "Grand Theft Auto: San Andreas",
+        "thumbnail_url": "",
+        "tags": ["gta san andreas", "gta sa", "pnach", "widescreen", "ps2", "patreon", "deadontheinside"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
     # ── Game-Specific Texture Packs ───────────────────────────────────────────
     {
         "id": "spyro_etd_textures",
@@ -3136,6 +4470,542 @@ CATALOGUE: List[dict] = [
         "tags": ["cheats", "pnach", "psx-place", "community"],
         "download_action": "",
         "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── Additional Game-Specific Texture Pack Hubs ────────────────────────────
+    {
+        "id": "jak2_textures",
+        "name": "Jak II — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Jak II (SCUS-97265 / SCES-52460). "
+            "Search GBAtemp, GameBanana, and Reddit for upscaled packs."
+        ),
+        "context": "Search 'Jak II texture' on GBAtemp or GameBanana for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=jak+2+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=jak+2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Jak II",
+        "thumbnail_url": "",
+        "tags": ["jak 2", "jak ii", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "jak3_textures",
+        "name": "Jak 3 — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Jak 3 (SCUS-97330 / SCES-53203). "
+            "Search GBAtemp, GameBanana, and Reddit for upscaled packs."
+        ),
+        "context": "Search 'Jak 3 texture' on GBAtemp or GameBanana for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=jak+3+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=jak+3+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Jak 3",
+        "thumbnail_url": "",
+        "tags": ["jak 3", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "ratchet_clank_gac_textures",
+        "name": "Ratchet & Clank: Going Commando — HD Textures",
+        "description": (
+            "Community HD texture replacements for Ratchet & Clank: Going Commando "
+            "(SCUS-97268 / SCES-51607). Browse GBAtemp and GameBanana for packs."
+        ),
+        "context": "Search 'Ratchet Clank Going Commando texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=ratchet+clank+going+commando+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=ratchet+clank+going+commando+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Ratchet & Clank: Going Commando",
+        "thumbnail_url": "",
+        "tags": ["ratchet clank", "going commando", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "ratchet_clank_uy_textures",
+        "name": "Ratchet & Clank: Up Your Arsenal — HD Textures",
+        "description": (
+            "Community HD texture replacements for Ratchet & Clank: Up Your Arsenal "
+            "(SCUS-97353 / SCES-52456). Browse GBAtemp and GameBanana for packs."
+        ),
+        "context": "Search 'Ratchet Clank Up Your Arsenal texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=ratchet+clank+up+your+arsenal+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=ratchet+clank+up+your+arsenal+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Ratchet & Clank: Up Your Arsenal",
+        "thumbnail_url": "",
+        "tags": ["ratchet clank", "up your arsenal", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "sly2_textures",
+        "name": "Sly 2: Band of Thieves — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Sly 2: Band of Thieves "
+            "(SCUS-97316 / SCES-52456). Search GBAtemp and GameBanana for packs."
+        ),
+        "context": "Search 'Sly 2 texture' on GBAtemp or GameBanana for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=sly+2+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=sly+2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Sly 2: Band of Thieves",
+        "thumbnail_url": "",
+        "tags": ["sly 2", "sly cooper", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "sly3_textures",
+        "name": "Sly 3: Honor Among Thieves — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Sly 3: Honor Among Thieves "
+            "(SCUS-97421 / SCES-53350). Search GBAtemp and GameBanana for packs."
+        ),
+        "context": "Search 'Sly 3 texture' on GBAtemp or GameBanana for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=sly+3+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=sly+3+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Sly 3: Honor Among Thieves",
+        "thumbnail_url": "",
+        "tags": ["sly 3", "sly cooper", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "gran_turismo3_textures",
+        "name": "Gran Turismo 3: A-Spec — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Gran Turismo 3: A-Spec "
+            "(SCUS-97100 / SCES-50294). Search GBAtemp for upscaled track and car textures."
+        ),
+        "context": "Search 'Gran Turismo 3 texture' on GBAtemp or GameBanana for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=gran+turismo+3+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=gran+turismo+3+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Gran Turismo 3: A-Spec",
+        "thumbnail_url": "",
+        "tags": ["gran turismo 3", "gt3", "racing", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "burnout_revenge_textures",
+        "name": "Burnout Revenge — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Burnout Revenge (SLUS-21349 / SLES-53662). "
+            "Browse GBAtemp for upscaled car and track textures."
+        ),
+        "context": "Search 'Burnout Revenge texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=burnout+revenge+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=burnout+revenge+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Burnout Revenge",
+        "thumbnail_url": "",
+        "tags": ["burnout revenge", "burnout", "racing", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "prince_of_persia_sot_textures",
+        "name": "Prince of Persia: Sands of Time — Community Pack Hub",
+        "description": (
+            "Community HD texture replacements for Prince of Persia: The Sands of Time "
+            "(SLUS-20550 / SLES-51605). "
+            "Browse GBAtemp and GameBanana for upscaled environment and character packs."
+        ),
+        "context": "Search 'Prince of Persia Sands of Time texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=prince+of+persia+sands+of+time+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=prince+of+persia+sands+of+time+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Prince of Persia: The Sands of Time",
+        "thumbnail_url": "",
+        "tags": ["prince of persia", "sands of time", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "prince_of_persia_ww_textures",
+        "name": "Prince of Persia: Warrior Within — HD Textures",
+        "description": (
+            "Community HD texture replacements for Prince of Persia: Warrior Within "
+            "(SLUS-21048 / SLES-52905). "
+            "Browse GBAtemp and GameBanana for upscaled packs."
+        ),
+        "context": "Search 'Prince of Persia Warrior Within texture' on GBAtemp.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=prince+of+persia+warrior+within+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=prince+of+persia+warrior+within+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Prince of Persia: Warrior Within",
+        "thumbnail_url": "",
+        "tags": ["prince of persia", "warrior within", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "mortal_kombat_armageddon_textures",
+        "name": "Mortal Kombat: Armageddon — HD Textures",
+        "description": (
+            "Community HD texture replacements for Mortal Kombat: Armageddon "
+            "(SLUS-21444 / SLES-54735). "
+            "Browse GBAtemp and GameBanana for fighter and stage texture packs."
+        ),
+        "context": "Search 'Mortal Kombat Armageddon texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=mortal+kombat+armageddon+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=mortal+kombat+armageddon+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Mortal Kombat: Armageddon",
+        "thumbnail_url": "",
+        "tags": ["mortal kombat", "armageddon", "fighting", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "castlevania_loi_textures",
+        "name": "Castlevania: Lament of Innocence — HD Textures",
+        "description": (
+            "Community HD texture replacements for Castlevania: Lament of Innocence "
+            "(SLUS-20845 / SLES-52157). "
+            "Browse GBAtemp and PSX-Place for upscaled castle and character textures."
+        ),
+        "context": "Search 'Castlevania Lament Innocence texture' on GBAtemp or PSX-Place.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=castlevania+lament+of+innocence+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=castlevania+lament+of+innocence+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Castlevania: Lament of Innocence",
+        "thumbnail_url": "",
+        "tags": ["castlevania", "lament of innocence", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "fatal_frame2_textures",
+        "name": "Fatal Frame II: Crimson Butterfly — HD Textures",
+        "description": (
+            "Community HD texture replacements for Fatal Frame II: Crimson Butterfly "
+            "(SLUS-20811 / SLES-52384). "
+            "Browse GBAtemp and PSX-Place for upscaled horror and environment textures."
+        ),
+        "context": "Search 'Fatal Frame 2 texture' on GBAtemp or PSX-Place for available packs.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=fatal+frame+2+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=fatal+frame+2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Fatal Frame II: Crimson Butterfly",
+        "thumbnail_url": "",
+        "tags": ["fatal frame 2", "fatal frame", "horror", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "dmc2_textures",
+        "name": "Devil May Cry 2 — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Devil May Cry 2 (SLUS-20783 / SLES-51390). "
+            "Browse GBAtemp and GameBanana for upscaled environment and character packs."
+        ),
+        "context": "Search 'Devil May Cry 2 texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=devil+may+cry+2+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=devil+may+cry+2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Devil May Cry 2",
+        "thumbnail_url": "",
+        "tags": ["devil may cry 2", "dmc2", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "ace_combat04_textures",
+        "name": "Ace Combat 04: Shattered Skies — HD Textures",
+        "description": (
+            "Community HD texture replacements for Ace Combat 04: Shattered Skies "
+            "(SLUS-20152 / SLES-50507). "
+            "Browse GBAtemp and PSX-Place for upscaled aircraft and landscape textures."
+        ),
+        "context": "Search 'Ace Combat 04 texture' on GBAtemp or PSX-Place.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=ace+combat+04+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=ace+combat+04+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Ace Combat 04: Shattered Skies",
+        "thumbnail_url": "",
+        "tags": ["ace combat", "ace combat 04", "flight", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "timesplitters_fp_textures",
+        "name": "TimeSplitters: Future Perfect — HD Textures",
+        "description": (
+            "Community HD texture replacements for TimeSplitters: Future Perfect "
+            "(SLUS-21028 / SLES-53032). "
+            "Browse GBAtemp and GameBanana for upscaled character and level textures."
+        ),
+        "context": "Search 'TimeSplitters Future Perfect texture' on GBAtemp or GameBanana.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=timesplitters+future+perfect+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=timesplitters+future+perfect+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "TimeSplitters: Future Perfect",
+        "thumbnail_url": "",
+        "tags": ["timesplitters", "future perfect", "fps", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "shadow_hearts2_textures",
+        "name": "Shadow Hearts: Covenant — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Shadow Hearts: Covenant "
+            "(SLUS-20971 / SLES-52838). "
+            "Browse GBAtemp and Reddit for upscaled JRPG character and world textures."
+        ),
+        "context": "Search 'Shadow Hearts Covenant texture' on GBAtemp or Reddit r/ps2.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=shadow+hearts+covenant+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=shadow+hearts+covenant+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Shadow Hearts: Covenant",
+        "thumbnail_url": "",
+        "tags": ["shadow hearts", "shadow hearts 2", "covenant", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "wild_arms5_textures",
+        "name": "Wild Arms 5 — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Wild Arms 5 (SLUS-21742 / SLES-55134). "
+            "Browse GBAtemp and Reddit for upscaled JRPG character and world textures."
+        ),
+        "context": "Search 'Wild Arms 5 texture' on GBAtemp or Reddit r/ps2.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=wild+arms+5+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=wild+arms+5+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Wild Arms 5",
+        "thumbnail_url": "",
+        "tags": ["wild arms 5", "wild arms", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "tales_of_the_abyss_textures",
+        "name": "Tales of the Abyss — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Tales of the Abyss "
+            "(SLUS-21386 / SLES-54438). "
+            "Browse GBAtemp and Reddit for upscaled character, world, and battle textures."
+        ),
+        "context": "Search 'Tales of the Abyss texture' on GBAtemp or Reddit r/ps2.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=tales+of+the+abyss+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=tales+of+the+abyss+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Tales of the Abyss",
+        "thumbnail_url": "",
+        "tags": ["tales of the abyss", "tales", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "suikoden5_textures",
+        "name": "Suikoden V — HD Texture Pack (Community)",
+        "description": (
+            "Community HD texture replacements for Suikoden V (SLUS-21291 / SLES-53962). "
+            "Browse GBAtemp and Reddit for upscaled JRPG character and environment textures."
+        ),
+        "context": "Search 'Suikoden 5 texture' on GBAtemp or Reddit r/ps2.",
+        "author": "",
+        "author_url": "https://gbatemp.net/search/?q=suikoden+5+texture&t=post",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/search/?q=suikoden+5+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Suikoden V",
+        "thumbnail_url": "",
+        "tags": ["suikoden 5", "suikoden", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    # ── Additional PNACH Hubs ─────────────────────────────────────────────────
+    {
+        "id": "ps2wide_jak_pnach",
+        "name": "Jak and Daxter Series — Widescreen Patches",
+        "description": (
+            "Widescreen and enhancement PNACH patches for the Jak and Daxter trilogy "
+            "on PS2. Available on PS2Wide.net — covers Jak and Daxter, Jak II, and Jak 3."
+        ),
+        "context": "Search ps2wide.net for 'Jak' to find widescreen patches for all three games.",
+        "author": "",
+        "author_url": "https://ps2wide.net/pc.html",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://ps2wide.net/pc.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Jak and Daxter",
+        "thumbnail_url": "",
+        "tags": ["jak", "jak and daxter", "widescreen", "pnach", "ps2wide"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ps2wide_crash_pnach",
+        "name": "Crash Bandicoot Series — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for Crash Bandicoot PS2 titles on PS2Wide.net. "
+            "Covers Wrath of Cortex, Twinsanity, and Crash of the Titans."
+        ),
+        "context": "Search ps2wide.net for 'Crash' to find widescreen patches.",
+        "author": "",
+        "author_url": "https://ps2wide.net/pc.html",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://ps2wide.net/pc.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Crash Bandicoot series",
+        "thumbnail_url": "",
+        "tags": ["crash bandicoot", "widescreen", "pnach", "ps2wide"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ps2wide_ratchet_pnach",
+        "name": "Ratchet & Clank Series — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for the Ratchet & Clank PS2 series on PS2Wide.net. "
+            "Covers all four main PS2 entries in the series."
+        ),
+        "context": "Search ps2wide.net for 'Ratchet' to find widescreen patches for all games.",
+        "author": "",
+        "author_url": "https://ps2wide.net/pc.html",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://ps2wide.net/pc.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Ratchet & Clank series",
+        "thumbnail_url": "",
+        "tags": ["ratchet clank", "widescreen", "pnach", "ps2wide"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ps2wide_sly_pnach",
+        "name": "Sly Cooper Series — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for the Sly Cooper PS2 trilogy on PS2Wide.net. "
+            "Covers Sly Cooper, Sly 2: Band of Thieves, and Sly 3: Honor Among Thieves."
+        ),
+        "context": "Search ps2wide.net for 'Sly' to find widescreen patches for all three games.",
+        "author": "",
+        "author_url": "https://ps2wide.net/pc.html",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://ps2wide.net/pc.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Sly Cooper series",
+        "thumbnail_url": "",
+        "tags": ["sly cooper", "sly", "widescreen", "pnach", "ps2wide"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ps2wide_silent_hill_pnach",
+        "name": "Silent Hill Series — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for the Silent Hill PS2 series on PS2Wide.net. "
+            "Covers Silent Hill 2, 3, 4: The Room, and Shattered Memories."
+        ),
+        "context": "Search ps2wide.net for 'Silent Hill' to find widescreen patches for all games.",
+        "author": "",
+        "author_url": "https://ps2wide.net/pc.html",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://ps2wide.net/pc.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Silent Hill series",
+        "thumbnail_url": "",
+        "tags": ["silent hill", "widescreen", "pnach", "horror", "ps2wide"],
+        "download_action": "",
         "upscale_tech": "",
     },
     # ── Patreon Examples: paid / account-required / incomplete ────────────────
