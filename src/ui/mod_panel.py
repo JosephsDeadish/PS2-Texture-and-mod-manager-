@@ -82,6 +82,10 @@ class ModPanel(BasePanel):
     and import/deploy actions.
     """
 
+    # Emitted when the user asks to view mods by an author in a *different* panel type.
+    # Payload: (author: str, target_mod_type: ModType)
+    navigate_to_author_type = pyqtSignal(str, object)
+
     def __init__(self, mod_type: ModType, db: ModDatabase, config: AppConfig, parent=None):
         meta = _TYPE_META[mod_type]
         super().__init__(
@@ -135,6 +139,12 @@ class ModPanel(BasePanel):
         conflict_btn = QPushButton("⚠ Conflicts")
         conflict_btn.clicked.connect(self._show_conflicts)
         toolbar.addWidget(conflict_btn)
+
+        # Check for Updates button
+        updates_btn = QPushButton("🔔 Updates")
+        updates_btn.setToolTip("Check for updates for mods that have a GitHub source URL")
+        updates_btn.clicked.connect(self._check_updates)
+        toolbar.addWidget(updates_btn)
 
         content.addLayout(toolbar)
 
@@ -289,6 +299,7 @@ class ModPanel(BasePanel):
                 widget.priority_down.connect(self._on_priority_down)
                 widget.details_requested.connect(self._on_details)
                 widget.edit_requested.connect(self._on_edit)
+                widget.filter_by_author.connect(self._filter_by_author)
                 self._list_layout.insertWidget(i, widget)
 
         enabled_count = sum(1 for m in self.db.by_type(self.mod_type) if m.enabled)
@@ -380,7 +391,32 @@ class ModPanel(BasePanel):
         mod = self.db.get(mod_id)
         if mod:
             dlg = ModDetailsDialog(mod, self)
+            dlg.see_more_by_author.connect(self._on_see_more_by_author)
             dlg.exec()
+
+    def _on_see_more_by_author(self, author: str, target_type: object):
+        """
+        Called when the user clicks "See more by [author]" in the details dialog.
+        If *target_type* matches the current panel's mod type, filter in-panel.
+        Otherwise emit navigate_to_author_type so MainWindow can switch panels.
+        """
+        if target_type == self.mod_type:
+            self._filter_by_author(author)
+        else:
+            self.navigate_to_author_type.emit(author, target_type)
+
+    def _filter_by_author(self, author: str):
+        """Set the author filter dropdown to *author* and refresh the list."""
+        idx = self._author_filter.findData(author)
+        if idx >= 0:
+            self._author_filter.setCurrentIndex(idx)
+        else:
+            # Author not yet in dropdown (e.g. after new import) — refresh first
+            self._refresh_author_filter()
+            idx = self._author_filter.findData(author)
+            if idx >= 0:
+                self._author_filter.setCurrentIndex(idx)
+        self.emit_status(f"Showing mods by {author}")
 
     def _on_edit(self, mod_id: str):
         mod = self.db.get(mod_id)
@@ -430,6 +466,78 @@ class ModPanel(BasePanel):
         dlg = ConflictDialog(conflicts, self.db, self)
         dlg.exec()
         self._apply_filter()
+
+    def _check_updates(self):
+        """
+        Run the update checker for all mods in this panel that have a source URL.
+        Results are shown in a summary dialog; mods with available updates get an
+        "↑ Update" badge and the list is refreshed.
+        """
+        from src.core.updater import UpdateChecker
+
+        mods_with_source = [
+            m for m in self.db.by_type(self.mod_type)
+            if m.source_url
+        ]
+        if not mods_with_source:
+            QMessageBox.information(
+                self,
+                "No Checkable Mods",
+                "None of the mods in this panel have a source URL set.\n\n"
+                "Add a GitHub Releases URL in a mod's Edit dialog to enable update checking."
+            )
+            return
+
+        self.emit_status("Checking for updates…")
+
+        # We collect results; since this is a background thread we accumulate
+        # and show a dialog when done.
+        results: list = []
+
+        def _on_result(mod_id: str, has_update: bool):
+            mod = self.db.get(mod_id)
+            if mod:
+                results.append((mod.name, has_update))
+
+        def _on_complete(updates_found: int):
+            from PyQt6.QtCore import QTimer
+            def _show():
+                self._apply_filter()
+                if updates_found == 0:
+                    QMessageBox.information(
+                        self, "Up to Date",
+                        f"✅ All {len(mods_with_source)} checked mod(s) are up to date."
+                    )
+                else:
+                    update_names = "\n".join(
+                        f"  • {name}" for name, upd in results if upd
+                    )
+                    QMessageBox.information(
+                        self, "Updates Available",
+                        f"🔔 {updates_found} update(s) available:\n\n{update_names}\n\n"
+                        "Mods with available updates are marked with '↑ Update'.\n"
+                        "To update, remove the mod and re-import the new version, "
+                        "or use 'Download from URL' in the Browse panel."
+                    )
+                self.emit_status(
+                    f"Update check complete — {updates_found} update(s) available"
+                )
+            QTimer.singleShot(0, _show)
+
+        # Use a temporarily-scoped db view for just this panel's mods
+        class _ScopedDB:
+            """Minimal DB wrapper that only returns mods in the current panel."""
+            def __init__(self, db, mod_ids):
+                self._db = db
+                self._ids = set(mod_ids)
+            def all(self):
+                return [m for m in self._db.all() if m.id in self._ids]
+            def update(self, mod):
+                return self._db.update(mod)
+
+        scoped_db = _ScopedDB(self.db, [m.id for m in mods_with_source])
+        checker = UpdateChecker(scoped_db)
+        checker.start(on_result=_on_result, on_complete=_on_complete)
 
     # ------------------------------------------------------------------
     # Import

@@ -184,6 +184,25 @@ class MainWindow(QMainWindow):
         self._settings_panel.rerun_wizard.connect(self._run_wizard)
         self._stack.addWidget(self._settings_panel)
 
+        # Wire cross-panel "see more by author" navigation
+        _panel_nav_index = {
+            ModType.TEXTURE_PACK: 1,
+            ModType.PNACH: 2,
+            ModType.COVER_ART: 3,
+            ModType.CHEAT: 5,
+        }
+        for panel in (
+            self._texture_panel,
+            self._pnach_panel,
+            self._cover_panel,
+            self._cheat_panel,
+        ):
+            panel.navigate_to_author_type.connect(
+                lambda author, mod_type, _nav=_panel_nav_index: self._navigate_to_author_type(
+                    author, mod_type, _nav
+                )
+            )
+
         # Connect status messages
         for panel in (
             self._dashboard,
@@ -222,6 +241,17 @@ class MainWindow(QMainWindow):
         panel = self._stack.currentWidget()
         if hasattr(panel, "refresh"):
             panel.refresh()
+
+    def _navigate_to_author_type(self, author: str, mod_type, nav_index: dict):
+        """Navigate to the target mod panel and pre-filter by *author*."""
+        idx = nav_index.get(mod_type)
+        if idx is None:
+            return
+        self._activate_nav(idx)
+        # Get the now-active panel and apply the author filter
+        panel = self._stack.currentWidget()
+        if hasattr(panel, "_filter_by_author"):
+            panel._filter_by_author(author)
 
     # ------------------------------------------------------------------
     # Handlers

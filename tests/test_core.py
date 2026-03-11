@@ -628,10 +628,6 @@ class TestUpdateMetadata(unittest.TestCase):
         mgr.update_metadata("nonexistent", name="Ghost")  # should not raise
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class TestMemoryCardWrite(unittest.TestCase):
     """Tests for the new memory card write / backup / copy features."""
 
@@ -1307,3 +1303,7 @@ class TestShadowedMods(unittest.TestCase):
         self.assertNotIn(low.id, shadowed)
 
 
+
+
+if __name__ == "__main__":
+    unittest.main()

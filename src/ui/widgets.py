@@ -81,6 +81,7 @@ class ModItemWidget(QFrame):
     priority_down = pyqtSignal(str)        # mod_id
     details_requested = pyqtSignal(str)    # mod_id
     edit_requested = pyqtSignal(str)       # mod_id
+    filter_by_author = pyqtSignal(str)     # author name — quick "see more by" filter
 
     def __init__(
         self,
@@ -234,6 +235,13 @@ class ModItemWidget(QFrame):
         edit_btn.clicked.connect(lambda: self.edit_requested.emit(self.mod.id))
         btn_col.addWidget(edit_btn)
 
+        if self.mod.author and self.mod.author != "Unknown":
+            author_btn = QPushButton("👤")
+            author_btn.setFixedSize(28, 28)
+            author_btn.setToolTip(f"See more by {self.mod.author}")
+            author_btn.clicked.connect(lambda: self.filter_by_author.emit(self.mod.author))
+            btn_col.addWidget(author_btn)
+
         del_btn = QPushButton("🗑")
         del_btn.setFixedSize(28, 28)
         del_btn.setObjectName("danger_btn")
@@ -257,6 +265,9 @@ class ModItemWidget(QFrame):
 
 class ModDetailsDialog(QDialog):
     """Full-screen details dialog for a mod."""
+
+    # Emitted when the user clicks "See more by [author]" — (author, mod_type_or_None)
+    see_more_by_author = pyqtSignal(str, object)
 
     def __init__(self, mod: ModInfo, parent=None):
         super().__init__(parent)
@@ -326,6 +337,56 @@ class ModDetailsDialog(QDialog):
         layout.addLayout(path_row)
 
         layout.addStretch()
+
+        # ── Author quick-nav row ──────────────────────────────────────────
+        if self.mod.author and self.mod.author != "Unknown":
+            from src.models.mod import ModType as _MT
+            author_nav_row = QHBoxLayout()
+            author_nav_row.setSpacing(6)
+
+            see_more_btn = QPushButton(f"👤 See more by {self.mod.author}")
+            see_more_btn.setToolTip(
+                f"Filter the current panel to show only mods by {self.mod.author}"
+            )
+            see_more_btn.clicked.connect(
+                lambda: (
+                    self.see_more_by_author.emit(self.mod.author, self.mod.mod_type),
+                    self.accept(),
+                )
+            )
+            author_nav_row.addWidget(see_more_btn)
+
+            # "See PNACH by this author" — only if current type is not already PNACH
+            if self.mod.mod_type not in (_MT.PNACH, _MT.CHEAT):
+                pnach_btn = QPushButton(f"🔧 Find PNACH by {self.mod.author}")
+                pnach_btn.setToolTip(
+                    f"Switch to the PNACH panel and filter by {self.mod.author}"
+                )
+                pnach_btn.clicked.connect(
+                    lambda: (
+                        self.see_more_by_author.emit(self.mod.author, _MT.PNACH),
+                        self.accept(),
+                    )
+                )
+                author_nav_row.addWidget(pnach_btn)
+
+            # "See textures by this author" — only if current type is not already TEXTURE
+            if self.mod.mod_type != _MT.TEXTURE_PACK:
+                tex_btn = QPushButton(f"🎨 Find textures by {self.mod.author}")
+                tex_btn.setToolTip(
+                    f"Switch to the Texture Packs panel and filter by {self.mod.author}"
+                )
+                tex_btn.clicked.connect(
+                    lambda: (
+                        self.see_more_by_author.emit(self.mod.author, _MT.TEXTURE_PACK),
+                        self.accept(),
+                    )
+                )
+                author_nav_row.addWidget(tex_btn)
+
+            author_nav_row.addStretch()
+            layout.addLayout(author_nav_row)
+
         btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         btns.rejected.connect(self.reject)
         layout.addWidget(btns)
