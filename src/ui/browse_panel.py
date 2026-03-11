@@ -876,6 +876,7 @@ CATALOGUE: List[dict] = [
         "thumbnail_url": "",
         "tags": ["cover-art", "gametdb", "official", "us"],
         "download_action": "cover_by_id",
+        "direct_download_url": "",
         "upscale_tech": "",
     },
     {
@@ -898,6 +899,623 @@ CATALOGUE: List[dict] = [
         "thumbnail_url": "",
         "tags": ["cover-art", "gametdb", "pal", "eu"],
         "download_action": "cover_by_id",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── New sources — GameBanana ──────────────────────────────────────────────
+    {
+        "id": "gamebanana_ps2",
+        "name": "GameBanana — PS2 / PCSX2 Mods",
+        "description": (
+            "GameBanana is one of the largest game modding communities, with a growing "
+            "PS2 section covering texture packs, model replacements, and patches."
+        ),
+        "context": (
+            "Every mod page on GameBanana includes an author profile, version history, "
+            "screenshots, and a direct download button. Quality varies — check ratings and comments."
+        ),
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["community", "gamebanana", "textures", "models"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Various",
+    },
+    {
+        "id": "gamebanana_ps2_pnach",
+        "name": "GameBanana — PS2 PNACH & Cheats",
+        "description": (
+            "GameBanana hosts community-made PNACH patches and cheat files for PS2 games. "
+            "Browse the PS2 game section to find widescreen, 60fps and gameplay patches."
+        ),
+        "context": (
+            "PNACH mods on GameBanana include author notes on which PCSX2 version they were "
+            "tested with and which game region the patch applies to."
+        ),
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/games/ps2?_aCategoryIdFilter[]=5981",
+        "type": ModType.PNACH,
+        "source": "GameBanana",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["pnach", "cheats", "gamebanana", "widescreen"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── New sources — ModDB ────────────────────────────────────────────────────
+    {
+        "id": "moddb_ps2",
+        "name": "ModDB — PS2 Mods",
+        "description": (
+            "ModDB is a major modding hub with PS2 content including texture mods, "
+            "gameplay patches, and total conversions."
+        ),
+        "context": (
+            "ModDB entries include detailed author descriptions, download statistics, "
+            "ratings, and comments. Good source for larger, well-documented mods."
+        ),
+        "author": "ModDB Community",
+        "author_url": "https://www.moddb.com",
+        "url": "https://www.moddb.com/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "ModDB",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["community", "moddb", "textures"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Various",
+    },
+    # ── New sources — GitHub Releases ─────────────────────────────────────────
+    {
+        "id": "github_ps2_textures",
+        "name": "GitHub — Open-Source PS2 Texture Packs",
+        "description": (
+            "Several creators publish their PS2 HD texture packs as open-source "
+            "GitHub repositories with versioned releases. These are freely available "
+            "with detailed changelogs."
+        ),
+        "context": (
+            "Search GitHub for 'ps2 texture pack pcsx2' to find open-source packs. "
+            "Download the latest release ZIP and install it using the Import button "
+            "in the Texture Packs panel."
+        ),
+        "author": "GitHub Community",
+        "author_url": "https://github.com",
+        "url": "https://github.com/search?q=ps2+texture+pack+pcsx2&type=repositories",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GitHub",
+        "game": "",
+        "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+        "tags": ["github", "open-source", "textures", "hd"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Various",
+    },
+    # ── Game-Specific — Silent Hill series ────────────────────────────────────
+    {
+        "id": "sh2_textures",
+        "name": "Silent Hill 2 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Silent Hill 2 (SLUS-20228). "
+            "Upscaled fog, environment, character and monster textures."
+        ),
+        "context": (
+            "Silent Hill 2's atmospheric fog and lighting make HD textures very impactful. "
+            "Check GBAtemp and PSX-Place for author-credited packs with settings recommendations."
+        ),
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=silent+hill+2+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Silent Hill 2",
+        "thumbnail_url": "",
+        "tags": ["silent-hill", "sh2", "horror", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "sh3_textures",
+        "name": "Silent Hill 3 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Silent Hill 3 (SLUS-20622). "
+            "Upscaled environments, character and UI textures."
+        ),
+        "context": "SH3 has vibrant colours that upscale very well. Find packs on GBAtemp and PSX-Place.",
+        "author": "PSX-Place Community",
+        "author_url": "https://www.psx-place.com",
+        "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PSX-Place",
+        "game": "Silent Hill 3",
+        "thumbnail_url": "",
+        "tags": ["silent-hill", "sh3", "horror", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / Waifu2x",
+    },
+    # ── Game-Specific — Metal Gear Solid series ────────────────────────────────
+    {
+        "id": "mgs3_textures",
+        "name": "Metal Gear Solid 3 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Metal Gear Solid 3: Snake Eater (SLUS-20763). "
+            "Upscaled jungle, character and equipment textures."
+        ),
+        "context": "One of the most-requested PS2 texture projects. Check GBAtemp and LoversLab for Snake Eater and Subsistence packs.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=metal+gear+solid+3+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Metal Gear Solid 3: Snake Eater",
+        "thumbnail_url": "",
+        "tags": ["mgs3", "metal-gear", "hd", "stealth", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "mgs3_widescreen_pnach",
+        "name": "Metal Gear Solid 3 — Widescreen + 60fps Patches",
+        "description": (
+            "Widescreen (16:9) and 60fps PNACH patches for Metal Gear Solid 3: "
+            "Snake Eater (SLUS-20763). From the PCSX2 widescreen patches repository."
+        ),
+        "context": "Fetch this patch directly using the '🔧 Fetch PNACH from GitHub' button and enter the game CRC.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Metal Gear Solid 3",
+        "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+        "tags": ["widescreen", "mgs3", "metal-gear", "60fps", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── Game-Specific — Persona series ───────────────────────────────────────
+    {
+        "id": "persona3_textures",
+        "name": "Persona 3 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Persona 3 / FES (SLUS-21224 / SLUS-21621). "
+            "Upscaled UI, character portraits and environment textures."
+        ),
+        "context": "Persona 3's stylised UI and anime art style upscale beautifully with Waifu2x. Check GBAtemp and LoversLab.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=persona+3+texture+ps2&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Persona 3 / FES",
+        "thumbnail_url": "",
+        "tags": ["persona", "persona3", "atlus", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Waifu2x / ESRGAN (anime)",
+    },
+    {
+        "id": "persona4_textures",
+        "name": "Persona 4 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Persona 4 (SLUS-21782). "
+            "Upscaled UI, character and dungeon textures. "
+            "Makes the game look substantially better on modern displays."
+        ),
+        "context": "Multiple authors have published P4 texture packs on GBAtemp and LoversLab. Look for packs that cover both the dungeon and social link scenes.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=persona+4+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Persona 4",
+        "thumbnail_url": "",
+        "tags": ["persona", "persona4", "atlus", "jrpg", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Waifu2x / ESRGAN (anime)",
+    },
+    # ── Game-Specific — Okami ────────────────────────────────────────────────
+    {
+        "id": "okami_textures",
+        "name": "Okami — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Okami (SLUS-21418). "
+            "Upscaled ink-wash art style textures — characters, environments and brush effects."
+        ),
+        "context": "Okami's unique cel-shaded art style responds remarkably well to texture upscaling. Check GBAtemp and LoversLab.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=okami+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Okami",
+        "thumbnail_url": "",
+        "tags": ["okami", "capcom", "cel-shaded", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    # ── Game-Specific — Resident Evil series ─────────────────────────────────
+    {
+        "id": "re4_textures",
+        "name": "Resident Evil 4 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Resident Evil 4 (SLUS-21134). "
+            "Upscaled character, environment and item textures."
+        ),
+        "context": "RE4 is widely modded. Check GBAtemp, LoversLab and GameBanana for texture packs. Many authors recommend Vulkan renderer with 4× resolution.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=resident+evil+4+ps2+texture&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Resident Evil 4",
+        "thumbnail_url": "",
+        "tags": ["resident-evil", "re4", "capcom", "survival-horror", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "re4_widescreen_pnach",
+        "name": "Resident Evil 4 — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for Resident Evil 4 (SLUS-21134). "
+            "Removes black bars and enables true 16:9 gameplay."
+        ),
+        "context": "Grab this patch from the PCSX2 widescreen patches GitHub using the '🔧 Fetch PNACH from GitHub' button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Resident Evil 4",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "resident-evil", "re4", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── Game-Specific — Prince of Persia / Tekken / WWE ───────────────────────
+    {
+        "id": "pop_sot_textures",
+        "name": "Prince of Persia: Sands of Time — HD Textures",
+        "description": (
+            "Community HD texture replacements for Prince of Persia: The Sands of Time (SLUS-20743). "
+            "Upscaled palace, desert, and character textures."
+        ),
+        "context": "Check GBAtemp and PSX-Place for PoP texture packs. The game's rich colour palette upscales well.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=prince+of+persia+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Prince of Persia: Sands of Time",
+        "thumbnail_url": "",
+        "tags": ["prince-of-persia", "ubisoft", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "tekken5_textures",
+        "name": "Tekken 5 — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Tekken 5 (SLUS-21059). "
+            "Upscaled character, stage and UI textures."
+        ),
+        "context": "Tekken 5 is one of the best-looking PS2 games and its textures upscale very well. Find packs on GBAtemp and GameBanana.",
+        "author": "GameBanana Community",
+        "author_url": "https://gamebanana.com",
+        "url": "https://gamebanana.com/mods/games/ps2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GameBanana",
+        "game": "Tekken 5",
+        "thumbnail_url": "",
+        "tags": ["tekken5", "bandai-namco", "fighting", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "burnout3_textures",
+        "name": "Burnout 3: Takedown — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Burnout 3: Takedown (SLUS-20872). "
+            "Upscaled car liveries, track environments and menu textures."
+        ),
+        "context": "Burnout 3's high-speed action benefits enormously from HD textures. Check GBAtemp and Reddit r/ps2.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=burnout+3+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Reddit",
+        "game": "Burnout 3: Takedown",
+        "thumbnail_url": "",
+        "tags": ["burnout3", "racing", "ea", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    # ── Game-Specific — GTA Vice City ─────────────────────────────────────────
+    {
+        "id": "gtavc_textures",
+        "name": "GTA Vice City — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Grand Theft Auto: Vice City (SLUS-20552). "
+            "Upscaled city, vehicle and character textures."
+        ),
+        "context": "Vice City's 80s aesthetic and dense city blocks are transformed by HD textures. Check GBAtemp and Reddit for the latest packs.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=gta+vice+city+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "GTA Vice City",
+        "thumbnail_url": "",
+        "tags": ["gta", "vice-city", "open-world", "hd", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    # ── Game-Specific — More PNACH patches ───────────────────────────────────
+    {
+        "id": "dbz_bt3_pnach",
+        "name": "Dragon Ball Z: Budokai Tenkaichi 3 — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for DBZ Budokai Tenkaichi 3 (SLUS-21678). "
+            "Enables native 16:9 output for a better viewing experience."
+        ),
+        "context": "Get the widescreen patch from the PCSX2 GitHub using the 🔧 Fetch PNACH button and entering your game CRC.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Dragon Ball Z: Budokai Tenkaichi 3",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "dbz", "dragon-ball", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "jak2_widescreen_pnach",
+        "name": "Jak II & Jak 3 — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for Jak II (SCUS-97265) and Jak 3 (SCUS-97330). "
+            "Enable 16:9 widescreen output."
+        ),
+        "context": "The Jak series widescreen patches are well-maintained. Fetch from the PCSX2 GitHub using the 🔧 button.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Jak II / Jak 3",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "jak", "naughty-dog", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ratchet_clank_pnach",
+        "name": "Ratchet & Clank — Widescreen Patches",
+        "description": (
+            "Widescreen PNACH patches for the Ratchet & Clank series on PS2. "
+            "Covers R&C (SCUS-97199), Going Commando (SCUS-97268) and Up Your Arsenal (SCUS-97353)."
+        ),
+        "context": "Fetch these from the PCSX2 GitHub. Enter your specific game's CRC in the 🔧 PNACH fetcher.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Ratchet & Clank series",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "ratchet-clank", "insomniac", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "persona3_pnach",
+        "name": "Persona 3 FES — Widescreen + Misc Patches",
+        "description": (
+            "PNACH patches for Persona 3 FES (SLUS-21621) including widescreen, "
+            "battle speed boosts, and UI fixes."
+        ),
+        "context": "Community patches collected in the GBAtemp PS2 PNACH thread. Author info and version notes included.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/3519/?q=persona+3&t=file_update",
+        "type": ModType.PNACH,
+        "source": "GBAtemp",
+        "game": "Persona 3 FES",
+        "thumbnail_url": "",
+        "tags": ["persona", "widescreen", "pnach", "jrpg"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── Community Cheat Databases ─────────────────────────────────────────────
+    {
+        "id": "ps2rd_cheatdb",
+        "name": "PS2RD — PS2 Reality Cheat Database",
+        "description": (
+            "PS2RD hosts a comprehensive community cheat database for PS2 games "
+            "in multiple formats including PNACH. Includes rare region-specific codes."
+        ),
+        "context": "PNACH-format cheats compatible with PCSX2 cheats folder. Author credits and game CRCs included.",
+        "author": "PS2RD Community",
+        "author_url": "https://ps2cheats.com",
+        "url": "https://ps2cheats.com",
+        "type": ModType.CHEAT,
+        "source": "PS2RD",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cheats", "pnach", "database", "community"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "reddit_ps2_cheats",
+        "name": "r/ps2 — Cheats & PNACH Patches",
+        "description": (
+            "Reddit r/ps2 community shares PNACH patches, cheat codes and "
+            "game-specific patches. Authors post regional compatibility info."
+        ),
+        "context": "Community-validated cheats. Check post date for PCSX2 version compatibility.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=pnach+cheat&sort=new",
+        "type": ModType.CHEAT,
+        "source": "Reddit",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cheats", "pnach", "community", "reddit"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "gamefaqs_cheats",
+        "name": "GameFAQs — PS2 Cheat Codes",
+        "description": (
+            "GameFAQs maintains one of the most comprehensive PS2 cheat code databases. "
+            "Codes can be converted to PNACH format for use with PCSX2."
+        ),
+        "context": "GameFAQs codes are in GameShark / CodeBreaker format. The PNACH Panel can import and auto-convert these.",
+        "author": "GameFAQs Community",
+        "author_url": "https://gamefaqs.gamespot.com",
+        "url": "https://gamefaqs.gamespot.com/ps2/",
+        "type": ModType.CHEAT,
+        "source": "GameFAQs",
+        "game": "",
+        "thumbnail_url": "https://gamefaqs.gamespot.com/favicon.ico",
+        "tags": ["cheats", "gameshark", "community"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── More Save File Sources ────────────────────────────────────────────────
+    {
+        "id": "archive_org_saves",
+        "name": "Internet Archive — PS2 Save Files",
+        "description": (
+            "The Internet Archive hosts collections of PS2 save files contributed "
+            "by the community. Good source for 100% completion saves and maxed-out profiles."
+        ),
+        "context": "Search for specific game titles to find relevant saves. Import using the Memory Card panel.",
+        "author": "Internet Archive",
+        "author_url": "https://archive.org",
+        "url": "https://archive.org/search?query=ps2+save+file&mediatype=data",
+        "type": ModType.SAVE_FILE,
+        "source": "Archive.org",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["saves", "archive", "100-percent"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "reddit_ps2_saves",
+        "name": "r/ps2 — Save Files",
+        "description": (
+            "Reddit r/ps2 users share game save files for progress sharing, "
+            "unlocking extras, and helping with difficult sections."
+        ),
+        "context": "Check the post for region info (NTSC-U / PAL) before downloading — saves are region-locked.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=save+file&sort=new",
+        "type": ModType.SAVE_FILE,
+        "source": "Reddit",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["saves", "community", "reddit"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    # ── New texture resource — Archive.org ───────────────────────────────────
+    {
+        "id": "archive_org_textures",
+        "name": "Internet Archive — PS2 Texture Packs",
+        "description": (
+            "The Internet Archive hosts community-uploaded PS2 HD texture packs "
+            "in freely accessible ZIP archives. A great long-term preservation source."
+        ),
+        "context": "Direct ZIP downloads available — use the '⬇ Download from URL' button with the Archive.org direct link.",
+        "author": "Internet Archive",
+        "author_url": "https://archive.org",
+        "url": "https://archive.org/search?query=ps2+hd+texture+pack+pcsx2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Archive.org",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["textures", "archive", "hd", "free"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "Various",
+    },
+    # ── PCSX2 Community Forum specific threads ────────────────────────────────
+    {
+        "id": "pcsx2_60fps_patches",
+        "name": "PCSX2 60fps Frame Rate Patches",
+        "description": (
+            "Community-maintained collection of 60fps frame rate PNACH patches "
+            "for PS2 games. Many popular titles have been modded to run at 60fps."
+        ),
+        "context": (
+            "60fps patches work at the PNACH level — no emulator settings needed. "
+            "Author attribution and game CRCs are included in each file."
+        ),
+        "author": "PCSX2 Community",
+        "author_url": "https://forums.pcsx2.net",
+        "url": "https://forums.pcsx2.net/search?q=60fps+patch&type=post",
+        "type": ModType.PNACH,
+        "source": "PCSX2 Forums",
+        "game": "",
+        "thumbnail_url": "https://pcsx2.net/favicon.ico",
+        "tags": ["60fps", "patches", "pnach", "performance"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "pcsx2_analog_patches",
+        "name": "PCSX2 Analog / HUD Fix Patches",
+        "description": (
+            "PNACH patches that fix HUD scaling, aspect ratio and analogue input issues "
+            "for PS2 games when played on PCSX2 with widescreen enabled."
+        ),
+        "context": "Often bundled with widescreen patches. Look for posts labelled 'HUD fix' or 'widescreen HUD correction'.",
+        "author": "PCSX2 Community",
+        "author_url": "https://forums.pcsx2.net",
+        "url": "https://forums.pcsx2.net/search?q=hud+fix+widescreen&type=post",
+        "type": ModType.PNACH,
+        "source": "PCSX2 Forums",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["hud-fix", "widescreen", "patches", "pnach"],
+        "download_action": "",
+        "direct_download_url": "",
         "upscale_tech": "",
     },
 ]
@@ -916,6 +1534,7 @@ class CatalogueCard(QFrame):
     open_url = pyqtSignal(str)
     download_cover = pyqtSignal(dict)
     favorite_toggled = pyqtSignal(str, bool)   # author, is_favorite
+    install_direct = pyqtSignal(dict)           # entry dict — in-app install requested
 
     def __init__(self, entry: dict, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -1065,6 +1684,16 @@ class CatalogueCard(QFrame):
             dl_btn = QPushButton("🖼 Download Cover by ID")
             dl_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
             layout.addWidget(dl_btn)
+
+        if self.entry.get("direct_download_url"):
+            inst_btn = QPushButton("⬇ Install In-App")
+            inst_btn.setObjectName("primary_btn")
+            inst_btn.setToolTip(
+                "Download and install this mod directly in PS2 Mod Manager.\n"
+                "The file will be placed in your configured mod storage folder."
+            )
+            inst_btn.clicked.connect(lambda: self.install_direct.emit(self.entry))
+            layout.addWidget(inst_btn)
 
     def _toggle_favorite(self):
         author = self.entry["author"]
@@ -1390,6 +2019,12 @@ class DownloadInstallDialog(QDialog):
 # PNACH GitHub browser dialog
 # ---------------------------------------------------------------------------
 
+#: Maximum number of widescreen-patch rows displayed at once in PnachGitHubDialog.
+#: The PCSX2 repo has 500+ patches; rendering them all at once degrades UI
+#: performance, so we cap the list and rely on the CRC search to narrow results.
+_MAX_PATCH_DISPLAY = 200
+
+
 class PnachGitHubDialog(QDialog):
     """
     Browse and download official PCSX2 widescreen PNACH patches directly
@@ -1546,7 +2181,7 @@ class PnachGitHubDialog(QDialog):
             if item.widget():
                 item.widget().deleteLater()
 
-        for patch in patches[:200]:  # cap display at 200 for UI performance (PCSX2 repo has ~500+ patches)
+        for patch in patches[:_MAX_PATCH_DISPLAY]:
             row = self._make_patch_row(patch)
             self._list_layout.insertWidget(self._list_layout.count() - 1, row)
 
@@ -1625,6 +2260,13 @@ class PnachGitHubDialog(QDialog):
         threading.Thread(target=_run, daemon=True).start()
 
 
+# ---------------------------------------------------------------------------
+# Tab content widget
+# ---------------------------------------------------------------------------
+
+class _CatalogueTabContent(QWidget):
+    favorite_toggled = pyqtSignal(str, bool)
+    install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
 
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -1691,6 +2333,7 @@ class PnachGitHubDialog(QDialog):
             card.open_url.connect(self._open_url)
             card.download_cover.connect(self._download_cover)
             card.favorite_toggled.connect(self.favorite_toggled)
+            card.install_direct.connect(self.install_direct.emit)
             self._cards_layout.addWidget(card, i // cols, i % cols)
 
         remainder = len(entries) % cols
@@ -1871,6 +2514,7 @@ class BrowsePanel(BasePanel):
             )
             tab = _CatalogueTabContent(entries, self.config)
             tab.favorite_toggled.connect(self._on_favorite_toggled)
+            tab.install_direct.connect(self._install_catalogue_entry)
             self._tab_contents.append(tab)
             self._tabs.addTab(tab, label)
 
@@ -1901,6 +2545,23 @@ class BrowsePanel(BasePanel):
 
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
+        dlg.exec()
+
+    def _install_catalogue_entry(self, entry: dict):
+        """Open the Download & Install dialog pre-filled from a catalogue entry."""
+        dlg = DownloadInstallDialog(self.config, self._db, self)
+        # Pre-fill from catalogue metadata
+        dlg._url_edit.setText(entry.get("direct_download_url", ""))
+        dlg._name_edit.setText(entry.get("name", ""))
+        dlg._author_edit.setText(entry.get("author", ""))
+        dlg._game_edit.setText(entry.get("game", ""))
+        # Set mod type combo
+        mod_type = entry.get("type")
+        if mod_type is not None:
+            for i in range(dlg._type_combo.count()):
+                if dlg._type_combo.itemData(i) == mod_type:
+                    dlg._type_combo.setCurrentIndex(i)
+                    break
         dlg.exec()
 
     def _open_pnach_github_dialog(self):

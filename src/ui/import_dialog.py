@@ -215,13 +215,15 @@ class ImportModDialog(QDialog):
                 self._gameid_edit.setToolTip(title)
                 self._gameid_edit.setPlaceholderText(title)
 
-                # If not found locally, try an async online lookup to enrich the tooltip
+                # If not found locally, try an async online lookup to enrich the tooltip.
+                # lookup_game_title() is the fast local-registry-only check (no network call).
                 if not lookup_game_title(serial):
                     import threading
                     from PyQt6.QtCore import QTimer
                     import weakref
 
-                    # Use a weak reference to avoid keeping the dialog alive after close
+                    # Weak reference prevents the background thread from keeping the dialog
+                    # alive after the user has closed it (avoids updating a destroyed widget).
                     self_ref = weakref.ref(self)
 
                     def _online_lookup():

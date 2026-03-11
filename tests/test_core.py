@@ -2233,12 +2233,12 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
     def test_download_patch_not_found_returns_none(self, mock_get):
         from src.core.downloader import download_pcsx2_widescreen_patch
         import tempfile
-        import requests as _requests
+        from requests import HTTPError
 
         mock_resp = MagicMock()
         mock_resp.__enter__ = lambda s: s
         mock_resp.__exit__ = MagicMock(return_value=False)
-        mock_resp.raise_for_status.side_effect = _requests.HTTPError("404")
+        mock_resp.raise_for_status.side_effect = HTTPError("404")
         mock_get.return_value = mock_resp
 
         with tempfile.TemporaryDirectory() as d:
