@@ -91,6 +91,19 @@ QFrame#mod_item_conflict {
     margin: 3px 0px;
 }
 
+QFrame#mod_item_shadowed {
+    background-color: #14161e;
+    border-radius: 8px;
+    border: 1px solid #303050;
+    padding: 8px;
+    margin: 3px 0px;
+    opacity: 0.6;
+}
+
+QFrame#mod_item_shadowed:hover {
+    border: 1px solid #505080;
+}
+
 /* ===== Buttons ===== */
 QPushButton {
     background-color: #0f3460;

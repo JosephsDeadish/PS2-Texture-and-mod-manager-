@@ -82,14 +82,26 @@ class ModItemWidget(QFrame):
     details_requested = pyqtSignal(str)    # mod_id
     edit_requested = pyqtSignal(str)       # mod_id
 
-    def __init__(self, mod: ModInfo, has_conflict: bool = False, parent=None):
+    def __init__(
+        self,
+        mod: ModInfo,
+        has_conflict: bool = False,
+        is_shadowed: bool = False,
+        parent=None,
+    ):
         super().__init__(parent)
         self.mod = mod
         self.has_conflict = has_conflict
+        self.is_shadowed = is_shadowed
         self._build_ui()
 
     def _build_ui(self):
-        self.setObjectName("mod_item_conflict" if self.has_conflict else "mod_item")
+        if self.is_shadowed:
+            self.setObjectName("mod_item_shadowed")
+        elif self.has_conflict:
+            self.setObjectName("mod_item_conflict")
+        else:
+            self.setObjectName("mod_item")
         self.setFrameShape(QFrame.Shape.StyledPanel)
 
         outer = QHBoxLayout(self)
@@ -100,7 +112,9 @@ class ModItemWidget(QFrame):
         icon_lbl = QLabel(_icon_for_type(self.mod.mod_type))
         icon_lbl.setFixedSize(32, 32)
         icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        icon_lbl.setStyleSheet("font-size: 20px;")
+        icon_lbl.setStyleSheet(
+            "font-size: 20px; opacity: 0.4;" if self.is_shadowed else "font-size: 20px;"
+        )
         outer.addWidget(icon_lbl)
 
         # Thumbnail
@@ -123,11 +137,27 @@ class ModItemWidget(QFrame):
         info = QVBoxLayout()
         info.setSpacing(2)
         name_row = QHBoxLayout()
+        name_color = "#808080" if self.is_shadowed else "#ffffff"
         name_lbl = QLabel(self.mod.name)
-        name_lbl.setStyleSheet("font-weight: bold; font-size: 14px; color: #ffffff;")
+        name_lbl.setStyleSheet(
+            f"font-weight: bold; font-size: 14px; color: {name_color};"
+        )
         name_row.addWidget(name_lbl)
 
-        if self.has_conflict:
+        if self.is_shadowed:
+            shadow_badge = QLabel("🚫 Completely Shadowed")
+            shadow_badge.setStyleSheet(
+                "background:#303030; color:#909090; border-radius:9px;"
+                "padding: 2px 8px; font-size:11px;"
+            )
+            shadow_badge.setToolTip(
+                "Every file in this mod is overridden by a higher-priority mod.\n"
+                "It will have no effect when deployed. Raise its priority or disable\n"
+                "the conflicting higher-priority mod to restore it."
+            )
+            name_row.addWidget(shadow_badge)
+
+        if self.has_conflict and not self.is_shadowed:
             warn = QLabel("⚠ Conflict")
             warn.setObjectName("badge")
             warn.setStyleSheet(
@@ -158,12 +188,12 @@ class ModItemWidget(QFrame):
             meta_parts.append(_fmt_size(self.mod.size_bytes))
 
         meta_lbl = QLabel("  •  ".join(meta_parts))
-        meta_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+        meta_lbl.setStyleSheet("color: #505070; font-size: 11px;" if self.is_shadowed else "color: #7070a0; font-size: 11px;")
         info.addWidget(meta_lbl)
 
         if self.mod.description:
             desc = QLabel(textwrap.shorten(self.mod.description, width=100, placeholder="…"))
-            desc.setStyleSheet("color: #9090b0; font-size: 11px;")
+            desc.setStyleSheet("color: #606070; font-size: 11px;" if self.is_shadowed else "color: #9090b0; font-size: 11px;")
             desc.setWordWrap(True)
             info.addWidget(desc)
 
@@ -313,7 +343,7 @@ class ConflictDialog(QDialog):
         self.conflicts = conflicts
         self.db = db
         self.setWindowTitle("Mod Conflicts Detected")
-        self.setMinimumSize(640, 480)
+        self.setMinimumSize(700, 520)
         self._build_ui()
 
     def _build_ui(self):
@@ -326,8 +356,8 @@ class ConflictDialog(QDialog):
         layout.addWidget(header)
 
         sub = QLabel(
-            "For each conflict, choose which mod should win (higher priority overrides).\n"
-            "You can also disable one of the conflicting mods."
+            "Choose which mod wins each conflict. You can resolve all files at once,\n"
+            "or expand a conflict to pick winners file-by-file."
         )
         sub.setStyleSheet("color: #9090b0;")
         sub.setWordWrap(True)
@@ -353,24 +383,27 @@ class ConflictDialog(QDialog):
             frame.setObjectName("card")
             f_layout = QVBoxLayout(frame)
 
+            # ── Header row ──────────────────────────────────────────────
             title = QLabel(f"🔴  {mod_a.name}  ↔  {mod_b.name}")
             title.setStyleSheet("font-weight: bold; color: #ff8080;")
             f_layout.addWidget(title)
 
-            files_txt = ", ".join(conflict.conflicting_files[:5])
-            if len(conflict.conflicting_files) > 5:
-                files_txt += f" (+{len(conflict.conflicting_files) - 5} more)"
-            f_layout.addWidget(QLabel(f"Conflicting files: {files_txt}"))
+            count_lbl = QLabel(
+                f"{len(conflict.conflicting_files)} conflicting file(s)"
+            )
+            count_lbl.setStyleSheet("color: #9090b0; font-size: 11px;")
+            f_layout.addWidget(count_lbl)
 
-            btn_row = QHBoxLayout()
-            a_wins = QPushButton(f"✅ {mod_a.name} wins")
+            # ── Quick-resolve: entire conflict ───────────────────────────
+            quick_row = QHBoxLayout()
+            a_wins = QPushButton(f"✅ {mod_a.name} wins all")
             a_wins.setObjectName("success_btn")
-            b_wins = QPushButton(f"✅ {mod_b.name} wins")
+            b_wins = QPushButton(f"✅ {mod_b.name} wins all")
             b_wins.setObjectName("success_btn")
-            ignore_btn = QPushButton("⚡ Allow both (unexpected effects)")
+            ignore_btn = QPushButton("⚡ Allow both (⚠ unexpected effects)")
             ignore_btn.setObjectName("primary_btn")
 
-            def _make_resolver(ma, mb, which):
+            def _make_whole_resolver(ma, mb, which):
                 def _resolve():
                     if which == "a":
                         ma.priority = max(ma.priority, mb.priority) + 1
@@ -380,13 +413,91 @@ class ConflictDialog(QDialog):
                         self.db.update(mb)
                 return _resolve
 
-            a_wins.clicked.connect(_make_resolver(mod_a, mod_b, "a"))
-            b_wins.clicked.connect(_make_resolver(mod_a, mod_b, "b"))
+            a_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "a"))
+            b_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "b"))
 
-            btn_row.addWidget(a_wins)
-            btn_row.addWidget(b_wins)
-            btn_row.addWidget(ignore_btn)
-            f_layout.addLayout(btn_row)
+            quick_row.addWidget(a_wins)
+            quick_row.addWidget(b_wins)
+            quick_row.addWidget(ignore_btn)
+            f_layout.addLayout(quick_row)
+
+            # ── Per-file resolution (expandable) ────────────────────────
+            if conflict.conflicting_files:
+                toggle_btn = QPushButton(
+                    f"▶  Per-file resolution ({len(conflict.conflicting_files)} files)"
+                )
+                toggle_btn.setCheckable(True)
+                toggle_btn.setStyleSheet(
+                    "background: transparent; color: #6090d0; border: none; text-align: left;"
+                )
+
+                per_file_container = QWidget()
+                per_file_container.setVisible(False)
+                pf_layout = QVBoxLayout(per_file_container)
+                pf_layout.setContentsMargins(12, 4, 4, 4)
+                pf_layout.setSpacing(4)
+
+                for rel_file in conflict.conflicting_files[:20]:  # cap at 20 for UI
+                    row = QHBoxLayout()
+                    fname_lbl = QLabel(rel_file)
+                    fname_lbl.setStyleSheet(
+                        "color: #808090; font-size: 11px; font-family: monospace;"
+                    )
+                    fname_lbl.setToolTip(rel_file)
+                    row.addWidget(fname_lbl, 1)
+
+                    def _make_file_resolver(ma, mb, f):
+                        def _resolve_a():
+                            # Ensure ma has higher priority than mb
+                            if ma.priority <= mb.priority:
+                                ma.priority = mb.priority + 1
+                                self.db.update(ma)
+                        def _resolve_b():
+                            if mb.priority <= ma.priority:
+                                mb.priority = ma.priority + 1
+                                self.db.update(mb)
+                        return _resolve_a, _resolve_b
+
+                    ra, rb = _make_file_resolver(mod_a, mod_b, rel_file)
+                    fa_btn = QPushButton(f"A")
+                    fa_btn.setFixedWidth(30)
+                    fa_btn.setToolTip(f"{mod_a.name} wins this file")
+                    fa_btn.setStyleSheet(
+                        "background:#1a4a1a; color:#60c060; border-radius:4px; padding:2px 4px;"
+                    )
+                    fa_btn.clicked.connect(ra)
+                    fb_btn = QPushButton(f"B")
+                    fb_btn.setFixedWidth(30)
+                    fb_btn.setToolTip(f"{mod_b.name} wins this file")
+                    fb_btn.setStyleSheet(
+                        "background:#1a1a4a; color:#6060c0; border-radius:4px; padding:2px 4px;"
+                    )
+                    fb_btn.clicked.connect(rb)
+
+                    row.addWidget(fa_btn)
+                    row.addWidget(fb_btn)
+                    pf_layout.addLayout(row)
+
+                if len(conflict.conflicting_files) > 20:
+                    pf_layout.addWidget(
+                        QLabel(
+                            f"  … and {len(conflict.conflicting_files) - 20} more files "
+                            "(use 'wins all' buttons above for bulk resolution)"
+                        )
+                    )
+
+                def _toggle_expanded(checked, container=per_file_container, btn=toggle_btn):
+                    container.setVisible(checked)
+                    btn.setText(
+                        (f"▼  Per-file resolution ({len(conflict.conflicting_files)} files)"
+                         if checked else
+                         f"▶  Per-file resolution ({len(conflict.conflicting_files)} files)")
+                    )
+
+                toggle_btn.toggled.connect(_toggle_expanded)
+                f_layout.addWidget(toggle_btn)
+                f_layout.addWidget(per_file_container)
+
             c_layout.addWidget(frame)
 
         c_layout.addStretch()

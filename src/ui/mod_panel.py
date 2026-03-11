@@ -258,6 +258,12 @@ class ModPanel(BasePanel):
             conflicting_ids.add(c.mod_a_id)
             conflicting_ids.add(c.mod_b_id)
 
+        # Shadowed mod detection (only for texture packs where file-level tracking matters)
+        shadowed_ids: set = set()
+        if self.mod_type == ModType.TEXTURE_PACK:
+            shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
+            shadowed_ids = set(shadowed_map.keys())
+
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
             item = self._list_layout.takeAt(0)
@@ -272,7 +278,11 @@ class ModPanel(BasePanel):
             self._list_layout.insertWidget(0, empty)
         else:
             for i, mod in enumerate(mods):
-                widget = ModItemWidget(mod, has_conflict=(mod.id in conflicting_ids))
+                widget = ModItemWidget(
+                    mod,
+                    has_conflict=(mod.id in conflicting_ids),
+                    is_shadowed=(mod.id in shadowed_ids),
+                )
                 widget.toggled.connect(self._on_toggle)
                 widget.remove_requested.connect(self._on_remove)
                 widget.priority_up.connect(self._on_priority_up)
@@ -283,9 +293,11 @@ class ModPanel(BasePanel):
 
         enabled_count = sum(1 for m in self.db.by_type(self.mod_type) if m.enabled)
         total_count = len(self.db.by_type(self.mod_type))
+        shadow_note = f"  •  {len(shadowed_ids)} shadowed" if shadowed_ids else ""
         self._count_lbl.setText(
             f"{enabled_count}/{total_count} enabled"
             + (f"  •  {len(conflicts)} conflict(s)" if conflicts else "")
+            + shadow_note
         )
 
     # ------------------------------------------------------------------
@@ -297,7 +309,44 @@ class ModPanel(BasePanel):
         mod = self.db.get(mod_id)
         status = "enabled" if enabled else "disabled"
         self.emit_status(f"'{mod.name if mod else mod_id}' {status}")
+
+        # Cover art: warn if multiple art enabled for same game serial
+        if enabled and self.mod_type == ModType.COVER_ART:
+            self._check_cover_art_duplicates(mod_id)
+
         self._apply_filter()
+
+    def _check_cover_art_duplicates(self, newly_enabled_id: str):
+        """
+        For Cover Art: warn when more than one cover art is enabled for the
+        same game serial, and offer to automatically disable the others.
+        """
+        conflicts = self.manager.detect_cover_art_conflicts()
+        if not conflicts:
+            return
+
+        for serial, mods in conflicts:
+            ids_in_conflict = [m.id for m in mods]
+            if newly_enabled_id not in ids_in_conflict:
+                continue
+
+            others = [m for m in mods if m.id != newly_enabled_id]
+            other_names = ", ".join(f"'{m.name}'" for m in others)
+            reply = QMessageBox.warning(
+                self,
+                "Multiple Cover Arts for Same Game",
+                f"<b>{serial}</b> already has cover art enabled:<br>{other_names}<br><br>"
+                "PCSX2 can only use one cover art per game. "
+                "Would you like to automatically disable the other(s)?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes,
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                for m in others:
+                    self.manager.set_enabled(m.id, False)
+                self.emit_status(
+                    f"Disabled {len(others)} duplicate cover art(s) for {serial}"
+                )
 
     def _on_remove(self, mod_id: str):
         mod = self.db.get(mod_id)

@@ -256,6 +256,10 @@ class ModManager:
         patch lines from multiple enabled mods are all applied.  Files that have
         no CRC in their filename (non-standard names) are copied as-is.
 
+        For ``ModType.COVER_ART``: files are renamed to ``{SERIAL}.png``
+        (e.g. ``SLUS-20062.png``) so PCSX2 can find them automatically.
+        Only the highest-priority cover art for each game serial is deployed.
+
         Returns (count_deployed, warnings).
         """
         target = Path(target_path)
@@ -274,6 +278,10 @@ class ModManager:
         if mod_type in (ModType.PNACH, ModType.CHEAT):
             return self._deploy_pnach(mods, target, warnings)
 
+        # ── Cover Art: rename to {SERIAL}.png, one per game serial ────────
+        if mod_type == ModType.COVER_ART:
+            return self._deploy_cover_art(mods, target, warnings)
+
         # ── All other types: copy in priority order ───────────────────────
         for mod in mods:
             src = Path(mod.path)
@@ -287,6 +295,115 @@ class ModManager:
             deployed += 1
 
         return deployed, warnings
+
+    def _deploy_cover_art(
+        self,
+        mods: List,
+        target: Path,
+        warnings: List[str],
+    ) -> Tuple[int, List[str]]:
+        """
+        Deploy cover art mods to *target*, renaming each file to the PCSX2
+        format: ``{SERIAL}.png``  (e.g. ``SLUS-20062.png``).
+
+        PCSX2 loads cover art from its covers directory by looking for a file
+        named exactly after the game's disc serial.  Only the highest-priority
+        cover art for each serial is copied; lower-priority duplicates are
+        skipped with a warning.
+        """
+        from src.core.game_registry import (
+            detect_game_serial,
+            normalise_serial,
+        )
+
+        deployed = 0
+        # Track which serials have already been deployed (highest priority first)
+        deployed_serials: set = set()
+
+        for mod in mods:
+            src = Path(mod.path)
+            if not src.exists():
+                warnings.append(f"Missing path for mod '{mod.name}': {mod.path}")
+                continue
+
+            # Determine the serial: prefer stored game_id, fall back to filename
+            serial = ""
+            if mod.game_id:
+                serial = normalise_serial(mod.game_id)
+            if not serial:
+                serial = detect_game_serial(str(src))
+
+            if not serial:
+                # No serial detected — copy with original filename but warn
+                dest_name = src.name
+                if not any(dest_name.lower().endswith(ext) for ext in (".png", ".jpg", ".jpeg", ".webp")):
+                    warnings.append(
+                        f"Cover art '{mod.name}' has no game serial set; "
+                        "copied with original filename. PCSX2 may not find it."
+                    )
+                shutil.copy2(str(src), str(target / dest_name))
+                deployed += 1
+                continue
+
+            if serial in deployed_serials:
+                warnings.append(
+                    f"Cover art '{mod.name}' skipped — a higher-priority cover "
+                    f"for {serial} was already deployed."
+                )
+                continue
+
+            # Determine source image (use src directly if it's a file)
+            img_src: Optional[Path] = None
+            if src.is_file():
+                img_src = src
+            elif src.is_dir():
+                # Look for an image in the folder
+                for img in src.iterdir():
+                    if img.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"):
+                        img_src = img
+                        break
+
+            if img_src is None:
+                warnings.append(f"Cover art '{mod.name}' has no image file.")
+                continue
+
+            # Always save as PNG to match PCSX2 expectations
+            dest = target / f"{serial}.png"
+            if img_src.suffix.lower() == ".png":
+                shutil.copy2(str(img_src), str(dest))
+            else:
+                # Convert to PNG via Pillow if available, otherwise copy as-is
+                try:
+                    from PIL import Image
+                    with Image.open(str(img_src)) as im:
+                        im.save(str(dest), "PNG")
+                except ImportError:
+                    shutil.copy2(str(img_src), str(dest))
+                    warnings.append(
+                        f"Pillow not installed; '{mod.name}' copied without format conversion."
+                    )
+
+            deployed_serials.add(serial)
+            deployed += 1
+
+        return deployed, warnings
+
+    def detect_cover_art_conflicts(self) -> List[Tuple[str, List]]:
+        """
+        Return a list of ``(serial, [mod_list])`` tuples where more than one
+        *enabled* cover art mod targets the same game serial.
+        """
+        from src.core.game_registry import normalise_serial, detect_game_serial
+
+        by_serial: Dict[str, List] = {}
+        for mod in self.db.by_type(ModType.COVER_ART):
+            if not mod.enabled:
+                continue
+            serial = normalise_serial(mod.game_id) if mod.game_id else detect_game_serial(mod.path)
+            if serial:
+                by_serial.setdefault(serial, []).append(mod)
+
+        return [(s, mods) for s, mods in by_serial.items() if len(mods) > 1]
 
     def _deploy_pnach(
         self,
@@ -465,6 +582,60 @@ class ModManager:
                 seen_keys.add(key)
                 deduped.append(r)
         return deduped
+
+    def detect_shadowed_mods(self, mod_type: Optional[ModType] = None) -> Dict[str, List[str]]:
+        """
+        Detect enabled mods that are **completely shadowed** by higher-priority mods.
+
+        A mod is considered shadowed when *all* of its registered files are also
+        present in at least one higher-priority enabled mod.
+
+        Returns a dict mapping ``mod_id`` → list of mod IDs that shadow it.
+        Only mods with at least one registered file are considered; mods with no
+        file list are skipped (they can't be shadowed by this analysis).
+        """
+        mods = self.db.by_type(mod_type) if mod_type else self.db.all()
+        enabled = sorted(
+            [m for m in mods if m.enabled],
+            key=lambda m: m.priority,
+            reverse=True,
+        )
+
+        # Build a map: file → set of mod_ids that own it (in priority order)
+        file_owners: Dict[str, List[str]] = {}
+        for mod in enabled:
+            for rel in mod.files:
+                file_owners.setdefault(rel, []).append(mod.id)
+
+        shadowed: Dict[str, List[str]] = {}
+
+        for mod in enabled:
+            if not mod.files:
+                continue  # can't determine shadowing without file list
+
+            # Gather all mod_ids that beat this mod's priority
+            higher_ids = {m.id for m in enabled if m.priority > mod.priority}
+            if not higher_ids:
+                continue
+
+            # Check whether every file of this mod is also owned by a higher-priority mod
+            shadowing: set = set()
+            for rel in mod.files:
+                owners = file_owners.get(rel, [])
+                # Find any higher-priority owner for this file
+                for owner_id in owners:
+                    if owner_id in higher_ids:
+                        shadowing.add(owner_id)
+                        break
+                else:
+                    # At least one file is NOT shadowed — mod is not fully shadowed
+                    shadowing = set()
+                    break
+
+            if shadowing:
+                shadowed[mod.id] = list(shadowing)
+
+        return shadowed
 
     # ------------------------------------------------------------------
     # Helpers

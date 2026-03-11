@@ -17,6 +17,7 @@ if str(_root) not in sys.path:
 
 from src.models.mod import AppConfig, ConflictInfo, ModInfo, ModStatus, ModType
 from src.core.config_manager import detect_pcsx2_paths, load_config, save_config
+from src.core.mod_manager import ModDatabase, ModManager
 
 
 class TestModInfoSerialization(unittest.TestCase):
@@ -1077,5 +1078,232 @@ class TestGameRegistry(unittest.TestCase):
         data = {"pcsx2_path": "/foo", "theme": "dark", "first_run": False}
         cfg = AppConfig.from_dict(data)
         self.assertEqual(cfg.favorite_authors, [])
+
+
+
+
+class TestCoverArtDeploy(unittest.TestCase):
+    """Tests for cover art deployment with PCSX2-correct naming."""
+
+    def setUp(self):
+        import src.core.config_manager as cm
+        self.tmpdir = tempfile.mkdtemp()
+        self.storage = os.path.join(self.tmpdir, "mods")
+        self.target = os.path.join(self.tmpdir, "covers")
+        os.makedirs(self.storage, exist_ok=True)
+        os.makedirs(self.target, exist_ok=True)
+        # Isolate the mod database from other tests
+        self._orig_db_file = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+        self.db = ModDatabase()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig_db_file
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_cover(self, name: str, game_id: str, filename: str = "cover.png") -> ModInfo:
+        """Create a fake cover art mod on disk and register it in the DB."""
+        mod_dir = os.path.join(self.storage, name)
+        os.makedirs(mod_dir, exist_ok=True)
+        # Create a minimal 1×1 white PNG
+        import struct, zlib
+        def _tiny_png():
+            sig = b'\x89PNG\r\n\x1a\n'
+            def chunk(tag, data):
+                return struct.pack('>I', len(data)) + tag + data + struct.pack('>I', zlib.crc32(tag + data) & 0xffffffff)
+            ihdr = chunk(b'IHDR', struct.pack('>IIBBBBB', 1, 1, 8, 2, 0, 0, 0))
+            raw = b'\x00\xff\xff\xff'
+            idat = chunk(b'IDAT', zlib.compress(raw))
+            iend = chunk(b'IEND', b'')
+            return sig + ihdr + idat + iend
+        img_path = os.path.join(mod_dir, filename)
+        with open(img_path, 'wb') as f:
+            f.write(_tiny_png())
+
+        import uuid
+        mod = ModInfo(
+            id=str(uuid.uuid4()),
+            name=name,
+            mod_type=ModType.COVER_ART,
+            path=img_path,
+            enabled=True,
+            game_id=game_id,
+            files=[filename],
+            priority=0,
+        )
+        self.db.add(mod)
+        return mod
+
+    def test_cover_art_deployed_with_serial_name(self):
+        """Cover art should be saved as SLUS-20062.png."""
+        from src.core.mod_manager import ModManager
+        self._make_cover("SpyroCover", "SLUS-20062")
+        mgr = ModManager(self.db)
+        count, warnings = mgr.deploy(ModType.COVER_ART, self.target)
+        self.assertEqual(count, 1)
+        self.assertFalse(warnings, warnings)
+        self.assertTrue(
+            os.path.exists(os.path.join(self.target, "SLUS-20062.png")),
+            "Expected SLUS-20062.png in target folder"
+        )
+
+    def test_cover_art_only_highest_priority_deployed(self):
+        """Only the highest-priority cover for the same serial is deployed."""
+        from src.core.mod_manager import ModManager
+        low = self._make_cover("SpyroCoverLow", "SLUS-20062")
+        low.priority = 0
+        self.db.update(low)
+        high = self._make_cover("SpyroCoverHigh", "SLUS-20062")
+        high.priority = 10
+        self.db.update(high)
+
+        mgr = ModManager(self.db)
+        count, warnings = mgr.deploy(ModType.COVER_ART, self.target)
+        self.assertEqual(count, 1)
+        # One warning about the skipped duplicate
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("higher-priority", warnings[0])
+
+    def test_detect_cover_art_conflicts_two_enabled(self):
+        """detect_cover_art_conflicts returns serials with >1 enabled cover."""
+        from src.core.mod_manager import ModManager
+        self._make_cover("A", "SLUS-20062")
+        self._make_cover("B", "SLUS-20062")
+        mgr = ModManager(self.db)
+        conflicts = mgr.detect_cover_art_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        serial, mods = conflicts[0]
+        self.assertEqual(serial, "SLUS-20062")
+        self.assertEqual(len(mods), 2)
+
+    def test_detect_cover_art_conflicts_one_enabled(self):
+        """No conflicts when only one cover per serial."""
+        from src.core.mod_manager import ModManager
+        self._make_cover("A", "SLUS-20062")
+        self._make_cover("B", "SCUS-97120")
+        mgr = ModManager(self.db)
+        conflicts = mgr.detect_cover_art_conflicts()
+        self.assertEqual(conflicts, [])
+
+    def test_detect_cover_art_conflicts_disabled_ignored(self):
+        """Disabled cover arts don't cause a conflict."""
+        from src.core.mod_manager import ModManager
+        a = self._make_cover("A", "SLUS-20062")
+        b = self._make_cover("B", "SLUS-20062")
+        b.enabled = False
+        self.db.update(b)
+        mgr = ModManager(self.db)
+        self.assertEqual(mgr.detect_cover_art_conflicts(), [])
+
+    def test_cover_art_no_serial_copies_with_original_name(self):
+        """Cover art with no serial is copied under its original filename."""
+        from src.core.mod_manager import ModManager
+        # Create a cover without a game_id and a filename that has no serial
+        mod_dir = os.path.join(self.storage, "NoSerial")
+        os.makedirs(mod_dir, exist_ok=True)
+        img_path = os.path.join(mod_dir, "my_cover.png")
+        import struct, zlib
+        with open(img_path, 'wb') as f:
+            f.write(b'\x89PNG\r\n\x1a\n' + b'\x00' * 8)  # minimal stub
+        import uuid
+        mod = ModInfo(
+            id=str(uuid.uuid4()),
+            name="NoSerialCover",
+            mod_type=ModType.COVER_ART,
+            path=img_path,
+            enabled=True,
+            game_id="",
+            files=["my_cover.png"],
+            priority=0,
+        )
+        self.db.add(mod)
+        mgr = ModManager(self.db)
+        count, warnings = mgr.deploy(ModType.COVER_ART, self.target)
+        self.assertEqual(count, 1)
+        # Should exist under original name
+        self.assertTrue(os.path.exists(os.path.join(self.target, "my_cover.png")))
+
+
+class TestShadowedMods(unittest.TestCase):
+    """Tests for detect_shadowed_mods in ModManager."""
+
+    def setUp(self):
+        import src.core.config_manager as cm
+        self.tmpdir = tempfile.mkdtemp()
+        self._orig_db_file = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+        self.db = ModDatabase()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig_db_file
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_mod(self, name, files, priority=0):
+        import uuid
+        mod = ModInfo(
+            id=str(uuid.uuid4()),
+            name=name,
+            mod_type=ModType.TEXTURE_PACK,
+            path=self.tmpdir,
+            enabled=True,
+            files=files,
+            priority=priority,
+        )
+        self.db.add(mod)
+        return mod
+
+    def test_no_shadowing_distinct_files(self):
+        from src.core.mod_manager import ModManager
+        self._make_mod("A", ["a.png"], priority=0)
+        self._make_mod("B", ["b.png"], priority=1)
+        mgr = ModManager(self.db)
+        self.assertEqual(mgr.detect_shadowed_mods(ModType.TEXTURE_PACK), {})
+
+    def test_full_shadowing_detected(self):
+        from src.core.mod_manager import ModManager
+        low = self._make_mod("Low", ["tex.png", "bump.png"], priority=0)
+        self._make_mod("High", ["tex.png", "bump.png"], priority=10)
+        mgr = ModManager(self.db)
+        shadowed = mgr.detect_shadowed_mods(ModType.TEXTURE_PACK)
+        self.assertIn(low.id, shadowed)
+
+    def test_partial_shadowing_not_detected(self):
+        """A mod with some but not all files overridden should NOT be shadowed."""
+        from src.core.mod_manager import ModManager
+        low = self._make_mod("Low", ["tex.png", "unique.png"], priority=0)
+        self._make_mod("High", ["tex.png"], priority=10)
+        mgr = ModManager(self.db)
+        shadowed = mgr.detect_shadowed_mods(ModType.TEXTURE_PACK)
+        self.assertNotIn(low.id, shadowed)
+
+    def test_highest_priority_never_shadowed(self):
+        from src.core.mod_manager import ModManager
+        high = self._make_mod("High", ["tex.png"], priority=10)
+        self._make_mod("Low", ["tex.png"], priority=0)
+        mgr = ModManager(self.db)
+        shadowed = mgr.detect_shadowed_mods(ModType.TEXTURE_PACK)
+        self.assertNotIn(high.id, shadowed)
+
+    def test_empty_file_list_not_shadowed(self):
+        """Mods with no file list are excluded from shadow analysis."""
+        from src.core.mod_manager import ModManager
+        no_files = self._make_mod("NoFiles", [], priority=0)
+        self._make_mod("High", ["tex.png"], priority=10)
+        mgr = ModManager(self.db)
+        shadowed = mgr.detect_shadowed_mods(ModType.TEXTURE_PACK)
+        self.assertNotIn(no_files.id, shadowed)
+
+    def test_disabled_mods_excluded(self):
+        """Disabled mods should not be shadowed (they're not active)."""
+        from src.core.mod_manager import ModManager
+        low = self._make_mod("Low", ["tex.png"], priority=0)
+        low.enabled = False
+        self.db.update(low)
+        self._make_mod("High", ["tex.png"], priority=10)
+        mgr = ModManager(self.db)
+        shadowed = mgr.detect_shadowed_mods(ModType.TEXTURE_PACK)
+        self.assertNotIn(low.id, shadowed)
 
 

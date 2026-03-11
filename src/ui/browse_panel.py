@@ -417,6 +417,54 @@ CATALOGUE: List[dict] = [
         "download_action": "",
         "upscale_tech": "",
     },
+    # ── Patreon creators ─────────────────────────────────────────────────────
+    {
+        "id": "patreon_ps2_textures",
+        "name": "PS2 Texture Creators on Patreon",
+        "description": (
+            "Several PS2 texture artists publish their HD packs exclusively on Patreon. "
+            "Search Patreon for 'PS2 texture' or 'PCSX2' to find active creators. "
+            "Most offer free tiers with public releases and paid tiers for early access."
+        ),
+        "context": (
+            "Patreon creators typically document their upscaling technique (ESRGAN model, "
+            "resolution multiplier), provide recommended PCSX2 graphic plugin settings, "
+            "and link to their other works. Check the About section of each creator's page."
+        ),
+        "author": "Various Patreon Creators",
+        "author_url": "https://www.patreon.com/search?q=ps2+texture",
+        "url": "https://www.patreon.com/search?q=ps2+texture+pcsx2",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "hd", "esrgan", "community"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ / Manual",
+    },
+    {
+        "id": "deadontheinside_patreon",
+        "name": "DeadOnTheInside — PS2 Mods & Tools",
+        "description": (
+            "Support the developer of PS2 Mod Manager on Patreon! "
+            "Patrons get early access to new features, exclusive mod packs, "
+            "and direct input on the roadmap."
+        ),
+        "context": (
+            "Your support keeps PS2 Mod Manager free and actively maintained. "
+            "Patreon members also get priority support and early builds."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "url": "https://www.patreon.com/c/DeadOnTheInside",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "support", "dev"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
 ]
 
 # Collect unique sources for the source filter dropdown
@@ -1085,6 +1133,41 @@ class BrowsePanel(BasePanel):
         note.setWordWrap(True)
         content.addWidget(note)
 
+        # ── Patreon support banner ────────────────────────────────────────
+        from PyQt6.QtWidgets import QFrame as _QFrame
+        patreon_frame = _QFrame()
+        patreon_frame.setObjectName("card")
+        patreon_frame.setStyleSheet(
+            "QFrame#card { border: 1px solid #f96854; background: #1e1010; "
+            "border-radius: 8px; padding: 0px; }"
+        )
+        patreon_row = QHBoxLayout(patreon_frame)
+        patreon_row.setContentsMargins(14, 10, 14, 10)
+        patreon_row.setSpacing(12)
+        heart_lbl = QLabel("❤")
+        heart_lbl.setStyleSheet("font-size: 24px;")
+        patreon_row.addWidget(heart_lbl)
+        p_msg = QLabel(
+            "<b style='color:#f96854;'>Enjoying PS2 Mod Manager?</b>  "
+            "Support the developer on "
+            "<a href='https://www.patreon.com/c/DeadOnTheInside' "
+            "style='color:#f96854;'>Patreon</a> "
+            "to keep the project alive!"
+        )
+        p_msg.setOpenExternalLinks(True)
+        p_msg.setWordWrap(False)
+        p_msg.setStyleSheet("color: #c0a0a0; font-size: 12px;")
+        patreon_row.addWidget(p_msg, 1)
+        p_btn = QPushButton("❤  Patreon")
+        p_btn.setObjectName("patreon_btn")
+        p_btn.setFixedWidth(110)
+        p_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        p_btn.clicked.connect(
+            lambda: self._open_url("https://www.patreon.com/c/DeadOnTheInside")
+        )
+        patreon_row.addWidget(p_btn)
+        content.addWidget(patreon_frame)
+
         # ── Tabs ─────────────────────────────────────────────────────────
         self._tabs = QTabWidget()
         self._tabs.setDocumentMode(True)
@@ -1137,6 +1220,11 @@ class BrowsePanel(BasePanel):
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
+
+    def _open_url(self, url: str):
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl(url))
 
     def refresh(self):
         self._apply_filters()
