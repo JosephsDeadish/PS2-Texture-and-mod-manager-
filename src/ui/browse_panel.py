@@ -3032,11 +3032,142 @@ CATALOGUE: List[dict] = [
         "direct_download_url": "",
         "upscale_tech": "",
     },
+    # ── Patreon Examples: paid / account-required / incomplete ────────────────
+    {
+        "id": "patreon_post_148478705",
+        "name": "DeadOnTheInside — PS2 HD Texture Pack (WIP, Free Membership)",
+        "description": (
+            "HD texture replacement pack available to free Patreon members. "
+            "This pack is currently a work-in-progress — not all textures are replaced yet. "
+            "Log in to Patreon with a free account to access the attachment."
+        ),
+        "context": (
+            "Download steps: 1) Create a free Patreon account. "
+            "2) Follow DeadOnTheInside on Patreon (free). "
+            "3) Open the post and download the attachment. "
+            "4) Import in PS2 Mod Manager with the correct Game ID."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/148478705",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "hd", "wip", "free-membership", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": False,
+    },
+    {
+        "id": "patreon_post_148718606",
+        "name": "DeadOnTheInside — PS2 HD Texture Pack (Paid)",
+        "description": (
+            "Paid HD texture replacement pack available to Patreon subscribers. "
+            "Requires an active paid Patreon membership to access and download."
+        ),
+        "context": (
+            "Subscribe to the DeadOnTheInside Patreon at the appropriate tier "
+            "to unlock this texture pack. Once downloaded, import using the "
+            "Texture Packs panel and enter the Game ID shown in the post."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/148718606",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["patreon", "hd", "paid", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": False,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "patreon_post_148894264",
+        "name": "Sims 2: Castaway — Sims Body Textures (Paid, Partial Coverage)",
+        "description": (
+            "Paid texture replacement pack for The Sims 2: Castaway (SLUS-21668) "
+            "that replaces Sims character body textures only. "
+            "This is a targeted partial pack — not a whole-game replacement. "
+            "Requires a paid Patreon membership to access."
+        ),
+        "context": (
+            "This pack is a body-texture swap, not an incomplete/WIP pack — it fully "
+            "replaces what it targets. The game ID is SLUS-21668 (US). "
+            "Download via Patreon, then import with Game ID SLUS-21668."
+        ),
+        "author": "DeadOnTheInside",
+        "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.patreon.com/posts/148894264",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Patreon",
+        "game": "The Sims 2: Castaway",
+        "thumbnail_url": "",
+        "tags": ["patreon", "sims", "castaway", "body-textures", "partial", "paid", "ps2"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "ESRGAN",
+        "is_free": False,
+        "requires_account": True,
+        "is_complete": False,
+    },
 ]
 
 # Collect unique sources for the source filter dropdown
 ALL_SOURCES = sorted({e["source"] for e in CATALOGUE})
 
+# ---------------------------------------------------------------------------
+# Catalogue entry attribute helpers
+# ---------------------------------------------------------------------------
+
+#: Sources that always require creating an account (even a free one) to access
+#: or download content from.
+_ACCOUNT_REQUIRED_SOURCES: frozenset = frozenset({
+    "GBAtemp",
+    "LoversLab",
+    "PSX-Place",
+    "PCSX2 Forums",
+    "Discord",
+    "ScreenScraper",
+    "Patreon",
+})
+
+
+def _entry_is_free(entry: dict) -> bool:
+    """Return True if this entry's content is freely available (no payment needed).
+
+    Defaults to True — only explicitly False for paid-subscription content."""
+    return bool(entry.get("is_free", True))
+
+
+def _entry_requires_account(entry: dict) -> bool:
+    """Return True if accessing/downloading this entry requires an account.
+
+    Checks explicit ``requires_account`` field first; falls back to inferring
+    from the source (e.g. GBAtemp, LoversLab, Patreon always need accounts)."""
+    if "requires_account" in entry:
+        return bool(entry["requires_account"])
+    return entry.get("source", "") in _ACCOUNT_REQUIRED_SOURCES
+
+
+def _entry_is_complete(entry: dict) -> bool:
+    """Return True if this is a full / complete pack (not a WIP or partial coverage).
+
+    Defaults to True — only explicitly False for incomplete or partial-coverage packs."""
+    return bool(entry.get("is_complete", True))
 
 # ---------------------------------------------------------------------------
 # Catalogue card widget
@@ -3104,6 +3235,38 @@ class CatalogueCard(QFrame):
             "padding: 2px 8px; font-size:10px;"
         )
         header.addWidget(src_lbl)
+
+        # Status badges: 💰 Paid / 🔐 Account Required / 🔧 WIP or Partial
+        if not _entry_is_free(self.entry):
+            paid_lbl = QLabel("💰 Paid")
+            paid_lbl.setStyleSheet(
+                "background:#3d2000; color:#f0a000; border-radius:9px;"
+                "padding: 2px 7px; font-size:10px;"
+            )
+            paid_lbl.setToolTip("This content requires a paid subscription to access.")
+            header.addWidget(paid_lbl)
+        if _entry_requires_account(self.entry):
+            acct_lbl = QLabel("🔐 Account")
+            acct_lbl.setStyleSheet(
+                "background:#001a3d; color:#60a8e0; border-radius:9px;"
+                "padding: 2px 7px; font-size:10px;"
+            )
+            acct_lbl.setToolTip(
+                "Requires creating a free (or paid) account to access or download."
+            )
+            header.addWidget(acct_lbl)
+        if not _entry_is_complete(self.entry):
+            wip_lbl = QLabel("🔧 WIP/Partial")
+            wip_lbl.setStyleSheet(
+                "background:#1a1000; color:#d08040; border-radius:9px;"
+                "padding: 2px 7px; font-size:10px;"
+            )
+            wip_lbl.setToolTip(
+                "This pack is incomplete, a work-in-progress, or only covers "
+                "part of the game (e.g. specific characters or areas)."
+            )
+            header.addWidget(wip_lbl)
+
         header.addStretch()
         layout.addLayout(header)
 
@@ -3850,6 +4013,9 @@ class _CatalogueTabContent(QWidget):
         self._current_author = ""
         self._show_favs_only = False
         self._show_nsfw = False
+        self._show_paid = False
+        self._show_account_required = True
+        self._show_incomplete = True
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -3862,17 +4028,26 @@ class _CatalogueTabContent(QWidget):
         self._cards_layout.setSpacing(14)
         self._scroll.setWidget(self._cards_container)
         layout.addWidget(self._scroll, 1)
-        # Populate with NSFW hidden by default
-        self._populate([e for e in entries if not e.get("nsfw", False)])
+        # Populate with NSFW and paid content hidden by default
+        self._populate([
+            e for e in entries
+            if not e.get("nsfw", False) and _entry_is_free(e)
+        ])
 
     def apply_filters(self, query: str = "", source: str = "",
                       author: str = "", favs_only: bool = False,
-                      show_nsfw: bool = False):
+                      show_nsfw: bool = False,
+                      show_paid: bool = False,
+                      show_account_required: bool = True,
+                      show_incomplete: bool = True):
         self._current_query = query
         self._current_source = source
         self._current_author = author
         self._show_favs_only = favs_only
         self._show_nsfw = show_nsfw
+        self._show_paid = show_paid
+        self._show_account_required = show_account_required
+        self._show_incomplete = show_incomplete
 
         q = query.lower()
         fav_authors = getattr(self.config, "favorite_authors", [])
@@ -3881,6 +4056,15 @@ class _CatalogueTabContent(QWidget):
         for e in self._all_entries:
             # NSFW filter — hide adult-content entries unless the user enables them
             if e.get("nsfw", False) and not show_nsfw:
+                continue
+            # Paid filter — hide paid content unless the user opts in
+            if not _entry_is_free(e) and not show_paid:
+                continue
+            # Account-required filter
+            if _entry_requires_account(e) and not show_account_required:
+                continue
+            # Incomplete/partial filter
+            if not _entry_is_complete(e) and not show_incomplete:
                 continue
             if q and not (
                 q in e.get("name", "").lower()
@@ -4039,6 +4223,49 @@ class BrowsePanel(BasePanel):
         filter_row.addStretch()
         content.addLayout(filter_row)
 
+        # ── Content-type filter row ───────────────────────────────────────
+        type_filter_row = QHBoxLayout()
+        type_filter_row.setSpacing(8)
+
+        # Paid content toggle
+        self._paid_check = QCheckBox("💰 Show Paid")
+        self._paid_check.setChecked(getattr(self.config, "show_paid", False))
+        self._paid_check.setStyleSheet("color: #e0a040; font-size: 12px;")
+        self._paid_check.setToolTip(
+            "By default only free content is shown.\n"
+            "Enable this to also see paid / subscription-only texture packs and mods."
+        )
+        self._paid_check.stateChanged.connect(self._on_paid_toggled)
+        type_filter_row.addWidget(self._paid_check)
+
+        # Account-required toggle
+        self._acct_check = QCheckBox("🔐 Show Account-Required")
+        self._acct_check.setChecked(getattr(self.config, "show_account_required", True))
+        self._acct_check.setStyleSheet("color: #60a8e0; font-size: 12px;")
+        self._acct_check.setToolTip(
+            "Some sources (GBAtemp, LoversLab, Patreon, PCSX2 Forums, Discord) \n"
+            "require a free or paid account to download files.\n"
+            "Uncheck to hide those entries and only show account-free sources."
+        )
+        self._acct_check.stateChanged.connect(self._on_acct_toggled)
+        type_filter_row.addWidget(self._acct_check)
+
+        # Incomplete / partial packs toggle
+        self._incomplete_check = QCheckBox("🔧 Show Incomplete/Partial")
+        self._incomplete_check.setChecked(getattr(self.config, "show_incomplete", True))
+        self._incomplete_check.setStyleSheet("color: #d08040; font-size: 12px;")
+        self._incomplete_check.setToolTip(
+            "Show work-in-progress (WIP) or partial-coverage texture packs.\n"
+            "Partial packs only replace textures for specific characters, areas,\n"
+            "or body types rather than covering the whole game.\n"
+            "Uncheck to show only complete, whole-game texture packs."
+        )
+        self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
+        type_filter_row.addWidget(self._incomplete_check)
+
+        type_filter_row.addStretch()
+        content.addLayout(type_filter_row)
+
         note = QLabel(
             "ℹ  Community-maintained public resources. "
             "PS2 Mod Manager does not host or distribute any copyrighted content."
@@ -4118,13 +4345,49 @@ class BrowsePanel(BasePanel):
         author = self._author_filter.currentData() or ""
         favs_only = self._favs_check.isChecked()
         show_nsfw = self._nsfw_check.isChecked()
+        show_paid = self._paid_check.isChecked()
+        show_account_required = self._acct_check.isChecked()
+        show_incomplete = self._incomplete_check.isChecked()
         for tab in self._tab_contents:
-            tab.apply_filters(query, source, author, favs_only, show_nsfw)
+            tab.apply_filters(
+                query, source, author, favs_only, show_nsfw,
+                show_paid, show_account_required, show_incomplete,
+            )
 
     def _on_nsfw_toggled(self, state: int):
         """Persist the NSFW preference and re-apply filters."""
         show_nsfw = bool(state)
         self.config.show_nsfw = show_nsfw
+        try:
+            from src.core.config import save_config
+            save_config(self.config)
+        except Exception:
+            pass
+        self._apply_filters()
+
+    def _on_paid_toggled(self, state: int):
+        """Persist the show-paid preference and re-apply filters."""
+        self.config.show_paid = bool(state)
+        try:
+            from src.core.config import save_config
+            save_config(self.config)
+        except Exception:
+            pass
+        self._apply_filters()
+
+    def _on_acct_toggled(self, state: int):
+        """Persist the show-account-required preference and re-apply filters."""
+        self.config.show_account_required = bool(state)
+        try:
+            from src.core.config import save_config
+            save_config(self.config)
+        except Exception:
+            pass
+        self._apply_filters()
+
+    def _on_incomplete_toggled(self, state: int):
+        """Persist the show-incomplete preference and re-apply filters."""
+        self.config.show_incomplete = bool(state)
         try:
             from src.core.config import save_config
             save_config(self.config)

@@ -111,6 +111,9 @@ class AppConfig:
     first_run: bool = True
     favorite_authors: list = field(default_factory=list)
     show_nsfw: bool = False
+    show_paid: bool = False
+    show_account_required: bool = True
+    show_incomplete: bool = True
 
     def to_dict(self) -> dict:
         return {
@@ -128,6 +131,9 @@ class AppConfig:
             "first_run": self.first_run,
             "favorite_authors": self.favorite_authors,
             "show_nsfw": self.show_nsfw,
+            "show_paid": self.show_paid,
+            "show_account_required": self.show_account_required,
+            "show_incomplete": self.show_incomplete,
         }
 
     @classmethod

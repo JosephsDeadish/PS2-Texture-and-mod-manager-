@@ -338,6 +338,7 @@ _KNOWN_SERIALS: dict[str, str] = {
 
     # Simulation / Strategy
     "SLUS-21102": "The Sims 2",
+    "SLUS-21668": "The Sims 2: Castaway",
     "SLUS-20469": "Harvest Moon: Save the Homeland",
     "SLUS-21234": "Harvest Moon: A Wonderful Life Special Edition",
 
