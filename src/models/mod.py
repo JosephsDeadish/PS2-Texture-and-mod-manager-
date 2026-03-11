@@ -110,6 +110,7 @@ class AppConfig:
     show_conflict_warnings: bool = True
     first_run: bool = True
     favorite_authors: list = field(default_factory=list)
+    show_nsfw: bool = False
 
     def to_dict(self) -> dict:
         return {
@@ -126,6 +127,7 @@ class AppConfig:
             "show_conflict_warnings": self.show_conflict_warnings,
             "first_run": self.first_run,
             "favorite_authors": self.favorite_authors,
+            "show_nsfw": self.show_nsfw,
         }
 
     @classmethod

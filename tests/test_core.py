@@ -2345,6 +2345,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
         "id", "name", "description", "author", "author_url",
         "url", "type", "source", "game", "tags",
         "download_action", "upscale_tech",
+        "is_hub", "nsfw",
     }
 
     def test_catalogue_not_empty(self):
@@ -2395,11 +2396,15 @@ class TestCatalogueIntegrity(unittest.TestCase):
             )
 
     def test_all_authors_are_non_empty(self):
+        """Named-author (non-hub) entries must have a non-empty author.
+        Hub entries intentionally use author="" since the individual poster
+        is not known at catalogue-build time."""
         for entry in self.catalogue:
-            self.assertTrue(
-                entry.get("author", "").strip(),
-                f"Entry {entry['id']} has empty author"
-            )
+            if not entry.get("is_hub", True):
+                self.assertTrue(
+                    entry.get("author", "").strip(),
+                    f"Named-author entry {entry['id']} has empty author"
+                )
 
     def test_all_sources_are_non_empty(self):
         for entry in self.catalogue:
@@ -2502,4 +2507,74 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     aurl, bare_homepages,
                     f"Hub entry {entry['id']} still uses a bare site homepage for author_url: {aurl!r}"
                 )
+
+    def test_nsfw_present_and_bool(self):
+        """Every entry must declare nsfw: True or False."""
+        for entry in self.catalogue:
+            self.assertIn(
+                "nsfw", entry,
+                f"Entry {entry['id']} is missing the 'nsfw' field"
+            )
+            self.assertIsInstance(
+                entry["nsfw"], bool,
+                f"Entry {entry['id']} nsfw must be a bool, got {type(entry['nsfw'])}"
+            )
+
+    def test_loverslab_entries_are_nsfw(self):
+        """All LoversLab-sourced entries must be marked nsfw=True
+        because LoversLab is an adult content site."""
+        for entry in self.catalogue:
+            if entry.get("source", "") == "LoversLab":
+                self.assertTrue(
+                    entry.get("nsfw", False),
+                    f"LoversLab entry {entry['id']} must have nsfw=True"
+                )
+
+    def test_hub_entries_have_empty_author(self):
+        """Hub entries (is_hub=True) must have an empty author string.
+        Individual posters on community search pages are not known ahead of time,
+        so we never pre-fill a fake community name as the 'author'."""
+        for entry in self.catalogue:
+            if entry.get("is_hub", False):
+                self.assertEqual(
+                    entry.get("author", ""), "",
+                    f"Hub entry {entry['id']} should have author='' (got {entry.get('author')!r})"
+                )
+
+    def test_named_author_entries_have_non_empty_author(self):
+        """Named-author entries (is_hub=False) must have a non-empty author."""
+        for entry in self.catalogue:
+            if not entry.get("is_hub", True):
+                self.assertTrue(
+                    entry.get("author", "").strip(),
+                    f"Named-author entry {entry['id']} must have a non-empty author"
+                )
+
+    def test_nsfw_filter_logic(self):
+        """NSFW entries must be filterable: with show_nsfw=False, no nsfw entries appear;
+        with show_nsfw=True, nsfw entries are included."""
+        nsfw_entries = [e for e in self.catalogue if e.get("nsfw")]
+        safe_entries  = [e for e in self.catalogue if not e.get("nsfw")]
+
+        self.assertGreater(len(nsfw_entries), 0, "There should be at least one nsfw entry")
+        self.assertGreater(len(safe_entries), 0, "There should be safe (non-nsfw) entries")
+
+        # Simulate the filter logic
+        def apply_filter(entries, show_nsfw):
+            return [e for e in entries if not e.get("nsfw", False) or show_nsfw]
+
+        without_nsfw = apply_filter(self.catalogue, show_nsfw=False)
+        with_nsfw    = apply_filter(self.catalogue, show_nsfw=True)
+
+        # No nsfw entries in filtered-out result
+        self.assertFalse(
+            any(e.get("nsfw") for e in without_nsfw),
+            "show_nsfw=False should remove all nsfw entries"
+        )
+        # All nsfw entries present when enabled
+        self.assertGreater(
+            len(with_nsfw), len(without_nsfw),
+            "show_nsfw=True should include more entries than show_nsfw=False"
+        )
+        self.assertEqual(len(with_nsfw), len(self.catalogue))
 
