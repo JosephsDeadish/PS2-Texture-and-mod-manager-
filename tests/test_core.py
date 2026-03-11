@@ -962,3 +962,120 @@ class TestPnachParser(unittest.TestCase):
         self.assertEqual(len(conflicts), 0)
 
 
+
+
+class TestGameRegistry(unittest.TestCase):
+    """Tests for src.core.game_registry — PS2 serial detection."""
+
+    # ------------------------------------------------------------------
+    # detect_game_serial
+    # ------------------------------------------------------------------
+
+    def test_detect_slus_with_dash(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLUS-20062.pnach"), "SLUS-20062")
+
+    def test_detect_slus_with_underscore(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLUS_20062.png"), "SLUS-20062")
+
+    def test_detect_slus_fused(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLUS20062_HD.zip"), "SLUS-20062")
+
+    def test_detect_scus(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SCUS-97120.cover.png"), "SCUS-97120")
+
+    def test_detect_sles_pal(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLES-52232_patch.pnach"), "SLES-52232")
+
+    def test_detect_slps_japan(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLPS25516.pnach"), "SLPS-25516")
+
+    def test_detect_from_content(self):
+        from src.core.game_registry import detect_game_serial
+        content = b"gametitle=Gran Turismo 4\n// CRC for SLUS-21163\npatch=1,EE,..."
+        result = detect_game_serial("unknown_crc.pnach", file_content=content)
+        self.assertEqual(result, "SLUS-21163")
+
+    def test_no_serial_in_crc_filename(self):
+        from src.core.game_registry import detect_game_serial
+        # 8-hex-digit PNACH filename = CRC, not a serial
+        self.assertEqual(detect_game_serial("F0A235B4.pnach"), "")
+
+    def test_no_serial_in_random_name(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("MyTexturePack_v2.zip"), "")
+
+    # ------------------------------------------------------------------
+    # serial_to_display
+    # ------------------------------------------------------------------
+
+    def test_serial_to_display_known(self):
+        from src.core.game_registry import serial_to_display
+        result = serial_to_display("SLUS-20062")
+        self.assertIn("SLUS-20062", result)
+        self.assertIn("Spyro", result)
+
+    def test_serial_to_display_unknown(self):
+        from src.core.game_registry import serial_to_display
+        self.assertEqual(serial_to_display("SLUS-99999"), "SLUS-99999")
+
+    def test_serial_to_display_empty(self):
+        from src.core.game_registry import serial_to_display
+        self.assertEqual(serial_to_display(""), "")
+
+    # ------------------------------------------------------------------
+    # normalise_serial
+    # ------------------------------------------------------------------
+
+    def test_normalise_dash(self):
+        from src.core.game_registry import normalise_serial
+        self.assertEqual(normalise_serial("slus-20062"), "SLUS-20062")
+
+    def test_normalise_underscore(self):
+        from src.core.game_registry import normalise_serial
+        self.assertEqual(normalise_serial("SLUS_20062"), "SLUS-20062")
+
+    # ------------------------------------------------------------------
+    # lookup_game_title
+    # ------------------------------------------------------------------
+
+    def test_lookup_known_title(self):
+        from src.core.game_registry import lookup_game_title
+        title = lookup_game_title("SCUS-97120")
+        self.assertIn("Jak", title)
+
+    def test_lookup_unknown_returns_empty(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertEqual(lookup_game_title("XXXX-99999"), "")
+
+    # ------------------------------------------------------------------
+    # AppConfig favorite_authors
+    # ------------------------------------------------------------------
+
+    def test_appconfig_favorite_authors_default(self):
+        from src.models.mod import AppConfig
+        cfg = AppConfig()
+        self.assertEqual(cfg.favorite_authors, [])
+
+    def test_appconfig_favorite_authors_serialised(self):
+        from src.models.mod import AppConfig
+        cfg = AppConfig()
+        cfg.favorite_authors = ["Alice", "Bob"]
+        d = cfg.to_dict()
+        self.assertEqual(d["favorite_authors"], ["Alice", "Bob"])
+        restored = AppConfig.from_dict(d)
+        self.assertEqual(restored.favorite_authors, ["Alice", "Bob"])
+
+    def test_appconfig_from_dict_no_favorite_authors_key(self):
+        """Old config files without favorite_authors should not crash."""
+        from src.models.mod import AppConfig
+        data = {"pcsx2_path": "/foo", "theme": "dark", "first_run": False}
+        cfg = AppConfig.from_dict(data)
+        self.assertEqual(cfg.favorite_authors, [])
+
+

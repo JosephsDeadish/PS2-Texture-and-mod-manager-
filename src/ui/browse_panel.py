@@ -1,11 +1,12 @@
 """Browse & Download panel — discover mods from public sources.
 
-New in this version:
+Features:
 - Tabbed browsing per mod type (All / Textures / PNACH / Covers / Saves / Cheats)
 - Live search across catalogue entries (name, game, author, tags)
-- "Download from URL" dialog — paste any direct URL, the app downloads
-  and auto-installs the mod with progress feedback
-- Google Drive link conversion to direct download
+- Source filter dropdown (filter by hosting site)
+- Author filter / favorite authors (❤ toggle to mark favorite)
+- "Download from URL" dialog with Google Drive conversion
+- Rich catalogue entries with upscale info, author links, context
 """
 
 import os
@@ -32,20 +33,21 @@ from PyQt6.QtWidgets import (
     QDialog,
     QProgressBar,
     QSizePolicy,
+    QCheckBox,
 )
 
-from src.core.config_manager import THUMBNAILS_DIR
+from src.core.config_manager import THUMBNAILS_DIR, save_config
 from src.core.downloader import DownloadError, download_file
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
 
 
 # ---------------------------------------------------------------------------
-# Catalogue
+# Catalogue — expanded with Lovers Lab, PS2-Home, PSX-Place, Archive.org, etc.
 # ---------------------------------------------------------------------------
 
 CATALOGUE: List[dict] = [
-    # Texture Packs
+    # ── Texture Packs ─────────────────────────────────────────────────────────
     {
         "id": "pcsx2_wiki_textures",
         "name": "PCSX2 Texture Replacement Guide",
@@ -53,89 +55,175 @@ CATALOGUE: List[dict] = [
             "The official PCSX2 wiki explains how to create and install HD texture "
             "replacement packs. Browse community-made packs linked from the wiki."
         ),
+        "context": "Official guide — good starting point for understanding texture replacement workflow.",
+        "author": "PCSX2 Community",
+        "author_url": "https://wiki.pcsx2.net",
         "url": "https://wiki.pcsx2.net/Texture_Replacement",
         "type": ModType.TEXTURE_PACK,
-        "author": "PCSX2 Community",
+        "source": "PCSX2",
         "game": "",
         "thumbnail_url": "https://wiki.pcsx2.net/images/pcsx2-icon.png",
         "tags": ["guide", "official"],
         "download_action": "",
+        "upscale_tech": "",
     },
     {
         "id": "gbatemp_textures",
         "name": "GBAtemp PS2 Texture Packs",
         "description": (
             "GBAtemp.net hosts community-uploaded HD texture packs for PS2 games. "
-            "Visit to browse and download individual packs."
+            "Browse and download individual packs for your favourite titles."
         ),
+        "context": "Large community forum — authors often include upscale info and recommended settings in their posts.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
         "url": "https://gbatemp.net/tags/ps2-texture-pack/",
         "type": ModType.TEXTURE_PACK,
-        "author": "GBAtemp Community",
+        "source": "GBAtemp",
         "game": "",
         "thumbnail_url": "https://gbatemp.net/styles/gbatemp/logo.png",
-        "tags": ["community", "hd"],
+        "tags": ["community", "hd", "gbatemp"],
         "download_action": "",
+        "upscale_tech": "Various (xBRZ, ESRGAN, Waifu2x)",
+    },
+    {
+        "id": "loverslab_ps2",
+        "name": "LoversLab — PS2 Texture Mods",
+        "description": (
+            "LoversLab is a major modding community with a growing PS2 / PCSX2 "
+            "section. Authors publish HD texture packs with detailed descriptions, "
+            "upscaling methodology, and recommended PCSX2 settings."
+        ),
+        "context": (
+            "Authors on LoversLab often detail their upscale technique (ESRGAN model used, "
+            "resolution), provide recommended PCSX2 graphic settings, and link to their "
+            "other work. Check the description of each post for this information."
+        ),
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=ps2+texture&t=files",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["community", "hd", "loverslab", "esrgan"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ / Manual",
     },
     {
         "id": "nexusmods_ps2",
         "name": "Nexus Mods — PS2 / PCSX2",
         "description": (
-            "Nexus Mods PS2 / PCSX2 section. Community-contributed texture packs "
-            "and mods. Browse and download freely."
+            "Nexus Mods PS2 section — community-contributed texture packs and mods. "
+            "Each file page includes author notes on upscale method and settings."
         ),
+        "context": "Nexus enforces a structured mod-page format so author-recommended settings are usually in the description.",
+        "author": "Nexus Mods",
+        "author_url": "https://www.nexusmods.com",
         "url": "https://www.nexusmods.com/pcsx2",
         "type": ModType.TEXTURE_PACK,
-        "author": "Nexus Mods",
+        "source": "Nexus Mods",
         "game": "",
         "thumbnail_url": "https://www.nexusmods.com/favicon.ico",
-        "tags": ["community", "textures", "hd"],
+        "tags": ["community", "textures", "hd", "nexus"],
         "download_action": "",
+        "upscale_tech": "Various",
+    },
+    {
+        "id": "ps2_home_textures",
+        "name": "PS2-Home — PS2 HD Textures",
+        "description": (
+            "PS2-Home.com is a dedicated PS2 community site hosting mods, texture "
+            "packs, and patches. Browse the Downloads section for texture packs."
+        ),
+        "context": "PS2-focused community — most uploads include author names and game compatibility notes.",
+        "author": "PS2-Home Community",
+        "author_url": "https://www.ps2-home.com",
+        "url": "https://www.ps2-home.com/forum/viewforum.php?f=50",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PS2-Home",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["community", "hd", "ps2-home"],
+        "download_action": "",
+        "upscale_tech": "Various",
+    },
+    {
+        "id": "psx_place_textures",
+        "name": "PSX-Place — PS2 Texture Packs",
+        "description": (
+            "PSX-Place hosts PS2 mods, patches and texture packs. "
+            "The dedicated PS2 section has author-credited releases with changelogs."
+        ),
+        "context": "PlayStation-focused site — HD texture packs and mods with version history and author attribution.",
+        "author": "PSX-Place Community",
+        "author_url": "https://www.psx-place.com",
+        "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PSX-Place",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["community", "hd", "psx-place"],
+        "download_action": "",
+        "upscale_tech": "Various",
     },
     {
         "id": "reddit_ps2_textures",
         "name": "r/ps2 — Mods & Textures",
         "description": (
             "Reddit r/ps2 community shares texture packs, mods, and patches. "
-            "Search for your favourite game."
+            "Authors often post links to Google Drive or MEGA downloads."
         ),
+        "context": "Author posts often link to external hosting (Google Drive, MEGA). Use the Download from URL button to install directly.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
         "url": "https://www.reddit.com/r/ps2/search/?q=texture+pack&sort=new",
         "type": ModType.TEXTURE_PACK,
-        "author": "Reddit r/ps2",
+        "source": "Reddit",
         "game": "",
         "thumbnail_url": "https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png",
         "tags": ["community", "hd", "reddit"],
         "download_action": "",
+        "upscale_tech": "Various",
     },
-    # PNACH
+    # ── PNACH / Patches ───────────────────────────────────────────────────────
     {
         "id": "pcsx2_widescreen_github",
         "name": "PCSX2 Widescreen Patches (GitHub)",
         "description": (
-            "Official collection of widescreen (16:9) PNACH patches for hundreds "
-            "of PS2 games, maintained by the PCSX2 team."
+            "Official collection of 16:9 widescreen PNACH patches for hundreds "
+            "of PS2 games, maintained by the PCSX2 team on GitHub."
         ),
+        "context": "Every patch file is named by game CRC. Use the PNACH manager to import directly.",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
-        "author": "PCSX2 Team",
+        "source": "GitHub",
         "game": "All Games",
         "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
         "tags": ["widescreen", "official", "open-source"],
         "download_action": "",
+        "upscale_tech": "",
     },
     {
         "id": "pcsx2_cheats_forum",
         "name": "PCSX2 Cheat / PNACH Archive",
         "description": (
-            "Community-maintained collection of PNACH cheat files for PS2 games, "
-            "including widescreen hacks and 60fps patches."
+            "Community-maintained PNACH cheat files for PS2 games, "
+            "including widescreen, 60fps patches, and gameplay cheats."
         ),
+        "context": "Forum thread links to community-submitted PNACH files. Author attribution included in thread posts.",
+        "author": "PCSX2 Forums",
+        "author_url": "https://forums.pcsx2.net",
         "url": "https://forums.pcsx2.net/Thread-PNACH-Patches",
         "type": ModType.PNACH,
-        "author": "PCSX2 Forums",
+        "source": "PCSX2",
         "game": "",
         "thumbnail_url": "https://pcsx2.net/favicon.ico",
         "tags": ["patches", "pnach", "widescreen", "60fps"],
         "download_action": "",
+        "upscale_tech": "",
     },
     {
         "id": "ps2wide_patches",
@@ -144,61 +232,96 @@ CATALOGUE: List[dict] = [
             "Community database of widescreen and HD resolution hacks for "
             "hundreds of PS2 games in PNACH format."
         ),
+        "context": "Specialised in widescreen hacks — includes aspect ratio corrections and HUD fixes.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
         "url": "https://ps2wide.net",
         "type": ModType.PNACH,
-        "author": "PS2Wide Community",
+        "source": "PS2Wide",
         "game": "",
         "thumbnail_url": "",
         "tags": ["widescreen", "resolution", "pnach"],
         "download_action": "",
+        "upscale_tech": "",
     },
     {
-        "id": "pcsx2_cheatdb",
-        "name": "PCSX2 Cheat Database (GitHub)",
+        "id": "gbatemp_pnach",
+        "name": "GBAtemp PS2 Patches & Cheats",
         "description": (
-            "Community-maintained cheat archive for PCSX2 on GitHub. "
-            "Contains WideScreen, 60FPS, and gameplay cheats in PNACH format."
+            "GBAtemp.net also hosts PNACH cheat files and game patches for PS2. "
+            "Search for your game to find community-submitted patches."
         ),
-        "url": "https://github.com/PCSX2/cheatdb",
-        "type": ModType.CHEAT,
-        "author": "PCSX2 Community",
-        "game": "All Games",
-        "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
-        "tags": ["cheats", "pnach", "official"],
+        "context": "Authors include game CRC, version notes, and sometimes recommended companion mods.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/3519/?q=pnach&t=file_update",
+        "type": ModType.PNACH,
+        "source": "GBAtemp",
+        "game": "",
+        "thumbnail_url": "https://gbatemp.net/styles/gbatemp/logo.png",
+        "tags": ["patches", "pnach", "gbatemp"],
         "download_action": "",
+        "upscale_tech": "",
     },
-    # Cover Art
+    # ── Cover Art ─────────────────────────────────────────────────────────────
     {
         "id": "gametdb_covers",
         "name": "GameTDB Cover Art (PS2)",
         "description": (
             "GameTDB.com provides free PS2 cover art by game serial/ID. "
-            "Click Download Cover by ID to fetch art."
+            "Click 'Download Cover by ID' to fetch cover art for any PS2 game."
         ),
+        "context": "Comprehensive cover art database — uses game serial (SLUS/SCUS) as the lookup key.",
+        "author": "GameTDB",
+        "author_url": "https://www.gametdb.com",
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
-        "author": "GameTDB",
+        "source": "GameTDB",
         "game": "All Games",
         "thumbnail_url": "https://www.gametdb.com/favicon.ico",
         "tags": ["covers", "art", "official"],
         "download_action": "cover_by_id",
+        "upscale_tech": "",
     },
     {
         "id": "launchbox_art",
         "name": "LaunchBox Games Database",
         "description": (
-            "LaunchBox hosts an extensive database of PS2 game artwork including "
-            "box fronts, backs, screenshots and more."
+            "LaunchBox hosts a large database of PS2 game artwork including "
+            "box fronts, backs, screenshots and more — community-contributed."
         ),
+        "context": "High-resolution scans and recreations. Good for box-art replacements.",
+        "author": "LaunchBox Community",
+        "author_url": "https://www.launchbox-app.com",
         "url": "https://gamesdb.launchbox-app.com/platforms/games/11",
         "type": ModType.COVER_ART,
-        "author": "LaunchBox Community",
+        "source": "LaunchBox",
         "game": "",
         "thumbnail_url": "https://www.launchbox-app.com/favicon.ico",
         "tags": ["covers", "artwork", "community"],
         "download_action": "",
+        "upscale_tech": "",
     },
-    # Save Files
+    {
+        "id": "archive_org_covers",
+        "name": "Internet Archive — PS2 Cover Art",
+        "description": (
+            "The Internet Archive hosts scanned and digital PS2 box art and manuals. "
+            "A great source for rare regional covers."
+        ),
+        "context": "Scanned physical media — highest-quality lossless images for many regional variants.",
+        "author": "Internet Archive",
+        "author_url": "https://archive.org",
+        "url": "https://archive.org/search?query=PS2+cover+art&mediatype=image",
+        "type": ModType.COVER_ART,
+        "source": "Archive.org",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["covers", "archive", "scanned"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    # ── Save Files ────────────────────────────────────────────────────────────
     {
         "id": "gamefaqs_saves",
         "name": "GameFAQs PS2 Save Files",
@@ -206,13 +329,17 @@ CATALOGUE: List[dict] = [
             "GameFAQs hosts community-submitted PS2 save files for hundreds of games. "
             "Download saves to pick up where someone left off."
         ),
+        "context": "Save files listed by game; most include region info and save slot description.",
+        "author": "GameFAQs Community",
+        "author_url": "https://gamefaqs.gamespot.com",
         "url": "https://gamefaqs.gamespot.com/ps2/category/929-saves",
         "type": ModType.SAVE_FILE,
-        "author": "GameFAQs Community",
+        "source": "GameFAQs",
         "game": "",
         "thumbnail_url": "https://gamefaqs.gamespot.com/favicon.ico",
         "tags": ["saves", "community"],
         "download_action": "",
+        "upscale_tech": "",
     },
     {
         "id": "ps2saves_com",
@@ -221,15 +348,38 @@ CATALOGUE: List[dict] = [
             "Collection of PS2 save files shared by the community, organised by "
             "game title. Download and import with the Memory Card manager."
         ),
+        "context": "Organised by game title with author credits. Import using the Memory Card panel.",
+        "author": "PS2Saves Community",
+        "author_url": "https://ps2saves.com",
         "url": "https://ps2saves.com",
         "type": ModType.SAVE_FILE,
-        "author": "PS2Saves Community",
+        "source": "PS2Saves",
         "game": "",
         "thumbnail_url": "",
         "tags": ["saves", "community"],
         "download_action": "",
+        "upscale_tech": "",
     },
-    # Cheats
+    # ── Cheats ────────────────────────────────────────────────────────────────
+    {
+        "id": "pcsx2_cheatdb",
+        "name": "PCSX2 Cheat Database (GitHub)",
+        "description": (
+            "Community-maintained cheat archive for PCSX2. "
+            "Contains WideScreen, 60FPS, and gameplay cheats in PNACH format."
+        ),
+        "context": "Well-organised by game CRC. Each file is labelled with CRC and game name for easy identification.",
+        "author": "PCSX2 Community",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/cheatdb",
+        "type": ModType.CHEAT,
+        "source": "GitHub",
+        "game": "All Games",
+        "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+        "tags": ["cheats", "pnach", "official"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
     {
         "id": "codejunkies_ps2",
         "name": "Code Junkies PS2 Cheats",
@@ -237,15 +387,40 @@ CATALOGUE: List[dict] = [
             "Code Junkies maintains a database of PS2 cheat codes that can be "
             "converted to PNACH format for use with PCSX2."
         ),
+        "context": "ActionReplay / GameShark format — the app imports and converts them to PNACH automatically.",
+        "author": "Code Junkies",
+        "author_url": "https://www.codejunkies.com",
         "url": "https://www.codejunkies.com/ps2/",
         "type": ModType.CHEAT,
-        "author": "Code Junkies",
+        "source": "CodeJunkies",
         "game": "",
         "thumbnail_url": "",
         "tags": ["cheats", "codes"],
         "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "psx_place_cheats",
+        "name": "PSX-Place — PS2 Cheats & Patches",
+        "description": (
+            "PSX-Place hosts PS2 cheat codes and PNACH patches contributed by the community."
+        ),
+        "context": "PS2-focused site with version-tagged releases and author attribution.",
+        "author": "PSX-Place Community",
+        "author_url": "https://www.psx-place.com",
+        "url": "https://www.psx-place.com/resources/categories/ps2-cheats.19/",
+        "type": ModType.CHEAT,
+        "source": "PSX-Place",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cheats", "pnach", "psx-place"],
+        "download_action": "",
+        "upscale_tech": "",
     },
 ]
+
+# Collect unique sources for the source filter dropdown
+ALL_SOURCES = sorted({e["source"] for e in CATALOGUE})
 
 
 # ---------------------------------------------------------------------------
@@ -257,13 +432,15 @@ class CatalogueCard(QFrame):
 
     open_url = pyqtSignal(str)
     download_cover = pyqtSignal(dict)
+    favorite_toggled = pyqtSignal(str, bool)   # author, is_favorite
 
-    def __init__(self, entry: dict, parent=None):
+    def __init__(self, entry: dict, config: AppConfig, parent=None):
         super().__init__(parent)
         self.entry = entry
+        self.config = config
         self.setObjectName("card")
         self.setMinimumWidth(240)
-        self.setMaximumWidth(380)
+        self.setMaximumWidth(400)
         self._build()
 
     def _build(self):
@@ -280,6 +457,7 @@ class CatalogueCard(QFrame):
         }
         icon = type_icons.get(self.entry["type"], "📦")
 
+        # Header row: thumbnail + type badge
         header = QHBoxLayout()
         self._thumb_lbl = QLabel()
         self._thumb_lbl.setFixedSize(32, 32)
@@ -301,29 +479,85 @@ class CatalogueCard(QFrame):
             "padding: 2px 8px; font-size:11px;"
         )
         header.addWidget(type_lbl)
+
+        # Source badge
+        src_lbl = QLabel(self.entry.get("source", ""))
+        src_lbl.setStyleSheet(
+            "background:#1a2050; color:#8080c0; border-radius:9px;"
+            "padding: 2px 8px; font-size:10px;"
+        )
+        header.addWidget(src_lbl)
         header.addStretch()
         layout.addLayout(header)
 
+        # Title
         title = QLabel(self.entry["name"])
         title.setStyleSheet("font-weight: bold; font-size: 13px; color: #ffffff;")
         title.setWordWrap(True)
         layout.addWidget(title)
 
+        # Game badge
         if self.entry.get("game"):
             game_lbl = QLabel(f"🎮 {self.entry['game']}")
             game_lbl.setStyleSheet("color: #80b0ff; font-size: 11px;")
             layout.addWidget(game_lbl)
 
-        author = QLabel(f"by {self.entry['author']}")
-        author.setStyleSheet("color: #7070a0; font-size: 11px;")
-        layout.addWidget(author)
+        # Author row with favorite button
+        author_row = QHBoxLayout()
+        author_lbl = QLabel(f"by {self.entry['author']}")
+        author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+        author_row.addWidget(author_lbl)
+        author_row.addStretch()
 
+        # Favorite author button
+        is_fav = self.entry["author"] in getattr(self.config, "favorite_authors", [])
+        self._fav_btn = QPushButton("❤" if is_fav else "🤍")
+        self._fav_btn.setFixedSize(26, 22)
+        self._fav_btn.setStyleSheet(
+            "border: none; background: transparent; font-size: 14px;"
+            + ("color: #e94560;" if is_fav else "color: #505080;")
+        )
+        self._fav_btn.setToolTip(
+            "Remove from favorites" if is_fav else "Add author to favorites"
+        )
+        self._fav_btn.clicked.connect(self._toggle_favorite)
+        author_row.addWidget(self._fav_btn)
+
+        # Author link button
+        if self.entry.get("author_url"):
+            author_link = QPushButton("🔗")
+            author_link.setFixedSize(26, 22)
+            author_link.setStyleSheet("border: none; background: transparent; font-size: 14px; color: #5080d0;")
+            author_link.setToolTip(f"Visit author page: {self.entry['author_url']}")
+            author_link.clicked.connect(lambda: self.open_url.emit(self.entry["author_url"]))
+            author_row.addWidget(author_link)
+        layout.addLayout(author_row)
+
+        # Description
         desc = QLabel(self.entry["description"])
         desc.setStyleSheet("color: #9090b0; font-size: 12px;")
         desc.setWordWrap(True)
-        desc.setMaximumHeight(72)
+        desc.setMaximumHeight(60)
         layout.addWidget(desc)
 
+        # Context info (collapsible-style tooltip hint)
+        if self.entry.get("context"):
+            ctx_lbl = QLabel(f"ℹ {self.entry['context'][:120]}{'…' if len(self.entry['context']) > 120 else ''}")
+            ctx_lbl.setStyleSheet(
+                "color: #607090; font-size: 10px; font-style: italic;"
+                "background: #0a1428; border-radius: 4px; padding: 4px 6px;"
+            )
+            ctx_lbl.setWordWrap(True)
+            ctx_lbl.setToolTip(self.entry["context"])
+            layout.addWidget(ctx_lbl)
+
+        # Upscale tech
+        if self.entry.get("upscale_tech"):
+            tech_lbl = QLabel(f"⚙ {self.entry['upscale_tech']}")
+            tech_lbl.setStyleSheet("color: #6080a0; font-size: 10px;")
+            layout.addWidget(tech_lbl)
+
+        # Tags
         if self.entry.get("tags"):
             tags_row = QHBoxLayout()
             tags_row.setSpacing(4)
@@ -348,6 +582,29 @@ class CatalogueCard(QFrame):
             dl_btn = QPushButton("🖼 Download Cover by ID")
             dl_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
             layout.addWidget(dl_btn)
+
+    def _toggle_favorite(self):
+        author = self.entry["author"]
+        favs = list(getattr(self.config, "favorite_authors", []))
+        is_fav = author in favs
+        if is_fav:
+            favs.remove(author)
+        else:
+            favs.append(author)
+        self.config.favorite_authors = favs
+        try:
+            save_config(self.config)
+        except Exception:
+            pass
+
+        new_fav = not is_fav
+        self._fav_btn.setText("❤" if new_fav else "🤍")
+        self._fav_btn.setStyleSheet(
+            "border: none; background: transparent; font-size: 14px;"
+            + ("color: #e94560;" if new_fav else "color: #505080;")
+        )
+        self._fav_btn.setToolTip("Remove from favorites" if new_fav else "Add author to favorites")
+        self.favorite_toggled.emit(author, new_fav)
 
     def _load_thumbnail(self, url: str):
         try:
@@ -467,8 +724,7 @@ class CoverDownloadDialog(QDialog):
 class DownloadInstallDialog(QDialog):
     """
     Download any direct URL (ZIP, 7z, PNACH, PNG) and import it as a mod.
-    Google Drive share links are converted to direct-download URLs automatically.
-    MEGA links are detected and the user is guided to download manually.
+    Google Drive share links are auto-converted. MEGA links get guidance.
     """
 
     def __init__(self, config: AppConfig, db, parent=None):
@@ -525,7 +781,7 @@ class DownloadInstallDialog(QDialog):
         self._author_edit = QLineEdit()
         self._author_edit.setPlaceholderText("Author name")
         self._game_edit = QLineEdit()
-        self._game_edit.setPlaceholderText("Game name or serial ID")
+        self._game_edit.setPlaceholderText("Game name or serial ID (e.g. SLUS-20062)")
 
         for label, edit in [
             ("Name:", self._name_edit),
@@ -563,11 +819,9 @@ class DownloadInstallDialog(QDialog):
     @staticmethod
     def _convert_url(url: str) -> str:
         import re
-        # Google Drive: /file/d/FILE_ID/
         m = re.search(r"drive\.google\.com/file/d/([^/?]+)", url)
         if m:
             return f"https://drive.google.com/uc?export=download&id={m.group(1)}"
-        # Google Drive open link
         m2 = re.search(r"drive\.google\.com/open[?]id=([^&]+)", url)
         if m2:
             return f"https://drive.google.com/uc?export=download&id={m2.group(1)}"
@@ -578,7 +832,6 @@ class DownloadInstallDialog(QDialog):
         if not raw_url:
             self._status.setText("⚠  Please enter a URL")
             return
-
         if "mega.nz" in raw_url or "mega.co.nz" in raw_url:
             QMessageBox.information(
                 self, "MEGA Link",
@@ -587,17 +840,13 @@ class DownloadInstallDialog(QDialog):
                 "the ➕ Import button in the relevant mod panel.",
             )
             return
-
         url = self._convert_url(raw_url)
         mod_type = self._type_combo.currentData()
         storage = self.config.mods_storage_path
         if not storage:
-            QMessageBox.warning(
-                self, "Storage Not Configured",
-                "Please configure a Mod Storage folder in Settings first.",
-            )
+            QMessageBox.warning(self, "Storage Not Configured",
+                "Please configure a Mod Storage folder in Settings first.")
             return
-
         self._dl_btn.setEnabled(False)
         self._progress.show()
         self._status.setText("Downloading...")
@@ -609,7 +858,6 @@ class DownloadInstallDialog(QDialog):
                 fname = Path(unquote(parsed.path)).name or "downloaded_mod"
                 if not Path(fname).suffix:
                     fname += ".zip"
-
                 tmpdir = tempfile.mkdtemp(prefix="ps2mm_dl_")
                 dest = str(Path(tmpdir) / fname)
 
@@ -621,22 +869,15 @@ class DownloadInstallDialog(QDialog):
                         QTimer.singleShot(0, lambda: self._progress.setRange(0, 0))
 
                 download_file(url, dest, _progress)
-
                 from src.core.mod_manager import ModManager
                 mgr = ModManager(self.db)
                 name = self._name_edit.text().strip() or Path(fname).stem
                 author = self._author_edit.text().strip()
                 game = self._game_edit.text().strip()
-
                 mod = mgr.install_from_folder(
-                    source_path=dest,
-                    mod_type=mod_type,
-                    dest_base=storage,
-                    name=name,
-                    author=author,
-                    game_id=game,
+                    source_path=dest, mod_type=mod_type, dest_base=storage,
+                    name=name, author=author, game_id=game,
                 )
-
                 import shutil
                 shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -646,7 +887,6 @@ class DownloadInstallDialog(QDialog):
                     self._status.setText(f"✅  Installed: {mod.name}")
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _done)
-
             except DownloadError as exc:
                 def _err():
                     self._status.setText(f"❌  Download failed: {exc}")
@@ -668,10 +908,17 @@ class DownloadInstallDialog(QDialog):
 # ---------------------------------------------------------------------------
 
 class _CatalogueTabContent(QWidget):
+    favorite_toggled = pyqtSignal(str, bool)
+
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
         self._all_entries = entries
         self.config = config
+        self._current_query = ""
+        self._current_source = ""
+        self._current_author = ""
+        self._show_favs_only = False
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         self._scroll = QScrollArea()
@@ -685,17 +932,35 @@ class _CatalogueTabContent(QWidget):
         layout.addWidget(self._scroll, 1)
         self._populate(entries)
 
-    def filter(self, query: str):
+    def apply_filters(self, query: str = "", source: str = "",
+                      author: str = "", favs_only: bool = False):
+        self._current_query = query
+        self._current_source = source
+        self._current_author = author
+        self._show_favs_only = favs_only
+
         q = query.lower()
-        filtered = [
-            e for e in self._all_entries
-            if not q
-            or q in e.get("name", "").lower()
-            or q in e.get("description", "").lower()
-            or q in e.get("author", "").lower()
-            or q in e.get("game", "").lower()
-            or any(q in t.lower() for t in e.get("tags", []))
-        ]
+        fav_authors = getattr(self.config, "favorite_authors", [])
+
+        filtered = []
+        for e in self._all_entries:
+            if q and not (
+                q in e.get("name", "").lower()
+                or q in e.get("description", "").lower()
+                or q in e.get("author", "").lower()
+                or q in e.get("game", "").lower()
+                or q in e.get("context", "").lower()
+                or any(q in t.lower() for t in e.get("tags", []))
+            ):
+                continue
+            if source and e.get("source", "") != source:
+                continue
+            if author and e.get("author", "") != author:
+                continue
+            if favs_only and e.get("author", "") not in fav_authors:
+                continue
+            filtered.append(e)
+
         self._populate(filtered)
 
     def _populate(self, entries: list):
@@ -706,9 +971,10 @@ class _CatalogueTabContent(QWidget):
 
         cols = 3
         for i, entry in enumerate(entries):
-            card = CatalogueCard(entry)
+            card = CatalogueCard(entry, self.config)
             card.open_url.connect(self._open_url)
             card.download_cover.connect(self._download_cover)
+            card.favorite_toggled.connect(self.favorite_toggled)
             self._cards_layout.addWidget(card, i // cols, i % cols)
 
         remainder = len(entries) % cols
@@ -753,13 +1019,14 @@ class BrowsePanel(BasePanel):
     def _build(self):
         content = self._content_layout
 
+        # ── Search + download toolbar ────────────────────────────────────
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
 
         self._search = QLineEdit()
         self._search.setPlaceholderText("🔍  Search by name, game, author, tag…")
         self._search.setObjectName("search_bar")
-        self._search.textChanged.connect(self._on_search)
+        self._search.textChanged.connect(self._apply_filters)
         toolbar.addWidget(self._search, 1)
 
         dl_btn = QPushButton("⬇ Download from URL")
@@ -770,8 +1037,42 @@ class BrowsePanel(BasePanel):
         )
         dl_btn.clicked.connect(self._open_download_dialog)
         toolbar.addWidget(dl_btn)
-
         content.addLayout(toolbar)
+
+        # ── Filter row ───────────────────────────────────────────────────
+        filter_row = QHBoxLayout()
+        filter_row.setSpacing(8)
+
+        # Source filter
+        filter_row.addWidget(QLabel("🌐 Source:"))
+        self._source_filter = QComboBox()
+        self._source_filter.setMinimumWidth(130)
+        self._source_filter.addItem("All Sources", "")
+        for src in ALL_SOURCES:
+            self._source_filter.addItem(src, src)
+        self._source_filter.currentIndexChanged.connect(self._apply_filters)
+        filter_row.addWidget(self._source_filter)
+
+        # Author filter
+        filter_row.addWidget(QLabel("👤 Author:"))
+        self._author_filter = QComboBox()
+        self._author_filter.setMinimumWidth(150)
+        self._author_filter.addItem("All Authors", "")
+        authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        for a in authors:
+            fav = a in getattr(self.config, "favorite_authors", [])
+            self._author_filter.addItem(("❤ " if fav else "") + a, a)
+        self._author_filter.currentIndexChanged.connect(self._apply_filters)
+        filter_row.addWidget(self._author_filter)
+
+        # Favorites only checkbox
+        self._favs_check = QCheckBox("❤ Favorites Only")
+        self._favs_check.setStyleSheet("color: #c08090; font-size: 12px;")
+        self._favs_check.stateChanged.connect(self._apply_filters)
+        filter_row.addWidget(self._favs_check)
+
+        filter_row.addStretch()
+        content.addLayout(filter_row)
 
         note = QLabel(
             "ℹ  Community-maintained public resources. "
@@ -784,6 +1085,7 @@ class BrowsePanel(BasePanel):
         note.setWordWrap(True)
         content.addWidget(note)
 
+        # ── Tabs ─────────────────────────────────────────────────────────
         self._tabs = QTabWidget()
         self._tabs.setDocumentMode(True)
 
@@ -803,19 +1105,38 @@ class BrowsePanel(BasePanel):
                 else [e for e in CATALOGUE if e["type"] == mod_type]
             )
             tab = _CatalogueTabContent(entries, self.config)
+            tab.favorite_toggled.connect(self._on_favorite_toggled)
             self._tab_contents.append(tab)
             self._tabs.addTab(tab, label)
 
         content.addWidget(self._tabs, 1)
 
-    def _on_search(self, query: str):
+    def _apply_filters(self):
+        query = self._search.text()
+        source = self._source_filter.currentData() or ""
+        author = self._author_filter.currentData() or ""
+        favs_only = self._favs_check.isChecked()
         for tab in self._tab_contents:
-            tab.filter(query)
+            tab.apply_filters(query, source, author, favs_only)
+
+    def _on_favorite_toggled(self, author: str, is_fav: bool):
+        """Rebuild author dropdown when favorites change."""
+        self._author_filter.blockSignals(True)
+        current = self._author_filter.currentData() or ""
+        self._author_filter.clear()
+        self._author_filter.addItem("All Authors", "")
+        authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        for a in authors:
+            fav = a in getattr(self.config, "favorite_authors", [])
+            self._author_filter.addItem(("❤ " if fav else "") + a, a)
+        idx = self._author_filter.findData(current)
+        if idx >= 0:
+            self._author_filter.setCurrentIndex(idx)
+        self._author_filter.blockSignals(False)
 
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
 
     def refresh(self):
-        for tab in self._tab_contents:
-            tab.filter(self._search.text())
+        self._apply_filters()

@@ -157,6 +157,8 @@ class ImportModDialog(QDialog):
             # Auto-fill name from folder
             if not self._name_edit.text():
                 self._name_edit.setText(Path(d).name)
+            # Auto-detect game serial
+            self._auto_detect_game_id(d)
 
     def _choose_archive(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -171,6 +173,8 @@ class ImportModDialog(QDialog):
                 # Strip extension for default name
                 stem = Path(path).stem
                 self._name_edit.setText(stem)
+            # Auto-detect game serial
+            self._auto_detect_game_id(path)
 
     def _choose_file(self):
         from src.ui.mod_panel import _TYPE_META
@@ -184,6 +188,24 @@ class ImportModDialog(QDialog):
             self._src_edit.setText(path)
             if not self._name_edit.text():
                 self._name_edit.setText(Path(path).stem)
+            # Auto-detect game serial
+            self._auto_detect_game_id(path)
+
+    def _auto_detect_game_id(self, path: str):
+        """Auto-fill Game ID and Name if a PS2 serial is detected in the filename."""
+        if self._gameid_edit.text():
+            return  # don't overwrite user-entered value
+        try:
+            from src.core.game_registry import detect_game_serial_from_file, serial_to_display
+            serial = detect_game_serial_from_file(path)
+            if serial:
+                self._gameid_edit.setText(serial)
+                # Show a helpful tooltip with the known game title
+                title = serial_to_display(serial)
+                self._gameid_edit.setToolTip(title)
+                self._gameid_edit.setPlaceholderText(title)
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # Accept
@@ -249,6 +271,13 @@ class EditModDialog(QDialog):
 
         self._gameid_edit = QLineEdit(self.mod.game_id)
         self._gameid_edit.setPlaceholderText("e.g. SLUS-20062")
+        # Show known game title as tooltip if available
+        try:
+            from src.core.game_registry import serial_to_display
+            if self.mod.game_id:
+                self._gameid_edit.setToolTip(serial_to_display(self.mod.game_id))
+        except ImportError:
+            pass
         form.addRow("Game ID:", self._gameid_edit)
 
         self._tags_edit = QLineEdit(", ".join(self.mod.tags))

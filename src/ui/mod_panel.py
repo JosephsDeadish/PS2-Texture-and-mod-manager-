@@ -138,21 +138,41 @@ class ModPanel(BasePanel):
 
         content.addLayout(toolbar)
 
+        # ---- Author filter row ----
+        author_row = QHBoxLayout()
+        author_row.setSpacing(6)
+
+        author_label = QLabel("👤 Author:")
+        author_label.setStyleSheet("color: #7070a0; font-size: 12px;")
+        author_row.addWidget(author_label)
+
+        self._author_filter = QComboBox()
+        self._author_filter.setMinimumWidth(160)
+        self._author_filter.addItem("All Authors", "")
+        self._author_filter.currentIndexChanged.connect(self._apply_filter)
+        author_row.addWidget(self._author_filter)
+
+        refresh_authors_btn = QPushButton("↺")
+        refresh_authors_btn.setFixedWidth(28)
+        refresh_authors_btn.setToolTip("Refresh author list")
+        refresh_authors_btn.clicked.connect(self._refresh_author_filter)
+        author_row.addWidget(refresh_authors_btn)
+
+        author_row.addStretch()
+
         # ---- Enable-all / Disable-all ----
-        bulk_row = QHBoxLayout()
-        bulk_row.setSpacing(6)
         enable_all = QPushButton("✅ Enable All")
         enable_all.setObjectName("success_btn")
         enable_all.clicked.connect(self._enable_all)
-        bulk_row.addWidget(enable_all)
+        author_row.addWidget(enable_all)
         disable_all = QPushButton("🚫 Disable All")
         disable_all.clicked.connect(self._disable_all)
-        bulk_row.addWidget(disable_all)
-        bulk_row.addStretch()
+        author_row.addWidget(disable_all)
+
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
-        bulk_row.addWidget(self._count_lbl)
-        content.addLayout(bulk_row)
+        author_row.addWidget(self._count_lbl)
+        content.addLayout(author_row)
 
         # ---- Scroll area for mod items ----
         self._scroll = QScrollArea()
@@ -166,6 +186,7 @@ class ModPanel(BasePanel):
         self._scroll.setWidget(self._list_container)
         content.addWidget(self._scroll, 1)
 
+        self._refresh_author_filter()
         self.refresh()
 
     # ------------------------------------------------------------------
@@ -173,10 +194,38 @@ class ModPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def refresh(self):
+        self._refresh_author_filter()
         self._apply_filter()
+
+    def _refresh_author_filter(self):
+        """Rebuild the author dropdown from the current mod list."""
+        current = self._author_filter.currentData() or ""
+        self._author_filter.blockSignals(True)
+        self._author_filter.clear()
+        self._author_filter.addItem("All Authors", "")
+
+        authors = sorted(
+            {m.author for m in self.db.by_type(self.mod_type) if m.author and m.author != "Unknown"},
+        )
+        for a in authors:
+            # Mark favorite authors with a heart
+            is_fav = (
+                hasattr(self, "config")
+                and self.config
+                and a in getattr(self.config, "favorite_authors", [])
+            )
+            label = f"❤ {a}" if is_fav else a
+            self._author_filter.addItem(label, a)
+
+        # Restore previous selection
+        idx = self._author_filter.findData(current)
+        if idx >= 0:
+            self._author_filter.setCurrentIndex(idx)
+        self._author_filter.blockSignals(False)
 
     def _apply_filter(self):
         query = self._search.text().lower()
+        author_filter = self._author_filter.currentData() or ""
         mods = self.db.by_type(self.mod_type)
         sort_idx = self._sort_combo.currentIndex()
 
@@ -188,6 +237,9 @@ class ModPanel(BasePanel):
                 or (m.game_id and query in m.game_id.lower())
                 or (m.description and query in m.description.lower())
             ]
+
+        if author_filter:
+            mods = [m for m in mods if m.author == author_filter]
 
         sort_keys = [
             lambda m: m.name.lower(),

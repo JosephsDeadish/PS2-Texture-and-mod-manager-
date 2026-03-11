@@ -105,6 +105,7 @@ class AppConfig:
     check_updates_on_start: bool = True
     show_conflict_warnings: bool = True
     first_run: bool = True
+    favorite_authors: list = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -119,6 +120,7 @@ class AppConfig:
             "check_updates_on_start": self.check_updates_on_start,
             "show_conflict_warnings": self.show_conflict_warnings,
             "first_run": self.first_run,
+            "favorite_authors": self.favorite_authors,
         }
 
     @classmethod
