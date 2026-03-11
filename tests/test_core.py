@@ -1303,6 +1303,153 @@ class TestShadowedMods(unittest.TestCase):
         self.assertNotIn(low.id, shadowed)
 
 
+class TestInstalledAtTimestamp(unittest.TestCase):
+    """Tests for the installed_at timestamp field added to ModInfo."""
+
+    def test_installed_at_defaults_to_now(self):
+        """A freshly created ModInfo should have installed_at close to now."""
+        import time
+        before = time.time()
+        mod = ModInfo(id="ts-1", name="Test", mod_type=ModType.TEXTURE_PACK, path="/tmp")
+        after = time.time()
+        self.assertGreaterEqual(mod.installed_at, before)
+        self.assertLessEqual(mod.installed_at, after)
+
+    def test_installed_at_roundtrip(self):
+        """installed_at survives a to_dict/from_dict round-trip."""
+        mod = ModInfo(
+            id="ts-2", name="RT", mod_type=ModType.PNACH, path="/tmp",
+            installed_at=1_700_000_000.0,
+        )
+        d = mod.to_dict()
+        self.assertAlmostEqual(d["installed_at"], 1_700_000_000.0)
+        mod2 = ModInfo.from_dict(d)
+        self.assertAlmostEqual(mod2.installed_at, 1_700_000_000.0)
+
+    def test_installed_at_json_roundtrip(self):
+        """installed_at survives JSON serialisation."""
+        mod = ModInfo(
+            id="ts-3", name="JSON", mod_type=ModType.CHEAT, path="/tmp",
+            installed_at=1_710_000_000.5,
+        )
+        raw = json.dumps(mod.to_dict())
+        d = json.loads(raw)
+        mod2 = ModInfo.from_dict(d)
+        self.assertAlmostEqual(mod2.installed_at, 1_710_000_000.5, places=1)
+
+    def test_install_from_folder_sets_installed_at(self):
+        """install_from_folder should record a non-zero installed_at timestamp."""
+        import time
+        tmpdir = tempfile.mkdtemp()
+        try:
+            import src.core.config_manager as cm
+            cm.MODS_DB_FILE = Path(tmpdir) / "mods.json"
+            cm.THUMBNAILS_DIR = Path(tmpdir) / "thumbs"
+
+            db = ModDatabase()
+            mgr = ModManager(db)
+
+            src_dir = Path(tmpdir) / "src"
+            src_dir.mkdir()
+            (src_dir / "patch.pnach").write_text("//comment\n")
+
+            before = time.time()
+            mod = mgr.install_from_folder(
+                str(src_dir), ModType.PNACH, tmpdir, name="Test Patch"
+            )
+            after = time.time()
+
+            self.assertGreaterEqual(mod.installed_at, before)
+            self.assertLessEqual(mod.installed_at, after)
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def test_recently_added_sorted_by_installed_at(self):
+        """Sorting db.all() by installed_at descending gives newest-first order."""
+        mods = [
+            ModInfo(id=f"ra-{i}", name=f"Mod {i}", mod_type=ModType.TEXTURE_PACK,
+                    path="/tmp", installed_at=float(i))
+            for i in range(5)
+        ]
+        sorted_mods = sorted(mods, key=lambda m: m.installed_at, reverse=True)
+        self.assertEqual(sorted_mods[0].id, "ra-4")
+        self.assertEqual(sorted_mods[-1].id, "ra-0")
+
+
+class TestBrowseCatalogueEntries(unittest.TestCase):
+    """Tests for the expanded browse catalogue."""
+
+    def _load_catalogue(self):
+        """Import and return the CATALOGUE list from browse_panel."""
+        # We can't import PyQt6 in the test env, so we parse the file directly
+        # and load just the IDs from the catalogue
+        import ast
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        # Extract all "id": "..." values from CATALOGUE
+        ids = []
+        for line in src.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('"id":'):
+                val = stripped.split(":", 1)[1].strip().strip('",').strip()
+                ids.append(val)
+        return ids
+
+    def test_game_specific_texture_entries_present(self):
+        """Catalogue should include game-specific texture pack entries."""
+        ids = self._load_catalogue()
+        game_entries = [
+            "spyro_etd_textures",
+            "crash_woc_textures",
+            "gow1_textures",
+            "ffx_textures",
+            "kh1_textures",
+            "kh2_textures",
+            "sotc_textures",
+            "gt4_textures",
+            "dmc3_textures",
+            "ratchet_clank_textures",
+            "jak_daxter_textures",
+            "dbz_bt3_textures",
+            "gta_sa_textures",
+            "ico_textures",
+        ]
+        for entry_id in game_entries:
+            self.assertIn(entry_id, ids, f"Missing catalogue entry: {entry_id}")
+
+    def test_game_specific_pnach_entries_present(self):
+        """Catalogue should include game-specific PNACH patch entries."""
+        ids = self._load_catalogue()
+        pnach_entries = [
+            "gow_widescreen_pnach",
+            "kh_widescreen_pnach",
+            "ffx_widescreen_pnach",
+            "gt4_widescreen_pnach",
+            "crash_woc_pnach",
+            "sotc_pnach",
+        ]
+        for entry_id in pnach_entries:
+            self.assertIn(entry_id, ids, f"Missing PNACH entry: {entry_id}")
+
+    def test_game_specific_cover_art_entries_present(self):
+        """Catalogue should include game-specific cover art entries."""
+        ids = self._load_catalogue()
+        cover_entries = [
+            "cover_art_popular_us",
+            "cover_art_popular_eu",
+        ]
+        for entry_id in cover_entries:
+            self.assertIn(entry_id, ids, f"Missing cover art entry: {entry_id}")
+
+    def test_no_duplicate_ids(self):
+        """All catalogue entry IDs must be unique."""
+        ids = self._load_catalogue()
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate catalogue IDs found")
+
+    def test_total_catalogue_size(self):
+        """Catalogue should have at least 40 entries (21 original + 22 new game-specific)."""
+        ids = self._load_catalogue()
+        self.assertGreaterEqual(len(ids), 40, f"Expected ≥40 entries, got {len(ids)}")
 
 
 if __name__ == "__main__":

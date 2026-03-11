@@ -465,6 +465,435 @@ CATALOGUE: List[dict] = [
         "download_action": "",
         "upscale_tech": "",
     },
+    # ── Game-Specific Texture Packs ───────────────────────────────────────────
+    {
+        "id": "spyro_etd_textures",
+        "name": "Spyro: Enter the Dragonfly — HD Textures",
+        "description": (
+            "Community HD texture pack for Spyro: Enter the Dragonfly (SLUS-20309). "
+            "Browse GBAtemp and LoversLab for upscaled packs using ESRGAN and xBRZ."
+        ),
+        "context": "Search for 'Spyro Enter Dragonfly texture' on GBAtemp or LoversLab for community uploads.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=spyro+ps2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Spyro: Enter the Dragonfly",
+        "thumbnail_url": "",
+        "tags": ["spyro", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "crash_woc_textures",
+        "name": "Crash Bandicoot: Wrath of Cortex — HD Textures",
+        "description": (
+            "HD texture replacement packs for Crash Bandicoot: The Wrath of Cortex (SLUS-20238). "
+            "Community-made packs with ESRGAN-upscaled character and environment textures."
+        ),
+        "context": "Check GBAtemp and the PCSX2 forums for Crash texture packs — authors often list upscale model and settings.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=crash+bandicoot+ps2+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Crash Bandicoot: Wrath of Cortex",
+        "thumbnail_url": "",
+        "tags": ["crash", "hd", "esrgan", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "gow1_textures",
+        "name": "God of War — HD Texture Pack",
+        "description": (
+            "HD texture replacements for God of War (SCUS-97399). "
+            "Community authors have produced high-quality upscales of Kratos, environments, and enemies."
+        ),
+        "context": "LoversLab and GBAtemp have several GoW packs. Authors typically note recommended PCSX2 renderer (OpenGL/Vulkan).",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=god+of+war+ps2+texture&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "God of War",
+        "thumbnail_url": "",
+        "tags": ["god-of-war", "gow", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "ffx_textures",
+        "name": "Final Fantasy X — HD Texture Replacements",
+        "description": (
+            "Community HD texture packs for Final Fantasy X (SLUS-20312). "
+            "Browse packs covering characters, menus, FMV upscales and environment retextures."
+        ),
+        "context": "Several authors on GBAtemp and PCSX2 forums have published FFX packs; check thread dates for compatibility with recent PCSX2 nightly builds.",
+        "author": "PCSX2 Community",
+        "author_url": "https://forums.pcsx2.net",
+        "url": "https://forums.pcsx2.net/search?q=final+fantasy+x+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "PCSX2 Forums",
+        "game": "Final Fantasy X",
+        "thumbnail_url": "",
+        "tags": ["final-fantasy", "ffx", "hd", "jrpg", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / Waifu2x",
+    },
+    {
+        "id": "kh1_textures",
+        "name": "Kingdom Hearts — HD Texture Pack",
+        "description": (
+            "HD texture replacements for Kingdom Hearts (SLUS-20370). "
+            "Upscaled character, world, and UI textures from the community."
+        ),
+        "context": "Check GBAtemp and LoversLab for KH texture packs. Many authors use ESRGAN with anime-tuned models for the distinct art style.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=kingdom+hearts+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Kingdom Hearts",
+        "thumbnail_url": "",
+        "tags": ["kingdom-hearts", "kh", "disney", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN (anime model)",
+    },
+    {
+        "id": "kh2_textures",
+        "name": "Kingdom Hearts II — HD Texture Pack",
+        "description": (
+            "HD texture replacements for Kingdom Hearts II (SLUS-21005). "
+            "Community-upscaled textures for characters, worlds, and menus."
+        ),
+        "context": "Multiple authors have published KH2 texture packs on GBAtemp and LoversLab. Check for author's recommended PCSX2 resolution and renderer.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=kingdom+hearts+2+texture&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Kingdom Hearts II",
+        "thumbnail_url": "",
+        "tags": ["kingdom-hearts", "kh2", "disney", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN (anime model)",
+    },
+    {
+        "id": "sotc_textures",
+        "name": "Shadow of the Colossus — HD Textures",
+        "description": (
+            "Community HD texture replacements for Shadow of the Colossus (SCUS-97472). "
+            "Upscaled environment, colossus and Wander textures."
+        ),
+        "context": "One of the most-requested PS2 texture projects. Look for packs on GBAtemp and Reddit r/ps2 for latest releases.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=shadow+colossus+texture",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Reddit",
+        "game": "Shadow of the Colossus",
+        "thumbnail_url": "",
+        "tags": ["shadow-of-the-colossus", "sotc", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "gt4_textures",
+        "name": "Gran Turismo 4 — HD Car & Track Textures",
+        "description": (
+            "Community HD texture packs for Gran Turismo 4 (SCUS-97436). "
+            "Upscaled car liveries, track environments and UI elements."
+        ),
+        "context": "GT4 texture packs often ship with per-car files. Check the GBAtemp GT4 thread for author-curated download links and install instructions.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=gran+turismo+4+texture&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Gran Turismo 4",
+        "thumbnail_url": "",
+        "tags": ["gran-turismo", "gt4", "racing", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "dmc3_textures",
+        "name": "Devil May Cry 3 — HD Texture Pack",
+        "description": (
+            "HD texture replacements for Devil May Cry 3 (SLUS-21048). "
+            "Character, environment and menu upscales from the community."
+        ),
+        "context": "Check LoversLab and GBAtemp for DMC3 texture packs. The game's high-contrast art style responds well to ESRGAN upscaling.",
+        "author": "LoversLab Community",
+        "author_url": "https://www.loverslab.com",
+        "url": "https://www.loverslab.com/search/#q=devil+may+cry+ps2+texture&type=downloads",
+        "type": ModType.TEXTURE_PACK,
+        "source": "LoversLab",
+        "game": "Devil May Cry 3",
+        "thumbnail_url": "",
+        "tags": ["devil-may-cry", "dmc3", "action", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "ratchet_clank_textures",
+        "name": "Ratchet & Clank — HD Texture Pack",
+        "description": (
+            "Community HD textures for Ratchet & Clank (SCUS-97199) and its sequels. "
+            "Upscaled character, weapon and planet textures."
+        ),
+        "context": "Insomniac's colourful art style upscales very well. Check GBAtemp for packs covering R&C, Going Commando and Up Your Arsenal.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=ratchet+clank+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Ratchet & Clank",
+        "thumbnail_url": "",
+        "tags": ["ratchet-clank", "insomniac", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "xBRZ / ESRGAN",
+    },
+    {
+        "id": "jak_daxter_textures",
+        "name": "Jak and Daxter — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Jak and Daxter: The Precursor Legacy (SCUS-97124). "
+            "Upscaled environment, character and UI textures."
+        ),
+        "context": "Jak and Daxter's open world responds beautifully to HD textures. Look on GBAtemp for author posts with recommended settings.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=jak+daxter+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Jak and Daxter",
+        "thumbnail_url": "",
+        "tags": ["jak-daxter", "naughty-dog", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "xBRZ / ESRGAN",
+    },
+    {
+        "id": "dbz_bt3_textures",
+        "name": "Dragon Ball Z: Budokai Tenkaichi 3 — HD Textures",
+        "description": (
+            "Community HD texture pack for DBZ Budokai Tenkaichi 3 (SLUS-21678). "
+            "Upscaled character, arena, and UI textures."
+        ),
+        "context": "One of the most popular PS2 games for texture modding. Multiple authors have published packs on GBAtemp covering different character rosters.",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=budokai+tenkaichi+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "Dragon Ball Z: Budokai Tenkaichi 3",
+        "thumbnail_url": "",
+        "tags": ["dbz", "dragon-ball", "fighting", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    {
+        "id": "gta_sa_textures",
+        "name": "GTA San Andreas — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Grand Theft Auto: San Andreas (SLUS-20946). "
+            "Upscaled world, character and vehicle textures for use in PCSX2."
+        ),
+        "context": "SA texture packs are very popular. Check GBAtemp and the PCSX2 forums for the latest releases; some packs are split by region (city/countryside).",
+        "author": "GBAtemp Community",
+        "author_url": "https://gbatemp.net",
+        "url": "https://gbatemp.net/search/?q=gta+san+andreas+texture+ps2&t=post",
+        "type": ModType.TEXTURE_PACK,
+        "source": "GBAtemp",
+        "game": "GTA San Andreas",
+        "thumbnail_url": "",
+        "tags": ["gta", "san-andreas", "open-world", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN / xBRZ",
+    },
+    {
+        "id": "ico_textures",
+        "name": "Ico — HD Texture Pack",
+        "description": (
+            "Community HD texture replacements for Ico (SCUS-97113). "
+            "Upscaled castle, character, and atmospheric environment textures."
+        ),
+        "context": "Ico's minimalist art style makes it a great candidate for HD textures. Check Reddit r/ps2 and GBAtemp for community packs.",
+        "author": "Reddit r/ps2",
+        "author_url": "https://www.reddit.com/r/ps2",
+        "url": "https://www.reddit.com/r/ps2/search/?q=ico+texture+pack",
+        "type": ModType.TEXTURE_PACK,
+        "source": "Reddit",
+        "game": "Ico",
+        "thumbnail_url": "",
+        "tags": ["ico", "adventure", "hd", "ps2"],
+        "download_action": "",
+        "upscale_tech": "ESRGAN",
+    },
+    # ── Game-Specific PNACH Patches ───────────────────────────────────────────
+    {
+        "id": "gow_widescreen_pnach",
+        "name": "God of War I & II — Widescreen Patches",
+        "description": (
+            "Widescreen (16:9) and 60fps patches for God of War I (SCUS-97399) and "
+            "God of War II (SCUS-97402) as PNACH files."
+        ),
+        "context": "Download the .pnach file and place it in your PCSX2 cheats folder, or import it here using the PNACH panel.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
+        "url": "https://ps2wide.net/pc10.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "God of War",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "gow", "pnach", "16:9", "ps2wide"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "kh_widescreen_pnach",
+        "name": "Kingdom Hearts I & II — Widescreen Patches",
+        "description": (
+            "Widescreen (16:9) PNACH patches for Kingdom Hearts (SLUS-20370) and "
+            "Kingdom Hearts II (SLUS-21005)."
+        ),
+        "context": "PS2Wide hosts the definitive widescreen patches. Import the .pnach into the PNACH panel and deploy to your PCSX2 cheats folder.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
+        "url": "https://ps2wide.net/pc10.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Kingdom Hearts",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "kingdom-hearts", "pnach", "16:9"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "ffx_widescreen_pnach",
+        "name": "Final Fantasy X — Widescreen + 60fps Patches",
+        "description": (
+            "Widescreen and 60fps PNACH patches for Final Fantasy X (SLUS-20312) and "
+            "Final Fantasy XII (SLUS-20963)."
+        ),
+        "context": "Download the specific PNACH for your game region from PS2Wide, then import it into the PNACH panel.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
+        "url": "https://ps2wide.net/pc10.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Final Fantasy X / XII",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "final-fantasy", "ffx", "pnach", "60fps"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "gt4_widescreen_pnach",
+        "name": "Gran Turismo 4 — Widescreen Patch",
+        "description": (
+            "Widescreen (16:9) PNACH patch for Gran Turismo 4 (SCUS-97436). "
+            "Removes the black bars for a true 16:9 racing experience."
+        ),
+        "context": "One of the most-requested GT4 patches. Get the .pnach from PS2Wide and import it using the PNACH panel.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
+        "url": "https://ps2wide.net/pc10.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Gran Turismo 4",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "gran-turismo", "gt4", "racing", "pnach"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "crash_woc_pnach",
+        "name": "Crash Bandicoot: Wrath of Cortex — 60fps Patch",
+        "description": (
+            "60fps and widescreen PNACH patches for Crash Bandicoot: The Wrath of Cortex (SLUS-20238). "
+            "Improves the notoriously slow PS2 version."
+        ),
+        "context": "The 60fps patch significantly improves feel. Grab the .pnach from the PCSX2 widescreen patches GitHub or PS2Wide.",
+        "author": "PCSX2 Community",
+        "author_url": "https://github.com/PCSX2",
+        "url": "https://github.com/PCSX2/PCSX2-Widescreen-Patches",
+        "type": ModType.PNACH,
+        "source": "GitHub",
+        "game": "Crash Bandicoot: Wrath of Cortex",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "crash-bandicoot", "60fps", "pnach"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    {
+        "id": "sotc_pnach",
+        "name": "Shadow of the Colossus — Widescreen + 60fps",
+        "description": (
+            "Widescreen and 60fps PNACH patches for Shadow of the Colossus (SCUS-97472). "
+            "Makes the game feel dramatically smoother at 16:9."
+        ),
+        "context": "The 60fps patch is one of the best PCSX2 experiences available. Find the patch file on PS2Wide or the PCSX2 GitHub widescreen patches repository.",
+        "author": "PS2Wide Community",
+        "author_url": "https://ps2wide.net",
+        "url": "https://ps2wide.net/pc10.html",
+        "type": ModType.PNACH,
+        "source": "PS2Wide",
+        "game": "Shadow of the Colossus",
+        "thumbnail_url": "",
+        "tags": ["widescreen", "shadow-of-the-colossus", "sotc", "60fps", "pnach"],
+        "download_action": "",
+        "upscale_tech": "",
+    },
+    # ── Game-Specific Cover Art ───────────────────────────────────────────────
+    {
+        "id": "cover_art_popular_us",
+        "name": "PS2 Cover Art — Popular US Titles (GameTDB)",
+        "description": (
+            "Download cover art for popular US PS2 titles from GameTDB by entering "
+            "the game serial ID (e.g. SLUS-20062). GameTDB provides free, "
+            "high-quality cover scans."
+        ),
+        "context": (
+            "Popular serials: Spyro EtD=SLUS-20309, Crash WoC=SLUS-20238, GoW=SCUS-97399, "
+            "GT4=SCUS-97436, FFX=SLUS-20312, KH1=SLUS-20370, KH2=SLUS-21005, "
+            "SotC=SCUS-97472, GTA SA=SLUS-20946."
+        ),
+        "author": "GameTDB",
+        "author_url": "https://www.gametdb.com",
+        "url": "https://www.gametdb.com/PS2",
+        "type": ModType.COVER_ART,
+        "source": "GameTDB",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cover-art", "gametdb", "official", "us"],
+        "download_action": "cover_by_id",
+        "upscale_tech": "",
+    },
+    {
+        "id": "cover_art_popular_eu",
+        "name": "PS2 Cover Art — Popular EU/PAL Titles (GameTDB)",
+        "description": (
+            "Download PAL region cover art for PS2 games from GameTDB. "
+            "Enter the SLES or SCES serial to get the EU cover."
+        ),
+        "context": (
+            "Popular PAL serials: GoW=SCES-53133, GT4=SCES-51719, FFX=SLES-50490, "
+            "KH1=SLES-51152, KH2=SLES-54114, SotC=SCES-53326."
+        ),
+        "author": "GameTDB",
+        "author_url": "https://www.gametdb.com",
+        "url": "https://www.gametdb.com/PS2",
+        "type": ModType.COVER_ART,
+        "source": "GameTDB",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["cover-art", "gametdb", "pal", "eu"],
+        "download_action": "cover_by_id",
+        "upscale_tech": "",
+    },
 ]
 
 # Collect unique sources for the source filter dropdown
@@ -1085,6 +1514,12 @@ class BrowsePanel(BasePanel):
         )
         dl_btn.clicked.connect(self._open_download_dialog)
         toolbar.addWidget(dl_btn)
+
+        reload_btn = QPushButton("🔄 Reload")
+        reload_btn.setToolTip("Clear all filters and reload the catalogue")
+        reload_btn.clicked.connect(self._reload_catalogue)
+        toolbar.addWidget(reload_btn)
+
         content.addLayout(toolbar)
 
         # ── Filter row ───────────────────────────────────────────────────
@@ -1225,6 +1660,17 @@ class BrowsePanel(BasePanel):
         from PyQt6.QtGui import QDesktopServices
         from PyQt6.QtCore import QUrl
         QDesktopServices.openUrl(QUrl(url))
+
+    def _reload_catalogue(self):
+        """Clear all filters and reset the catalogue view."""
+        self._search.blockSignals(True)
+        self._search.clear()
+        self._search.blockSignals(False)
+        self._source_filter.setCurrentIndex(0)
+        self._author_filter.setCurrentIndex(0)
+        self._favs_check.setChecked(False)
+        self._apply_filters()
+        self.emit_status("Catalogue reloaded")
 
     def refresh(self):
         self._apply_filters()

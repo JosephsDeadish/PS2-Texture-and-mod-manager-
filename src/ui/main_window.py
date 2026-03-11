@@ -317,4 +317,15 @@ class MainWindow(QMainWindow):
                 f"🔔 {count} mod update(s) available — check individual mod panels for details",
                 10_000,
             )
+            # Refresh all mod panels so "↑ Update" badges appear immediately
+            for panel in (
+                self._texture_panel,
+                self._pnach_panel,
+                self._cover_panel,
+                self._cheat_panel,
+            ):
+                try:
+                    panel._apply_filter()
+                except Exception:
+                    pass
 

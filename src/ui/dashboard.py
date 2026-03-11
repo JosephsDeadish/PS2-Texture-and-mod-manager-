@@ -1,5 +1,6 @@
 """Dashboard panel — overview and quick stats."""
 
+import time
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QFrame,
@@ -180,6 +181,69 @@ class DashboardPanel(BasePanel):
             cfg_layout.addLayout(row)
 
         content.addWidget(cfg_frame)
+
+        # ---- Recently Added ----
+        recent_all = sorted(self.db.all(), key=lambda m: getattr(m, "installed_at", 0), reverse=True)
+        recent = recent_all[:6]
+        if recent:
+            recent_frame = QFrame()
+            recent_frame.setObjectName("card")
+            recent_layout = QVBoxLayout(recent_frame)
+            recent_layout.setContentsMargins(16, 12, 16, 12)
+            recent_layout.setSpacing(6)
+
+            recent_title = QLabel("🕐  Recently Added")
+            recent_title.setStyleSheet("font-weight: bold; color: #b0b0d0; font-size: 14px;")
+            recent_layout.addWidget(recent_title)
+
+            _type_icons = {
+                "texture_pack": "🎨",
+                "pnach": "🔧",
+                "cover_art": "🖼️",
+                "save_file": "💾",
+                "cheat": "⚡",
+            }
+
+            for mod in recent:
+                row = QHBoxLayout()
+                type_icon = _type_icons.get(mod.mod_type.value, "📦")
+                icon_lbl = QLabel(type_icon)
+                icon_lbl.setFixedWidth(24)
+                icon_lbl.setStyleSheet("font-size: 14px;")
+                row.addWidget(icon_lbl)
+
+                name_lbl = QLabel(mod.name)
+                name_lbl.setStyleSheet("color: #d0d0e8; font-size: 12px;")
+                row.addWidget(name_lbl, 1)
+
+                if mod.author and mod.author != "Unknown":
+                    auth_lbl = QLabel(f"by {mod.author}")
+                    auth_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+                    row.addWidget(auth_lbl)
+
+                ts = getattr(mod, "installed_at", 0)
+                if ts:
+                    from datetime import datetime
+                    try:
+                        dt = datetime.fromtimestamp(ts)
+                        time_str = dt.strftime("%b %d, %H:%M")
+                    except Exception:
+                        time_str = ""
+                    if time_str:
+                        time_lbl = QLabel(time_str)
+                        time_lbl.setStyleSheet("color: #50507a; font-size: 10px;")
+                        row.addWidget(time_lbl)
+
+                enabled_dot = QLabel("●" if mod.enabled else "○")
+                enabled_dot.setStyleSheet(
+                    "color: #22c870; font-size: 10px;" if mod.enabled else "color: #555570; font-size: 10px;"
+                )
+                enabled_dot.setToolTip("Enabled" if mod.enabled else "Disabled")
+                row.addWidget(enabled_dot)
+
+                recent_layout.addLayout(row)
+
+            content.addWidget(recent_frame)
 
         # ---- Patreon / About banner ----
         about_frame = QFrame()

@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 import json
+import time
 
 
 class ModType(Enum):
@@ -41,6 +42,7 @@ class ModInfo:
     size_bytes: int = 0
     installed: bool = True
     has_update: bool = False
+    installed_at: float = field(default_factory=time.time)  # Unix timestamp
 
     def to_dict(self) -> dict:
         return {
@@ -62,6 +64,7 @@ class ModInfo:
             "size_bytes": self.size_bytes,
             "installed": self.installed,
             "has_update": self.has_update,
+            "installed_at": self.installed_at,
         }
 
     @classmethod
