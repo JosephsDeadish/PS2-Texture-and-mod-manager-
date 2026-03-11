@@ -1842,8 +1842,8 @@ class TestPcsx2Layout(unittest.TestCase):
 # AppConfig new fields
 # =============================================================================
 
-class TestAppConfigNewFields(unittest.TestCase):
-    """Tests for partial_textures_path field and auto_deploy removal from AppConfig."""
+class TestAppConfigFieldChanges(unittest.TestCase):
+    """Tests for AppConfig field changes: partial_textures_path added, auto_deploy removed."""
 
     def test_default_partial_textures_path(self):
         cfg = AppConfig()
@@ -1866,7 +1866,8 @@ class TestAppConfigNewFields(unittest.TestCase):
         self.assertEqual(restored.partial_textures_path, "/pt")
 
     def test_from_dict_old_config_no_crash(self):
-        """Old configs (including stale auto_deploy key) should not crash."""
+        """Old configs (including stale auto_deploy key) should not crash and
+        must not create an auto_deploy attribute on the loaded config."""
         old_data = {
             "pcsx2_path": "/foo",
             "textures_path": "/tex",
@@ -1885,6 +1886,8 @@ class TestAppConfigNewFields(unittest.TestCase):
         }
         cfg = AppConfig.from_dict(old_data)
         self.assertEqual(cfg.partial_textures_path, "")
+        # Stale key must be dropped — not available as an attribute
+        self.assertFalse(hasattr(cfg, "auto_deploy"))
 
 
 # =============================================================================
@@ -1979,3 +1982,124 @@ class TestDetectPcsx2Paths(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# =============================================================================
+# Deploy-on-toggle behaviour (auto_deploy removed, always automatic)
+# =============================================================================
+
+class TestSetEnabledAutoDeployBehaviour(unittest.TestCase):
+    """
+    Verify that set_enabled() automatically deploys / undeploys mods.
+
+    When a config with a valid target path is supplied:
+    - Enabling a mod triggers a deploy to the target folder.
+    - Disabling a mod removes its files and re-deploys remaining mods.
+
+    When config is None (DB-only mode, used in tests that don't need FS):
+    - The enabled flag is still toggled correctly.
+    - No filesystem operations are attempted.
+    """
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_db_file = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig_db_file
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_pnach_mod(self, crc="AABBCCDD"):
+        """Create a real .pnach file on disk and register it."""
+        src_dir = Path(self.tmpdir) / "mod_src"
+        src_dir.mkdir(exist_ok=True)
+        pnach_file = src_dir / f"{crc}.pnach"
+        pnach_file.write_text(f"// pnach for {crc}\n[{crc}]\npatch=1,EE,002345AA,word,00000001\n")
+        db = ModDatabase()
+        mgr = ModManager(db)
+        mod = mgr.install_from_folder(
+            source_path=str(src_dir),
+            mod_type=ModType.PNACH,
+            dest_base=str(Path(self.tmpdir) / "storage"),
+        )
+        return db, mgr, mod
+
+    def test_set_enabled_toggles_flag_no_config(self):
+        """Without a config, set_enabled still flips the DB flag."""
+        db = ModDatabase()
+        mgr = ModManager(db)
+        mod = ModInfo(id="m1", name="T", mod_type=ModType.TEXTURE_PACK, path="/p", enabled=True)
+        db.add(mod)
+
+        count, warnings = mgr.set_enabled("m1", False)
+        self.assertFalse(db.get("m1").enabled)
+        self.assertEqual(count, 0)
+        self.assertEqual(warnings, [])
+
+        count, warnings = mgr.set_enabled("m1", True)
+        self.assertTrue(db.get("m1").enabled)
+        self.assertEqual(count, 0)
+        self.assertEqual(warnings, [])
+
+    def test_set_enabled_deploys_when_config_provided(self):
+        """Enabling a mod with a valid config copies files to the target dir."""
+        deploy_dir = Path(self.tmpdir) / "pcsx2_cheats"
+        deploy_dir.mkdir()
+
+        db, mgr, mod = self._make_pnach_mod("12345678")
+
+        config = AppConfig(pnach_path=str(deploy_dir))
+        count, warnings = mgr.set_enabled(mod.id, True, config)
+
+        # At least one file should have been deployed
+        deployed_files = list(deploy_dir.iterdir())
+        self.assertGreater(len(deployed_files), 0, "No files were deployed to target dir")
+        self.assertTrue(db.get(mod.id).enabled)
+
+    def test_set_enabled_false_undeploys(self):
+        """Disabling a mod removes its files from the target dir."""
+        deploy_dir = Path(self.tmpdir) / "pcsx2_cheats2"
+        deploy_dir.mkdir()
+
+        db, mgr, mod = self._make_pnach_mod("DEADBEEF")
+        config = AppConfig(pnach_path=str(deploy_dir))
+
+        # First enable → deploy
+        mgr.set_enabled(mod.id, True, config)
+        self.assertGreater(len(list(deploy_dir.iterdir())), 0)
+
+        # Now disable → undeploy
+        mgr.set_enabled(mod.id, False, config)
+        self.assertFalse(db.get(mod.id).enabled)
+        # After disabling the only mod, no .pnach files should remain
+        remaining = [f for f in deploy_dir.iterdir() if f.suffix == ".pnach"]
+        self.assertEqual(len(remaining), 0, f"Stale pnach files remain: {remaining}")
+
+    def test_set_enabled_no_path_returns_warning(self):
+        """When config path is empty, a warning is returned (no crash)."""
+        db, mgr, mod = self._make_pnach_mod()
+        config = AppConfig(pnach_path="")  # path not configured
+
+        count, warnings = mgr.set_enabled(mod.id, True, config)
+        self.assertEqual(count, 0)
+        self.assertTrue(len(warnings) > 0, "Expected a warning when path not configured")
+
+    def test_no_auto_deploy_field_on_app_config(self):
+        """AppConfig no longer has an auto_deploy field — deployment is always on."""
+        cfg = AppConfig()
+        self.assertFalse(hasattr(cfg, "auto_deploy"),
+                         "auto_deploy was removed; deployment is always automatic")
+
+    def test_from_dict_ignores_stale_auto_deploy_key(self):
+        """Old saved configs that contain auto_deploy must load without error."""
+        old_dict = {
+            "pcsx2_path": "/pcsx2",
+            "pnach_path": "/cheats",
+            "auto_deploy": True,   # stale key from old version
+        }
+        cfg = AppConfig.from_dict(old_dict)
+        self.assertEqual(cfg.pnach_path, "/cheats")
+        self.assertFalse(hasattr(cfg, "auto_deploy"))

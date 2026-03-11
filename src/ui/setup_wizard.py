@@ -215,7 +215,7 @@ class SetupWizard(QDialog):
         layout.addWidget(_h("Mod Storage Location"))
         layout.addWidget(_p(
             "Choose where PS2 Mod Manager will store downloaded/imported mods.\n"
-            "Enabling a mod automatically copies it to PCSX2; disabling removes it."
+            "Enabling a mod copies it to PCSX2; disabling removes it."
         ))
 
         from src.core.config_manager import get_data_dir

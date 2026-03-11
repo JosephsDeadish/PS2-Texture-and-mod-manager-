@@ -99,7 +99,7 @@ class SettingsPanel(BasePanel):
 
         deploy_note = QLabel(
             "ℹ  Mods are deployed to PCSX2 automatically — enabling a mod\n"
-            "copies it instantly; disabling removes it."
+            "copies it to PCSX2; disabling removes it."
         )
         deploy_note.setStyleSheet("color: #7070a0; font-size: 12px;")
         deploy_note.setWordWrap(True)
