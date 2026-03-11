@@ -88,6 +88,40 @@ class SettingsPanel(BasePanel):
 
         layout.addWidget(_sep())
 
+        # ---- Game Library ----
+        layout.addWidget(_section("Game Library"))
+
+        game_lib_note = QLabel(
+            "Select the folder where your PS2 disc images are stored\n"
+            "(ISO, CHD, BIN, IMG, MDF …).  PS2 Mod Manager will scan for game\n"
+            "serials so you can filter mods to only show what you own."
+        )
+        game_lib_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        game_lib_note.setWordWrap(True)
+        layout.addWidget(game_lib_note)
+
+        self._game_lib_chooser = PathChooser("Game Library Folder:")
+        self._game_lib_chooser.set_path(self.config.game_library_path)
+        self._game_lib_chooser.path_changed.connect(self._on_game_lib_changed)
+        layout.addWidget(self._game_lib_chooser)
+
+        scan_row = QHBoxLayout()
+        scan_btn = QPushButton("🔍 Scan Library")
+        scan_btn.setToolTip("Scan the folder for disc images and detect game serials")
+        scan_btn.clicked.connect(self._scan_game_library)
+        scan_row.addWidget(scan_btn)
+        self._game_lib_count_lbl = QLabel("")
+        self._game_lib_count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
+        scan_row.addWidget(self._game_lib_count_lbl)
+        scan_row.addStretch()
+        layout.addLayout(scan_row)
+
+        # Update label if library is already set
+        if self.config.game_library_path:
+            self._update_game_lib_label(self.config.game_library_path)
+
+        layout.addWidget(_sep())
+
         # ---- Behaviour ----
         layout.addWidget(_section("Behaviour"))
 
@@ -183,6 +217,7 @@ class SettingsPanel(BasePanel):
         self.config.cheats_path = self._cheats_chooser.get_path()
         self.config.partial_textures_path = self._partial_tex_chooser.get_path()
         self.config.mods_storage_path = self._storage_chooser.get_path()
+        self.config.game_library_path = self._game_lib_chooser.get_path()
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
         self.config.theme = self._theme_combo.currentData() or "dark"
@@ -204,6 +239,28 @@ class SettingsPanel(BasePanel):
         if app:
             apply_theme(app, theme_key)
         self.theme_changed.emit(theme_key)
+
+    def _on_game_lib_changed(self, path: str):
+        if path:
+            self._update_game_lib_label(path)
+
+    def _scan_game_library(self):
+        path = self._game_lib_chooser.get_path()
+        if not path:
+            self._game_lib_count_lbl.setText("  No folder selected")
+            return
+        self._update_game_lib_label(path)
+
+    def _update_game_lib_label(self, path: str):
+        from src.core.game_library import scan_library
+        games = scan_library(path)
+        identified = sum(1 for g in games if g.serial)
+        if games:
+            self._game_lib_count_lbl.setText(
+                f"  {len(games)} disc image(s)  —  {identified} with detected serial"
+            )
+        else:
+            self._game_lib_count_lbl.setText("  No disc images found in that folder")
 
     def _auto_detect(self):
         from src.core.config_manager import detect_pcsx2_paths
@@ -235,6 +292,9 @@ class SettingsPanel(BasePanel):
         self._cheats_chooser.set_path(config.cheats_path)
         self._partial_tex_chooser.set_path(config.partial_textures_path)
         self._storage_chooser.set_path(config.mods_storage_path)
+        self._game_lib_chooser.set_path(config.game_library_path)
+        if config.game_library_path:
+            self._update_game_lib_label(config.game_library_path)
         self._conflicts_check.setChecked(config.show_conflict_warnings)
         self._updates_check.setChecked(config.check_updates_on_start)
         idx = self._theme_combo.findData(getattr(config, "theme", "dark"))

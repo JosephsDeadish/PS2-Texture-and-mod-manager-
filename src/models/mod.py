@@ -105,6 +105,7 @@ class AppConfig:
     cheats_path: str = ""
     partial_textures_path: str = ""
     mods_storage_path: str = ""
+    game_library_path: str = ""
     theme: str = "dark"
     check_updates_on_start: bool = True
     show_conflict_warnings: bool = True
@@ -125,6 +126,7 @@ class AppConfig:
             "cheats_path": self.cheats_path,
             "partial_textures_path": self.partial_textures_path,
             "mods_storage_path": self.mods_storage_path,
+            "game_library_path": self.game_library_path,
             "theme": self.theme,
             "check_updates_on_start": self.check_updates_on_start,
             "show_conflict_warnings": self.show_conflict_warnings,

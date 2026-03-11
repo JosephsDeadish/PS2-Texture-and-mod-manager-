@@ -6,6 +6,7 @@ from typing import List
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
+    QCheckBox,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -142,7 +143,7 @@ class ModPanel(BasePanel):
 
         content.addLayout(toolbar)
 
-        # ---- Author filter row ----
+        # ---- Author + library filter row ----
         author_row = QHBoxLayout()
         author_row.setSpacing(6)
 
@@ -161,6 +162,16 @@ class ModPanel(BasePanel):
         refresh_authors_btn.setToolTip("Refresh author list")
         refresh_authors_btn.clicked.connect(self._refresh_author_filter)
         author_row.addWidget(refresh_authors_btn)
+
+        # Game library filter — only show mods for games you own
+        self._library_filter_check = QCheckBox("🎮 My Library Only")
+        self._library_filter_check.setToolTip(
+            "Show only mods whose game serial matches a disc image\n"
+            "in your Game Library folder (configure in Settings)."
+        )
+        self._library_filter_check.setStyleSheet("color: #80b0ff; font-size: 12px;")
+        self._library_filter_check.stateChanged.connect(self._apply_filter)
+        author_row.addWidget(self._library_filter_check)
 
         author_row.addStretch()
 
@@ -230,6 +241,7 @@ class ModPanel(BasePanel):
     def _apply_filter(self):
         query = self._search.text().lower()
         author_filter = self._author_filter.currentData() or ""
+        library_only = self._library_filter_check.isChecked()
         mods = self.db.by_type(self.mod_type)
         sort_idx = self._sort_combo.currentIndex()
 
@@ -244,6 +256,17 @@ class ModPanel(BasePanel):
 
         if author_filter:
             mods = [m for m in mods if m.author == author_filter]
+
+        if library_only:
+            lib_serials = self._get_library_serials()
+            if lib_serials:
+                mods = [
+                    m for m in mods
+                    if m.game_id and m.game_id.upper() in lib_serials
+                ]
+            # If library is empty / unset, show nothing to avoid confusion
+            else:
+                mods = []
 
         sort_keys = [
             lambda m: m.name.lower(),
@@ -417,6 +440,21 @@ class ModPanel(BasePanel):
             self._filter_by_author(author)
         else:
             self.navigate_to_author_type.emit(author, target_type)
+
+    def _get_library_serials(self) -> frozenset:
+        """Return the set of game serials detected in the configured game library.
+
+        Returns an empty frozenset if no library path is configured or no
+        disc images with recognisable serials are found.
+        """
+        path = getattr(self.config, "game_library_path", "")
+        if not path:
+            return frozenset()
+        try:
+            from src.core.game_library import get_library_serials
+            return get_library_serials(path)
+        except Exception:
+            return frozenset()
 
     def _filter_by_author(self, author: str):
         """Set the author filter dropdown to *author* and refresh the list."""

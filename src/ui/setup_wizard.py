@@ -35,7 +35,7 @@ class SetupWizard(QDialog):
 
     setup_complete = pyqtSignal(AppConfig)
 
-    _PAGES = ["Welcome", "PCSX2 Location", "Advanced Paths", "Mod Storage", "Done"]
+    _PAGES = ["Welcome", "PCSX2 Location", "Advanced Paths", "Mod Storage", "Game Library", "Done"]
 
     def __init__(self, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -81,6 +81,7 @@ class SetupWizard(QDialog):
         self._stack.addWidget(self._page_pcsx2())
         self._stack.addWidget(self._page_advanced())
         self._stack.addWidget(self._page_storage())
+        self._stack.addWidget(self._page_game_library())
         self._stack.addWidget(self._page_done())
         root.addWidget(self._stack, 1)
 
@@ -253,6 +254,85 @@ class SetupWizard(QDialog):
         layout.addStretch()
         return w
 
+    def _page_game_library(self) -> QWidget:
+        w = QWidget()
+        layout = QVBoxLayout(w)
+        layout.setContentsMargins(40, 24, 40, 20)
+        layout.setSpacing(12)
+
+        layout.addWidget(_h("Game Library  (optional)"))
+        layout.addWidget(_p(
+            "Point PS2 Mod Manager to the folder where your PS2 disc images are stored\n"
+            "(ISO, CHD, BIN, IMG …).  The app will scan for game serials so you can\n"
+            "filter your mods to show only what's compatible with games you own.\n\n"
+            "You can skip this step and configure the folder later in Settings."
+        ))
+
+        self._game_lib_chooser = PathChooser("Game Library:", "folder containing .iso / .chd files")
+        self._game_lib_chooser.set_path(self.config.game_library_path)
+        self._game_lib_chooser.path_changed.connect(self._on_game_lib_changed)
+        layout.addWidget(self._game_lib_chooser)
+
+        # Preview area
+        preview_row = QHBoxLayout()
+        scan_btn = QPushButton("🔍 Scan Now")
+        scan_btn.clicked.connect(self._scan_game_library)
+        preview_row.addWidget(scan_btn)
+        self._game_lib_count_lbl = QLabel("")
+        self._game_lib_count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
+        preview_row.addWidget(self._game_lib_count_lbl)
+        preview_row.addStretch()
+        layout.addLayout(preview_row)
+
+        self._game_lib_scroll = QScrollArea()
+        self._game_lib_scroll.setWidgetResizable(True)
+        self._game_lib_scroll.setMaximumHeight(180)
+        self._game_lib_scroll.setFrameShape(QFrame.Shape.StyledPanel)
+        self._game_lib_list_widget = QWidget()
+        self._game_lib_list_layout = QVBoxLayout(self._game_lib_list_widget)
+        self._game_lib_list_layout.setContentsMargins(4, 4, 4, 4)
+        self._game_lib_list_layout.setSpacing(2)
+        self._game_lib_list_layout.addStretch()
+        self._game_lib_scroll.setWidget(self._game_lib_list_widget)
+        layout.addWidget(self._game_lib_scroll)
+
+        layout.addStretch()
+        return w
+
+    def _on_game_lib_changed(self, path: str):
+        if path:
+            self._scan_game_library()
+
+    def _scan_game_library(self):
+        path = self._game_lib_chooser.get_path()
+        if not path:
+            return
+        from src.core.game_library import scan_library
+        games = scan_library(path)
+
+        # Clear old rows
+        while self._game_lib_list_layout.count() > 1:
+            item = self._game_lib_list_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        if games:
+            self._game_lib_count_lbl.setText(f"  {len(games)} disc image(s) found")
+            for g in games[:50]:  # cap preview to 50 rows
+                lbl = QLabel(f"  {'✅' if g.serial else '❓'}  {g.display_name}")
+                lbl.setStyleSheet("font-size: 11px; color: #9090b0;")
+                self._game_lib_list_layout.insertWidget(
+                    self._game_lib_list_layout.count() - 1, lbl
+                )
+            if len(games) > 50:
+                more = QLabel(f"  … and {len(games) - 50} more")
+                more.setStyleSheet("font-size: 11px; color: #606080;")
+                self._game_lib_list_layout.insertWidget(
+                    self._game_lib_list_layout.count() - 1, more
+                )
+        else:
+            self._game_lib_count_lbl.setText("  No disc images found in that folder")
+
     def _page_done(self) -> QWidget:
         w = QWidget()
         layout = QVBoxLayout(w)
@@ -335,6 +415,8 @@ class SetupWizard(QDialog):
             self.config.cheats_path = self._cheats_chooser.get_path()
         elif page == 3:
             self.config.mods_storage_path = self._storage_chooser.get_path()
+        elif page == 4:
+            self.config.game_library_path = self._game_lib_chooser.get_path()
 
     def _run_automatic_setup(self):
         """
@@ -368,6 +450,12 @@ class SetupWizard(QDialog):
             summary_lines.append(f"📝 PNACH: {self.config.pnach_path}")
         if self.config.cover_art_path:
             summary_lines.append(f"🎨 Covers: {self.config.cover_art_path}")
+        if self.config.game_library_path:
+            from src.core.game_library import scan_library
+            games = scan_library(self.config.game_library_path)
+            summary_lines.append(
+                f"🎮 Game Library: {len(games)} disc image(s) found"
+            )
         summary_lines.append("⚡ Mods deploy automatically when toggled on/off")
 
         if summary_lines:
