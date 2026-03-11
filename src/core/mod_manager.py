@@ -18,7 +18,8 @@ from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
 # Texture pack folder-structure helpers
 # ---------------------------------------------------------------------------
 
-#: Matches a PS2 disc serial in XXXX-NNNNN form (e.g. SLUS-20062, SLES-54053).
+#: Matches a PS2 disc serial in any valid form, e.g. SLUS-20062, SLES-54053,
+#: SCUS-97131 (2-4 uppercase letters, dash, 3-5 digits).
 _PS2_SERIAL_RE = re.compile(r'^[A-Z]{2,4}-\d{3,5}$', re.IGNORECASE)
 
 
@@ -28,7 +29,7 @@ def _folder_has_serial_structure(folder: Path) -> bool:
     correct PCSX2 layout and need no further normalization."""
     try:
         return any(
-            child.is_dir() and bool(_PS2_SERIAL_RE.match(child.name))
+            child.is_dir() and _PS2_SERIAL_RE.match(child.name) is not None
             for child in folder.iterdir()
         )
     except PermissionError:

@@ -113,9 +113,11 @@ class ImportModDialog(QDialog):
             self._gameid_edit.setPlaceholderText(
                 "e.g. SLUS-20062  ← required for PCSX2 to find textures"
             )
+            game_id_label = "Game ID *:"
         else:
             self._gameid_edit.setPlaceholderText("e.g. SLUS-20062  (fetches cover art)")
-        form.addRow("Game ID *:" if self.mod_type == ModType.TEXTURE_PACK else "Game ID:", self._gameid_edit)
+            game_id_label = "Game ID:"
+        form.addRow(game_id_label, self._gameid_edit)
 
         # Hint shown when a "replacement" folder pattern is detected
         self._replacement_hint = QLabel(

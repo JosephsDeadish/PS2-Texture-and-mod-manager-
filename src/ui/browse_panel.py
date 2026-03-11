@@ -513,6 +513,9 @@ CATALOGUE: List[dict] = [
         "download_action": "",
         "direct_download_url": "",
         "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
     },
     {
         "id": "eragon_hd_textures",
@@ -545,6 +548,9 @@ CATALOGUE: List[dict] = [
         "download_action": "",
         "direct_download_url": "",
         "upscale_tech": "ESRGAN",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
     },
     # ── Post 147372741: HD Textures + PNACH + Lights (multi-part zips) ────────
     {
@@ -3500,7 +3506,8 @@ class CatalogueCard(QFrame):
 
         # Download button is always shown — opens the download/install dialog
         # so users can paste a direct link for any entry in the catalogue.
-        dl_label = "⬇ Install In-App" if self.entry.get("direct_download_url") else "⬇ Download from URL"
+        has_direct = bool(self.entry.get("direct_download_url"))
+        dl_label = "⬇ Install In-App" if has_direct else "⬇ Download from URL"
         dl_btn = QPushButton(dl_label)
         dl_btn.setObjectName("primary_btn")
         dl_btn.setToolTip(
@@ -4103,6 +4110,7 @@ class PnachGitHubDialog(QDialog):
 class _CatalogueTabContent(QWidget):
     favorite_toggled = pyqtSignal(str, bool)
     install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
+    result_count_changed = pyqtSignal(int, int)  # (visible, total)
 
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -4129,10 +4137,11 @@ class _CatalogueTabContent(QWidget):
         self._scroll.setWidget(self._cards_container)
         layout.addWidget(self._scroll, 1)
         # Populate with NSFW and paid content hidden by default
-        self._populate([
+        initial = [
             e for e in entries
             if not e.get("nsfw", False) and _entry_is_free(e)
-        ])
+        ]
+        self._populate(initial)
 
     def apply_filters(self, query: str = "", source: str = "",
                       author: str = "", favs_only: bool = False,
@@ -4208,6 +4217,8 @@ class _CatalogueTabContent(QWidget):
                     QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
                 )
                 self._cards_layout.addWidget(spacer, len(entries) // cols, remainder + j)
+
+        self.result_count_changed.emit(len(entries), len(self._all_entries))
 
     def _open_url(self, url: str):
         from PyQt6.QtGui import QDesktopServices
@@ -4364,7 +4375,21 @@ class BrowsePanel(BasePanel):
         type_filter_row.addWidget(self._incomplete_check)
 
         type_filter_row.addStretch()
+
+        # Clear Filters button — resets all filters to defaults
+        clear_btn = QPushButton("✖ Clear Filters")
+        clear_btn.setToolTip("Reset all search and filter controls to their defaults")
+        clear_btn.setFixedWidth(110)
+        clear_btn.clicked.connect(self._clear_filters)
+        type_filter_row.addWidget(clear_btn)
+
         content.addLayout(type_filter_row)
+
+        # ── Result count label ────────────────────────────────────────────
+        self._result_count_lbl = QLabel("")
+        self._result_count_lbl.setStyleSheet("color: #5060a0; font-size: 11px;")
+        self._result_count_lbl.setAlignment(Qt.AlignmentFlag.AlignRight)
+        content.addWidget(self._result_count_lbl)
 
         note = QLabel(
             "ℹ  Community-maintained public resources. "
@@ -4434,9 +4459,11 @@ class BrowsePanel(BasePanel):
             tab = _CatalogueTabContent(entries, self.config)
             tab.favorite_toggled.connect(self._on_favorite_toggled)
             tab.install_direct.connect(self._install_catalogue_entry)
+            tab.result_count_changed.connect(self._on_result_count_changed)
             self._tab_contents.append(tab)
             self._tabs.addTab(tab, label)
 
+        self._tabs.currentChanged.connect(self._on_tab_changed)
         content.addWidget(self._tabs, 1)
 
     def _apply_filters(self):
@@ -4495,6 +4522,69 @@ class BrowsePanel(BasePanel):
             pass
         self._apply_filters()
 
+    def _on_result_count_changed(self, visible: int, total: int):
+        """Update the result count label when the active tab's filter changes."""
+        if visible == total:
+            self._result_count_lbl.setText(f"Showing all {total} entries")
+        else:
+            self._result_count_lbl.setText(f"Showing {visible} of {total} entries")
+
+    def _on_tab_changed(self, index: int):
+        """Sync the result count label when the user switches tabs."""
+        if 0 <= index < len(self._tab_contents):
+            tab = self._tab_contents[index]
+            # Ask the tab to re-emit its count by retrieving from its private state
+            total = len(tab._all_entries)
+            # Count visible by running the filter logic again (cheaply via signal)
+            tab.apply_filters(
+                self._search.text(),
+                self._source_filter.currentData() or "",
+                self._author_filter.currentData() or "",
+                self._favs_check.isChecked(),
+                self._nsfw_check.isChecked(),
+                self._paid_check.isChecked(),
+                self._acct_check.isChecked(),
+                self._incomplete_check.isChecked(),
+            )
+
+    def _clear_filters(self):
+        """Reset all search and filter controls to their default state."""
+        # Block signals while resetting to avoid multiple filter refreshes
+        for widget in (
+            self._search,
+            self._source_filter,
+            self._author_filter,
+            self._favs_check,
+            self._nsfw_check,
+            self._paid_check,
+            self._acct_check,
+            self._incomplete_check,
+        ):
+            widget.blockSignals(True)
+
+        self._search.clear()
+        self._source_filter.setCurrentIndex(0)
+        self._author_filter.setCurrentIndex(0)
+        self._favs_check.setChecked(False)
+        self._nsfw_check.setChecked(getattr(self.config, "show_nsfw", False))
+        self._paid_check.setChecked(False)
+        self._acct_check.setChecked(True)
+        self._incomplete_check.setChecked(True)
+
+        for widget in (
+            self._search,
+            self._source_filter,
+            self._author_filter,
+            self._favs_check,
+            self._nsfw_check,
+            self._paid_check,
+            self._acct_check,
+            self._incomplete_check,
+        ):
+            widget.blockSignals(False)
+
+        self._apply_filters()
+
     def _on_favorite_toggled(self, author: str, is_fav: bool):
         """Rebuild author dropdown when favorites change."""
         self._author_filter.blockSignals(True)
@@ -4546,13 +4636,7 @@ class BrowsePanel(BasePanel):
 
     def _reload_catalogue(self):
         """Clear all filters and reset the catalogue view."""
-        self._search.blockSignals(True)
-        self._search.clear()
-        self._search.blockSignals(False)
-        self._source_filter.setCurrentIndex(0)
-        self._author_filter.setCurrentIndex(0)
-        self._favs_check.setChecked(False)
-        self._apply_filters()
+        self._clear_filters()
         self.emit_status("Catalogue reloaded")
 
     def refresh(self):

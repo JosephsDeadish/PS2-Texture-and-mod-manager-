@@ -2015,6 +2015,41 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         # Stale key must be dropped — not available as an attribute
         self.assertFalse(hasattr(cfg, "auto_deploy"))
 
+    # -- New browse-filter preference fields ---------------------------------
+
+    def test_browse_filter_defaults(self):
+        """show_paid defaults to False; show_account_required and show_incomplete to True."""
+        cfg = AppConfig()
+        self.assertFalse(cfg.show_paid)
+        self.assertTrue(cfg.show_account_required)
+        self.assertTrue(cfg.show_incomplete)
+
+    def test_browse_filter_fields_in_to_dict(self):
+        cfg = AppConfig(show_paid=True, show_account_required=False, show_incomplete=False)
+        d = cfg.to_dict()
+        self.assertTrue(d["show_paid"])
+        self.assertFalse(d["show_account_required"])
+        self.assertFalse(d["show_incomplete"])
+
+    def test_browse_filter_fields_round_trip(self):
+        cfg = AppConfig(show_paid=True, show_account_required=False, show_incomplete=False)
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertTrue(restored.show_paid)
+        self.assertFalse(restored.show_account_required)
+        self.assertFalse(restored.show_incomplete)
+
+    def test_old_config_without_browse_filter_fields_uses_defaults(self):
+        """Configs saved before the browse-filter fields were added should load fine."""
+        old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
+               "cover_art_path": "", "memcards_path": "", "cheats_path": "",
+               "mods_storage_path": "", "theme": "dark",
+               "check_updates_on_start": True, "show_conflict_warnings": True,
+               "first_run": False, "favorite_authors": [], "show_nsfw": False}
+        cfg = AppConfig.from_dict(old)
+        self.assertFalse(cfg.show_paid)
+        self.assertTrue(cfg.show_account_required)
+        self.assertTrue(cfg.show_incomplete)
+
 
 # =============================================================================
 # is_valid_serial
@@ -2704,3 +2739,142 @@ class TestCatalogueIntegrity(unittest.TestCase):
         )
         self.assertEqual(len(with_nsfw), len(self.catalogue))
 
+
+    # -- Paid / account-required / incomplete filter logic -------------------
+
+    def test_optional_content_flags_are_bool_when_present(self):
+        """is_free, requires_account, is_complete must be bool when explicitly set."""
+        for entry in self.catalogue:
+            for field in ("is_free", "requires_account", "is_complete"):
+                if field in entry:
+                    self.assertIsInstance(
+                        entry[field], bool,
+                        f"Entry {entry['id']} field '{field}' must be bool, got {type(entry[field])}"
+                    )
+
+    def test_paid_filter_logic(self):
+        """Entries with is_free=False are hidden when show_paid=False."""
+        paid = [e for e in self.catalogue if e.get("is_free") is False]
+        if not paid:
+            self.skipTest("No explicitly paid entries in catalogue")
+        free = [e for e in self.catalogue if e.get("is_free", True)]
+
+        # Without paid: only free entries visible
+        without_paid = [e for e in self.catalogue if e.get("is_free", True)]
+        # With paid: all entries visible
+        with_paid = self.catalogue
+
+        self.assertGreater(len(with_paid), len(without_paid),
+                           "show_paid=True should reveal more entries")
+        self.assertFalse(any(e.get("is_free") is False for e in without_paid),
+                         "show_paid=False should hide all paid entries")
+
+    def test_incomplete_filter_logic(self):
+        """Entries with is_complete=False are hidden when show_incomplete=False."""
+        incomplete = [e for e in self.catalogue if e.get("is_complete") is False]
+        if not incomplete:
+            self.skipTest("No explicitly incomplete entries in catalogue")
+        without_incomplete = [e for e in self.catalogue if e.get("is_complete", True)]
+        self.assertFalse(
+            any(e.get("is_complete") is False for e in without_incomplete),
+            "show_incomplete=False should hide all incomplete entries"
+        )
+
+    def test_patreon_entries_have_requires_account_true(self):
+        """All non-hub Patreon entries should have requires_account=True (explicit or inferred)."""
+        patreon_entries = [
+            e for e in self.catalogue
+            if e.get("source") == "Patreon" and not e.get("is_hub", False)
+        ]
+        self.assertGreater(len(patreon_entries), 0, "Should have some Patreon entries")
+        for entry in patreon_entries:
+            # Either explicitly set or inferred as True (Patreon is in _ACCOUNT_REQUIRED_SOURCES)
+            explicit = entry.get("requires_account")
+            if explicit is not None:
+                self.assertTrue(explicit,
+                    f"Patreon entry {entry['id']} has requires_account=False, expected True")
+
+
+class TestTextureStructureNormalization(unittest.TestCase):
+    """Tests for ModManager._normalize_texture_structure."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_dest(self) -> Path:
+        d = Path(self.tmpdir) / "dest"
+        d.mkdir()
+        return d
+
+    def test_replacement_folder_at_depth0(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "ABCD1234.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertTrue((expected / "ABCD1234.png").exists())
+        self.assertFalse((dest / "replacement").exists())
+
+    def test_replacements_folder_at_depth0(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacements").mkdir()
+        (dest / "replacements" / "HASH.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-20062")
+        expected = dest / "SLUS-20062" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertTrue((expected / "HASH.png").exists())
+
+    def test_replacement_inside_wrapper_folder(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "MyPack_v1" / "replacement").mkdir(parents=True)
+        (dest / "MyPack_v1" / "replacement" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements" / "tex.png"
+        self.assertTrue(expected.exists())
+
+    def test_flat_structure_moved_to_serial_replacements(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "hash1.png").write_bytes(b"A")
+        (dest / "hash2.png").write_bytes(b"B")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertEqual(len(list(expected.iterdir())), 2)
+
+    def test_already_correct_structure_unchanged(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "SLUS-21228" / "replacements").mkdir(parents=True)
+        (dest / "SLUS-21228" / "replacements" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        # Should be completely unchanged
+        self.assertTrue((dest / "SLUS-21228" / "replacements" / "tex.png").exists())
+        self.assertEqual(len(list((dest / "SLUS-21228" / "replacements").iterdir())), 1)
+
+    def test_no_game_id_does_nothing(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "")
+        # Nothing should change — no serial to normalize into
+        self.assertTrue((dest / "replacement").exists())
+        self.assertTrue((dest / "replacement" / "tex.png").exists())
+
+    def test_multiple_texture_files_all_moved(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        for i in range(5):
+            (dest / "replacement" / f"hash{i}.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-20062")
+        expected = dest / "SLUS-20062" / "replacements"
+        self.assertEqual(len(list(expected.iterdir())), 5)

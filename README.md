@@ -24,6 +24,8 @@
 
 ### 🎨 Texture Pack Manager
 - Import HD texture replacement packs (ZIP, 7z, folder)
+- **Multi-part archive support** — packs split across `_Part1.zip`, `_Part2.zip` … (or 7-zip volumes) are extracted automatically; the import dialog detects all sibling parts and warns about any that are missing
+- **Auto folder normalization** — packs that ship with a `replacement/` folder (common in Patreon releases) are automatically placed into the correct `textures/<SERIAL>/replacements/` layout when a Game ID is provided
 - Enable/disable individual packs without deleting them
 - Set priority order — higher-priority packs win conflicts
 - Greyed-out **"Completely Shadowed"** badge when a pack is 100% overridden by a higher-priority one
@@ -54,12 +56,22 @@
 - Manage widescreen and other `.pnach`-format cheat files
 
 ### 🌐 Browse & Download
-- Curated catalogue of **21 community mod resources** across GBAtemp, Nexus Mods, LoversLab, PS2-Home, PSX-Place, PCSX2 Forums, Archive.org, Reddit, GameTDB, LaunchBox, GameFAQs, Patreon, and more
+- Curated catalogue of **139 entries** across texture packs, PNACH patches, cover art, cheats, and community hubs — GBAtemp, LoversLab, PS2-Home, PSX-Place, PCSX2 Forums, Archive.org, Reddit, GameTDB, LaunchBox, GameFAQs, Patreon, GitHub, PS2Wide, and more
+- **Browse** is the first panel after Dashboard for quick access
+- Every catalogue card shows both **🌐 Visit Source** and **⬇ Download from URL** buttons
 - **Source**, **author**, and **favorites-only** filter dropdowns
+- **Content-type filter row:**
+  - 💰 **Show Paid** — hidden by default; toggle to reveal subscription-only packs
+  - 🔐 **Show Account-Required** — toggle to hide/show sources requiring a free or paid account
+  - 🔧 **Show Incomplete/Partial** — toggle to show/hide WIP or partial-coverage packs
+- Status badges on every card: **💰 Paid**, **🔐 Account**, **🔧 WIP/Partial** shown where applicable
+- **Result count label** — "Showing X of Y entries" updates live as filters change
+- **✖ Clear Filters** button — resets all filter controls in one click
 - Async thumbnail loading per card — thumbnails loaded in background without blocking the UI
 - ❤ **Favorite authors** toggle — mark authors you follow; favorites shown first
 - Download cover art by game ID directly from GameTDB
 - **Download from URL** — paste any HTTPS link (ZIP, 7z, PNACH, PNG); Google Drive share links auto-converted
+- **🔧 Fetch PNACH from GitHub** — browse and install official PCSX2 widescreen patches
 - Patreon support banner links directly to the developer's creator page
 
 ### 🔍 Conflict Detection & Resolution
@@ -78,7 +90,7 @@
 
 ### 🔎 Game Serial Recognition
 - Automatically detects PS2 game serials (SLUS/SCUS/SLES/SLPS/SLPM/SLCD/SCPS and more) from filenames and file contents
-- 80+ built-in serial → game title lookups
+- 390+ built-in serial → game title lookups
 - Used for cover art naming, thumbnail fetching, and display in mod items
 
 ### 🔔 Update Checking
@@ -157,6 +169,9 @@ The CI workflow (`.github/workflows/build.yml`) builds automatically when a `v*`
 pip install pytest
 python -m pytest tests/ -v
 ```
+
+258 unit tests covering core logic, catalogue integrity, multi-part archive detection,
+texture structure normalization, PNACH merging, memory card operations, and more.
 
 ---
 
