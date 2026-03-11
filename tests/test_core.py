@@ -1076,6 +1076,207 @@ class TestGameRegistry(unittest.TestCase):
         self.assertEqual(cfg.favorite_authors, [])
 
 
+class TestGameRegistryExpanded(unittest.TestCase):
+    """Tests for the expanded PS2 serial registry — new prefixes, path detection, reverse lookup."""
+
+    # ------------------------------------------------------------------
+    # SERIAL_PREFIXES constant
+    # ------------------------------------------------------------------
+
+    def test_serial_prefixes_exported(self):
+        from src.core.game_registry import SERIAL_PREFIXES
+        self.assertIsInstance(SERIAL_PREFIXES, tuple)
+        self.assertGreater(len(SERIAL_PREFIXES), 10)
+
+    def test_serial_prefixes_contains_all_retail(self):
+        from src.core.game_registry import SERIAL_PREFIXES
+        for prefix in ("SLUS", "SCUS", "SLES", "SCES", "SLPS", "SCPS",
+                        "SLKA", "SCKA", "SLAJ", "SCAJ", "SLPM", "SCPM",
+                        "SLEH", "SCEH", "PBPX"):
+            self.assertIn(prefix, SERIAL_PREFIXES, f"Missing prefix: {prefix}")
+
+    def test_serial_prefixes_contains_demo_prefixes(self):
+        from src.core.game_registry import SERIAL_PREFIXES
+        for prefix in ("SCED", "SLED", "SCPD", "SLPD"):
+            self.assertIn(prefix, SERIAL_PREFIXES, f"Missing demo prefix: {prefix}")
+
+    # ------------------------------------------------------------------
+    # New prefix detection
+    # ------------------------------------------------------------------
+
+    def test_detect_sced_demo(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SCED-12345_demo.pnach"), "SCED-12345")
+
+    def test_detect_sled_demo(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLED-54321_demo.png"), "SLED-54321")
+
+    def test_detect_scpd_jp_demo(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SCPD-10001.pnach"), "SCPD-10001")
+
+    def test_detect_slpm_platinum(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLPM-65792_mgs3.zip"), "SLPM-65792")
+
+    def test_detect_slka_korea(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SLKA-25104.png"), "SLKA-25104")
+
+    def test_detect_scaj_asia(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("SCAJ-20065_gt4.zip"), "SCAJ-20065")
+
+    # ------------------------------------------------------------------
+    # detect_serial_from_path
+    # ------------------------------------------------------------------
+
+    def test_path_component_folder_named_as_serial(self):
+        """A folder named exactly as a serial should be detected."""
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(
+            detect_serial_from_path("/textures/SLUS-20062/replacements/pack.zip"),
+            "SLUS-20062",
+        )
+
+    def test_path_pcsx2_texture_layout(self):
+        """PCSX2 texture path: textures/{SERIAL}/replacements/"""
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(
+            detect_serial_from_path("C:/PCSX2/textures/SCUS-97399/replacements/gow_hd.zip"),
+            "SCUS-97399",
+        )
+
+    def test_path_serial_as_only_folder(self):
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(detect_serial_from_path("/mods/SLES-54114/"), "SLES-54114")
+
+    def test_path_serial_with_underscore_separator(self):
+        """Path component with underscore separator should normalise to dash."""
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(
+            detect_serial_from_path("/packs/SLPS_25088/textures/ui.png"),
+            "SLPS-25088",
+        )
+
+    def test_path_serial_fused(self):
+        """Path component with fused serial (no separator) should be detected."""
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(
+            detect_serial_from_path("/mods/SLUS21005_hd/textures/char.dds"),
+            "SLUS-21005",
+        )
+
+    def test_path_no_serial_returns_empty(self):
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(detect_serial_from_path("/mods/my_texture_pack/tex.png"), "")
+
+    def test_path_deepest_serial_wins(self):
+        """When multiple path components contain serials, the deepest wins."""
+        from src.core.game_registry import detect_serial_from_path
+        # Deepest (rightmost) serial is SLUS-20312
+        result = detect_serial_from_path(
+            "/SLUS-20062/nested/SLUS-20312/file.png"
+        )
+        self.assertEqual(result, "SLUS-20312")
+
+    def test_path_plain_filename_still_works(self):
+        """detect_serial_from_path should work for a plain filename too."""
+        from src.core.game_registry import detect_serial_from_path
+        self.assertEqual(detect_serial_from_path("SLUS-20672.png"), "SLUS-20672")
+
+    # ------------------------------------------------------------------
+    # title_to_serials
+    # ------------------------------------------------------------------
+
+    def test_title_to_serials_kingdom_hearts(self):
+        from src.core.game_registry import title_to_serials
+        hits = title_to_serials("Kingdom Hearts")
+        serials = [s for s, _ in hits]
+        self.assertGreater(len(hits), 2, "Expected multiple KH serials")
+        # US, PAL, JP and other regions should all appear
+        self.assertTrue(any("SLUS" in s for s in serials), "Expected a US serial")
+
+    def test_title_to_serials_case_insensitive(self):
+        from src.core.game_registry import title_to_serials
+        lower = title_to_serials("kingdom hearts")
+        upper = title_to_serials("KINGDOM HEARTS")
+        self.assertEqual(lower, upper)
+
+    def test_title_to_serials_god_of_war(self):
+        from src.core.game_registry import title_to_serials
+        hits = title_to_serials("God of War")
+        self.assertGreater(len(hits), 2)
+
+    def test_title_to_serials_no_match_returns_empty(self):
+        from src.core.game_registry import title_to_serials
+        self.assertEqual(title_to_serials("xyzzy_nonexistent_game_12345"), [])
+
+    def test_title_to_serials_empty_string(self):
+        from src.core.game_registry import title_to_serials
+        self.assertEqual(title_to_serials(""), [])
+
+    def test_title_to_serials_returns_sorted(self):
+        from src.core.game_registry import title_to_serials
+        hits = title_to_serials("Gran Turismo")
+        serials = [s for s, _ in hits]
+        self.assertEqual(serials, sorted(serials))
+
+    # ------------------------------------------------------------------
+    # Expanded _KNOWN_SERIALS coverage
+    # ------------------------------------------------------------------
+
+    def test_new_serials_ffx(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Final Fantasy X", lookup_game_title("SLUS-20312"))
+
+    def test_new_serials_ffx2(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Final Fantasy X-2", lookup_game_title("SLUS-20672"))
+
+    def test_new_serials_mgs2(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Metal Gear", lookup_game_title("SLUS-20213"))
+
+    def test_new_serials_crash_woc(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Crash", lookup_game_title("SLUS-20238"))
+
+    def test_new_serials_sly_cooper(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Sly", lookup_game_title("SCUS-97198"))
+
+    def test_new_serials_devil_may_cry2(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Devil May Cry", lookup_game_title("SLUS-20626"))
+
+    def test_new_serials_pal_god_of_war(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("God of War", lookup_game_title("SCES-53133"))
+
+    def test_new_serials_pal_ffx(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Final Fantasy X", lookup_game_title("SLES-50490"))
+
+    def test_new_serials_jp_gt4(self):
+        from src.core.game_registry import lookup_game_title
+        self.assertIn("Gran Turismo 4", lookup_game_title("SCPS-17001"))
+
+    def test_known_serials_count(self):
+        """Registry should have at least 200 entries."""
+        from src.core.game_registry import all_known_serials
+        serials = all_known_serials()
+        self.assertGreaterEqual(len(serials), 200, f"Got only {len(serials)} entries")
+
+    def test_all_keys_normalised_form(self):
+        """Every key in _KNOWN_SERIALS must be in XXXX-NNNNN form."""
+        from src.core.game_registry import all_known_serials
+        for serial, _ in all_known_serials():
+            self.assertRegex(serial, r"^[A-Z]{4}-\d{5}$",
+                             f"Malformed serial key: {serial}")
+
+
 
 
 class TestCoverArtDeploy(unittest.TestCase):

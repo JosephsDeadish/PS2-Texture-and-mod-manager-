@@ -192,12 +192,21 @@ class ImportModDialog(QDialog):
             self._auto_detect_game_id(path)
 
     def _auto_detect_game_id(self, path: str):
-        """Auto-fill Game ID and Name if a PS2 serial is detected in the filename."""
+        """Auto-fill Game ID and Name if a PS2 serial is detected in the filename or path."""
         if self._gameid_edit.text():
             return  # don't overwrite user-entered value
         try:
-            from src.core.game_registry import detect_game_serial_from_file, serial_to_display
+            from src.core.game_registry import (
+                detect_game_serial_from_file,
+                detect_serial_from_path,
+                serial_to_display,
+            )
+            # 1. Try reading the file / filename first
             serial = detect_game_serial_from_file(path)
+            # 2. Fall back to scanning every component of the path
+            #    (handles PCSX2 folder layout: textures/SLUS-20062/replacements/…)
+            if not serial:
+                serial = detect_serial_from_path(path)
             if serial:
                 self._gameid_edit.setText(serial)
                 # Show a helpful tooltip with the known game title

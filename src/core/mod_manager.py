@@ -313,6 +313,7 @@ class ModManager:
         """
         from src.core.game_registry import (
             detect_game_serial,
+            detect_serial_from_path,
             normalise_serial,
         )
 
@@ -326,12 +327,14 @@ class ModManager:
                 warnings.append(f"Missing path for mod '{mod.name}': {mod.path}")
                 continue
 
-            # Determine the serial: prefer stored game_id, fall back to filename
+            # Determine the serial: prefer stored game_id, then filename, then path
             serial = ""
             if mod.game_id:
                 serial = normalise_serial(mod.game_id)
             if not serial:
                 serial = detect_game_serial(str(src))
+            if not serial:
+                serial = detect_serial_from_path(str(src))
 
             if not serial:
                 # No serial detected — copy with original filename but warn
