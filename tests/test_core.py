@@ -2314,15 +2314,19 @@ class TestCatalogueIntegrity(unittest.TestCase):
         # Convert the AST list of dicts to Python dicts.
         # ModType.TEXTURE_PACK etc. appear as ast.Attribute nodes; convert
         # them to their .value strings (e.g. "texture_pack").
-        def _literal(node):
+        _MAX_DEPTH = 20  # catalogue data is at most 3 levels deep; guard against malformed input
+
+        def _literal(node, depth=0):
+            if depth > _MAX_DEPTH:
+                raise ValueError(f"AST nesting depth exceeded {_MAX_DEPTH} (possible malformed input)")
             if isinstance(node, ast.Constant):
                 return node.value
             if isinstance(node, ast.List):
-                return [_literal(e) for e in node.elts]
+                return [_literal(e, depth + 1) for e in node.elts]
             if isinstance(node, ast.Tuple):
-                return tuple(_literal(e) for e in node.elts)
+                return tuple(_literal(e, depth + 1) for e in node.elts)
             if isinstance(node, ast.Dict):
-                return {_literal(k): _literal(v) for k, v in zip(node.keys, node.values)}
+                return {_literal(k, depth + 1): _literal(v, depth + 1) for k, v in zip(node.keys, node.values)}
             # ModType.TEXTURE_PACK → "texture_pack" etc.
             if isinstance(node, ast.Attribute):
                 return node.attr.lower()
@@ -2434,4 +2438,68 @@ class TestCatalogueIntegrity(unittest.TestCase):
         duplicates = {n: ids for n, ids in seen.items() if len(ids) > 1}
         for name, ids in duplicates.items():
             self.fail(f"Duplicate catalogue name {name!r} shared by IDs: {ids}")
+
+    def test_is_hub_present_and_bool(self):
+        """Every entry must declare is_hub: True (community browse) or False (specific author)."""
+        for entry in self.catalogue:
+            self.assertIn(
+                "is_hub", entry,
+                f"Entry {entry['id']} is missing the 'is_hub' field"
+            )
+            self.assertIsInstance(
+                entry["is_hub"], bool,
+                f"Entry {entry['id']} is_hub must be a bool, got {type(entry['is_hub'])}"
+            )
+
+    def test_non_hub_author_url_is_specific(self):
+        """Non-hub entries must have an author_url pointing to a specific profile,
+        not a bare site homepage.  We spot-check for known generic homepages."""
+        generic_homepages = {
+            "https://gbatemp.net",
+            "https://gamebanana.com",
+            "https://www.loverslab.com",
+            "https://www.psx-place.com",
+            "https://forums.pcsx2.net",
+            "https://archive.org",
+            "https://www.moddb.com",
+            "https://github.com",
+            "https://gamefaqs.gamespot.com",
+            "https://www.reddit.com/r/ps2",
+            "https://www.mobygames.com",
+            "https://www.screenscraper.fr",
+        }
+        for entry in self.catalogue:
+            if not entry.get("is_hub", True):
+                aurl = entry.get("author_url", "")
+                self.assertNotIn(
+                    aurl, generic_homepages,
+                    f"Named-author entry {entry['id']} has generic homepage as author_url: {aurl!r}"
+                )
+                self.assertTrue(
+                    aurl.startswith("http://") or aurl.startswith("https://"),
+                    f"Named-author entry {entry['id']} has invalid author_url: {aurl!r}"
+                )
+
+    def test_hub_author_url_not_bare_homepage(self):
+        """Hub entries should still have a useful author_url (at least the browse/search
+        page, not just the root homepage like https://gbatemp.net).
+        We check this by requiring the URL to have a path longer than '/'."""
+        import urllib.parse
+        bare_homepages = {
+            "https://gbatemp.net",
+            "https://gamebanana.com",
+            "https://www.loverslab.com",
+            "https://www.psx-place.com",
+            "https://forums.pcsx2.net",
+            "https://archive.org",
+            "https://www.moddb.com",
+            "https://github.com",
+        }
+        for entry in self.catalogue:
+            if entry.get("is_hub", True):
+                aurl = entry.get("author_url", "")
+                self.assertNotIn(
+                    aurl, bare_homepages,
+                    f"Hub entry {entry['id']} still uses a bare site homepage for author_url: {aurl!r}"
+                )
 

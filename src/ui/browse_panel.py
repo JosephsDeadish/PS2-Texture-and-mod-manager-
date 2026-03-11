@@ -62,8 +62,9 @@ CATALOGUE: List[dict] = [
             "replacement packs. Browse community-made packs linked from the wiki."
         ),
         "context": "Official guide — good starting point for understanding texture replacement workflow.",
-        "author": "PCSX2 Community",
-        "author_url": "https://wiki.pcsx2.net",
+        "author": "PCSX2 Wiki Editors",
+        "author_url": "https://wiki.pcsx2.net/Special:RecentChanges",
+        "is_hub": True,
         "url": "https://wiki.pcsx2.net/Texture_Replacement",
         "type": ModType.TEXTURE_PACK,
         "source": "PCSX2",
@@ -81,8 +82,9 @@ CATALOGUE: List[dict] = [
             "Browse and download individual packs for your favourite titles."
         ),
         "context": "Large community forum — authors often include upscale info and recommended settings in their posts.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/tags/ps2-texture-pack/",
+        "is_hub": True,
         "url": "https://gbatemp.net/tags/ps2-texture-pack/",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -105,8 +107,9 @@ CATALOGUE: List[dict] = [
             "resolution), provide recommended PCSX2 graphic settings, and link to their "
             "other work. Check the description of each post for this information."
         ),
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=ps2+texture&t=files",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=ps2+texture&t=files",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -124,8 +127,9 @@ CATALOGUE: List[dict] = [
             "Each file page includes author notes on upscale method and settings."
         ),
         "context": "Nexus enforces a structured mod-page format so author-recommended settings are usually in the description.",
-        "author": "Nexus Mods",
-        "author_url": "https://www.nexusmods.com",
+        "author": "Nexus Mods Authors",
+        "author_url": "https://www.nexusmods.com/pcsx2",
+        "is_hub": True,
         "url": "https://www.nexusmods.com/pcsx2",
         "type": ModType.TEXTURE_PACK,
         "source": "Nexus Mods",
@@ -143,8 +147,9 @@ CATALOGUE: List[dict] = [
             "packs, and patches. Browse the Downloads section for texture packs."
         ),
         "context": "PS2-focused community — most uploads include author names and game compatibility notes.",
-        "author": "PS2-Home Community",
-        "author_url": "https://www.ps2-home.com",
+        "author": "PS2-Home Members",
+        "author_url": "https://www.ps2-home.com/forum/viewforum.php?f=50",
+        "is_hub": True,
         "url": "https://www.ps2-home.com/forum/viewforum.php?f=50",
         "type": ModType.TEXTURE_PACK,
         "source": "PS2-Home",
@@ -162,8 +167,9 @@ CATALOGUE: List[dict] = [
             "The dedicated PS2 section has author-credited releases with changelogs."
         ),
         "context": "PlayStation-focused site — HD texture packs and mods with version history and author attribution.",
-        "author": "PSX-Place Community",
-        "author_url": "https://www.psx-place.com",
+        "author": "PSX-Place Members",
+        "author_url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "is_hub": True,
         "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
         "type": ModType.TEXTURE_PACK,
         "source": "PSX-Place",
@@ -181,8 +187,9 @@ CATALOGUE: List[dict] = [
             "Authors often post links to Google Drive or MEGA downloads."
         ),
         "context": "Author posts often link to external hosting (Google Drive, MEGA). Use the Download from URL button to install directly.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=texture+pack&sort=new",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=texture+pack&sort=new",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -201,8 +208,9 @@ CATALOGUE: List[dict] = [
             "of PS2 games, maintained by the PCSX2 team on GitHub."
         ),
         "context": "Every patch file is named by game CRC. Use the PNACH manager to import directly.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -220,8 +228,9 @@ CATALOGUE: List[dict] = [
             "including widescreen, 60fps patches, and gameplay cheats."
         ),
         "context": "Forum thread links to community-submitted PNACH files. Author attribution included in thread posts.",
-        "author": "PCSX2 Forums",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Team",
+        "author_url": "https://github.com/PCSX2",
+        "is_hub": False,
         "url": "https://forums.pcsx2.net/Thread-PNACH-Patches",
         "type": ModType.PNACH,
         "source": "PCSX2",
@@ -239,8 +248,9 @@ CATALOGUE: List[dict] = [
             "hundreds of PS2 games in PNACH format."
         ),
         "context": "Specialised in widescreen hacks — includes aspect ratio corrections and HUD fixes.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -258,8 +268,9 @@ CATALOGUE: List[dict] = [
             "Search for your game to find community-submitted patches."
         ),
         "context": "Authors include game CRC, version notes, and sometimes recommended companion mods.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/3519/?q=pnach&t=file_update",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/3519/?q=pnach&t=file_update",
         "type": ModType.PNACH,
         "source": "GBAtemp",
@@ -280,6 +291,7 @@ CATALOGUE: List[dict] = [
         "context": "Comprehensive cover art database — uses game serial (SLUS/SCUS) as the lookup key.",
         "author": "GameTDB",
         "author_url": "https://www.gametdb.com",
+        "is_hub": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
         "source": "GameTDB",
@@ -297,8 +309,9 @@ CATALOGUE: List[dict] = [
             "box fronts, backs, screenshots and more — community-contributed."
         ),
         "context": "High-resolution scans and recreations. Good for box-art replacements.",
-        "author": "LaunchBox Community",
-        "author_url": "https://www.launchbox-app.com",
+        "author": "LaunchBox Database",
+        "author_url": "https://gamesdb.launchbox-app.com/platforms/games/11",
+        "is_hub": True,
         "url": "https://gamesdb.launchbox-app.com/platforms/games/11",
         "type": ModType.COVER_ART,
         "source": "LaunchBox",
@@ -316,8 +329,9 @@ CATALOGUE: List[dict] = [
             "A great source for rare regional covers."
         ),
         "context": "Scanned physical media — highest-quality lossless images for many regional variants.",
-        "author": "Internet Archive",
-        "author_url": "https://archive.org",
+        "author": "Internet Archive Contributors",
+        "author_url": "https://archive.org/search?query=PS2+cover+art&mediatype=image",
+        "is_hub": True,
         "url": "https://archive.org/search?query=PS2+cover+art&mediatype=image",
         "type": ModType.COVER_ART,
         "source": "Archive.org",
@@ -337,7 +351,8 @@ CATALOGUE: List[dict] = [
         ),
         "context": "Save files listed by game; most include region info and save slot description.",
         "author": "GameFAQs Community",
-        "author_url": "https://gamefaqs.gamespot.com",
+        "author_url": "https://gamefaqs.gamespot.com/ps2/category/929-saves",
+        "is_hub": True,
         "url": "https://gamefaqs.gamespot.com/ps2/category/929-saves",
         "type": ModType.SAVE_FILE,
         "source": "GameFAQs",
@@ -355,8 +370,9 @@ CATALOGUE: List[dict] = [
             "game title. Download and import with the Memory Card manager."
         ),
         "context": "Organised by game title with author credits. Import using the Memory Card panel.",
-        "author": "PS2Saves Community",
+        "author": "PS2Saves Members",
         "author_url": "https://ps2saves.com",
+        "is_hub": True,
         "url": "https://ps2saves.com",
         "type": ModType.SAVE_FILE,
         "source": "PS2Saves",
@@ -375,8 +391,9 @@ CATALOGUE: List[dict] = [
             "Contains WideScreen, 60FPS, and gameplay cheats in PNACH format."
         ),
         "context": "Well-organised by game CRC. Each file is labelled with CRC and game name for easy identification.",
-        "author": "PCSX2 Community",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 CheatDB Contributors",
+        "author_url": "https://github.com/PCSX2/cheatdb/graphs/contributors",
+        "is_hub": True,
         "url": "https://github.com/PCSX2/cheatdb",
         "type": ModType.CHEAT,
         "source": "GitHub",
@@ -395,7 +412,8 @@ CATALOGUE: List[dict] = [
         ),
         "context": "ActionReplay / GameShark format — the app imports and converts them to PNACH automatically.",
         "author": "Code Junkies",
-        "author_url": "https://www.codejunkies.com",
+        "author_url": "https://www.codejunkies.com/ps2/",
+        "is_hub": False,
         "url": "https://www.codejunkies.com/ps2/",
         "type": ModType.CHEAT,
         "source": "CodeJunkies",
@@ -412,8 +430,9 @@ CATALOGUE: List[dict] = [
             "PSX-Place hosts PS2 cheat codes and PNACH patches contributed by the community."
         ),
         "context": "PS2-focused site with version-tagged releases and author attribution.",
-        "author": "PSX-Place Community",
-        "author_url": "https://www.psx-place.com",
+        "author": "PSX-Place Members",
+        "author_url": "https://www.psx-place.com/resources/categories/ps2-cheats.19/",
+        "is_hub": True,
         "url": "https://www.psx-place.com/resources/categories/ps2-cheats.19/",
         "type": ModType.CHEAT,
         "source": "PSX-Place",
@@ -438,7 +457,8 @@ CATALOGUE: List[dict] = [
             "and link to their other works. Check the About section of each creator's page."
         ),
         "author": "Various Patreon Creators",
-        "author_url": "https://www.patreon.com/search?q=ps2+texture",
+        "author_url": "https://www.patreon.com/search?q=ps2+texture+pcsx2",
+        "is_hub": True,
         "url": "https://www.patreon.com/search?q=ps2+texture+pcsx2",
         "type": ModType.TEXTURE_PACK,
         "source": "Patreon",
@@ -462,6 +482,7 @@ CATALOGUE: List[dict] = [
         ),
         "author": "DeadOnTheInside",
         "author_url": "https://www.patreon.com/c/DeadOnTheInside",
+        "is_hub": False,
         "url": "https://www.patreon.com/c/DeadOnTheInside",
         "type": ModType.TEXTURE_PACK,
         "source": "Patreon",
@@ -480,8 +501,9 @@ CATALOGUE: List[dict] = [
             "Browse GBAtemp and LoversLab for upscaled packs using ESRGAN and xBRZ."
         ),
         "context": "Search for 'Spyro Enter Dragonfly texture' on GBAtemp or LoversLab for community uploads.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=spyro+ps2+texture&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=spyro+ps2+texture&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -499,8 +521,9 @@ CATALOGUE: List[dict] = [
             "Community-made packs with ESRGAN-upscaled character and environment textures."
         ),
         "context": "Check GBAtemp and the PCSX2 forums for Crash texture packs — authors often list upscale model and settings.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=crash+bandicoot+ps2+texture&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=crash+bandicoot+ps2+texture&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -518,8 +541,9 @@ CATALOGUE: List[dict] = [
             "Community authors have produced high-quality upscales of Kratos, environments, and enemies."
         ),
         "context": "LoversLab and GBAtemp have several GoW packs. Authors typically note recommended PCSX2 renderer (OpenGL/Vulkan).",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=god+of+war+ps2+texture&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=god+of+war+ps2+texture&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -537,8 +561,9 @@ CATALOGUE: List[dict] = [
             "Browse packs covering characters, menus, FMV upscales and environment retextures."
         ),
         "context": "Several authors on GBAtemp and PCSX2 forums have published FFX packs; check thread dates for compatibility with recent PCSX2 nightly builds.",
-        "author": "PCSX2 Community",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Forum Members",
+        "author_url": "https://forums.pcsx2.net/search?q=final+fantasy+x+texture",
+        "is_hub": True,
         "url": "https://forums.pcsx2.net/search?q=final+fantasy+x+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "PCSX2 Forums",
@@ -556,8 +581,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, world, and UI textures from the community."
         ),
         "context": "Check GBAtemp and LoversLab for KH texture packs. Many authors use ESRGAN with anime-tuned models for the distinct art style.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=kingdom+hearts+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=kingdom+hearts+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -575,8 +601,9 @@ CATALOGUE: List[dict] = [
             "Community-upscaled textures for characters, worlds, and menus."
         ),
         "context": "Multiple authors have published KH2 texture packs on GBAtemp and LoversLab. Check for author's recommended PCSX2 resolution and renderer.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=kingdom+hearts+2+texture&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=kingdom+hearts+2+texture&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -594,8 +621,9 @@ CATALOGUE: List[dict] = [
             "Upscaled environment, colossus and Wander textures."
         ),
         "context": "One of the most-requested PS2 texture projects. Look for packs on GBAtemp and Reddit r/ps2 for latest releases.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=shadow+colossus+texture",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=shadow+colossus+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -613,8 +641,9 @@ CATALOGUE: List[dict] = [
             "Upscaled car liveries, track environments and UI elements."
         ),
         "context": "GT4 texture packs often ship with per-car files. Check the GBAtemp GT4 thread for author-curated download links and install instructions.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=gran+turismo+4+texture&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=gran+turismo+4+texture&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -632,8 +661,9 @@ CATALOGUE: List[dict] = [
             "Character, environment and menu upscales from the community."
         ),
         "context": "Check LoversLab and GBAtemp for DMC3 texture packs. The game's high-contrast art style responds well to ESRGAN upscaling.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=devil+may+cry+ps2+texture&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=devil+may+cry+ps2+texture&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -651,8 +681,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, weapon and planet textures."
         ),
         "context": "Insomniac's colourful art style upscales very well. Check GBAtemp for packs covering R&C, Going Commando and Up Your Arsenal.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=ratchet+clank+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=ratchet+clank+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -670,8 +701,9 @@ CATALOGUE: List[dict] = [
             "Upscaled environment, character and UI textures."
         ),
         "context": "Jak and Daxter's open world responds beautifully to HD textures. Look on GBAtemp for author posts with recommended settings.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=jak+daxter+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=jak+daxter+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -689,8 +721,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, arena, and UI textures."
         ),
         "context": "One of the most popular PS2 games for texture modding. Multiple authors have published packs on GBAtemp covering different character rosters.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=budokai+tenkaichi+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=budokai+tenkaichi+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -708,8 +741,9 @@ CATALOGUE: List[dict] = [
             "Upscaled world, character and vehicle textures for use in PCSX2."
         ),
         "context": "SA texture packs are very popular. Check GBAtemp and the PCSX2 forums for the latest releases; some packs are split by region (city/countryside).",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=gta+san+andreas+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=gta+san+andreas+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -727,8 +761,9 @@ CATALOGUE: List[dict] = [
             "Upscaled castle, character, and atmospheric environment textures."
         ),
         "context": "Ico's minimalist art style makes it a great candidate for HD textures. Check Reddit r/ps2 and GBAtemp for community packs.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=ico+texture+pack",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=ico+texture+pack",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -747,8 +782,9 @@ CATALOGUE: List[dict] = [
             "God of War II (SCUS-97402) as PNACH files."
         ),
         "context": "Download the .pnach file and place it in your PCSX2 cheats folder, or import it here using the PNACH panel.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -766,8 +802,9 @@ CATALOGUE: List[dict] = [
             "Kingdom Hearts II (SLUS-21005)."
         ),
         "context": "PS2Wide hosts the definitive widescreen patches. Import the .pnach into the PNACH panel and deploy to your PCSX2 cheats folder.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -785,8 +822,9 @@ CATALOGUE: List[dict] = [
             "Final Fantasy XII (SLUS-20963)."
         ),
         "context": "Download the specific PNACH for your game region from PS2Wide, then import it into the PNACH panel.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -804,8 +842,9 @@ CATALOGUE: List[dict] = [
             "Removes the black bars for a true 16:9 racing experience."
         ),
         "context": "One of the most-requested GT4 patches. Get the .pnach from PS2Wide and import it using the PNACH panel.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -823,8 +862,9 @@ CATALOGUE: List[dict] = [
             "Improves the notoriously slow PS2 version."
         ),
         "context": "The 60fps patch significantly improves feel. Grab the .pnach from the PCSX2 widescreen patches GitHub or PS2Wide.",
-        "author": "PCSX2 Community",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/PCSX2-Widescreen-Patches",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -842,8 +882,9 @@ CATALOGUE: List[dict] = [
             "Makes the game feel dramatically smoother at 16:9."
         ),
         "context": "The 60fps patch is one of the best PCSX2 experiences available. Find the patch file on PS2Wide or the PCSX2 GitHub widescreen patches repository.",
-        "author": "PS2Wide Community",
-        "author_url": "https://ps2wide.net",
+        "author": "nemesis2090 (PS2Wide)",
+        "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+        "is_hub": False,
         "url": "https://ps2wide.net/pc10.html",
         "type": ModType.PNACH,
         "source": "PS2Wide",
@@ -869,6 +910,7 @@ CATALOGUE: List[dict] = [
         ),
         "author": "GameTDB",
         "author_url": "https://www.gametdb.com",
+        "is_hub": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
         "source": "GameTDB",
@@ -892,6 +934,7 @@ CATALOGUE: List[dict] = [
         ),
         "author": "GameTDB",
         "author_url": "https://www.gametdb.com",
+        "is_hub": False,
         "url": "https://www.gametdb.com/PS2",
         "type": ModType.COVER_ART,
         "source": "GameTDB",
@@ -914,8 +957,9 @@ CATALOGUE: List[dict] = [
             "Every mod page on GameBanana includes an author profile, version history, "
             "screenshots, and a direct download button. Quality varies — check ratings and comments."
         ),
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -937,8 +981,9 @@ CATALOGUE: List[dict] = [
             "PNACH mods on GameBanana include author notes on which PCSX2 version they were "
             "tested with and which game region the patch applies to."
         ),
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/games/ps2?_aCategoryIdFilter[]=5981",
         "type": ModType.PNACH,
         "source": "GameBanana",
@@ -961,8 +1006,9 @@ CATALOGUE: List[dict] = [
             "ModDB entries include detailed author descriptions, download statistics, "
             "ratings, and comments. Good source for larger, well-documented mods."
         ),
-        "author": "ModDB Community",
-        "author_url": "https://www.moddb.com",
+        "author": "ModDB Authors",
+        "author_url": "https://www.moddb.com/games/ps2/mods",
+        "is_hub": True,
         "url": "https://www.moddb.com/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "ModDB",
@@ -987,8 +1033,9 @@ CATALOGUE: List[dict] = [
             "Download the latest release ZIP and install it using the Import button "
             "in the Texture Packs panel."
         ),
-        "author": "GitHub Community",
-        "author_url": "https://github.com",
+        "author": "GitHub Contributors",
+        "author_url": "https://github.com/search?q=ps2+texture+pack+pcsx2&type=repositories",
+        "is_hub": True,
         "url": "https://github.com/search?q=ps2+texture+pack+pcsx2&type=repositories",
         "type": ModType.TEXTURE_PACK,
         "source": "GitHub",
@@ -1011,8 +1058,9 @@ CATALOGUE: List[dict] = [
             "Silent Hill 2's atmospheric fog and lighting make HD textures very impactful. "
             "Check GBAtemp and PSX-Place for author-credited packs with settings recommendations."
         ),
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=silent+hill+2+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=silent+hill+2+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1031,8 +1079,9 @@ CATALOGUE: List[dict] = [
             "Upscaled environments, character and UI textures."
         ),
         "context": "SH3 has vibrant colours that upscale very well. Find packs on GBAtemp and PSX-Place.",
-        "author": "PSX-Place Community",
-        "author_url": "https://www.psx-place.com",
+        "author": "PSX-Place Members",
+        "author_url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "is_hub": True,
         "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
         "type": ModType.TEXTURE_PACK,
         "source": "PSX-Place",
@@ -1052,8 +1101,9 @@ CATALOGUE: List[dict] = [
             "Upscaled jungle, character and equipment textures."
         ),
         "context": "One of the most-requested PS2 texture projects. Check GBAtemp and LoversLab for Snake Eater and Subsistence packs.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=metal+gear+solid+3+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=metal+gear+solid+3+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1072,8 +1122,9 @@ CATALOGUE: List[dict] = [
             "Snake Eater (SLUS-20763). From the PCSX2 widescreen patches repository."
         ),
         "context": "Fetch this patch directly using the '🔧 Fetch PNACH from GitHub' button and enter the game CRC.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1093,8 +1144,9 @@ CATALOGUE: List[dict] = [
             "Upscaled UI, character portraits and environment textures."
         ),
         "context": "Persona 3's stylised UI and anime art style upscale beautifully with Waifu2x. Check GBAtemp and LoversLab.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=persona+3+texture+ps2&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=persona+3+texture+ps2&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -1114,8 +1166,9 @@ CATALOGUE: List[dict] = [
             "Makes the game look substantially better on modern displays."
         ),
         "context": "Multiple authors have published P4 texture packs on GBAtemp and LoversLab. Look for packs that cover both the dungeon and social link scenes.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=persona+4+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=persona+4+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1135,8 +1188,9 @@ CATALOGUE: List[dict] = [
             "Upscaled ink-wash art style textures — characters, environments and brush effects."
         ),
         "context": "Okami's unique cel-shaded art style responds remarkably well to texture upscaling. Check GBAtemp and LoversLab.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=okami+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=okami+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1156,8 +1210,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, environment and item textures."
         ),
         "context": "RE4 is widely modded. Check GBAtemp, LoversLab and GameBanana for texture packs. Many authors recommend Vulkan renderer with 4× resolution.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=resident+evil+4+ps2+texture&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=resident+evil+4+ps2+texture&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -1176,8 +1231,9 @@ CATALOGUE: List[dict] = [
             "Removes black bars and enables true 16:9 gameplay."
         ),
         "context": "Grab this patch from the PCSX2 widescreen patches GitHub using the '🔧 Fetch PNACH from GitHub' button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1197,8 +1253,9 @@ CATALOGUE: List[dict] = [
             "Upscaled palace, desert, and character textures."
         ),
         "context": "Check GBAtemp and PSX-Place for PoP texture packs. The game's rich colour palette upscales well.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=prince+of+persia+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=prince+of+persia+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1217,8 +1274,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, stage and UI textures."
         ),
         "context": "Tekken 5 is one of the best-looking PS2 games and its textures upscale very well. Find packs on GBAtemp and GameBanana.",
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/mods/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -1237,8 +1295,9 @@ CATALOGUE: List[dict] = [
             "Upscaled car liveries, track environments and menu textures."
         ),
         "context": "Burnout 3's high-speed action benefits enormously from HD textures. Check GBAtemp and Reddit r/ps2.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=burnout+3+texture",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=burnout+3+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -1258,8 +1317,9 @@ CATALOGUE: List[dict] = [
             "Upscaled city, vehicle and character textures."
         ),
         "context": "Vice City's 80s aesthetic and dense city blocks are transformed by HD textures. Check GBAtemp and Reddit for the latest packs.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=gta+vice+city+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=gta+vice+city+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1279,8 +1339,9 @@ CATALOGUE: List[dict] = [
             "Enables native 16:9 output for a better viewing experience."
         ),
         "context": "Get the widescreen patch from the PCSX2 GitHub using the 🔧 Fetch PNACH button and entering your game CRC.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1299,8 +1360,9 @@ CATALOGUE: List[dict] = [
             "Enable 16:9 widescreen output."
         ),
         "context": "The Jak series widescreen patches are well-maintained. Fetch from the PCSX2 GitHub using the 🔧 button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1319,8 +1381,9 @@ CATALOGUE: List[dict] = [
             "Covers R&C (SCUS-97199), Going Commando (SCUS-97268) and Up Your Arsenal (SCUS-97353)."
         ),
         "context": "Fetch these from the PCSX2 GitHub. Enter your specific game's CRC in the 🔧 PNACH fetcher.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1339,8 +1402,9 @@ CATALOGUE: List[dict] = [
             "battle speed boosts, and UI fixes."
         ),
         "context": "Community patches collected in the GBAtemp PS2 PNACH thread. Author info and version notes included.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/3519/?q=persona+3&t=file_update",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/3519/?q=persona+3&t=file_update",
         "type": ModType.PNACH,
         "source": "GBAtemp",
@@ -1360,8 +1424,9 @@ CATALOGUE: List[dict] = [
             "in multiple formats including PNACH. Includes rare region-specific codes."
         ),
         "context": "PNACH-format cheats compatible with PCSX2 cheats folder. Author credits and game CRCs included.",
-        "author": "PS2RD Community",
+        "author": "PS2RD Contributors",
         "author_url": "https://ps2cheats.com",
+        "is_hub": True,
         "url": "https://ps2cheats.com",
         "type": ModType.CHEAT,
         "source": "PS2RD",
@@ -1380,8 +1445,9 @@ CATALOGUE: List[dict] = [
             "game-specific patches. Authors post regional compatibility info."
         ),
         "context": "Community-validated cheats. Check post date for PCSX2 version compatibility.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=pnach+cheat&sort=new",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=pnach+cheat&sort=new",
         "type": ModType.CHEAT,
         "source": "Reddit",
@@ -1401,7 +1467,8 @@ CATALOGUE: List[dict] = [
         ),
         "context": "GameFAQs codes are in GameShark / CodeBreaker format. The PNACH Panel can import and auto-convert these.",
         "author": "GameFAQs Community",
-        "author_url": "https://gamefaqs.gamespot.com",
+        "author_url": "https://gamefaqs.gamespot.com/ps2/",
+        "is_hub": True,
         "url": "https://gamefaqs.gamespot.com/ps2/",
         "type": ModType.CHEAT,
         "source": "GameFAQs",
@@ -1421,8 +1488,9 @@ CATALOGUE: List[dict] = [
             "by the community. Good source for 100% completion saves and maxed-out profiles."
         ),
         "context": "Search for specific game titles to find relevant saves. Import using the Memory Card panel.",
-        "author": "Internet Archive",
-        "author_url": "https://archive.org",
+        "author": "Internet Archive Contributors",
+        "author_url": "https://archive.org/search?query=ps2+save+file&mediatype=data",
+        "is_hub": True,
         "url": "https://archive.org/search?query=ps2+save+file&mediatype=data",
         "type": ModType.SAVE_FILE,
         "source": "Archive.org",
@@ -1441,8 +1509,9 @@ CATALOGUE: List[dict] = [
             "unlocking extras, and helping with difficult sections."
         ),
         "context": "Check the post for region info (NTSC-U / PAL) before downloading — saves are region-locked.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=save+file&sort=new",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=save+file&sort=new",
         "type": ModType.SAVE_FILE,
         "source": "Reddit",
@@ -1462,8 +1531,9 @@ CATALOGUE: List[dict] = [
             "in freely accessible ZIP archives. A great long-term preservation source."
         ),
         "context": "Direct ZIP downloads available — use the '⬇ Download from URL' button with the Archive.org direct link.",
-        "author": "Internet Archive",
-        "author_url": "https://archive.org",
+        "author": "Internet Archive Contributors",
+        "author_url": "https://archive.org/search?query=ps2+hd+texture+pack+pcsx2",
+        "is_hub": True,
         "url": "https://archive.org/search?query=ps2+hd+texture+pack+pcsx2",
         "type": ModType.TEXTURE_PACK,
         "source": "Archive.org",
@@ -1486,8 +1556,9 @@ CATALOGUE: List[dict] = [
             "60fps patches work at the PNACH level — no emulator settings needed. "
             "Author attribution and game CRCs are included in each file."
         ),
-        "author": "PCSX2 Community",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Forum Members",
+        "author_url": "https://forums.pcsx2.net/search?q=60fps+patch&type=post",
+        "is_hub": True,
         "url": "https://forums.pcsx2.net/search?q=60fps+patch&type=post",
         "type": ModType.PNACH,
         "source": "PCSX2 Forums",
@@ -1506,8 +1577,9 @@ CATALOGUE: List[dict] = [
             "for PS2 games when played on PCSX2 with widescreen enabled."
         ),
         "context": "Often bundled with widescreen patches. Look for posts labelled 'HUD fix' or 'widescreen HUD correction'.",
-        "author": "PCSX2 Community",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Forum Members",
+        "author_url": "https://forums.pcsx2.net/search?q=hud+fix+widescreen&type=post",
+        "is_hub": True,
         "url": "https://forums.pcsx2.net/search?q=hud+fix+widescreen&type=post",
         "type": ModType.PNACH,
         "source": "PCSX2 Forums",
@@ -1527,8 +1599,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, jutsu effect and environment textures."
         ),
         "context": "Naruto's distinctive anime art style responds very well to Waifu2x upscaling. Check GBAtemp and LoversLab.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=naruto+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=naruto+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1547,8 +1620,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character portraits, jutsu effects and stage backgrounds."
         ),
         "context": "Search GameBanana and GBAtemp for Naruto Ultimate Ninja HD mods. The anime cel-shaded style benefits greatly from Waifu2x.",
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/mods/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -1567,8 +1641,9 @@ CATALOGUE: List[dict] = [
             "Upscaled wrestler portraits, arena and crowd textures."
         ),
         "context": "One of the most popular PS2 wrestling games for modding. Check GameBanana and GBAtemp for packs with specific wrestler rosters.",
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/mods/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -1587,8 +1662,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, campus and town environment textures."
         ),
         "context": "Bully's rich open world benefits greatly from HD textures. Check GBAtemp and Reddit for community packs.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=bully+texture+pack",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=bully+texture+pack",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -1607,8 +1683,9 @@ CATALOGUE: List[dict] = [
             "Upscaled car liveries, city environment and menu textures."
         ),
         "context": "NFS Most Wanted is one of the most played PS2 racing games. Check GBAtemp and GameBanana for community texture packs.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=need+for+speed+most+wanted+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=need+for+speed+most+wanted+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1627,8 +1704,9 @@ CATALOGUE: List[dict] = [
             "Upscaled car customisation, city streets and neon environment textures."
         ),
         "context": "NFS Underground 2 has a large modding community. Check GameBanana and GBAtemp for car livery and environment packs.",
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/mods/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -1647,8 +1725,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, demon and environment textures for this cult classic."
         ),
         "context": "God Hand's cartoon-ish 3D style upscales nicely. Find packs on PSX-Place and GBAtemp.",
-        "author": "PSX-Place Community",
-        "author_url": "https://www.psx-place.com",
+        "author": "PSX-Place Members",
+        "author_url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
+        "is_hub": True,
         "url": "https://www.psx-place.com/resources/categories/ps2-mods.18/",
         "type": ModType.TEXTURE_PACK,
         "source": "PSX-Place",
@@ -1667,8 +1746,9 @@ CATALOGUE: List[dict] = [
             "Upscaled cel-shaded character and stage textures."
         ),
         "context": "Viewtiful Joe's bold cel-shading style makes it excellent for HD upscaling. Check GBAtemp and LoversLab.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=viewtiful+joe+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=viewtiful+joe+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1687,8 +1767,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character portrait, cutscene and battle textures."
         ),
         "context": "Xenosaga's anime-adjacent art style responds very well to Waifu2x. Check GBAtemp and LoversLab for episode I–III packs.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=xenosaga+texture+ps2&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=xenosaga+texture+ps2&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -1707,8 +1788,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character, environment and monster textures."
         ),
         "context": "DQ VIII's vibrant cel-shaded art style benefits enormously from ESRGAN upscaling. Check GBAtemp for community packs.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=dragon+quest+viii+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=dragon+quest+viii+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1727,8 +1809,9 @@ CATALOGUE: List[dict] = [
             "Upscaled character portraits, battle and world map textures."
         ),
         "context": "SO3 has very detailed environments that upscale well. Check GBAtemp and PCSX2 Forums for community packs.",
-        "author": "PCSX2 Community",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Forum Members",
+        "author_url": "https://forums.pcsx2.net/search?q=star+ocean+texture",
+        "is_hub": True,
         "url": "https://forums.pcsx2.net/search?q=star+ocean+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "PCSX2 Forums",
@@ -1747,8 +1830,9 @@ CATALOGUE: List[dict] = [
             "and its sequels. Upscaled cel-shaded character and environment textures."
         ),
         "context": "Sly's bold cartoon style upscales beautifully. Check GBAtemp for packs covering all three PS2 Sly games.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/?q=sly+cooper+texture+ps2&t=post",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/?q=sly+cooper+texture+ps2&t=post",
         "type": ModType.TEXTURE_PACK,
         "source": "GBAtemp",
@@ -1767,8 +1851,9 @@ CATALOGUE: List[dict] = [
             "Upscaled objects, environment and UI textures for the quirky cult classic."
         ),
         "context": "Katamari's colorful distinct art style lends itself perfectly to texture upscaling. Check GBAtemp and Reddit r/ps2.",
-        "author": "Reddit r/ps2",
-        "author_url": "https://www.reddit.com/r/ps2",
+        "author": "r/ps2 Members",
+        "author_url": "https://www.reddit.com/r/ps2/search/?q=katamari+texture",
+        "is_hub": True,
         "url": "https://www.reddit.com/r/ps2/search/?q=katamari+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "Reddit",
@@ -1787,8 +1872,9 @@ CATALOGUE: List[dict] = [
             "Upscaled characters, Ivalice environment and UI textures."
         ),
         "context": "FF12 is a popular target for texture mods due to its large open world. Check GBAtemp and PCSX2 Forums for community packs.",
-        "author": "PCSX2 Community",
-        "author_url": "https://forums.pcsx2.net",
+        "author": "PCSX2 Forum Members",
+        "author_url": "https://forums.pcsx2.net/search?q=final+fantasy+xii+texture",
+        "is_hub": True,
         "url": "https://forums.pcsx2.net/search?q=final+fantasy+xii+texture",
         "type": ModType.TEXTURE_PACK,
         "source": "PCSX2 Forums",
@@ -1807,8 +1893,9 @@ CATALOGUE: List[dict] = [
             "Upscaled environment, character and codec textures."
         ),
         "context": "MGS2's highly detailed environments respond extremely well to ESRGAN upscaling. Check GBAtemp and LoversLab.",
-        "author": "LoversLab Community",
-        "author_url": "https://www.loverslab.com",
+        "author": "LoversLab Members",
+        "author_url": "https://www.loverslab.com/search/#q=metal+gear+solid+2+texture&type=downloads",
+        "is_hub": True,
         "url": "https://www.loverslab.com/search/#q=metal+gear+solid+2+texture&type=downloads",
         "type": ModType.TEXTURE_PACK,
         "source": "LoversLab",
@@ -1827,8 +1914,9 @@ CATALOGUE: List[dict] = [
             "Upscaled skate park environments, character and trick effect textures."
         ),
         "context": "THPS games have vibrant environments that upscale nicely. Check GBAtemp and GameBanana for packs.",
-        "author": "GameBanana Community",
-        "author_url": "https://gamebanana.com",
+        "author": "GameBanana Authors",
+        "author_url": "https://gamebanana.com/mods/games/ps2",
+        "is_hub": True,
         "url": "https://gamebanana.com/mods/games/ps2",
         "type": ModType.TEXTURE_PACK,
         "source": "GameBanana",
@@ -1848,8 +1936,9 @@ CATALOGUE: List[dict] = [
             "Enables true 16:9 output to match the beautiful ink-wash art style."
         ),
         "context": "Fetch this patch from the PCSX2 GitHub widescreen patches repo using the 🔧 PNACH button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1868,8 +1957,9 @@ CATALOGUE: List[dict] = [
             "Removes black bars for a proper 16:9 experience."
         ),
         "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1888,8 +1978,9 @@ CATALOGUE: List[dict] = [
             "Corrects aspect ratio for modern widescreen monitors."
         ),
         "context": "Get from the PCSX2 widescreen patches GitHub using the 🔧 button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1908,8 +1999,9 @@ CATALOGUE: List[dict] = [
             "Enables 16:9 output and smoother gameplay."
         ),
         "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1928,8 +2020,9 @@ CATALOGUE: List[dict] = [
             "Corrects the aspect ratio for a proper widescreen experience."
         ),
         "context": "Fetch from the PCSX2 GitHub widescreen patches using the 🔧 PNACH button.",
-        "author": "PCSX2 Team",
-        "author_url": "https://github.com/PCSX2",
+        "author": "PCSX2 GitHub Contributors",
+        "author_url": "https://github.com/PCSX2/pcsx2/graphs/contributors",
+        "is_hub": False,
         "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
         "type": ModType.PNACH,
         "source": "GitHub",
@@ -1949,8 +2042,9 @@ CATALOGUE: List[dict] = [
             "for various PS2 games. Great for exploring cut content."
         ),
         "context": "Found on GBAtemp and the PCSX2 forums. Author notes usually explain what each patch does and its game region.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/3519/?q=unlock+debug&t=file_update",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/3519/?q=unlock+debug&t=file_update",
         "type": ModType.CHEAT,
         "source": "GBAtemp",
@@ -1969,8 +2063,9 @@ CATALOGUE: List[dict] = [
             "GameShark and CodeBreaker code collections in various formats."
         ),
         "context": "Raw cheat codes in AR2/CodeBreaker format. The PNACH panel can import and convert many of these.",
-        "author": "Internet Archive",
-        "author_url": "https://archive.org",
+        "author": "Internet Archive Contributors",
+        "author_url": "https://archive.org/search?query=ps2+cheat+codes&mediatype=texts",
+        "is_hub": True,
         "url": "https://archive.org/search?query=ps2+cheat+codes&mediatype=texts",
         "type": ModType.CHEAT,
         "source": "Archive.org",
@@ -1990,8 +2085,9 @@ CATALOGUE: List[dict] = [
             "version notes. Authors often include completion percentage and unlock info."
         ),
         "context": "Check the author's post for region info (NTSC-U / PAL). Save files are region-locked so the right version matters.",
-        "author": "GBAtemp Community",
-        "author_url": "https://gbatemp.net",
+        "author": "GBAtemp Members",
+        "author_url": "https://gbatemp.net/search/3519/?q=ps2+save&t=file_update",
+        "is_hub": True,
         "url": "https://gbatemp.net/search/3519/?q=ps2+save&t=file_update",
         "type": ModType.SAVE_FILE,
         "source": "GBAtemp",
@@ -2011,8 +2107,9 @@ CATALOGUE: List[dict] = [
             "screenshots, and metadata. Excellent for finding regional cover variants."
         ),
         "context": "High-resolution box art from multiple regions. Useful for finding Japanese, European and Australian variants.",
-        "author": "MobyGames Community",
-        "author_url": "https://www.mobygames.com",
+        "author": "MobyGames Database",
+        "author_url": "https://www.mobygames.com/game/platform:ps2/",
+        "is_hub": True,
         "url": "https://www.mobygames.com/game/platform:ps2/",
         "type": ModType.COVER_ART,
         "source": "MobyGames",
@@ -2031,8 +2128,9 @@ CATALOGUE: List[dict] = [
             "screenshots, manuals and fanart. Free API for personal use."
         ),
         "context": "Used by EmulationStation and other frontends. Box art is available in multiple resolutions and regional variants.",
-        "author": "ScreenScraper Community",
-        "author_url": "https://www.screenscraper.fr",
+        "author": "ScreenScraper Contributors",
+        "author_url": "https://www.screenscraper.fr/gameinfos.php?plateforme=57",
+        "is_hub": True,
         "url": "https://www.screenscraper.fr/gameinfos.php?plateforme=57",
         "type": ModType.COVER_ART,
         "source": "ScreenScraper",
@@ -2068,6 +2166,7 @@ class CatalogueCard(QFrame):
         self.setObjectName("card")
         self.setMinimumWidth(240)
         self.setMaximumWidth(400)
+        self._fav_btn = None   # only created for non-hub entries
         self._build()
 
     def _build(self):
@@ -2129,35 +2228,71 @@ class CatalogueCard(QFrame):
             game_lbl.setStyleSheet("color: #80b0ff; font-size: 11px;")
             layout.addWidget(game_lbl)
 
-        # Author row with favorite button
+        # Author row — distinguishes a specific named author from a community hub
+        is_hub = self.entry.get("is_hub", False)
         author_row = QHBoxLayout()
-        author_lbl = QLabel(f"by {self.entry['author']}")
-        author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
-        author_row.addWidget(author_lbl)
-        author_row.addStretch()
 
-        # Favorite author button
-        is_fav = self.entry["author"] in getattr(self.config, "favorite_authors", [])
-        self._fav_btn = QPushButton("❤" if is_fav else "🤍")
-        self._fav_btn.setFixedSize(26, 22)
-        self._fav_btn.setStyleSheet(
-            "border: none; background: transparent; font-size: 14px;"
-            + ("color: #e94560;" if is_fav else "color: #505080;")
-        )
-        self._fav_btn.setToolTip(
-            "Remove from favorites" if is_fav else "Add author to favorites"
-        )
-        self._fav_btn.clicked.connect(self._toggle_favorite)
-        author_row.addWidget(self._fav_btn)
+        if is_hub:
+            # Hub entry: multiple authors, no specific person to credit
+            author_lbl = QLabel(
+                f"🔍 Multiple authors — see source for individual uploaders"
+            )
+            author_lbl.setStyleSheet(
+                "color: #507090; font-size: 10px; font-style: italic;"
+            )
+            author_row.addWidget(author_lbl, 1)
+        else:
+            # Specific person: show their name with profile link
+            author_lbl = QLabel(f"👤 {self.entry['author']}")
+            author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+            author_row.addWidget(author_lbl)
+            author_row.addStretch()
 
-        # Author link button
-        if self.entry.get("author_url"):
-            author_link = QPushButton("🔗")
-            author_link.setFixedSize(26, 22)
-            author_link.setStyleSheet("border: none; background: transparent; font-size: 14px; color: #5080d0;")
-            author_link.setToolTip(f"Visit author page: {self.entry['author_url']}")
-            author_link.clicked.connect(lambda: self.open_url.emit(self.entry["author_url"]))
-            author_row.addWidget(author_link)
+            # Favorite author button (only for known individuals)
+            is_fav = self.entry["author"] in getattr(self.config, "favorite_authors", [])
+            self._fav_btn = QPushButton("❤" if is_fav else "🤍")
+            self._fav_btn.setFixedSize(26, 22)
+            self._fav_btn.setStyleSheet(
+                "border: none; background: transparent; font-size: 14px;"
+                + ("color: #e94560;" if is_fav else "color: #505080;")
+            )
+            self._fav_btn.setToolTip(
+                "Remove from favorites" if is_fav else "Add author to favorites"
+            )
+            self._fav_btn.clicked.connect(self._toggle_favorite)
+            author_row.addWidget(self._fav_btn)
+
+            # Profile link button
+            if self.entry.get("author_url"):
+                author_link = QPushButton("🔗")
+                author_link.setFixedSize(26, 22)
+                author_link.setStyleSheet(
+                    "border: none; background: transparent; font-size: 14px; color: #5080d0;"
+                )
+                author_link.setToolTip(
+                    f"View {self.entry['author']}'s profile on {self.entry.get('source', 'source site')}"
+                )
+                author_link.clicked.connect(
+                    lambda: self.open_url.emit(self.entry["author_url"])
+                )
+                author_row.addWidget(author_link)
+
+        # For hub entries, still allow a "Browse source" link
+        if is_hub and self.entry.get("author_url"):
+            browse_link = QPushButton("🔍 Browse")
+            browse_link.setFixedWidth(72)
+            browse_link.setStyleSheet(
+                "border: none; background: transparent; font-size: 10px;"
+                "color: #507090; text-decoration: underline;"
+            )
+            browse_link.setToolTip(
+                f"Browse all mods on {self.entry.get('source', 'this source')}"
+            )
+            browse_link.clicked.connect(
+                lambda: self.open_url.emit(self.entry["author_url"])
+            )
+            author_row.addWidget(browse_link)
+
         layout.addLayout(author_row)
 
         # Description
