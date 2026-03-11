@@ -200,6 +200,7 @@ class ImportModDialog(QDialog):
                 detect_game_serial_from_file,
                 detect_serial_from_path,
                 serial_to_display,
+                lookup_game_title,
             )
             # 1. Try reading the file / filename first
             serial = detect_game_serial_from_file(path)
@@ -209,10 +210,35 @@ class ImportModDialog(QDialog):
                 serial = detect_serial_from_path(path)
             if serial:
                 self._gameid_edit.setText(serial)
-                # Show a helpful tooltip with the known game title
+                # Show a helpful tooltip with the known game title (local lookup first)
                 title = serial_to_display(serial)
                 self._gameid_edit.setToolTip(title)
                 self._gameid_edit.setPlaceholderText(title)
+
+                # If not found locally, try an async online lookup to enrich the tooltip
+                if not lookup_game_title(serial):
+                    import threading
+                    from PyQt6.QtCore import QTimer
+                    import weakref
+
+                    # Use a weak reference to avoid keeping the dialog alive after close
+                    self_ref = weakref.ref(self)
+
+                    def _online_lookup():
+                        from src.core.game_registry import serial_to_display_with_online_fallback
+                        display = serial_to_display_with_online_fallback(serial, timeout=5)
+
+                        def _update():
+                            dlg = self_ref()
+                            if dlg is None or not dlg.isVisible():
+                                return
+                            if display and display != serial:
+                                dlg._gameid_edit.setToolTip(display)
+                                dlg._gameid_edit.setPlaceholderText(display)
+
+                        QTimer.singleShot(0, _update)
+
+                    threading.Thread(target=_online_lookup, daemon=True).start()
         except Exception:
             pass
 

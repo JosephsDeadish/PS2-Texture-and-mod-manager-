@@ -37,7 +37,13 @@ from PyQt6.QtWidgets import (
 )
 
 from src.core.config_manager import THUMBNAILS_DIR, save_config
-from src.core.downloader import DownloadError, download_file
+from src.core.downloader import (
+    DownloadError,
+    download_file,
+    download_pcsx2_widescreen_patch,
+    list_pcsx2_widescreen_patches,
+    search_pcsx2_patches_by_crc,
+)
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
 
@@ -1381,11 +1387,244 @@ class DownloadInstallDialog(QDialog):
 
 
 # ---------------------------------------------------------------------------
-# Tab content widget
+# PNACH GitHub browser dialog
 # ---------------------------------------------------------------------------
 
-class _CatalogueTabContent(QWidget):
-    favorite_toggled = pyqtSignal(str, bool)
+class PnachGitHubDialog(QDialog):
+    """
+    Browse and download official PCSX2 widescreen PNACH patches directly
+    from the PCSX2 GitHub repository.
+
+    Allows users to:
+    - Load the full index of available patches from GitHub
+    - Search by 8-digit game CRC
+    - Download and install patches into the configured PNACH folder
+    """
+
+    def __init__(self, config: AppConfig, db, parent=None):
+        super().__init__(parent)
+        self.config = config
+        self.db = db
+        self.setWindowTitle("🔧 Fetch PNACH from PCSX2 GitHub")
+        self.setMinimumSize(620, 500)
+        self._patches: List[dict] = []
+        self._build()
+
+    def _build(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(18, 18, 18, 18)
+
+        info = QLabel(
+            "<b>Download official widescreen PNACH patches from the PCSX2 GitHub repository.</b><br>"
+            "These patches enable 16:9 widescreen mode for hundreds of PS2 games.<br>"
+            "All patches are from the open-source PCSX2 project (MIT licence)."
+        )
+        info.setTextFormat(Qt.TextFormat.RichText)
+        info.setWordWrap(True)
+        layout.addWidget(info)
+
+        # CRC search row
+        search_row = QHBoxLayout()
+        search_row.addWidget(QLabel("Game CRC (8 hex digits):"))
+        self._crc_edit = QLineEdit()
+        self._crc_edit.setPlaceholderText("e.g. F0A235B4")
+        self._crc_edit.setMaxLength(8)
+        self._crc_edit.textChanged.connect(self._filter_list)
+        search_row.addWidget(self._crc_edit, 1)
+
+        self._check_btn = QPushButton("🔍 Check CRC")
+        self._check_btn.clicked.connect(self._check_single_crc)
+        search_row.addWidget(self._check_btn)
+        layout.addLayout(search_row)
+
+        # Index browser
+        index_row = QHBoxLayout()
+        self._load_btn = QPushButton("📋 Load Full Patch Index")
+        self._load_btn.setObjectName("primary_btn")
+        self._load_btn.setToolTip("Fetch the complete list of widescreen patches from PCSX2 GitHub (requires internet)")
+        self._load_btn.clicked.connect(self._load_index)
+        index_row.addWidget(self._load_btn)
+
+        self._count_lbl = QLabel("")
+        self._count_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+        index_row.addWidget(self._count_lbl)
+        index_row.addStretch()
+        layout.addLayout(index_row)
+
+        # Patch list
+        self._list_widget = QScrollArea()
+        self._list_widget.setWidgetResizable(True)
+        self._list_widget.setFrameShape(QFrame.Shape.StyledPanel)
+        self._list_container = QWidget()
+        self._list_layout = QVBoxLayout(self._list_container)
+        self._list_layout.setContentsMargins(4, 4, 4, 4)
+        self._list_layout.setSpacing(4)
+        self._list_layout.addStretch()
+        self._list_widget.setWidget(self._list_container)
+        layout.addWidget(self._list_widget, 1)
+
+        # Progress / status
+        self._progress = QProgressBar()
+        self._progress.setRange(0, 0)
+        self._progress.hide()
+        layout.addWidget(self._progress)
+
+        self._status = QLabel("")
+        self._status.setWordWrap(True)
+        self._status.setStyleSheet("color: #9090b0; font-size: 12px;")
+        layout.addWidget(self._status)
+
+        btns = QHBoxLayout()
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.reject)
+        btns.addStretch()
+        btns.addWidget(close_btn)
+        layout.addLayout(btns)
+
+    def _load_index(self):
+        self._load_btn.setEnabled(False)
+        self._progress.show()
+        self._status.setText("Fetching patch index from PCSX2 GitHub…")
+
+        def _run():
+            patches = list_pcsx2_widescreen_patches(timeout=15)
+
+            def _done():
+                self._patches = patches
+                self._progress.hide()
+                self._load_btn.setEnabled(True)
+                if patches:
+                    self._count_lbl.setText(f"  {len(patches)} patches available")
+                    self._status.setText(f"✅  Loaded {len(patches)} widescreen patches from PCSX2 GitHub.")
+                    self._populate_list(patches)
+                else:
+                    self._status.setText("❌  Could not fetch patch index. Check your internet connection.")
+
+            QTimer.singleShot(0, _done)
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _check_single_crc(self):
+        crc = self._crc_edit.text().strip().upper()
+        if len(crc) != 8:
+            self._status.setText("⚠  Please enter a valid 8-digit hex CRC (e.g. F0A235B4)")
+            return
+        self._check_btn.setEnabled(False)
+        self._progress.show()
+        self._status.setText(f"Checking for widescreen patch for CRC {crc}…")
+
+        def _run():
+            result = search_pcsx2_patches_by_crc(crc, timeout=10)
+
+            def _done():
+                self._progress.hide()
+                self._check_btn.setEnabled(True)
+                if result:
+                    self._patches = [result]
+                    self._populate_list([result])
+                    self._status.setText(f"✅  Widescreen patch found for {crc}!")
+                else:
+                    self._populate_list([])
+                    self._status.setText(f"❌  No widescreen patch found for CRC {crc}.")
+
+            QTimer.singleShot(0, _done)
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _filter_list(self, text: str):
+        if not self._patches:
+            return
+        q = text.strip().upper()
+        filtered = [p for p in self._patches if q in p["crc"]] if q else self._patches
+        self._populate_list(filtered)
+
+    def _populate_list(self, patches: List[dict]):
+        # Remove all existing widgets except the trailing stretch
+        while self._list_layout.count() > 1:
+            item = self._list_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        for patch in patches[:200]:  # cap display at 200 for UI performance (PCSX2 repo has ~500+ patches)
+            row = self._make_patch_row(patch)
+            self._list_layout.insertWidget(self._list_layout.count() - 1, row)
+
+        if not patches:
+            lbl = QLabel("No patches match the current filter.")
+            lbl.setStyleSheet("color: #606080; font-size: 12px; padding: 8px;")
+            self._list_layout.insertWidget(0, lbl)
+
+    def _make_patch_row(self, patch: dict) -> QFrame:
+        frame = QFrame()
+        frame.setObjectName("card")
+        frame.setMaximumHeight(44)
+        row = QHBoxLayout(frame)
+        row.setContentsMargins(8, 4, 8, 4)
+        row.setSpacing(8)
+
+        crc_lbl = QLabel(f"<b>{patch['crc']}</b>")
+        crc_lbl.setStyleSheet("font-family: monospace; font-size: 12px; color: #80b0ff;")
+        crc_lbl.setFixedWidth(110)
+        row.addWidget(crc_lbl)
+
+        file_lbl = QLabel(patch["filename"])
+        file_lbl.setStyleSheet("color: #9090b0; font-size: 11px;")
+        row.addWidget(file_lbl, 1)
+
+        dl_btn = QPushButton("⬇ Install")
+        dl_btn.setFixedWidth(80)
+        dl_btn.setObjectName("primary_btn")
+        dl_btn.clicked.connect(lambda _checked, p=patch: self._install_patch(p, dl_btn))
+        row.addWidget(dl_btn)
+
+        return frame
+
+    def _install_patch(self, patch: dict, btn: QPushButton):
+        pnach_dir = self.config.pnach_path
+        if not pnach_dir:
+            QMessageBox.warning(
+                self, "PNACH Folder Not Configured",
+                "Please configure a PNACH folder in Settings before installing patches.",
+            )
+            return
+        btn.setEnabled(False)
+        btn.setText("⏳")
+        self._status.setText(f"Downloading {patch['filename']}…")
+
+        def _run():
+            path = download_pcsx2_widescreen_patch(patch["crc"], pnach_dir, timeout=15)
+
+            def _done():
+                btn.setEnabled(True)
+                if path:
+                    btn.setText("✅")
+                    btn.setStyleSheet("color: #40c040;")
+                    self._status.setText(f"✅  Installed: {path}")
+                    # Register the patch in the mod database
+                    if self.db is not None:
+                        try:
+                            from src.core.mod_manager import ModManager
+                            mgr = ModManager(self.db)
+                            mgr.install_from_folder(
+                                source_path=path,
+                                mod_type=ModType.PNACH,
+                                dest_base=pnach_dir,
+                                name=f"Widescreen Patch ({patch['crc']})",
+                                author="PCSX2 Team",
+                            )
+                        except Exception as _reg_exc:  # DB registration is best-effort
+                            import sys
+                            print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)
+                else:
+                    btn.setText("⬇ Install")
+                    self._status.setText(f"❌  Download failed for {patch['filename']}.")
+
+            QTimer.singleShot(0, _done)
+
+        threading.Thread(target=_run, daemon=True).start()
+
+
 
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -1514,6 +1753,14 @@ class BrowsePanel(BasePanel):
         )
         dl_btn.clicked.connect(self._open_download_dialog)
         toolbar.addWidget(dl_btn)
+
+        pnach_btn = QPushButton("🔧 Fetch PNACH from GitHub")
+        pnach_btn.setToolTip(
+            "Browse and download official PCSX2 widescreen PNACH patches "
+            "directly from the PCSX2 GitHub repository"
+        )
+        pnach_btn.clicked.connect(self._open_pnach_github_dialog)
+        toolbar.addWidget(pnach_btn)
 
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
@@ -1654,6 +1901,10 @@ class BrowsePanel(BasePanel):
 
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
+        dlg.exec()
+
+    def _open_pnach_github_dialog(self):
+        dlg = PnachGitHubDialog(self.config, self._db, self)
         dlg.exec()
 
     def _open_url(self, url: str):

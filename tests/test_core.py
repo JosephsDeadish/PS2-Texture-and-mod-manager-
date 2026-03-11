@@ -2103,3 +2103,179 @@ class TestSetEnabledAutoDeployBehaviour(unittest.TestCase):
         cfg = AppConfig.from_dict(old_dict)
         self.assertEqual(cfg.pnach_path, "/cheats")
         self.assertFalse(hasattr(cfg, "auto_deploy"))
+
+
+# =============================================================================
+# Online game title lookup (mocked network)
+# =============================================================================
+
+class TestOnlineGameTitleLookup(unittest.TestCase):
+    """Tests for serial_to_display_with_online_fallback and
+    lookup_game_title_with_online_fallback."""
+
+    def test_known_serial_uses_local_registry_no_network(self):
+        """Known serials should NOT trigger a network call."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        with patch("src.core.downloader.requests.get") as mock_get:
+            result = serial_to_display_with_online_fallback("SLUS-20062")
+        mock_get.assert_not_called()
+        self.assertIn("SLUS-20062", result)
+        self.assertIn("Spyro", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_unknown_serial_tries_online_lookup(self, mock_get):
+        """Unknown serials should attempt an online lookup."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<title>SLUS-99999 - Test Online Game | GameTDB</title>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = serial_to_display_with_online_fallback("SLUS-99999")
+        mock_get.assert_called_once()
+        self.assertIn("SLUS-99999", result)
+        self.assertIn("Test Online Game", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_unknown_serial_online_failure_returns_serial_only(self, mock_get):
+        """If the online lookup fails, the serial alone is returned."""
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        mock_get.side_effect = Exception("network error")
+        result = serial_to_display_with_online_fallback("SLUS-99999")
+        self.assertEqual(result, "SLUS-99999")
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_with_online_fallback_known(self, mock_get):
+        """Known serials should return title from local registry."""
+        from src.core.game_registry import lookup_game_title_with_online_fallback
+        result = lookup_game_title_with_online_fallback("SLUS-20062")
+        mock_get.assert_not_called()
+        self.assertIn("Spyro", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_with_online_fallback_unknown_network_error(self, mock_get):
+        """Network errors during online lookup should return empty string."""
+        from src.core.game_registry import lookup_game_title_with_online_fallback
+        mock_get.side_effect = Exception("timeout")
+        result = lookup_game_title_with_online_fallback("SLUS-99999")
+        self.assertEqual(result, "")
+
+    def test_serial_to_display_with_online_fallback_empty(self):
+        from src.core.game_registry import serial_to_display_with_online_fallback
+        self.assertEqual(serial_to_display_with_online_fallback(""), "")
+
+
+# =============================================================================
+# PCSX2 widescreen PNACH fetcher (mocked network)
+# =============================================================================
+
+class TestPcsx2PnachFetcher(unittest.TestCase):
+    """Tests for list_pcsx2_widescreen_patches and download_pcsx2_widescreen_patch."""
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_patches_returns_entries(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.json.return_value = [
+            {
+                "name": "F0A235B4.pnach",
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/F0A235B4.pnach",
+            },
+            {
+                "name": "A94060E1.pnach",
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/A94060E1.pnach",
+            },
+            {
+                "name": "README.md",  # should be filtered out (not a .pnach)
+                "download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/cheats_ws/README.md",
+            },
+        ]
+        mock_get.return_value = mock_resp
+
+        patches = list_pcsx2_widescreen_patches()
+        self.assertEqual(len(patches), 2)
+        crcs = [p["crc"] for p in patches]
+        self.assertIn("F0A235B4", crcs)
+        self.assertIn("A94060E1", crcs)
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_patches_network_error_returns_empty(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+        mock_get.side_effect = Exception("network error")
+        result = list_pcsx2_widescreen_patches()
+        self.assertEqual(result, [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_patch_success(self, mock_get):
+        from src.core.downloader import download_pcsx2_widescreen_patch
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "100"}
+        mock_resp.iter_content.return_value = [b"// PNACH content"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            result = download_pcsx2_widescreen_patch("F0A235B4", d)
+            self.assertIsNotNone(result)
+            self.assertTrue(result.endswith("F0A235B4.pnach"))
+            self.assertTrue(Path(result).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_patch_not_found_returns_none(self, mock_get):
+        from src.core.downloader import download_pcsx2_widescreen_patch
+        import tempfile
+        import requests as _requests
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status.side_effect = _requests.HTTPError("404")
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            result = download_pcsx2_widescreen_patch("00000000", d)
+            self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_found(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("F0A235B4")
+        self.assertIsNotNone(result)
+        self.assertEqual(result["crc"], "F0A235B4")
+        self.assertTrue(result["filename"].endswith(".pnach"))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_not_found(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("00000000")
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_by_crc_normalises_case(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_head.return_value = mock_resp
+
+        result = search_pcsx2_patches_by_crc("f0a235b4")  # lower-case input
+        self.assertEqual(result["crc"], "F0A235B4")
