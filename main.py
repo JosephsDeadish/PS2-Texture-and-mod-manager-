@@ -11,11 +11,22 @@ if _here not in sys.path:
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QIcon
 
 from src.core.config_manager import load_config
+from src.core.assets import icon_path, ico_path
 from src.ui.main_window import MainWindow
 from src.ui.theme import apply_theme
+
+
+def _load_app_icon() -> QIcon:
+    """Return the application icon, using available sizes for best quality."""
+    icon = QIcon()
+    for size in (16, 32, 48, 256):
+        path = icon_path(size)
+        if os.path.exists(path):
+            icon.addFile(path)
+    return icon
 
 
 def main():
@@ -26,6 +37,7 @@ def main():
     app.setApplicationName("PS2 Mod Manager")
     app.setApplicationVersion("1.0.0")
     app.setOrganizationName("PS2ModManager")
+    app.setOrganizationDomain("ps2modmanager.github.io")
 
     # Set default font
     font = QFont("Segoe UI", 10)
@@ -35,11 +47,16 @@ def main():
     # Apply dark theme
     apply_theme(app)
 
+    # Set application icon (shows in taskbar / Alt+Tab / title bar / Windows Explorer)
+    app_icon = _load_app_icon()
+    app.setWindowIcon(app_icon)
+
     # Load configuration
     config = load_config()
 
     # Create and show main window
     window = MainWindow(config)
+    window.setWindowIcon(app_icon)
     window.show()
 
     sys.exit(app.exec())

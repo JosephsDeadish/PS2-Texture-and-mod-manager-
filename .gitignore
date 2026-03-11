@@ -20,6 +20,11 @@ wheels/
 .installed.cfg
 MANIFEST
 
+# PyInstaller
+*.spec.bak
+__pycache__/
+*.manifest
+
 # Virtual environments
 venv/
 env/

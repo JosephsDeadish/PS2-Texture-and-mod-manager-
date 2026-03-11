@@ -1,6 +1,6 @@
 """Settings panel for PS2 Mod Manager."""
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -18,6 +18,9 @@ from src.core.config_manager import save_config
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
+
+PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+APP_VERSION = "1.0.0"
 
 
 class SettingsPanel(BasePanel):
@@ -99,6 +102,38 @@ class SettingsPanel(BasePanel):
         wizard_btn.clicked.connect(self.rerun_wizard.emit)
         layout.addWidget(wizard_btn)
 
+        layout.addWidget(_sep())
+
+        # ---- About / Patreon ----
+        layout.addWidget(_section("About"))
+
+        about_lbl = QLabel(
+            f"<b>PS2 Mod Manager</b>  v{APP_VERSION}<br>"
+            "A free, open-source mod manager for PCSX2.<br><br>"
+            "Manage texture packs, PNACH patches, cover art, memory cards, and cheats "
+            "all in one place.<br><br>"
+            f'If you enjoy this app, please consider supporting the developer on '
+            f'<a href="{PATREON_URL}" style="color:#f96854;">Patreon</a>!'
+        )
+        about_lbl.setOpenExternalLinks(True)
+        about_lbl.setWordWrap(True)
+        about_lbl.setStyleSheet("color: #9090b0; font-size: 12px; line-height: 1.6;")
+        layout.addWidget(about_lbl)
+
+        patreon_btn = QPushButton("❤  Support on Patreon")
+        patreon_btn.setObjectName("patreon_btn")
+        patreon_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        patreon_btn.clicked.connect(self._open_patreon)
+        layout.addWidget(patreon_btn)
+
+        github_lbl = QLabel(
+            '<a href="https://github.com/JosephsDeadish/PS2-Texture-and-mod-manager-" '
+            'style="color:#6090d0;">View Source on GitHub</a>'
+        )
+        github_lbl.setOpenExternalLinks(True)
+        github_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(github_lbl)
+
         layout.addStretch()
         scroll.setWidget(container)
         content.addWidget(scroll, 1)
@@ -137,6 +172,11 @@ class SettingsPanel(BasePanel):
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
         self._memcards_chooser.set_path(paths.get("memcards_path", ""))
         self._cheats_chooser.set_path(paths.get("cheats_path", ""))
+
+    def _open_patreon(self):
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl(PATREON_URL))
 
     def reload_config(self, config: AppConfig):
         """Update displayed values when config changes."""

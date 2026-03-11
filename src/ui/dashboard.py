@@ -16,6 +16,8 @@ from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
 
+PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+
 
 class StatCard(QFrame):
     """A numeric stat card shown on the dashboard."""
@@ -178,6 +180,43 @@ class DashboardPanel(BasePanel):
             cfg_layout.addLayout(row)
 
         content.addWidget(cfg_frame)
+
+        # ---- Patreon / About banner ----
+        about_frame = QFrame()
+        about_frame.setObjectName("card")
+        about_frame.setStyleSheet(
+            "QFrame#card { border: 1px solid #f96854; background: #1e1010; }"
+        )
+        about_layout = QHBoxLayout(about_frame)
+        about_layout.setContentsMargins(16, 14, 16, 14)
+        about_layout.setSpacing(16)
+
+        heart_lbl = QLabel("❤")
+        heart_lbl.setStyleSheet("font-size: 36px;")
+        about_layout.addWidget(heart_lbl)
+
+        msg_col = QVBoxLayout()
+        msg_col.setSpacing(4)
+        msg_title = QLabel("<b>PS2 Mod Manager is free!</b>")
+        msg_title.setStyleSheet("font-size: 14px; color: #f96854;")
+        msg_col.addWidget(msg_title)
+        msg_sub = QLabel(
+            "If you enjoy this tool, please consider supporting the developer on Patreon.\n"
+            "Your support helps keep the project alive and funded!"
+        )
+        msg_sub.setStyleSheet("color: #c0a0a0; font-size: 12px;")
+        msg_sub.setWordWrap(True)
+        msg_col.addWidget(msg_sub)
+        about_layout.addLayout(msg_col, 1)
+
+        patreon_btn = QPushButton("❤  Support on Patreon")
+        patreon_btn.setObjectName("patreon_btn")
+        patreon_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        patreon_btn.setFixedWidth(180)
+        patreon_btn.clicked.connect(self._open_patreon)
+        about_layout.addWidget(patreon_btn)
+
+        content.addWidget(about_frame)
         content.addStretch()
 
     def refresh(self):
@@ -187,3 +226,8 @@ class DashboardPanel(BasePanel):
             if item.widget():
                 item.widget().deleteLater()
         self._build()
+
+    def _open_patreon(self):
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl(PATREON_URL))

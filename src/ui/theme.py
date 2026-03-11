@@ -375,6 +375,21 @@ QSlider::sub-page:horizontal {
     border-radius: 3px;
 }
 
+/* ===== Patreon button ===== */
+QPushButton#patreon_btn {
+    background-color: #f96854;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 4px 8px;
+    font-size: 12px;
+}
+
+QPushButton#patreon_btn:hover {
+    background-color: #ff8070;
+}
+
 /* ===== Separator ===== */
 QFrame[frameShape="4"],
 QFrame[frameShape="5"] {

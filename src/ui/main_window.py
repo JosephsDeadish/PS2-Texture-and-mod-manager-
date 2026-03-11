@@ -27,6 +27,8 @@ from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
 
+PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+
 
 # ---------------------------------------------------------------------------
 # Sidebar navigation button
@@ -118,6 +120,16 @@ class MainWindow(QMainWindow):
         sep2.setFrameShape(QFrame.Shape.HLine)
         sep2.setStyleSheet("color: #0f3460; margin: 0 12px;")
         sidebar_layout.addWidget(sep2)
+
+        # Patreon support banner
+        patreon_btn = QPushButton("❤  Support on Patreon")
+        patreon_btn.setObjectName("patreon_btn")
+        patreon_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        patreon_btn.setToolTip(PATREON_URL)
+        patreon_btn.clicked.connect(self._open_patreon)
+        sidebar_layout.addWidget(patreon_btn)
+
+        sidebar_layout.addSpacing(4)
 
         # Settings button
         settings_btn = NavButton("⚙️", "Settings")
@@ -216,6 +228,11 @@ class MainWindow(QMainWindow):
 
     def _show_status(self, msg: str):
         self._status_bar.showMessage(msg, 5000)
+
+    def _open_patreon(self):
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl(PATREON_URL))
 
     # ------------------------------------------------------------------
     # First-run / Setup Wizard
