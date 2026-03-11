@@ -3,6 +3,7 @@
 Supports:
   - .zip  (Python stdlib zipfile — always available)
   - .7z   (py7zr — optional, graceful fallback if not installed)
+  - .rar  (rarfile + unrar — optional, helpful error if not installed)
   - Multi-part archives (common for large PS2 texture packs):
       * Named zip parts:   Pack_Part1.zip, Pack_Part2.zip, …  (extract each)
       * 7-zip volumes:     Pack.7z.001, Pack.7z.002, …        (py7zr handles)
@@ -242,10 +243,7 @@ def extract_archive(source_path: str, dest_dir: str) -> List[str]:
     elif ext == ".7z":
         return _extract_7z(src, dest)
     elif ext == ".rar":
-        raise ArchiveError(
-            "RAR extraction is not supported.\n"
-            "Please extract the RAR file manually and import the resulting folder."
-        )
+        return _extract_rar(src, dest)
     else:
         raise ArchiveError(f"Unsupported archive format: {ext!r}")
 
@@ -319,5 +317,55 @@ def _extract_7z(src: Path, dest: Path) -> List[str]:
         if isinstance(exc, ArchiveError):
             raise
         raise ArchiveError(f"7z extraction failed: {exc}") from exc
+
+    return extracted
+
+
+def _extract_rar(src: Path, dest: Path) -> List[str]:
+    """Extract a RAR archive using the ``rarfile`` package (optional dependency).
+
+    ``rarfile`` requires the ``unrar`` or ``bsdtar`` command-line tool to be
+    installed on the system.  If neither the Python package nor the system tool
+    is available, a helpful :class:`ArchiveError` is raised.
+
+    Returns a list of relative paths of all extracted files.
+    """
+    try:
+        import rarfile  # type: ignore[import]
+    except ImportError:
+        raise ArchiveError(
+            "RAR extraction requires the 'rarfile' Python package.\n"
+            "Install it with:  pip install rarfile\n"
+            "You also need the 'unrar' command-line tool:\n"
+            "  • Windows: download from https://www.rarlab.com/rar_add.htm\n"
+            "  • Linux:   sudo apt install unrar\n"
+            "  • macOS:   brew install rar\n\n"
+            "Alternatively, extract the RAR manually and import the resulting folder."
+        )
+
+    extracted: List[str] = []
+    try:
+        with rarfile.RarFile(str(src)) as rf:
+            members = rf.infolist()
+            for member in members:
+                if member.is_dir():
+                    continue
+                if not _safe_name(member.filename):
+                    raise ArchiveError(
+                        f"Archive contains unsafe path: {member.filename!r}"
+                    )
+            rf.extractall(str(dest))
+            extracted = [m.filename for m in members if not m.is_dir()]
+    except rarfile.BadRarFile as exc:
+        raise ArchiveError(f"Corrupt RAR file: {exc}") from exc
+    except rarfile.RarCannotExec as exc:
+        raise ArchiveError(
+            f"RAR extraction tool not found: {exc}\n"
+            "Install 'unrar' and ensure it is on your PATH."
+        ) from exc
+    except Exception as exc:
+        if isinstance(exc, ArchiveError):
+            raise
+        raise ArchiveError(f"RAR extraction failed: {exc}") from exc
 
     return extracted

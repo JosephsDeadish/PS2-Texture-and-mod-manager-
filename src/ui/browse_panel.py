@@ -5231,6 +5231,161 @@ CATALOGUE: List[dict] = [
         "requires_account": True,
         "is_complete": False,
     },
+    # ── GBAtemp Downloads — PS2 Save Files ───────────────────────────────────
+    # Source: https://gbatemp.net/download/categories/game-saves.1396/
+    {
+        "id": "gbatemp_downloads_saves_hub",
+        "name": "GBAtemp Downloads — PS2 Save Files Category",
+        "description": (
+            "GBAtemp's Downloads section hosts hundreds of PS2 save files submitted "
+            "by the community.  Each upload includes region info, completion percentage, "
+            "and unlock notes.  Saves come in ZIP, RAR, or as raw .ps2/.psu files."
+        ),
+        "context": (
+            "Use the '🔍 Scan GBAtemp/PS2-Home Post' button to paste any individual "
+            "download page URL (e.g. https://gbatemp.net/download/title.38672/) and "
+            "auto-detect the author, file, and download link for one-click install."
+        ),
+        "author": "",
+        "author_url": "https://gbatemp.net/download/categories/game-saves.1396/",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://gbatemp.net/download/categories/game-saves.1396/",
+        "type": ModType.SAVE_FILE,
+        "source": "GBAtemp",
+        "game": "",
+        "thumbnail_url": "https://gbatemp.net/styles/gbatemp/logo.png",
+        "tags": ["saves", "community", "gbatemp", "downloads"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "sly2_save_gamefiles",
+        "name": "Sly 2: Band of Thieves — 100% Complete Save (PAL)",
+        "description": (
+            "100% complete game save for Sly 2: Band of Thieves — PAL (European) region. "
+            "All levels finished, all clue bottles collected. "
+            "Submitted by GameSavedFiles on GBAtemp Downloads."
+        ),
+        "context": (
+            "This is a PAL save — only works with the PAL (SCES-52400) disc. "
+            "If you have the NTSC-U version (SLUS-20816), look for an NTSC save instead. "
+            "Import using the Memory Card panel after download."
+        ),
+        "author": "GameSavedFiles",
+        "author_url": "https://gbatemp.net/download/categories/game-saves.1396/",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/download/sly-2-band-of-thieves-ps2-europe.38672/",
+        "type": ModType.SAVE_FILE,
+        "source": "GBAtemp",
+        "game": "Sly 2: Band of Thieves",
+        "thumbnail_url": "",
+        "tags": ["sly", "sly-2", "save", "100%", "pal", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": True,
+        "is_complete": True,
+    },
+    {
+        "id": "bully_save_moataz",
+        "name": "Bully / Canis Canem Edit — 100% Save + Chapter Saves",
+        "description": (
+            "Complete 100% save file and chapter-by-chapter saves for Bully "
+            "(also known as Canis Canem Edit in PAL regions). "
+            "Includes saves at the start of each chapter so you can jump to any point. "
+            "Uploaded by moataz on GBAtemp. File hosted on MediaFire (RAR archive)."
+        ),
+        "context": (
+            "The download is a RAR file — the app will attempt to extract it automatically "
+            "(requires the 'rarfile' package and 'unrar' tool). "
+            "If extraction fails, extract manually and import the folder. "
+            "Check the GBAtemp post for region compatibility before using."
+        ),
+        "author": "moataz",
+        "author_url": "https://gbatemp.net/members/moataz.683955/#recent-content",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://gbatemp.net/download/bully-saves-100-and-more.38390/",
+        "type": ModType.SAVE_FILE,
+        "source": "GBAtemp",
+        "game": "Bully / Canis Canem Edit",
+        "thumbnail_url": "",
+        "tags": ["bully", "canis-canem-edit", "rockstar", "save", "100%", "gbatemp"],
+        "download_action": "",
+        "direct_download_url": "https://www.mediafire.com/file/hktfw1t8dv4etgo/bully_saves_100%25_and_saves_on_other_chapters.rar/file",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    # ── PS2-Home — Save Files ─────────────────────────────────────────────────
+    {
+        "id": "ps2home_saves_hub",
+        "name": "PS2-Home Forum — Save Files",
+        "description": (
+            "PS2-Home hosts a large forum archive of PS2 save files shared by the "
+            "community.  Saves are posted as attachments or external download links. "
+            "The forum covers a wide range of titles across all regions."
+        ),
+        "context": (
+            "Paste any ps2-home.com forum topic URL into the "
+            "'🔍 Scan GBAtemp/PS2-Home Post' tool to auto-detect the author and "
+            "download links for one-click install."
+        ),
+        "author": "",
+        "author_url": "https://www.ps2-home.com/forum/viewforum.php?f=70",
+        "is_hub": True,
+        "nsfw": False,
+        "url": "https://www.ps2-home.com/forum/viewforum.php?f=70",
+        "type": ModType.SAVE_FILE,
+        "source": "PS2-Home",
+        "game": "",
+        "thumbnail_url": "",
+        "tags": ["saves", "community", "ps2-home"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
+    {
+        "id": "atv_fury_save_ps2home",
+        "name": "ATV Off-Road Fury — Game Save",
+        "description": (
+            "Community game save for ATV Off Road Fury posted on PS2-Home. "
+            "Author: jumper cable. "
+            "Download link and save details are on the PS2-Home forum post."
+        ),
+        "context": (
+            "Open the PS2-Home forum post via '🌐 Visit Source' to check region "
+            "compatibility and see what the save contains. "
+            "Or paste the URL into '🔍 Scan GBAtemp/PS2-Home Post' for one-click install."
+        ),
+        "author": "jumper cable",
+        "author_url": "https://www.ps2-home.com/forum/viewforum.php?f=70",
+        "is_hub": False,
+        "nsfw": False,
+        "url": "https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165",
+        "type": ModType.SAVE_FILE,
+        "source": "PS2-Home",
+        "game": "ATV Off-Road Fury",
+        "thumbnail_url": "",
+        "tags": ["atv", "off-road-fury", "save", "ps2-home"],
+        "download_action": "",
+        "direct_download_url": "",
+        "upscale_tech": "",
+        "is_free": True,
+        "requires_account": False,
+        "is_complete": True,
+    },
 ]
 
 # Collect unique sources for the source filter dropdown
@@ -5685,8 +5840,11 @@ class DownloadInstallDialog(QDialog):
 
         info = QLabel(
             "<b>Paste a direct download URL below.</b><br>"
-            "Supported: HTTPS links to ZIP, 7z, PNACH, PNG, Google Drive, "
+            "Supported: HTTPS links to ZIP, 7z, RAR, PNACH, PNG, Google Drive, "
             "<span style='color:#60b0e0;'>MediaFire</span> (auto-resolved).<br>"
+            "<span style='color:#a0c070;'>RAR files</span> are extracted automatically "
+            "if the <code>rarfile</code> package and <code>unrar</code> tool are installed "
+            "(run: <code>pip install rarfile</code>).<br>"
             "MEGA links must be downloaded manually.<br>"
             "<span style='color:#a08040;'>🔒 Patreon attachments:</span> "
             "log in to Patreon, open the post, download <b>all parts</b> to the same "
@@ -6183,19 +6341,20 @@ class PnachGitHubDialog(QDialog):
 # ---------------------------------------------------------------------------
 
 class GBATempScraperDialog(QDialog):
-    """Paste a GBAtemp thread URL to auto-discover author info and download links.
+    """Paste a GBAtemp or PS2-Home post URL to auto-discover author info and download links.
 
     The dialog:
-    1. Fetches and parses the GBAtemp thread page (via :func:`scrape_gbatemp_thread`)
-    2. Shows the detected title, author, game serial, and every download link found
-    3. Lets the user one-click-install any of the discovered variants
+    1. Detects whether the URL is a GBAtemp page (threads or downloads) or a PS2-Home forum topic
+    2. Fetches and parses the page via the appropriate scraper
+    3. Shows the detected title, author, game serial, and every download link found
+    4. Lets the user one-click-install any of the discovered variants
     """
 
     def __init__(self, config: AppConfig, db, parent=None):
         super().__init__(parent)
         self.config = config
         self.db = db
-        self.setWindowTitle("🔍 Scrape GBAtemp Thread")
+        self.setWindowTitle("🔍 Scan GBAtemp / PS2-Home Post")
         self.setMinimumSize(720, 560)
         self._build()
 
@@ -6205,19 +6364,19 @@ class GBATempScraperDialog(QDialog):
         layout.setContentsMargins(18, 18, 18, 18)
 
         intro = QLabel(
-            "<b>Paste a GBAtemp thread URL</b> to automatically discover the author, "
+            "<b>Paste a GBAtemp or PS2-Home URL</b> to automatically discover the author, "
             "game serial, and all download links (MediaFire, Google Drive, MEGA, etc.).<br>"
-            "Each discovered link is offered as a one-click install."
+            "Supported: GBAtemp threads, GBAtemp Downloads pages, and PS2-Home forum topics."
         )
         intro.setTextFormat(Qt.TextFormat.RichText)
         intro.setWordWrap(True)
         layout.addWidget(intro)
 
         url_row = QHBoxLayout()
-        url_row.addWidget(QLabel("GBAtemp URL:"))
+        url_row.addWidget(QLabel("URL:"))
         self._url_edit = QLineEdit()
         self._url_edit.setPlaceholderText(
-            "https://gbatemp.net/threads/<thread-name>.<id>/"
+            "https://gbatemp.net/threads/…  or  https://gbatemp.net/download/…  or  https://www.ps2-home.com/forum/viewtopic.php?…"
         )
         url_row.addWidget(self._url_edit, 1)
         self._scan_btn = QPushButton("🔍 Scan")
@@ -6249,19 +6408,43 @@ class GBATempScraperDialog(QDialog):
         close_btn.clicked.connect(self.reject)
         layout.addWidget(close_btn, 0, Qt.AlignmentFlag.AlignRight)
 
+    @staticmethod
+    def _classify_url(url: str) -> str:
+        """Return 'gbatemp', 'ps2home', or '' for unrecognised URLs.
+
+        Uses ``urllib.parse`` for domain validation to prevent substring-match
+        bypasses (e.g. ``evil.com/gbatemp.net``).
+        """
+        import urllib.parse as _up
+        try:
+            netloc = _up.urlparse(url).netloc.lower()
+        except Exception:
+            return ""
+        # Match exact domain or subdomain (e.g. www.gbatemp.net)
+        if netloc == "gbatemp.net" or netloc.endswith(".gbatemp.net"):
+            return "gbatemp"
+        if netloc == "ps2-home.com" or netloc.endswith(".ps2-home.com"):
+            return "ps2home"
+        return ""
+
     # ------------------------------------------------------------------
     def _scan(self):
         url = self._url_edit.text().strip()
         if not url:
-            self._status.setText("⚠  Please enter a GBAtemp thread URL")
+            self._status.setText("⚠  Please enter a GBAtemp or PS2-Home URL")
             return
-        if "gbatemp.net" not in url.lower():
-            self._status.setText("⚠  URL does not appear to be a GBAtemp thread")
+        kind = self._classify_url(url)
+        if not kind:
+            self._status.setText(
+                "⚠  URL does not appear to be a GBAtemp or PS2-Home page.\n"
+                "Supported: gbatemp.net/threads/…, gbatemp.net/download/…, "
+                "ps2-home.com/forum/viewtopic.php?…"
+            )
             return
 
         self._scan_btn.setEnabled(False)
         self._progress.show()
-        self._status.setText("Fetching thread…")
+        self._status.setText("Fetching page…")
         # Clear previous results
         while self._results_layout.count():
             item = self._results_layout.takeAt(0)
@@ -6270,20 +6453,25 @@ class GBATempScraperDialog(QDialog):
         self._results_frame.hide()
 
         def _run():
-            from src.core.downloader import scrape_gbatemp_thread
-            data = scrape_gbatemp_thread(url)
-            QTimer.singleShot(0, lambda: self._show_results(data))
+            if kind == "gbatemp":
+                from src.core.downloader import scrape_gbatemp_thread
+                data = scrape_gbatemp_thread(url)
+            else:
+                from src.core.downloader import scrape_ps2home_post
+                data = scrape_ps2home_post(url)
+            QTimer.singleShot(0, lambda: self._show_results(data, kind))
 
         threading.Thread(target=_run, daemon=True).start()
 
-    def _show_results(self, data: dict):
+    def _show_results(self, data: dict, kind: str):
         self._progress.hide()
         self._scan_btn.setEnabled(True)
 
         if not data.get("title") and not data.get("download_urls"):
+            site = "GBAtemp" if kind == "gbatemp" else "PS2-Home"
             self._status.setText(
-                "❌  Could not parse the thread. "
-                "Check that the URL is a public GBAtemp thread and try again."
+                f"❌  Could not parse the {site} post. "
+                "Check that the URL is a public page and try again."
             )
             return
 
@@ -6310,7 +6498,7 @@ class GBATempScraperDialog(QDialog):
 
         download_urls = data.get("download_urls", [])
         if not download_urls:
-            rl.addWidget(QLabel("ℹ  No recognised download links found in this thread."))
+            rl.addWidget(QLabel("ℹ  No recognised download links found in this post."))
             self._results_frame.show()
             return
 
@@ -6565,10 +6753,11 @@ class BrowsePanel(BasePanel):
         pnach_btn.clicked.connect(self._open_pnach_github_dialog)
         toolbar.addWidget(pnach_btn)
 
-        gbatemp_btn = QPushButton("🔍 Scan GBAtemp Post")
+        gbatemp_btn = QPushButton("🔍 Scan GBAtemp/PS2-Home Post")
         gbatemp_btn.setToolTip(
-            "Paste a GBAtemp thread URL to auto-discover the author, game serial, "
-            "and all download links for one-click in-app installation"
+            "Paste a GBAtemp thread, GBAtemp Downloads page, or PS2-Home forum topic URL "
+            "to auto-discover the author, game serial, and all download links "
+            "for one-click in-app installation"
         )
         gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
         toolbar.addWidget(gbatemp_btn)

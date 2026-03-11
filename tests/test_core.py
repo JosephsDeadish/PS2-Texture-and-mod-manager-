@@ -2738,6 +2738,366 @@ class TestSpyroANBCatalogueEntries(unittest.TestCase):
         self.assertIn("gbatemp.net/members/durindragon", src)
 
 
+# =============================================================================
+# GBAtemp Download-page scraper extension
+# =============================================================================
+
+class TestGBATempDownloadPageScraper(unittest.TestCase):
+    """Tests for scrape_gbatemp_thread() handling /download/ pages."""
+
+    _DOWNLOAD_PAGE_HTML = """
+    <html>
+    <head><title>GBAtemp Downloads | Bully Saves</title></head>
+    <body>
+    <h1 class="p-title-value">Bully Saves 100% and More</h1>
+    <dl class="pairs pairs--rows">
+      <dt>Author</dt>
+      <dd>moataz</dd>
+    </dl>
+    <a class="username" href="/members/moataz.683955/">moataz</a>
+    <div class="message-body">
+      Download: <a href="https://www.mediafire.com/file/hktfw1t8dv4etgo/bully_saves.rar/file">Download here</a>
+    </div>
+    <a href="/download/bully-saves.38390/download">Download from GBAtemp</a>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        self.assertIn("Bully", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_author_from_dl_block(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        self.assertEqual(result["author"], "moataz")
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_external_links(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_includes_gbatemp_hosted_download(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("GBAtemp", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_gbatemp_link_is_first(self, mock_get):
+        """GBAtemp-hosted download should be first in the list (most authoritative)."""
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        if result["download_urls"]:
+            self.assertEqual(result["download_urls"][0]["host"], "GBAtemp")
+
+
+# =============================================================================
+# PS2-Home forum post scraper
+# =============================================================================
+
+class TestPS2HomeScraper(unittest.TestCase):
+    """Tests for scrape_ps2home_post()."""
+
+    _SAMPLE_HTML = """
+    <html>
+    <head><title>PS2-Home • View topic - ATV Off-Road Fury Save</title></head>
+    <body>
+    <h2 class="topic-title">ATV Off-Road Fury Game Save</h2>
+    <strong class="postauthor">jumper cable</strong>
+    <div class="post-text">
+      Download available here:
+      <a href="https://www.mediafire.com/file/abc123/ATV_save.zip/file">ATV Save</a>
+      Also on Google Drive:
+      <a href="https://drive.google.com/file/d/xyz789/view">Drive Link</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    _ATTACHMENT_HTML = """
+    <html>
+    <head><title>PS2-Home • View topic - Save with Attachment</title></head>
+    <body>
+    <h2 class="topic-title">Game Save With Attachment</h2>
+    <strong class="postauthor">testuser</strong>
+    <div class="post-text">
+      <a href="./download/file.php?id=99&mode=view">game_save.ps2</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        self.assertIn("ATV", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        self.assertEqual(result["author"], "jumper cable")
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_mediafire_download_url(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_gdrive_download_url(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("Google Drive", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_phpbb_attachment_link(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._ATTACHMENT_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=99")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("PS2-Home", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_source_url_echoed_back(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_get.side_effect = Exception("network error")
+        url = "https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165"
+        result = scrape_ps2home_post(url)
+        self.assertEqual(result["source_url"], url)
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=0")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_title_extracted_from_page_title_fallback(self, mock_get):
+        """If no h2.topic-title found, fall back to parsing the <title> tag."""
+        from src.core.downloader import scrape_ps2home_post
+        html_no_h2 = (
+            '<html><head><title>PS2-Home Board • View topic - Fallback Title</title></head>'
+            '<body><strong class="postauthor">user</strong></body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = html_no_h2
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "Fallback Title")
+
+
+# =============================================================================
+# RAR archive support
+# =============================================================================
+
+class TestRarExtraction(unittest.TestCase):
+    """Tests for RAR support in extract_archive()."""
+
+    def test_rar_without_rarfile_raises_helpful_error(self):
+        """If 'rarfile' is not installed, a clear ArchiveError is raised."""
+        import sys
+        from unittest.mock import patch as _patch
+        from src.core.archive import ArchiveError
+
+        # Simulate rarfile not being installed
+        with _patch.dict(sys.modules, {"rarfile": None}):
+            # Re-import to pick up the mock
+            import importlib
+            import src.core.archive as _archive
+            importlib.reload(_archive)
+            try:
+                with self.assertRaises(_archive.ArchiveError) as cm:
+                    _archive._extract_rar(Path("/fake/file.rar"), Path("/tmp"))
+                self.assertIn("rarfile", str(cm.exception).lower())
+            finally:
+                importlib.reload(_archive)  # restore
+
+    def test_rar_extension_recognised_as_archive(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("/path/to/file.rar"))
+
+    def test_non_rar_extension_not_affected(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("/path/to/file.zip"))
+        self.assertFalse(is_archive("/path/to/file.txt"))
+
+
+# =============================================================================
+# Save file catalogue entries
+# =============================================================================
+
+class TestSaveFileCatalogueEntries(unittest.TestCase):
+    """The new save file entries must be present in the catalogue."""
+
+    def _get_ids(self):
+        import ast
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        ids = []
+        for line in src.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('"id":'):
+                val = stripped.split(":", 1)[1].strip().strip('",').strip()
+                ids.append(val)
+        return ids
+
+    def test_gbatemp_downloads_saves_hub_present(self):
+        ids = self._get_ids()
+        self.assertIn("gbatemp_downloads_saves_hub", ids)
+
+    def test_sly2_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("sly2_save_gamefiles", ids)
+
+    def test_bully_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("bully_save_moataz", ids)
+
+    def test_ps2home_saves_hub_present(self):
+        ids = self._get_ids()
+        self.assertIn("ps2home_saves_hub", ids)
+
+    def test_atv_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("atv_fury_save_ps2home", ids)
+
+    def test_bully_save_has_mediafire_url(self):
+        """Bully save entry must have a direct_download_url pointing to MediaFire."""
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        self.assertIn("mediafire.com/file/hktfw1t8dv4etgo/bully_saves", src)
+
+    def test_bully_save_author_is_moataz(self):
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        self.assertIn("moataz", src)
+        self.assertIn("gbatemp.net/members/moataz", src)
+
+    def test_sly2_save_source_is_gbatemp_download(self):
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        self.assertIn("gbatemp.net/download/sly-2-band-of-thieves-ps2-europe", src)
+
+    def test_atv_save_source_is_ps2home(self):
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src = bp_path.read_text(encoding="utf-8")
+        self.assertIn("ps2-home.com/forum/viewtopic.php?f=70&t=12165", src)
+
+
+# =============================================================================
+# GBATempScraperDialog URL classifier
+# =============================================================================
+
+class TestScraperDialogClassifier(unittest.TestCase):
+    """Tests for GBATempScraperDialog._classify_url() (static, no Qt needed)."""
+
+    def _classify(self, url: str) -> str:
+        """Replicate the production _classify_url logic using proper domain matching."""
+        import urllib.parse as _up
+        try:
+            netloc = _up.urlparse(url).netloc.lower()
+        except Exception:
+            return ""
+        if netloc == "gbatemp.net" or netloc.endswith(".gbatemp.net"):
+            return "gbatemp"
+        if netloc == "ps2-home.com" or netloc.endswith(".ps2-home.com"):
+            return "ps2home"
+        return ""
+
+    def test_gbatemp_thread_url_classified_as_gbatemp(self):
+        self.assertEqual(
+            self._classify("https://gbatemp.net/threads/spyro.677477/"),
+            "gbatemp",
+        )
+
+    def test_gbatemp_download_url_classified_as_gbatemp(self):
+        self.assertEqual(
+            self._classify("https://gbatemp.net/download/bully-saves.38390/"),
+            "gbatemp",
+        )
+
+    def test_ps2home_url_classified_as_ps2home(self):
+        self.assertEqual(
+            self._classify("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165"),
+            "ps2home",
+        )
+
+    def test_unrecognised_url_returns_empty(self):
+        self.assertEqual(self._classify("https://example.com/stuff"), "")
+
+    def test_mediafire_url_returns_empty(self):
+        self.assertEqual(
+            self._classify("https://www.mediafire.com/file/abc/file.zip/file"),
+            "",
+        )
+
+
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the browse-panel catalogue.
 

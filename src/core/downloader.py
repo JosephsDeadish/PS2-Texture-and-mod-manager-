@@ -404,13 +404,15 @@ def _make_download_label(url: str) -> str:
 
 
 def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
-    """Scrape a GBAtemp thread page and extract mod metadata.
+    """Scrape a GBAtemp page and extract mod metadata.
 
-    Fetches *thread_url* (must be a ``gbatemp.net/threads/…`` URL) and
-    parses the HTML to extract:
+    Handles both GBAtemp thread pages (``/threads/…``) and GBAtemp resource/
+    download pages (``/download/…``).
 
-    * **title** — the thread title
-    * **author** — display name of the thread author (first post)
+    Fetches *thread_url* and parses the HTML to extract:
+
+    * **title** — the thread or resource title
+    * **author** — display name of the thread author (first post or resource author)
     * **author_url** — absolute URL to the author's GBAtemp profile
     * **download_urls** — list of dicts, each with keys:
 
@@ -444,8 +446,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
             return result
         html = resp.text
 
-        # ── Thread title ────────────────────────────────────────────────────
-        # XenForo: <h1 class="p-title-value">…</h1>
+        # ── Title ───────────────────────────────────────────────────────────
+        # XenForo: <h1 class="p-title-value">…</h1>  (threads and downloads)
         m = re.search(
             r'<h1[^>]+class="[^"]*p-title-value[^"]*"[^>]*>(.*?)</h1>',
             html,
@@ -454,9 +456,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
         if m:
             result["title"] = re.sub(r"<[^>]+>", "", m.group(1)).strip()
 
-        # ── Thread author (first post) ───────────────────────────────────────
-        # XenForo: <span class="username"> or itemprop="name" inside first message
-        # Try itemprop="name" first (most reliable)
+        # ── Author name ─────────────────────────────────────────────────────
+        # XenForo: itemprop="name" inside first message — works for threads
         m_name = re.search(
             r'<span[^>]+itemprop=["\']name["\'][^>]*>(.*?)</span>',
             html,
@@ -464,6 +465,17 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
         )
         if m_name:
             result["author"] = re.sub(r"<[^>]+>", "", m_name.group(1)).strip()
+
+        # For /download/ resource pages the author is in a "resource-author"
+        # section or inside the first "p-description" author block.
+        if not result["author"]:
+            m_ra = re.search(
+                r'<dt[^>]*>Author</dt>\s*<dd[^>]*>(.*?)</dd>',
+                html,
+                re.DOTALL | re.IGNORECASE,
+            )
+            if m_ra:
+                result["author"] = re.sub(r"<[^>]+>", "", m_ra.group(1)).strip()
 
         # ── Author profile URL ───────────────────────────────────────────────
         # XenForo: <a class="username" href="/members/…"> or similar
@@ -478,7 +490,7 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                 href = "https://gbatemp.net" + href
             result["author_url"] = href
 
-        # ── Download links ───────────────────────────────────────────────────
+        # ── Download links (external hosts) ─────────────────────────────────
         seen: set = set()
         for pattern, host in _DOWNLOAD_PATTERNS:
             for m_dl in pattern.finditer(html):
@@ -492,9 +504,145 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                     "label": _make_download_label(raw),
                 })
 
+        # For GBAtemp-hosted resource downloads (/download/ pages) also expose
+        # the on-site download action URL so the scraper dialog can offer it.
+        _psd = urllib.parse.urlparse(thread_url)
+        if "/download/" in _psd.path:
+            # XenForo resource manager: look for the "Download" button href
+            # pattern: /download/<slug>/download
+            m_gbadl = re.search(
+                r'href="(/download/[^"]+/download)"',
+                html,
+                re.IGNORECASE,
+            )
+            if m_gbadl:
+                dl_path = m_gbadl.group(1)
+                gbatemp_dl = "https://gbatemp.net" + dl_path
+                if gbatemp_dl not in seen:
+                    seen.add(gbatemp_dl)
+                    result["download_urls"].insert(0, {
+                        "url": gbatemp_dl,
+                        "host": "GBAtemp",
+                        "label": "Download from GBAtemp (login required)",
+                    })
+
         # ── PS2 game serial ──────────────────────────────────────────────────
         # Check in order: URL, title, then first 64 KB of body
         for text in (thread_url, result["title"], html[:65536]):
+            m_ser = _SERIAL_RE.search(text)
+            if m_ser:
+                result["game_serial"] = m_ser.group(1).upper()
+                break
+
+    except Exception:
+        pass
+
+    return result
+
+
+def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
+    """Scrape a PS2-Home forum topic page and extract mod/save metadata.
+
+    Fetches *post_url* (a ``ps2-home.com/forum/viewtopic.php`` URL) and
+    parses the phpBB HTML to extract:
+
+    * **title** — the topic title
+    * **author** — display name of the first post's author
+    * **author_url** — ``""`` (PS2-Home does not expose profile URLs in a
+      consistent way without login)
+    * **download_urls** — list of dicts with ``url``, ``host``, ``label`` for
+      any recognised download links (MediaFire, Google Drive, MEGA, etc.) found
+      in the first post
+    * **game_serial** — first PS2 serial found in the URL, title, or body
+    * **source_url** — echoes back *post_url*
+
+    Returns a dict with the above keys (all empty/empty-list on failure).
+    This function never raises; all errors are silently suppressed.
+    """
+    result: Dict = {
+        "title": "",
+        "author": "",
+        "author_url": "",
+        "download_urls": [],
+        "game_serial": "",
+        "source_url": post_url,
+    }
+    try:
+        resp = requests.get(
+            post_url,
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return result
+        html = resp.text
+
+        # ── Topic title ──────────────────────────────────────────────────────
+        # phpBB: <h2 class="topic-title">…</h2>  or  <title>Board… • Topic</title>
+        m_t = re.search(
+            r'<h[12][^>]+class="[^"]*topic-title[^"]*"[^>]*>(.*?)</h[12]>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        )
+        if m_t:
+            result["title"] = re.sub(r"<[^>]+>", "", m_t.group(1)).strip()
+        else:
+            # Fallback: page <title>
+            m_pt = re.search(r"<title>(.+?)</title>", html, re.IGNORECASE | re.DOTALL)
+            if m_pt:
+                raw = re.sub(r"<[^>]+>", "", m_pt.group(1)).strip()
+                # phpBB titles look like "Board • View topic - Game Save Title"
+                if " - " in raw:
+                    raw = raw.split(" - ", 1)[-1].strip()
+                result["title"] = raw
+
+        # ── Author (first post) ─────────────────────────────────────────────
+        # phpBB: <p class="author"> or <strong class="postauthor">
+        m_a = re.search(
+            r'<(?:strong|span)[^>]+class="[^"]*postauthor[^"]*"[^>]*>(.*?)</(?:strong|span)>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        )
+        if m_a:
+            result["author"] = re.sub(r"<[^>]+>", "", m_a.group(1)).strip()
+
+        # ── Download links ───────────────────────────────────────────────────
+        # Also check for direct attachment links on ps2-home.com itself
+        seen: set = set()
+        for pattern, host in _DOWNLOAD_PATTERNS:
+            for m_dl in pattern.finditer(html):
+                raw = m_dl.group(0).rstrip(".,;)")
+                if raw in seen:
+                    continue
+                seen.add(raw)
+                result["download_urls"].append({
+                    "url": raw,
+                    "host": host,
+                    "label": _make_download_label(raw),
+                })
+
+        # phpBB attachments: <a href="./download/...">filename</a>
+        _ps2home_base = "https://www.ps2-home.com/forum"
+        for m_att in re.finditer(
+            r'<a[^>]+href="(\./download/file\.php[^"]*)"[^>]*>(.*?)</a>',
+            html,
+            re.DOTALL | re.IGNORECASE,
+        ):
+            raw_href = m_att.group(1)
+            label = re.sub(r"<[^>]+>", "", m_att.group(2)).strip() or "attachment"
+            full_url = _ps2home_base + "/" + raw_href.lstrip("./")
+            if full_url in seen:
+                continue
+            seen.add(full_url)
+            result["download_urls"].append({
+                "url": full_url,
+                "host": "PS2-Home",
+                "label": label,
+            })
+
+        # ── PS2 game serial ──────────────────────────────────────────────────
+        for text in (post_url, result["title"], html[:65536]):
             m_ser = _SERIAL_RE.search(text)
             if m_ser:
                 result["game_serial"] = m_ser.group(1).upper()
