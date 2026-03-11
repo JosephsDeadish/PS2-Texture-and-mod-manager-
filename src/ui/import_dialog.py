@@ -109,8 +109,40 @@ class ImportModDialog(QDialog):
         form.addRow("Version:", self._version_edit)
 
         self._gameid_edit = QLineEdit()
-        self._gameid_edit.setPlaceholderText("e.g. SLUS-20062  (fetches cover art)")
-        form.addRow("Game ID:", self._gameid_edit)
+        if self.mod_type == ModType.TEXTURE_PACK:
+            self._gameid_edit.setPlaceholderText(
+                "e.g. SLUS-20062  ← required for PCSX2 to find textures"
+            )
+            game_id_label = "Game ID *:"
+        else:
+            self._gameid_edit.setPlaceholderText("e.g. SLUS-20062  (fetches cover art)")
+            game_id_label = "Game ID:"
+        form.addRow(game_id_label, self._gameid_edit)
+
+        # Hint shown when a "replacement" folder pattern is detected
+        self._replacement_hint = QLabel(
+            "⚠  This pack uses a folder named 'replacement'.\n"
+            "Enter the Game ID (e.g. SLUS-21228) so PS2 Mod Manager can\n"
+            "automatically place files in the correct PCSX2 location:\n"
+            "  textures/<SERIAL>/replacements/"
+        )
+        self._replacement_hint.setStyleSheet(
+            "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
+            "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+        )
+        self._replacement_hint.setWordWrap(True)
+        self._replacement_hint.hide()
+        form.addRow("", self._replacement_hint)
+
+        # Hint shown when a multi-part archive is detected
+        self._multipart_hint = QLabel("")
+        self._multipart_hint.setStyleSheet(
+            "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+            "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+        )
+        self._multipart_hint.setWordWrap(True)
+        self._multipart_hint.hide()
+        form.addRow("", self._multipart_hint)
 
         self._desc_edit = QTextEdit()
         self._desc_edit.setPlaceholderText("Short description…")
@@ -123,12 +155,21 @@ class ImportModDialog(QDialog):
 
         layout.addLayout(form)
 
-        # ---- Thumbnail note ----
-        if self.mod_type in (ModType.TEXTURE_PACK, ModType.COVER_ART, ModType.PNACH, ModType.CHEAT):
+        # ---- Notes ----
+        if self.mod_type == ModType.TEXTURE_PACK:
+            note = QLabel(
+                "ℹ  Texture packs need a Game ID so PCSX2 can find them.\n"
+                "The app will place textures in textures/<SERIAL>/replacements/\n"
+                "automatically.  Check the Patreon/forum post for the serial\n"
+                "(e.g. SLUS-21228).  If you enter a Game ID, cover art is\n"
+                "also downloaded from GameTDB automatically."
+            )
+        else:
             note = QLabel(
                 "ℹ  If you enter a Game ID, PS2 Mod Manager will automatically\n"
                 "download the cover art from GameTDB as the thumbnail."
             )
+        if self.mod_type in (ModType.TEXTURE_PACK, ModType.COVER_ART, ModType.PNACH, ModType.CHEAT):
             note.setStyleSheet("color: #6070a0; font-size: 11px;")
             layout.addWidget(note)
 
@@ -159,22 +200,32 @@ class ImportModDialog(QDialog):
                 self._name_edit.setText(Path(d).name)
             # Auto-detect game serial
             self._auto_detect_game_id(d)
+            # Detect "replacement" folder pattern for texture packs
+            if self.mod_type == ModType.TEXTURE_PACK:
+                self._check_replacement_pattern(d)
 
     def _choose_archive(self):
         path, _ = QFileDialog.getOpenFileName(
             self,
             f"Select {_type_label(self.mod_type)} Archive",
             "",
-            "Archives (*.zip *.7z);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
+            "Archives (*.zip *.7z *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
         )
         if path:
             self._src_edit.setText(path)
             if not self._name_edit.text():
-                # Strip extension for default name
+                # Strip extension for default name; handle .7z.001 → stem up to first .7z
                 stem = Path(path).stem
+                if stem.lower().endswith(".7z"):
+                    stem = Path(stem).stem  # strip the inner .7z too
                 self._name_edit.setText(stem)
             # Auto-detect game serial
             self._auto_detect_game_id(path)
+            # Detect multi-part archive and show status
+            self._check_multipart_archive(path)
+            # For archives, peek at top-level names to detect replacement pattern
+            if self.mod_type == ModType.TEXTURE_PACK:
+                self._check_replacement_pattern(path)
 
     def _choose_file(self):
         from src.ui.mod_panel import _TYPE_META
@@ -244,11 +295,123 @@ class ImportModDialog(QDialog):
         except Exception:
             pass
 
-    # ------------------------------------------------------------------
-    # Accept
-    # ------------------------------------------------------------------
+    def _check_replacement_pattern(self, path: str) -> None:
+        """Show a hint if the selected path looks like a 'replacement'-named pack.
 
-    def _accept(self):
+        Many texture pack authors name their folder ``replacement`` or
+        ``replacements`` instead of the game serial, expecting the user to place
+        it inside ``textures/<SERIAL>/``.  PS2 Mod Manager handles this
+        automatically when a Game ID is provided, but we want to alert the user
+        to enter the serial.
+        """
+        if not hasattr(self, '_replacement_hint'):
+            return  # hint widget not built (shouldn't happen for TEXTURE_PACK)
+
+        needs_hint = False
+        p = Path(path)
+
+        # Folder named "replacement" or "replacements"
+        if p.is_dir() and p.name.lower() in ("replacement", "replacements"):
+            needs_hint = True
+        elif p.is_dir():
+            # Contains a direct "replacement" or "replacements" subfolder
+            for name in ("replacement", "replacements"):
+                if (p / name).is_dir():
+                    needs_hint = True
+                    break
+        elif p.suffix.lower() in (".zip", ".7z"):
+            # Peek inside the archive at top-level names (without extracting)
+            try:
+                import zipfile
+                if zipfile.is_zipfile(str(p)):
+                    with zipfile.ZipFile(str(p)) as zf:
+                        names = zf.namelist()
+                    top_names = {n.split("/")[0].lower() for n in names}
+                    if "replacement" in top_names or "replacements" in top_names:
+                        needs_hint = True
+            except Exception:
+                pass
+
+        if needs_hint:
+            self._replacement_hint.show()
+            # Highlight the Game ID field so the user notices it
+            if not self._gameid_edit.text():
+                self._gameid_edit.setStyleSheet(
+                    "border: 1px solid #e0a040; background: #1a1200;"
+                )
+        else:
+            self._replacement_hint.hide()
+            self._gameid_edit.setStyleSheet("")
+
+    def _check_multipart_archive(self, path: str) -> None:
+        """Detect a multi-part archive and show status in the multipart hint label.
+
+        When the user selects e.g. ``Pack_Part1.zip`` or ``Pack.7z.001``, this
+        method scans the same folder for sibling parts and reports:
+          • How many parts were found.
+          • Which (if any) parts appear to be missing.
+          • An instruction that all parts will be imported together automatically.
+        """
+        if not hasattr(self, '_multipart_hint'):
+            return
+
+        try:
+            from src.core.archive import (
+                is_multipart_archive,
+                find_multipart_parts,
+                check_multipart_completeness,
+            )
+        except ImportError:
+            return
+
+        if not is_multipart_archive(path):
+            self._multipart_hint.hide()
+            return
+
+        is_complete, parts, missing = check_multipart_completeness(path)
+        count = len(parts)
+
+        part_names = [Path(p).name for p in parts]
+        names_preview = ", ".join(part_names[:4])
+        if len(part_names) > 4:
+            names_preview += f", … (+{len(part_names) - 4} more)"
+
+        if is_complete and count > 1:
+            msg = (
+                f"📦  Multi-part archive detected — {count} parts found in the same folder.\n"
+                f"Parts: {names_preview}\n"
+                "✅  All parts are present. They will all be extracted together on import."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+        elif missing > 0:
+            msg = (
+                f"📦  Multi-part archive detected — {count} parts found, ~{missing} missing.\n"
+                f"Parts found: {names_preview}\n"
+                f"⚠  Download all parts to the same folder before importing.\n"
+                "The pack will be incomplete if any parts are missing."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+        else:
+            msg = (
+                "📦  This looks like a multi-part archive.\n"
+                "Make sure all parts are in the same folder, then select Part 1 here.\n"
+                "PS2 Mod Manager will find and extract all other parts automatically."
+            )
+            self._multipart_hint.setStyleSheet(
+                "background: #001020; color: #60c0e0; border: 1px solid #204060;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+
+        self._multipart_hint.setText(msg)
+        self._multipart_hint.show()
+
+
         if not self._src_edit.text():
             from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(self, "No Source", "Please select a source folder or file.")

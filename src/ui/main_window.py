@@ -111,12 +111,12 @@ class MainWindow(QMainWindow):
         # Navigation items
         nav_items = [
             ("🏠", "Dashboard"),
+            ("🌐", "Browse"),
             ("🎨", "Texture Packs"),
             ("🔧", "PNACH Patches"),
             ("🖼️", "Cover Art"),
             ("💾", "Memory Cards"),
             ("⚡", "Cheats"),
-            ("🌐", "Browse"),
         ]
 
         for icon, label in nav_items:
@@ -158,38 +158,38 @@ class MainWindow(QMainWindow):
 
         # Pages (must match nav_items order + settings at end)
         self._dashboard = DashboardPanel(self.db, self.config)
-        self._stack.addWidget(self._dashboard)
-
-        self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
-        self._stack.addWidget(self._texture_panel)
-
-        self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config)
-        self._stack.addWidget(self._pnach_panel)
-
-        self._cover_panel = ModPanel(ModType.COVER_ART, self.db, self.config)
-        self._stack.addWidget(self._cover_panel)
-
-        self._memcard_panel = MemoryCardPanel(self.config)
-        self._stack.addWidget(self._memcard_panel)
-
-        self._cheat_panel = ModPanel(ModType.CHEAT, self.db, self.config)
-        self._stack.addWidget(self._cheat_panel)
+        self._stack.addWidget(self._dashboard)          # index 0
 
         self._browse_panel = BrowsePanel(self.config)
         self._browse_panel.set_db(self.db)
-        self._stack.addWidget(self._browse_panel)
+        self._stack.addWidget(self._browse_panel)       # index 1
+
+        self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
+        self._stack.addWidget(self._texture_panel)      # index 2
+
+        self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config)
+        self._stack.addWidget(self._pnach_panel)        # index 3
+
+        self._cover_panel = ModPanel(ModType.COVER_ART, self.db, self.config)
+        self._stack.addWidget(self._cover_panel)        # index 4
+
+        self._memcard_panel = MemoryCardPanel(self.config)
+        self._stack.addWidget(self._memcard_panel)      # index 5
+
+        self._cheat_panel = ModPanel(ModType.CHEAT, self.db, self.config)
+        self._stack.addWidget(self._cheat_panel)        # index 6
 
         self._settings_panel = SettingsPanel(self.config)
         self._settings_panel.settings_saved.connect(self._on_settings_saved)
         self._settings_panel.rerun_wizard.connect(self._run_wizard)
-        self._stack.addWidget(self._settings_panel)
+        self._stack.addWidget(self._settings_panel)     # index 7
 
         # Wire cross-panel "see more by author" navigation
         _panel_nav_index = {
-            ModType.TEXTURE_PACK: 1,
-            ModType.PNACH: 2,
-            ModType.COVER_ART: 3,
-            ModType.CHEAT: 5,
+            ModType.TEXTURE_PACK: 2,
+            ModType.PNACH: 3,
+            ModType.COVER_ART: 4,
+            ModType.CHEAT: 6,
         }
         for panel in (
             self._texture_panel,

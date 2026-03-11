@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 import shutil
 import uuid
 from pathlib import Path
@@ -12,6 +13,27 @@ import src.core.config_manager as _cfg
 from src.core.archive import ArchiveError, extract_archive, is_archive
 from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
 
+
+# ---------------------------------------------------------------------------
+# Texture pack folder-structure helpers
+# ---------------------------------------------------------------------------
+
+#: Matches a PS2 disc serial in any valid form, e.g. SLUS-20062, SLES-54053,
+#: SCUS-97131 (2-4 uppercase letters, dash, 3-5 digits).
+_PS2_SERIAL_RE = re.compile(r'^[A-Z]{2,4}-\d{3,5}$', re.IGNORECASE)
+
+
+def _folder_has_serial_structure(folder: Path) -> bool:
+    """Return True if *folder* contains any direct sub-directory named like a
+    PS2 disc serial (e.g. ``SLUS-20062``).  These packs are already in the
+    correct PCSX2 layout and need no further normalization."""
+    try:
+        return any(
+            child.is_dir() and _PS2_SERIAL_RE.match(child.name) is not None
+            for child in folder.iterdir()
+        )
+    except PermissionError:
+        return False
 
 class ModDatabase:
     """Persistent mod database backed by JSON."""
@@ -120,6 +142,14 @@ class ModManager:
                 raise
         else:
             shutil.copy2(str(source), str(dest_dir / source.name))
+
+        # ── Normalise texture pack folder layout ──────────────────────────
+        # Many texture packs ship with a folder named "replacement" or
+        # "replacements" rather than the PS2 disc serial.  When a game_id is
+        # known we reorganise the contents into the structure PCSX2 expects:
+        #     <dest_dir>/<SERIAL>/replacements/<texture_files>
+        if mod_type == ModType.TEXTURE_PACK and game_id:
+            self._normalize_texture_structure(dest_dir, game_id)
 
         files = self._list_files(dest_dir)
         size = sum(f.stat().st_size for f in dest_dir.rglob("*") if f.is_file())
@@ -313,6 +343,93 @@ class ModManager:
             return fetch_gametdb_art(game_id, thumb_dir, region)
         except Exception:
             return None
+
+    @staticmethod
+    def _normalize_texture_structure(dest_dir: Path, game_id: str) -> None:
+        """Reorganise an imported texture pack so it matches PCSX2's expected layout::
+
+                <dest_dir>/<SERIAL>/replacements/<texture_files>
+
+        Handles three common pack patterns that authors use:
+
+        * **replacement/replacements subfolder** (depth 0 or depth 1 inside a
+          single outer wrapper folder): the subfolder's contents are moved into
+          ``<serial>/replacements/``.
+        * **Flat folder** of texture files (no replacements subfolder): every
+          file/directory is moved into ``<serial>/replacements/``.
+        * **Already correct structure** (a ``<SERIAL>/`` subdirectory is already
+          present): no action taken.
+
+        This means a user can import a pack whose zip contains::
+
+            replacement/
+                <hash1>.png
+                <hash2>.png
+
+        and the app will automatically place those files where PCSX2 looks for
+        them::
+
+            textures/SLUS-21228/replacements/<hash1>.png
+            textures/SLUS-21228/replacements/<hash2>.png
+        """
+        from src.core.game_registry import normalise_serial
+
+        serial = normalise_serial(game_id) if game_id else ""
+        if not serial:
+            return  # Can't normalise without a valid serial
+
+        # Already has the correct serial structure — nothing to do.
+        if (dest_dir / serial).exists():
+            return
+        if _folder_has_serial_structure(dest_dir):
+            return
+
+        # ── Locate the source of texture files ────────────────────────────
+        replacements_src: Optional[Path] = None
+
+        # Depth 0: "replacements" or "replacement" directly under dest_dir
+        for sub_name in ("replacements", "replacement"):
+            p = dest_dir / sub_name
+            if p.is_dir():
+                replacements_src = p
+                break
+
+        # Depth 1: single outer wrapper folder containing a replacements subfolder
+        # (common when a zip file has an outer named folder, e.g. Eragon_HD_v1/)
+        if replacements_src is None:
+            try:
+                subdirs = [d for d in dest_dir.iterdir() if d.is_dir()]
+            except PermissionError:
+                return
+            if len(subdirs) == 1:
+                for sub_name in ("replacements", "replacement"):
+                    p = subdirs[0] / sub_name
+                    if p.is_dir():
+                        replacements_src = p
+                        break
+
+        # ── Move files into <serial>/replacements/ ─────────────────────────
+        target = dest_dir / serial / "replacements"
+        target.mkdir(parents=True, exist_ok=True)
+
+        if replacements_src is not None:
+            # Move each item from the replacement folder into the target
+            for item in list(replacements_src.iterdir()):
+                shutil.move(str(item), str(target / item.name))
+            # Clean up the now-empty wrapper/replacement folder
+            try:
+                outer = replacements_src.parent
+                if outer != dest_dir:
+                    shutil.rmtree(str(outer), ignore_errors=True)
+                else:
+                    replacements_src.rmdir()
+            except OSError:
+                pass
+        else:
+            # Flat structure: move all top-level items into target
+            for item in list(dest_dir.iterdir()):
+                if item.name != serial:  # don't move the serial folder we just created
+                    shutil.move(str(item), str(target / item.name))
 
     def refresh_thumbnail(self, mod_id: str, region: str = "EN") -> bool:
         """Re-fetch the thumbnail for *mod_id* from GameTDB. Returns True on success."""

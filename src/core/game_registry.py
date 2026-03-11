@@ -332,8 +332,13 @@ _KNOWN_SERIALS: dict[str, str] = {
     "SLUS-20432": "Call of Duty 2: Big Red One",
     "SLUS-20845": "Killzone",
 
+    # Family / Action-Adventure
+    "SLUS-21228": "Eragon",
+    "SLES-54053": "Eragon (PAL)",
+
     # Simulation / Strategy
     "SLUS-21102": "The Sims 2",
+    "SLUS-21668": "The Sims 2: Castaway",
     "SLUS-20469": "Harvest Moon: Save the Homeland",
     "SLUS-21234": "Harvest Moon: A Wonderful Life Special Edition",
 

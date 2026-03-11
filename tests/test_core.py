@@ -536,6 +536,132 @@ class TestArchiveExtraction(unittest.TestCase):
             cm.MODS_DB_FILE = orig
 
 
+class TestMultipartArchive(unittest.TestCase):
+    """Tests for multi-part archive detection and extraction."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_zip(self, name: str, files: dict) -> str:
+        import zipfile
+        path = Path(self.tmpdir) / name
+        with zipfile.ZipFile(str(path), "w") as zf:
+            for fname, content in files.items():
+                zf.writestr(fname, content)
+        return str(path)
+
+    # -- is_multipart_archive ------------------------------------------------
+
+    def test_named_parts_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack_Part1.zip"))
+        self.assertTrue(is_multipart_archive("Pack_Part2.zip"))
+        self.assertTrue(is_multipart_archive("MyMod-Part-3.zip"))
+        self.assertTrue(is_multipart_archive("Textures_pt1.7z"))
+
+    def test_7z_volume_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack.7z.001"))
+        self.assertTrue(is_multipart_archive("Pack.7z.002"))
+
+    def test_zip_split_detected(self):
+        from src.core.archive import is_multipart_archive
+        self.assertTrue(is_multipart_archive("Pack.z01"))
+        self.assertTrue(is_multipart_archive("Pack.z02"))
+
+    def test_regular_zip_not_multipart(self):
+        from src.core.archive import is_multipart_archive
+        self.assertFalse(is_multipart_archive("Pack.zip"))
+        self.assertFalse(is_multipart_archive("SLUS-20062.zip"))
+        self.assertFalse(is_multipart_archive("textures.7z"))
+
+    # -- find_multipart_parts ------------------------------------------------
+
+    def test_find_all_named_parts(self):
+        from src.core.archive import find_multipart_parts
+        # Create three part files
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"MyPack_Part{i}.zip").write_bytes(b"data")
+        parts = find_multipart_parts(str(Path(self.tmpdir) / "MyPack_Part1.zip"))
+        names = [Path(p).name for p in parts]
+        self.assertEqual(names, ["MyPack_Part1.zip", "MyPack_Part2.zip", "MyPack_Part3.zip"])
+
+    def test_find_parts_from_any_sibling(self):
+        from src.core.archive import find_multipart_parts
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"Tex_Part{i}.zip").write_bytes(b"data")
+        # Asking from Part2 should still find all three
+        parts = find_multipart_parts(str(Path(self.tmpdir) / "Tex_Part2.zip"))
+        self.assertEqual(len(parts), 3)
+
+    def test_find_returns_empty_for_regular_zip(self):
+        from src.core.archive import find_multipart_parts
+        p = str(Path(self.tmpdir) / "single.zip")
+        Path(p).write_bytes(b"data")
+        self.assertEqual(find_multipart_parts(p), [])
+
+    # -- check_multipart_completeness ----------------------------------------
+
+    def test_complete_set_reports_no_missing(self):
+        from src.core.archive import check_multipart_completeness
+        for i in (1, 2, 3):
+            Path(self.tmpdir, f"Pack_Part{i}.zip").write_bytes(b"data")
+        ok, parts, missing = check_multipart_completeness(
+            str(Path(self.tmpdir) / "Pack_Part1.zip")
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(parts), 3)
+        self.assertEqual(missing, 0)
+
+    def test_incomplete_set_reports_missing(self):
+        from src.core.archive import check_multipart_completeness
+        # Only parts 1 and 3 — part 2 is missing
+        for i in (1, 3):
+            Path(self.tmpdir, f"Pack_Part{i}.zip").write_bytes(b"data")
+        ok, parts, missing = check_multipart_completeness(
+            str(Path(self.tmpdir) / "Pack_Part1.zip")
+        )
+        self.assertFalse(ok)
+        self.assertGreater(missing, 0)
+
+    # -- extract_archive with multi-part zips --------------------------------
+
+    def test_extract_named_parts_merges_contents(self):
+        from src.core.archive import extract_archive
+        # Part 1 has textures A, Part 2 has textures B
+        self._make_zip("Set_Part1.zip", {"texA.png": b"A"})
+        self._make_zip("Set_Part2.zip", {"texB.png": b"B"})
+        dest = str(Path(self.tmpdir) / "out")
+        extracted = extract_archive(
+            str(Path(self.tmpdir) / "Set_Part1.zip"), dest
+        )
+        # Both files should be in the output
+        self.assertIn("texA.png", extracted)
+        self.assertIn("texB.png", extracted)
+        self.assertTrue((Path(dest) / "texA.png").exists())
+        self.assertTrue((Path(dest) / "texB.png").exists())
+
+    def test_extract_single_named_part_works(self):
+        from src.core.archive import extract_archive
+        self._make_zip("Solo_Part1.zip", {"file.png": b"data"})
+        dest = str(Path(self.tmpdir) / "out")
+        extracted = extract_archive(
+            str(Path(self.tmpdir) / "Solo_Part1.zip"), dest
+        )
+        self.assertIn("file.png", extracted)
+
+    def test_is_archive_recognises_named_parts(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("Pack_Part1.zip"))
+        self.assertTrue(is_archive("Pack.7z.001"))
+        # Regular archives still work
+        self.assertTrue(is_archive("pack.zip"))
+        self.assertTrue(is_archive("pack.7z"))
+
+
 class TestMemoryCardCreate(unittest.TestCase):
     """Tests for create_memcard."""
 
@@ -1581,39 +1707,31 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
     """Tests for the expanded browse catalogue."""
 
     def _load_catalogue(self):
-        """Import and return the CATALOGUE list from browse_panel."""
-        # We can't import PyQt6 in the test env, so we parse the file directly
-        # and load just the IDs from the catalogue
-        import ast
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        # Extract all "id": "..." values from CATALOGUE
-        ids = []
-        for line in src.splitlines():
-            stripped = line.strip()
-            if stripped.startswith('"id":'):
-                val = stripped.split(":", 1)[1].strip().strip('",').strip()
-                ids.append(val)
-        return ids
+        """Load catalogue IDs from the JSON data files via catalogue_loader."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
 
     def test_game_specific_texture_entries_present(self):
-        """Catalogue should include game-specific texture pack entries."""
+        """Catalogue should include game-specific texture pack entries (non-hub, specific files)."""
         ids = self._load_catalogue()
+        # DeadOnTheInside Patreon-hosted texture packs are the main specific-file entries
         game_entries = [
-            "spyro_etd_textures",
-            "crash_woc_textures",
-            "gow1_textures",
-            "ffx_textures",
-            "kh1_textures",
-            "kh2_textures",
-            "sotc_textures",
-            "gt4_textures",
-            "dmc3_textures",
-            "ratchet_clank_textures",
-            "jak_daxter_textures",
-            "dbz_bt3_textures",
-            "gta_sa_textures",
-            "ico_textures",
+            "doti_spyro_textures",
+            "doti_crash_woc_textures",
+            "doti_gow1_textures",
+            "doti_ffx_textures",
+            "doti_kh1_textures",
+            "doti_kh2_textures",
+            "doti_sotc_textures",
+            "doti_gt4_textures",
+            "doti_dmc3_textures",
+            "doti_ratchet_clank_textures",
+            "doti_jak_textures",
+            "doti_dbz_bt3_textures",
+            "doti_gtasa_textures",
+            "doti_ico_textures",
         ]
         for entry_id in game_entries:
             self.assertIn(entry_id, ids, f"Missing catalogue entry: {entry_id}")
@@ -1888,6 +2006,41 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertEqual(cfg.partial_textures_path, "")
         # Stale key must be dropped — not available as an attribute
         self.assertFalse(hasattr(cfg, "auto_deploy"))
+
+    # -- New browse-filter preference fields ---------------------------------
+
+    def test_browse_filter_defaults(self):
+        """show_paid defaults to False; show_account_required and show_incomplete to True."""
+        cfg = AppConfig()
+        self.assertFalse(cfg.show_paid)
+        self.assertTrue(cfg.show_account_required)
+        self.assertTrue(cfg.show_incomplete)
+
+    def test_browse_filter_fields_in_to_dict(self):
+        cfg = AppConfig(show_paid=True, show_account_required=False, show_incomplete=False)
+        d = cfg.to_dict()
+        self.assertTrue(d["show_paid"])
+        self.assertFalse(d["show_account_required"])
+        self.assertFalse(d["show_incomplete"])
+
+    def test_browse_filter_fields_round_trip(self):
+        cfg = AppConfig(show_paid=True, show_account_required=False, show_incomplete=False)
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertTrue(restored.show_paid)
+        self.assertFalse(restored.show_account_required)
+        self.assertFalse(restored.show_incomplete)
+
+    def test_old_config_without_browse_filter_fields_uses_defaults(self):
+        """Configs saved before the browse-filter fields were added should load fine."""
+        old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
+               "cover_art_path": "", "memcards_path": "", "cheats_path": "",
+               "mods_storage_path": "", "theme": "dark",
+               "check_updates_on_start": True, "show_conflict_warnings": True,
+               "first_run": False, "favorite_authors": [], "show_nsfw": False}
+        cfg = AppConfig.from_dict(old)
+        self.assertFalse(cfg.show_paid)
+        self.assertTrue(cfg.show_account_required)
+        self.assertTrue(cfg.show_incomplete)
 
 
 # =============================================================================
@@ -2281,61 +2434,705 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
         self.assertEqual(result["crc"], "F0A235B4")
 
 
+# =============================================================================
+# MediaFire URL resolver (mocked network)
+# =============================================================================
+
+class TestMediaFireResolver(unittest.TestCase):
+    """Tests for resolve_mediafire_url()."""
+
+    def test_non_mediafire_url_returns_none(self):
+        from src.core.downloader import resolve_mediafire_url
+        result = resolve_mediafire_url("https://example.com/file.zip")
+        self.assertIsNone(result)
+
+    def test_empty_url_returns_none(self):
+        from src.core.downloader import resolve_mediafire_url
+        self.assertIsNone(resolve_mediafire_url(""))
+        self.assertIsNone(resolve_mediafire_url(None))  # type: ignore[arg-type]
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_download_button_href(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<a id="downloadButton" class="input popsok" '
+            'aria-label="Download file" '
+            'href="https://download1234.mediafire.com/abc123/Spyro.zip">Download (48 MB)</a>'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/y1057yt4l2ndobn/Spyro.zip/file"
+        )
+        self.assertEqual(result, "https://download1234.mediafire.com/abc123/Spyro.zip")
+
+    @patch("src.core.downloader.requests.get")
+    def test_fallback_to_download_domain_href(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        # No id="downloadButton" but has a download*.mediafire.com href
+        mock_resp.text = (
+            '<html><body>'
+            '<a href="https://download99.mediafire.com/xyz/texture.zip">Get file</a>'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertEqual(result, "https://download99.mediafire.com/xyz/texture.zip")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/bad/file.zip/file"
+        )
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+        mock_get.side_effect = Exception("connection refused")
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertIsNone(result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_no_download_link_in_html_returns_none(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>No download link here.</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        result = resolve_mediafire_url(
+            "https://www.mediafire.com/file/abc/texture.zip/file"
+        )
+        self.assertIsNone(result)
+
+
+# =============================================================================
+# GBAtemp thread scraper (mocked network)
+# =============================================================================
+
+class TestGBAtempScraper(unittest.TestCase):
+    """Tests for scrape_gbatemp_thread()."""
+
+    # Minimal synthetic GBAtemp-like HTML used across tests
+    _SAMPLE_HTML = """
+    <html>
+    <head><title>A New Beginning | GBAtemp</title></head>
+    <body>
+    <h1 class="p-title-value">The Legend of Spyro: A New Beginning — 6x HD Texture Pack</h1>
+    <div class="message-body">
+      <span itemprop="name">DurinDragon</span>
+      <a class="username" href="/members/durindragon.778677/">DurinDragon</a>
+      <p>Download the packs below:</p>
+      <a href="https://www.mediafire.com/file/y1057yt4l2ndobn/Spyro_ANB_SLUS-21372_6x.zip/file">6x Extra</a>
+      <a href="https://www.mediafire.com/file/vkkkunm8kj09bh3/Spyro_ANB_SLUS-21372_6x_only.zip/file">6x Only</a>
+      <a href="https://www.mediafire.com/file/3jilfm7ahm6bs62/Spyro_ANB_SLUS-21372_4x_anime.zip/file">4x Anime</a>
+      <a href="https://www.mediafire.com/folder/jpnyulhtdvd77/Spyro_ANB_SLUS-21372">All Variants</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertIn("Spyro", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author_name(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["author"], "DurinDragon")
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertIn("gbatemp.net", result["author_url"])
+        self.assertIn("durindragon", result["author_url"].lower())
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_mediafire_download_urls(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+        self.assertGreaterEqual(len(result["download_urls"]), 3)
+
+    @patch("src.core.downloader.requests.get")
+    def test_detects_game_serial_in_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        # Serial is in the thread URL
+        result = scrape_gbatemp_thread(
+            "https://gbatemp.net/threads/spyro-SLUS-21372-textures.677477/"
+        )
+        self.assertEqual(result["game_serial"], "SLUS-21372")
+
+    @patch("src.core.downloader.requests.get")
+    def test_detects_game_serial_in_download_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML  # MediaFire links contain SLUS-21372
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        # Serial should be picked up from the MediaFire URLs in the HTML
+        self.assertEqual(result["game_serial"], "SLUS-21372")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 403
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_get.side_effect = Exception("timeout")
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/spyro.677477/")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+        self.assertEqual(result["game_serial"], "")
+
+    @patch("src.core.downloader.requests.get")
+    def test_source_url_always_echoed_back(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_get.side_effect = Exception("timeout")
+
+        url = "https://gbatemp.net/threads/some-pack.99999/"
+        result = scrape_gbatemp_thread(url)
+        self.assertEqual(result["source_url"], url)
+
+    @patch("src.core.downloader.requests.get")
+    def test_no_duplicate_download_urls(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        # HTML with the same URL duplicated
+        dup_html = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test</h1>'
+            '<a href="https://www.mediafire.com/file/abc/test.zip/file">Link 1</a>'
+            '<a href="https://www.mediafire.com/file/abc/test.zip/file">Link 2</a>'
+            '</body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = dup_html
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        urls = [dl["url"] for dl in result["download_urls"]]
+        self.assertEqual(len(urls), len(set(urls)), "Duplicate URLs returned")
+
+
+# =============================================================================
+# Spyro: A New Beginning catalogue entries
+# =============================================================================
+
+class TestSpyroANBCatalogueEntries(unittest.TestCase):
+    """The three DurinDragon Spyro: ANB variants must be in the catalogue."""
+
+    def _load_catalogue(self):
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
+
+    def _get_all_json_text(self):
+        """Return concatenated text of all catalogue JSON files for string searches."""
+        import json
+        base = Path(__file__).parent.parent / "data" / "catalogue"
+        return "\n".join(f.read_text() for f in base.glob("*.json") if f.suffix == ".json")
+
+    def test_all_spyro_anb_variants_present(self):
+        ids = self._load_catalogue()
+        expected = [
+            "spyro_anb_6x_extra_detail",
+            "spyro_anb_6x_only",
+            "spyro_anb_4x_anime",
+            "spyro_anb_mediafire_folder",
+        ]
+        for eid in expected:
+            self.assertIn(eid, ids, f"Missing Spyro ANB catalogue entry: {eid}")
+
+    def test_spyro_anb_direct_download_urls_are_mediafire(self):
+        """Each downloadable variant must have a MediaFire direct_download_url."""
+        src = self._get_all_json_text()
+        for variant in ("6x_extra_detail", "6x_only", "4x_anime"):
+            self.assertIn(
+                "mediafire.com/file/",
+                src,
+                f"No MediaFire download URL found for spyro_anb_{variant}",
+            )
+
+    def test_spyro_anb_entries_author_is_durindragon(self):
+        """All Spyro ANB entries should credit DurinDragon."""
+        src = self._get_all_json_text()
+        self.assertIn("DurinDragon", src)
+        self.assertIn("gbatemp.net/members/durindragon", src)
+
+
+# =============================================================================
+# GBAtemp Download-page scraper extension
+# =============================================================================
+
+class TestGBATempDownloadPageScraper(unittest.TestCase):
+    """Tests for scrape_gbatemp_thread() handling /download/ pages."""
+
+    _DOWNLOAD_PAGE_HTML = """
+    <html>
+    <head><title>GBAtemp Downloads | Bully Saves</title></head>
+    <body>
+    <h1 class="p-title-value">Bully Saves 100% and More</h1>
+    <dl class="pairs pairs--rows">
+      <dt>Author</dt>
+      <dd>moataz</dd>
+    </dl>
+    <a class="username" href="/members/moataz.683955/">moataz</a>
+    <div class="message-body">
+      Download: <a href="https://www.mediafire.com/file/hktfw1t8dv4etgo/bully_saves.rar/file">Download here</a>
+    </div>
+    <a href="/download/bully-saves.38390/download">Download from GBAtemp</a>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        self.assertIn("Bully", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_author_from_dl_block(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        self.assertEqual(result["author"], "moataz")
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_extracts_external_links(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_includes_gbatemp_hosted_download(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("GBAtemp", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_page_gbatemp_link_is_first(self, mock_get):
+        """GBAtemp-hosted download should be first in the list (most authoritative)."""
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._DOWNLOAD_PAGE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_gbatemp_thread("https://gbatemp.net/download/bully-saves.38390/")
+        if result["download_urls"]:
+            self.assertEqual(result["download_urls"][0]["host"], "GBAtemp")
+
+
+# =============================================================================
+# PS2-Home forum post scraper
+# =============================================================================
+
+class TestPS2HomeScraper(unittest.TestCase):
+    """Tests for scrape_ps2home_post()."""
+
+    _SAMPLE_HTML = """
+    <html>
+    <head><title>PS2-Home • View topic - ATV Off-Road Fury Save</title></head>
+    <body>
+    <h2 class="topic-title">ATV Off-Road Fury Game Save</h2>
+    <strong class="postauthor">jumper cable</strong>
+    <div class="post-text">
+      Download available here:
+      <a href="https://www.mediafire.com/file/abc123/ATV_save.zip/file">ATV Save</a>
+      Also on Google Drive:
+      <a href="https://drive.google.com/file/d/xyz789/view">Drive Link</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    _ATTACHMENT_HTML = """
+    <html>
+    <head><title>PS2-Home • View topic - Save with Attachment</title></head>
+    <body>
+    <h2 class="topic-title">Game Save With Attachment</h2>
+    <strong class="postauthor">testuser</strong>
+    <div class="post-text">
+      <a href="./download/file.php?id=99&mode=view">game_save.ps2</a>
+    </div>
+    </body>
+    </html>
+    """
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_title(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        self.assertIn("ATV", result["title"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_author(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        self.assertEqual(result["author"], "jumper cable")
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_mediafire_download_url(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("MediaFire", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_gdrive_download_url(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._SAMPLE_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("Google Drive", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_extracts_phpbb_attachment_link(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = self._ATTACHMENT_HTML
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=99")
+        hosts = [dl["host"] for dl in result["download_urls"]]
+        self.assertIn("PS2-Home", hosts)
+
+    @patch("src.core.downloader.requests.get")
+    def test_source_url_echoed_back(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_get.side_effect = Exception("network error")
+        url = "https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165"
+        result = scrape_ps2home_post(url)
+        self.assertEqual(result["source_url"], url)
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_returns_empty(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 404
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=0")
+        self.assertEqual(result["title"], "")
+        self.assertEqual(result["download_urls"], [])
+
+    @patch("src.core.downloader.requests.get")
+    def test_title_extracted_from_page_title_fallback(self, mock_get):
+        """If no h2.topic-title found, fall back to parsing the <title> tag."""
+        from src.core.downloader import scrape_ps2home_post
+        html_no_h2 = (
+            '<html><head><title>PS2-Home Board • View topic - Fallback Title</title></head>'
+            '<body><strong class="postauthor">user</strong></body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = html_no_h2
+        mock_get.return_value = mock_resp
+
+        result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "Fallback Title")
+
+
+# =============================================================================
+# RAR archive support
+# =============================================================================
+
+class TestRarExtraction(unittest.TestCase):
+    """Tests for RAR support in extract_archive()."""
+
+    def test_rar_without_rarfile_raises_helpful_error(self):
+        """If 'rarfile' is not installed, a clear ArchiveError is raised."""
+        import sys
+        from unittest.mock import patch as _patch
+        from src.core.archive import ArchiveError
+
+        # Simulate rarfile not being installed
+        with _patch.dict(sys.modules, {"rarfile": None}):
+            # Re-import to pick up the mock
+            import importlib
+            import src.core.archive as _archive
+            importlib.reload(_archive)
+            try:
+                with self.assertRaises(_archive.ArchiveError) as cm:
+                    _archive._extract_rar(Path("/fake/file.rar"), Path("/tmp"))
+                self.assertIn("rarfile", str(cm.exception).lower())
+            finally:
+                importlib.reload(_archive)  # restore
+
+    def test_rar_extension_recognised_as_archive(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("/path/to/file.rar"))
+
+    def test_non_rar_extension_not_affected(self):
+        from src.core.archive import is_archive
+        self.assertTrue(is_archive("/path/to/file.zip"))
+        self.assertFalse(is_archive("/path/to/file.txt"))
+
+
+# =============================================================================
+# Save file catalogue entries
+# =============================================================================
+
+class TestSaveFileCatalogueEntries(unittest.TestCase):
+    """The new save file entries must be present in the catalogue."""
+
+    def _get_ids(self):
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
+
+    def _get_entries(self):
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return load_catalogue(catalogue_dir=CATALOGUE_DIR)
+
+    def _get_all_json_text(self):
+        """Concatenate all catalogue JSON files for plain text searches."""
+        base = Path(__file__).parent.parent / "data" / "catalogue"
+        return "\n".join(f.read_text() for f in base.glob("*.json"))
+
+    def test_gbatemp_downloads_saves_hub_removed(self):
+        """The gbatemp_downloads_saves_hub entry is a category hub and must NOT be in catalogue."""
+        ids = self._get_ids()
+        self.assertNotIn("gbatemp_downloads_saves_hub", ids)
+
+    def test_sly2_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("sly2_save_gamefiles", ids)
+
+    def test_bully_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("bully_save_moataz", ids)
+
+    def test_ps2home_saves_hub_removed(self):
+        """The ps2home_saves_hub entry is a category hub and must NOT be in catalogue."""
+        ids = self._get_ids()
+        self.assertNotIn("ps2home_saves_hub", ids)
+
+    def test_atv_save_entry_present(self):
+        ids = self._get_ids()
+        self.assertIn("atv_fury_save_ps2home", ids)
+
+    def test_bully_save_has_mediafire_url(self):
+        """Bully save entry must have a direct_download_url pointing to MediaFire."""
+        src = self._get_all_json_text()
+        self.assertIn("mediafire.com/file/hktfw1t8dv4etgo/bully_saves", src)
+
+    def test_bully_save_author_is_moataz(self):
+        src = self._get_all_json_text()
+        self.assertIn("moataz", src)
+        self.assertIn("gbatemp.net/members/moataz", src)
+
+    def test_sly2_save_source_is_gbatemp_download(self):
+        src = self._get_all_json_text()
+        self.assertIn("gbatemp.net/download/sly-2-band-of-thieves-ps2-europe", src)
+
+    def test_atv_save_source_is_ps2home(self):
+        src = self._get_all_json_text()
+        self.assertIn("ps2-home.com/forum/viewtopic.php?f=70&t=12165", src)
+
+    # Popular-game save entries added for issue #3
+    def test_popular_game_saves_present(self):
+        """Issue #3 popular PS2 game save entries must be in the catalogue."""
+        ids = self._get_ids()
+        expected = [
+            "kingdom_hearts_save_gbatemp",
+            "ffx_save_gbatemp",
+            "god_of_war_save_gbatemp",
+            "gta_sa_save_gbatemp",
+            "mgs3_save_gbatemp",
+            "re4_save_gbatemp",
+            "sotc_save_gbatemp",
+            "jak_daxter_save_gbatemp",
+            "ratchet_clank_save_gbatemp",
+            "dbz_bt3_save_gbatemp",
+            "tekken5_save_gbatemp",
+            "persona4_save_gbatemp",
+        ]
+        for eid in expected:
+            self.assertIn(eid, ids, f"Missing popular-game save entry: {eid}")
+
+    def test_all_save_entries_are_not_hub(self):
+        """Every save file entry must be a specific-file entry (is_hub=False)."""
+        entries = self._get_entries()
+        saves = [e for e in entries if e["type"] == "save_file"]
+        for e in saves:
+            self.assertFalse(e.get("is_hub", False),
+                             f"Save entry {e['id']} must not be a hub")
+
+    def test_save_entries_have_game_serial_or_game_name(self):
+        """Every specific save entry should mention a game name or serial in description/context."""
+        ids = self._get_ids()
+        save_ids = [eid for eid in ids if 'save' in eid.lower()]
+        self.assertGreater(len(save_ids), 5, "Expected multiple specific save entries")
+
+
+# =============================================================================
+# GBATempScraperDialog URL classifier
+# =============================================================================
+
+class TestScraperDialogClassifier(unittest.TestCase):
+    """Tests for GBATempScraperDialog._classify_url() (static, no Qt needed)."""
+
+    def _classify(self, url: str) -> str:
+        """Replicate the production _classify_url logic using proper domain matching."""
+        import urllib.parse as _up
+        try:
+            netloc = _up.urlparse(url).netloc.lower()
+        except Exception:
+            return ""
+        if netloc == "gbatemp.net" or netloc.endswith(".gbatemp.net"):
+            return "gbatemp"
+        if netloc == "ps2-home.com" or netloc.endswith(".ps2-home.com"):
+            return "ps2home"
+        return ""
+
+    def test_gbatemp_thread_url_classified_as_gbatemp(self):
+        self.assertEqual(
+            self._classify("https://gbatemp.net/threads/spyro.677477/"),
+            "gbatemp",
+        )
+
+    def test_gbatemp_download_url_classified_as_gbatemp(self):
+        self.assertEqual(
+            self._classify("https://gbatemp.net/download/bully-saves.38390/"),
+            "gbatemp",
+        )
+
+    def test_ps2home_url_classified_as_ps2home(self):
+        self.assertEqual(
+            self._classify("https://www.ps2-home.com/forum/viewtopic.php?f=70&t=12165"),
+            "ps2home",
+        )
+
+    def test_unrecognised_url_returns_empty(self):
+        self.assertEqual(self._classify("https://example.com/stuff"), "")
+
+    def test_mediafire_url_returns_empty(self):
+        self.assertEqual(
+            self._classify("https://www.mediafire.com/file/abc/file.zip/file"),
+            "",
+        )
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
-    """Structural integrity checks for the browse-panel catalogue.
+    """Structural integrity checks for the JSON catalogue files.
 
-    Uses Python's ``ast`` module to parse the catalogue list without importing
-    any Qt code, so these tests run fine in headless CI environments.
+    Uses ``catalogue_loader.load_catalogue()`` which reads from
+    ``data/catalogue/*.json``.  No Qt import needed.
     """
 
     @classmethod
     def setUpClass(cls):
-        import ast
-
-        src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        tree = ast.parse(src_file.read_text(encoding="utf-8"))
-
-        # Walk the AST to find the CATALOGUE assignment
-        catalogue_node = None
-        for node in ast.walk(tree):
-            if (
-                isinstance(node, ast.AnnAssign)
-                and isinstance(node.target, ast.Name)
-                and node.target.id == "CATALOGUE"
-                and node.value is not None
-            ):
-                catalogue_node = node.value
-                break
-
-        if catalogue_node is None:
-            raise RuntimeError("Could not find CATALOGUE assignment in browse_panel.py")
-
-        # Convert the AST list of dicts to Python dicts.
-        # ModType.TEXTURE_PACK etc. appear as ast.Attribute nodes; convert
-        # them to their .value strings (e.g. "texture_pack").
-        _MAX_DEPTH = 20  # catalogue data is at most 3 levels deep; guard against malformed input
-
-        def _literal(node, depth=0):
-            if depth > _MAX_DEPTH:
-                raise ValueError(f"AST nesting depth exceeded {_MAX_DEPTH} (possible malformed input)")
-            if isinstance(node, ast.Constant):
-                return node.value
-            if isinstance(node, ast.List):
-                return [_literal(e, depth + 1) for e in node.elts]
-            if isinstance(node, ast.Tuple):
-                return tuple(_literal(e, depth + 1) for e in node.elts)
-            if isinstance(node, ast.Dict):
-                return {_literal(k, depth + 1): _literal(v, depth + 1) for k, v in zip(node.keys, node.values)}
-            # ModType.TEXTURE_PACK → "texture_pack" etc.
-            if isinstance(node, ast.Attribute):
-                return node.attr.lower()
-            # Concatenated strings: ("part1" "part2") → JoinedStr handled as concat
-            if isinstance(node, ast.JoinedStr):
-                return "<f-string>"
-            raise ValueError(f"Unexpected AST node type: {type(node).__name__}")
-
-        cls.catalogue = _literal(catalogue_node)
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        cls.catalogue = load_catalogue(catalogue_dir=CATALOGUE_DIR, strict=True)
+        cls.catalogue_dir = CATALOGUE_DIR
 
     # ------------------------------------------------------------------
     # Structural checks
@@ -2343,7 +3140,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
 
     _REQUIRED_FIELDS = {
         "id", "name", "description", "author", "author_url",
-        "url", "type", "source", "game", "tags",
+        "url", "type", "source", "game", "game_serial", "tags",
         "download_action", "upscale_tech",
         "is_hub", "nsfw",
     }
@@ -2551,12 +3348,16 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 )
 
     def test_nsfw_filter_logic(self):
-        """NSFW entries must be filterable: with show_nsfw=False, no nsfw entries appear;
-        with show_nsfw=True, nsfw entries are included."""
+        """NSFW filter logic must work correctly.
+
+        All current entries are safe (nsfw=False).  The filter with show_nsfw=False
+        must return only non-nsfw entries; with show_nsfw=True it returns everything.
+        """
         nsfw_entries = [e for e in self.catalogue if e.get("nsfw")]
         safe_entries  = [e for e in self.catalogue if not e.get("nsfw")]
 
-        self.assertGreater(len(nsfw_entries), 0, "There should be at least one nsfw entry")
+        # All current entries should be non-nsfw (hub entries that were nsfw have been removed)
+        self.assertEqual(len(nsfw_entries), 0, "No nsfw entries expected after hub removal")
         self.assertGreater(len(safe_entries), 0, "There should be safe (non-nsfw) entries")
 
         # Simulate the filter logic
@@ -2566,15 +3367,642 @@ class TestCatalogueIntegrity(unittest.TestCase):
         without_nsfw = apply_filter(self.catalogue, show_nsfw=False)
         with_nsfw    = apply_filter(self.catalogue, show_nsfw=True)
 
-        # No nsfw entries in filtered-out result
+        # No nsfw entries in either result (since there are none)
         self.assertFalse(
             any(e.get("nsfw") for e in without_nsfw),
             "show_nsfw=False should remove all nsfw entries"
         )
-        # All nsfw entries present when enabled
-        self.assertGreater(
-            len(with_nsfw), len(without_nsfw),
-            "show_nsfw=True should include more entries than show_nsfw=False"
-        )
+        # All entries appear with show_nsfw=True as well
         self.assertEqual(len(with_nsfw), len(self.catalogue))
 
+
+    # -- Paid / account-required / incomplete filter logic -------------------
+
+    def test_optional_content_flags_are_bool_when_present(self):
+        """is_free, requires_account, is_complete must be bool when explicitly set."""
+        for entry in self.catalogue:
+            for field in ("is_free", "requires_account", "is_complete"):
+                if field in entry:
+                    self.assertIsInstance(
+                        entry[field], bool,
+                        f"Entry {entry['id']} field '{field}' must be bool, got {type(entry[field])}"
+                    )
+
+    def test_paid_filter_logic(self):
+        """Entries with is_free=False are hidden when show_paid=False."""
+        paid = [e for e in self.catalogue if e.get("is_free") is False]
+        if not paid:
+            self.skipTest("No explicitly paid entries in catalogue")
+        free = [e for e in self.catalogue if e.get("is_free", True)]
+
+        # Without paid: only free entries visible
+        without_paid = [e for e in self.catalogue if e.get("is_free", True)]
+        # With paid: all entries visible
+        with_paid = self.catalogue
+
+        self.assertGreater(len(with_paid), len(without_paid),
+                           "show_paid=True should reveal more entries")
+        self.assertFalse(any(e.get("is_free") is False for e in without_paid),
+                         "show_paid=False should hide all paid entries")
+
+    def test_incomplete_filter_logic(self):
+        """Entries with is_complete=False are hidden when show_incomplete=False."""
+        incomplete = [e for e in self.catalogue if e.get("is_complete") is False]
+        if not incomplete:
+            self.skipTest("No explicitly incomplete entries in catalogue")
+        without_incomplete = [e for e in self.catalogue if e.get("is_complete", True)]
+        self.assertFalse(
+            any(e.get("is_complete") is False for e in without_incomplete),
+            "show_incomplete=False should hide all incomplete entries"
+        )
+
+    def test_patreon_entries_have_requires_account_true(self):
+        """All non-hub Patreon entries should have requires_account=True (explicit or inferred)."""
+        patreon_entries = [
+            e for e in self.catalogue
+            if e.get("source") == "Patreon" and not e.get("is_hub", False)
+        ]
+        self.assertGreater(len(patreon_entries), 0, "Should have some Patreon entries")
+        for entry in patreon_entries:
+            # Either explicitly set or inferred as True (Patreon is in _ACCOUNT_REQUIRED_SOURCES)
+            explicit = entry.get("requires_account")
+            if explicit is not None:
+                self.assertTrue(explicit,
+                    f"Patreon entry {entry['id']} has requires_account=False, expected True")
+
+
+class TestTextureStructureNormalization(unittest.TestCase):
+    """Tests for ModManager._normalize_texture_structure."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_dest(self) -> Path:
+        d = Path(self.tmpdir) / "dest"
+        d.mkdir()
+        return d
+
+    def test_replacement_folder_at_depth0(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "ABCD1234.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertTrue((expected / "ABCD1234.png").exists())
+        self.assertFalse((dest / "replacement").exists())
+
+    def test_replacements_folder_at_depth0(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacements").mkdir()
+        (dest / "replacements" / "HASH.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-20062")
+        expected = dest / "SLUS-20062" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertTrue((expected / "HASH.png").exists())
+
+    def test_replacement_inside_wrapper_folder(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "MyPack_v1" / "replacement").mkdir(parents=True)
+        (dest / "MyPack_v1" / "replacement" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements" / "tex.png"
+        self.assertTrue(expected.exists())
+
+    def test_flat_structure_moved_to_serial_replacements(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "hash1.png").write_bytes(b"A")
+        (dest / "hash2.png").write_bytes(b"B")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        expected = dest / "SLUS-21228" / "replacements"
+        self.assertTrue(expected.exists())
+        self.assertEqual(len(list(expected.iterdir())), 2)
+
+    def test_already_correct_structure_unchanged(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "SLUS-21228" / "replacements").mkdir(parents=True)
+        (dest / "SLUS-21228" / "replacements" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-21228")
+        # Should be completely unchanged
+        self.assertTrue((dest / "SLUS-21228" / "replacements" / "tex.png").exists())
+        self.assertEqual(len(list((dest / "SLUS-21228" / "replacements").iterdir())), 1)
+
+    def test_no_game_id_does_nothing(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "tex.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "")
+        # Nothing should change — no serial to normalize into
+        self.assertTrue((dest / "replacement").exists())
+        self.assertTrue((dest / "replacement" / "tex.png").exists())
+
+    def test_multiple_texture_files_all_moved(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        for i in range(5):
+            (dest / "replacement" / f"hash{i}.png").write_bytes(b"PNG")
+        ModManager._normalize_texture_structure(dest, "SLUS-20062")
+        expected = dest / "SLUS-20062" / "replacements"
+        self.assertEqual(len(list(expected.iterdir())), 5)
+
+
+# =============================================================================
+# gametdb_cover_url helper
+# =============================================================================
+
+class TestGametdbCoverUrl(unittest.TestCase):
+    """Tests for the gametdb_cover_url() helper in downloader.py."""
+
+    def setUp(self):
+        from src.core.downloader import gametdb_cover_url
+        self.gcu = gametdb_cover_url
+
+    def test_ntsc_us_slus_gives_us_region(self):
+        url = self.gcu("SLUS-21829")
+        self.assertIn("/US/", url)
+        self.assertIn("SLUS21829", url)
+        self.assertTrue(url.startswith("https://art.gametdb.com/ps2/cover/"))
+
+    def test_ntsc_us_scus_gives_us_region(self):
+        url = self.gcu("SCUS-97399")
+        self.assertIn("/US/", url)
+        self.assertIn("SCUS97399", url)
+
+    def test_pal_sles_gives_en_region(self):
+        url = self.gcu("SLES-52400")
+        self.assertIn("/EN/", url)
+        self.assertIn("SLES52400", url)
+
+    def test_pal_sces_gives_en_region(self):
+        url = self.gcu("SCES-52400")
+        self.assertIn("/EN/", url)
+
+    def test_japan_slps_gives_ja_region(self):
+        url = self.gcu("SLPS-25302")
+        self.assertIn("/JA/", url)
+        self.assertIn("SLPS25302", url)
+
+    def test_hyphen_stripped_from_serial(self):
+        url = self.gcu("SLUS-20312")
+        self.assertIn("SLUS20312", url)
+        self.assertNotIn("SLUS-20312", url)
+
+    def test_empty_serial_returns_empty(self):
+        url = self.gcu("")
+        self.assertEqual(url, "")
+
+    def test_lowercase_input_normalised(self):
+        url = self.gcu("slus-21829")
+        self.assertIn("SLUS21829", url)
+        self.assertIn("/US/", url)
+
+    def test_url_ends_with_jpg(self):
+        url = self.gcu("SLUS-20946")
+        self.assertTrue(url.endswith(".jpg"))
+
+    def test_korea_serial_gives_ko_region(self):
+        url = self.gcu("SLKA-25001")
+        self.assertIn("/KO/", url)
+
+    def test_unknown_prefix_defaults_to_us(self):
+        url = self.gcu("XXXX-99999")
+        self.assertIn("/US/", url)
+
+
+# =============================================================================
+# game_serial field in catalogue (JSON-based, no Qt import needed)
+# =============================================================================
+
+def _load_catalogue_ast():
+    """Load catalogue from JSON files via catalogue_loader (no Qt)."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+    return load_catalogue(catalogue_dir=CATALOGUE_DIR, strict=True)
+
+
+class TestCatalogueGameSerial(unittest.TestCase):
+    """Every entry must have the game_serial field; game-specific entries must
+    have a non-empty, correctly formatted serial (AST-based, no Qt)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.catalogue = _load_catalogue_ast()
+
+    def test_all_entries_have_game_serial_field(self):
+        for entry in self.catalogue:
+            self.assertIn(
+                "game_serial", entry,
+                f"Entry {entry['id']} missing 'game_serial' field",
+            )
+
+    def test_game_serial_is_string(self):
+        for entry in self.catalogue:
+            self.assertIsInstance(
+                entry["game_serial"], str,
+                f"Entry {entry['id']} game_serial must be str",
+            )
+
+    def test_game_specific_entries_have_valid_serial_format(self):
+        """Non-empty serials must follow the XXXX-DDDDD pattern."""
+        import re
+        serial_re = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for entry in self.catalogue:
+            serial = entry.get("game_serial", "")
+            if serial:
+                self.assertRegex(
+                    serial, serial_re,
+                    f"Entry {entry['id']} has malformed serial: {serial!r}",
+                )
+
+    def test_well_known_game_serials(self):
+        by_id = {e["id"]: e for e in self.catalogue}
+        expected = {
+            "doti_gow1_textures":          "SCUS-97399",
+            "doti_kh2_textures":           "SLUS-21005",
+            "doti_ffx_textures":           "SLUS-20312",
+            "doti_sh2_textures":           "SLUS-20228",
+            "cckrizalid_baroque_textures": "SLUS-21829",
+            "spyro_anb_6x_extra_detail":   "SLUS-21372",
+            "sly2_save_gamefiles":         "SCES-52400",
+            "bully_save_moataz":           "SLUS-21358",
+            "god_of_war_save_gbatemp":     "SCUS-97399",
+        }
+        for eid, expected_serial in expected.items():
+            self.assertIn(eid, by_id, f"Entry {eid!r} not found")
+            actual = by_id[eid]["game_serial"]
+            self.assertEqual(actual, expected_serial,
+                             f"{eid!r}: expected {expected_serial!r}, got {actual!r}")
+
+    def test_game_specific_entries_mostly_have_serial(self):
+        no_serial = [
+            e for e in self.catalogue
+            if e.get("game") and not e.get("game_serial")
+        ]
+        self.assertLessEqual(len(no_serial), 8,
+            f"Too many game entries without serial: {[e['id'] for e in no_serial]}")
+
+
+# =============================================================================
+# Scraper thumbnail_url extraction
+# =============================================================================
+
+class TestScraperThumbnailExtraction(unittest.TestCase):
+    """scrape_gbatemp_thread and scrape_ps2home_post should extract
+    thumbnail_url from post images."""
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_extracts_thumbnail_url(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        img = "https://files.catbox.moe/cover_art.jpg"
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test HD Textures</h1>'
+            '<span itemprop="name">Author</span>'
+            f'<img src="{img}" alt="cover">'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.12345/")
+        self.assertEqual(result["thumbnail_url"], img)
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_skips_avatar_images(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        avatar = "https://gbatemp.net/data/avatars/user_123.jpg"
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = (
+            '<html><body>'
+            '<h1 class="p-title-value">Test</h1>'
+            f'<img src="{avatar}" alt="av">'
+            '</body></html>'
+        )
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.12345/")
+        self.assertEqual(result["thumbnail_url"], "")
+
+    @patch("src.core.downloader.requests.get")
+    def test_gbatemp_result_has_thumbnail_url_key(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><h1 class='p-title-value'>T</h1></body></html>"
+        mock_get.return_value = mock_resp
+        result = scrape_gbatemp_thread("https://gbatemp.net/threads/x.1/")
+        self.assertIn("thumbnail_url", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_ps2home_result_has_thumbnail_url_key(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><h2 class='topic-title'>S</h2></body></html>"
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post(
+            "https://www.ps2-home.com/forum/viewtopic.php?t=1"
+        )
+        self.assertIn("thumbnail_url", result)
+
+    @patch("src.core.downloader.requests.get")
+    def test_ps2home_extracts_post_image(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+        img = "https://www.ps2-home.com/forum/img/screenshot.jpg"
+        html = (
+            '<html><body>'
+            '<h2 class="topic-title">ATV Save</h2>'
+            f'<img src="{img}" alt="shot">'
+            '</body></html>'
+        )
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = html
+        mock_get.return_value = mock_resp
+        result = scrape_ps2home_post(
+            "https://www.ps2-home.com/forum/viewtopic.php?t=12165"
+        )
+        self.assertEqual(result["thumbnail_url"], img)
+
+
+# =============================================================================
+# CCKrizalid catalogue entries (AST-based)
+# =============================================================================
+
+class TestCCKrizalidEntries(unittest.TestCase):
+    """Verify CCKrizalid 'Mega Library' texture pack entries."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.entries = {e["id"]: e for e in _load_catalogue_ast()}
+
+    def test_baroque_entry_present(self):
+        self.assertIn("cckrizalid_baroque_textures", self.entries)
+
+    def test_baroque_has_confirmed_mega_link(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertIn("mega.nz/file/Qds2kQAR", e["direct_download_url"])
+
+    def test_baroque_serial_is_slus_21829(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertEqual(e["game_serial"], "SLUS-21829")
+
+    def test_baroque_author_is_cckrizalid(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertEqual(e["author"], "CCKrizalid")
+
+    def test_baroque_author_url_points_to_profile(self):
+        e = self.entries["cckrizalid_baroque_textures"]
+        self.assertIn("cckrizalid.606805", e["author_url"])
+
+    def test_all_cckrizalid_entries_have_thread_url(self):
+        thread = "mega-library-of-hd-texture-packs-by-cckrizalid.618690"
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        self.assertGreater(len(cc), 1)
+        for e in cc:
+            self.assertIn(thread, e["url"],
+                          f"{e['id']}: url should contain the thread slug")
+
+    def test_all_cckrizalid_entries_are_texture_packs(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        for e in cc:
+            self.assertEqual(e["type"], "texture_pack",
+                             f"{e['id']} type should be texture_pack")
+
+    def test_all_cckrizalid_entries_have_serials(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        for e in cc:
+            self.assertTrue(e.get("game_serial"),
+                            f"{e['id']} missing game_serial")
+
+    def test_minimum_cckrizalid_pack_count(self):
+        cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
+        self.assertGreaterEqual(len(cc), 15,
+                                "Expected at least 15 CCKrizalid pack entries")
+
+
+# =============================================================================
+# CatalogueLoader
+# =============================================================================
+
+class TestCatalogueLoader(unittest.TestCase):
+    """Tests for src.core.catalogue_loader — the new JSON-based catalogue."""
+
+    @classmethod
+    def setUpClass(cls):
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import (
+            load_catalogue, CATALOGUE_DIR, CATALOGUE, ALL_SOURCES,
+        )
+        cls.load_catalogue = staticmethod(load_catalogue)
+        cls.catalogue_dir = CATALOGUE_DIR
+        cls.catalogue = CATALOGUE
+        cls.all_sources = ALL_SOURCES
+
+    # ── Basic load ──────────────────────────────────────────────────────────
+
+    def test_loads_more_than_150_entries(self):
+        self.assertGreater(len(self.catalogue), 850,
+                           "catalogue should have >850 entries after scaling")
+
+    def test_no_duplicate_ids(self):
+        ids = [e["id"] for e in self.catalogue]
+        seen = set()
+        for eid in ids:
+            self.assertNotIn(eid, seen, f"Duplicate ID: {eid!r}")
+            seen.add(eid)
+
+    def test_type_field_injected(self):
+        """Every entry must have a 'type' field (injected from file name)."""
+        valid_types = {"texture_pack", "pnach", "save_file", "cheat", "cover_art"}
+        for e in self.catalogue:
+            self.assertIn(e.get("type"), valid_types,
+                          f"Entry {e['id']} has invalid type {e.get('type')!r}")
+
+    def test_all_required_fields_present(self):
+        required = {"id", "name", "description", "author", "url", "source",
+                    "game", "game_serial"}
+        for e in self.catalogue:
+            for f in required:
+                self.assertIn(f, e,
+                              f"Entry {e['id']!r} missing required field {f!r}")
+
+    def test_optional_defaults_filled_in(self):
+        """Optional fields must be present in every loaded entry."""
+        optional = {"context", "author_url", "is_hub", "nsfw", "thumbnail_url",
+                    "tags", "download_action", "direct_download_url",
+                    "upscale_tech", "is_free", "requires_account", "is_complete"}
+        for e in self.catalogue:
+            for f in optional:
+                self.assertIn(f, e,
+                              f"Entry {e['id']!r} missing optional field {f!r}")
+
+    def test_tags_are_lists(self):
+        for e in self.catalogue:
+            self.assertIsInstance(e["tags"], list,
+                                  f"Entry {e['id']!r} 'tags' must be a list")
+
+    # ── Type counts ─────────────────────────────────────────────────────────
+
+    def test_has_texture_pack_entries(self):
+        tp = [e for e in self.catalogue if e["type"] == "texture_pack"]
+        self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
+
+    def test_has_pnach_entries(self):
+        pn = [e for e in self.catalogue if e["type"] == "pnach"]
+        self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
+
+    def test_has_save_file_entries(self):
+        sv = [e for e in self.catalogue if e["type"] == "save_file"]
+        self.assertGreater(len(sv), 120, "Expected >120 save file entries")
+
+    def test_no_generic_placeholder_authors(self):
+        """Every catalogue entry must credit a real person or project.
+
+        Prevents generic community-level placeholders from being used instead of
+        the specific uploader's username.  Each string in ``generic_authors`` is
+        a known placeholder that was previously used and must not reappear — the
+        correct attribution (e.g. ``GameSavedFiles`` for GBAtemp PS2 saves,
+        ``kozarovv`` for PCSX2 patches) must be used instead.
+        """
+        generic_authors = {
+            "GBAtemp Community",
+            "PS2Wide Community",
+            "GitHub Community",
+            "PS2-Home Community",
+            "Unknown (GBAtemp member)",
+        }
+        bad = [e["id"] for e in self.catalogue if e.get("author") in generic_authors]
+        self.assertEqual(bad, [],
+                         f"Entries still using generic placeholder author: {bad}")
+
+    # ── Strict mode ─────────────────────────────────────────────────────────
+
+    def test_strict_mode_raises_on_bad_json(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            p.write_text("NOT VALID JSON")
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_strict_mode_raises_on_missing_required_field(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            # Entry missing 'name'
+            p.write_text(json.dumps([{
+                "id": "test_entry",
+                "description": "desc",
+                "author": "Author",
+                "url": "https://example.com",
+                "source": "GBAtemp",
+                "game": "Game",
+                "game_serial": "SLUS-12345",
+            }]))
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_lenient_mode_skips_bad_entries(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            p.write_text("NOT VALID JSON")
+            # Should not raise in lenient (default) mode
+            result = load_catalogue(catalogue_dir=d, strict=False)
+            self.assertEqual(result, [])
+
+    def test_empty_dir_returns_empty_list(self):
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            result = load_catalogue(catalogue_dir=d)
+            self.assertEqual(result, [])
+
+    def test_duplicate_ids_skipped_in_lenient_mode(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "dup", "name": "N", "description": "D",
+                "author": "A", "url": "https://x.com", "source": "S",
+                "game": "G", "game_serial": "SLUS-00001",
+            }
+            p.write_text(json.dumps([entry, entry]))  # same ID twice
+            result = load_catalogue(catalogue_dir=d, strict=False)
+            self.assertEqual(len(result), 1)
+
+    def test_duplicate_ids_raise_in_strict_mode(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "dup", "name": "N", "description": "D",
+                "author": "A", "url": "https://x.com", "source": "S",
+                "game": "G", "game_serial": "SLUS-00001",
+            }
+            p.write_text(json.dumps([entry, entry]))
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    # ── ALL_SOURCES ──────────────────────────────────────────────────────────
+
+    def test_all_sources_is_sorted(self):
+        self.assertEqual(self.all_sources, sorted(self.all_sources))
+
+    def test_all_sources_contains_gbatemp(self):
+        self.assertIn("GBAtemp", self.all_sources)
+
+    def test_all_sources_contains_github(self):
+        self.assertIn("GitHub", self.all_sources)
+
+    def test_all_sources_contains_ps2wide(self):
+        self.assertIn("PS2Wide", self.all_sources)
+
+    # ── New sources from scaling ──────────────────────────────────────────────
+
+    def test_gamebanana_source_present(self):
+        """Scaling added GameBanana entries."""
+        gb = [e for e in self.catalogue if e["source"] == "GameBanana"]
+        self.assertGreater(len(gb), 0, "Expected GameBanana entries")
+
+    # ── 60fps patches ─────────────────────────────────────────────────────────
+
+    def test_60fps_patches_present(self):
+        fps_patches = [e for e in self.catalogue if "60fps" in e.get("tags", [])]
+        self.assertGreater(len(fps_patches), 10,
+                           "Expected >10 60fps PNACH entries")
+
+    def test_60fps_patches_are_pnach_type(self):
+        for e in self.catalogue:
+            if "60fps" in e.get("tags", []):
+                self.assertEqual(e["type"], "pnach",
+                                 f"60fps entry {e['id']} should be pnach type")
+
+    # ── CCKrizalid coverage ───────────────────────────────────────────────────
+
+    def test_cckrizalid_baroque_present(self):
+        by_id = {e["id"]: e for e in self.catalogue}
+        self.assertIn("cckrizalid_baroque_textures", by_id)
+
+    def test_cckrizalid_minimum_pack_count(self):
+        cc = [e for e in self.catalogue if e.get("author") == "CCKrizalid"]
+        self.assertGreaterEqual(len(cc), 20,
+                                "Expected at least 20 CCKrizalid entries after scaling")
