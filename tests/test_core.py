@@ -3869,12 +3869,20 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertGreater(len(sv), 120, "Expected >120 save file entries")
 
     def test_no_generic_placeholder_authors(self):
-        """Every entry should attribute a real person/project, not a generic placeholder."""
+        """Every catalogue entry must credit a real person or project.
+
+        Prevents generic community-level placeholders from being used instead of
+        the specific uploader's username.  Each string in ``generic_authors`` is
+        a known placeholder that was previously used and must not reappear — the
+        correct attribution (e.g. ``GameSavedFiles`` for GBAtemp PS2 saves,
+        ``kozarovv`` for PCSX2 patches) must be used instead.
+        """
         generic_authors = {
             "GBAtemp Community",
             "PS2Wide Community",
             "GitHub Community",
             "PS2-Home Community",
+            "Unknown (GBAtemp member)",
         }
         bad = [e["id"] for e in self.catalogue if e.get("author") in generic_authors]
         self.assertEqual(bad, [],
