@@ -80,6 +80,7 @@ class ModItemWidget(QFrame):
     priority_up = pyqtSignal(str)          # mod_id
     priority_down = pyqtSignal(str)        # mod_id
     details_requested = pyqtSignal(str)    # mod_id
+    edit_requested = pyqtSignal(str)       # mod_id
 
     def __init__(self, mod: ModInfo, has_conflict: bool = False, parent=None):
         super().__init__(parent)
@@ -196,6 +197,12 @@ class ModItemWidget(QFrame):
         info_btn.setToolTip("Details")
         info_btn.clicked.connect(lambda: self.details_requested.emit(self.mod.id))
         btn_col.addWidget(info_btn)
+
+        edit_btn = QPushButton("✏")
+        edit_btn.setFixedSize(28, 28)
+        edit_btn.setToolTip("Edit metadata")
+        edit_btn.clicked.connect(lambda: self.edit_requested.emit(self.mod.id))
+        btn_col.addWidget(edit_btn)
 
         del_btn = QPushButton("🗑")
         del_btn.setFixedSize(28, 28)

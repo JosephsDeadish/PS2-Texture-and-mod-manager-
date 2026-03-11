@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import src.core.config_manager as _cfg
+from src.core.archive import ArchiveError, extract_archive, is_archive
 from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
 
 
@@ -83,12 +84,16 @@ class ModManager:
         dest_base: str,
         name: str = "",
         author: str = "",
+        version: str = "",
         description: str = "",
         game_id: str = "",
         source_url: str = "",
     ) -> ModInfo:
         """
         Copy a folder or file into managed storage and register it as a mod.
+
+        Archive files (.zip, .7z) are extracted automatically; their contents
+        land in the destination directory rather than the archive file itself.
 
         If *source_path* is a directory it is copied recursively using
         dirs_exist_ok=True, meaning any pre-existing files at the destination
@@ -106,11 +111,23 @@ class ModManager:
 
         if source.is_dir():
             shutil.copytree(str(source), str(dest_dir), dirs_exist_ok=True)
+        elif is_archive(str(source)):
+            # Extract archive contents into the destination directory
+            try:
+                extract_archive(str(source), str(dest_dir))
+            except ArchiveError as exc:
+                shutil.rmtree(str(dest_dir), ignore_errors=True)
+                raise
         else:
             shutil.copy2(str(source), str(dest_dir / source.name))
 
         files = self._list_files(dest_dir)
         size = sum(f.stat().st_size for f in dest_dir.rglob("*") if f.is_file())
+
+        # Auto-fetch thumbnail from GameTDB if a game_id is provided
+        thumbnail_path = ""
+        if game_id:
+            thumbnail_path = self._fetch_thumbnail(game_id) or ""
 
         mod = ModInfo(
             id=mod_id,
@@ -119,9 +136,11 @@ class ModManager:
             path=str(dest_dir),
             enabled=True,
             author=author,
+            version=version or "1.0.0",
             description=description,
             game_id=game_id,
             source_url=source_url,
+            thumbnail_path=thumbnail_path,
             files=files,
             size_bytes=size,
         )
@@ -150,6 +169,79 @@ class ModManager:
         if mod:
             mod.priority = priority
             self.db.update(mod)
+
+    # ------------------------------------------------------------------
+    # Metadata update
+    # ------------------------------------------------------------------
+
+    def update_metadata(
+        self,
+        mod_id: str,
+        name: str = "",
+        author: str = "",
+        description: str = "",
+        game_id: str = "",
+        version: str = "",
+        source_url: str = "",
+        tags: Optional[List[str]] = None,
+    ):
+        """Update editable metadata fields on an existing mod."""
+        mod = self.db.get(mod_id)
+        if not mod:
+            return
+        if name:
+            mod.name = name
+        if author is not None:
+            mod.author = author
+        if description is not None:
+            mod.description = description
+        if version:
+            mod.version = version
+        if source_url is not None:
+            mod.source_url = source_url
+        if tags is not None:
+            mod.tags = tags
+
+        # If game_id changed and we don't have a thumbnail yet, fetch one
+        if game_id is not None and game_id != mod.game_id:
+            mod.game_id = game_id
+            if game_id and not mod.thumbnail_path:
+                mod.thumbnail_path = self._fetch_thumbnail(game_id) or ""
+        elif game_id is not None:
+            mod.game_id = game_id
+
+        self.db.update(mod)
+
+    # ------------------------------------------------------------------
+    # Thumbnail helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _fetch_thumbnail(game_id: str, region: str = "EN") -> Optional[str]:
+        """
+        Try to download a cover art thumbnail from GameTDB.
+        Returns local file path on success, None on failure.
+        Runs synchronously; callers that want non-blocking behaviour should
+        call this in a background thread.
+        """
+        try:
+            from src.core.downloader import fetch_gametdb_art
+            thumb_dir = str(_cfg.THUMBNAILS_DIR)
+            return fetch_gametdb_art(game_id, thumb_dir, region)
+        except Exception:
+            return None
+
+    def refresh_thumbnail(self, mod_id: str, region: str = "EN") -> bool:
+        """Re-fetch the thumbnail for *mod_id* from GameTDB. Returns True on success."""
+        mod = self.db.get(mod_id)
+        if not mod or not mod.game_id:
+            return False
+        path = self._fetch_thumbnail(mod.game_id, region)
+        if path:
+            mod.thumbnail_path = path
+            self.db.update(mod)
+            return True
+        return False
 
     # ------------------------------------------------------------------
     # Apply mods (deploy to PCSX2 folders)

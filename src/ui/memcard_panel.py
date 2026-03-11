@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QFileDialog,
     QFrame,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QListWidget,
     QListWidgetItem,
@@ -21,6 +22,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.memory_card import (
     MemoryCardError,
+    create_memcard,
     export_save,
     is_valid_memcard,
     list_memcard_files,
@@ -64,6 +66,12 @@ class MemoryCardPanel(BasePanel):
         browse_btn = QPushButton("📁 Browse")
         browse_btn.clicked.connect(self._browse_card)
         card_row.addWidget(browse_btn)
+
+        new_btn = QPushButton("➕ New Card")
+        new_btn.setToolTip("Create a new blank PS2 memory card")
+        new_btn.setObjectName("primary_btn")
+        new_btn.clicked.connect(self._create_card)
+        card_row.addWidget(new_btn)
 
         content.addLayout(card_row)
 
@@ -199,6 +207,45 @@ class MemoryCardPanel(BasePanel):
                     self._saves_list.addItem(item)
         except MemoryCardError as exc:
             self._saves_list.addItem(f"Error reading card: {exc}")
+
+    def _create_card(self):
+        """Create a new blank PCSX2-format memory card image."""
+        # Get destination folder — prefer configured memcards dir
+        cards_dir = self.config.memcards_path
+        if not cards_dir:
+            cards_dir = QFileDialog.getExistingDirectory(
+                self, "Choose folder for new memory card"
+            )
+            if not cards_dir:
+                return
+
+        name, ok = QInputDialog.getText(
+            self,
+            "New Memory Card",
+            "Card filename (without extension):",
+            text="MemoryCard1",
+        )
+        if not ok or not name.strip():
+            return
+
+        filename = name.strip()
+        if not filename.endswith(".ps2"):
+            filename += ".ps2"
+
+        dest_path = str(Path(cards_dir) / filename)
+
+        try:
+            path = create_memcard(dest_path)
+            QMessageBox.information(
+                self,
+                "Memory Card Created",
+                f"New memory card created at:\n{path}\n\n"
+                "PCSX2 will initialise the card structure the first time it is used.",
+            )
+            self.emit_status(f"Created memory card: {filename}")
+            self.refresh()
+        except MemoryCardError as exc:
+            QMessageBox.critical(self, "Error", str(exc))
 
     def _export_selected(self):
         item = self._saves_list.currentItem()

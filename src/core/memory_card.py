@@ -25,7 +25,7 @@ from typing import List, Optional
 # Memory card constants
 # The magic string ends with a trailing space — this is part of the official
 # PS2 memory card superblock format and is intentional.
-MC_SUPERBLOCK_MAGIC = b"Sony PS2 Memory Card Format "
+MC_SUPERBLOCK_MAGIC = b"Sony PS2 Memory Card Format "  # trailing space is required by spec
 MC_PAGE_SIZE = 512
 MC_SPARE_SIZE = 16
 MC_PAGES_PER_CLUSTER = 2
@@ -162,3 +162,43 @@ def list_memcard_files(memcards_dir: str) -> List[str]:
         if p.suffix.lower() in (".ps2", ".mcd", ".mc2"):
             result.append(str(p))
     return result
+
+
+def create_memcard(dest_path: str, size_mb: int = 8) -> str:
+    """
+    Create a blank PCSX2-compatible PS2 memory card image at *dest_path*.
+
+    The file is zeroed-out except for the superblock magic at byte 0,
+    which makes PCSX2 recognise it as a valid (empty) card on first use.
+    PCSX2 will initialise the FAT structures the first time it opens the card.
+
+    Args:
+        dest_path: Full path including filename (e.g. ~/memcards/Slot1.ps2).
+        size_mb:   Card size in megabytes.  8 MB is the standard PS2 card size.
+
+    Returns:
+        The absolute path of the created file.
+    """
+    dest = Path(dest_path)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+
+    if dest.exists():
+        raise MemoryCardError(f"File already exists: {dest_path}")
+
+    total_bytes = size_mb * 1024 * 1024
+    try:
+        with open(dest, "wb") as f:
+            # Write superblock magic followed by zeroes
+            f.write(MC_SUPERBLOCK_MAGIC)
+            remaining = total_bytes - len(MC_SUPERBLOCK_MAGIC)
+            # Write in 64 KB chunks to avoid allocating the whole card at once
+            chunk = b"\x00" * 65536
+            while remaining > 0:
+                to_write = min(remaining, 65536)
+                f.write(chunk[:to_write])
+                remaining -= to_write
+    except OSError as exc:
+        dest.unlink(missing_ok=True)
+        raise MemoryCardError(f"Failed to create memory card: {exc}") from exc
+
+    return str(dest)

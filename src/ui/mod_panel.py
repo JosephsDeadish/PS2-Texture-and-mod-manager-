@@ -6,7 +6,6 @@ from typing import List
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
-    QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -17,12 +16,12 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QComboBox,
-    QSizePolicy,
 )
 
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
+from src.ui.import_dialog import EditModDialog, ImportModDialog
 from src.ui.widgets import (
     ConflictDialog,
     EmptyStateWidget,
@@ -227,6 +226,7 @@ class ModPanel(BasePanel):
                 widget.priority_up.connect(self._on_priority_up)
                 widget.priority_down.connect(self._on_priority_down)
                 widget.details_requested.connect(self._on_details)
+                widget.edit_requested.connect(self._on_edit)
                 self._list_layout.insertWidget(i, widget)
 
         enabled_count = sum(1 for m in self.db.by_type(self.mod_type) if m.enabled)
@@ -281,6 +281,32 @@ class ModPanel(BasePanel):
             dlg = ModDetailsDialog(mod, self)
             dlg.exec()
 
+    def _on_edit(self, mod_id: str):
+        mod = self.db.get(mod_id)
+        if not mod:
+            return
+        dlg = EditModDialog(mod, self)
+        if dlg.exec() == dlg.DialogCode.Accepted:
+            meta = dlg.updated_meta
+            self.manager.update_metadata(
+                mod_id,
+                name=meta.get("name", ""),
+                author=meta.get("author", ""),
+                description=meta.get("description", ""),
+                game_id=meta.get("game_id", ""),
+                version=meta.get("version", ""),
+                source_url=meta.get("source_url", ""),
+                tags=meta.get("tags"),
+            )
+            # Apply thumbnail if explicitly fetched in dialog
+            if meta.get("thumbnail_path"):
+                updated = self.db.get(mod_id)
+                if updated:
+                    updated.thumbnail_path = meta["thumbnail_path"]
+                    self.db.update(updated)
+            self.emit_status(f"Updated '{meta.get('name', mod.name)}'")
+            self._apply_filter()
+
     def _enable_all(self):
         for mod in self.db.by_type(self.mod_type):
             self.manager.set_enabled(mod.id, True)
@@ -309,7 +335,6 @@ class ModPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def _import_mod(self):
-        meta = _TYPE_META[self.mod_type]
         storage = self.config.mods_storage_path
         if not storage:
             QMessageBox.warning(
@@ -319,24 +344,26 @@ class ModPanel(BasePanel):
             )
             return
 
-        if meta["folder"]:
-            path = QFileDialog.getExistingDirectory(
-                self, f"Import {meta['label']} Folder"
-            )
-        else:
-            path, _ = QFileDialog.getOpenFileName(
-                self, f"Import {meta['label']}", "", meta["ext_filter"]
-            )
-
-        if not path:
+        dlg = ImportModDialog(self.mod_type, self)
+        if dlg.exec() != dlg.DialogCode.Accepted:
             return
+
+        path = dlg.source_path
+        meta = dlg.meta
 
         try:
             mod = self.manager.install_from_folder(
                 source_path=path,
                 mod_type=self.mod_type,
                 dest_base=storage,
+                name=meta.get("name", ""),
+                author=meta.get("author", ""),
+                version=meta.get("version", ""),
+                description=meta.get("description", ""),
+                game_id=meta.get("game_id", ""),
+                source_url=meta.get("source_url", ""),
             )
+            # version is now passed directly to install_from_folder
             self.emit_status(f"Imported '{mod.name}'")
             self._apply_filter()
         except Exception as exc:
