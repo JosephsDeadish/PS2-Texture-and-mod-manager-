@@ -1,0 +1,50 @@
+[
+  {
+    "id": "codejunkies_ps2",
+    "name": "Code Junkies PS2 Cheats",
+    "description": "Code Junkies maintains a database of PS2 cheat codes that can be converted to PNACH format for use with PCSX2.",
+    "context": "ActionReplay / GameShark format — the app imports and converts them to PNACH automatically.",
+    "author": "Code Junkies",
+    "author_url": "https://www.codejunkies.com/ps2/",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.codejunkies.com/ps2/",
+    "type": "cheat",
+    "game_serial": "",
+    "source": "CodeJunkies",
+    "game": "",
+    "thumbnail_url": "",
+    "tags": [
+      "cheats",
+      "codes"
+    ],
+    "download_action": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "pcsx2_cheatdb_github",
+    "name": "PCSX2 Cheat Database — GitHub (All Games)",
+    "description": "The comprehensive PCSX2 community cheat database on GitHub. Contains hundreds of game cheat files in PNACH format covering widescreen, 60fps, gameplay enhancements and more.",
+    "context": "Use the '🔧 Fetch PNACH from GitHub' button above to browse and install patches from this repository by CRC.",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/cheatdb/graphs/contributors",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://github.com/PCSX2/cheatdb",
+    "type": "cheat",
+    "game_serial": "",
+    "source": "GitHub",
+    "game": "All Games",
+    "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+    "tags": [
+      "cheats",
+      "pnach",
+      "official",
+      "all-games",
+      "community"
+    ],
+    "download_action": "",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  }
+]

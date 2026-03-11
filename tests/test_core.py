@@ -1707,20 +1707,11 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
     """Tests for the expanded browse catalogue."""
 
     def _load_catalogue(self):
-        """Import and return the CATALOGUE list from browse_panel."""
-        # We can't import PyQt6 in the test env, so we parse the file directly
-        # and load just the IDs from the catalogue
-        import ast
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        # Extract all "id": "..." values from CATALOGUE
-        ids = []
-        for line in src.splitlines():
-            stripped = line.strip()
-            if stripped.startswith('"id":'):
-                val = stripped.split(":", 1)[1].strip().strip('",').strip()
-                ids.append(val)
-        return ids
+        """Load catalogue IDs from the JSON data files via catalogue_loader."""
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
 
     def test_game_specific_texture_entries_present(self):
         """Catalogue should include game-specific texture pack entries (non-hub, specific files)."""
@@ -2694,16 +2685,15 @@ class TestSpyroANBCatalogueEntries(unittest.TestCase):
     """The three DurinDragon Spyro: ANB variants must be in the catalogue."""
 
     def _load_catalogue(self):
-        import ast
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        ids = []
-        for line in src.splitlines():
-            stripped = line.strip()
-            if stripped.startswith('"id":'):
-                val = stripped.split(":", 1)[1].strip().strip('",').strip()
-                ids.append(val)
-        return ids
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
+
+    def _get_all_json_text(self):
+        """Return concatenated text of all catalogue JSON files for string searches."""
+        import json
+        base = Path(__file__).parent.parent / "data" / "catalogue"
+        return "\n".join(f.read_text() for f in base.glob("*.json") if f.suffix == ".json")
 
     def test_all_spyro_anb_variants_present(self):
         ids = self._load_catalogue()
@@ -2718,11 +2708,7 @@ class TestSpyroANBCatalogueEntries(unittest.TestCase):
 
     def test_spyro_anb_direct_download_urls_are_mediafire(self):
         """Each downloadable variant must have a MediaFire direct_download_url."""
-        import ast, re
-
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        # Verify MediaFire file-page URLs appear for the three variant IDs
+        src = self._get_all_json_text()
         for variant in ("6x_extra_detail", "6x_only", "4x_anime"):
             self.assertIn(
                 "mediafire.com/file/",
@@ -2732,9 +2718,7 @@ class TestSpyroANBCatalogueEntries(unittest.TestCase):
 
     def test_spyro_anb_entries_author_is_durindragon(self):
         """All Spyro ANB entries should credit DurinDragon."""
-        import ast
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
+        src = self._get_all_json_text()
         self.assertIn("DurinDragon", src)
         self.assertIn("gbatemp.net/members/durindragon", src)
 
@@ -2997,16 +2981,19 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
     """The new save file entries must be present in the catalogue."""
 
     def _get_ids(self):
-        import ast
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        ids = []
-        for line in src.splitlines():
-            stripped = line.strip()
-            if stripped.startswith('"id":'):
-                val = stripped.split(":", 1)[1].strip().strip('",').strip()
-                ids.append(val)
-        return ids
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
+
+    def _get_entries(self):
+        import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        return load_catalogue(catalogue_dir=CATALOGUE_DIR)
+
+    def _get_all_json_text(self):
+        """Concatenate all catalogue JSON files for plain text searches."""
+        base = Path(__file__).parent.parent / "data" / "catalogue"
+        return "\n".join(f.read_text() for f in base.glob("*.json"))
 
     def test_gbatemp_downloads_saves_hub_removed(self):
         """The gbatemp_downloads_saves_hub entry is a category hub and must NOT be in catalogue."""
@@ -3032,24 +3019,20 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
 
     def test_bully_save_has_mediafire_url(self):
         """Bully save entry must have a direct_download_url pointing to MediaFire."""
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
+        src = self._get_all_json_text()
         self.assertIn("mediafire.com/file/hktfw1t8dv4etgo/bully_saves", src)
 
     def test_bully_save_author_is_moataz(self):
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
+        src = self._get_all_json_text()
         self.assertIn("moataz", src)
         self.assertIn("gbatemp.net/members/moataz", src)
 
     def test_sly2_save_source_is_gbatemp_download(self):
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
+        src = self._get_all_json_text()
         self.assertIn("gbatemp.net/download/sly-2-band-of-thieves-ps2-europe", src)
 
     def test_atv_save_source_is_ps2home(self):
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
+        src = self._get_all_json_text()
         self.assertIn("ps2-home.com/forum/viewtopic.php?f=70&t=12165", src)
 
     # Popular-game save entries added for issue #3
@@ -3075,10 +3058,11 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
 
     def test_all_save_entries_are_not_hub(self):
         """Every save file entry must be a specific-file entry (is_hub=False)."""
-        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        src = bp_path.read_text(encoding="utf-8")
-        # Confirm the catalogue has no hub entries at all
-        self.assertNotIn('"is_hub": True', src, "Hub entries should have been removed")
+        entries = self._get_entries()
+        saves = [e for e in entries if e["type"] == "save_file"]
+        for e in saves:
+            self.assertFalse(e.get("is_hub", False),
+                             f"Save entry {e['id']} must not be a hub")
 
     def test_save_entries_have_game_serial_or_game_name(self):
         """Every specific save entry should mention a game name or serial in description/context."""
@@ -3136,59 +3120,19 @@ class TestScraperDialogClassifier(unittest.TestCase):
 
 
 class TestCatalogueIntegrity(unittest.TestCase):
-    """Structural integrity checks for the browse-panel catalogue.
+    """Structural integrity checks for the JSON catalogue files.
 
-    Uses Python's ``ast`` module to parse the catalogue list without importing
-    any Qt code, so these tests run fine in headless CI environments.
+    Uses ``catalogue_loader.load_catalogue()`` which reads from
+    ``data/catalogue/*.json``.  No Qt import needed.
     """
 
     @classmethod
     def setUpClass(cls):
-        import ast
-
-        src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-        tree = ast.parse(src_file.read_text(encoding="utf-8"))
-
-        # Walk the AST to find the CATALOGUE assignment
-        catalogue_node = None
-        for node in ast.walk(tree):
-            if (
-                isinstance(node, ast.AnnAssign)
-                and isinstance(node.target, ast.Name)
-                and node.target.id == "CATALOGUE"
-                and node.value is not None
-            ):
-                catalogue_node = node.value
-                break
-
-        if catalogue_node is None:
-            raise RuntimeError("Could not find CATALOGUE assignment in browse_panel.py")
-
-        # Convert the AST list of dicts to Python dicts.
-        # ModType.TEXTURE_PACK etc. appear as ast.Attribute nodes; convert
-        # them to their .value strings (e.g. "texture_pack").
-        _MAX_DEPTH = 20  # catalogue data is at most 3 levels deep; guard against malformed input
-
-        def _literal(node, depth=0):
-            if depth > _MAX_DEPTH:
-                raise ValueError(f"AST nesting depth exceeded {_MAX_DEPTH} (possible malformed input)")
-            if isinstance(node, ast.Constant):
-                return node.value
-            if isinstance(node, ast.List):
-                return [_literal(e, depth + 1) for e in node.elts]
-            if isinstance(node, ast.Tuple):
-                return tuple(_literal(e, depth + 1) for e in node.elts)
-            if isinstance(node, ast.Dict):
-                return {_literal(k, depth + 1): _literal(v, depth + 1) for k, v in zip(node.keys, node.values)}
-            # ModType.TEXTURE_PACK → "texture_pack" etc.
-            if isinstance(node, ast.Attribute):
-                return node.attr.lower()
-            # Concatenated strings: ("part1" "part2") → JoinedStr handled as concat
-            if isinstance(node, ast.JoinedStr):
-                return "<f-string>"
-            raise ValueError(f"Unexpected AST node type: {type(node).__name__}")
-
-        cls.catalogue = _literal(catalogue_node)
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        cls.catalogue = load_catalogue(catalogue_dir=CATALOGUE_DIR, strict=True)
+        cls.catalogue_dir = CATALOGUE_DIR
 
     # ------------------------------------------------------------------
     # Structural checks
@@ -3636,47 +3580,15 @@ class TestGametdbCoverUrl(unittest.TestCase):
 
 
 # =============================================================================
-# game_serial field in catalogue (AST-based, no Qt import needed)
+# game_serial field in catalogue (JSON-based, no Qt import needed)
 # =============================================================================
 
 def _load_catalogue_ast():
-    """Parse browse_panel.py with ast and return the CATALOGUE list of dicts."""
-    import ast as _ast
-
-    src_file = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
-    tree = _ast.parse(src_file.read_text(encoding="utf-8"))
-
-    catalogue_node = None
-    for node in _ast.walk(tree):
-        if (
-            isinstance(node, _ast.AnnAssign)
-            and isinstance(node.target, _ast.Name)
-            and node.target.id == "CATALOGUE"
-            and node.value is not None
-        ):
-            catalogue_node = node.value
-            break
-    if catalogue_node is None:
-        raise RuntimeError("CATALOGUE not found")
-
-    def _lit(node, depth=0):
-        if depth > 20:
-            raise ValueError("depth")
-        if isinstance(node, _ast.Constant):
-            return node.value
-        if isinstance(node, _ast.List):
-            return [_lit(e, depth + 1) for e in node.elts]
-        if isinstance(node, _ast.Tuple):
-            return tuple(_lit(e, depth + 1) for e in node.elts)
-        if isinstance(node, _ast.Dict):
-            return {_lit(k, depth + 1): _lit(v, depth + 1) for k, v in zip(node.keys, node.values)}
-        if isinstance(node, _ast.Attribute):
-            return node.attr.lower()
-        if isinstance(node, _ast.JoinedStr):
-            return "<f-string>"
-        raise ValueError(f"Unexpected node: {type(node).__name__}")
-
-    return _lit(catalogue_node)
+    """Load catalogue from JSON files via catalogue_loader (no Qt)."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+    return load_catalogue(catalogue_dir=CATALOGUE_DIR, strict=True)
 
 
 class TestCatalogueGameSerial(unittest.TestCase):
@@ -3878,3 +3790,199 @@ class TestCCKrizalidEntries(unittest.TestCase):
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
         self.assertGreaterEqual(len(cc), 15,
                                 "Expected at least 15 CCKrizalid pack entries")
+
+
+# =============================================================================
+# CatalogueLoader
+# =============================================================================
+
+class TestCatalogueLoader(unittest.TestCase):
+    """Tests for src.core.catalogue_loader — the new JSON-based catalogue."""
+
+    @classmethod
+    def setUpClass(cls):
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.catalogue_loader import (
+            load_catalogue, CATALOGUE_DIR, CATALOGUE, ALL_SOURCES,
+        )
+        cls.load_catalogue = staticmethod(load_catalogue)
+        cls.catalogue_dir = CATALOGUE_DIR
+        cls.catalogue = CATALOGUE
+        cls.all_sources = ALL_SOURCES
+
+    # ── Basic load ──────────────────────────────────────────────────────────
+
+    def test_loads_more_than_150_entries(self):
+        self.assertGreater(len(self.catalogue), 150,
+                           "catalogue should have >150 entries after scaling")
+
+    def test_no_duplicate_ids(self):
+        ids = [e["id"] for e in self.catalogue]
+        seen = set()
+        for eid in ids:
+            self.assertNotIn(eid, seen, f"Duplicate ID: {eid!r}")
+            seen.add(eid)
+
+    def test_type_field_injected(self):
+        """Every entry must have a 'type' field (injected from file name)."""
+        valid_types = {"texture_pack", "pnach", "save_file", "cheat", "cover_art"}
+        for e in self.catalogue:
+            self.assertIn(e.get("type"), valid_types,
+                          f"Entry {e['id']} has invalid type {e.get('type')!r}")
+
+    def test_all_required_fields_present(self):
+        required = {"id", "name", "description", "author", "url", "source",
+                    "game", "game_serial"}
+        for e in self.catalogue:
+            for f in required:
+                self.assertIn(f, e,
+                              f"Entry {e['id']!r} missing required field {f!r}")
+
+    def test_optional_defaults_filled_in(self):
+        """Optional fields must be present in every loaded entry."""
+        optional = {"context", "author_url", "is_hub", "nsfw", "thumbnail_url",
+                    "tags", "download_action", "direct_download_url",
+                    "upscale_tech", "is_free", "requires_account", "is_complete"}
+        for e in self.catalogue:
+            for f in optional:
+                self.assertIn(f, e,
+                              f"Entry {e['id']!r} missing optional field {f!r}")
+
+    def test_tags_are_lists(self):
+        for e in self.catalogue:
+            self.assertIsInstance(e["tags"], list,
+                                  f"Entry {e['id']!r} 'tags' must be a list")
+
+    # ── Type counts ─────────────────────────────────────────────────────────
+
+    def test_has_texture_pack_entries(self):
+        tp = [e for e in self.catalogue if e["type"] == "texture_pack"]
+        self.assertGreater(len(tp), 60, "Expected >60 texture pack entries")
+
+    def test_has_pnach_entries(self):
+        pn = [e for e in self.catalogue if e["type"] == "pnach"]
+        self.assertGreater(len(pn), 60, "Expected >60 PNACH entries")
+
+    def test_has_save_file_entries(self):
+        sv = [e for e in self.catalogue if e["type"] == "save_file"]
+        self.assertGreater(len(sv), 10, "Expected >10 save file entries")
+
+    # ── Strict mode ─────────────────────────────────────────────────────────
+
+    def test_strict_mode_raises_on_bad_json(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            p.write_text("NOT VALID JSON")
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_strict_mode_raises_on_missing_required_field(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            # Entry missing 'name'
+            p.write_text(json.dumps([{
+                "id": "test_entry",
+                "description": "desc",
+                "author": "Author",
+                "url": "https://example.com",
+                "source": "GBAtemp",
+                "game": "Game",
+                "game_serial": "SLUS-12345",
+            }]))
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_lenient_mode_skips_bad_entries(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            p.write_text("NOT VALID JSON")
+            # Should not raise in lenient (default) mode
+            result = load_catalogue(catalogue_dir=d, strict=False)
+            self.assertEqual(result, [])
+
+    def test_empty_dir_returns_empty_list(self):
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            result = load_catalogue(catalogue_dir=d)
+            self.assertEqual(result, [])
+
+    def test_duplicate_ids_skipped_in_lenient_mode(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "dup", "name": "N", "description": "D",
+                "author": "A", "url": "https://x.com", "source": "S",
+                "game": "G", "game_serial": "SLUS-00001",
+            }
+            p.write_text(json.dumps([entry, entry]))  # same ID twice
+            result = load_catalogue(catalogue_dir=d, strict=False)
+            self.assertEqual(len(result), 1)
+
+    def test_duplicate_ids_raise_in_strict_mode(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "dup", "name": "N", "description": "D",
+                "author": "A", "url": "https://x.com", "source": "S",
+                "game": "G", "game_serial": "SLUS-00001",
+            }
+            p.write_text(json.dumps([entry, entry]))
+            with self.assertRaises(ValueError):
+                load_catalogue(catalogue_dir=d, strict=True)
+
+    # ── ALL_SOURCES ──────────────────────────────────────────────────────────
+
+    def test_all_sources_is_sorted(self):
+        self.assertEqual(self.all_sources, sorted(self.all_sources))
+
+    def test_all_sources_contains_gbatemp(self):
+        self.assertIn("GBAtemp", self.all_sources)
+
+    def test_all_sources_contains_github(self):
+        self.assertIn("GitHub", self.all_sources)
+
+    def test_all_sources_contains_ps2wide(self):
+        self.assertIn("PS2Wide", self.all_sources)
+
+    # ── New sources from scaling ──────────────────────────────────────────────
+
+    def test_gamebanana_source_present(self):
+        """Scaling added GameBanana entries."""
+        gb = [e for e in self.catalogue if e["source"] == "GameBanana"]
+        self.assertGreater(len(gb), 0, "Expected GameBanana entries")
+
+    # ── 60fps patches ─────────────────────────────────────────────────────────
+
+    def test_60fps_patches_present(self):
+        fps_patches = [e for e in self.catalogue if "60fps" in e.get("tags", [])]
+        self.assertGreater(len(fps_patches), 10,
+                           "Expected >10 60fps PNACH entries")
+
+    def test_60fps_patches_are_pnach_type(self):
+        for e in self.catalogue:
+            if "60fps" in e.get("tags", []):
+                self.assertEqual(e["type"], "pnach",
+                                 f"60fps entry {e['id']} should be pnach type")
+
+    # ── CCKrizalid coverage ───────────────────────────────────────────────────
+
+    def test_cckrizalid_baroque_present(self):
+        by_id = {e["id"]: e for e in self.catalogue}
+        self.assertIn("cckrizalid_baroque_textures", by_id)
+
+    def test_cckrizalid_minimum_pack_count(self):
+        cc = [e for e in self.catalogue if e.get("author") == "CCKrizalid"]
+        self.assertGreaterEqual(len(cc), 20,
+                                "Expected at least 20 CCKrizalid entries after scaling")

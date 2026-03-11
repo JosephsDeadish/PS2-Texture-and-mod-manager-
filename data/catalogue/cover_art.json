@@ -1,0 +1,75 @@
+[
+  {
+    "id": "gametdb_covers",
+    "name": "GameTDB Cover Art (PS2)",
+    "description": "GameTDB.com provides free PS2 cover art by game serial/ID. Click 'Download Cover by ID' to fetch cover art for any PS2 game.",
+    "context": "Comprehensive cover art database — uses game serial (SLUS/SCUS) as the lookup key.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2",
+    "type": "cover_art",
+    "game_serial": "",
+    "source": "GameTDB",
+    "game": "All Games",
+    "thumbnail_url": "https://www.gametdb.com/favicon.ico",
+    "tags": [
+      "covers",
+      "art",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_art_popular_us",
+    "name": "PS2 Cover Art — Popular US Titles (GameTDB)",
+    "description": "Download cover art for popular US PS2 titles from GameTDB by entering the game serial ID (e.g. SLUS-20062). GameTDB provides free, high-quality cover scans.",
+    "context": "Popular serials: Spyro EtD=SLUS-20309, Crash WoC=SLUS-20238, GoW=SCUS-97399, GT4=SCUS-97436, FFX=SLUS-20312, KH1=SLUS-20370, KH2=SLUS-21005, SotC=SCUS-97472, GTA SA=SLUS-20946.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2",
+    "type": "cover_art",
+    "game_serial": "",
+    "source": "GameTDB",
+    "game": "",
+    "thumbnail_url": "",
+    "tags": [
+      "cover-art",
+      "gametdb",
+      "official",
+      "us"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_art_popular_eu",
+    "name": "PS2 Cover Art — Popular EU/PAL Titles (GameTDB)",
+    "description": "Download PAL region cover art for PS2 games from GameTDB. Enter the SLES or SCES serial to get the EU cover.",
+    "context": "Popular PAL serials: GoW=SCES-53133, GT4=SCES-51719, FFX=SLES-50490, KH1=SLES-51152, KH2=SLES-54114, SotC=SCES-53326.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2",
+    "type": "cover_art",
+    "game_serial": "",
+    "source": "GameTDB",
+    "game": "",
+    "thumbnail_url": "",
+    "tags": [
+      "cover-art",
+      "gametdb",
+      "pal",
+      "eu"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  }
+]
