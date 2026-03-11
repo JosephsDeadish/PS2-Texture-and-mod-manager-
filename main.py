@@ -36,7 +36,8 @@ def main():
 
     app = QApplication(sys.argv)
     app.setApplicationName("PS2 Mod Manager")
-    app.setApplicationVersion("1.0.0")
+    from src import __version__
+    app.setApplicationVersion(__version__)
     app.setOrganizationName("PS2ModManager")
     app.setOrganizationDomain("ps2modmanager.github.io")
 

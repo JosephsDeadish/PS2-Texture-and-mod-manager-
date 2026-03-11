@@ -250,6 +250,12 @@ class ModManager:
     def deploy(self, mod_type: ModType, target_path: str) -> Tuple[int, List[str]]:
         """
         Copy enabled mods of *mod_type* into *target_path* in priority order.
+
+        For ``ModType.PNACH`` and ``ModType.CHEAT``: PNACH files for the *same
+        game CRC* are automatically **merged** into a single output file so that
+        patch lines from multiple enabled mods are all applied.  Files that have
+        no CRC in their filename (non-standard names) are copied as-is.
+
         Returns (count_deployed, warnings).
         """
         target = Path(target_path)
@@ -264,6 +270,11 @@ class ModManager:
         deployed = 0
         warnings: List[str] = []
 
+        # ── PNACH / Cheat: merge by game CRC ─────────────────────────────
+        if mod_type in (ModType.PNACH, ModType.CHEAT):
+            return self._deploy_pnach(mods, target, warnings)
+
+        # ── All other types: copy in priority order ───────────────────────
         for mod in mods:
             src = Path(mod.path)
             if not src.exists():
@@ -273,6 +284,79 @@ class ModManager:
                 shutil.copytree(str(src), str(target), dirs_exist_ok=True)
             else:
                 shutil.copy2(str(src), str(target / src.name))
+            deployed += 1
+
+        return deployed, warnings
+
+    def _deploy_pnach(
+        self,
+        mods: List,
+        target: Path,
+        warnings: List[str],
+    ) -> Tuple[int, List[str]]:
+        """
+        Deploy PNACH/Cheat mods, merging multiple files for the same game CRC.
+
+        Strategy:
+        1. Collect all .pnach files from enabled mods, grouped by CRC.
+        2. For each CRC group with >1 file: merge into a combined .pnach.
+        3. For each CRC group with 1 file: copy directly.
+        4. Files without a recognisable CRC filename are copied as-is.
+        """
+        from src.core.pnach import extract_game_crc, merge_pnach_files
+        import tempfile
+
+        # Map CRC → [(priority, pnach_file_path), …]
+        crc_files: Dict[str, List[Tuple[int, str]]] = {}
+        no_crc_files: List[Tuple[int, str]] = []
+        deployed = 0
+
+        for mod in mods:
+            src = Path(mod.path)
+            if not src.exists():
+                warnings.append(f"Missing path for mod '{mod.name}': {mod.path}")
+                continue
+
+            # Collect all .pnach files from mod
+            if src.is_dir():
+                pnach_files = list(src.rglob("*.pnach"))
+            elif src.suffix.lower() == ".pnach":
+                pnach_files = [src]
+            else:
+                pnach_files = []
+
+            for pf in pnach_files:
+                crc = extract_game_crc(str(pf))
+                if crc:
+                    crc_files.setdefault(crc, []).append((mod.priority, str(pf)))
+                else:
+                    no_crc_files.append((mod.priority, str(pf)))
+
+        # Sort each CRC group by priority (highest first)
+        for crc, entries in crc_files.items():
+            entries.sort(key=lambda e: e[0], reverse=True)
+            paths = [e[1] for e in entries]
+
+            if len(paths) == 1:
+                shutil.copy2(paths[0], str(target / f"{crc}.pnach"))
+                deployed += 1
+            else:
+                try:
+                    with tempfile.TemporaryDirectory() as tmp:
+                        merged = merge_pnach_files(paths, tmp, game_crc=crc)
+                        shutil.copy2(merged, str(target / f"{crc}.pnach"))
+                    deployed += 1
+                except Exception as exc:
+                    warnings.append(
+                        f"Failed to merge PNACH for CRC {crc}: {exc}. "
+                        "Using highest-priority file instead."
+                    )
+                    shutil.copy2(paths[0], str(target / f"{crc}.pnach"))
+                    deployed += 1
+
+        # Copy no-CRC files directly
+        for _prio, path in no_crc_files:
+            shutil.copy2(path, str(target / Path(path).name))
             deployed += 1
 
         return deployed, warnings
@@ -314,6 +398,73 @@ class ModManager:
                                     c.conflicting_files.append(rel_path)
 
         return conflicts
+
+    def detect_pnach_conflicts(
+        self, mod_type: Optional[ModType] = None
+    ) -> List[dict]:
+        """
+        Detect address-level conflicts in PNACH/Cheat mods.
+
+        Returns a list of dicts with keys:
+        ``address``, ``processor``, ``mod_a_id``, ``value_a``,
+        ``mod_b_id``, ``value_b``.
+        """
+        from src.core.pnach import find_pnach_conflicts, extract_game_crc
+        from pathlib import Path as _Path
+
+        pnach_types = (ModType.PNACH, ModType.CHEAT)
+        types_to_check = [mod_type] if mod_type and mod_type in pnach_types else pnach_types
+
+        result = []
+        for mt in types_to_check:
+            enabled = [m for m in self.db.by_type(mt) if m.enabled]
+            for mod in enabled:
+                src = _Path(mod.path)
+                pnach_files = (
+                    list(src.rglob("*.pnach")) if src.is_dir()
+                    else [src] if src.suffix.lower() == ".pnach" else []
+                )
+                for pf in pnach_files:
+                    crc = extract_game_crc(str(pf))
+                    if not crc:
+                        continue
+                    # Find other mods that also have a file for this CRC
+                    siblings = []
+                    for other in enabled:
+                        if other.id == mod.id:
+                            continue
+                        other_src = _Path(other.path)
+                        ofiles = (
+                            list(other_src.rglob("*.pnach")) if other_src.is_dir()
+                            else [other_src] if other_src.suffix.lower() == ".pnach" else []
+                        )
+                        for opf in ofiles:
+                            if extract_game_crc(str(opf)) == crc:
+                                siblings.append((other.id, str(opf)))
+
+                    if siblings:
+                        for sibling_id, sibling_path in siblings:
+                            conflicts = find_pnach_conflicts([str(pf), sibling_path])
+                            for c in conflicts:
+                                result.append({
+                                    "address": c.address,
+                                    "processor": c.processor,
+                                    "mod_a_id": mod.id,
+                                    "value_a": c.value_a,
+                                    "mod_b_id": sibling_id,
+                                    "value_b": c.value_b,
+                                    "game_crc": crc,
+                                })
+        # Deduplicate
+        seen_keys = set()
+        deduped = []
+        for r in result:
+            key = (r["address"], r["processor"], r["game_crc"],
+                   tuple(sorted([r["mod_a_id"], r["mod_b_id"]])))
+            if key not in seen_keys:
+                seen_keys.add(key)
+                deduped.append(r)
+        return deduped
 
     # ------------------------------------------------------------------
     # Helpers

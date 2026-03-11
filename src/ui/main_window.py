@@ -176,6 +176,7 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._cheat_panel)
 
         self._browse_panel = BrowsePanel(self.config)
+        self._browse_panel.set_db(self.db)
         self._stack.addWidget(self._browse_panel)
 
         self._settings_panel = SettingsPanel(self.config)

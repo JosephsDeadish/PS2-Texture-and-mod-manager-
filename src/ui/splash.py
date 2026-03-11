@@ -180,10 +180,11 @@ class SplashWidget(QWidget):
         sub_font = QFont("Segoe UI", 10)
         painter.setFont(sub_font)
         painter.setPen(QPen(QColor(100, 100, 160)))
+        from src import __version__
         painter.drawText(
             QRect(0, cy + 108, W, 24),
             Qt.AlignmentFlag.AlignCenter,
-            "v1.0.0",
+            f"v{__version__}",
         )
 
         # ── Status message ─────────────────────────────────────────────

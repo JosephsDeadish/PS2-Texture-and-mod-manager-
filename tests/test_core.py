@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from typing import List
 from unittest.mock import patch, MagicMock
 
 # Ensure src is importable
@@ -781,5 +782,183 @@ class TestAssetPaths(unittest.TestCase):
         from src.core.assets import asset_path
         p = asset_path("icon.svg")
         self.assertIn("icon.svg", p)
+
+
+
+
+class TestPnachParser(unittest.TestCase):
+    """Tests for src.core.pnach — parser, writer and merger."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_pnach(self, crc: str, lines: List[str]) -> str:
+        path = str(Path(self.tmpdir) / f"{crc}.pnach")
+        with open(path, "w") as f:
+            f.write("\n".join(lines) + "\n")
+        return path
+
+    # ------------------------------------------------------------------
+    # extract_game_crc
+    # ------------------------------------------------------------------
+
+    def test_extract_crc_valid(self):
+        from src.core.pnach import extract_game_crc
+        self.assertEqual(extract_game_crc("/path/to/F0A235B4.pnach"), "F0A235B4")
+
+    def test_extract_crc_uppercase(self):
+        from src.core.pnach import extract_game_crc
+        self.assertEqual(extract_game_crc("abcdef01.pnach"), "ABCDEF01")
+
+    def test_extract_crc_invalid(self):
+        from src.core.pnach import extract_game_crc
+        self.assertEqual(extract_game_crc("MyMod.pnach"), "")
+        self.assertEqual(extract_game_crc("SLUS-20062.pnach"), "")
+
+    # ------------------------------------------------------------------
+    # parse_pnach
+    # ------------------------------------------------------------------
+
+    def test_parse_basic(self):
+        from src.core.pnach import parse_pnach
+        path = self._write_pnach("AABB0011", [
+            "// Test PNACH file",
+            "gametitle=My Game",
+            "comment=A test patch",
+            "",
+            "patch=1,EE,001234AB,word,12345678",
+            "patch=0,EE,001234CD,word,00000000",
+        ])
+        pf = parse_pnach(path)
+        self.assertEqual(pf.game_crc, "AABB0011")
+        self.assertEqual(pf.game_title, "My Game")
+        self.assertEqual(pf.comment, "A test patch")
+        self.assertEqual(len(pf.patches), 2)
+        self.assertEqual(pf.patches[0].enabled, 1)
+        self.assertEqual(pf.patches[0].address, "001234AB")
+        self.assertEqual(pf.patches[0].value, "12345678")
+        self.assertEqual(pf.patches[1].enabled, 0)
+
+    def test_parse_missing_file_raises(self):
+        from src.core.pnach import parse_pnach
+        with self.assertRaises(ValueError):
+            parse_pnach("/nonexistent/AABB0011.pnach")
+
+    def test_parse_no_crc_in_filename(self):
+        from src.core.pnach import parse_pnach
+        path = str(Path(self.tmpdir) / "MyMod.pnach")
+        with open(path, "w") as f:
+            f.write("patch=1,EE,00112233,word,AABBCCDD\n")
+        pf = parse_pnach(path)
+        self.assertEqual(pf.game_crc, "")
+        self.assertEqual(len(pf.patches), 1)
+
+    # ------------------------------------------------------------------
+    # write_pnach / round-trip
+    # ------------------------------------------------------------------
+
+    def test_write_and_reparse(self):
+        from src.core.pnach import parse_pnach, write_pnach
+        src = self._write_pnach("11223344", [
+            "// header",
+            "gametitle=Round Trip",
+            "patch=1,EE,00AABBCC,word,DEADBEEF",
+        ])
+        pf = parse_pnach(src)
+        out = str(Path(self.tmpdir) / "out.pnach")
+        write_pnach(pf, out)
+        pf2 = parse_pnach(out)
+        self.assertEqual(len(pf2.patches), 1)
+        self.assertEqual(pf2.patches[0].address, "00AABBCC")
+        self.assertEqual(pf2.patches[0].value, "DEADBEEF")
+
+    # ------------------------------------------------------------------
+    # merge_pnach_files
+    # ------------------------------------------------------------------
+
+    def test_merge_no_overlap(self):
+        from src.core.pnach import merge_pnach_files, parse_pnach
+        a = self._write_pnach("CCDD0011", [
+            "gametitle=Game A",
+            "patch=1,EE,00000001,word,11111111",
+        ])
+        b = self._write_pnach("CCDD0011_b", [
+            "gametitle=Game A",
+            "patch=1,EE,00000002,word,22222222",
+        ])
+        out_dir = str(Path(self.tmpdir) / "merged")
+        merged_path = merge_pnach_files([a, b], out_dir, game_crc="CCDD0011")
+        merged = parse_pnach(merged_path)
+        addrs = {p.address for p in merged.patches}
+        self.assertIn("00000001", addrs)
+        self.assertIn("00000002", addrs)
+
+    def test_merge_deduplicates_same_address(self):
+        from src.core.pnach import merge_pnach_files, parse_pnach
+        # Both files write to the same address — first one (higher priority) wins
+        a = self._write_pnach("FFEE0011", [
+            "patch=1,EE,DEADBEEF,word,AAAAAAAA",
+        ])
+        b = self._write_pnach("FFEE0011_b", [
+            "patch=1,EE,DEADBEEF,word,BBBBBBBB",
+        ])
+        out_dir = str(Path(self.tmpdir) / "merged2")
+        merged_path = merge_pnach_files([a, b], out_dir, game_crc="FFEE0011")
+        merged = parse_pnach(merged_path)
+        self.assertEqual(len(merged.patches), 1)
+        self.assertEqual(merged.patches[0].value, "AAAAAAAA")
+
+    def test_merge_empty_list_raises(self):
+        from src.core.pnach import merge_pnach_files
+        with self.assertRaises(ValueError):
+            merge_pnach_files([], self.tmpdir)
+
+    def test_merge_preserves_game_title(self):
+        from src.core.pnach import merge_pnach_files, parse_pnach
+        a = self._write_pnach("12345678", [
+            "gametitle=Awesome Game",
+            "patch=1,EE,00000001,word,AABBCCDD",
+        ])
+        out_dir = str(Path(self.tmpdir) / "merged3")
+        merged_path = merge_pnach_files([a], out_dir, game_crc="12345678")
+        merged = parse_pnach(merged_path)
+        self.assertEqual(merged.game_title, "Awesome Game")
+
+    # ------------------------------------------------------------------
+    # find_pnach_conflicts
+    # ------------------------------------------------------------------
+
+    def test_conflict_same_address_different_value(self):
+        from src.core.pnach import find_pnach_conflicts
+        a = self._write_pnach("AABB1234", ["patch=1,EE,00001234,word,AAAA0000"])
+        b = self._write_pnach("AABB1234_b", ["patch=1,EE,00001234,word,BBBB0000"])
+        conflicts = find_pnach_conflicts([a, b])
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].address, "00001234")
+
+    def test_no_conflict_same_value(self):
+        from src.core.pnach import find_pnach_conflicts
+        a = self._write_pnach("AABB5678", ["patch=1,EE,00001234,word,AAAA0000"])
+        b = self._write_pnach("AABB5678_b", ["patch=1,EE,00001234,word,AAAA0000"])
+        conflicts = find_pnach_conflicts([a, b])
+        self.assertEqual(len(conflicts), 0)
+
+    def test_no_conflict_different_addresses(self):
+        from src.core.pnach import find_pnach_conflicts
+        a = self._write_pnach("AABB9999", ["patch=1,EE,00000001,word,AAAA0000"])
+        b = self._write_pnach("AABB9999_b", ["patch=1,EE,00000002,word,BBBB0000"])
+        conflicts = find_pnach_conflicts([a, b])
+        self.assertEqual(len(conflicts), 0)
+
+    def test_disabled_patches_not_conflicting(self):
+        from src.core.pnach import find_pnach_conflicts
+        a = self._write_pnach("AACC1111", ["patch=1,EE,00001234,word,AAAA0000"])
+        b = self._write_pnach("AACC1111_b", ["patch=0,EE,00001234,word,BBBB0000"])
+        conflicts = find_pnach_conflicts([a, b])
+        # Disabled patches should not generate conflicts
+        self.assertEqual(len(conflicts), 0)
 
 
