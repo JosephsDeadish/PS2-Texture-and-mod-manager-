@@ -2612,5 +2612,465 @@
     "game_crc": "3A72A7B1",
     "description": "Gold — currency for the item shop",
     "category": "cheat"
+  },
+  "F0BDF5C5:EE:003B4540": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
+    "game_crc": "F0BDF5C5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F0BDF5C5:EE:00B00000": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
+    "game_crc": "F0BDF5C5",
+    "description": "Cole — party currency for ingredients and equipment",
+    "category": "cheat"
+  },
+  "F0BDF5C5:EE:005A0000": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
+    "game_crc": "F0BDF5C5",
+    "description": "HP — Klein's current hit points",
+    "category": "cheat"
+  },
+  "8E9C0D58:EE:003B4540": {
+    "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
+    "game_crc": "8E9C0D58",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8E9C0D58:EE:00B00000": {
+    "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
+    "game_crc": "8E9C0D58",
+    "description": "Cole — party currency",
+    "category": "cheat"
+  },
+  "6327AA24:EE:003B4540": {
+    "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
+    "game_crc": "6327AA24",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6327AA24:EE:00B00000": {
+    "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
+    "game_crc": "6327AA24",
+    "description": "Cole — party currency",
+    "category": "cheat"
+  },
+  "8A41256F:EE:003B4540": {
+    "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
+    "game_crc": "8A41256F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8A41256F:EE:00B00000": {
+    "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
+    "game_crc": "8A41256F",
+    "description": "Gold — party currency for shops in dungeons",
+    "category": "cheat"
+  },
+  "8A41256F:EE:005A0000": {
+    "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
+    "game_crc": "8A41256F",
+    "description": "HP — hero's current hit points",
+    "category": "cheat"
+  },
+  "2C23B3EA:EE:003B4540": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2C23B3EA:EE:00B00000": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "Gold — party currency",
+    "category": "cheat"
+  },
+  "A5B82E82:EE:003C4560": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "A5B82E82",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A5B82E82:EE:00900000": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "A5B82E82",
+    "description": "Gold — Leon's money for potions",
+    "category": "cheat"
+  },
+  "A5B82E82:EE:005A0000": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "A5B82E82",
+    "description": "HP — Leon's current hit points",
+    "category": "cheat"
+  },
+  "8E3F7DC1:EE:003C4560": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8E3F7DC1:EE:00900000": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "Gold — Hector's money for materials",
+    "category": "cheat"
+  },
+  "22CA9B7A:EE:003B4540": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "22CA9B7A:EE:00B00000": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "Platinum — party currency in Norrath",
+    "category": "cheat"
+  },
+  "0ADE5CEF:EE:003B4560": {
+    "game": "Dark Cloud (SCUS-97121)",
+    "game_crc": "0ADE5CEF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0ADE5CEF:EE:00C00000": {
+    "game": "Dark Cloud (SCUS-97121)",
+    "game_crc": "0ADE5CEF",
+    "description": "Gilda — currency for rebuilding villages",
+    "category": "cheat"
+  },
+  "84B8AB13:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20821)",
+    "game_crc": "84B8AB13",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "31879F22:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21353)",
+    "game_crc": "31879F22",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0EDF6B4B:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21472)",
+    "game_crc": "0EDF6B4B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B9FF5B97:EE:003C4560": {
+    "game": "Fatal Frame (SLUS-21060)",
+    "game_crc": "B9FF5B97",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B9FF5B97:EE:005A0080": {
+    "game": "Fatal Frame (SLUS-21060)",
+    "game_crc": "B9FF5B97",
+    "description": "Film — camera film remaining count",
+    "category": "cheat"
+  },
+  "9B4D085A:EE:003C4560": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
+    "game_crc": "9B4D085A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9B4D085A:EE:005A0080": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
+    "game_crc": "9B4D085A",
+    "description": "Film — type 61 film count",
+    "category": "cheat"
+  },
+  "7D6C1BF5:EE:003C4560": {
+    "game": "Fatal Frame III: The Tormented (SLUS-21161)",
+    "game_crc": "7D6C1BF5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7D6C1BF5:EE:005A0080": {
+    "game": "Fatal Frame III: The Tormented (SLUS-21161)",
+    "game_crc": "7D6C1BF5",
+    "description": "Film — type 61 film count",
+    "category": "cheat"
+  },
+  "F517EEDF:EE:003B4540": {
+    "game": "Final Fantasy XII (SLUS-20792)",
+    "game_crc": "F517EEDF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F517EEDF:EE:00D00000": {
+    "game": "Final Fantasy XII (SLUS-20792)",
+    "game_crc": "F517EEDF",
+    "description": "Gil — party currency for items and equipment",
+    "category": "cheat"
+  },
+  "F517EEDF:EE:005A0000": {
+    "game": "Final Fantasy XII (SLUS-20792)",
+    "game_crc": "F517EEDF",
+    "description": "HP — Vaan's current HP",
+    "category": "cheat"
+  },
+  "44A80B4C:EE:003C4560": {
+    "game": "God of War II (SCUS-97450)",
+    "game_crc": "44A80B4C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "44A80B4C:EE:00C00000": {
+    "game": "God of War II (SCUS-97450)",
+    "game_crc": "44A80B4C",
+    "description": "Red Orbs — currency for magic and weapon upgrades",
+    "category": "cheat"
+  },
+  "44A80B4C:EE:005A0000": {
+    "game": "God of War II (SCUS-97450)",
+    "game_crc": "44A80B4C",
+    "description": "HP — Kratos' current health",
+    "category": "cheat"
+  },
+  "77E61C8A:EE:00D00000": {
+    "game": "Gran Turismo 3: A-spec (SLUS-20486)",
+    "game_crc": "77E61C8A",
+    "description": "Credits — in-game money for buying cars",
+    "category": "cheat"
+  },
+  "CF56B7D1:EE:003B4540": {
+    "game": "Gran Turismo 4 (SCUS-97436)",
+    "game_crc": "CF56B7D1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF56B7D1:EE:00D00000": {
+    "game": "Gran Turismo 4 (SCUS-97436)",
+    "game_crc": "CF56B7D1",
+    "description": "Credits — garage money for car purchases",
+    "category": "cheat"
+  },
+  "6F0E2BEE:EE:003B4540": {
+    "game": "Grand Theft Auto III (SLUS-20069)",
+    "game_crc": "6F0E2BEE",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6F0E2BEE:EE:00C00000": {
+    "game": "Grand Theft Auto III (SLUS-20069)",
+    "game_crc": "6F0E2BEE",
+    "description": "Money — Claude's cash",
+    "category": "cheat"
+  },
+  "6F0E2BEE:EE:005A0080": {
+    "game": "Grand Theft Auto III (SLUS-20069)",
+    "game_crc": "6F0E2BEE",
+    "description": "HP — player health bar",
+    "category": "cheat"
+  },
+  "7AC3B4F3:EE:003B4540": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20140)",
+    "game_crc": "7AC3B4F3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7AC3B4F3:EE:00C00000": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20140)",
+    "game_crc": "7AC3B4F3",
+    "description": "Money — Tommy's cash",
+    "category": "cheat"
+  },
+  "7AC3B4F3:EE:005A0080": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20140)",
+    "game_crc": "7AC3B4F3",
+    "description": "HP — Tommy's health",
+    "category": "cheat"
+  },
+  "399A49CA:EE:003B4540": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
+    "game_crc": "399A49CA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "399A49CA:EE:00C00000": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
+    "game_crc": "399A49CA",
+    "description": "Money — CJ's cash",
+    "category": "cheat"
+  },
+  "399A49CA:EE:005A0080": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
+    "game_crc": "399A49CA",
+    "description": "HP — CJ's health",
+    "category": "cheat"
+  },
+  "4F17EE96:EE:003B4540": {
+    "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21275 alt)",
+    "game_crc": "4F17EE96",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "91A69524:EE:003C4560": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "91A69524:EE:00B00000": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "GP — party currency for items",
+    "category": "cheat"
+  },
+  "D7D7A24B:EE:003C4560": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D7D7A24B:EE:00B00000": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "GP — party currency",
+    "category": "cheat"
+  },
+  "B5B7C4AF:EE:003B4540": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B5B7C4AF:EE:00700000": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Cookies — items for monkey pacification",
+    "category": "cheat"
+  },
+  "7AC4D8CA:EE:003B4540": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "7AC4D8CA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "66D3F895:EE:003B4540": {
+    "game": "Gran Turismo 4 (SLUS-21163 alt)",
+    "game_crc": "66D3F895",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4A85F895:EE:003B4540": {
+    "game": "Guitar Hero: World Tour (SLUS-21768)",
+    "game_crc": "4A85F895",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
   }
 }
