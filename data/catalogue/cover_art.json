@@ -594,32 +594,6 @@
     "upscale_tech": ""
   },
   {
-    "id": "cover_burnout3",
-    "name": "Burnout 3: Takedown — Cover Art (GameTDB)",
-    "description": "Official cover art for Burnout 3: Takedown (SLUS-20625 NTSC-U, SLES-52456 PAL) from GameTDB.",
-    "context": "US serial: SLUS-20625. EU serial: SLES-52456. Enter the serial in the Cover Art panel to fetch.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "is_hub": false,
-    "nsfw": false,
-    "url": "https://www.gametdb.com/PS2/SLUS20625",
-    "type": "cover_art",
-    "game_serial": "SLUS-20625",
-    "source": "GameTDB",
-    "game": "Burnout 3: Takedown",
-    "thumbnail_url": "",
-    "tags": [
-      "cover-art",
-      "burnout",
-      "racing",
-      "official",
-      "gametdb"
-    ],
-    "download_action": "cover_by_id",
-    "direct_download_url": "",
-    "upscale_tech": ""
-  },
-  {
     "id": "cover_dbz_bt3",
     "name": "Dragon Ball Z: Budokai Tenkaichi 3 — Cover Art (GameTDB)",
     "description": "Official cover art for Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678 NTSC-U) from GameTDB.",
@@ -1122,32 +1096,6 @@
     ],
     "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS20936.png",
     "context": "US serial: SLUS-20936.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
-    "id": "cover_castlevania_loi",
-    "name": "Castlevania: Lament of Innocence — Cover Art (GameTDB)",
-    "description": "Official cover art for Castlevania: Lament of Innocence (SLUS-21050 NTSC-U).",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS21050",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Castlevania: Lament of Innocence",
-    "game_serial": "SLUS-21050",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "cover-art",
-      "castlevania",
-      "action",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21050.png",
-    "context": "US serial: SLUS-21050.",
     "is_hub": false,
     "nsfw": false
   },
@@ -2140,32 +2088,6 @@
     "nsfw": false
   },
   {
-    "id": "cover_bully",
-    "name": "Bully (SLUS-21131) — Cover Art (GameTDB)",
-    "description": "Official cover art for Bully (SLUS-21269 NTSC-U).",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS21131",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Bully",
-    "game_serial": "SLUS-21131",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "cover-art",
-      "bully",
-      "open-world",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21131.png",
-    "context": "US serial: SLUS-21131.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
     "id": "cover_manhunt",
     "name": "Manhunt — Cover Art (GameTDB)",
     "description": "Official cover art for Manhunt (SLUS-20827 NTSC-U).",
@@ -3031,58 +2953,6 @@
     "nsfw": false
   },
   {
-    "id": "cover_ape_escape2",
-    "name": "Ape Escape 2 — Cover Art (GameTDB)",
-    "description": "Official cover art for Ape Escape 2 (SLUS-20685). Available from GameTDB.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS20685",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Ape Escape 2",
-    "game_serial": "SLUS-20685",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "ape-escape",
-      "platform",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "",
-    "context": "US serial: SLUS-20685.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
-    "id": "cover_ape_escape3",
-    "name": "Ape Escape 3 — Cover Art (GameTDB)",
-    "description": "Official cover art for Ape Escape 3 (SLUS-21282). Available from GameTDB.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS21282",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Ape Escape 3",
-    "game_serial": "SLUS-21282",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "ape-escape",
-      "platform",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "",
-    "context": "US serial: SLUS-21282.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
     "id": "cover_spyro_anb",
     "name": "The Legend of Spyro: A New Beginning — Cover Art (GameTDB)",
     "description": "Official cover art for The Legend of Spyro: A New Beginning (SLUS-21372). Available from GameTDB.",
@@ -3292,32 +3162,6 @@
     "nsfw": false
   },
   {
-    "id": "cover_burnout_revenge",
-    "name": "Burnout Revenge — Cover Art (GameTDB)",
-    "description": "Official cover art for Burnout Revenge (SLUS-21242). Available from GameTDB.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS21242",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Burnout Revenge",
-    "game_serial": "SLUS-21242",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "burnout",
-      "racing",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "",
-    "context": "Serial: SLUS-21242. Use the Download Cover button.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
     "id": "cover_forbidden_siren2_pal",
     "name": "Forbidden Siren 2 (PAL) — Cover Art (GameTDB)",
     "description": "Official cover art for Forbidden Siren 2 (PAL) (SLES-53853). Available from GameTDB.",
@@ -3473,32 +3317,6 @@
     ],
     "thumbnail_url": "",
     "context": "Serial: SLUS-20879. Use the Download Cover button.",
-    "is_hub": false,
-    "nsfw": false
-  },
-  {
-    "id": "cover_mk_armageddon",
-    "name": "Mortal Kombat: Armageddon — Cover Art (GameTDB)",
-    "description": "Official cover art for Mortal Kombat: Armageddon (SLUS-21420). Available from GameTDB.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "url": "https://www.gametdb.com/PS2/SLUS21420",
-    "direct_download_url": "",
-    "download_action": "cover_by_id",
-    "source": "GameTDB",
-    "game": "Mortal Kombat: Armageddon",
-    "game_serial": "SLUS-21420",
-    "type": "cover_art",
-    "upscale_tech": "",
-    "tags": [
-      "mortal-kombat",
-      "fighting",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "thumbnail_url": "",
-    "context": "Serial: SLUS-21420. Use the Download Cover button.",
     "is_hub": false,
     "nsfw": false
   },
@@ -10240,31 +10058,6 @@
     "upscale_tech": ""
   },
   {
-    "id": "cover_shadow_hearts_covenant",
-    "name": "Shadow Hearts: Covenant (SLUS-20964) — Cover Art (GameTDB)",
-    "description": "Official cover art for Shadow Hearts: Covenant (SLUS-20964) from GameTDB.",
-    "context": "Serial: SLUS-20964. Use the Download Cover button.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "is_hub": false,
-    "nsfw": false,
-    "url": "https://www.gametdb.com/PS2/SLUS20964",
-    "type": "cover_art",
-    "game_serial": "SLUS-20964",
-    "source": "GameTDB",
-    "game": "Shadow Hearts: Covenant",
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS20964.png",
-    "tags": [
-      "jrpg",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "download_action": "cover_by_id",
-    "direct_download_url": "",
-    "upscale_tech": ""
-  },
-  {
     "id": "cover_persona2_ep",
     "name": "Persona 2: Eternal Punishment (SLUS-21193) — Cover Art (GameTDB)",
     "description": "Official cover art for Persona 2: Eternal Punishment (SLUS-21193) from GameTDB.",
@@ -10306,31 +10099,6 @@
     "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS20448.png",
     "tags": [
       "action",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "download_action": "cover_by_id",
-    "direct_download_url": "",
-    "upscale_tech": ""
-  },
-  {
-    "id": "cover_cross_edge_blus30082",
-    "name": "Cross Edge — Cover Art (GameTDB)",
-    "description": "Official cover art for Cross Edge (BLUS-30082) from GameTDB.",
-    "context": "Serial: BLUS-30082. Use the Download Cover button.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "is_hub": false,
-    "nsfw": false,
-    "url": "https://www.gametdb.com/PS2/BLUS30082",
-    "type": "cover_art",
-    "game_serial": "BLUS-30082",
-    "source": "GameTDB",
-    "game": "Cross Edge",
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/BLUS30082.png",
-    "tags": [
-      "jrpg",
       "cover-art",
       "official",
       "gametdb"
@@ -12815,31 +12583,6 @@
     "upscale_tech": ""
   },
   {
-    "id": "cover_ys_the_oath_in_felghana_ulus10494",
-    "name": "Ys: The Oath in Felghana — Cover Art (GameTDB)",
-    "description": "Official cover art for Ys: The Oath in Felghana (ULUS-10494) from GameTDB.",
-    "context": "Serial: ULUS-10494. Use the Download Cover button.",
-    "author": "GameTDB",
-    "author_url": "https://www.gametdb.com",
-    "is_hub": false,
-    "nsfw": false,
-    "url": "https://www.gametdb.com/PS2/ULUS10494",
-    "type": "cover_art",
-    "game_serial": "ULUS-10494",
-    "source": "GameTDB",
-    "game": "Ys: The Oath in Felghana",
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/ULUS10494.png",
-    "tags": [
-      "jrpg",
-      "cover-art",
-      "official",
-      "gametdb"
-    ],
-    "download_action": "cover_by_id",
-    "direct_download_url": "",
-    "upscale_tech": ""
-  },
-  {
     "id": "cover_tony_hawk_pro_skater_3",
     "name": "Tony Hawk's Pro Skater 3 — Cover Art",
     "description": "Official PS2 cover art for Tony Hawk's Pro Skater 3.",
@@ -13008,10 +12751,10 @@
     "size_label": ""
   },
   {
-    "id": "cover_burnout_revenge",
+    "id": "cover_burnout_revenge_slus21150",
     "name": "Burnout Revenge — Cover Art (GameTDB)",
     "description": "Official cover art for Burnout Revenge (SLUS-21150) from GameTDB.",
-    "context": "US serial: SLUS-21150.",
+    "context": "US serial: SLUS-21150. Enter serial in Cover Art panel to fetch.",
     "author": "GameTDB",
     "author_url": "https://www.gametdb.com",
     "is_hub": false,
@@ -13024,9 +12767,7 @@
     "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21150.png",
     "tags": [
       "cover-art",
-      "burnout",
-      "revenge",
-      "racing",
+      "official",
       "gametdb"
     ],
     "download_action": "cover_by_id",
@@ -13034,23 +12775,23 @@
     "upscale_tech": ""
   },
   {
-    "id": "cover_bully",
-    "name": "Bully — Cover Art (GameTDB)",
-    "description": "Official cover art for Bully (SLUS-21269) from GameTDB.",
-    "context": "US serial: SLUS-21269.",
+    "id": "cover_castlevania_loi_slus21050",
+    "name": "Castlevania: Lament of Innocence — Cover Art (GameTDB)",
+    "description": "Official cover art for Castlevania: Lament of Innocence (SLUS-21050) from GameTDB.",
+    "context": "US serial: SLUS-21050. Enter serial in Cover Art panel to fetch.",
     "author": "GameTDB",
     "author_url": "https://www.gametdb.com",
     "is_hub": false,
     "nsfw": false,
-    "url": "https://www.gametdb.com/PS2/SLUS21269",
+    "url": "https://www.gametdb.com/PS2/SLUS21050",
     "type": "cover_art",
-    "game_serial": "SLUS-21269",
+    "game_serial": "SLUS-21050",
     "source": "GameTDB",
-    "game": "Bully",
-    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21269.png",
+    "game": "Castlevania: Lament of Innocence",
+    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21050.png",
     "tags": [
       "cover-art",
-      "bully",
+      "official",
       "gametdb"
     ],
     "download_action": "cover_by_id",
@@ -13058,10 +12799,10 @@
     "upscale_tech": ""
   },
   {
-    "id": "cover_mk_armageddon",
+    "id": "cover_mk_armageddon_slus21444",
     "name": "Mortal Kombat: Armageddon — Cover Art (GameTDB)",
     "description": "Official cover art for Mortal Kombat: Armageddon (SLUS-21444) from GameTDB.",
-    "context": "US serial: SLUS-21444.",
+    "context": "US serial: SLUS-21444. Enter serial in Cover Art panel to fetch.",
     "author": "GameTDB",
     "author_url": "https://www.gametdb.com",
     "is_hub": false,
@@ -13074,8 +12815,31 @@
     "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21444.png",
     "tags": [
       "cover-art",
-      "mortal-kombat",
-      "fighting",
+      "official",
+      "gametdb"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_samurai_warriors_slus20685",
+    "name": "Samurai Warriors — Cover Art (GameTDB)",
+    "description": "Official cover art for Samurai Warriors (SLUS-20685) from GameTDB.",
+    "context": "US serial: SLUS-20685. Enter serial in Cover Art panel to fetch.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS20685",
+    "type": "cover_art",
+    "game_serial": "SLUS-20685",
+    "source": "GameTDB",
+    "game": "Samurai Warriors",
+    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS20685.png",
+    "tags": [
+      "cover-art",
+      "official",
       "gametdb"
     ],
     "download_action": "cover_by_id",
