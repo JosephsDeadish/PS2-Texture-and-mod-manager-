@@ -255,6 +255,11 @@ def restore_backup(entry: BackupEntry, config) -> int:
             if dest_root is None:
                 continue
             dest_file = dest_root / rel_path
+            # Guard against zip-slip: reject any path that escapes dest_root.
+            try:
+                dest_file.resolve().relative_to(dest_root.resolve())
+            except ValueError:
+                continue
             dest_file.parent.mkdir(parents=True, exist_ok=True)
             with zf.open(info) as src, open(dest_file, "wb") as dst:
                 dst.write(src.read())

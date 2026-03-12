@@ -6523,3 +6523,29 @@ class TestBackupManager(unittest.TestCase):
         entries = list_backups(self.cfg)
         self.assertEqual(len(entries), 1)
         self.assertIn("keep", entries[0].label)
+
+    def test_restore_zipslip_rejected(self):
+        """A malicious archive with path traversal must not write outside dest_root."""
+        import zipfile as zf_mod
+        from src.core.backup_manager import BackupEntry, restore_backup, get_backup_dir
+
+        backup_dir = get_backup_dir(self.cfg)
+        evil_zip = str(backup_dir / "backup_19990101_000000.zip")
+
+        # Craft an entry whose arcname tries to escape cheats_dir via ../
+        evil_path = "cheats/../../evil.txt"
+        with zf_mod.ZipFile(evil_zip, "w") as zf:
+            zf.writestr(evil_path, "evil content")
+
+        entry = BackupEntry(
+            path=evil_zip,
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        count = restore_backup(entry, self.cfg)
+        # The evil file must NOT have been written outside cheats_dir
+        evil_file = os.path.join(self.tmpdir, "evil.txt")
+        self.assertFalse(os.path.exists(evil_file), "Zip-slip path traversal was not blocked")
+        # And nothing should have been restored (the entry was skipped)
+        self.assertEqual(count, 0)
