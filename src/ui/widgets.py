@@ -1841,7 +1841,11 @@ class PnachCodeBuilderDialog(QDialog):
         value_combo = None
         if value_map:
             # Choose context-sensitive header label
-            if value_type == "button":
+            if value_type == "button_combo":
+                val_header = QLabel("Combo:")
+            elif value_type == "button":
+                # Legacy single-button type (all entries upgraded to button_combo in wave 9;
+                # kept for backward-compatibility with user-edited DB snapshots).
                 val_header = QLabel("Button:")
             else:
                 val_header = QLabel("Value:")
@@ -1849,12 +1853,26 @@ class PnachCodeBuilderDialog(QDialog):
             row.addWidget(val_header)
 
             value_combo = QCBox()
-            if value_type == "button":
+            if value_type == "button_combo":
+                value_combo.setMinimumWidth(280)
+                value_combo.setToolTip(
+                    "Select the PS2 button combination that toggles freecam mode.\n"
+                    "You must press ALL listed buttons simultaneously to toggle.\n\n"
+                    "When freecam is active:\n"
+                    "  • Left stick — pan camera\n"
+                    "  • Right stick — rotate / tilt\n"
+                    "  • Circle (○) — move forward\n"
+                    "  • Square (□) — move backward\n"
+                    "  • Cross (✕) — descend\n"
+                    "  • Triangle (△) — ascend\n\n"
+                    "⚠ Addresses are research-estimated — verify in PCSX2 debugger."
+                )
+            elif value_type == "button":
                 value_combo.setMinimumWidth(240)
                 value_combo.setToolTip(
                     "Select the PS2 controller button that will activate this feature.\n"
                     "Left stick pans camera, right stick rotates, Cross (X) descends, "
-                    "Triangle ascends.\nOnly one button can be assigned at a time."
+                    "Triangle ascends."
                 )
             else:
                 value_combo.setMinimumWidth(200)

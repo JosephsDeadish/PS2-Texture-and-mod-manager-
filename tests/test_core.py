@@ -4379,10 +4379,10 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 2900 entries (wave 8+NFS)."""
+        """Known addresses DB should have grown beyond 2950 entries (wave 9 freecam expansion)."""
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 2900, "PNACH DB should have more than 2900 entries after wave-8 NFS expansion")
+        self.assertGreater(n, 2950, "PNACH DB should have more than 2950 entries after wave-9 freecam expansion")
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
@@ -4503,6 +4503,27 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertIsNone(hex_val)
         self.assertIsNotNone(err)
 
+    def test_value_to_pnach_hex_button_combo_l3_r3(self):
+        """L3+R3 bitmask (0x0006) → '00000006'."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("00000006", "button_combo")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000006")
+
+    def test_value_to_pnach_hex_button_combo_l1_l2_r1(self):
+        """L1+L2+R1 bitmask (0x0D00) → '00000D00'."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("00000D00", "button_combo")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000D00")
+
+    def test_value_to_pnach_hex_button_combo_bad_input(self):
+        """Non-hex string should return error for button_combo."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("L3+R3", "button_combo")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
     def test_value_to_pnach_hex_int_strips_underscores(self):
         """Python-style 1_000_000 separators should work."""
         from src.core.pnach_analyzer import value_to_pnach_hex
@@ -4529,7 +4550,7 @@ class TestPnachAnalyzer(unittest.TestCase):
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
-        valid = {"int", "float", "bool", "button"}
+        valid = {"int", "float", "bool", "button", "button_combo"}
         bad = [(k, e["value_type"]) for k, e in db.items()
                if e.get("value_type") and e["value_type"] not in valid]
         self.assertEqual(bad, [], f"Entries with invalid value_type: {bad[:5]}")
@@ -4681,32 +4702,76 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(nocol), 3, "Should have no-collision entries for multiple games")
 
     def test_db_has_freecam_entries(self):
-        """Freecam enable and button entries should exist in the DB."""
+        """Freecam enable and button_combo entries should exist in the DB for multiple games."""
         import json
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
         freecam = [v for v in db.values() if "freecam" in v.get("description", "").lower()]
-        self.assertGreater(len(freecam), 5, "Should have freecam entries for multiple games")
-        btn_entries = [v for v in freecam if v.get("value_type") == "button"]
-        self.assertGreater(len(btn_entries), 0,
-                           "Freecam entries should include button-type activation entries")
+        self.assertGreater(len(freecam), 10, "Should have freecam entries for multiple games")
+        btn_combo_entries = [v for v in freecam if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(btn_combo_entries), 0,
+                           "Freecam entries should include button_combo activation entries")
 
-    def test_db_button_type_entries_have_ps2_buttons(self):
-        """button value_type entries must have a value_map with PS2 button names."""
+    def test_db_button_combo_type_entries_have_ps2_combos(self):
+        """button_combo value_type entries must have a value_map with PS2 combo names."""
         import json
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
-        btn_entries = [v for v in db.values() if v.get("value_type") == "button"]
-        self.assertGreater(len(btn_entries), 0, "Should have button-type entries")
-        for e in btn_entries:
+        combo_entries = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combo_entries), 0, "Should have button_combo entries")
+        for e in combo_entries:
             vm = e.get("value_map", {})
-            self.assertGreater(len(vm), 5, "Button value_map should have PS2 button options")
-            # At least one entry should mention a PS2 button name
+            self.assertGreater(len(vm), 2, "button_combo value_map should list multiple combos")
             labels = " ".join(vm.values()).lower()
-            has_button = any(b in labels for b in ["cross", "triangle", "circle", "square", "l1", "r1"])
-            self.assertTrue(has_button, f"Button value_map should mention PS2 button names: {vm}")
+            # Must mention at least one shoulder/stick combo
+            has_combo = any(b in labels for b in ["l3", "r3", "l1", "l2", "r1", "r2"])
+            self.assertTrue(has_combo,
+                            f"button_combo value_map should mention PS2 button names: {vm}")
+
+    def test_db_button_combo_bitmasks_are_valid_hex(self):
+        """Every key in button_combo value_maps must be a valid 8-char hex bitmask."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        for v in db.values():
+            if v.get("value_type") != "button_combo":
+                continue
+            for hex_key in v.get("value_map", {}).keys():
+                self.assertEqual(len(hex_key), 8,
+                                 f"button_combo key must be 8 chars: {hex_key!r}")
+                try:
+                    int(hex_key, 16)
+                except ValueError:
+                    self.fail(f"button_combo key is not valid hex: {hex_key!r}")
+
+    def test_freecam_entries_have_estimated_flag(self):
+        """All freecam entries should be marked estimated=True for user transparency."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        freecam = [v for v in db.values() if "freecam" in v.get("description", "").lower()]
+        not_estimated = [v["description"][:50] for v in freecam if not v.get("estimated")]
+        self.assertEqual(not_estimated, [],
+                         f"All freecam entries must have estimated=True: {not_estimated}")
+
+    def test_db_button_type_entries_have_ps2_buttons(self):
+        """button_combo value_type entries must have a value_map with PS2 combo names
+        (the old 'button' single-key type has been superseded by 'button_combo')."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Verify no stale single 'button' entries remain; all should be button_combo
+        stale_btn = [v.get("description", "")[:50] for v in db.values()
+                     if v.get("value_type") == "button"]
+        self.assertEqual(stale_btn, [],
+                         f"All single-button entries should be upgraded to button_combo: {stale_btn}")
+        combo_entries = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combo_entries), 0, "Should have button_combo entries")
 
     def test_no_collision_entries_have_bool_type(self):
         """No-collision toggle entries should use value_type=bool."""
@@ -4719,22 +4784,21 @@ class TestPnachAnalyzer(unittest.TestCase):
         bad = [v["description"][:50] for v in nocol if v.get("value_type") != "bool"]
         self.assertEqual(bad, [], f"No-collision entries should have value_type=bool: {bad}")
 
-    def test_nfs_freecam_button_has_ps2_map(self):
-        """NFS freecam activation button entries should have PS2 button choices."""
+    def test_nfs_freecam_button_combo_has_ps2_map(self):
+        """NFS freecam toggle entries should use button_combo type with L3/R3 combo options."""
         import json
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
-        nfs_fc_btn = [
+        nfs_fc_combo = [
             v for v in db.values()
             if "need for speed" in v.get("game", "").lower()
-            and v.get("value_type") == "button"
+            and v.get("value_type") == "button_combo"
         ]
-        self.assertGreater(len(nfs_fc_btn), 0,
-                           "NFS games should have freecam button-type entries")
-        for e in nfs_fc_btn:
+        self.assertGreater(len(nfs_fc_combo), 0,
+                           "NFS games should have freecam button_combo entries")
+        for e in nfs_fc_combo:
             vm = e.get("value_map", {})
-            # Should have L3 and R3 options at minimum
             all_labels = " ".join(vm.values())
             self.assertIn("L3", all_labels)
             self.assertIn("R3", all_labels)

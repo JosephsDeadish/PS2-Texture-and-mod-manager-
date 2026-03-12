@@ -399,9 +399,14 @@ def value_to_pnach_hex(text: str, value_type: str) -> tuple[str | None, str | No
     Parameters
     ----------
     text:       The user's input, e.g. ``"1000"``, ``"1,000"``, ``"2.5"``.
-    value_type: ``"int"`` for whole-number values (money, HP, counts) or
-                ``"float"`` for IEEE-754 single-precision values (speed
-                multipliers, gravity, FOV degrees, etc.).
+                For ``"button_combo"`` this is the raw 8-char hex bitmask
+                (e.g. ``"00000006"`` for L3+R3).
+    value_type: One of:
+                ``"int"``          — whole-number values (money, HP, counts)
+                ``"float"``        — IEEE-754 single-precision (speed, gravity, FOV)
+                ``"bool"``         — treated as int (0 or 1)
+                ``"button_combo"`` — PS2 bitmask for simultaneous button combo;
+                                     text must already be a valid 8-char hex string.
 
     Returns
     -------
@@ -421,6 +426,8 @@ def value_to_pnach_hex(text: str, value_type: str) -> tuple[str | None, str | No
     ('42B40000', None)
     >>> value_to_pnach_hex("abc", "int")
     (None, "Enter a whole number (e.g. 1000 or 1,000,000)")
+    >>> value_to_pnach_hex("00000006", "button_combo")
+    ('00000006', None)
     """
     clean = text.strip().replace(",", "").replace("_", "")
     if not clean:
@@ -447,5 +454,24 @@ def value_to_pnach_hex(text: str, value_type: str) -> tuple[str | None, str | No
         except struct.error:
             return None, "Value out of range for a 32-bit float"
         return packed.hex().upper(), None
+
+    if value_type == "bool":
+        # Bool is stored as an int 0/1
+        try:
+            val = int(clean)
+        except ValueError:
+            return None, "Enter 0 (off) or 1 (on)"
+        return f"{(1 if val else 0):08X}", None
+
+    if value_type == "button_combo":
+        # The text is already the 8-char hex bitmask chosen from the combo dropdown.
+        # Accept raw hex strings up to 8 chars.
+        try:
+            bitmask = int(clean, 16)
+        except ValueError:
+            return None, "Button combo value must be a hex bitmask (e.g. 00000006)"
+        if not (0 <= bitmask <= 0xFFFF):
+            return None, "Button bitmask out of range (must be 0x0000–0xFFFF)"
+        return f"{bitmask:08X}", None
 
     return None, f"Unknown value_type: {value_type!r}"
