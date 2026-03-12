@@ -3328,13 +3328,19 @@ class TestCatalogueIntegrity(unittest.TestCase):
             )
 
     def test_no_fake_gamesavedfiles_com_in_author_url(self):
-        """author_url must not use gamesavedfiles.com which is a non-existent website."""
+        """author_url and url must not use gamesavedfiles.com which is a non-existent website."""
         for entry in self.catalogue:
             aurl = entry.get("author_url", "")
             self.assertNotIn(
                 "gamesavedfiles.com",
                 aurl,
                 f"Entry {entry['id']} author_url uses non-existent domain gamesavedfiles.com: {aurl!r}"
+            )
+            url = entry.get("url", "")
+            self.assertNotIn(
+                "gamesavedfiles.com",
+                url,
+                f"Entry {entry['id']} url uses non-existent domain gamesavedfiles.com: {url!r}"
             )
 
     def test_no_wrong_plural_gbatemp_urls(self):
