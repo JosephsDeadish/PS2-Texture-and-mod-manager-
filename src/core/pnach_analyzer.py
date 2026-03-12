@@ -390,6 +390,97 @@ def reload_db() -> int:
 
 
 # ---------------------------------------------------------------------------
+# SCE pad / input compatibility API
+# ---------------------------------------------------------------------------
+
+#: Valid ``input_compat`` values and their human-readable meanings.
+INPUT_COMPAT_LABELS: Dict[str, str] = {
+    "standard_sce_pad": "✅ Standard SCE libpad — button bitmasks and PNACH writes are valid",
+    "inverted_sce_pad": "⚠ Inverted SCE pad — bitmask bits are pressed=0; values must be inverted",
+    "analog_only":      "❌ Analog-only input — game reads axes not digital flags; combo writes have no effect",
+    "custom_polling":   "⚠ Custom polling — game uses proprietary input loop; standard bitmask may not apply",
+    "not_applicable":   "ℹ Not applicable — this entry does not involve controller input",
+    "unknown":          "⚠ Unknown compatibility — verify address in PCSX2 Debug → Memory Search first",
+}
+
+#: Description of the SCE pad bitmask standard for display in tooltips.
+SCE_PAD_BITMASK_DESCRIPTION = (
+    "PS2 SCE libpad standard button bitmask (pressed = bit set to 1 in game's normalized copy):\n"
+    "  0x0001 Select  |  0x0002 L3  |  0x0004 R3   |  0x0008 Start\n"
+    "  0x0010 D-Up    |  0x0020 D-R |  0x0040 D-Dn |  0x0080 D-Left\n"
+    "  0x0100 L2      |  0x0200 R2  |  0x0400 L1   |  0x0800 R1\n"
+    "  0x1000 △       |  0x2000 ○   |  0x4000 ✕    |  0x8000 □\n\n"
+    "Note: raw scePadRead uses inverted convention (pressed=0).  Most games\n"
+    "normalize this before storing in their own pad-state struct (pressed=1).\n"
+    "PNACH codes target the game's normalized copy, not the raw DMA buffer."
+)
+
+#: Why some games' PNACH codes may not work — informational text for the UI.
+SCE_PAD_INCOMPATIBILITY_REASONS = (
+    "Reasons a freecam PNACH may not work in some games:\n"
+    "  • Inverted bits — game keeps raw scePadRead output (pressed=bit=0)\n"
+    "  • Different address — game stores pad state at a per-session address\n"
+    "  • Analog-only — camera movement uses analog axis values, not digital flags\n"
+    "  • Per-frame recalculation — camera mode is recomputed every frame;\n"
+    "    a one-shot PNACH write is immediately overwritten (needs type-C continuous)\n"
+    "  • Custom driver — game uses a proprietary pad library (e.g. licensed engines)\n"
+    "  • Multi-address — camera state is spread across multiple addresses\n\n"
+    "When 'estimated' is true, always verify the address in PCSX2:\n"
+    "  Debug → Memory Search → search for value '0' while in normal camera,\n"
+    "  then search for '1' after triggering freecam in-game."
+)
+
+
+def check_freecam_compatibility(game_crc: str) -> List[dict]:
+    """Return input-compatibility information for all freecam entries for a game.
+
+    Parameters
+    ----------
+    game_crc:   The uppercase 8-char CRC for the game (e.g. ``"E2F01792"``).
+
+    Returns
+    -------
+    A list of dicts, one per freecam-related DB entry found for this CRC.
+    Each dict contains:
+        ``address``      — the EE memory address (uppercase, 8 chars)
+        ``description``  — human-readable feature name
+        ``value_type``   — ``"bool"`` / ``"float"`` / ``"button_combo"`` / …
+        ``input_compat`` — one of the ``INPUT_COMPAT_LABELS`` keys
+        ``compat_label`` — human-readable label from ``INPUT_COMPAT_LABELS``
+        ``estimated``    — whether the address is research-derived (not verified)
+        ``notes``        — full notes string from the DB entry
+
+    Examples
+    --------
+    >>> results = check_freecam_compatibility("E2F01792")
+    >>> [r["input_compat"] for r in results]
+    ['not_applicable', 'not_applicable', 'standard_sce_pad']
+    """
+    crc = game_crc.upper()
+    out: List[dict] = []
+    for key, entry in _DB.items():
+        if entry.get("game_crc", "").upper() != crc:
+            continue
+        desc = entry.get("description", "").lower()
+        if "freecam" not in desc:
+            continue
+        compat = entry.get("input_compat", "unknown")
+        # Extract address from key  e.g. "E2F01792:EE:00B80090"
+        parts = key.split(":")
+        address = parts[2] if len(parts) >= 3 else ""
+        out.append({
+            "address":      address,
+            "description":  entry.get("description", ""),
+            "value_type":   entry.get("value_type", ""),
+            "input_compat": compat,
+            "compat_label": INPUT_COMPAT_LABELS.get(compat, compat),
+            "estimated":    entry.get("estimated", True),
+            "notes":        entry.get("notes", ""),
+        })
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Custom value conversion
 # ---------------------------------------------------------------------------
 

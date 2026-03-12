@@ -4803,6 +4803,139 @@ class TestPnachAnalyzer(unittest.TestCase):
             self.assertIn("L3", all_labels)
             self.assertIn("R3", all_labels)
 
+    # ------------------------------------------------------------------
+    # Wave 10 — input_compat / SCE pad compatibility tests
+    # ------------------------------------------------------------------
+
+    def test_db_button_combo_entries_have_input_compat(self):
+        """Every button_combo entry must have an input_compat field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        VALID = {"standard_sce_pad", "inverted_sce_pad", "analog_only",
+                 "custom_polling", "not_applicable", "unknown"}
+        bad = [
+            (v.get("description","")[:50], v.get("input_compat","MISSING"))
+            for v in db.values()
+            if v.get("value_type") == "button_combo"
+            and v.get("input_compat", "MISSING") not in VALID
+        ]
+        self.assertEqual(bad, [],
+                         f"button_combo entries with missing/invalid input_compat: {bad}")
+
+    def test_all_db_entries_have_input_compat(self):
+        """Every entry in the DB should have an input_compat field (not missing)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        VALID = {"standard_sce_pad", "inverted_sce_pad", "analog_only",
+                 "custom_polling", "not_applicable", "unknown"}
+        missing = [
+            v.get("description", "")[:50]
+            for v in db.values()
+            if v.get("input_compat", "MISSING") not in VALID
+        ]
+        self.assertEqual(missing, [],
+                         f"Entries missing valid input_compat ({len(missing)} found): {missing[:5]}")
+
+    def test_nfs_freecam_combo_is_standard_sce_pad(self):
+        """NFS freecam button_combo entries must be tagged standard_sce_pad."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs_combos = [
+            v for v in db.values()
+            if "need for speed" in v.get("game", "").lower()
+            and v.get("value_type") == "button_combo"
+        ]
+        self.assertGreater(len(nfs_combos), 0, "NFS should have button_combo entries")
+        for e in nfs_combos:
+            self.assertEqual(
+                e.get("input_compat"), "standard_sce_pad",
+                f"NFS button_combo entry not tagged standard_sce_pad: {e.get('game')}"
+            )
+
+    def test_non_freecam_entries_are_not_applicable(self):
+        """Non-freecam float/int/bool entries should be tagged not_applicable."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        bad = [
+            v.get("description","")[:60]
+            for v in db.values()
+            if v.get("value_type") in ("float", "int")
+            and "freecam" not in v.get("description","").lower()
+            and v.get("input_compat") != "not_applicable"
+        ]
+        self.assertEqual(bad, [],
+                         f"Non-freecam float/int entries should be not_applicable: {bad[:5]}")
+
+    def test_check_freecam_compatibility_api_nfs(self):
+        """check_freecam_compatibility returns typed results for NFS Underground."""
+        from src.core.pnach_analyzer import check_freecam_compatibility, reload_db, entries_for_serial
+        reload_db()
+        nfs_entries = entries_for_serial("SLUS-20672")
+        if not nfs_entries:
+            self.skipTest("NFS Underground not in DB")
+        # Find an entry that has freecam in its description (may be a different CRC)
+        fc_entry = next(
+            (e for e in nfs_entries if "freecam" in e.get("description", "").lower()),
+            None,
+        )
+        if fc_entry is None:
+            self.skipTest("No freecam entries for NFS Underground")
+        crc = fc_entry.get("game_crc", "")
+        if not crc:
+            self.skipTest("No CRC for NFS Underground freecam entry")
+        results = check_freecam_compatibility(crc)
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0, "Should find freecam entries for NFS Underground")
+        # All results should have required fields
+        for r in results:
+            self.assertIn("input_compat", r)
+            self.assertIn("compat_label", r)
+            self.assertIn("estimated", r)
+            self.assertIn("address", r)
+
+    def test_check_freecam_compatibility_returns_empty_for_unknown_crc(self):
+        """check_freecam_compatibility returns empty list for an unknown CRC."""
+        from src.core.pnach_analyzer import check_freecam_compatibility
+        results = check_freecam_compatibility("DEADBEEF")
+        self.assertEqual(results, [])
+
+    def test_input_compat_labels_constant_is_complete(self):
+        """INPUT_COMPAT_LABELS must contain all valid input_compat values used in DB."""
+        import json
+        from pathlib import Path
+        from src.core.pnach_analyzer import INPUT_COMPAT_LABELS
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        used = {v.get("input_compat") for v in db.values() if v.get("input_compat")}
+        missing_from_labels = used - set(INPUT_COMPAT_LABELS)
+        self.assertEqual(missing_from_labels, set(),
+                         f"DB uses input_compat values not in INPUT_COMPAT_LABELS: {missing_from_labels}")
+
+    def test_button_combo_notes_contain_sce_pad_section(self):
+        """All button_combo entries must have the SCE pad compatibility section in notes."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        combos = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combos), 0, "Should have button_combo entries")
+        missing_section = [
+            v.get("description","")[:60]
+            for v in combos
+            if "SCE Pad Bitmask Compatibility" not in v.get("notes", "")
+        ]
+        self.assertEqual(missing_section, [],
+                         f"button_combo entries missing SCE section in notes: {missing_section[:5]}")
+
+
 
 class TestTextureFilePickerLogic(unittest.TestCase):
     """Tests for TextureFilePickerDialog.write_merged() logic without a real UI."""

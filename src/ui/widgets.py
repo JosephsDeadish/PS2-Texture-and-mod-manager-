@@ -1778,7 +1778,10 @@ class PnachCodeBuilderDialog(QDialog):
         time (e.g. you can't stack "ki damage 2×" with "max ki damage").
         """
         from PyQt6.QtWidgets import QComboBox as QCBox
-        from src.core.pnach_analyzer import value_to_pnach_hex
+        from src.core.pnach_analyzer import (
+            value_to_pnach_hex, INPUT_COMPAT_LABELS,
+            SCE_PAD_BITMASK_DESCRIPTION, SCE_PAD_INCOMPATIBILITY_REASONS,
+        )
 
         key = entry.get("key", "")
         # Parse address from key: CRC:PROC:ADDR
@@ -1789,9 +1792,11 @@ class PnachCodeBuilderDialog(QDialog):
 
         desc           = entry.get("description", addr)
         value_map      = entry.get("value_map", {})
-        value_type     = entry.get("value_type", "")   # "int" | "float" | "bool" | ""
+        value_type     = entry.get("value_type", "")   # "int" | "float" | "bool" | "button_combo" | ""
         excl_group     = entry.get("exclusion_group", "").strip()
         excl_note      = entry.get("exclusion_note", "").strip()
+        input_compat   = entry.get("input_compat", "").strip()
+        is_estimated   = entry.get("estimated", True)
 
         frame = QFrame()
         # Highlight frames that belong to an exclusion group with a subtle border
@@ -1832,6 +1837,59 @@ class PnachCodeBuilderDialog(QDialog):
             excl_tag.setToolTip(tag_tooltip)
             row.addWidget(excl_tag)
 
+        # ── Input compatibility badge (shown for button_combo entries) ─
+        # Badge appearance keyed by input_compat value.
+        _COMPAT_BADGE: dict = {
+            "standard_sce_pad":  ("✅ SCE pad",
+                                   "color: #40c060; font-size: 10px;"
+                                   " background: #0a2a0a; border-radius: 3px; padding: 1px 4px;",
+                                   True),   # True = use SCE_PAD_BITMASK_DESCRIPTION in tip
+            "inverted_sce_pad":  ("⚠ non-std",
+                                   "color: #e0a030; font-size: 10px;"
+                                   " background: #2a1a00; border-radius: 3px; padding: 1px 4px;",
+                                   False),
+            "custom_polling":    ("⚠ non-std",
+                                   "color: #e0a030; font-size: 10px;"
+                                   " background: #2a1a00; border-radius: 3px; padding: 1px 4px;",
+                                   False),
+            "analog_only":       ("❌ analog",
+                                   "color: #c04040; font-size: 10px;"
+                                   " background: #2a0a0a; border-radius: 3px; padding: 1px 4px;",
+                                   False),
+        }
+        if value_type == "button_combo" and input_compat:
+            badge_text, badge_style, use_bitmask_tip = _COMPAT_BADGE.get(
+                input_compat,
+                ("⚠ unverified",
+                 "color: #909090; font-size: 10px;"
+                 " background: #1a1a1a; border-radius: 3px; padding: 1px 4px;",
+                 False),
+            )
+            detail_text = (SCE_PAD_BITMASK_DESCRIPTION
+                           if use_bitmask_tip else SCE_PAD_INCOMPATIBILITY_REASONS)
+            badge_tip = (
+                INPUT_COMPAT_LABELS.get(input_compat, input_compat) + "\n\n"
+                + detail_text
+            )
+            compat_badge = QLabel(badge_text)
+            compat_badge.setStyleSheet(badge_style)
+            compat_badge.setToolTip(badge_tip)
+            row.addWidget(compat_badge)
+
+        # ── Estimated-address warning badge ───────────────────────────
+        if is_estimated and value_type in ("button_combo", "bool") and "freecam" in desc.lower():
+            est_badge = QLabel("⚠ est.")
+            est_badge.setStyleSheet(
+                "color: #c09040; font-size: 10px; font-style: italic;"
+                " background: #201800; border-radius: 3px; padding: 1px 4px;"
+            )
+            est_badge.setToolTip(
+                "Address is research-estimated — not verified against real hardware "
+                "or a community cheat database.\n"
+                "Verify with PCSX2: Debug → Memory Search before relying on this code."
+            )
+            row.addWidget(est_badge)
+
         # ── Address badge ─────────────────────────────────────────────
         addr_lbl = QLabel(f"[{proc}:{addr}]")
         addr_lbl.setStyleSheet("color: #505080; font-family: monospace; font-size: 11px;")
@@ -1855,6 +1913,7 @@ class PnachCodeBuilderDialog(QDialog):
             value_combo = QCBox()
             if value_type == "button_combo":
                 value_combo.setMinimumWidth(280)
+                compat_label = INPUT_COMPAT_LABELS.get(input_compat, "")
                 value_combo.setToolTip(
                     "Select the PS2 button combination that toggles freecam mode.\n"
                     "You must press ALL listed buttons simultaneously to toggle.\n\n"
@@ -1865,6 +1924,8 @@ class PnachCodeBuilderDialog(QDialog):
                     "  • Square (□) — move backward\n"
                     "  • Cross (✕) — descend\n"
                     "  • Triangle (△) — ascend\n\n"
+                    + (f"SCE Pad Compatibility:  {compat_label}\n\n" if compat_label else "")
+                    + SCE_PAD_BITMASK_DESCRIPTION + "\n\n"
                     "⚠ Addresses are research-estimated — verify in PCSX2 debugger."
                 )
             elif value_type == "button":
