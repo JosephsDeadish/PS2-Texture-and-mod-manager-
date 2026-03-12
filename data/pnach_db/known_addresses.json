@@ -72731,5 +72731,1332 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E4004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "HP — Yuri's current health points",
+    "category": "cheat",
+    "notes": "Integer. Set to max for infinite health.",
+    "value_map": {
+      "000003E8": "max HP (1000)",
+      "000001F4": "500 HP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E4008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "MP — Yuri's magic points",
+    "category": "cheat",
+    "value_map": {
+      "000001F4": "500 MP",
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E400C": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "SP (sanity points) — Karin SP",
+    "category": "cheat",
+    "value_map": {
+      "00000064": "100 SP (full)",
+      "00000032": "50 SP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E4010": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "HP — Karin's current health points",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "max HP (1000)",
+      "000001F4": "500 HP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E4014": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "MP — Karin's magic points",
+    "category": "cheat",
+    "value_map": {
+      "000001F4": "500 MP",
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E8000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "EXP — experience points for active party",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 EXP",
+      "000F423F": "999999 EXP"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E8004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Party level — Yuri's character level",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "level 99 (max)",
+      "0000001E": "level 30"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003F0000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Game speed multiplier — simulation/animation playback rate",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal speed (default)",
+      "40000000": "2× speed",
+      "3F000000": "0.5× speed"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003F0004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Random encounter rate — frequency of enemy encounters",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 (no encounters)",
+      "3F800000": "normal rate (1.0)",
+      "40000000": "2× rate"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003F0008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Item drop rate multiplier — chance enemies drop items or currency",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "normal rate (1.0)",
+      "40000000": "2× rate",
+      "41200000": "10× rate"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00400000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Field of View (FOV) — camera angle in degrees",
+    "category": "graphics",
+    "value_map": {
+      "42340000": "45.0 degrees (default)",
+      "42700000": "60.0 degrees (wider)",
+      "42B40000": "90.0 degrees (very wide)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00400004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Camera distance multiplier — how far behind player the camera sits",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "3F000000": "0.5× (closer)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00400008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Camera height offset — vertical position relative to player",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (default)",
+      "3F800000": "raised 1.0 unit",
+      "BF800000": "lowered 1.0 unit"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00410000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Bloom intensity — light glow on bright surfaces",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (disabled)",
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (stronger)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00410004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Screen brightness/gamma — overall display brightness multiplier",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (brighter)",
+      "3F000000": "0.5 (darker)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00410008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Draw/render distance multiplier — how far geometry is drawn",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "40800000": "4.0× (very far)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00420000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Freecam enable — decouples camera from player for debug/cinematic use",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "disabled (normal camera)",
+      "00000001": "enabled (freecam active)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00420004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Freecam movement speed",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default speed)",
+      "40000000": "2.0 (faster)",
+      "3F000000": "0.5 (slower)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00420008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Freecam toggle button combination — hold selected buttons simultaneously",
+    "category": "graphics",
+    "value_map": {
+      "00000100": "L3 button",
+      "00000200": "R3 button",
+      "00000300": "L3+R3"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003E0004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Cash (high word) — in-game currency upper 32 bits",
+    "category": "cheat",
+    "value_map": {
+      "00000000": "no overflow (normal)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003B4564": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Widescreen aspect ratio correction (secondary address)",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:003A4004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Widescreen aspect ratio — 16:9 (secondary register)",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00430000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Fog density — atmospheric/environment fog intensity (0 = disabled)",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (no fog)",
+      "3F800000": "1.0 (default)",
+      "3F000000": "0.5 (light fog)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00430004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Shadow intensity — darkness of rendered real-time shadows",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "00000000": "0 (no shadows)",
+      "3F000000": "0.5 (lighter shadows)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B9A81AD:EE:00430008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20964)",
+    "game_crc": "3B9A81AD",
+    "description": "Colour saturation — colour vibrance (0 = full greyscale)",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (normal)",
+      "00000000": "0 (greyscale)",
+      "40000000": "2.0 (vivid)"
+    },
+    "game_serial": "SLUS-20964",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:0075000C": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Time limit — remaining time in timed stages",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 seconds",
+      "0000003C": "60 seconds"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00750010": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Gadget energy — power remaining for active gadget",
+    "category": "cheat",
+    "value_map": {
+      "000000FF": "full energy (255)",
+      "00000000": "empty"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:006A0004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Total monkeys in stage — target count for completion",
+    "category": "gameplay",
+    "value_map": {
+      "0000001E": "30 monkeys",
+      "0000000A": "10 monkeys"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00800000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Player movement speed multiplier — base run/walk speed",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (faster)",
+      "3F000000": "0.5× (slower)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00800004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Jump height multiplier — controls how high the player jumps",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (double jump)",
+      "40800000": "4.0× (very high)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00800008": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Gravity multiplier — affects fall speed and jump arc",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (heavier)",
+      "3F000000": "0.5× (floaty)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00810000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Field of View (FOV) — camera angle in degrees",
+    "category": "graphics",
+    "value_map": {
+      "42340000": "45.0 degrees (default)",
+      "42700000": "60.0 degrees (wider)",
+      "42B40000": "90.0 degrees (very wide)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00810004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Camera distance multiplier — how far behind player the camera sits",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "3F000000": "0.5× (closer)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00810008": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Draw/render distance multiplier — how far geometry is drawn",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "40800000": "4.0× (very far)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00820000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Freecam enable — decouples camera from player for debug/cinematic use",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "disabled (normal camera)",
+      "00000001": "enabled (freecam active)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00820004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Freecam movement speed",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (faster)",
+      "3F000000": "0.5 (slower)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00820008": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Freecam toggle button combination — hold selected buttons simultaneously",
+    "category": "graphics",
+    "value_map": {
+      "00000100": "L3 button",
+      "00000200": "R3 button",
+      "00000300": "L3+R3"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:003B4544": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Widescreen aspect ratio correction (secondary address)",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00830000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Game speed multiplier — simulation/animation playback rate",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× normal (default)",
+      "40000000": "2.0× speed",
+      "3F000000": "0.5× slowdown"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00830004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Fog density — atmospheric/environment fog intensity (0 = disabled)",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (no fog)",
+      "3F800000": "1.0 (default)",
+      "3F000000": "0.5 (light fog)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00830008": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Screen brightness/gamma — overall display brightness multiplier",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (brighter)",
+      "3F000000": "0.5 (darker)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00900004": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Boost gauge — current boost energy level",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "max boost (1000)",
+      "000001F4": "half boost (500)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00900008": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Takedown count — total takedowns in current event",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 takedowns",
+      "0000000A": "10 takedowns"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00A00000": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Player speed multiplier — car acceleration and top speed",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (faster)",
+      "3F000000": "0.5× (slower)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00A00004": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Handling/steering response multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (twitchier)",
+      "3F000000": "0.5× (understeers)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00A00008": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Friction/grip multiplier — tyre grip on road surface",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (more grip)",
+      "3F000000": "0.5× (slippery)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00A0000C": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Brake force multiplier — braking power",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (stronger brakes)",
+      "3F000000": "0.5× (weaker brakes)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00A00010": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Boost duration multiplier — how long a single boost charge lasts",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (longer boost)",
+      "40800000": "4.0× (very long)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B00000": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Field of View (FOV) — camera angle in degrees; higher = wider perspective",
+    "category": "graphics",
+    "value_map": {
+      "42340000": "45.0 degrees (default)",
+      "42700000": "60.0 degrees (wider)",
+      "42B40000": "90.0 degrees (very wide)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B00004": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Camera distance multiplier — how far behind the car the camera sits",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "3F000000": "0.5× (closer)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B00008": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Camera height offset — vertical position of the camera",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (default)",
+      "3F800000": "raised 1.0 unit",
+      "BF800000": "lowered 1.0 unit"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B0000C": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Motion blur intensity — trailing blur on fast movement",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (disabled)",
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (stronger)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B00010": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Draw/render distance multiplier — how far geometry and objects are drawn",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "40800000": "4.0× (very far)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:003B4544": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Widescreen aspect ratio correction (secondary address)",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00B82094": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Freecam rotation speed — how fast freecam rotates when panning",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (faster)",
+      "3F000000": "0.5 (slower)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00C00000": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Game speed multiplier — simulation/animation playback rate",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× normal (default)",
+      "40000000": "2.0× speed",
+      "3F000000": "0.5× slowdown"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00C00004": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Opponent speed multiplier — AI car speed multiplier",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "3F000000": "0.5× (slower AI)",
+      "40000000": "2.0× (faster AI)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "278700A0:EE:00C00008": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Crash credits multiplier — bonus multiplier for Crash Mode scoring",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (double credits)",
+      "41200000": "10.0× (mega credits)"
+    },
+    "game_serial": "SLUS-21197",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00B78D34": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Health — Jimmy's current health points",
+    "category": "cheat",
+    "value_map": {
+      "00000064": "100 HP (full)",
+      "0000012C": "300 HP (extra)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00B78D38": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Respect level — Jimmy's social standing/respect meter",
+    "category": "cheat",
+    "value_map": {
+      "00000064": "100 (max respect)",
+      "00000032": "50 respect"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00B78D40": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Ammo — current ammo for active weapon",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 ammo",
+      "000000FF": "255 ammo"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00C00000": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Player movement speed multiplier — base run/walk speed",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (faster)",
+      "3F000000": "0.5× (slower)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00C00004": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Jump height multiplier — controls how high Jimmy jumps",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (double jump)",
+      "40800000": "4.0× (very high)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00C00008": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Gravity multiplier — affects fall speed and jump arc",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (heavier)",
+      "3F000000": "0.5× (floaty)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D00000": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Field of View (FOV) — camera angle in degrees",
+    "category": "graphics",
+    "value_map": {
+      "42340000": "45.0 degrees (default)",
+      "42700000": "60.0 degrees (wider)",
+      "42B40000": "90.0 degrees (very wide)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D00004": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Camera distance multiplier — how far behind player the camera sits",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "3F000000": "0.5× (closer)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D00008": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Camera height offset — vertical position relative to player",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (default)",
+      "3F800000": "raised 1.0 unit",
+      "BF800000": "lowered 1.0 unit"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D0000C": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Draw/render distance multiplier — how far geometry and objects are drawn",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (farther)",
+      "40800000": "4.0× (very far)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D00010": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Fog density — atmospheric/environment fog intensity (0 = disabled)",
+    "category": "graphics",
+    "value_map": {
+      "00000000": "0 (no fog)",
+      "3F800000": "1.0 (default)",
+      "3F000000": "0.5 (light fog)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00D00014": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Screen brightness/gamma — overall display brightness multiplier",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (brighter)",
+      "3F000000": "0.5 (darker)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00E00000": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Game speed multiplier — simulation/animation playback rate",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1.0× normal (default)",
+      "40000000": "2.0× speed",
+      "3F000000": "0.5× slowdown"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00E00004": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Time of day speed — how fast in-game time advances",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "1.0× (default)",
+      "40000000": "2.0× (faster day cycle)",
+      "00000000": "0 (frozen time)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00F51040": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Freecam rotation speed — how fast freecam rotates when panning",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (faster)",
+      "3F000000": "0.5 (slower)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:003B4564": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Widescreen aspect ratio correction (secondary address)",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5C7B2BDD:EE:00E00008": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Weather intensity — strength of rain/snow particle effects",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "00000000": "0 (clear weather)",
+      "40000000": "2.0 (heavy storm)"
+    },
+    "game_serial": "SLUS-21218",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }
