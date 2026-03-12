@@ -4378,6 +4378,26 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertGreater(len(data), 0)
 
+    def test_pnach_db_expanded(self):
+        """Known addresses DB should have grown beyond 109 entries."""
+        from src.core.pnach_analyzer import reload_db
+        n = reload_db()
+        self.assertGreater(n, 109, "PNACH DB should have more than 109 entries after expansion")
+
+    def test_infer_category_handles_all_sizes(self):
+        from src.core.pnach_analyzer import infer_category
+        for size in ("word", "short", "byte", "extended", "double"):
+            cat = infer_category("003B2340", "3F800000", size)
+            self.assertIsInstance(cat, str)
+            self.assertGreater(len(cat), 0)
+
+    def test_describe_patch_value_map_case_insensitive(self):
+        """Value map lookup should work regardless of case."""
+        from src.core.pnach_analyzer import describe_patch
+        ann_upper = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
+        ann_lower = describe_patch("2EB5B9A9", "EE", "00385538", "3f800000", "word")
+        self.assertEqual(ann_upper["value_note"], ann_lower["value_note"])
+
 
 class TestTextureFilePickerLogic(unittest.TestCase):
     """Tests for TextureFilePickerDialog.write_merged() logic without a real UI."""
@@ -4458,25 +4478,3 @@ class TestTextureFilePickerLogic(unittest.TestCase):
             self.assertEqual(result_tex.read_bytes(), b"MOD_A_TEX")
             self.assertTrue((dest / "env" / "sky.png").exists())
             self.assertTrue((dest / "hud" / "icon.png").exists())
-
-    def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 51 entries."""
-        from src.core.pnach_analyzer import reload_db
-        n = reload_db()
-        self.assertGreater(n, 51, "PNACH DB should have more than 51 entries after expansion")
-
-    def test_infer_category_handles_all_sizes(self):
-        from src.core.pnach_analyzer import infer_category
-        for size in ("word", "short", "byte", "extended", "double"):
-            cat = infer_category("003B2340", "3F800000", size)
-            self.assertIsInstance(cat, str)
-            self.assertGreater(len(cat), 0)
-
-    def test_describe_patch_value_map_case_insensitive(self):
-        """Value map lookup should work regardless of case."""
-        from src.core.pnach_analyzer import describe_patch
-        # Known entry: Spider-Man 2 jump with value map
-        # Test with both upper and lower case value
-        ann_upper = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
-        ann_lower = describe_patch("2EB5B9A9", "EE", "00385538", "3f800000", "word")
-        self.assertEqual(ann_upper["value_note"], ann_lower["value_note"])

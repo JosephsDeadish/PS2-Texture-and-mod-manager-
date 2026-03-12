@@ -904,5 +904,345 @@
     "game_crc": "0F6C0DB9",
     "description": "Yu's HP — current health in Dungeons",
     "category": "cheat"
+  },
+  "F0A34C75:EE:003B4540": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "F0A34C75",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F0A34C75:EE:005B3F00": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "F0A34C75",
+    "description": "Kratos HP — current health",
+    "category": "cheat"
+  },
+  "F0A34C75:EE:005B3F04": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "F0A34C75",
+    "description": "Kratos magic — current magic energy",
+    "category": "cheat"
+  },
+  "F0A34C75:EE:005B3F10": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "F0A34C75",
+    "description": "Red Orbs — upgrade currency",
+    "category": "cheat"
+  },
+  "39BB7DF5:EE:003B4560": {
+    "game": "Kingdom Hearts (SLUS-20145)",
+    "game_crc": "39BB7DF5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "39BB7DF5:EE:006C4000": {
+    "game": "Kingdom Hearts (SLUS-20145)",
+    "game_crc": "39BB7DF5",
+    "description": "Munny — in-game currency",
+    "category": "cheat"
+  },
+  "39BB7DF5:EE:006C4008": {
+    "game": "Kingdom Hearts (SLUS-20145)",
+    "game_crc": "39BB7DF5",
+    "description": "Sora HP — current health",
+    "category": "cheat"
+  },
+  "77E61C8A:EE:003B4540": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "77E61C8A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "77E61C8A:EE:00C18000": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "77E61C8A",
+    "description": "Credits — car purchase currency",
+    "category": "cheat"
+  },
+  "CF5A1A6B:EE:003C4560": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF5A1A6B:EE:008E0000": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Gold — currency for Tekken Dojo and customisation",
+    "category": "cheat"
+  },
+  "1540CFB5:EE:003B4560": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9F8B4FD0:EE:003C4560": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9F8B4FD0:EE:00C08000": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Dalton — in-game currency for purchases",
+    "category": "cheat"
+  },
+  "CF5F6552:EE:003C4560": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF5F6552:EE:00C10000": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Fol — party money for items and synthesis",
+    "category": "cheat"
+  },
+  "2CFF5D40:EE:003C4560": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2CFF5D40:EE:00B82000": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Dharmas — in-game currency",
+    "category": "cheat"
+  },
+  "3C5B2087:EE:003C4560": {
+    "game": "Tales of the Abyss (SLUS-20957)",
+    "game_crc": "3C5B2087",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3C5B2087:EE:00C08000": {
+    "game": "Tales of the Abyss (SLUS-20957)",
+    "game_crc": "3C5B2087",
+    "description": "Gald — in-game currency for items and equipment",
+    "category": "cheat"
+  },
+  "3C5B2087:EE:00C0B000": {
+    "game": "Tales of the Abyss (SLUS-20957)",
+    "game_crc": "3C5B2087",
+    "description": "Grade — earned in battles for Grade Shop",
+    "category": "cheat"
+  },
+  "4B44E3B7:EE:003C4560": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20565)",
+    "game_crc": "4B44E3B7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4B44E3B7:EE:00C00000": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20565)",
+    "game_crc": "4B44E3B7",
+    "description": "HL (Hell) — party currency for Item World and equipment",
+    "category": "cheat"
+  },
+  "ED4C4D0F:EE:003C4560": {
+    "game": "Indigo Prophecy (SLUS-21179)",
+    "game_crc": "ED4C4D0F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3B75CE2F:EE:003C4560": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5C6EF847:EE:003B4540": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "5C6EF847",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5C6EF847:EE:006C0040": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "5C6EF847",
+    "description": "Lives counter — number of remaining lives",
+    "category": "cheat"
+  },
+  "6A2B7C19:EE:003B4540": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6A2B7C19:EE:00B78D00": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "description": "Cash — money for car upgrades and new cars",
+    "category": "cheat"
+  },
+  "11FDFFCE:EE:003C4560": {
+    "game": "Viewtiful Joe (SLUS-20981)",
+    "game_crc": "11FDFFCE",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "11FDFFCE:EE:00740000": {
+    "game": "Viewtiful Joe (SLUS-20981)",
+    "game_crc": "11FDFFCE",
+    "description": "Viewtiful Points (V-Film) — VFX energy bar",
+    "category": "cheat"
+  },
+  "60E7D3C0:EE:003C4560": {
+    "game": "Haunting Ground (SLUS-21171)",
+    "game_crc": "60E7D3C0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A09B3C1E:EE:003C4560": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "A09B3C1E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A09B3C1E:EE:00C08000": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "A09B3C1E",
+    "description": "Leaf — in-game currency for items and equipment",
+    "category": "cheat"
+  },
+  "8A9CE7E6:EE:003B4540": {
+    "game": "Tony Hawk's Underground (SLUS-20782)",
+    "game_crc": "8A9CE7E6",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3CF0A5A2:EE:003C4560": {
+    "game": "Soul Nomad & the World Eaters (SLUS-21667)",
+    "game_crc": "3CF0A5A2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3CF0A5A2:EE:00B82000": {
+    "game": "Soul Nomad & the World Eaters (SLUS-21667)",
+    "game_crc": "3CF0A5A2",
+    "description": "Crimson — in-game currency",
+    "category": "cheat"
+  },
+  "F0A26C87:EE:003B4540": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "F0A26C87",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F0A26C87:EE:006E0080": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "F0A26C87",
+    "description": "Wumpa fruit counter",
+    "category": "cheat"
+  },
+  "87432EB9:EE:003B4560": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "87432EB9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9AA4CBC1:EE:003B4560": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "9AA4CBC1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9AA4CBC1:EE:00682000": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "9AA4CBC1",
+    "description": "Gems counter — collectible currency in levels",
+    "category": "cheat"
   }
 }

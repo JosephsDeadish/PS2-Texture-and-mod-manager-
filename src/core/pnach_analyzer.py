@@ -209,8 +209,9 @@ def _interpret_value(value: str, size: str, value_map: Optional[dict] = None) ->
 
     if size in ("word", "extended") and _FLOAT_RE.match(value):
         try:
+            import math as _math
             fval = struct.unpack(">f", struct.pack(">I", raw))[0]
-            if not (fval != fval) and abs(fval) < 1e10:  # not NaN, not huge
+            if not _math.isnan(fval) and abs(fval) < 1e10:
                 notes.append(f"float: {fval:.4g}")
         except (struct.error, OverflowError):
             pass
