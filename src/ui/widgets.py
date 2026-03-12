@@ -399,12 +399,14 @@ class ModDetailsDialog(QDialog):
 class ConflictDialog(QDialog):
     """Shows conflicts and lets the user choose resolution."""
 
-    def __init__(self, conflicts: list, db, parent=None):
+    def __init__(self, conflicts: list, db, parent=None, pnach_conflicts: list = None):
         super().__init__(parent)
         self.conflicts = conflicts
+        self.pnach_conflicts = pnach_conflicts or []
         self.db = db
-        self.setWindowTitle("Mod Conflicts Detected")
-        self.setMinimumSize(700, 520)
+        total = len(conflicts) + len(self.pnach_conflicts)
+        self.setWindowTitle(f"Mod Conflicts Detected ({total})")
+        self.setMinimumSize(740, 560)
         self._build_ui()
 
     def _build_ui(self):
@@ -412,7 +414,16 @@ class ConflictDialog(QDialog):
         layout.setSpacing(12)
         layout.setContentsMargins(20, 20, 20, 20)
 
-        header = QLabel("⚠ The following mods have conflicting files")
+        n_file = len(self.conflicts)
+        n_pnach = len(self.pnach_conflicts)
+        parts = []
+        if n_file:
+            parts.append(f"{n_file} file conflict(s)")
+        if n_pnach:
+            parts.append(f"{n_pnach} PNACH address conflict(s)")
+        summary_str = "  •  ".join(parts) if parts else "conflicts"
+
+        header = QLabel(f"⚠  {summary_str} detected between enabled mods")
         header.setStyleSheet("font-size: 16px; font-weight: bold; color: #ff8080;")
         layout.addWidget(header)
 
@@ -592,6 +603,139 @@ class ConflictDialog(QDialog):
                 f_layout.addWidget(per_file_container)
 
             c_layout.addWidget(frame)
+
+        # ── PNACH address-level conflicts ────────────────────────────────
+        if self.pnach_conflicts:
+            pnach_sep = QFrame()
+            pnach_sep.setFrameShape(QFrame.Shape.HLine)
+            pnach_sep.setStyleSheet("color: #3a3060; margin-top: 8px;")
+            c_layout.addWidget(pnach_sep)
+
+            pnach_header = QLabel("🔧  PNACH Address Conflicts")
+            pnach_header.setStyleSheet(
+                "font-size: 14px; font-weight: bold; color: #e0a030; margin-top: 4px;"
+            )
+            c_layout.addWidget(pnach_header)
+
+            pnach_sub = QLabel(
+                "The following PNACH mods write different values to the same memory address.\n"
+                "Only one value can take effect. Raise a mod's priority to let it win."
+            )
+            pnach_sub.setStyleSheet("color: #9090b0; font-size: 11px;")
+            pnach_sub.setWordWrap(True)
+            c_layout.addWidget(pnach_sub)
+
+            # Group by (mod_a, mod_b) pair for cleaner display
+            from collections import defaultdict
+            pnach_by_pair: dict = defaultdict(list)
+            for pc in self.pnach_conflicts:
+                pair = tuple(sorted([pc["mod_a_id"], pc["mod_b_id"]]))
+                pnach_by_pair[pair].append(pc)
+
+            for (id_a, id_b), entries in pnach_by_pair.items():
+                mod_a = self.db.get(id_a)
+                mod_b = self.db.get(id_b)
+                if not mod_a or not mod_b:
+                    continue
+
+                pf = QFrame()
+                pf.setObjectName("card")
+                pf.setStyleSheet(
+                    "QFrame#card { border: 1px solid #5a3010; background: #1e1208; }"
+                )
+                pf_layout = QVBoxLayout(pf)
+
+                pf_title = QLabel(
+                    f"🟠  {mod_a.name}  ↔  {mod_b.name}"
+                    f"  —  {len(entries)} address conflict(s)"
+                )
+                pf_title.setStyleSheet("font-weight: bold; color: #e0a030; font-size: 12px;")
+                pf_layout.addWidget(pf_title)
+
+                # Quick-resolve buttons
+                pq_row = QHBoxLayout()
+                pa_wins = QPushButton(f"✅ {mod_a.name} wins")
+                pa_wins.setObjectName("success_btn")
+                pb_wins = QPushButton(f"✅ {mod_b.name} wins")
+                pb_wins.setObjectName("success_btn")
+
+                def _make_pnach_resolver(ma, mb, which):
+                    def _resolve():
+                        if which == "a":
+                            ma.priority = max(ma.priority, mb.priority) + 1
+                            self.db.update(ma)
+                        else:
+                            mb.priority = max(ma.priority, mb.priority) + 1
+                            self.db.update(mb)
+                    return _resolve
+
+                pa_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "a"))
+                pb_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "b"))
+                pq_row.addWidget(pa_wins)
+                pq_row.addWidget(pb_wins)
+                pq_row.addStretch()
+                pf_layout.addLayout(pq_row)
+
+                # Expandable address list
+                addr_toggle = QPushButton(
+                    f"▶  Show conflicting addresses ({len(entries)})"
+                )
+                addr_toggle.setCheckable(True)
+                addr_toggle.setStyleSheet(
+                    "background: transparent; color: #c08030; border: none; text-align: left;"
+                )
+
+                addr_container = QWidget()
+                addr_container.setVisible(False)
+                al = QVBoxLayout(addr_container)
+                al.setContentsMargins(12, 2, 4, 2)
+                al.setSpacing(2)
+
+                for entry in entries[:20]:
+                    ar = QHBoxLayout()
+                    crc_lbl = QLabel(f"CRC {entry.get('game_crc', '?')}")
+                    crc_lbl.setStyleSheet("color: #606060; font-size: 10px; font-family: monospace;")
+                    crc_lbl.setFixedWidth(90)
+                    ar.addWidget(crc_lbl)
+
+                    proc_lbl = QLabel(entry.get("processor", "EE"))
+                    proc_lbl.setStyleSheet("color: #606090; font-size: 10px; font-family: monospace;")
+                    proc_lbl.setFixedWidth(30)
+                    ar.addWidget(proc_lbl)
+
+                    addr_lbl = QLabel(f"0x{entry.get('address', '?')}")
+                    addr_lbl.setStyleSheet("color: #a09040; font-family: monospace; font-size: 11px;")
+                    addr_lbl.setFixedWidth(110)
+                    ar.addWidget(addr_lbl)
+
+                    val_a_lbl = QLabel(f"A: {entry.get('value_a', '?')}")
+                    val_a_lbl.setStyleSheet("color: #60a060; font-size: 10px; font-family: monospace;")
+                    val_a_lbl.setFixedWidth(100)
+                    ar.addWidget(val_a_lbl)
+
+                    val_b_lbl = QLabel(f"B: {entry.get('value_b', '?')}")
+                    val_b_lbl.setStyleSheet("color: #6060a0; font-size: 10px; font-family: monospace;")
+                    val_b_lbl.setFixedWidth(100)
+                    ar.addWidget(val_b_lbl)
+
+                    ar.addStretch()
+                    al.addLayout(ar)
+
+                if len(entries) > 20:
+                    al.addWidget(QLabel(f"  … and {len(entries) - 20} more addresses"))
+
+                def _toggle_addrs(checked, c=addr_container, b=addr_toggle, n=len(entries)):
+                    c.setVisible(checked)
+                    b.setText(
+                        f"▼  Show conflicting addresses ({n})" if checked
+                        else f"▶  Show conflicting addresses ({n})"
+                    )
+
+                addr_toggle.toggled.connect(_toggle_addrs)
+                pf_layout.addWidget(addr_toggle)
+                pf_layout.addWidget(addr_container)
+
+                c_layout.addWidget(pf)
 
         c_layout.addStretch()
         scroll.setWidget(container)

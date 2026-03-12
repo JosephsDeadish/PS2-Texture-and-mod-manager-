@@ -2197,3 +2197,13 @@ class BrowsePanel(BasePanel):
 
     def refresh(self):
         self._apply_filters()
+
+    def filter_by_serial(self, serial: str):
+        """Pre-fill the search bar with *serial* and apply filters.
+
+        Called from the Library panel's "Browse Catalogue" button to jump
+        directly to catalogue entries for a specific game.
+        """
+        if hasattr(self, "_search") and serial:
+            self._search.setText(serial)
+            self._apply_filters()

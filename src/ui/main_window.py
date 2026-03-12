@@ -167,6 +167,7 @@ class MainWindow(QMainWindow):
         self._stack.addWidget(self._browse_panel)       # index 1
 
         self._library_panel = LibraryPanel(self.db, self.config)
+        self._library_panel.browse_game.connect(self._on_library_browse_game)
         self._stack.addWidget(self._library_panel)      # index 2
 
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
@@ -262,6 +263,13 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
     # Handlers
     # ------------------------------------------------------------------
+
+    def _on_library_browse_game(self, serial: str):
+        """Navigate to the Browse panel and pre-filter by *serial*."""
+        self._activate_nav(1)  # Browse is at index 1
+        if hasattr(self._browse_panel, "filter_by_serial"):
+            self._browse_panel.filter_by_serial(serial)
+        self._show_status(f"Browsing catalogue for {serial}")
 
     def _on_settings_saved(self, config: AppConfig):
         self.config = config

@@ -525,12 +525,19 @@ class ModPanel(BasePanel):
 
     def _show_conflicts(self):
         conflicts = self.manager.detect_conflicts(self.mod_type)
-        if not conflicts:
+        pnach_conflicts = []
+        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+            try:
+                pnach_conflicts = self.manager.detect_pnach_conflicts(self.mod_type)
+            except Exception:
+                pass
+
+        if not conflicts and not pnach_conflicts:
             QMessageBox.information(
                 self, "No Conflicts", "No conflicts detected between enabled mods! ✅"
             )
             return
-        dlg = ConflictDialog(conflicts, self.db, self)
+        dlg = ConflictDialog(conflicts, self.db, self, pnach_conflicts=pnach_conflicts)
         dlg.exec()
         self._apply_filter()
 

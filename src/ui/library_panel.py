@@ -162,6 +162,7 @@ class _GameDetailPane(QWidget):
     """Shows mods installed for one specific game."""
 
     refreshed = pyqtSignal()
+    browse_requested = pyqtSignal(str)  # emits game serial
 
     def __init__(self, db: ModDatabase, parent=None):
         super().__init__(parent)
@@ -215,6 +216,19 @@ class _GameDetailPane(QWidget):
             )
             header_row.addWidget(serial_lbl)
 
+        if self._game.serial:
+            browse_btn = QPushButton("🌐 Browse Catalogue")
+            browse_btn.setToolTip(
+                f"Open the Browse panel filtered to mods for {self._game.serial}"
+            )
+            browse_btn.setStyleSheet(
+                "background:#1a2a4a; color:#6090d0; border-radius:4px;"
+                "font-size:11px; padding:4px 10px;"
+            )
+            _serial = self._game.serial
+            browse_btn.clicked.connect(lambda: self.browse_requested.emit(_serial))
+            header_row.addWidget(browse_btn)
+
         layout.addLayout(header_row)
 
         if self._game.size_bytes:
@@ -249,7 +263,8 @@ class _GameDetailPane(QWidget):
         if not game_mods:
             empty_lbl = QLabel(
                 "No mods installed for this game yet.\n\n"
-                "Browse the catalogue or import mods from the sidebar panels."
+                "Use the 🌐 Browse Catalogue button above to find mods, "
+                "or import mods from the sidebar panels."
             )
             empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
             empty_lbl.setStyleSheet("color: #50507a; font-size: 13px;")
@@ -415,6 +430,9 @@ class LibraryPanel(BasePanel):
     Clicking a game opens a per-game mod management view on the right.
     """
 
+    # Emitted when the user clicks "Browse Catalogue" for a specific serial
+    browse_game = pyqtSignal(str)  # emits game serial
+
     def __init__(self, db: ModDatabase, config: AppConfig, parent=None):
         super().__init__("🎮  My Library", "Enable and disable mods for each game", parent)
         self.db = db
@@ -474,6 +492,7 @@ class LibraryPanel(BasePanel):
         # Right: detail pane
         self._detail = _GameDetailPane(self.db)
         self._detail.refreshed.connect(self._on_mod_toggled)
+        self._detail.browse_requested.connect(self.browse_game)
 
         self._splitter.addWidget(left_widget)
         self._splitter.addWidget(self._detail)
