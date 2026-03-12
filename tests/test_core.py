@@ -4013,3 +4013,294 @@ class TestCatalogueLoader(unittest.TestCase):
         cc = [e for e in self.catalogue if e.get("author") == "CCKrizalid"]
         self.assertGreaterEqual(len(cc), 20,
                                 "Expected at least 20 CCKrizalid entries after scaling")
+
+
+# =============================================================================
+# Game Library Scanner
+# =============================================================================
+
+class TestGameLibrary(unittest.TestCase):
+    """Tests for src.core.game_library — disc image scanner."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.game_library import scan_library, get_library_serials, GAME_EXTENSIONS, GameEntry
+        cls.scan_library = staticmethod(scan_library)
+        cls.get_library_serials = staticmethod(get_library_serials)
+        cls.GAME_EXTENSIONS = GAME_EXTENSIONS
+        cls.GameEntry = GameEntry
+
+    # ── Non-existent directory ───────────────────────────────────────────────
+
+    def test_nonexistent_dir_returns_empty(self):
+        result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
+        self.assertEqual(result, [])
+
+    def test_empty_dir_returns_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            result = self.scan_library(d)
+            self.assertEqual(result, [])
+
+    # ── Extension filtering ──────────────────────────────────────────────────
+
+    def test_only_supported_extensions_included(self):
+        with tempfile.TemporaryDirectory() as d:
+            for ext in self.GAME_EXTENSIONS:
+                Path(d, f"game{ext}").write_bytes(b"\x00")
+            # Unsupported
+            Path(d, "game.mp4").write_bytes(b"\x00")
+            Path(d, "readme.txt").write_text("hello")
+
+            games = self.scan_library(d)
+            exts = {g.extension for g in games}
+            self.assertNotIn(".mp4", exts)
+            self.assertNotIn(".txt", exts)
+            self.assertEqual(len(games), len(self.GAME_EXTENSIONS))
+
+    def test_iso_detected(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "game.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].extension, ".iso")
+
+    def test_chd_detected(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "game.chd").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].extension, ".chd")
+
+    # ── Serial detection from filename ──────────────────────────────────────
+
+    def test_serial_detected_from_filename(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891 God of War.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].serial, "SLUS-20891")
+
+    def test_title_filled_from_known_serial(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            # "God of War" is a known serial in game_registry
+            self.assertIn("God of War", games[0].title)
+
+    def test_unknown_serial_empty_title(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "unknown_game.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].serial, "")
+            self.assertEqual(games[0].title, "")
+
+    def test_display_name_with_title_and_serial(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            g = self.scan_library(d)[0]
+            dn = g.display_name
+            # Should include both serial and title
+            self.assertIn("SLUS-20891", dn)
+            self.assertIn("God of War", dn)
+
+    def test_display_name_fallback_to_filename(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "mystery_game.iso").write_bytes(b"\x00")
+            g = self.scan_library(d)[0]
+            self.assertIn("mystery_game.iso", g.display_name)
+
+    def test_results_sorted_by_display_name(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "zzz.iso").write_bytes(b"\x00")
+            Path(d, "aaa.chd").write_bytes(b"\x00")
+            Path(d, "mmm.bin").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            names = [g.display_name.lower() for g in games]
+            self.assertEqual(names, sorted(names))
+
+    # ── get_library_serials ──────────────────────────────────────────────────
+
+    def test_get_library_serials_returns_frozenset(self):
+        with tempfile.TemporaryDirectory() as d:
+            result = self.get_library_serials(d)
+            self.assertIsInstance(result, frozenset)
+
+    def test_get_library_serials_excludes_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            Path(d, "no_serial.chd").write_bytes(b"\x00")
+            serials = self.get_library_serials(d)
+            self.assertIn("SLUS-20891", serials)
+            self.assertNotIn("", serials)
+
+    def test_get_library_serials_upper_case(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "slus-20891.iso").write_bytes(b"\x00")
+            serials = self.get_library_serials(d)
+            self.assertIn("SLUS-20891", serials)
+
+    def test_size_bytes_populated(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d, "SLUS-20891.iso")
+            p.write_bytes(b"\x00" * 256)
+            games = self.scan_library(d)
+            self.assertEqual(games[0].size_bytes, 256)
+
+
+# =============================================================================
+# AppConfig game_library_path field
+# =============================================================================
+
+class TestAppConfigGameLibrary(unittest.TestCase):
+    """Tests for AppConfig.game_library_path — new field added in recent session."""
+
+    def test_default_is_empty_string(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.game_library_path, "")
+
+    def test_to_dict_includes_game_library_path(self):
+        cfg = AppConfig(game_library_path="/my/roms")
+        d = cfg.to_dict()
+        self.assertIn("game_library_path", d)
+        self.assertEqual(d["game_library_path"], "/my/roms")
+
+    def test_from_dict_restores_game_library_path(self):
+        cfg = AppConfig(game_library_path="/my/roms")
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(restored.game_library_path, "/my/roms")
+
+    def test_old_config_without_game_library_path_defaults(self):
+        """Configs saved before game_library_path was added must load cleanly."""
+        old = {
+            "pcsx2_path": "", "textures_path": "", "pnach_path": "",
+            "cover_art_path": "", "memcards_path": "", "cheats_path": "",
+            "mods_storage_path": "", "theme": "dark",
+            "check_updates_on_start": True, "show_conflict_warnings": True,
+            "first_run": False, "favorite_authors": [], "show_nsfw": False,
+        }
+        cfg = AppConfig.from_dict(old)
+        self.assertEqual(cfg.game_library_path, "")
+
+    def test_config_save_and_load_preserves_game_library_path(self):
+        import src.core.config_manager as cm
+        orig_file = cm.CONFIG_FILE
+        with tempfile.TemporaryDirectory() as d:
+            cm.CONFIG_FILE = Path(d) / "config.json"
+            try:
+                cfg = AppConfig(game_library_path="/roms/ps2")
+                from src.core.config_manager import save_config, load_config
+                save_config(cfg)
+                loaded = load_config()
+                self.assertEqual(loaded.game_library_path, "/roms/ps2")
+            finally:
+                cm.CONFIG_FILE = orig_file
+
+
+# =============================================================================
+# Theme registry
+# =============================================================================
+
+class TestThemeRegistry(unittest.TestCase):
+    """Tests for src.ui.theme — multi-theme support added in recent session."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.ui.theme import THEMES, THEME_KEYS, get_stylesheet
+        cls.THEMES = THEMES
+        cls.THEME_KEYS = THEME_KEYS
+        cls.get_stylesheet = staticmethod(get_stylesheet)
+
+    def test_four_themes_available(self):
+        self.assertIn("Dark", self.THEMES)
+        self.assertIn("Midnight", self.THEMES)
+        self.assertIn("Retro Green", self.THEMES)
+        self.assertIn("Purple", self.THEMES)
+
+    def test_four_theme_keys(self):
+        self.assertIn("dark", self.THEME_KEYS)
+        self.assertIn("midnight", self.THEME_KEYS)
+        self.assertIn("retro_green", self.THEME_KEYS)
+        self.assertIn("purple", self.THEME_KEYS)
+
+    def test_key_to_display_name_mapping(self):
+        self.assertEqual(self.THEME_KEYS["dark"], "Dark")
+        self.assertEqual(self.THEME_KEYS["midnight"], "Midnight")
+        self.assertEqual(self.THEME_KEYS["retro_green"], "Retro Green")
+        self.assertEqual(self.THEME_KEYS["purple"], "Purple")
+
+    def test_get_stylesheet_returns_non_empty_string(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIsInstance(sheet, str)
+            self.assertIn("QWidget", sheet)
+
+    def test_get_stylesheet_fallback_for_unknown_key(self):
+        """Unknown theme keys should silently fall back to the Dark theme."""
+        dark = self.get_stylesheet("dark")
+        fallback = self.get_stylesheet("nonexistent_theme")
+        self.assertEqual(dark, fallback)
+
+    def test_all_stylesheets_have_sidebar(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIn("#sidebar", sheet, f"Theme {key!r} missing #sidebar rule")
+
+    def test_all_stylesheets_have_primary_btn(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIn("primary_btn", sheet, f"Theme {key!r} missing primary_btn rule")
+
+    def test_default_theme_in_appconfig(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.theme, "dark")
+
+    def test_theme_round_trips_through_appconfig(self):
+        for key in self.THEME_KEYS:
+            cfg = AppConfig(theme=key)
+            restored = AppConfig.from_dict(cfg.to_dict())
+            self.assertEqual(restored.theme, key)
+
+
+# =============================================================================
+# Catalogue ModType enum correctness
+# =============================================================================
+
+class TestCatalogueModTypeEnum(unittest.TestCase):
+    """Verify that catalogue entries store ModType enum values (not plain strings)."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.catalogue_loader import CATALOGUE
+        cls.catalogue = CATALOGUE
+
+    def test_all_types_are_modtype_instances(self):
+        for e in self.catalogue:
+            self.assertIsInstance(
+                e["type"], ModType,
+                f"Entry {e['id']} has type {e['type']!r} (expected ModType enum)"
+            )
+
+    def test_type_value_attribute_accessible(self):
+        """CatalogueCard calls e['type'].value — must not raise AttributeError."""
+        for e in self.catalogue:
+            try:
+                _ = e["type"].value
+            except AttributeError:
+                self.fail(f"Entry {e['id']}: .value not accessible on {e['type']!r}")
+
+    def test_tab_filtering_by_modtype_enum_non_empty(self):
+        for mt in ModType:
+            entries = [e for e in self.catalogue if e["type"] == mt]
+            self.assertGreater(len(entries), 0,
+                               f"No catalogue entries of type {mt}")
+
+    def test_tab_filtering_consistent_with_string_value(self):
+        """Filtering by enum equals filtering by its string value via .value."""
+        for mt in ModType:
+            by_enum = [e for e in self.catalogue if e["type"] == mt]
+            by_value = [e for e in self.catalogue if e["type"].value == mt.value]
+            self.assertEqual(
+                len(by_enum), len(by_value),
+                f"Enum vs .value filtering mismatch for {mt}"
+            )
