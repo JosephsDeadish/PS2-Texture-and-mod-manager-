@@ -7724,5 +7724,57 @@
     "context": "Serial: SLUS-21922.",
     "is_hub": false,
     "nsfw": false
+  },
+  {
+    "id": "cover_slus21238",
+    "name": "Neopets: The Darkest Fairy (SLUS-21238) — Cover Art (GameTDB)",
+    "description": "Official cover art for Neopets: The Darkest Fairy (SLUS-21238).",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "url": "https://www.gametdb.com/PS2/SLUS21238",
+    "direct_download_url": "",
+    "download_action": "cover_by_id",
+    "source": "GameTDB",
+    "game": "Neopets: The Darkest Fairy",
+    "game_serial": "SLUS-21238",
+    "type": "cover_art",
+    "upscale_tech": "",
+    "tags": [
+      "neopets",
+      "action-adventure",
+      "cover-art",
+      "official",
+      "gametdb"
+    ],
+    "thumbnail_url": "",
+    "context": "Serial: SLUS-21238.",
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cover_sces54023",
+    "name": "Neopets: The Darkest Fairy (SCES-54023) — Cover Art (GameTDB)",
+    "description": "Official cover art for Neopets: The Darkest Fairy (SCES-54023).",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "url": "https://www.gametdb.com/PS2/SCES54023",
+    "direct_download_url": "",
+    "download_action": "cover_by_id",
+    "source": "GameTDB",
+    "game": "Neopets: The Darkest Fairy",
+    "game_serial": "SCES-54023",
+    "type": "cover_art",
+    "upscale_tech": "",
+    "tags": [
+      "neopets",
+      "action-adventure",
+      "cover-art",
+      "official",
+      "gametdb"
+    ],
+    "thumbnail_url": "",
+    "context": "Serial: SCES-54023.",
+    "is_hub": false,
+    "nsfw": false
   }
 ]

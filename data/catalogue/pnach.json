@@ -16534,5 +16534,32 @@
     "context": "Serial: SLUS-20459.",
     "is_hub": false,
     "nsfw": false
+  },
+  {
+    "id": "pnach_slus21238_ws",
+    "name": "Neopets: The Darkest Fairy — Widescreen Patch",
+    "description": "16:9 widescreen PNACH patch for Neopets: The Darkest Fairy (SLUS-21238).",
+    "author": "nemesis2090 (PS2Wide)",
+    "author_url": "https://gbatemp.net/members/nemesis2090.27154/",
+    "url": "https://ps2wide.net/pc10.html",
+    "direct_download_url": "",
+    "download_action": "",
+    "source": "PS2Wide",
+    "game": "Neopets: The Darkest Fairy",
+    "game_serial": "SLUS-21238",
+    "type": "pnach",
+    "upscale_tech": "",
+    "tags": [
+      "neopets",
+      "action-adventure",
+      "widescreen",
+      "16:9",
+      "pnach",
+      "ps2wide"
+    ],
+    "thumbnail_url": "",
+    "context": "Serial: SLUS-21238.",
+    "is_hub": false,
+    "nsfw": false
   }
 ]

@@ -10,7 +10,8 @@
       "40000000": "double height (2.0×)",
       "40400000": "triple height (3.0×)",
       "3F400000": "half height (0.75×)"
-    }
+    },
+    "game_serial": "SLUS-20782"
   },
   "2EB5B9A9:EE:003855A0": {
     "game": "Spider-Man 2 (SLUS-20782)",
@@ -21,7 +22,8 @@
     "value_map": {
       "3F800000": "normal speed (1.0×)",
       "40000000": "double speed (2.0×)"
-    }
+    },
+    "game_serial": "SLUS-20782"
   },
   "2EB5B9A9:EE:003855B4": {
     "game": "Spider-Man 2 (SLUS-20782)",
@@ -32,13 +34,23 @@
     "value_map": {
       "0000270F": "9999 points",
       "00009999": "unlimited (near-max)"
-    }
+    },
+    "game_serial": "SLUS-20782"
   },
   "2EB5B9A9:EE:00385620": {
     "game": "Spider-Man 2 (SLUS-20782)",
     "game_crc": "2EB5B9A9",
     "description": "Movement speed — base running/walking speed multiplier",
-    "category": "physics"
+    "category": "physics",
+    "game_serial": "SLUS-20782",
+    "value_map": {
+      "3F800000": "1× normal speed (default)",
+      "40000000": "2× speed",
+      "40800000": "4× speed",
+      "40C00000": "6× speed",
+      "3F000000": "½× speed (slower)",
+      "3E800000": "¼× speed (very slow)"
+    }
   },
   "17D68D15:EE:005B4BF0": {
     "game": "God of War (SLUS-20891)",
@@ -49,13 +61,15 @@
     "value_map": {
       "000003E8": "max health (1000)",
       "0000270F": "over-cap (cheat)"
-    }
+    },
+    "game_serial": "SLUS-20891"
   },
   "17D68D15:EE:005B4BF4": {
     "game": "God of War (SLUS-20891)",
     "game_crc": "17D68D15",
     "description": "Player magic — current magic/mana for Kratos",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20891"
   },
   "17D68D15:EE:005B4C00": {
     "game": "God of War (SLUS-20891)",
@@ -65,7 +79,8 @@
     "value_map": {
       "0000270F": "9999 orbs",
       "000F423F": "999999 orbs (near-max)"
-    }
+    },
+    "game_serial": "SLUS-20891"
   },
   "17D68D15:EE:00385540": {
     "game": "God of War (SLUS-20891)",
@@ -76,7 +91,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20891"
   },
   "B3A9F9D5:EE:00388570": {
     "game": "Kingdom Hearts (SLUS-20370)",
@@ -86,7 +102,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20370"
   },
   "B3A9F9D5:EE:006D5A90": {
     "game": "Kingdom Hearts (SLUS-20370)",
@@ -96,7 +113,8 @@
     "value_map": {
       "0000270F": "9999 munny",
       "0098967F": "9999999 munny"
-    }
+    },
+    "game_serial": "SLUS-20370"
   },
   "B3A9F9D5:EE:006D5A94": {
     "game": "Kingdom Hearts (SLUS-20370)",
@@ -106,7 +124,8 @@
     "value_map": {
       "3F800000": "normal (1.0×)",
       "40000000": "double (2.0×)"
-    }
+    },
+    "game_serial": "SLUS-20370"
   },
   "A39517AB:EE:004F6AF8": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
@@ -116,19 +135,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20718"
   },
   "A39517AB:EE:006D0310": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
     "game_crc": "A39517AB",
     "description": "Stamina — Snake's stamina gauge value",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20718"
   },
   "A39517AB:EE:006D0314": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
     "game_crc": "A39517AB",
     "description": "Life (health) — Snake's maximum health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20718"
   },
   "CF0B0D11:EE:004B9E90": {
     "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
@@ -138,13 +160,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20554"
   },
   "CF0B0D11:EE:007F6B4C": {
     "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
     "game_crc": "CF0B0D11",
     "description": "Ammo counter — current magazine ammo for equipped weapon",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20554"
   },
   "9A5B29A1:EE:003CD218": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
@@ -154,7 +178,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20946"
   },
   "9A5B29A1:EE:00B78D30": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
@@ -163,7 +188,8 @@
     "category": "cheat",
     "value_map": {
       "05F5E0FF": "max money ($99,999,999)"
-    }
+    },
+    "game_serial": "SLUS-20946"
   },
   "9A5B29A1:EE:00B78D34": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
@@ -173,19 +199,22 @@
     "value_map": {
       "00000000": "no wanted level",
       "00000006": "6-star maximum wanted"
-    }
+    },
+    "game_serial": "SLUS-20946"
   },
   "9A5B29A1:EE:00B79010": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
     "game_crc": "9A5B29A1",
     "description": "Player health — CJ's current health points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20946"
   },
   "9A5B29A1:EE:00B79014": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
     "game_crc": "9A5B29A1",
     "description": "Player armour — CJ's current armour value",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20946"
   },
   "8D057621:EE:003B2340": {
     "game": "Gran Turismo 4 (SCUS-97328 / SCAJ-20065)",
@@ -201,7 +230,8 @@
     "game": "Gran Turismo 4 (SCUS-97328)",
     "game_crc": "8D057621",
     "description": "Credits (in-game currency) — player's current GT credit balance",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97328"
   },
   "B9D90F75:EE:003B2340": {
     "game": "Shadow of the Colossus (SLUS-21195)",
@@ -211,19 +241,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21195"
   },
   "B9D90F75:EE:0075B860": {
     "game": "Shadow of the Colossus (SLUS-21195)",
     "game_crc": "B9D90F75",
     "description": "Player health — Wander's health bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21195"
   },
   "B9D90F75:EE:0075B864": {
     "game": "Shadow of the Colossus (SLUS-21195)",
     "game_crc": "B9D90F75",
     "description": "Grip strength — how long Wander can hold on to a Colossus",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21195"
   },
   "B4414C0D:EE:005C3B80": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -233,13 +266,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21085"
   },
   "B4414C0D:EE:008CF040": {
     "game": "Tekken 5 (SLUS-21085)",
     "game_crc": "B4414C0D",
     "description": "Money (in-game currency) — used to unlock items in Customise",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21085"
   },
   "D697D204:EE:0038AB60": {
     "game": "Resident Evil 4 (SLUS-21134)",
@@ -249,19 +284,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21134"
   },
   "D697D204:EE:006B00A8": {
     "game": "Resident Evil 4 (SLUS-21134)",
     "game_crc": "D697D204",
     "description": "Pesetas (currency) — Leon's current money amount",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21134"
   },
   "D697D204:EE:006B0044": {
     "game": "Resident Evil 4 (SLUS-21134)",
     "game_crc": "D697D204",
     "description": "Leon's health — current health value",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21134"
   },
   "4A0E5B3A:EE:00388570": {
     "game": "Silent Hill 2 (SLUS-20228)",
@@ -271,7 +309,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20228"
   },
   "4A0E5B3A:EE:006A2270": {
     "game": "Silent Hill 2 (SLUS-20228)",
@@ -281,7 +320,8 @@
     "value_map": {
       "00000000": "flashlight off",
       "00000001": "flashlight on"
-    }
+    },
+    "game_serial": "SLUS-20228"
   },
   "F4A7473E:EE:003B1570": {
     "game": "Devil May Cry (SLUS-20216)",
@@ -291,19 +331,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20216"
   },
   "F4A7473E:EE:007B5040": {
     "game": "Devil May Cry (SLUS-20216)",
     "game_crc": "F4A7473E",
     "description": "Red Orbs — currency for upgrades and items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20216"
   },
   "F4A7473E:EE:007B5044": {
     "game": "Devil May Cry (SLUS-20216)",
     "game_crc": "F4A7473E",
     "description": "Dante's health — current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20216"
   },
   "FFF16BAB:EE:004C5870": {
     "game": "Jak and Daxter (SCUS-97123 alt CRC)",
@@ -329,7 +372,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20851"
   },
   "DA5CC7A3:EE:00830040": {
     "game": "Burnout 3: Takedown (SLUS-20851)",
@@ -339,7 +383,8 @@
     "value_map": {
       "3F800000": "normal speed (1.0×)",
       "40000000": "double speed (2.0×)"
-    }
+    },
+    "game_serial": "SLUS-20851"
   },
   "3E1CC296:EE:003B4560": {
     "game": "Ratchet & Clank (SCUS-97199)",
@@ -349,19 +394,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97199"
   },
   "3E1CC296:EE:00826000": {
     "game": "Ratchet & Clank (SCUS-97199)",
     "game_crc": "3E1CC296",
     "description": "Bolts — Ratchet's in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97199"
   },
   "3E1CC296:EE:00826004": {
     "game": "Ratchet & Clank (SCUS-97199)",
     "game_crc": "3E1CC296",
     "description": "Health orbs — Ratchet's current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97199"
   },
   "E2F01792:EE:003C2220": {
     "game": "Need for Speed: Underground 2 (SLUS-21001)",
@@ -371,13 +419,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21001"
   },
   "E2F01792:EE:00B12380": {
     "game": "Need for Speed: Underground 2 (SLUS-21001)",
     "game_crc": "E2F01792",
     "description": "Cash (in-game) — player's current money for car upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21001"
   },
   "43AB7196:EE:003B7FF0": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -387,7 +437,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20238"
   },
   "43AB7196:EE:0068B060": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -397,13 +448,15 @@
     "value_map": {
       "00000063": "99 lives",
       "00000005": "5 lives (default)"
-    }
+    },
+    "game_serial": "SLUS-20238"
   },
   "43AB7196:EE:0068B064": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
     "game_crc": "43AB7196",
     "description": "Wumpa fruit counter — collected fruits in current level",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20238"
   },
   "F2A5C5CF:EE:003B3A80": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -413,19 +466,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20062"
   },
   "F2A5C5CF:EE:007C1040": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
     "game_crc": "F2A5C5CF",
     "description": "Dragonflies collected — main collectible count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20062"
   },
   "F2A5C5CF:EE:007C1044": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
     "game_crc": "F2A5C5CF",
     "description": "Gems collected — secondary collectible count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20062"
   },
   "CA5B7A61:EE:003B4560": {
     "game": "Crash Twinsanity (SLUS-20979)",
@@ -435,13 +491,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20979"
   },
   "CA5B7A61:EE:0068F040": {
     "game": "Crash Twinsanity (SLUS-20979)",
     "game_crc": "CA5B7A61",
     "description": "Wumpa fruit counter",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20979"
   },
   "F266B00B:EE:003B4560": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -451,7 +509,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21005"
   },
   "F266B00B:EE:006D5A90": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -460,19 +519,22 @@
     "category": "cheat",
     "value_map": {
       "0098967F": "9999999 munny"
-    }
+    },
+    "game_serial": "SLUS-21005"
   },
   "F266B00B:EE:006B1A40": {
     "game": "Kingdom Hearts II (SLUS-21005)",
     "game_crc": "F266B00B",
     "description": "Sora's HP — current health points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21005"
   },
   "F266B00B:EE:006B1A44": {
     "game": "Kingdom Hearts II (SLUS-21005)",
     "game_crc": "F266B00B",
     "description": "Sora's MP — current magic points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21005"
   },
   "A39517AB:EE:003B2340": {
     "game": "Final Fantasy X (SLUS-20312 alt)",
@@ -492,7 +554,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20312"
   },
   "CF8ABA10:EE:00C3F000": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -501,13 +564,15 @@
     "category": "cheat",
     "value_map": {
       "0098967F": "max gil (9999999)"
-    }
+    },
+    "game_serial": "SLUS-20312"
   },
   "CF8ABA10:EE:00C3F020": {
     "game": "Final Fantasy X (SLUS-20312)",
     "game_crc": "CF8ABA10",
     "description": "Tidus HP — current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20312"
   },
   "4D4B0C8F:EE:003B4560": {
     "game": "Ico (SCUS-97113)",
@@ -517,7 +582,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97113"
   },
   "2B2570A0:EE:003B5670": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
@@ -527,13 +593,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97123"
   },
   "2B2570A0:EE:00832860": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
     "game_crc": "2B2570A0",
     "description": "Orb count — Precursor orbs collected",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97123"
   },
   "A5C02F40:EE:003C5000": {
     "game": "Jak II (SCUS-97265)",
@@ -543,13 +611,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97265"
   },
   "A5C02F40:EE:00A82000": {
     "game": "Jak II (SCUS-97265)",
     "game_crc": "A5C02F40",
     "description": "Dark eco level — current amount of dark eco",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97265"
   },
   "3F5A3B78:EE:003C5000": {
     "game": "Jak 3 (SCUS-97330)",
@@ -559,7 +629,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97330"
   },
   "7B1B8A6F:EE:003C0000": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
@@ -569,7 +640,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97316"
   },
   "B3A9F9E7:EE:003C4000": {
     "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
@@ -579,7 +651,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97501"
   },
   "A51FB9E1:EE:003C4570": {
     "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
@@ -589,13 +662,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97268"
   },
   "A51FB9E1:EE:00826004": {
     "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
     "game_crc": "A51FB9E1",
     "description": "Bolts — in-game currency counter",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97268"
   },
   "28D4E52B:EE:003C4570": {
     "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
@@ -605,13 +680,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97353"
   },
   "28D4E52B:EE:00A12040": {
     "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
     "game_crc": "28D4E52B",
     "description": "Bolts — in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97353"
   },
   "4A9A1ABE:EE:003B3540": {
     "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
@@ -621,13 +698,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21069"
   },
   "4A9A1ABE:EE:008C0000": {
     "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
     "game_crc": "4A9A1ABE",
     "description": "Zeni (currency) — used in the Dragon Universe shop",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21069"
   },
   "1D5CC6E7:EE:003C3540": {
     "game": "Mortal Kombat: Armageddon (SLUS-21522)",
@@ -637,7 +716,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21522"
   },
   "6A928BAE:EE:003B4570": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -647,19 +727,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20743"
   },
   "6A928BAE:EE:006E0040": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
     "game_crc": "6A928BAE",
     "description": "Sand credits — amount of sand (magic resource)",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20743"
   },
   "6A928BAE:EE:006E0044": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
     "game_crc": "6A928BAE",
     "description": "Player health — Prince's current health level",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20743"
   },
   "52F2E55D:EE:003C4540": {
     "game": "Ico (SCUS-97113 alt)",
@@ -679,7 +762,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20128"
   },
   "44A8A22A:EE:003B4540": {
     "game": "God of War II (SCUS-97481)",
@@ -689,25 +773,29 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97481"
   },
   "44A8A22A:EE:005B4BF0": {
     "game": "God of War II (SCUS-97481)",
     "game_crc": "44A8A22A",
     "description": "Player health — Kratos's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97481"
   },
   "44A8A22A:EE:005B4BF4": {
     "game": "God of War II (SCUS-97481)",
     "game_crc": "44A8A22A",
     "description": "Player magic — Kratos's magic energy",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97481"
   },
   "44A8A22A:EE:005B4C00": {
     "game": "God of War II (SCUS-97481)",
     "game_crc": "44A8A22A",
     "description": "Red Orbs — upgrade currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97481"
   },
   "3BA51AC3:EE:003B4560": {
     "game": "Onimusha: Warlords (SLUS-20179)",
@@ -717,7 +805,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20179"
   },
   "C5A26456:EE:003B4560": {
     "game": "Armored Core 3 (SLUS-20392)",
@@ -727,13 +816,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20392"
   },
   "C5A26456:EE:00A82000": {
     "game": "Armored Core 3 (SLUS-20392)",
     "game_crc": "C5A26456",
     "description": "Credits — in-garage currency for AC parts",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20392"
   },
   "3E34F9D4:EE:003B4560": {
     "game": "Shadow Hearts (SLUS-20472)",
@@ -743,7 +834,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20472"
   },
   "1A9BFCD1:EE:003B4560": {
     "game": "Shadow Hearts: Covenant (SLUS-20845)",
@@ -753,13 +845,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20845"
   },
   "1A9BFCD1:EE:00C3A400": {
     "game": "Shadow Hearts: Covenant (SLUS-20845)",
     "game_crc": "1A9BFCD1",
     "description": "Cash — party funds for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20845"
   },
   "E4FD7B8D:EE:003B4560": {
     "game": "Xenosaga Episode I (SLUS-20433)",
@@ -769,13 +863,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20433"
   },
   "E4FD7B8D:EE:00C18000": {
     "game": "Xenosaga Episode I (SLUS-20433)",
     "game_crc": "E4FD7B8D",
     "description": "G-Points (GP) — money for Segment Addresses and items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20433"
   },
   "D3C7A0A3:EE:003B4560": {
     "game": ".hack//Infection (SLUS-20267)",
@@ -785,7 +881,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20267"
   },
   "66CB9620:EE:003B4560": {
     "game": "Champions: Return to Arms (SLUS-21053)",
@@ -795,7 +892,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21053"
   },
   "2FAC5233:EE:003B4560": {
     "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
@@ -805,13 +903,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20962"
   },
   "2FAC5233:EE:00B79010": {
     "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
     "game_crc": "2FAC5233",
     "description": "Cash — in-game currency for tuning and buying cars",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20962"
   },
   "1B594C95:EE:003C4540": {
     "game": "Okami (SLUS-21115)",
@@ -821,19 +921,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21115"
   },
   "1B594C95:EE:00A13000": {
     "game": "Okami (SLUS-21115)",
     "game_crc": "1B594C95",
     "description": "Yen — money for items from merchants",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21115"
   },
   "1B594C95:EE:00A13004": {
     "game": "Okami (SLUS-21115)",
     "game_crc": "1B594C95",
     "description": "Astral Pouch size — how many Astral Pouches Amaterasu carries",
-    "category": "gameplay"
+    "category": "gameplay",
+    "game_serial": "SLUS-21115"
   },
   "5C7B2BDD:EE:003B4560": {
     "game": "Bully (SLUS-21218)",
@@ -843,13 +946,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21218"
   },
   "5C7B2BDD:EE:00B78D30": {
     "game": "Bully (SLUS-21218)",
     "game_crc": "5C7B2BDD",
     "description": "Money — Jimmy's current cash",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21218"
   },
   "CEEF2AC2:EE:003C4540": {
     "game": "Yakuza (SLUS-21355)",
@@ -859,13 +964,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21355"
   },
   "CEEF2AC2:EE:00B12000": {
     "game": "Yakuza (SLUS-21355)",
     "game_crc": "CEEF2AC2",
     "description": "Money — Kiryu's current yen",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21355"
   },
   "B3B56447:EE:003C4560": {
     "game": "Persona 3 FES (SLUS-21621)",
@@ -875,13 +982,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21621"
   },
   "B3B56447:EE:00C28000": {
     "game": "Persona 3 FES (SLUS-21621)",
     "game_crc": "B3B56447",
     "description": "Yen — money for Personas and items at the mall",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21621"
   },
   "0F6C0DB9:EE:003C4560": {
     "game": "Persona 4 (SLUS-21844)",
@@ -891,19 +1000,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21844"
   },
   "0F6C0DB9:EE:00C18000": {
     "game": "Persona 4 (SLUS-21844)",
     "game_crc": "0F6C0DB9",
     "description": "Yen — money for items, Personas, and Velvet Room",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21844"
   },
   "0F6C0DB9:EE:00C18004": {
     "game": "Persona 4 (SLUS-21844)",
     "game_crc": "0F6C0DB9",
     "description": "Yu's HP — current health in Dungeons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21844"
   },
   "F0A34C75:EE:003B4540": {
     "game": "God of War (SLUS-20891)",
@@ -913,25 +1025,29 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20891"
   },
   "F0A34C75:EE:005B3F00": {
     "game": "God of War (SLUS-20891)",
     "game_crc": "F0A34C75",
     "description": "Kratos HP — current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20891"
   },
   "F0A34C75:EE:005B3F04": {
     "game": "God of War (SLUS-20891)",
     "game_crc": "F0A34C75",
     "description": "Kratos magic — current magic energy",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20891"
   },
   "F0A34C75:EE:005B3F10": {
     "game": "God of War (SLUS-20891)",
     "game_crc": "F0A34C75",
     "description": "Red Orbs — upgrade currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20891"
   },
   "39BB7DF5:EE:003B4560": {
     "game": "Kingdom Hearts (SLUS-20145)",
@@ -941,19 +1057,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20145"
   },
   "39BB7DF5:EE:006C4000": {
     "game": "Kingdom Hearts (SLUS-20145)",
     "game_crc": "39BB7DF5",
     "description": "Munny — in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20145"
   },
   "39BB7DF5:EE:006C4008": {
     "game": "Kingdom Hearts (SLUS-20145)",
     "game_crc": "39BB7DF5",
     "description": "Sora HP — current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20145"
   },
   "77E61C8A:EE:003B4540": {
     "game": "Gran Turismo 4 (SCUS-97328)",
@@ -963,13 +1082,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97328"
   },
   "77E61C8A:EE:00C18000": {
     "game": "Gran Turismo 4 (SCUS-97328)",
     "game_crc": "77E61C8A",
     "description": "Credits — car purchase currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97328"
   },
   "CF5A1A6B:EE:003C4560": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -979,13 +1100,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21085"
   },
   "CF5A1A6B:EE:008E0000": {
     "game": "Tekken 5 (SLUS-21085)",
     "game_crc": "CF5A1A6B",
     "description": "Gold — currency for Tekken Dojo and customisation",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21085"
   },
   "1540CFB5:EE:003B4560": {
     "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
@@ -995,7 +1118,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20213"
   },
   "9F8B4FD0:EE:003C4560": {
     "game": "Rogue Galaxy (SCUS-97490)",
@@ -1005,13 +1129,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97490"
   },
   "9F8B4FD0:EE:00C08000": {
     "game": "Rogue Galaxy (SCUS-97490)",
     "game_crc": "9F8B4FD0",
     "description": "Dalton — in-game currency for purchases",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97490"
   },
   "CF5F6552:EE:003C4560": {
     "game": "Star Ocean: Till the End of Time (SLUS-20734)",
@@ -1021,13 +1147,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20734"
   },
   "CF5F6552:EE:00C10000": {
     "game": "Star Ocean: Till the End of Time (SLUS-20734)",
     "game_crc": "CF5F6552",
     "description": "Fol — party money for items and synthesis",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20734"
   },
   "2CFF5D40:EE:003C4560": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
@@ -1037,13 +1165,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21299"
   },
   "2CFF5D40:EE:00B82000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
     "game_crc": "2CFF5D40",
     "description": "Dharmas — in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21299"
   },
   "3C5B2087:EE:003C4560": {
     "game": "Tales of the Abyss (SLUS-20957)",
@@ -1053,19 +1183,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20957"
   },
   "3C5B2087:EE:00C08000": {
     "game": "Tales of the Abyss (SLUS-20957)",
     "game_crc": "3C5B2087",
     "description": "Gald — in-game currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20957"
   },
   "3C5B2087:EE:00C0B000": {
     "game": "Tales of the Abyss (SLUS-20957)",
     "game_crc": "3C5B2087",
     "description": "Grade — earned in battles for Grade Shop",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20957"
   },
   "4B44E3B7:EE:003C4560": {
     "game": "Disgaea: Hour of Darkness (SLUS-20565)",
@@ -1075,13 +1208,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20565"
   },
   "4B44E3B7:EE:00C00000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20565)",
     "game_crc": "4B44E3B7",
     "description": "HL (Hell) — party currency for Item World and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20565"
   },
   "ED4C4D0F:EE:003C4560": {
     "game": "Indigo Prophecy (SLUS-21179)",
@@ -1091,7 +1226,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21179"
   },
   "3B75CE2F:EE:003C4560": {
     "game": "Manhunt (SLUS-20853)",
@@ -1101,7 +1237,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20853"
   },
   "5C6EF847:EE:003B4540": {
     "game": "Contra: Shattered Soldier (SLUS-20492)",
@@ -1111,13 +1248,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20492"
   },
   "5C6EF847:EE:006C0040": {
     "game": "Contra: Shattered Soldier (SLUS-20492)",
     "game_crc": "5C6EF847",
     "description": "Lives counter — number of remaining lives",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20492"
   },
   "6A2B7C19:EE:003B4540": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -1127,13 +1266,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21065"
   },
   "6A2B7C19:EE:00B78D00": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
     "game_crc": "6A2B7C19",
     "description": "Cash — money for car upgrades and new cars",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21065"
   },
   "11FDFFCE:EE:003C4560": {
     "game": "Viewtiful Joe (SLUS-20981)",
@@ -1143,13 +1284,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20981"
   },
   "11FDFFCE:EE:00740000": {
     "game": "Viewtiful Joe (SLUS-20981)",
     "game_crc": "11FDFFCE",
     "description": "Viewtiful Points (V-Film) — VFX energy bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20981"
   },
   "60E7D3C0:EE:003C4560": {
     "game": "Haunting Ground (SLUS-21171)",
@@ -1159,7 +1302,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21171"
   },
   "A09B3C1E:EE:003C4560": {
     "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
@@ -1169,13 +1313,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21430"
   },
   "A09B3C1E:EE:00C08000": {
     "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
     "game_crc": "A09B3C1E",
     "description": "Leaf — in-game currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21430"
   },
   "8A9CE7E6:EE:003B4540": {
     "game": "Tony Hawk's Underground (SLUS-20782)",
@@ -1185,7 +1331,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20782"
   },
   "3CF0A5A2:EE:003C4560": {
     "game": "Soul Nomad & the World Eaters (SLUS-21667)",
@@ -1195,13 +1342,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21667"
   },
   "3CF0A5A2:EE:00B82000": {
     "game": "Soul Nomad & the World Eaters (SLUS-21667)",
     "game_crc": "3CF0A5A2",
     "description": "Crimson — in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21667"
   },
   "F0A26C87:EE:003B4540": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -1211,13 +1360,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20238"
   },
   "F0A26C87:EE:006E0080": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
     "game_crc": "F0A26C87",
     "description": "Wumpa fruit counter",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20238"
   },
   "87432EB9:EE:003B4560": {
     "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
@@ -1227,7 +1378,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20084"
   },
   "9AA4CBC1:EE:003B4560": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -1237,13 +1389,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20062"
   },
   "9AA4CBC1:EE:00682000": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
     "game_crc": "9AA4CBC1",
     "description": "Gems counter — collectible currency in levels",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20062"
   },
   "627B2B89:EE:003B4540": {
     "game": "Zone of the Enders (SLUS-20216)",
@@ -1253,19 +1407,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20216"
   },
   "627B2B89:EE:00B00000": {
     "game": "Zone of the Enders (SLUS-20216)",
     "game_crc": "627B2B89",
     "description": "EP (Energy Points) — mech weapon energy",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20216"
   },
   "87432EB9:EE:007A0000": {
     "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
     "game_crc": "87432EB9",
     "description": "Zack Dollars — in-game currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20084"
   },
   "A5EC9ADB:EE:003B4540": {
     "game": "Hot Shots Golf 3 (SCUS-97123)",
@@ -1275,13 +1432,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97123"
   },
   "A5EC9ADB:EE:00A00000": {
     "game": "Hot Shots Golf 3 (SCUS-97123)",
     "game_crc": "A5EC9ADB",
     "description": "Points — experience points for unlocking courses and characters",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97123"
   },
   "9EE5B3D4:EE:003B4540": {
     "game": "We Love Katamari (SLUS-21174)",
@@ -1291,13 +1450,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21174"
   },
   "9EE5B3D4:EE:00A80000": {
     "game": "We Love Katamari (SLUS-21174)",
     "game_crc": "9EE5B3D4",
     "description": "Cousins collected — total related cousins found",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21174"
   },
   "3C67C957:EE:003C4560": {
     "game": "Xenosaga Episode II: Jenseits von Gut und Böse (SLUS-20892)",
@@ -1307,13 +1468,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20892"
   },
   "3C67C957:EE:00C00000": {
     "game": "Xenosaga Episode II: Jenseits von Gut und Böse (SLUS-20892)",
     "game_crc": "3C67C957",
     "description": "G (gold) — party currency for shops and Segment Addresses",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20892"
   },
   "94A82AAA:EE:003C4560": {
     "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
@@ -1323,13 +1486,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21382"
   },
   "94A82AAA:EE:00C08000": {
     "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
     "game_crc": "94A82AAA",
     "description": "G (gold) — party money for equipment and items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21382"
   },
   "2AFF83F8:EE:003B4540": {
     "game": "Ape Escape 3 (SCUS-97501)",
@@ -1339,13 +1504,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97501"
   },
   "2AFF83F8:EE:006A0000": {
     "game": "Ape Escape 3 (SCUS-97501)",
     "game_crc": "2AFF83F8",
     "description": "Monkeys caught — total ape count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97501"
   },
   "4A2FF487:EE:003C4560": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
@@ -1355,13 +1522,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20743"
   },
   "4A2FF487:EE:00C08000": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
     "game_crc": "4A2FF487",
     "description": "G — gold currency for item shops",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20743"
   },
   "D5B16B2D:EE:003B4540": {
     "game": "Devil May Cry 2 (SLUS-20443)",
@@ -1371,13 +1540,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20443"
   },
   "D5B16B2D:EE:005E0000": {
     "game": "Devil May Cry 2 (SLUS-20443)",
     "game_crc": "D5B16B2D",
     "description": "Proud Souls — orbs used to unlock abilities (equivalent to Red Orbs)",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20443"
   },
   "4B7FDC64:EE:003B4560": {
     "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
@@ -1387,7 +1558,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20554"
   },
   "C0437D3A:EE:003C4560": {
     "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
@@ -1397,13 +1569,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21243"
   },
   "C0437D3A:EE:007A0080": {
     "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
     "game_crc": "C0437D3A",
     "description": "SP (skill points) — used to unlock scenarios and files",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21243"
   },
   "4F75B0A4:EE:003B4540": {
     "game": "WWE SmackDown! vs. RAW 2006 (SLUS-21302)",
@@ -1413,13 +1587,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21302"
   },
   "4F75B0A4:EE:00900000": {
     "game": "WWE SmackDown! vs. RAW 2006 (SLUS-21302)",
     "game_crc": "4F75B0A4",
     "description": "Money — currency for shop purchases and created superstars",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21302"
   },
   "B5CC9F00:EE:003B4540": {
     "game": "Ultimate Spider-Man (SLUS-21262)",
@@ -1429,13 +1605,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21262"
   },
   "B5CC9F00:EE:006C0080": {
     "game": "Ultimate Spider-Man (SLUS-21262)",
     "game_crc": "B5CC9F00",
     "description": "Tokens — collectibles for unlocking concept art",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21262"
   },
   "E2AC3453:EE:003B4540": {
     "game": "Need for Speed: Most Wanted (SLUS-21202)",
@@ -1445,13 +1623,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21202"
   },
   "E2AC3453:EE:00B78D00": {
     "game": "Need for Speed: Most Wanted (SLUS-21202)",
     "game_crc": "E2AC3453",
     "description": "Cash — money for car upgrades and pursuit tech",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21202"
   },
   "4A8B4CC9:EE:003C4560": {
     "game": "Armored Core 3 (SLUS-20392)",
@@ -1461,13 +1641,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20392"
   },
   "4A8B4CC9:EE:00D00000": {
     "game": "Armored Core 3 (SLUS-20392)",
     "game_crc": "4A8B4CC9",
     "description": "Credits — money to buy AC parts and upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20392"
   },
   "09E4EC93:EE:003C4560": {
     "game": "Suikoden III (SLUS-20292)",
@@ -1477,13 +1659,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20292"
   },
   "09E4EC93:EE:00C00000": {
     "game": "Suikoden III (SLUS-20292)",
     "game_crc": "09E4EC93",
     "description": "Potch — in-game currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20292"
   },
   "D14EA600:EE:003C4560": {
     "game": "Suikoden IV (SLUS-20895)",
@@ -1493,13 +1677,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20895"
   },
   "D14EA600:EE:00C08000": {
     "game": "Suikoden IV (SLUS-20895)",
     "game_crc": "D14EA600",
     "description": "Potch — party currency for ships and items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20895"
   },
   "7AC53678:EE:003C4560": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -1509,13 +1695,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21085"
   },
   "7AC53678:EE:009C0000": {
     "game": "Tekken 5 (SLUS-21085)",
     "game_crc": "7AC53678",
     "description": "Gold — Dojo tournament prize money",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21085"
   },
   "00DC3F8E:EE:003B4540": {
     "game": "Grandia II (SLUS-20048)",
@@ -1525,13 +1713,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20048"
   },
   "00DC3F8E:EE:00A00000": {
     "game": "Grandia II (SLUS-20048)",
     "game_crc": "00DC3F8E",
     "description": "Gold — currency for item and equipment shops",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20048"
   },
   "BCEC7DBD:EE:003B4540": {
     "game": "Grandia III (SLUS-21516)",
@@ -1541,13 +1731,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21516"
   },
   "BCEC7DBD:EE:00A80000": {
     "game": "Grandia III (SLUS-21516)",
     "game_crc": "BCEC7DBD",
     "description": "Gold — currency for shops and Alchemy",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21516"
   },
   "B19F5B04:EE:003B4540": {
     "game": "Mafia (SLUS-20671)",
@@ -1557,7 +1749,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20671"
   },
   "3E1DE0F5:EE:003B4540": {
     "game": "Burnout 3: Takedown (SLUS-21077)",
@@ -1567,13 +1760,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21077"
   },
   "3E1DE0F5:EE:00A00000": {
     "game": "Burnout 3: Takedown (SLUS-21077)",
     "game_crc": "3E1DE0F5",
     "description": "Crash credits — amount earned from Crash Mode",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21077"
   },
   "278700A0:EE:003B4540": {
     "game": "Burnout Revenge (SLUS-21197)",
@@ -1583,13 +1778,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21197"
   },
   "278700A0:EE:00900000": {
     "game": "Burnout Revenge (SLUS-21197)",
     "game_crc": "278700A0",
     "description": "Crash credits — earned from Crash Mode events",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21197"
   },
   "2B123FE9:EE:003C4560": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
@@ -1599,13 +1796,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21050"
   },
   "2B123FE9:EE:00B00000": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
     "game_crc": "2B123FE9",
     "description": "Gold — currency for item shops",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21050"
   },
   "7152BCA7:EE:003C4560": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
@@ -1615,13 +1814,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21173"
   },
   "7152BCA7:EE:00C00000": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
     "game_crc": "7152BCA7",
     "description": "Gold — currency for materials and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21173"
   },
   "3B0ADBEF:EE:003B4540": {
     "game": "Twisted Metal: Black (SLUS-20136)",
@@ -1631,13 +1832,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20136"
   },
   "3B0ADBEF:EE:005A0000": {
     "game": "Twisted Metal: Black (SLUS-20136)",
     "game_crc": "3B0ADBEF",
     "description": "Health — vehicle HP bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20136"
   },
   "B4E1D81B:EE:003B4540": {
     "game": "Mortal Kombat: Deception (SLUS-21090)",
@@ -1647,13 +1850,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21090"
   },
   "B4E1D81B:EE:00900000": {
     "game": "Mortal Kombat: Deception (SLUS-21090)",
     "game_crc": "B4E1D81B",
     "description": "Koins — currency for Krypt unlocks",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21090"
   },
   "D1B27F62:EE:003B4540": {
     "game": "Mortal Kombat: Armageddon (SLUS-21444)",
@@ -1663,13 +1868,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21444"
   },
   "D1B27F62:EE:00A00000": {
     "game": "Mortal Kombat: Armageddon (SLUS-21444)",
     "game_crc": "D1B27F62",
     "description": "Koins — currency for Motor Kombat and Konquest",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21444"
   },
   "FCC1F0CC:EE:003B4540": {
     "game": "Need for Speed: Underground (SLUS-20672)",
@@ -1679,13 +1886,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20672"
   },
   "FCC1F0CC:EE:00B00000": {
     "game": "Need for Speed: Underground (SLUS-20672)",
     "game_crc": "FCC1F0CC",
     "description": "Cash — money for car upgrades and parts",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20672"
   },
   "3AA8E025:EE:003B4540": {
     "game": "Need for Speed: Carbon (SLUS-21466)",
@@ -1695,13 +1904,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21466"
   },
   "3AA8E025:EE:00C00000": {
     "game": "Need for Speed: Carbon (SLUS-21466)",
     "game_crc": "3AA8E025",
     "description": "Cash — money for car upgrades and crew upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21466"
   },
   "F63F5B78:EE:003B4540": {
     "game": "Need for Speed: Hot Pursuit 2 (SLUS-20137)",
@@ -1711,7 +1922,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20137"
   },
   "0D1EA753:EE:003C4560": {
     "game": "Silent Hill 4: The Room (SLUS-20814)",
@@ -1721,13 +1933,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20814"
   },
   "0D1EA753:EE:005A0000": {
     "game": "Silent Hill 4: The Room (SLUS-20814)",
     "game_crc": "0D1EA753",
     "description": "Health — Henry's hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20814"
   },
   "C7ED171F:EE:003C4560": {
     "game": "Silent Hill: Origins (SLUS-21583)",
@@ -1737,13 +1951,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21583"
   },
   "C7ED171F:EE:005B0000": {
     "game": "Silent Hill: Origins (SLUS-21583)",
     "game_crc": "C7ED171F",
     "description": "Health — Travis Grady's hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21583"
   },
   "8028A9B5:EE:003C4560": {
     "game": "Suikoden V (SLUS-21615)",
@@ -1753,13 +1969,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21615"
   },
   "8028A9B5:EE:00C08000": {
     "game": "Suikoden V (SLUS-21615)",
     "game_crc": "8028A9B5",
     "description": "Potch — party currency for items and weapons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21615"
   },
   "ECA23E67:EE:003B4540": {
     "game": "Wild ARMs 3 (SLUS-20512)",
@@ -1769,13 +1987,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20512"
   },
   "ECA23E67:EE:00B00000": {
     "game": "Wild ARMs 3 (SLUS-20512)",
     "game_crc": "ECA23E67",
     "description": "Gella — currency for shops and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20512"
   },
   "BB7BAC4B:EE:003B4540": {
     "game": "Wild ARMs 4 (SLUS-21183)",
@@ -1785,13 +2005,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21183"
   },
   "BB7BAC4B:EE:00A80000": {
     "game": "Wild ARMs 4 (SLUS-21183)",
     "game_crc": "BB7BAC4B",
     "description": "Gella — party money for shops",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21183"
   },
   "B54B0573:EE:003B4540": {
     "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
@@ -1801,13 +2023,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20152"
   },
   "B54B0573:EE:006A0000": {
     "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
     "game_crc": "B54B0573",
     "description": "Credits — money for aircraft and weapons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20152"
   },
   "3E9E7B49:EE:003B4540": {
     "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
@@ -1817,13 +2041,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21346"
   },
   "3E9E7B49:EE:00780000": {
     "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
     "game_crc": "3E9E7B49",
     "description": "Credits — money for aircraft",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21346"
   },
   "0E82B2D2:EE:003B4540": {
     "game": "SSX Tricky (SLUS-20358)",
@@ -1833,7 +2059,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20358"
   },
   "56B39E23:EE:003B4540": {
     "game": "SSX 3 (SLUS-20687)",
@@ -1843,7 +2070,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20687"
   },
   "09F2E574:EE:003B4540": {
     "game": "Katamari Damacy (SLUS-20775)",
@@ -1853,7 +2081,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20775"
   },
   "3B340B97:EE:003C4560": {
     "game": "Haunting Ground (SLUS-21171)",
@@ -1863,13 +2092,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21171"
   },
   "3B340B97:EE:005A0080": {
     "game": "Haunting Ground (SLUS-21171)",
     "game_crc": "3B340B97",
     "description": "Health — Fiona's HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21171"
   },
   "B2E15B01:EE:003C4560": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
@@ -1879,13 +2110,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21394"
   },
   "B2E15B01:EE:00C00000": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
     "game_crc": "B2E15B01",
     "description": "HL (Hel) — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21394"
   },
   "24036809:EE:003C4560": {
     "game": "Resident Evil: Code Veronica X (SLUS-20184)",
@@ -1895,13 +2128,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20184"
   },
   "24036809:EE:005A0000": {
     "game": "Resident Evil: Code Veronica X (SLUS-20184)",
     "game_crc": "24036809",
     "description": "Health — Claire/Chris current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20184"
   },
   "36C5957B:EE:003B4560": {
     "game": "Metal Gear Solid 3: Subsistence (SLUS-21370)",
@@ -1911,13 +2146,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21370"
   },
   "36C5957B:EE:00600000": {
     "game": "Metal Gear Solid 3: Subsistence (SLUS-21370)",
     "game_crc": "36C5957B",
     "description": "Stamina — Snake's stamina gauge (linked to Life)",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21370"
   },
   "4C2B4D8D:EE:003B4540": {
     "game": "Jak X: Combat Racing (SLUS-21310)",
@@ -1927,13 +2164,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21310"
   },
   "4C2B4D8D:EE:00700000": {
     "game": "Jak X: Combat Racing (SLUS-21310)",
     "game_crc": "4C2B4D8D",
     "description": "Orbs — collected for upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21310"
   },
   "4AE8AFC6:EE:003B4540": {
     "game": "Viewtiful Joe 2 (SLUS-21369)",
@@ -1943,13 +2182,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21369"
   },
   "4AE8AFC6:EE:005E0000": {
     "game": "Viewtiful Joe 2 (SLUS-21369)",
     "game_crc": "4AE8AFC6",
     "description": "V-Points — earned from defeating enemies",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21369"
   },
   "1D568F61:EE:003B4540": {
     "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
@@ -1959,7 +2200,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20446"
   },
   "F55CCCF1:EE:003C4560": {
     "game": "Magna Carta: Tears of Blood (SLUS-21158)",
@@ -1969,13 +2211,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21158"
   },
   "F55CCCF1:EE:00B00000": {
     "game": "Magna Carta: Tears of Blood (SLUS-21158)",
     "game_crc": "F55CCCF1",
     "description": "Kan — party currency for items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21158"
   },
   "1E75FE3A:EE:003B4540": {
     "game": "Ys: The Ark of Napishtim (SLUS-21441)",
@@ -1985,13 +2229,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21441"
   },
   "1E75FE3A:EE:00B08000": {
     "game": "Ys: The Ark of Napishtim (SLUS-21441)",
     "game_crc": "1E75FE3A",
     "description": "Gold — currency for equipment at the shop",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21441"
   },
   "96660560:EE:003C4560": {
     "game": "Phantom Brave (SLUS-20811)",
@@ -2001,13 +2247,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20811"
   },
   "96660560:EE:00B80000": {
     "game": "Phantom Brave (SLUS-20811)",
     "game_crc": "96660560",
     "description": "Bordeaux — party currency for items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20811"
   },
   "21181211:EE:003B4560": {
     "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
@@ -2017,7 +2265,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20213"
   },
   "9F1D2F39:EE:003B4540": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
@@ -2027,25 +2276,29 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97316"
   },
   "9F1D2F39:EE:00680000": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
     "game_crc": "9F1D2F39",
     "description": "Coins — collectibles from the environment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97316"
   },
   "09F2E574:EE:007A0000": {
     "game": "Katamari Damacy (SLUS-20775)",
     "game_crc": "09F2E574",
     "description": "Katamari diameter — current katamari size in cm",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20775"
   },
   "3B0ADBEF:EE:00800000": {
     "game": "Twisted Metal: Black (SLUS-20136)",
     "game_crc": "3B0ADBEF",
     "description": "Special weapon energy — secondary attack meter",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20136"
   },
   "A86571F9:EE:003B4540": {
     "game": "Bully / Canis Canem Edit (SLUS-21131)",
@@ -2055,19 +2308,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21131"
   },
   "A86571F9:EE:00700000": {
     "game": "Bully / Canis Canem Edit (SLUS-21131)",
     "game_crc": "A86571F9",
     "description": "Money — Jimmy's pocket cash",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21131"
   },
   "A86571F9:EE:00780000": {
     "game": "Bully / Canis Canem Edit (SLUS-21131)",
     "game_crc": "A86571F9",
     "description": "Health — Jimmy's HP bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21131"
   },
   "D0D8B73B:EE:003B4540": {
     "game": "Armored Core 3 (SLUS-20355)",
@@ -2077,13 +2333,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20355"
   },
   "D0D8B73B:EE:00900000": {
     "game": "Armored Core 3 (SLUS-20355)",
     "game_crc": "D0D8B73B",
     "description": "Credits — money for parts and upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20355"
   },
   "1A7F49AB:EE:003B4540": {
     "game": "Armored Core: Nine Breaker (SLUS-21177)",
@@ -2093,7 +2351,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21177"
   },
   "0E7B9852:EE:003B4560": {
     "game": "Dark Cloud (SCUS-97121)",
@@ -2103,19 +2362,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97121"
   },
   "0E7B9852:EE:00C00000": {
     "game": "Dark Cloud (SCUS-97121)",
     "game_crc": "0E7B9852",
     "description": "Gilda — currency for rebuilding Norune Village",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97121"
   },
   "0E7B9852:EE:00680000": {
     "game": "Dark Cloud (SCUS-97121)",
     "game_crc": "0E7B9852",
     "description": "Attack Coins — combat currency for weapon breakdowns",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97121"
   },
   "47AAB3DC:EE:003B4560": {
     "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
@@ -2125,19 +2387,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97331"
   },
   "47AAB3DC:EE:00D00000": {
     "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
     "game_crc": "47AAB3DC",
     "description": "Gilda — party currency for shops and items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97331"
   },
   "47AAB3DC:EE:006A0000": {
     "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
     "game_crc": "47AAB3DC",
     "description": "Medals — battle bonus currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97331"
   },
   "0BF94D63:EE:003C4560": {
     "game": "Devil May Cry 2 (SLUS-20443)",
@@ -2147,13 +2412,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20443"
   },
   "0BF94D63:EE:005A0000": {
     "game": "Devil May Cry 2 (SLUS-20443)",
     "game_crc": "0BF94D63",
     "description": "Health — Dante/Lucia HP bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20443"
   },
   "0EC5F7A0:EE:003C4560": {
     "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
@@ -2163,19 +2430,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21058"
   },
   "0EC5F7A0:EE:00700000": {
     "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
     "game_crc": "0EC5F7A0",
     "description": "Orbs — red orbs for Divinity Statue upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21058"
   },
   "0EC5F7A0:EE:005A0000": {
     "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
     "game_crc": "0EC5F7A0",
     "description": "Health — Dante HP gauge (max when maxed-out)",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21058"
   },
   "471A4AF8:EE:003C4560": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
@@ -2185,13 +2455,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20365"
   },
   "471A4AF8:EE:00C08000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
     "game_crc": "471A4AF8",
     "description": "HL (Hel) — currency for item shops and skill learning",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20365"
   },
   "4FDB72F2:EE:003C4560": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
@@ -2201,13 +2473,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21440"
   },
   "4FDB72F2:EE:00C00000": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
     "game_crc": "4FDB72F2",
     "description": "HL — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21440"
   },
   "14E7D560:EE:003C4560": {
     "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
@@ -2217,13 +2491,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21683"
   },
   "14E7D560:EE:00D00000": {
     "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
     "game_crc": "14E7D560",
     "description": "HL — party money",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21683"
   },
   "33EC7780:EE:003B4540": {
     "game": "Star Ocean: Till the End of Time (SLUS-20492)",
@@ -2233,19 +2509,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20492"
   },
   "33EC7780:EE:00B00000": {
     "game": "Star Ocean: Till the End of Time (SLUS-20492)",
     "game_crc": "33EC7780",
     "description": "Fol — party currency for items and weapons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20492"
   },
   "33EC7780:EE:005A0000": {
     "game": "Star Ocean: Till the End of Time (SLUS-20492)",
     "game_crc": "33EC7780",
     "description": "HP — Fayt's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20492"
   },
   "AEF2012F:EE:003C4560": {
     "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
@@ -2255,19 +2534,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20970"
   },
   "AEF2012F:EE:00C00000": {
     "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
     "game_crc": "AEF2012F",
     "description": "Macca — currency for fusion and purchasing demons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20970"
   },
   "AEF2012F:EE:00680000": {
     "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
     "game_crc": "AEF2012F",
     "description": "HP — Demi-fiend current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20970"
   },
   "1F5D6258:EE:003C4560": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21053)",
@@ -2277,13 +2559,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21053"
   },
   "1F5D6258:EE:00B00000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21053)",
     "game_crc": "1F5D6258",
     "description": "OTH (Oths) — currency for items in the shops",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21053"
   },
   "5CC18476:EE:003C4560": {
     "game": "Odin Sphere (SLUS-21705)",
@@ -2293,19 +2577,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21705"
   },
   "5CC18476:EE:00A00000": {
     "game": "Odin Sphere (SLUS-21705)",
     "game_crc": "5CC18476",
     "description": "Phozons — life-force orbs that level up characters",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21705"
   },
   "5CC18476:EE:005A0000": {
     "game": "Odin Sphere (SLUS-21705)",
     "game_crc": "5CC18476",
     "description": "HP — active character's hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21705"
   },
   "CE5B7A3B:EE:003B4540": {
     "game": "Rogue Galaxy (SLUS-21721)",
@@ -2315,13 +2602,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21721"
   },
   "CE5B7A3B:EE:00C08000": {
     "game": "Rogue Galaxy (SLUS-21721)",
     "game_crc": "CE5B7A3B",
     "description": "Zol — party currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21721"
   },
   "96B12B74:EE:003B4540": {
     "game": "Grandia III (SLUS-21453)",
@@ -2331,13 +2620,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21453"
   },
   "96B12B74:EE:00A80000": {
     "game": "Grandia III (SLUS-21453)",
     "game_crc": "96B12B74",
     "description": "Gold — party currency for items and skills",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21453"
   },
   "76548EF1:EE:003B4540": {
     "game": "Dynasty Warriors 4 (SLUS-20787)",
@@ -2347,13 +2638,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20787"
   },
   "76548EF1:EE:00800000": {
     "game": "Dynasty Warriors 4 (SLUS-20787)",
     "game_crc": "76548EF1",
     "description": "EXP — experience gained in Musou mode",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20787"
   },
   "D6F4BE78:EE:003B4540": {
     "game": "Samurai Warriors (SLUS-20685)",
@@ -2363,7 +2656,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20685"
   },
   "8B462B6D:EE:003C4560": {
     "game": "Xenosaga Episode II (SLUS-20831)",
@@ -2373,13 +2667,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20831"
   },
   "8B462B6D:EE:00C00000": {
     "game": "Xenosaga Episode II (SLUS-20831)",
     "game_crc": "8B462B6D",
     "description": "Gold — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20831"
   },
   "6F1E8D2B:EE:003C4560": {
     "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
@@ -2389,13 +2685,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21765"
   },
   "6F1E8D2B:EE:00B00000": {
     "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
     "game_crc": "6F1E8D2B",
     "description": "Leaf — party currency for items and IPD gratitude",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21765"
   },
   "0B6EC3A3:EE:003B4540": {
     "game": "Call of Duty 2: Big Red One (SLUS-20432)",
@@ -2405,13 +2703,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20432"
   },
   "0B6EC3A3:EE:005A0000": {
     "game": "Call of Duty 2: Big Red One (SLUS-20432)",
     "game_crc": "0B6EC3A3",
     "description": "Health — soldier's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20432"
   },
   "1CD5CC9D:EE:003B4540": {
     "game": "Burnout 3: Takedown (SLUS-20462)",
@@ -2421,7 +2721,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20462"
   },
   "749BDDCA:EE:003B4540": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
@@ -2431,19 +2732,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21207"
   },
   "749BDDCA:EE:00C00000": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
     "game_crc": "749BDDCA",
     "description": "Gold — party currency for shops and crafting",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21207"
   },
   "749BDDCA:EE:005A0000": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
     "game_crc": "749BDDCA",
     "description": "HP — Hero's current hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21207"
   },
   "2C2B7C50:EE:003C4560": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20766)",
@@ -2453,13 +2757,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20766"
   },
   "2C2B7C50:EE:005A0080": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20766)",
     "game_crc": "2C2B7C50",
     "description": "Film — type 61 camera film count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20766"
   },
   "B4289C08:EE:003B4540": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -2469,13 +2775,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21065"
   },
   "B4289C08:EE:00B00000": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
     "game_crc": "B4289C08",
     "description": "Cash — money for car parts and customisation",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21065"
   },
   "7BF9042A:EE:003B4540": {
     "game": "Tekken 4 (SLUS-20401)",
@@ -2485,7 +2793,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20401"
   },
   "2B6A5E81:EE:003B4540": {
     "game": "Tekken Tag Tournament (SLUS-20001)",
@@ -2495,7 +2804,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20001"
   },
   "A7B26D14:EE:003B4540": {
     "game": "Mega Man X Collection (SLUS-21303)",
@@ -2505,7 +2815,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21303"
   },
   "8B7C6617:EE:003B4540": {
     "game": "Ape Escape 2 (SCUS-97129)",
@@ -2515,13 +2826,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97129"
   },
   "8B7C6617:EE:00700000": {
     "game": "Ape Escape 2 (SCUS-97129)",
     "game_crc": "8B7C6617",
     "description": "Cookies — collectible items used to pacify monkeys",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97129"
   },
   "CE44FD7A:EE:003B4540": {
     "game": "Ape Escape 3 (SCUS-97480)",
@@ -2531,7 +2844,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97480"
   },
   "6020F8C5:EE:003C4560": {
     "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
@@ -2541,13 +2855,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21194"
   },
   "6020F8C5:EE:00C00000": {
     "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
     "game_crc": "6020F8C5",
     "description": "Macca — demon currency for items and skills",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21194"
   },
   "BD2AC49F:EE:003B4540": {
     "game": "Crash Twinsanity (SLUS-20697)",
@@ -2557,13 +2873,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20697"
   },
   "BD2AC49F:EE:00700000": {
     "game": "Crash Twinsanity (SLUS-20697)",
     "game_crc": "BD2AC49F",
     "description": "Gems — collectibles from Gem Crates",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20697"
   },
   "D7C97CF4:EE:003B4540": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
@@ -2573,13 +2891,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20743"
   },
   "D7C97CF4:EE:00B00000": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
     "game_crc": "D7C97CF4",
     "description": "Gold — party currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20743"
   },
   "E99E80B3:EE:003C4560": {
     "game": "Shadow Hearts: From the New World (SLUS-21574 alt)",
@@ -2605,13 +2925,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21553"
   },
   "3A72A7B1:EE:00B08000": {
     "game": "Ys: The Oath in Felghana (SLUS-21553)",
     "game_crc": "3A72A7B1",
     "description": "Gold — currency for the item shop",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21553"
   },
   "F0BDF5C5:EE:003B4540": {
     "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
@@ -2621,19 +2943,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21052"
   },
   "F0BDF5C5:EE:00B00000": {
     "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
     "game_crc": "F0BDF5C5",
     "description": "Cole — party currency for ingredients and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21052"
   },
   "F0BDF5C5:EE:005A0000": {
     "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
     "game_crc": "F0BDF5C5",
     "description": "HP — Klein's current hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21052"
   },
   "8E9C0D58:EE:003B4540": {
     "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
@@ -2643,13 +2968,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21350"
   },
   "8E9C0D58:EE:00B00000": {
     "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
     "game_crc": "8E9C0D58",
     "description": "Cole — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21350"
   },
   "6327AA24:EE:003B4540": {
     "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
@@ -2659,13 +2986,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21614"
   },
   "6327AA24:EE:00B00000": {
     "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
     "game_crc": "6327AA24",
     "description": "Cole — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21614"
   },
   "8A41256F:EE:003B4540": {
     "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
@@ -2675,19 +3004,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20519"
   },
   "8A41256F:EE:00B00000": {
     "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
     "game_crc": "8A41256F",
     "description": "Gold — party currency for shops in dungeons",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20519"
   },
   "8A41256F:EE:005A0000": {
     "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
     "game_crc": "8A41256F",
     "description": "HP — hero's current hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20519"
   },
   "2C23B3EA:EE:003B4540": {
     "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
@@ -2697,13 +3029,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20803"
   },
   "2C23B3EA:EE:00B00000": {
     "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
     "game_crc": "2C23B3EA",
     "description": "Gold — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20803"
   },
   "A5B82E82:EE:003C4560": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
@@ -2713,19 +3047,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21050"
   },
   "A5B82E82:EE:00900000": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
     "game_crc": "A5B82E82",
     "description": "Gold — Leon's money for potions",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21050"
   },
   "A5B82E82:EE:005A0000": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
     "game_crc": "A5B82E82",
     "description": "HP — Leon's current hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21050"
   },
   "8E3F7DC1:EE:003C4560": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
@@ -2735,13 +3072,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21173"
   },
   "8E3F7DC1:EE:00900000": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
     "game_crc": "8E3F7DC1",
     "description": "Gold — Hector's money for materials",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21173"
   },
   "22CA9B7A:EE:003B4540": {
     "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
@@ -2751,13 +3090,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20789"
   },
   "22CA9B7A:EE:00B00000": {
     "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
     "game_crc": "22CA9B7A",
     "description": "Platinum — party currency in Norrath",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20789"
   },
   "0ADE5CEF:EE:003B4560": {
     "game": "Dark Cloud (SCUS-97121)",
@@ -2767,13 +3108,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97121"
   },
   "0ADE5CEF:EE:00C00000": {
     "game": "Dark Cloud (SCUS-97121)",
     "game_crc": "0ADE5CEF",
     "description": "Gilda — currency for rebuilding villages",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97121"
   },
   "84B8AB13:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai 2 (SLUS-20821)",
@@ -2783,7 +3126,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20821"
   },
   "31879F22:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21353)",
@@ -2793,7 +3137,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21353"
   },
   "0EDF6B4B:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21472)",
@@ -2803,7 +3148,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21472"
   },
   "B9FF5B97:EE:003C4560": {
     "game": "Fatal Frame (SLUS-21060)",
@@ -2813,13 +3159,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21060"
   },
   "B9FF5B97:EE:005A0080": {
     "game": "Fatal Frame (SLUS-21060)",
     "game_crc": "B9FF5B97",
     "description": "Film — camera film remaining count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21060"
   },
   "9B4D085A:EE:003C4560": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
@@ -2829,13 +3177,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20825"
   },
   "9B4D085A:EE:005A0080": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
     "game_crc": "9B4D085A",
     "description": "Film — type 61 film count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20825"
   },
   "7D6C1BF5:EE:003C4560": {
     "game": "Fatal Frame III: The Tormented (SLUS-21161)",
@@ -2845,13 +3195,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21161"
   },
   "7D6C1BF5:EE:005A0080": {
     "game": "Fatal Frame III: The Tormented (SLUS-21161)",
     "game_crc": "7D6C1BF5",
     "description": "Film — type 61 film count",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21161"
   },
   "F517EEDF:EE:003B4540": {
     "game": "Final Fantasy XII (SLUS-20792)",
@@ -2861,19 +3213,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20792"
   },
   "F517EEDF:EE:00D00000": {
     "game": "Final Fantasy XII (SLUS-20792)",
     "game_crc": "F517EEDF",
     "description": "Gil — party currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20792"
   },
   "F517EEDF:EE:005A0000": {
     "game": "Final Fantasy XII (SLUS-20792)",
     "game_crc": "F517EEDF",
     "description": "HP — Vaan's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20792"
   },
   "44A80B4C:EE:003C4560": {
     "game": "God of War II (SCUS-97450)",
@@ -2883,25 +3238,29 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97450"
   },
   "44A80B4C:EE:00C00000": {
     "game": "God of War II (SCUS-97450)",
     "game_crc": "44A80B4C",
     "description": "Red Orbs — currency for magic and weapon upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97450"
   },
   "44A80B4C:EE:005A0000": {
     "game": "God of War II (SCUS-97450)",
     "game_crc": "44A80B4C",
     "description": "HP — Kratos' current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97450"
   },
   "77E61C8A:EE:00D00000": {
     "game": "Gran Turismo 3: A-spec (SLUS-20486)",
     "game_crc": "77E61C8A",
     "description": "Credits — in-game money for buying cars",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20486"
   },
   "CF56B7D1:EE:003B4540": {
     "game": "Gran Turismo 4 (SCUS-97436)",
@@ -2911,13 +3270,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97436"
   },
   "CF56B7D1:EE:00D00000": {
     "game": "Gran Turismo 4 (SCUS-97436)",
     "game_crc": "CF56B7D1",
     "description": "Credits — garage money for car purchases",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97436"
   },
   "6F0E2BEE:EE:003B4540": {
     "game": "Grand Theft Auto III (SLUS-20069)",
@@ -2927,19 +3288,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20069"
   },
   "6F0E2BEE:EE:00C00000": {
     "game": "Grand Theft Auto III (SLUS-20069)",
     "game_crc": "6F0E2BEE",
     "description": "Money — Claude's cash",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20069"
   },
   "6F0E2BEE:EE:005A0080": {
     "game": "Grand Theft Auto III (SLUS-20069)",
     "game_crc": "6F0E2BEE",
     "description": "HP — player health bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20069"
   },
   "7AC3B4F3:EE:003B4540": {
     "game": "Grand Theft Auto: Vice City (SLUS-20140)",
@@ -2949,19 +3313,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20140"
   },
   "7AC3B4F3:EE:00C00000": {
     "game": "Grand Theft Auto: Vice City (SLUS-20140)",
     "game_crc": "7AC3B4F3",
     "description": "Money — Tommy's cash",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20140"
   },
   "7AC3B4F3:EE:005A0080": {
     "game": "Grand Theft Auto: Vice City (SLUS-20140)",
     "game_crc": "7AC3B4F3",
     "description": "HP — Tommy's health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20140"
   },
   "399A49CA:EE:003B4540": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
@@ -2971,19 +3338,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20444"
   },
   "399A49CA:EE:00C00000": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
     "game_crc": "399A49CA",
     "description": "Money — CJ's cash",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20444"
   },
   "399A49CA:EE:005A0080": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
     "game_crc": "399A49CA",
     "description": "HP — CJ's health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20444"
   },
   "4F17EE96:EE:003B4540": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21275 alt)",
@@ -3003,13 +3373,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21618"
   },
   "91A69524:EE:00B00000": {
     "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
     "game_crc": "91A69524",
     "description": "GP — party currency for items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21618"
   },
   "D7D7A24B:EE:003C4560": {
     "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
@@ -3019,13 +3391,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21750"
   },
   "D7D7A24B:EE:00B00000": {
     "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
     "game_crc": "D7D7A24B",
     "description": "GP — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21750"
   },
   "B5B7C4AF:EE:003B4540": {
     "game": "Ape Escape 2 (SCUS-97129)",
@@ -3035,13 +3409,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97129"
   },
   "B5B7C4AF:EE:00700000": {
     "game": "Ape Escape 2 (SCUS-97129)",
     "game_crc": "B5B7C4AF",
     "description": "Cookies — items for monkey pacification",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97129"
   },
   "7AC4D8CA:EE:003B4540": {
     "game": "Ape Escape 3 (SCUS-97480)",
@@ -3051,7 +3427,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97480"
   },
   "66D3F895:EE:003B4540": {
     "game": "Gran Turismo 4 (SLUS-21163 alt)",
@@ -3071,7 +3448,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21768"
   },
   "A9FE1E04:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
@@ -3081,7 +3459,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21028"
   },
   "0B29B9B6:EE:003C4560": {
     "game": "God of War II (SLUS-21441)",
@@ -3091,13 +3470,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21441"
   },
   "0B29B9B6:EE:00C00000": {
     "game": "God of War II (SLUS-21441)",
     "game_crc": "0B29B9B6",
     "description": "Red Orbs — currency for upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21441"
   },
   "6B6D7FF0:EE:003B4540": {
     "game": "Hitman 2: Silent Assassin (SLUS-20374)",
@@ -3107,13 +3488,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20374"
   },
   "6B6D7FF0:EE:00700000": {
     "game": "Hitman 2: Silent Assassin (SLUS-20374)",
     "game_crc": "6B6D7FF0",
     "description": "Saves — mission saves remaining",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20374"
   },
   "BD9A3CCA:EE:003B4540": {
     "game": "Hitman: Contracts (SLUS-20775)",
@@ -3123,7 +3506,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20775"
   },
   "60EB4D80:EE:003B4540": {
     "game": "Hitman: Blood Money (SLUS-21210)",
@@ -3133,13 +3517,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21210"
   },
   "60EB4D80:EE:00D00000": {
     "game": "Hitman: Blood Money (SLUS-21210)",
     "game_crc": "60EB4D80",
     "description": "Money — Agency payout for contracts",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21210"
   },
   "2DFAA78D:EE:003C4560": {
     "game": "Ico (SLUS-20678)",
@@ -3149,13 +3535,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20678"
   },
   "2DFAA78D:EE:005A0000": {
     "game": "Ico (SLUS-20678)",
     "game_crc": "2DFAA78D",
     "description": "HP — Ico's health bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20678"
   },
   "71E449F4:EE:003B4560": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97120)",
@@ -3165,13 +3553,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97120"
   },
   "71E449F4:EE:00700000": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97120)",
     "game_crc": "71E449F4",
     "description": "Orbs — precursor orbs collected",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SCUS-97120"
   },
   "8CC3A6A4:EE:003B4540": {
     "game": "Killzone (SLUS-20845)",
@@ -3181,13 +3571,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20845"
   },
   "8CC3A6A4:EE:005A0080": {
     "game": "Killzone (SLUS-20845)",
     "game_crc": "8CC3A6A4",
     "description": "HP — player health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20845"
   },
   "D3E8D5EC:EE:003C4560": {
     "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
@@ -3197,19 +3589,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21721"
   },
   "D3E8D5EC:EE:00B00000": {
     "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
     "game_crc": "D3E8D5EC",
     "description": "Munny — currency for world cards",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21721"
   },
   "D3E8D5EC:EE:005A0000": {
     "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
     "game_crc": "D3E8D5EC",
     "description": "HP — Sora's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21721"
   },
   "EF08CCE8:EE:003B4540": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20785)",
@@ -3219,13 +3614,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20785"
   },
   "EF08CCE8:EE:005A0080": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20785)",
     "game_crc": "EF08CCE8",
     "description": "Life — Snake's stamina/health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20785"
   },
   "49FBF26F:EE:003B4540": {
     "game": "Midnight Club II (SLUS-20458)",
@@ -3235,7 +3632,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20458"
   },
   "CD6A34C8:EE:003B4540": {
     "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
@@ -3245,13 +3643,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21062"
   },
   "CD6A34C8:EE:00C00000": {
     "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
     "game_crc": "CD6A34C8",
     "description": "Cash — in-game currency for car upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21062"
   },
   "E2FE3066:EE:003B4540": {
     "game": "Need for Speed: Underground (SLUS-20590)",
@@ -3261,13 +3661,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20590"
   },
   "E2FE3066:EE:00C00000": {
     "game": "Need for Speed: Underground (SLUS-20590)",
     "game_crc": "E2FE3066",
     "description": "Cash — money for mods and upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20590"
   },
   "A32D9744:EE:003B4540": {
     "game": "Need for Speed: Underground 2 (SLUS-20811)",
@@ -3277,13 +3679,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20811"
   },
   "A32D9744:EE:00C00000": {
     "game": "Need for Speed: Underground 2 (SLUS-20811)",
     "game_crc": "A32D9744",
     "description": "Cash — car modification budget",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20811"
   },
   "0B77FE0C:EE:003B4540": {
     "game": "Need for Speed: Carbon (SLUS-21399)",
@@ -3293,7 +3697,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21399"
   },
   "E8892FC1:EE:003C4560": {
     "game": "Persona 3 (SLUS-21354)",
@@ -3303,13 +3708,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21354"
   },
   "E8892FC1:EE:00B00000": {
     "game": "Persona 3 (SLUS-21354)",
     "game_crc": "E8892FC1",
     "description": "Yen — shopping mall currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21354"
   },
   "A47B23C4:EE:003C4560": {
     "game": "Persona 3 FES (SLUS-21270)",
@@ -3319,7 +3726,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21270"
   },
   "F5DD2F45:EE:003C4560": {
     "game": "Persona 4 (SLUS-21819)",
@@ -3329,7 +3737,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21819"
   },
   "5741B3B4:EE:003C4560": {
     "game": "Resident Evil: Outbreak (SLUS-21616)",
@@ -3339,13 +3748,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21616"
   },
   "5741B3B4:EE:005A0000": {
     "game": "Resident Evil: Outbreak (SLUS-21616)",
     "game_crc": "5741B3B4",
     "description": "HP — player character health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21616"
   },
   "31E1BC9B:EE:003C4560": {
     "game": "Rogue Galaxy (SLUS-21591)",
@@ -3355,13 +3766,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21591"
   },
   "31E1BC9B:EE:00C00000": {
     "game": "Rogue Galaxy (SLUS-21591)",
     "game_crc": "31E1BC9B",
     "description": "Zeni — party currency for items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21591"
   },
   "FFAAC65B:EE:003C4560": {
     "game": "Silent Hill 3 (SLUS-20459)",
@@ -3371,13 +3784,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20459"
   },
   "FFAAC65B:EE:005A0080": {
     "game": "Silent Hill 3 (SLUS-20459)",
     "game_crc": "FFAAC65B",
     "description": "HP — Heather's current health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20459"
   },
   "0152E0C7:EE:003C4560": {
     "game": "Silent Hill 4: The Room (SLUS-20978)",
@@ -3387,13 +3802,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20978"
   },
   "0152E0C7:EE:005A0080": {
     "game": "Silent Hill 4: The Room (SLUS-20978)",
     "game_crc": "0152E0C7",
     "description": "HP — Henry's health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20978"
   },
   "3A66F702:EE:003B4540": {
     "game": "SoulCalibur II (SLUS-20574)",
@@ -3403,7 +3820,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20574"
   },
   "E327DA03:EE:003B4540": {
     "game": "SSX 3 (SLUS-20783)",
@@ -3413,7 +3831,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20783"
   },
   "3FCB7A3A:EE:003C4560": {
     "game": "Tales of Symphonia (SLUS-21033)",
@@ -3423,19 +3842,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21033"
   },
   "3FCB7A3A:EE:00B00000": {
     "game": "Tales of Symphonia (SLUS-21033)",
     "game_crc": "3FCB7A3A",
     "description": "Gald — party currency for items and equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21033"
   },
   "3FCB7A3A:EE:005A0000": {
     "game": "Tales of Symphonia (SLUS-21033)",
     "game_crc": "3FCB7A3A",
     "description": "HP — Lloyd's current hit points",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21033"
   },
   "8CE89B4C:EE:003B4540": {
     "game": "Tekken 4 (SLUS-20328)",
@@ -3445,7 +3867,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20328"
   },
   "B537D600:EE:003B4540": {
     "game": "Tekken 5 (SLUS-21219)",
@@ -3455,7 +3878,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21219"
   },
   "20E7CC63:EE:003B4540": {
     "game": "Tony Hawk's Pro Skater 3 (SLUS-20095)",
@@ -3465,7 +3889,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20095"
   },
   "5C86124C:EE:003B4540": {
     "game": "Tony Hawk's Underground (SLUS-20731)",
@@ -3475,7 +3900,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20731"
   },
   "AA9B2DC0:EE:003C4560": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
@@ -3485,19 +3911,22 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21299"
   },
   "AA9B2DC0:EE:00B00000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
     "game_crc": "AA9B2DC0",
     "description": "OTH — in-game currency for equipment",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21299"
   },
   "AA9B2DC0:EE:005A0000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
     "game_crc": "AA9B2DC0",
     "description": "HP — Silmeria's current HP",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21299"
   },
   "7D32CF7D:EE:003C4560": {
     "game": "Xenosaga Episode III: Also Sprach Zarathustra (SLUS-21137)",
@@ -3507,13 +3936,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21137"
   },
   "7D32CF7D:EE:00B00000": {
     "game": "Xenosaga Episode III: Also Sprach Zarathustra (SLUS-21137)",
     "game_crc": "7D32CF7D",
     "description": "G — party funds for equipment upgrades",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-21137"
   },
   "F26A89E4:EE:003B4560": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
@@ -3523,13 +3954,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20365"
   },
   "F26A89E4:EE:00B00000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
     "game_crc": "F26A89E4",
     "description": "Hell — in-game currency (HL) for items",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20365"
   },
   "3C16D0C5:EE:003C4560": {
     "game": "Shadow of the Colossus (SLUS-20721)",
@@ -3539,13 +3972,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20721"
   },
   "3C16D0C5:EE:005A0080": {
     "game": "Shadow of the Colossus (SLUS-20721)",
     "game_crc": "3C16D0C5",
     "description": "HP — Wander's health bar",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20721"
   },
   "B0791D8E:EE:003B4540": {
     "game": "SSX Tricky (SLUS-20301)",
@@ -3555,7 +3990,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20301"
   },
   "AEECF30D:EE:003B4540": {
     "game": "Zone of the Enders (SLUS-20515)",
@@ -3565,7 +4001,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20515"
   },
   "D2A1D042:EE:003B4540": {
     "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
@@ -3575,13 +4012,15 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20541"
   },
   "D2A1D042:EE:005A0000": {
     "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
     "game_crc": "D2A1D042",
     "description": "HP — Jehuty's energy/health",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20541"
   },
   "73BC4AAC:EE:003C4560": {
     "game": "Rogue Galaxy (SCUS-97490)",
@@ -3591,7 +4030,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SCUS-97490"
   },
   "B60DD19A:EE:003C4560": {
     "game": "Shin Megami Tensei: Digital Devil Saga (SLUS-21020)",
@@ -3601,7 +4041,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21020"
   },
   "3F36CFBF:EE:003B4540": {
     "game": "Need for Speed: ProStreet (SLUS-21658)",
@@ -3611,7 +4052,8 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-21658"
   },
   "1BC9364D:EE:003C4560": {
     "game": "Tales of Legendia (SLUS-20594)",
@@ -3621,12 +4063,64 @@
     "value_map": {
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
-    }
+    },
+    "game_serial": "SLUS-20594"
   },
   "1BC9364D:EE:00B00000": {
     "game": "Tales of Legendia (SLUS-20594)",
     "game_crc": "1BC9364D",
     "description": "Gald — party currency",
-    "category": "cheat"
+    "category": "cheat",
+    "game_serial": "SLUS-20594"
+  },
+  "8704B825:EE:003C4560": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8704B825:EE:005A0000": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "HP — player character health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "8704B825:EE:00700000": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Neopoints — in-game currency",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max Neopoints (9999)",
+      "000003E8": "1000 Neopoints"
+    }
+  },
+  "8704B825:EE:00480030": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× normal (2- normal)",
+      "3E800000": "¼× normal (4- normal)"
+    }
   }
 }

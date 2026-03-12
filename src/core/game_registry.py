@@ -335,6 +335,8 @@ _KNOWN_SERIALS: dict[str, str] = {
     # Family / Action-Adventure
     "SLUS-21228": "Eragon",
     "SLES-54053": "Eragon (PAL)",
+    "SLUS-21238": "Neopets: The Darkest Fairy",
+    "SCES-54023": "Neopets: The Darkest Fairy (PAL)",
 
     # Simulation / Strategy
     "SLUS-21102": "The Sims 2",

@@ -141,6 +141,17 @@ class ModPanel(BasePanel):
         updates_btn.clicked.connect(self._check_updates)
         toolbar.addWidget(updates_btn)
 
+        # PNACH Code Builder button — only visible on PNACH panel
+        if self.mod_type == ModType.PNACH:
+            builder_btn = QPushButton("🧩 Build from DB")
+            builder_btn.setToolTip(
+                "Open the PNACH Code Builder — select effects from the known-address\n"
+                "database for your game and generate a merged .pnach file"
+            )
+            builder_btn.setObjectName("primary_btn")
+            builder_btn.clicked.connect(self._open_code_builder)
+            toolbar.addWidget(builder_btn)
+
         content.addLayout(toolbar)
 
         # ---- Author + library filter row ----
@@ -541,7 +552,43 @@ class ModPanel(BasePanel):
         dlg.exec()
         self._apply_filter()
 
-    def _check_updates(self):
+    def _open_code_builder(self):
+        """Open the PNACH Code Builder dialog for the current game context."""
+        from src.ui.widgets import PnachCodeBuilderDialog
+        from src.core.config_manager import AppConfig
+
+        # Try to determine cheats dir from config
+        cheats_dir = ""
+        try:
+            cfg = AppConfig.load()
+            pcsx2_root = cfg.pcsx2_path or ""
+            if pcsx2_root:
+                from src.core.pcsx2_layout import detect_pcsx2_subfolders
+                paths = detect_pcsx2_subfolders(pcsx2_root)
+                cheats_dir = paths.get("pnach_path", "")
+        except Exception:
+            pass
+
+        # Try to pre-fill the game serial from the current library filter
+        serial = ""
+        try:
+            if hasattr(self, '_library_filter_check') and self._library_filter_check.isChecked():
+                # Get currently shown mods and infer serial from them
+                mods = self.manager.list_mods(self.mod_type)
+                enabled_serials = {m.game_id for m in mods if m.enabled and m.game_id}
+                if len(enabled_serials) == 1:
+                    serial = enabled_serials.pop()
+        except Exception:
+            pass
+
+        dlg = PnachCodeBuilderDialog(
+            game_serial=serial,
+            cheats_dir=cheats_dir,
+            parent=self,
+        )
+        dlg.exec()
+
+
         """
         Run the update checker for all mods in this panel that have a source URL.
         Results are shown in a summary dialog; mods with available updates get an

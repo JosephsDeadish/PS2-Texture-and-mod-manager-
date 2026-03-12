@@ -12211,5 +12211,32 @@
     "nsfw": false,
     "requires_account": true,
     "download_action": ""
+  },
+  {
+    "id": "save_slus21238",
+    "name": "Neopets: The Darkest Fairy — Complete Save",
+    "description": "Complete save file for Neopets: The Darkest Fairy (SLUS-21238).",
+    "author": "GameSavedFiles",
+    "author_url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "direct_download_url": "",
+    "source": "GBAtemp",
+    "game": "Neopets: The Darkest Fairy",
+    "game_serial": "SLUS-21238",
+    "type": "save_file",
+    "upscale_tech": "",
+    "tags": [
+      "neopets",
+      "action-adventure",
+      "save"
+    ],
+    "thumbnail_url": "",
+    "context": "Serial: SLUS-21238.",
+    "is_hub": false,
+    "is_complete": true,
+    "is_free": true,
+    "nsfw": false,
+    "requires_account": true,
+    "download_action": ""
   }
 ]

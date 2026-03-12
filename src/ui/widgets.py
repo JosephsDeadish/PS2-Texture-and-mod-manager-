@@ -1540,3 +1540,432 @@ class DownloadProgressWidget(QWidget):
 
     def set_error(self, msg: str):
         self.status_lbl.setText(f"❌ {msg[:30]}")
+
+
+# ---------------------------------------------------------------------------
+# PnachCodeBuilderDialog
+# ---------------------------------------------------------------------------
+
+class PnachCodeBuilderDialog(QDialog):
+    """Interactive PNACH code builder that lets users select effects from the
+    known-address DB for a specific game, choose preset values, detect
+    conflicts, and write a merged ``.pnach`` file to the PCSX2 cheats folder.
+
+    Usage::
+
+        dlg = PnachCodeBuilderDialog(
+            game_serial="SLUS-21028",
+            cheats_dir="/path/to/pcsx2/cheats",
+            parent=self,
+        )
+        dlg.exec()
+    """
+
+    def __init__(
+        self,
+        game_serial: str = "",
+        cheats_dir: str = "",
+        parent=None,
+    ):
+        super().__init__(parent)
+        self._game_serial = game_serial.strip().upper()
+        self._cheats_dir = cheats_dir
+        self._patch_widgets: list = []  # list of (key, addr_widget)
+        self.setWindowTitle("🧩 PNACH Code Builder — Apply DB Effects to Game")
+        self.setMinimumSize(860, 600)
+        self.resize(920, 680)
+        self._build_ui()
+        if self._game_serial:
+            self._load_game(self._game_serial)
+
+    # ------------------------------------------------------------------
+    # Build UI
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        from PyQt6.QtWidgets import QComboBox, QGroupBox, QRadioButton, QButtonGroup, QSplitter
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(16, 16, 16, 16)
+
+        # Header
+        hdr = QLabel("🧩  PNACH Code Builder")
+        hdr.setStyleSheet("font-size: 17px; font-weight: bold; color: #70b0ff;")
+        layout.addWidget(hdr)
+
+        intro = QLabel(
+            "Select a game, tick the effects you want, choose preset values where offered,\n"
+            "then click Install to write a merged .pnach to your PCSX2 cheats folder."
+        )
+        intro.setStyleSheet("color: #9090b0; font-size: 12px;")
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        layout.addWidget(sep)
+
+        # Game picker row
+        game_row = QHBoxLayout()
+        game_row.setSpacing(8)
+        game_lbl = QLabel("Game:")
+        game_lbl.setStyleSheet("color: #c0c0e0; font-weight: bold;")
+        game_row.addWidget(game_lbl)
+
+        self._game_combo = QComboBox()
+        self._game_combo.setMinimumWidth(350)
+        self._game_combo.setEditable(True)
+        self._populate_game_combo()
+        game_row.addWidget(self._game_combo, 1)
+
+        load_btn = QPushButton("Load Effects")
+        load_btn.setObjectName("primary_btn")
+        load_btn.clicked.connect(self._on_load_btn)
+        game_row.addWidget(load_btn)
+        layout.addLayout(game_row)
+
+        # Scroll area for effect rows
+        self._scroll = QScrollArea()
+        self._scroll.setWidgetResizable(True)
+        self._scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self._effects_container = QWidget()
+        self._effects_layout = QVBoxLayout(self._effects_container)
+        self._effects_layout.setSpacing(6)
+        self._effects_layout.setContentsMargins(0, 0, 0, 0)
+        self._effects_layout.addStretch()
+        self._scroll.setWidget(self._effects_container)
+        layout.addWidget(self._scroll, 1)
+
+        # Status / conflict bar
+        self._status_lbl = QLabel("")
+        self._status_lbl.setStyleSheet("color: #e0b060; font-size: 12px;")
+        self._status_lbl.setWordWrap(True)
+        layout.addWidget(self._status_lbl)
+
+        # Cheats dir row
+        dir_row = QHBoxLayout()
+        dir_lbl = QLabel("PCSX2 Cheats folder:")
+        dir_lbl.setStyleSheet("color: #9090b0;")
+        dir_row.addWidget(dir_lbl)
+        self._dir_edit = QLineEdit(self._cheats_dir)
+        self._dir_edit.setPlaceholderText("Path to PCSX2 cheats/ folder…")
+        dir_row.addWidget(self._dir_edit, 1)
+        browse_btn = QPushButton("Browse…")
+        browse_btn.clicked.connect(self._browse_dir)
+        dir_row.addWidget(browse_btn)
+        layout.addLayout(dir_row)
+
+        # Buttons
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        preview_btn = QPushButton("🔍 Preview PNACH")
+        preview_btn.clicked.connect(self._preview_pnach)
+        btn_row.addWidget(preview_btn)
+        install_btn = QPushButton("💾 Install to PCSX2")
+        install_btn.setObjectName("primary_btn")
+        install_btn.clicked.connect(self._install_pnach)
+        btn_row.addWidget(install_btn)
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.reject)
+        btn_row.addWidget(close_btn)
+        layout.addLayout(btn_row)
+
+    # ------------------------------------------------------------------
+    # Game combo
+    # ------------------------------------------------------------------
+
+    def _populate_game_combo(self):
+        from src.core.pnach_analyzer import list_all_serials_in_db
+        self._game_combo.clear()
+        self._game_combo.addItem("— Select a game —", "")
+        for serial, title in list_all_serials_in_db():
+            self._game_combo.addItem(f"{title}  ({serial})", serial)
+        # Pre-select current game
+        if self._game_serial:
+            for i in range(self._game_combo.count()):
+                if self._game_combo.itemData(i) == self._game_serial:
+                    self._game_combo.setCurrentIndex(i)
+                    break
+
+    def _on_load_btn(self):
+        serial = self._game_combo.currentData() or self._game_combo.currentText().strip().upper()
+        if serial and serial != "":
+            self._load_game(serial)
+
+    # ------------------------------------------------------------------
+    # Load entries for the selected game
+    # ------------------------------------------------------------------
+
+    def _load_game(self, serial: str):
+        from src.core.pnach_analyzer import entries_for_serial
+        self._game_serial = serial.strip().upper()
+        entries = entries_for_serial(self._game_serial)
+        self._render_entries(entries)
+
+    def _render_entries(self, entries: list):
+        from PyQt6.QtWidgets import QGroupBox, QRadioButton, QButtonGroup, QComboBox as QCBox
+
+        # Clear existing
+        self._patch_widgets = []
+        while self._effects_layout.count() > 1:
+            item = self._effects_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        if not entries:
+            empty = QLabel(
+                "No DB entries found for this game serial.\n"
+                "Add addresses to data/pnach_db/known_addresses.json to enable this feature."
+            )
+            empty.setStyleSheet("color: #7070a0; font-size: 13px;")
+            empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self._effects_layout.insertWidget(0, empty)
+            self._status_lbl.setText("")
+            return
+
+        # Group by category
+        CAT_LABELS = {
+            "physics":    "⚡ Physics & Movement",
+            "gameplay":   "🎮 Gameplay",
+            "graphics":   "🖥️ Graphics & Display",
+            "audio":      "🔊 Audio",
+            "cheat":      "🌟 Cheats & Stats",
+            "hardware_registers": "🔌 Hardware",
+            "unknown":    "❓ Other",
+        }
+        cats: dict = {}
+        for e in entries:
+            c = e.get("category", "unknown")
+            cats.setdefault(c, []).append(e)
+
+        cat_order = ["physics", "gameplay", "graphics", "cheat", "audio",
+                     "hardware_registers", "unknown"]
+        ordered_cats = [c for c in cat_order if c in cats]
+        ordered_cats += [c for c in cats if c not in ordered_cats]
+
+        idx = 0
+        for cat in ordered_cats:
+            cat_lbl = QLabel(f"  {CAT_LABELS.get(cat, cat.title())}")
+            cat_lbl.setStyleSheet(
+                "font-size: 13px; font-weight: bold; color: #80c0ff;"
+                " background: #1a2040; padding: 4px 8px;"
+            )
+            self._effects_layout.insertWidget(idx, cat_lbl)
+            idx += 1
+
+            for entry in cats[cat]:
+                row_widget = self._make_effect_row(entry)
+                self._effects_layout.insertWidget(idx, row_widget)
+                idx += 1
+
+        self._status_lbl.setText(
+            f"✅ Loaded {len(entries)} DB entries for {self._game_serial}. "
+            "Tick effects and choose preset values, then click Install."
+        )
+
+    def _make_effect_row(self, entry: dict) -> QWidget:
+        """Build a single effect row: checkbox + description + optional value picker."""
+        from PyQt6.QtWidgets import QComboBox as QCBox
+
+        key = entry.get("key", "")
+        # Parse address from key: CRC:PROC:ADDR
+        parts = key.split(":")
+        crc = parts[0] if len(parts) > 0 else ""
+        proc = parts[1] if len(parts) > 1 else "EE"
+        addr = parts[2] if len(parts) > 2 else "00000000"
+
+        desc = entry.get("description", addr)
+        value_map: dict = entry.get("value_map", {})
+
+        frame = QFrame()
+        frame.setStyleSheet(
+            "QFrame { background: #1a1a2e; border: 1px solid #2a2a50;"
+            " border-radius: 4px; margin: 1px; }"
+        )
+        row = QHBoxLayout(frame)
+        row.setContentsMargins(8, 4, 8, 4)
+        row.setSpacing(10)
+
+        # Checkbox
+        chk = QCheckBox()
+        chk.setToolTip("Enable this effect")
+        row.addWidget(chk)
+
+        # Description label
+        desc_lbl = QLabel(desc)
+        desc_lbl.setStyleSheet("color: #d0d0f0; min-width: 260px;")
+        desc_lbl.setWordWrap(False)
+        row.addWidget(desc_lbl, 1)
+
+        # Address label
+        addr_lbl = QLabel(f"[{proc}:{addr}]")
+        addr_lbl.setStyleSheet("color: #505080; font-family: monospace; font-size: 11px;")
+        row.addWidget(addr_lbl)
+
+        # Value picker
+        value_combo = None
+        if value_map:
+            value_combo = QCBox()
+            value_combo.setMinimumWidth(200)
+            # Sort: put "default" / "1x normal" first
+            items = list(value_map.items())
+            # heuristic: sort by key lexicographically but prefer "default" entries first
+            default_first = sorted(items, key=lambda kv: (
+                0 if "default" in kv[1].lower() or "1×" in kv[1] or "4:3" in kv[1] else 1,
+                kv[1]
+            ))
+            for hex_val, label in default_first:
+                value_combo.addItem(label, hex_val)
+            row.addWidget(value_combo)
+        else:
+            placeholder = QLabel("(no value options)")
+            placeholder.setStyleSheet("color: #505060; font-size: 11px; font-style: italic;")
+            row.addWidget(placeholder)
+
+        # Store references for later retrieval
+        self._patch_widgets.append({
+            "check": chk,
+            "value_combo": value_combo,
+            "crc": crc,
+            "proc": proc,
+            "addr": addr,
+            "description": desc,
+            "value_map": value_map,
+        })
+
+        return frame
+
+    # ------------------------------------------------------------------
+    # Generate PNACH content
+    # ------------------------------------------------------------------
+
+    def _collect_selected_patches(self) -> tuple:
+        """Return (patches: list[dict], conflicts: list[str])."""
+        selected = []
+        addr_seen: dict = {}
+        conflicts = []
+
+        for pw in self._patch_widgets:
+            if not pw["check"].isChecked():
+                continue
+            value_combo = pw["value_combo"]
+            if value_combo is not None:
+                hex_val = value_combo.currentData() or "00000000"
+            else:
+                # No value options — use the first value in DB or zero
+                vm = pw.get("value_map", {})
+                hex_val = list(vm.keys())[0] if vm else "00000000"
+
+            addr_key = f"{pw['proc']}:{pw['addr']}"
+            if addr_key in addr_seen:
+                conflicts.append(
+                    f"Address {pw['addr']} ({pw['description']!r}) conflicts with "
+                    f"{addr_seen[addr_key]!r}"
+                )
+            else:
+                addr_seen[addr_key] = pw["description"]
+
+            selected.append({
+                "processor": pw["proc"],
+                "address": pw["addr"],
+                "value": hex_val,
+                "description": pw["description"],
+                "size": "extended",
+                "crc": pw["crc"],
+            })
+
+        return selected, conflicts
+
+    def _get_pnach_text(self) -> str | None:
+        from src.core.pnach_analyzer import generate_pnach_text, entries_for_serial
+
+        patches, conflicts = self._collect_selected_patches()
+        if not patches:
+            QMessageBox.information(self, "Nothing selected",
+                                    "Tick at least one effect to generate a PNACH patch.")
+            return None
+
+        if conflicts:
+            msg = "⚠ Conflicts detected:\n\n" + "\n".join(f"• {c}" for c in conflicts)
+            msg += "\n\nOnly the first selected value for each address will be used."
+            QMessageBox.warning(self, "Address Conflicts", msg)
+            # De-duplicate by address (keep first)
+            seen = set()
+            deduped = []
+            for p in patches:
+                k = f"{p['processor']}:{p['address']}"
+                if k not in seen:
+                    seen.add(k)
+                    deduped.append(p)
+            patches = deduped
+
+        # Get CRC from first patch
+        game_crc = patches[0].get("crc", "00000000") if patches else "00000000"
+        # Get game title from serial
+        from src.core.game_registry import lookup_game_title
+        game_title = lookup_game_title(self._game_serial) or self._game_serial
+
+        return generate_pnach_text(game_crc, game_title, patches), game_crc
+
+    def _preview_pnach(self):
+        result = self._get_pnach_text()
+        if result is None:
+            return
+        text, crc = result
+        dlg = QDialog(self)
+        dlg.setWindowTitle(f"PNACH Preview — {crc}.pnach")
+        dlg.resize(640, 480)
+        layout = QVBoxLayout(dlg)
+        te = QTextEdit()
+        te.setPlainText(text)
+        te.setReadOnly(True)
+        te.setFontFamily("Courier New")
+        layout.addWidget(te)
+        btn = QPushButton("Close")
+        btn.clicked.connect(dlg.accept)
+        layout.addWidget(btn)
+        dlg.exec()
+
+    def _install_pnach(self):
+        result = self._get_pnach_text()
+        if result is None:
+            return
+        text, crc = result
+
+        cheats_dir = self._dir_edit.text().strip()
+        if not cheats_dir:
+            QMessageBox.warning(self, "No Cheats Folder",
+                                "Please specify your PCSX2 cheats/ folder path.")
+            return
+
+        import os
+        os.makedirs(cheats_dir, exist_ok=True)
+        dest = os.path.join(cheats_dir, f"{crc}.pnach")
+
+        # Warn if file already exists
+        if os.path.exists(dest):
+            reply = QMessageBox.question(
+                self, "File Exists",
+                f"{crc}.pnach already exists.\nOverwrite it?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if reply != QMessageBox.StandardButton.Yes:
+                return
+
+        try:
+            with open(dest, "w", encoding="utf-8") as f:
+                f.write(text)
+            QMessageBox.information(
+                self, "✅ Installed",
+                f"PNACH written to:\n{dest}\n\n"
+                "Launch PCSX2 and the patch will be applied automatically."
+            )
+        except OSError as exc:
+            QMessageBox.critical(self, "Write Error", f"Could not write PNACH:\n{exc}")
+
+    def _browse_dir(self):
+        d = QFileDialog.getExistingDirectory(self, "Select PCSX2 cheats/ folder",
+                                              self._dir_edit.text())
+        if d:
+            self._dir_edit.setText(d)

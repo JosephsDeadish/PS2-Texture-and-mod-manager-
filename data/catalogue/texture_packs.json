@@ -19545,5 +19545,33 @@
     "context": "Search for Silent Hill 3 in the mega-library thread. Serial: SLUS-20459.",
     "is_hub": false,
     "nsfw": false
+  },
+  {
+    "id": "tp_neopets_slus21238",
+    "name": "Neopets: The Darkest Fairy — HD Texture Pack",
+    "description": "AI-upscaled HD textures for Neopets: The Darkest Fairy (SLUS-21238). Vibrant Neopia rendered in crystal clarity.",
+    "author": "cckrizalid",
+    "author_url": "https://gbatemp.net/members/cckrizalid.485489/",
+    "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
+    "direct_download_url": "",
+    "download_action": "manual_mega",
+    "source": "GBAtemp",
+    "game": "Neopets: The Darkest Fairy",
+    "game_serial": "SLUS-21238",
+    "type": "texture_pack",
+    "upscale_tech": "AI upscale",
+    "tags": [
+      "neopets",
+      "action-adventure",
+      "ai-upscale",
+      "hd-textures",
+      "upscale",
+      "pcsx2",
+      "gbatemp"
+    ],
+    "thumbnail_url": "",
+    "context": "Serial: SLUS-21238.",
+    "is_hub": false,
+    "nsfw": false
   }
 ]
