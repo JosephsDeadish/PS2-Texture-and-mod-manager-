@@ -6549,3 +6549,276 @@ class TestBackupManager(unittest.TestCase):
         self.assertFalse(os.path.exists(evil_file), "Zip-slip path traversal was not blocked")
         # And nothing should have been restored (the entry was skipped)
         self.assertEqual(count, 0)
+
+
+# ===========================================================================
+# TestDownloadHistory
+# ===========================================================================
+
+class TestDownloadHistory(unittest.TestCase):
+    """Tests for src.core.download_history."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # --- imports -----------------------------------------------------------
+
+    def test_import(self):
+        from src.core.download_history import (
+            HistoryEntry,
+            STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED,
+            get_history_file,
+            record_event,
+            list_history,
+            clear_history,
+            delete_entry,
+            export_history_csv,
+        )
+
+    # --- HistoryEntry properties -------------------------------------------
+
+    def test_status_label_success(self):
+        from src.core.download_history import HistoryEntry, STATUS_SUCCESS
+        e = HistoryEntry(id="1", timestamp="2025-01-01T00:00:00+00:00",
+                         mod_name="Test", mod_type="pnach", status=STATUS_SUCCESS)
+        self.assertIn("Success", e.status_label)
+
+    def test_status_label_failed(self):
+        from src.core.download_history import HistoryEntry, STATUS_FAILED
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         status=STATUS_FAILED)
+        self.assertIn("Failed", e.status_label)
+
+    def test_status_label_skipped(self):
+        from src.core.download_history import HistoryEntry, STATUS_SKIPPED
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         status=STATUS_SKIPPED)
+        self.assertIn("Skip", e.status_label)
+
+    def test_type_label_texture_pack(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack")
+        self.assertIn("Texture", e.type_label)
+
+    def test_type_label_pnach(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach")
+        self.assertIn("PNACH", e.type_label)
+
+    def test_size_label_zero(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         size_bytes=0)
+        self.assertEqual(e.size_label, "–")
+
+    def test_size_label_bytes(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         size_bytes=512)
+        self.assertIn("B", e.size_label)
+
+    def test_size_label_mb(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack",
+                         size_bytes=10 * 1024 * 1024)
+        self.assertIn("MB", e.size_label)
+
+    def test_size_label_gb(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack",
+                         size_bytes=2 * 1024 * 1024 * 1024)
+        self.assertIn("GB", e.size_label)
+
+    # --- serialisation round-trip ------------------------------------------
+
+    def test_to_dict_from_dict_roundtrip(self):
+        from src.core.download_history import HistoryEntry, STATUS_SUCCESS
+        e = HistoryEntry(
+            id="abc", timestamp="2025-03-01T12:00:00+00:00",
+            mod_name="SH2 HD", mod_type="texture_pack",
+            serial="SLUS-20228", source_url="https://example.com",
+            status=STATUS_SUCCESS, size_bytes=1024, note="test note",
+        )
+        e2 = HistoryEntry.from_dict(e.to_dict())
+        self.assertEqual(e.id, e2.id)
+        self.assertEqual(e.mod_name, e2.mod_name)
+        self.assertEqual(e.serial, e2.serial)
+        self.assertEqual(e.size_bytes, e2.size_bytes)
+
+    # --- get_history_file --------------------------------------------------
+
+    def test_get_history_file_returns_path(self):
+        from src.core.download_history import get_history_file
+        p = get_history_file(self.cfg)
+        self.assertIsInstance(p, Path)
+        self.assertTrue(str(p).endswith("download_history.json"))
+
+    # --- record_event ------------------------------------------------------
+
+    def test_record_event_returns_entry(self):
+        from src.core.download_history import record_event, STATUS_SUCCESS
+        e = record_event(self.cfg, mod_name="Test Mod", mod_type="pnach",
+                         status=STATUS_SUCCESS)
+        self.assertIsNotNone(e.id)
+        self.assertEqual(e.mod_name, "Test Mod")
+        self.assertEqual(e.status, STATUS_SUCCESS)
+
+    def test_record_event_writes_json(self):
+        from src.core.download_history import record_event, get_history_file
+        record_event(self.cfg, mod_name="Test Mod", mod_type="pnach")
+        p = get_history_file(self.cfg)
+        self.assertTrue(p.exists())
+        import json
+        data = json.loads(p.read_text())
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+
+    def test_record_event_multiple(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        record_event(self.cfg, mod_name="B", mod_type="cover_art")
+        record_event(self.cfg, mod_name="C", mod_type="texture_pack")
+        entries = list_history(self.cfg)
+        self.assertEqual(len(entries), 3)
+
+    def test_record_event_newest_first(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="First", mod_type="pnach")
+        record_event(self.cfg, mod_name="Second", mod_type="pnach")
+        entries = list_history(self.cfg)
+        self.assertEqual(entries[0].mod_name, "Second")
+        self.assertEqual(entries[1].mod_name, "First")
+
+    # --- list_history filters ----------------------------------------------
+
+    def test_list_history_filter_status(self):
+        from src.core.download_history import record_event, list_history, STATUS_SUCCESS, STATUS_FAILED
+        record_event(self.cfg, mod_name="OK",  mod_type="pnach", status=STATUS_SUCCESS)
+        record_event(self.cfg, mod_name="BAD", mod_type="pnach", status=STATUS_FAILED)
+        successes = list_history(self.cfg, status=STATUS_SUCCESS)
+        failures  = list_history(self.cfg, status=STATUS_FAILED)
+        self.assertEqual(len(successes), 1)
+        self.assertEqual(successes[0].mod_name, "OK")
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].mod_name, "BAD")
+
+    def test_list_history_filter_mod_type(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="P", mod_type="pnach")
+        record_event(self.cfg, mod_name="T", mod_type="texture_pack")
+        pnach_only = list_history(self.cfg, mod_type="pnach")
+        self.assertEqual(len(pnach_only), 1)
+        self.assertEqual(pnach_only[0].mod_type, "pnach")
+
+    def test_list_history_filter_serial(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach", serial="SLUS-20228")
+        record_event(self.cfg, mod_name="B", mod_type="pnach", serial="SLES-54053")
+        results = list_history(self.cfg, serial="SLUS-20228")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].serial, "SLUS-20228")
+
+    def test_list_history_limit(self):
+        from src.core.download_history import record_event, list_history
+        for i in range(10):
+            record_event(self.cfg, mod_name=f"Mod {i}", mod_type="pnach")
+        results = list_history(self.cfg, limit=3)
+        self.assertEqual(len(results), 3)
+
+    def test_list_history_empty(self):
+        from src.core.download_history import list_history
+        entries = list_history(self.cfg)
+        self.assertEqual(entries, [])
+
+    # --- clear_history -----------------------------------------------------
+
+    def test_clear_history_returns_count(self):
+        from src.core.download_history import record_event, clear_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        record_event(self.cfg, mod_name="B", mod_type="pnach")
+        count = clear_history(self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_clear_history_empties_log(self):
+        from src.core.download_history import record_event, clear_history, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        clear_history(self.cfg)
+        self.assertEqual(list_history(self.cfg), [])
+
+    # --- delete_entry ------------------------------------------------------
+
+    def test_delete_entry_removes_one(self):
+        from src.core.download_history import record_event, delete_entry, list_history
+        e1 = record_event(self.cfg, mod_name="Keep", mod_type="pnach")
+        e2 = record_event(self.cfg, mod_name="Remove", mod_type="pnach")
+        result = delete_entry(e2, self.cfg)
+        self.assertTrue(result)
+        remaining = list_history(self.cfg)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0].mod_name, "Keep")
+
+    def test_delete_entry_missing_returns_false(self):
+        from src.core.download_history import HistoryEntry, delete_entry
+        ghost = HistoryEntry(id="nonexistent", timestamp="t",
+                             mod_name="X", mod_type="pnach")
+        self.assertFalse(delete_entry(ghost, self.cfg))
+
+    # --- export_history_csv ------------------------------------------------
+
+    def test_export_csv_creates_file(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        csv_path = export_history_csv(self.cfg)
+        self.assertTrue(os.path.isfile(csv_path))
+
+    def test_export_csv_has_header_and_row(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="Silent Hill 2 HD",
+                     mod_type="texture_pack", serial="SLUS-20228")
+        csv_path = export_history_csv(self.cfg)
+        import csv as csv_mod
+        with open(csv_path, newline="", encoding="utf-8") as fh:
+            rows = list(csv_mod.DictReader(fh))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["mod_name"], "Silent Hill 2 HD")
+        self.assertEqual(rows[0]["serial"], "SLUS-20228")
+
+    def test_export_csv_custom_path(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="X", mod_type="pnach")
+        out = os.path.join(self.tmpdir, "out.csv")
+        result = export_history_csv(self.cfg, path=out)
+        self.assertEqual(result, out)
+        self.assertTrue(os.path.isfile(out))
+
+    # --- max entries pruning -----------------------------------------------
+
+    def test_max_entries_pruned(self):
+        from src.core.download_history import (
+            record_event, list_history, MAX_HISTORY_ENTRIES,
+            _load, _save,
+        )
+        # Directly write more than MAX entries and verify list_history returns all
+        entries = []
+        for i in range(MAX_HISTORY_ENTRIES + 10):
+            entries.append(
+                __import__("src.core.download_history", fromlist=["HistoryEntry"]).HistoryEntry(
+                    id=str(i), timestamp="t", mod_name=f"M{i}", mod_type="pnach"
+                )
+            )
+        _save(entries, self.cfg)
+        loaded = _load(self.cfg)
+        self.assertEqual(len(loaded), MAX_HISTORY_ENTRIES)
+

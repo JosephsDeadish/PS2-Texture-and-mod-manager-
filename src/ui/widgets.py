@@ -3235,3 +3235,302 @@ class BackupManagerDialog(QDialog):
         from PyQt6.QtGui import QDesktopServices
         from PyQt6.QtCore import QUrl
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(backup_dir)))
+
+
+# ---------------------------------------------------------------------------
+# DownloadHistoryDialog
+# ---------------------------------------------------------------------------
+
+class DownloadHistoryDialog(QDialog):
+    """Browse, filter and manage the download / installation event history.
+
+    Every successful or failed installation is recorded automatically.  This
+    dialog lets the user:
+
+    * View entries with type / status / serial filters.
+    * Delete individual entries.
+    * Clear the entire history with one click.
+    * Export the log to a CSV file.
+
+    Parameters
+    ----------
+    config:
+        Current :class:`~src.models.mod.AppConfig` instance.
+    parent:
+        Parent widget.
+    """
+
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self._config  = config
+        self._entries = []   # list[HistoryEntry] — currently displayed
+        self.setWindowTitle("📋  Download History")
+        self.setMinimumSize(860, 520)
+        self._build_ui()
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Header
+        hdr = QLabel(
+            "A log of every mod, texture pack, PNACH patch and cover-art image "
+            "that was installed through the manager."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        # Filter row
+        filter_row = QHBoxLayout()
+
+        filter_row.addWidget(QLabel("Status:"))
+        self._status_combo = QComboBox()
+        self._status_combo.addItems(["All", "✅ Success", "❌ Failed", "⏭ Skipped"])
+        self._status_combo.currentIndexChanged.connect(self._refresh)
+        filter_row.addWidget(self._status_combo)
+
+        filter_row.addWidget(QLabel("Type:"))
+        self._type_combo = QComboBox()
+        self._type_combo.addItems([
+            "All",
+            "🎨 Texture Pack",
+            "🔧 PNACH Patch",
+            "🖼 Cover Art",
+            "💾 Game Save",
+            "🕹 Cheat",
+            "📦 Other",
+        ])
+        self._type_combo.currentIndexChanged.connect(self._refresh)
+        filter_row.addWidget(self._type_combo)
+
+        filter_row.addWidget(QLabel("Serial:"))
+        self._serial_edit = QLineEdit()
+        self._serial_edit.setPlaceholderText("e.g. SLUS-20228")
+        self._serial_edit.setMaximumWidth(130)
+        self._serial_edit.textChanged.connect(self._refresh)
+        filter_row.addWidget(self._serial_edit)
+
+        filter_row.addStretch()
+        layout.addLayout(filter_row)
+
+        # Splitter: list (left) + detail (right)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Left — entry list
+        left  = QWidget()
+        ll    = QVBoxLayout(left)
+        ll.setContentsMargins(0, 0, 0, 0)
+
+        self._list_widget = QListWidget()
+        self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.currentRowChanged.connect(self._on_selection_changed)
+        ll.addWidget(self._list_widget)
+        splitter.addWidget(left)
+
+        # Right — detail panel
+        right = QWidget()
+        rl    = QVBoxLayout(right)
+        rl.setContentsMargins(0, 0, 0, 0)
+
+        self._detail_label = QLabel("← Select an entry from the list")
+        self._detail_label.setWordWrap(True)
+        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self._detail_label.setTextFormat(Qt.TextFormat.RichText)
+        rl.addWidget(self._detail_label, 1)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        rl.addWidget(sep)
+
+        action_row = QHBoxLayout()
+
+        self._delete_btn = QPushButton("🗑  Delete Entry")
+        self._delete_btn.setToolTip("Remove this single entry from the history log")
+        self._delete_btn.setEnabled(False)
+        self._delete_btn.clicked.connect(self._on_delete_entry)
+        action_row.addWidget(self._delete_btn)
+
+        action_row.addStretch()
+
+        rl.addLayout(action_row)
+        splitter.addWidget(right)
+
+        splitter.setStretchFactor(0, 3)
+        splitter.setStretchFactor(1, 2)
+        layout.addWidget(splitter, 1)
+
+        # Bottom action row
+        bottom_row = QHBoxLayout()
+
+        clear_btn = QPushButton("🗑  Clear All History")
+        clear_btn.setToolTip("Permanently delete every entry in the history log")
+        clear_btn.clicked.connect(self._on_clear)
+        bottom_row.addWidget(clear_btn)
+
+        export_btn = QPushButton("📤 Export CSV")
+        export_btn.setToolTip("Save the history log as a CSV file")
+        export_btn.clicked.connect(self._on_export_csv)
+        bottom_row.addWidget(export_btn)
+
+        bottom_row.addStretch()
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.accept)
+        bottom_row.addWidget(close_btn)
+
+        layout.addLayout(bottom_row)
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    _STATUS_MAP = {
+        "All": None,
+        "✅ Success": "success",
+        "❌ Failed":  "failed",
+        "⏭ Skipped": "skipped",
+    }
+
+    _TYPE_MAP = {
+        "All": None,
+        "🎨 Texture Pack": "texture_pack",
+        "🔧 PNACH Patch":  "pnach",
+        "🖼 Cover Art":    "cover_art",
+        "💾 Game Save":    "save",
+        "🕹 Cheat":        "cheat",
+        "📦 Other":        "other",
+    }
+
+    def _refresh(self):
+        status_text = self._status_combo.currentText()
+        type_text   = self._type_combo.currentText()
+        serial_text = self._serial_edit.text().strip()
+
+        status_filter   = self._STATUS_MAP.get(status_text)
+        mod_type_filter = self._TYPE_MAP.get(type_text)
+        serial_filter   = serial_text if serial_text else None
+
+        try:
+            from src.core.download_history import list_history
+            self._entries = list_history(
+                self._config,
+                status=status_filter,
+                mod_type=mod_type_filter,
+                serial=serial_filter,
+            )
+        except Exception as exc:
+            self._entries = []
+            self._detail_label.setText(f"<i>Could not read history: {exc}</i>")
+
+        self._list_widget.clear()
+        for entry in self._entries:
+            label = (
+                f"{entry.timestamp[:10]}  {entry.status_label}  "
+                f"{entry.type_label}  {entry.mod_name}"
+            )
+            self._list_widget.addItem(label)
+
+        if not self._entries:
+            self._detail_label.setText("<i>No entries found.</i>")
+
+        self._delete_btn.setEnabled(False)
+
+    # ------------------------------------------------------------------
+    def _on_selection_changed(self, row: int):
+        if row < 0 or row >= len(self._entries):
+            self._detail_label.setText("← Select an entry from the list")
+            self._delete_btn.setEnabled(False)
+            return
+
+        e = self._entries[row]
+
+        color = __import__(
+            "src.core.download_history", fromlist=["STATUS_COLOR"]
+        ).STATUS_COLOR.get(e.status, "#555")
+
+        html = (
+            f"<b>{e.mod_name}</b><br>"
+            f"<br>"
+            f"<b>Type:</b> {e.type_label}<br>"
+            f"<b>Status:</b> <span style='color:{color}'>{e.status_label}</span><br>"
+            f"<b>Timestamp:</b> {e.timestamp}<br>"
+        )
+        if e.serial:
+            html += f"<b>Serial:</b> {e.serial}<br>"
+        if e.source_url:
+            html += f"<b>Source:</b> <code>{e.source_url}</code><br>"
+        if e.size_bytes > 0:
+            html += f"<b>Size:</b> {e.size_label}<br>"
+        if e.note:
+            html += f"<b>Note:</b> {e.note}<br>"
+        html += f"<br><small><i>ID: {e.id}</i></small>"
+
+        self._detail_label.setText(html)
+        self._delete_btn.setEnabled(True)
+
+    # ------------------------------------------------------------------
+    def _on_delete_entry(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._entries):
+            return
+
+        entry = self._entries[row]
+        reply = QMessageBox.question(
+            self,
+            "Delete Entry",
+            f"Remove this entry from the history log?\n\n{entry.mod_name}",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        from src.core.download_history import delete_entry
+        delete_entry(entry, self._config)
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _on_clear(self):
+        reply = QMessageBox.question(
+            self,
+            "Clear History",
+            "Delete ALL entries from the history log?\n\nThis cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        from src.core.download_history import clear_history
+        count = clear_history(self._config)
+        self._refresh()
+        QMessageBox.information(
+            self,
+            "✅ History Cleared",
+            f"Removed {count} entr{'y' if count == 1 else 'ies'} from the history log.",
+        )
+
+    # ------------------------------------------------------------------
+    def _on_export_csv(self):
+        from PyQt6.QtWidgets import QFileDialog as _QFD
+        path, _ = _QFD.getSaveFileName(
+            self,
+            "Export History CSV",
+            "download_history.csv",
+            "CSV files (*.csv)",
+        )
+        if not path:
+            return
+
+        try:
+            from src.core.download_history import export_history_csv
+            result = export_history_csv(self._config, path=path)
+        except Exception as exc:
+            QMessageBox.critical(self, "Export Failed", str(exc))
+            return
+
+        QMessageBox.information(
+            self,
+            "✅ Export Complete",
+            f"History exported to:\n{result}",
+        )

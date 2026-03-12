@@ -1852,6 +1852,16 @@ class BrowsePanel(BasePanel):
         backup_btn.clicked.connect(self._open_backup_manager)
         toolbar.addWidget(backup_btn)
 
+        history_btn = QPushButton("📋 History")
+        history_btn.setToolTip(
+            "View the download and installation history log:\n"
+            "• Browse past installations by type, status or serial\n"
+            "• Delete individual entries or clear the whole log\n"
+            "• Export the log as a CSV file"
+        )
+        history_btn.clicked.connect(self._open_download_history)
+        toolbar.addWidget(history_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -2232,6 +2242,12 @@ class BrowsePanel(BasePanel):
         """Open the Backup Manager dialog."""
         from src.ui.widgets import BackupManagerDialog
         dlg = BackupManagerDialog(self.config, self)
+        dlg.exec()
+
+    def _open_download_history(self):
+        """Open the Download History dialog."""
+        from src.ui.widgets import DownloadHistoryDialog
+        dlg = DownloadHistoryDialog(self.config, self)
         dlg.exec()
 
     def _open_url(self, url: str):
