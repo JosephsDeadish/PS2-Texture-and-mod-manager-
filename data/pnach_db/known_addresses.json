@@ -1558,5 +1558,493 @@
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
     }
+  },
+  "3E1DE0F5:EE:003B4540": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3E1DE0F5:EE:00A00000": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Crash credits — amount earned from Crash Mode",
+    "category": "cheat"
+  },
+  "278700A0:EE:003B4540": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "278700A0:EE:00900000": {
+    "game": "Burnout Revenge (SLUS-21197)",
+    "game_crc": "278700A0",
+    "description": "Crash credits — earned from Crash Mode events",
+    "category": "cheat"
+  },
+  "2B123FE9:EE:003C4560": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2B123FE9:EE:00B00000": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "Gold — currency for item shops",
+    "category": "cheat"
+  },
+  "7152BCA7:EE:003C4560": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7152BCA7:EE:00C00000": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "Gold — currency for materials and equipment",
+    "category": "cheat"
+  },
+  "3B0ADBEF:EE:003B4540": {
+    "game": "Twisted Metal: Black (SLUS-20136)",
+    "game_crc": "3B0ADBEF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3B0ADBEF:EE:005A0000": {
+    "game": "Twisted Metal: Black (SLUS-20136)",
+    "game_crc": "3B0ADBEF",
+    "description": "Health — vehicle HP bar",
+    "category": "cheat"
+  },
+  "B4E1D81B:EE:003B4540": {
+    "game": "Mortal Kombat: Deception (SLUS-21090)",
+    "game_crc": "B4E1D81B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B4E1D81B:EE:00900000": {
+    "game": "Mortal Kombat: Deception (SLUS-21090)",
+    "game_crc": "B4E1D81B",
+    "description": "Koins — currency for Krypt unlocks",
+    "category": "cheat"
+  },
+  "D1B27F62:EE:003B4540": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21444)",
+    "game_crc": "D1B27F62",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D1B27F62:EE:00A00000": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21444)",
+    "game_crc": "D1B27F62",
+    "description": "Koins — currency for Motor Kombat and Konquest",
+    "category": "cheat"
+  },
+  "FCC1F0CC:EE:003B4540": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "FCC1F0CC",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "FCC1F0CC:EE:00B00000": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "FCC1F0CC",
+    "description": "Cash — money for car upgrades and parts",
+    "category": "cheat"
+  },
+  "3AA8E025:EE:003B4540": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3AA8E025:EE:00C00000": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Cash — money for car upgrades and crew upgrades",
+    "category": "cheat"
+  },
+  "F63F5B78:EE:003B4540": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20137)",
+    "game_crc": "F63F5B78",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0D1EA753:EE:003C4560": {
+    "game": "Silent Hill 4: The Room (SLUS-20814)",
+    "game_crc": "0D1EA753",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0D1EA753:EE:005A0000": {
+    "game": "Silent Hill 4: The Room (SLUS-20814)",
+    "game_crc": "0D1EA753",
+    "description": "Health — Henry's hit points",
+    "category": "cheat"
+  },
+  "C7ED171F:EE:003C4560": {
+    "game": "Silent Hill: Origins (SLUS-21583)",
+    "game_crc": "C7ED171F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "C7ED171F:EE:005B0000": {
+    "game": "Silent Hill: Origins (SLUS-21583)",
+    "game_crc": "C7ED171F",
+    "description": "Health — Travis Grady's hit points",
+    "category": "cheat"
+  },
+  "8028A9B5:EE:003C4560": {
+    "game": "Suikoden V (SLUS-21615)",
+    "game_crc": "8028A9B5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8028A9B5:EE:00C08000": {
+    "game": "Suikoden V (SLUS-21615)",
+    "game_crc": "8028A9B5",
+    "description": "Potch — party currency for items and weapons",
+    "category": "cheat"
+  },
+  "ECA23E67:EE:003B4540": {
+    "game": "Wild ARMs 3 (SLUS-20512)",
+    "game_crc": "ECA23E67",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "ECA23E67:EE:00B00000": {
+    "game": "Wild ARMs 3 (SLUS-20512)",
+    "game_crc": "ECA23E67",
+    "description": "Gella — currency for shops and equipment",
+    "category": "cheat"
+  },
+  "BB7BAC4B:EE:003B4540": {
+    "game": "Wild ARMs 4 (SLUS-21183)",
+    "game_crc": "BB7BAC4B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "BB7BAC4B:EE:00A80000": {
+    "game": "Wild ARMs 4 (SLUS-21183)",
+    "game_crc": "BB7BAC4B",
+    "description": "Gella — party money for shops",
+    "category": "cheat"
+  },
+  "B54B0573:EE:003B4540": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B54B0573:EE:006A0000": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Credits — money for aircraft and weapons",
+    "category": "cheat"
+  },
+  "3E9E7B49:EE:003B4540": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "3E9E7B49",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3E9E7B49:EE:00780000": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "3E9E7B49",
+    "description": "Credits — money for aircraft",
+    "category": "cheat"
+  },
+  "0E82B2D2:EE:003B4540": {
+    "game": "SSX Tricky (SLUS-20358)",
+    "game_crc": "0E82B2D2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "56B39E23:EE:003B4540": {
+    "game": "SSX 3 (SLUS-20687)",
+    "game_crc": "56B39E23",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "09F2E574:EE:003B4540": {
+    "game": "Katamari Damacy (SLUS-20775)",
+    "game_crc": "09F2E574",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3B340B97:EE:003C4560": {
+    "game": "Haunting Ground (SLUS-21171)",
+    "game_crc": "3B340B97",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3B340B97:EE:005A0080": {
+    "game": "Haunting Ground (SLUS-21171)",
+    "game_crc": "3B340B97",
+    "description": "Health — Fiona's HP",
+    "category": "cheat"
+  },
+  "B2E15B01:EE:003C4560": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B2E15B01:EE:00C00000": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "HL (Hel) — party currency",
+    "category": "cheat"
+  },
+  "24036809:EE:003C4560": {
+    "game": "Resident Evil: Code Veronica X (SLUS-20184)",
+    "game_crc": "24036809",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "24036809:EE:005A0000": {
+    "game": "Resident Evil: Code Veronica X (SLUS-20184)",
+    "game_crc": "24036809",
+    "description": "Health — Claire/Chris current HP",
+    "category": "cheat"
+  },
+  "36C5957B:EE:003B4560": {
+    "game": "Metal Gear Solid 3: Subsistence (SLUS-21370)",
+    "game_crc": "36C5957B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "36C5957B:EE:00600000": {
+    "game": "Metal Gear Solid 3: Subsistence (SLUS-21370)",
+    "game_crc": "36C5957B",
+    "description": "Stamina — Snake's stamina gauge (linked to Life)",
+    "category": "cheat"
+  },
+  "4C2B4D8D:EE:003B4540": {
+    "game": "Jak X: Combat Racing (SLUS-21310)",
+    "game_crc": "4C2B4D8D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4C2B4D8D:EE:00700000": {
+    "game": "Jak X: Combat Racing (SLUS-21310)",
+    "game_crc": "4C2B4D8D",
+    "description": "Orbs — collected for upgrades",
+    "category": "cheat"
+  },
+  "4AE8AFC6:EE:003B4540": {
+    "game": "Viewtiful Joe 2 (SLUS-21369)",
+    "game_crc": "4AE8AFC6",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4AE8AFC6:EE:005E0000": {
+    "game": "Viewtiful Joe 2 (SLUS-21369)",
+    "game_crc": "4AE8AFC6",
+    "description": "V-Points — earned from defeating enemies",
+    "category": "cheat"
+  },
+  "1D568F61:EE:003B4540": {
+    "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
+    "game_crc": "1D568F61",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F55CCCF1:EE:003C4560": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21158)",
+    "game_crc": "F55CCCF1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F55CCCF1:EE:00B00000": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21158)",
+    "game_crc": "F55CCCF1",
+    "description": "Kan — party currency for items",
+    "category": "cheat"
+  },
+  "1E75FE3A:EE:003B4540": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1E75FE3A:EE:00B08000": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Gold — currency for equipment at the shop",
+    "category": "cheat"
+  },
+  "96660560:EE:003C4560": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "96660560",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "96660560:EE:00B80000": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "96660560",
+    "description": "Bordeaux — party currency for items",
+    "category": "cheat"
+  },
+  "21181211:EE:003B4560": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9F1D2F39:EE:003B4540": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "9F1D2F39",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9F1D2F39:EE:00680000": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "9F1D2F39",
+    "description": "Coins — collectibles from the environment",
+    "category": "cheat"
+  },
+  "09F2E574:EE:007A0000": {
+    "game": "Katamari Damacy (SLUS-20775)",
+    "game_crc": "09F2E574",
+    "description": "Katamari diameter — current katamari size in cm",
+    "category": "cheat"
+  },
+  "3B0ADBEF:EE:00800000": {
+    "game": "Twisted Metal: Black (SLUS-20136)",
+    "game_crc": "3B0ADBEF",
+    "description": "Special weapon energy — secondary attack meter",
+    "category": "cheat"
   }
 }
