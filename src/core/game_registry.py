@@ -718,6 +718,34 @@ _KNOWN_SERIALS: dict[str, str] = {
 
     # Shooter / Action
     "SLUS-20568": "Contra: Shattered Soldier",
+
+    # ── Additional serials for texture/PNACH/save catalogue entries ──────────
+
+    # Action RPG
+    "SLUS-20707": "Drakengard",
+    "SLUS-21134": "Drakengard 2",
+
+    # Shoot-em-up
+    "SLUS-21080": "Gradius V",
+
+    # Horror
+    "SLUS-20700": "Forbidden Siren",
+    "SLES-53853": "Forbidden Siren 2 (PAL)",
+
+    # Open World
+    "SLUS-21590": "Grand Theft Auto: Vice City Stories",
+
+    # Action Adventure
+    "SLUS-20959": "Beyond Good & Evil",
+
+    # Shooter
+    "SLUS-20898": "Star Wars: Battlefront",
+
+    # Racing
+    "SLUS-20489": "Burnout 2: Point of Impact",
+
+    # Sports / Wrestling
+    "SLUS-21302": "WWE SmackDown! vs. RAW 2006",
 }
 # fmt: on
 
