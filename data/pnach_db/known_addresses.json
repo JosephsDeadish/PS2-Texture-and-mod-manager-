@@ -2046,5 +2046,571 @@
     "game_crc": "3B0ADBEF",
     "description": "Special weapon energy — secondary attack meter",
     "category": "cheat"
+  },
+  "A86571F9:EE:003B4540": {
+    "game": "Bully / Canis Canem Edit (SLUS-21131)",
+    "game_crc": "A86571F9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A86571F9:EE:00700000": {
+    "game": "Bully / Canis Canem Edit (SLUS-21131)",
+    "game_crc": "A86571F9",
+    "description": "Money — Jimmy's pocket cash",
+    "category": "cheat"
+  },
+  "A86571F9:EE:00780000": {
+    "game": "Bully / Canis Canem Edit (SLUS-21131)",
+    "game_crc": "A86571F9",
+    "description": "Health — Jimmy's HP bar",
+    "category": "cheat"
+  },
+  "D0D8B73B:EE:003B4540": {
+    "game": "Armored Core 3 (SLUS-20355)",
+    "game_crc": "D0D8B73B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D0D8B73B:EE:00900000": {
+    "game": "Armored Core 3 (SLUS-20355)",
+    "game_crc": "D0D8B73B",
+    "description": "Credits — money for parts and upgrades",
+    "category": "cheat"
+  },
+  "1A7F49AB:EE:003B4540": {
+    "game": "Armored Core: Nine Breaker (SLUS-21177)",
+    "game_crc": "1A7F49AB",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0E7B9852:EE:003B4560": {
+    "game": "Dark Cloud (SCUS-97121)",
+    "game_crc": "0E7B9852",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0E7B9852:EE:00C00000": {
+    "game": "Dark Cloud (SCUS-97121)",
+    "game_crc": "0E7B9852",
+    "description": "Gilda — currency for rebuilding Norune Village",
+    "category": "cheat"
+  },
+  "0E7B9852:EE:00680000": {
+    "game": "Dark Cloud (SCUS-97121)",
+    "game_crc": "0E7B9852",
+    "description": "Attack Coins — combat currency for weapon breakdowns",
+    "category": "cheat"
+  },
+  "47AAB3DC:EE:003B4560": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "47AAB3DC",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "47AAB3DC:EE:00D00000": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "47AAB3DC",
+    "description": "Gilda — party currency for shops and items",
+    "category": "cheat"
+  },
+  "47AAB3DC:EE:006A0000": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "47AAB3DC",
+    "description": "Medals — battle bonus currency",
+    "category": "cheat"
+  },
+  "0BF94D63:EE:003C4560": {
+    "game": "Devil May Cry 2 (SLUS-20443)",
+    "game_crc": "0BF94D63",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0BF94D63:EE:005A0000": {
+    "game": "Devil May Cry 2 (SLUS-20443)",
+    "game_crc": "0BF94D63",
+    "description": "Health — Dante/Lucia HP bar",
+    "category": "cheat"
+  },
+  "0EC5F7A0:EE:003C4560": {
+    "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
+    "game_crc": "0EC5F7A0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0EC5F7A0:EE:00700000": {
+    "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
+    "game_crc": "0EC5F7A0",
+    "description": "Orbs — red orbs for Divinity Statue upgrades",
+    "category": "cheat"
+  },
+  "0EC5F7A0:EE:005A0000": {
+    "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
+    "game_crc": "0EC5F7A0",
+    "description": "Health — Dante HP gauge (max when maxed-out)",
+    "category": "cheat"
+  },
+  "471A4AF8:EE:003C4560": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "471A4AF8",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "471A4AF8:EE:00C08000": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "471A4AF8",
+    "description": "HL (Hel) — currency for item shops and skill learning",
+    "category": "cheat"
+  },
+  "4FDB72F2:EE:003C4560": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4FDB72F2:EE:00C00000": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "HL — party currency",
+    "category": "cheat"
+  },
+  "14E7D560:EE:003C4560": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "14E7D560:EE:00D00000": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "HL — party money",
+    "category": "cheat"
+  },
+  "33EC7780:EE:003B4540": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20492)",
+    "game_crc": "33EC7780",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "33EC7780:EE:00B00000": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20492)",
+    "game_crc": "33EC7780",
+    "description": "Fol — party currency for items and weapons",
+    "category": "cheat"
+  },
+  "33EC7780:EE:005A0000": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20492)",
+    "game_crc": "33EC7780",
+    "description": "HP — Fayt's current HP",
+    "category": "cheat"
+  },
+  "AEF2012F:EE:003C4560": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
+    "game_crc": "AEF2012F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "AEF2012F:EE:00C00000": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
+    "game_crc": "AEF2012F",
+    "description": "Macca — currency for fusion and purchasing demons",
+    "category": "cheat"
+  },
+  "AEF2012F:EE:00680000": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
+    "game_crc": "AEF2012F",
+    "description": "HP — Demi-fiend current HP",
+    "category": "cheat"
+  },
+  "1F5D6258:EE:003C4560": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21053)",
+    "game_crc": "1F5D6258",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1F5D6258:EE:00B00000": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21053)",
+    "game_crc": "1F5D6258",
+    "description": "OTH (Oths) — currency for items in the shops",
+    "category": "cheat"
+  },
+  "5CC18476:EE:003C4560": {
+    "game": "Odin Sphere (SLUS-21705)",
+    "game_crc": "5CC18476",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5CC18476:EE:00A00000": {
+    "game": "Odin Sphere (SLUS-21705)",
+    "game_crc": "5CC18476",
+    "description": "Phozons — life-force orbs that level up characters",
+    "category": "cheat"
+  },
+  "5CC18476:EE:005A0000": {
+    "game": "Odin Sphere (SLUS-21705)",
+    "game_crc": "5CC18476",
+    "description": "HP — active character's hit points",
+    "category": "cheat"
+  },
+  "CE5B7A3B:EE:003B4540": {
+    "game": "Rogue Galaxy (SLUS-21721)",
+    "game_crc": "CE5B7A3B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CE5B7A3B:EE:00C08000": {
+    "game": "Rogue Galaxy (SLUS-21721)",
+    "game_crc": "CE5B7A3B",
+    "description": "Zol — party currency for items and equipment",
+    "category": "cheat"
+  },
+  "96B12B74:EE:003B4540": {
+    "game": "Grandia III (SLUS-21453)",
+    "game_crc": "96B12B74",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "96B12B74:EE:00A80000": {
+    "game": "Grandia III (SLUS-21453)",
+    "game_crc": "96B12B74",
+    "description": "Gold — party currency for items and skills",
+    "category": "cheat"
+  },
+  "76548EF1:EE:003B4540": {
+    "game": "Dynasty Warriors 4 (SLUS-20787)",
+    "game_crc": "76548EF1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "76548EF1:EE:00800000": {
+    "game": "Dynasty Warriors 4 (SLUS-20787)",
+    "game_crc": "76548EF1",
+    "description": "EXP — experience gained in Musou mode",
+    "category": "cheat"
+  },
+  "D6F4BE78:EE:003B4540": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "D6F4BE78",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8B462B6D:EE:003C4560": {
+    "game": "Xenosaga Episode II (SLUS-20831)",
+    "game_crc": "8B462B6D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8B462B6D:EE:00C00000": {
+    "game": "Xenosaga Episode II (SLUS-20831)",
+    "game_crc": "8B462B6D",
+    "description": "Gold — party currency",
+    "category": "cheat"
+  },
+  "6F1E8D2B:EE:003C4560": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6F1E8D2B:EE:00B00000": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "Leaf — party currency for items and IPD gratitude",
+    "category": "cheat"
+  },
+  "0B6EC3A3:EE:003B4540": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0B6EC3A3:EE:005A0000": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Health — soldier's current HP",
+    "category": "cheat"
+  },
+  "1CD5CC9D:EE:003B4540": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "749BDDCA:EE:003B4540": {
+    "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
+    "game_crc": "749BDDCA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "749BDDCA:EE:00C00000": {
+    "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
+    "game_crc": "749BDDCA",
+    "description": "Gold — party currency for shops and crafting",
+    "category": "cheat"
+  },
+  "749BDDCA:EE:005A0000": {
+    "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
+    "game_crc": "749BDDCA",
+    "description": "HP — Hero's current hit points",
+    "category": "cheat"
+  },
+  "2C2B7C50:EE:003C4560": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-20766)",
+    "game_crc": "2C2B7C50",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2C2B7C50:EE:005A0080": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-20766)",
+    "game_crc": "2C2B7C50",
+    "description": "Film — type 61 camera film count",
+    "category": "cheat"
+  },
+  "B4289C08:EE:003B4540": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "B4289C08",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B4289C08:EE:00B00000": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "B4289C08",
+    "description": "Cash — money for car parts and customisation",
+    "category": "cheat"
+  },
+  "7BF9042A:EE:003B4540": {
+    "game": "Tekken 4 (SLUS-20401)",
+    "game_crc": "7BF9042A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2B6A5E81:EE:003B4540": {
+    "game": "Tekken Tag Tournament (SLUS-20001)",
+    "game_crc": "2B6A5E81",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A7B26D14:EE:003B4540": {
+    "game": "Mega Man X Collection (SLUS-21303)",
+    "game_crc": "A7B26D14",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8B7C6617:EE:003B4540": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8B7C6617:EE:00700000": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Cookies — collectible items used to pacify monkeys",
+    "category": "cheat"
+  },
+  "CE44FD7A:EE:003B4540": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "CE44FD7A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6020F8C5:EE:003C4560": {
+    "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
+    "game_crc": "6020F8C5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6020F8C5:EE:00C00000": {
+    "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
+    "game_crc": "6020F8C5",
+    "description": "Macca — demon currency for items and skills",
+    "category": "cheat"
+  },
+  "BD2AC49F:EE:003B4540": {
+    "game": "Crash Twinsanity (SLUS-20697)",
+    "game_crc": "BD2AC49F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "BD2AC49F:EE:00700000": {
+    "game": "Crash Twinsanity (SLUS-20697)",
+    "game_crc": "BD2AC49F",
+    "description": "Gems — collectibles from Gem Crates",
+    "category": "cheat"
+  },
+  "D7C97CF4:EE:003B4540": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "D7C97CF4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D7C97CF4:EE:00B00000": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "D7C97CF4",
+    "description": "Gold — party currency for items and equipment",
+    "category": "cheat"
+  },
+  "E99E80B3:EE:003C4560": {
+    "game": "Shadow Hearts: From the New World (SLUS-21574 alt)",
+    "game_crc": "E99E80B3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E99E80B3:EE:00B80000": {
+    "game": "Shadow Hearts: From the New World (SLUS-21574 alt)",
+    "game_crc": "E99E80B3",
+    "description": "Cash — Will's spending money",
+    "category": "cheat"
+  },
+  "3A72A7B1:EE:003B4540": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3A72A7B1:EE:00B08000": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Gold — currency for the item shop",
+    "category": "cheat"
   }
 }
