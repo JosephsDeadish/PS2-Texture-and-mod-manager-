@@ -712,6 +712,301 @@ class ModDetailsDialog(QDialog):
 
 
 # ---------------------------------------------------------------------------
+# Texture File Picker Dialog
+# ---------------------------------------------------------------------------
+
+class TextureFilePickerDialog(QDialog):
+    """Let the user resolve texture-pack file conflicts by choosing, for every
+    conflicting relative path, which mod's file they want to deploy.
+
+    Non-conflicting files from **all** selected mods are always included.
+    After the dialog is accepted, call :meth:`write_merged` to copy the
+    chosen files into an output folder that can be used as a new mod.
+    """
+
+    def __init__(self, conflicts: list, db, parent=None):
+        """
+        *conflicts* — list of :class:`~src.models.mod.ConflictInfo` objects
+            (texture-pack file-level conflicts from ``ModManager.detect_conflicts()``).
+        *db* — ``ModDatabase`` instance.
+        """
+        super().__init__(parent)
+        self.conflicts = conflicts
+        self.db = db
+        self.setWindowTitle("🎨 Texture File Picker — Build Custom Merged Texture Pack")
+        self.setMinimumSize(860, 600)
+        # Map (mod_a_id, mod_b_id, rel_file) → winning mod_id
+        self._choices: dict = {}
+        self._dest_dir: str = ""
+        self._build_ui()
+
+    # ------------------------------------------------------------------
+    # Build
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        from pathlib import Path as _P
+        from collections import defaultdict
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(18, 18, 18, 18)
+
+        header = QLabel("🎨  Build Your Own Merged Texture Pack")
+        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #b0e0ff;")
+        layout.addWidget(header)
+
+        intro = QLabel(
+            "For each conflicting texture file, choose which mod's version you want to use.\n"
+            "All non-conflicting files from every selected mod are automatically included.\n"
+            "Click 'A wins all' / 'B wins all' to quickly resolve all files for a pair at once."
+        )
+        intro.setStyleSheet("color: #9090b0; font-size: 12px;")
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        layout.addWidget(sep)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        container = QWidget()
+        c_layout = QVBoxLayout(container)
+        c_layout.setSpacing(12)
+
+        self._radio_rows: dict = {}  # (mod_a_id, mod_b_id, rel_file) → {mod_id: QRadioButton}
+
+        for conflict in self.conflicts:
+            mod_a = self.db.get(conflict.mod_a_id)
+            mod_b = self.db.get(conflict.mod_b_id)
+            if not mod_a or not mod_b:
+                continue
+
+            pair_frame = QFrame()
+            pair_frame.setObjectName("card")
+            pair_frame.setStyleSheet(
+                "QFrame#card { border: 1px solid #204070; background: #0d1020; "
+                "border-radius: 6px; padding: 4px; }"
+            )
+            p_layout = QVBoxLayout(pair_frame)
+            p_layout.setSpacing(6)
+
+            # --- Pair header ---
+            pair_header_row = QHBoxLayout()
+            pair_lbl = QLabel(f"🔴  {mod_a.name}  ↔  {mod_b.name}")
+            pair_lbl.setStyleSheet("font-weight: bold; color: #e080a0; font-size: 13px;")
+            pair_header_row.addWidget(pair_lbl, 1)
+
+            # "A wins all" / "B wins all" quick-resolve
+            from PyQt6.QtWidgets import QButtonGroup as _QBG
+            a_all_btn = QPushButton(f"✅ {mod_a.name} wins all")
+            a_all_btn.setObjectName("success_btn")
+            a_all_btn.setFixedHeight(24)
+            b_all_btn = QPushButton(f"✅ {mod_b.name} wins all")
+            b_all_btn.setObjectName("success_btn")
+            b_all_btn.setFixedHeight(24)
+
+            def _make_all_winner(ma, mb, files, pick):
+                def _do():
+                    for rf in files:
+                        triple = (ma.id, mb.id, rf)
+                        rmap = self._radio_rows.get(triple, {})
+                        winner = ma.id if pick == "a" else mb.id
+                        if winner in rmap:
+                            rmap[winner].setChecked(True)
+                return _do
+
+            a_all_btn.clicked.connect(
+                _make_all_winner(mod_a, mod_b, conflict.conflicting_files, "a")
+            )
+            b_all_btn.clicked.connect(
+                _make_all_winner(mod_a, mod_b, conflict.conflicting_files, "b")
+            )
+
+            pair_header_row.addWidget(a_all_btn)
+            pair_header_row.addWidget(b_all_btn)
+            p_layout.addLayout(pair_header_row)
+
+            files_count_lbl = QLabel(
+                f"  {len(conflict.conflicting_files)} conflicting file(s)"
+            )
+            files_count_lbl.setStyleSheet("color: #60608a; font-size: 11px;")
+            p_layout.addWidget(files_count_lbl)
+
+            # --- Per-file rows (inside collapsible) ---
+            toggle_btn = QPushButton(
+                f"▶  Show per-file choices ({len(conflict.conflicting_files)} files)"
+            )
+            toggle_btn.setCheckable(True)
+            toggle_btn.setStyleSheet(
+                "background: transparent; color: #6090d0; border: none; "
+                "text-align: left; font-size: 12px;"
+            )
+            p_layout.addWidget(toggle_btn)
+
+            per_file_widget = QWidget()
+            per_file_widget.setVisible(False)
+            pf_v = QVBoxLayout(per_file_widget)
+            pf_v.setSpacing(4)
+            pf_v.setContentsMargins(10, 4, 4, 4)
+
+            display_files = conflict.conflicting_files[:50]
+            for rel_file in display_files:
+                triple = (mod_a.id, mod_b.id, rel_file)
+                row_w = QWidget()
+                row_h = QHBoxLayout(row_w)
+                row_h.setContentsMargins(0, 0, 0, 0)
+                row_h.setSpacing(6)
+
+                fname_lbl = QLabel(_P(rel_file).name)
+                fname_lbl.setStyleSheet(
+                    "color: #a0a0c0; font-size: 11px; font-family: monospace;"
+                )
+                fname_lbl.setToolTip(rel_file)
+                fname_lbl.setFixedWidth(240)
+                row_h.addWidget(fname_lbl)
+
+                from PyQt6.QtWidgets import QRadioButton as _QRB
+                btn_group = _QBG(row_w)
+                radio_map = {}
+
+                for mod in (mod_a, mod_b):
+                    rb = _QRB(mod.name)
+                    rb.setStyleSheet("color: #c0c0e8; font-size: 11px;")
+                    btn_group.addButton(rb)
+                    radio_map[mod.id] = rb
+                    row_h.addWidget(rb)
+
+                row_h.addStretch()
+                # Default: mod_a wins
+                list(radio_map.values())[0].setChecked(True)
+                self._radio_rows[triple] = radio_map
+                pf_v.addWidget(row_w)
+
+            if len(conflict.conflicting_files) > 50:
+                more_lbl = QLabel(
+                    f"  … and {len(conflict.conflicting_files) - 50} more files. "
+                    "Use 'wins all' buttons above to resolve them all at once."
+                )
+                more_lbl.setStyleSheet("color: #606080; font-size: 10px; font-style: italic;")
+                pf_v.addWidget(more_lbl)
+                # Default all extra files to mod_a
+                for rf in conflict.conflicting_files[50:]:
+                    triple = (mod_a.id, mod_b.id, rf)
+                    self._radio_rows[triple] = {mod_a.id: None, "_default": mod_a.id}
+
+            per_file_widget.setLayout(pf_v)
+            p_layout.addWidget(per_file_widget)
+
+            def _toggle_files(checked, w=per_file_widget, btn=toggle_btn, n=len(conflict.conflicting_files)):
+                w.setVisible(checked)
+                btn.setText(
+                    f"{'▼' if checked else '▶'}  Show per-file choices ({n} files)"
+                )
+
+            toggle_btn.toggled.connect(_toggle_files)
+            c_layout.addWidget(pair_frame)
+
+        c_layout.addStretch()
+        scroll.setWidget(container)
+        layout.addWidget(scroll, 1)
+
+        # --- Buttons ---
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(self.reject)
+        btn_row.addWidget(cancel_btn)
+
+        merge_btn = QPushButton("✅ Copy Selected Files to Folder")
+        merge_btn.setObjectName("success_btn")
+        merge_btn.clicked.connect(self._on_merge)
+        btn_row.addWidget(merge_btn)
+
+        layout.addLayout(btn_row)
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
+
+    def _on_merge(self):
+        from PyQt6.QtWidgets import QFileDialog as _FD
+        dest = _FD.getExistingDirectory(self, "Choose output folder for merged texture pack")
+        if not dest:
+            return
+        self._dest_dir = dest
+        self.accept()
+
+    def get_file_choices(self) -> dict:
+        """Return {(mod_a_id, mod_b_id, rel_file): winning_mod_id}."""
+        choices = {}
+        for triple, radio_map in self._radio_rows.items():
+            if "_default" in radio_map:
+                choices[triple] = radio_map["_default"]
+                continue
+            for mod_id, rb in radio_map.items():
+                if rb is not None and rb.isChecked():
+                    choices[triple] = mod_id
+                    break
+        return choices
+
+    def dest_dir(self) -> str:
+        return self._dest_dir
+
+    def write_merged(self) -> dict:
+        """Copy selected texture files to *dest_dir*.
+
+        Returns a dict with:
+          ``"copied"``  — number of files copied
+          ``"skipped"`` — number skipped (missing source)
+          ``"dest"``    — destination folder path
+        """
+        import shutil
+        from pathlib import Path as _P
+
+        choices = self.get_file_choices()
+        dest = _P(self._dest_dir)
+        dest.mkdir(parents=True, exist_ok=True)
+
+        # Collect all involved mod IDs
+        all_mod_ids: set = set()
+        for conflict in self.conflicts:
+            all_mod_ids.add(conflict.mod_a_id)
+            all_mod_ids.add(conflict.mod_b_id)
+
+        # Track which relative paths have been resolved by the choices map
+        resolved_paths: dict = {}  # rel_path → winning_mod_id
+        for (ma_id, mb_id, rel_file), winner_id in choices.items():
+            resolved_paths[rel_file] = winner_id
+
+        copied = 0
+        skipped = 0
+
+        for mod_id in all_mod_ids:
+            mod = self.db.get(mod_id)
+            if not mod:
+                continue
+            src_root = _P(mod.path)
+            for rel_file in (mod.files or []):
+                # If this file is a conflict, only copy the winner
+                if rel_file in resolved_paths:
+                    if resolved_paths[rel_file] != mod_id:
+                        continue  # this mod lost the conflict
+                src_file = src_root / rel_file
+                if not src_file.is_file():
+                    skipped += 1
+                    continue
+                dest_file = dest / rel_file
+                dest_file.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(str(src_file), str(dest_file))
+                copied += 1
+
+        return {"copied": copied, "skipped": skipped, "dest": str(dest)}
+
+
+# ---------------------------------------------------------------------------
 # Conflict Resolution Dialog
 # ---------------------------------------------------------------------------
 
@@ -1060,9 +1355,19 @@ class ConflictDialog(QDialog):
         scroll.setWidget(container)
         layout.addWidget(scroll, 1)
 
-        # Button row: Code Picker (if PNACH conflicts exist) + Close
+        # Button row: Texture Picker + Code Picker + Close
         btn_row = QHBoxLayout()
         btn_row.addStretch()
+
+        if self.conflicts:
+            tex_picker_btn = QPushButton("🎨 Open Texture File Picker — build custom merged texture pack")
+            tex_picker_btn.setObjectName("primary_btn")
+            tex_picker_btn.setToolTip(
+                "Opens the Texture File Picker where you can choose exactly which mod's "
+                "file wins for each conflicting texture, then export a merged texture pack folder."
+            )
+            tex_picker_btn.clicked.connect(self._open_texture_picker)
+            btn_row.addWidget(tex_picker_btn)
 
         if self.pnach_conflicts:
             picker_btn = QPushButton("🔧 Open Code Picker — build custom merged PNACH")
@@ -1079,6 +1384,27 @@ class ConflictDialog(QDialog):
         btn_row.addWidget(close_btn)
 
         layout.addLayout(btn_row)
+
+    def _open_texture_picker(self):
+        from src.ui.widgets import TextureFilePickerDialog
+        dlg = TextureFilePickerDialog(self.conflicts, self.db, self)
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            result = dlg.write_merged()
+            dest = result.get("dest", "")
+            copied = result.get("copied", 0)
+            skipped = result.get("skipped", 0)
+            if dest:
+                msg = (
+                    f"✅  Merged texture pack written to:\n{dest}\n\n"
+                    f"Files copied: {copied}"
+                )
+                if skipped:
+                    msg += f"\nFiles skipped (missing source): {skipped}"
+                msg += "\n\nImport the folder from the Texture Packs panel."
+                QMessageBox.information(self, "Texture Pack Merged", msg)
+            else:
+                QMessageBox.warning(self, "Nothing Written",
+                                    "No files were copied. Choose an output folder.")
 
     def _open_code_picker(self):
         from src.ui.widgets import PnachCodePickerDialog

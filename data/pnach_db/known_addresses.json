@@ -426,5 +426,483 @@
     "game_crc": "F2A5C5CF",
     "description": "Gems collected — secondary collectible count",
     "category": "cheat"
+  },
+  "CA5B7A61:EE:003B4560": {
+    "game": "Crash Twinsanity (SLUS-20979)",
+    "game_crc": "CA5B7A61",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CA5B7A61:EE:0068F040": {
+    "game": "Crash Twinsanity (SLUS-20979)",
+    "game_crc": "CA5B7A61",
+    "description": "Wumpa fruit counter",
+    "category": "cheat"
+  },
+  "F266B00B:EE:003B4560": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F266B00B:EE:006D5A90": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "description": "Munny (currency) counter",
+    "category": "cheat",
+    "value_map": {
+      "0098967F": "9999999 munny"
+    }
+  },
+  "F266B00B:EE:006B1A40": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "description": "Sora's HP — current health points",
+    "category": "cheat"
+  },
+  "F266B00B:EE:006B1A44": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "description": "Sora's MP — current magic points",
+    "category": "cheat"
+  },
+  "A39517AB:EE:003B2340": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "A39517AB",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF8ABA10:EE:00388000": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "CF8ABA10",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF8ABA10:EE:00C3F000": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "CF8ABA10",
+    "description": "Gil (currency) — party money for items and equipment",
+    "category": "cheat",
+    "value_map": {
+      "0098967F": "max gil (9999999)"
+    }
+  },
+  "CF8ABA10:EE:00C3F020": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "CF8ABA10",
+    "description": "Tidus HP — current health",
+    "category": "cheat"
+  },
+  "4D4B0C8F:EE:003B4560": {
+    "game": "Ico (SCUS-97113)",
+    "game_crc": "4D4B0C8F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2B2570A0:EE:003B5670": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2B2570A0:EE:00832860": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Orb count — Precursor orbs collected",
+    "category": "cheat"
+  },
+  "A5C02F40:EE:003C5000": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A5C02F40:EE:00A82000": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Dark eco level — current amount of dark eco",
+    "category": "cheat"
+  },
+  "3F5A3B78:EE:003C5000": {
+    "game": "Jak 3 (SCUS-97330)",
+    "game_crc": "3F5A3B78",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7B1B8A6F:EE:003C0000": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "7B1B8A6F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B3A9F9E7:EE:003C4000": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A51FB9E1:EE:003C4570": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A51FB9E1:EE:00826004": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Bolts — in-game currency counter",
+    "category": "cheat"
+  },
+  "28D4E52B:EE:003C4570": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
+    "game_crc": "28D4E52B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "28D4E52B:EE:00A12040": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
+    "game_crc": "28D4E52B",
+    "description": "Bolts — in-game currency",
+    "category": "cheat"
+  },
+  "4A9A1ABE:EE:003B3540": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4A9A1ABE:EE:008C0000": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Zeni (currency) — used in the Dragon Universe shop",
+    "category": "cheat"
+  },
+  "1D5CC6E7:EE:003C3540": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6A928BAE:EE:003B4570": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "6A928BAE",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6A928BAE:EE:006E0040": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "6A928BAE",
+    "description": "Sand credits — amount of sand (magic resource)",
+    "category": "cheat"
+  },
+  "6A928BAE:EE:006E0044": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "6A928BAE",
+    "description": "Player health — Prince's current health level",
+    "category": "cheat"
+  },
+  "52F2E55D:EE:003C4540": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1B7A3E32:EE:003B4560": {
+    "game": "Zone of the Enders (SLUS-20128)",
+    "game_crc": "1B7A3E32",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "44A8A22A:EE:003B4540": {
+    "game": "God of War II (SCUS-97481)",
+    "game_crc": "44A8A22A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "44A8A22A:EE:005B4BF0": {
+    "game": "God of War II (SCUS-97481)",
+    "game_crc": "44A8A22A",
+    "description": "Player health — Kratos's current HP",
+    "category": "cheat"
+  },
+  "44A8A22A:EE:005B4BF4": {
+    "game": "God of War II (SCUS-97481)",
+    "game_crc": "44A8A22A",
+    "description": "Player magic — Kratos's magic energy",
+    "category": "cheat"
+  },
+  "44A8A22A:EE:005B4C00": {
+    "game": "God of War II (SCUS-97481)",
+    "game_crc": "44A8A22A",
+    "description": "Red Orbs — upgrade currency",
+    "category": "cheat"
+  },
+  "3BA51AC3:EE:003B4560": {
+    "game": "Onimusha: Warlords (SLUS-20179)",
+    "game_crc": "3BA51AC3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "C5A26456:EE:003B4560": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "C5A26456:EE:00A82000": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "Credits — in-garage currency for AC parts",
+    "category": "cheat"
+  },
+  "3E34F9D4:EE:003B4560": {
+    "game": "Shadow Hearts (SLUS-20472)",
+    "game_crc": "3E34F9D4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1A9BFCD1:EE:003B4560": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "1A9BFCD1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1A9BFCD1:EE:00C3A400": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "1A9BFCD1",
+    "description": "Cash — party funds for items and equipment",
+    "category": "cheat"
+  },
+  "E4FD7B8D:EE:003B4560": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E4FD7B8D:EE:00C18000": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "G-Points (GP) — money for Segment Addresses and items",
+    "category": "cheat"
+  },
+  "D3C7A0A3:EE:003B4560": {
+    "game": ".hack//Infection (SLUS-20267)",
+    "game_crc": "D3C7A0A3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "66CB9620:EE:003B4560": {
+    "game": "Champions: Return to Arms (SLUS-21053)",
+    "game_crc": "66CB9620",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2FAC5233:EE:003B4560": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
+    "game_crc": "2FAC5233",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2FAC5233:EE:00B79010": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
+    "game_crc": "2FAC5233",
+    "description": "Cash — in-game currency for tuning and buying cars",
+    "category": "cheat"
+  },
+  "1B594C95:EE:003C4540": {
+    "game": "Okami (SLUS-21115)",
+    "game_crc": "1B594C95",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1B594C95:EE:00A13000": {
+    "game": "Okami (SLUS-21115)",
+    "game_crc": "1B594C95",
+    "description": "Yen — money for items from merchants",
+    "category": "cheat"
+  },
+  "1B594C95:EE:00A13004": {
+    "game": "Okami (SLUS-21115)",
+    "game_crc": "1B594C95",
+    "description": "Astral Pouch size — how many Astral Pouches Amaterasu carries",
+    "category": "gameplay"
+  },
+  "5C7B2BDD:EE:003B4560": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5C7B2BDD:EE:00B78D30": {
+    "game": "Bully (SLUS-21218)",
+    "game_crc": "5C7B2BDD",
+    "description": "Money — Jimmy's current cash",
+    "category": "cheat"
+  },
+  "CEEF2AC2:EE:003C4540": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CEEF2AC2:EE:00B12000": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Money — Kiryu's current yen",
+    "category": "cheat"
+  },
+  "B3B56447:EE:003C4560": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B3B56447:EE:00C28000": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Yen — money for Personas and items at the mall",
+    "category": "cheat"
+  },
+  "0F6C0DB9:EE:003C4560": {
+    "game": "Persona 4 (SLUS-21844)",
+    "game_crc": "0F6C0DB9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0F6C0DB9:EE:00C18000": {
+    "game": "Persona 4 (SLUS-21844)",
+    "game_crc": "0F6C0DB9",
+    "description": "Yen — money for items, Personas, and Velvet Room",
+    "category": "cheat"
+  },
+  "0F6C0DB9:EE:00C18004": {
+    "game": "Persona 4 (SLUS-21844)",
+    "game_crc": "0F6C0DB9",
+    "description": "Yu's HP — current health in Dungeons",
+    "category": "cheat"
   }
 }

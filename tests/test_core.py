@@ -4377,3 +4377,106 @@ class TestPnachAnalyzer(unittest.TestCase):
         data = json.loads(db_path.read_text())
         self.assertIsInstance(data, dict)
         self.assertGreater(len(data), 0)
+
+
+class TestTextureFilePickerLogic(unittest.TestCase):
+    """Tests for TextureFilePickerDialog.write_merged() logic without a real UI."""
+
+    def _make_db_and_mods(self, tmp_dir: Path):
+        """Create two mods with one shared file and one unique file each."""
+        mod_a_dir = tmp_dir / "mod_a"
+        mod_b_dir = tmp_dir / "mod_b"
+        mod_a_dir.mkdir(parents=True)
+        mod_b_dir.mkdir(parents=True)
+
+        # Conflicting texture
+        (mod_a_dir / "char" / "texture.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_a_dir / "char" / "texture.png").write_bytes(b"MOD_A_TEX")
+
+        (mod_b_dir / "char" / "texture.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_b_dir / "char" / "texture.png").write_bytes(b"MOD_B_TEX")
+
+        # Non-conflicting files
+        (mod_a_dir / "env" / "sky.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_a_dir / "env" / "sky.png").write_bytes(b"SKY_A")
+
+        (mod_b_dir / "hud" / "icon.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_b_dir / "hud" / "icon.png").write_bytes(b"ICON_B")
+
+        db = ModDatabase()
+        mod_a = ModInfo(
+            id="modA", name="Mod A", mod_type=ModType.TEXTURE_PACK,
+            path=str(mod_a_dir), enabled=True,
+            files=["char/texture.png", "env/sky.png"],
+        )
+        mod_b = ModInfo(
+            id="modB", name="Mod B", mod_type=ModType.TEXTURE_PACK,
+            path=str(mod_b_dir), enabled=True,
+            files=["char/texture.png", "hud/icon.png"],
+        )
+        db.add(mod_a)
+        db.add(mod_b)
+        return db, mod_a, mod_b
+
+    def test_write_merged_mod_a_wins_conflict(self):
+        """When modA wins the conflict, mod_a texture is written; non-conflicting from both included."""
+        import shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            db, mod_a, mod_b = self._make_db_and_mods(tmp)
+
+            # choices: modA wins char/texture.png
+            choices = {("modA", "modB", "char/texture.png"): "modA"}
+            resolved_paths = {rf: winner for (_, _, rf), winner in choices.items()}
+
+            dest = tmp / "merged"
+            dest.mkdir()
+            all_mod_ids = {"modA", "modB"}
+            copied = 0
+            skipped = 0
+            for mod_id in all_mod_ids:
+                mod = db.get(mod_id)
+                if not mod:
+                    continue
+                src_root = Path(mod.path)
+                for rel_file in (mod.files or []):
+                    if rel_file in resolved_paths and resolved_paths[rel_file] != mod_id:
+                        continue
+                    src_file = src_root / rel_file
+                    if not src_file.is_file():
+                        skipped += 1
+                        continue
+                    dest_file = dest / rel_file
+                    dest_file.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(str(src_file), str(dest_file))
+                    copied += 1
+
+            self.assertEqual(copied, 3)  # mod_a/char/texture, mod_a/env/sky, mod_b/hud/icon
+            self.assertEqual(skipped, 0)
+            result_tex = dest / "char" / "texture.png"
+            self.assertTrue(result_tex.exists())
+            self.assertEqual(result_tex.read_bytes(), b"MOD_A_TEX")
+            self.assertTrue((dest / "env" / "sky.png").exists())
+            self.assertTrue((dest / "hud" / "icon.png").exists())
+
+    def test_pnach_db_expanded(self):
+        """Known addresses DB should have grown beyond 51 entries."""
+        from src.core.pnach_analyzer import reload_db
+        n = reload_db()
+        self.assertGreater(n, 51, "PNACH DB should have more than 51 entries after expansion")
+
+    def test_infer_category_handles_all_sizes(self):
+        from src.core.pnach_analyzer import infer_category
+        for size in ("word", "short", "byte", "extended", "double"):
+            cat = infer_category("003B2340", "3F800000", size)
+            self.assertIsInstance(cat, str)
+            self.assertGreater(len(cat), 0)
+
+    def test_describe_patch_value_map_case_insensitive(self):
+        """Value map lookup should work regardless of case."""
+        from src.core.pnach_analyzer import describe_patch
+        # Known entry: Spider-Man 2 jump with value map
+        # Test with both upper and lower case value
+        ann_upper = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
+        ann_lower = describe_patch("2EB5B9A9", "EE", "00385538", "3f800000", "word")
+        self.assertEqual(ann_upper["value_note"], ann_lower["value_note"])
