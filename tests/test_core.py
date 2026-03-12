@@ -3327,7 +3327,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 f"Entry {entry['id']} author_url contains typo domain 'gbatem.org': {aurl!r}"
             )
 
-    def test_no_fake_gamesavedfiles_com_in_author_url(self):
+    def test_no_fake_gamesavedfiles_com_in_urls(self):
         """author_url and url must not use gamesavedfiles.com which is a non-existent website."""
         for entry in self.catalogue:
             aurl = entry.get("author_url", "")
