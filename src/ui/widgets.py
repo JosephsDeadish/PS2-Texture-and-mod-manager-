@@ -1863,30 +1863,30 @@ class PnachCodeBuilderDialog(QDialog):
             )
             custom_label.setToolTip("PNACH hex that will be written")
 
-            def _on_custom_changed(text, _vtype=value_type,
-                                   _lbl=custom_label, _combo=value_combo):
+            def _on_custom_changed(text, vtype=value_type,
+                                   label_widget=custom_label, combo_widget=value_combo):
                 """Update the live hex preview and dim the combo when custom is active."""
                 text = text.strip()
                 if not text:
-                    _lbl.setText("")
-                    if _combo:
-                        _combo.setEnabled(True)
+                    label_widget.setText("")
+                    if combo_widget:
+                        combo_widget.setEnabled(True)
                     return
-                hx, err = value_to_pnach_hex(text, _vtype)
+                hx, err = value_to_pnach_hex(text, vtype)
                 if hx:
-                    _lbl.setText(f"→ {hx}")
-                    _lbl.setStyleSheet(
+                    label_widget.setText(f"→ {hx}")
+                    label_widget.setStyleSheet(
                         "color: #50d090; font-family: monospace; font-size: 11px;"
                     )
-                    if _combo:
-                        _combo.setEnabled(False)   # custom overrides preset
+                    if combo_widget:
+                        combo_widget.setEnabled(False)   # custom overrides preset
                 else:
-                    _lbl.setText(err or "?")
-                    _lbl.setStyleSheet(
+                    label_widget.setText(err or "?")
+                    label_widget.setStyleSheet(
                         "color: #e05050; font-family: monospace; font-size: 11px;"
                     )
-                    if _combo:
-                        _combo.setEnabled(True)
+                    if combo_widget:
+                        combo_widget.setEnabled(True)
 
             custom_edit.textChanged.connect(_on_custom_changed)
             row.addWidget(custom_edit)
