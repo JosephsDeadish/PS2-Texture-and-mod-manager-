@@ -6284,3 +6284,242 @@ class TestConflictResolver(unittest.TestCase):
         )
         ok, msg = auto_fix_conflict(c)
         self.assertFalse(ok)
+
+
+# ===========================================================================
+
+class TestBackupManager(unittest.TestCase):
+    """Tests for src.core.backup_manager — create / list / restore / delete."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        # Patch get_exe_dir so backups go into our temp dir
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        # Simple fake config with real sub-directories
+        self.cheats_dir    = os.path.join(self.tmpdir, "cheats")
+        self.cheats_ws_dir = os.path.join(self.tmpdir, "cheats_ws")
+        self.covers_dir    = os.path.join(self.tmpdir, "covers")
+        self.textures_dir  = os.path.join(self.tmpdir, "textures")
+        for d in (self.cheats_dir, self.cheats_ws_dir, self.covers_dir, self.textures_dir):
+            os.makedirs(d, exist_ok=True)
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+        self.cfg.pnach_path     = self.cheats_dir
+        self.cfg.cheats_path    = self.cheats_ws_dir
+        self.cfg.cover_art_path = self.covers_dir
+        self.cfg.textures_path  = self.textures_dir
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # -----------------------------------------------------------------------
+    # Module import
+    # -----------------------------------------------------------------------
+
+    def test_import(self):
+        from src.core.backup_manager import (
+            BackupEntry,
+            get_backup_dir,
+            create_backup,
+            list_backups,
+            restore_backup,
+            delete_backup,
+        )
+
+    # -----------------------------------------------------------------------
+    # BackupEntry helpers
+    # -----------------------------------------------------------------------
+
+    def test_size_label_bytes(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=512)
+        self.assertIn("KB", e.size_label)
+
+    def test_size_label_mb(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=5 * 1024 * 1024)
+        self.assertIn("MB", e.size_label)
+
+    def test_size_label_gb(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=2 * 1024 * 1024 * 1024)
+        self.assertIn("GB", e.size_label)
+
+    # -----------------------------------------------------------------------
+    # get_backup_dir
+    # -----------------------------------------------------------------------
+
+    def test_get_backup_dir_creates_dir(self):
+        from src.core.backup_manager import get_backup_dir
+        backup_dir = get_backup_dir(self.cfg)
+        self.assertTrue(backup_dir.exists())
+        self.assertTrue(backup_dir.is_dir())
+
+    def test_get_backup_dir_idempotent(self):
+        from src.core.backup_manager import get_backup_dir
+        d1 = get_backup_dir(self.cfg)
+        d2 = get_backup_dir(self.cfg)
+        self.assertEqual(d1, d2)
+
+    # -----------------------------------------------------------------------
+    # create_backup
+    # -----------------------------------------------------------------------
+
+    def test_create_backup_returns_entry(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertIsNotNone(entry)
+        self.assertTrue(entry.label.startswith("backup_"))
+        self.assertTrue(entry.label.endswith(".zip"))
+
+    def test_create_backup_file_exists(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+
+    def test_create_backup_with_note(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg, note="my note")
+        self.assertIn("my_note", entry.label)
+
+    def test_create_backup_note_sanitised(self):
+        """Note with special characters must be sanitised in the filename."""
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg, note="bad/path\\hack")
+        # Slashes and backslashes must not appear in the filename
+        self.assertNotIn("/", entry.label[7:])  # skip "backup_" prefix
+        self.assertNotIn("\\", entry.label)
+
+    def test_create_backup_includes_files(self):
+        """Files placed in the source dirs must appear in the archive."""
+        import zipfile
+        from src.core.backup_manager import create_backup
+
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+        Path(os.path.join(self.covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+
+        entry = create_backup(self.cfg)
+        with zipfile.ZipFile(entry.path) as zf:
+            names = zf.namelist()
+        self.assertTrue(any("AABBCCDD.pnach" in n for n in names))
+        self.assertTrue(any("SLUS-20062.png" in n for n in names))
+
+    def test_create_backup_size_bytes(self):
+        """size_bytes should be > 0 when files are present."""
+        from src.core.backup_manager import create_backup
+        Path(os.path.join(self.cheats_dir, "11223344.pnach")).write_text("patch=1,EE,0,word,0")
+        entry = create_backup(self.cfg)
+        self.assertGreater(entry.size_bytes, 0)
+
+    def test_create_backup_empty_dirs(self):
+        """create_backup should succeed even when all configured dirs are empty."""
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+
+    # -----------------------------------------------------------------------
+    # list_backups
+    # -----------------------------------------------------------------------
+
+    def test_list_backups_empty(self):
+        from src.core.backup_manager import list_backups
+        entries = list_backups(self.cfg)
+        self.assertEqual(entries, [])
+
+    def test_list_backups_after_create(self):
+        from src.core.backup_manager import create_backup, list_backups
+        create_backup(self.cfg, note="first")
+        create_backup(self.cfg, note="second")
+        entries = list_backups(self.cfg)
+        self.assertEqual(len(entries), 2)
+
+    def test_list_backups_newest_first(self):
+        """list_backups must return entries newest-first."""
+        import time
+        from src.core.backup_manager import create_backup, list_backups
+        e1 = create_backup(self.cfg, note="a")
+        time.sleep(0.01)
+        e2 = create_backup(self.cfg, note="b")
+        entries = list_backups(self.cfg)
+        # The most recently created file should appear first
+        labels = [e.label for e in entries]
+        self.assertEqual(labels.index(e2.label), 0)
+
+    # -----------------------------------------------------------------------
+    # restore_backup
+    # -----------------------------------------------------------------------
+
+    def test_restore_backup_restores_files(self):
+        """Files in an archive should be restored to the correct destination."""
+        from src.core.backup_manager import create_backup, restore_backup
+
+        src_file = Path(os.path.join(self.cheats_dir, "DEADBEEF.pnach"))
+        src_file.write_text("patch=1,EE,0,word,0")
+
+        entry = create_backup(self.cfg)
+
+        # Delete the source file then restore
+        src_file.unlink()
+        self.assertFalse(src_file.exists())
+
+        count = restore_backup(entry, self.cfg)
+        self.assertGreater(count, 0)
+        self.assertTrue(src_file.exists())
+
+    def test_restore_backup_returns_count(self):
+        from src.core.backup_manager import create_backup, restore_backup
+        Path(os.path.join(self.covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+        entry = create_backup(self.cfg)
+        count = restore_backup(entry, self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_restore_missing_archive_raises(self):
+        from src.core.backup_manager import BackupEntry, restore_backup
+        fake = BackupEntry(
+            path="/nonexistent/backup_19990101_000000.zip",
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        with self.assertRaises(FileNotFoundError):
+            restore_backup(fake, self.cfg)
+
+    # -----------------------------------------------------------------------
+    # delete_backup
+    # -----------------------------------------------------------------------
+
+    def test_delete_backup_removes_file(self):
+        from src.core.backup_manager import create_backup, delete_backup, list_backups
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+        ok = delete_backup(entry)
+        self.assertTrue(ok)
+        self.assertFalse(os.path.isfile(entry.path))
+
+    def test_delete_backup_nonexistent_returns_false(self):
+        from src.core.backup_manager import BackupEntry, delete_backup
+        fake = BackupEntry(
+            path="/nonexistent/backup_19990101_000000.zip",
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        ok = delete_backup(fake)
+        self.assertFalse(ok)
+
+    def test_list_after_delete_shows_fewer(self):
+        from src.core.backup_manager import create_backup, delete_backup, list_backups
+        e1 = create_backup(self.cfg, note="keep")
+        e2 = create_backup(self.cfg, note="remove")
+        delete_backup(e2)
+        entries = list_backups(self.cfg)
+        self.assertEqual(len(entries), 1)
+        self.assertIn("keep", entries[0].label)

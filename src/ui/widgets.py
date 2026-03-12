@@ -2979,3 +2979,259 @@ class ConflictResolverDialog(QDialog):
         if folder.is_file():
             folder = folder.parent
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+
+
+# ---------------------------------------------------------------------------
+# BackupManagerDialog
+# ---------------------------------------------------------------------------
+
+class BackupManagerDialog(QDialog):
+    """Create, browse, restore and delete backups of PCSX2 managed content.
+
+    Backups are timestamped ZIP archives stored in a ``backups/`` folder next
+    to the application executable.  Each archive may contain one or more of:
+
+    * PNACH cheat files (``cheats/``)
+    * Widescreen PNACH patches (``cheats_ws/``)
+    * Cover-art images (``covers/``)
+    * Texture-pack directories (``textures/``)
+
+    Parameters
+    ----------
+    config:
+        Current :class:`~src.models.mod.AppConfig` instance providing PCSX2 paths.
+    parent:
+        Parent widget.
+    """
+
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self._config  = config
+        self._entries = []   # list[BackupEntry]
+        self.setWindowTitle("💾  Backup Manager")
+        self.setMinimumSize(780, 480)
+        self._build_ui()
+        self._refresh_list()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Header
+        hdr = QLabel(
+            "Backups are ZIP archives of your PCSX2 data (PNACH files, cover art, "
+            "texture packs).\nSelect an archive to view details or restore it."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # --- Left: backup list ---
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._list_widget = QListWidget()
+        self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.currentRowChanged.connect(self._on_selection_changed)
+        left_layout.addWidget(self._list_widget)
+
+        create_row = QHBoxLayout()
+        self._note_edit = QLineEdit()
+        self._note_edit.setPlaceholderText("Optional note…")
+        self._note_edit.setMaxLength(40)
+        create_row.addWidget(self._note_edit, 1)
+
+        create_btn = QPushButton("➕ Create Backup")
+        create_btn.setObjectName("primary_btn")
+        create_btn.setToolTip("Create a new backup archive now")
+        create_btn.clicked.connect(self._on_create)
+        create_row.addWidget(create_btn)
+
+        left_layout.addLayout(create_row)
+        splitter.addWidget(left)
+
+        # --- Right: detail panel ---
+        right = QWidget()
+        right_layout = QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._detail_label = QLabel("← Select a backup from the list")
+        self._detail_label.setWordWrap(True)
+        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self._detail_label.setTextFormat(Qt.TextFormat.RichText)
+        right_layout.addWidget(self._detail_label, 1)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        right_layout.addWidget(sep)
+
+        action_row = QHBoxLayout()
+
+        self._restore_btn = QPushButton("♻  Restore")
+        self._restore_btn.setToolTip(
+            "Extract this backup into the PCSX2 directories (overwrites existing files)"
+        )
+        self._restore_btn.setEnabled(False)
+        self._restore_btn.clicked.connect(self._on_restore)
+        action_row.addWidget(self._restore_btn)
+
+        self._delete_btn = QPushButton("🗑  Delete")
+        self._delete_btn.setToolTip("Permanently delete this backup archive")
+        self._delete_btn.setEnabled(False)
+        self._delete_btn.clicked.connect(self._on_delete)
+        action_row.addWidget(self._delete_btn)
+
+        action_row.addStretch()
+
+        open_dir_btn = QPushButton("📂 Open Backups Folder")
+        open_dir_btn.setToolTip("Open the backups folder in the file manager")
+        open_dir_btn.clicked.connect(self._on_open_dir)
+        action_row.addWidget(open_dir_btn)
+
+        right_layout.addLayout(action_row)
+        splitter.addWidget(right)
+
+        splitter.setStretchFactor(0, 2)
+        splitter.setStretchFactor(1, 3)
+        layout.addWidget(splitter, 1)
+
+        # Close button
+        close_row = QHBoxLayout()
+        close_row.addStretch()
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.accept)
+        close_row.addWidget(close_btn)
+        layout.addLayout(close_row)
+
+    # ------------------------------------------------------------------
+    def _refresh_list(self):
+        self._list_widget.clear()
+        try:
+            from src.core.backup_manager import list_backups
+            self._entries = list_backups(self._config)
+        except Exception as exc:
+            self._entries = []
+            self._detail_label.setText(f"<i>Could not read backups: {exc}</i>")
+            return
+
+        for entry in self._entries:
+            self._list_widget.addItem(f"{entry.label}  ({entry.size_label})")
+
+        if not self._entries:
+            self._detail_label.setText("<i>No backups found.  Use ➕ Create Backup to make one.</i>")
+
+        self._restore_btn.setEnabled(False)
+        self._delete_btn.setEnabled(False)
+
+    # ------------------------------------------------------------------
+    def _on_selection_changed(self, row: int):
+        if row < 0 or row >= len(self._entries):
+            self._detail_label.setText("← Select a backup from the list")
+            self._restore_btn.setEnabled(False)
+            self._delete_btn.setEnabled(False)
+            return
+
+        entry = self._entries[row]
+        html = (
+            f"<b>{entry.label}</b><br>"
+            f"<br>"
+            f"<b>Created:</b> {entry.created_at}<br>"
+            f"<b>Size (uncompressed):</b> {entry.size_label}<br>"
+        )
+        if entry.note:
+            html += f"<b>Note:</b> {entry.note}<br>"
+        html += f"<br><b>Archive path:</b><br><code>{entry.path}</code>"
+        self._detail_label.setText(html)
+        self._restore_btn.setEnabled(True)
+        self._delete_btn.setEnabled(True)
+
+    # ------------------------------------------------------------------
+    def _on_create(self):
+        note = self._note_edit.text().strip()
+        try:
+            from src.core.backup_manager import create_backup
+            entry = create_backup(self._config, note=note)
+        except Exception as exc:
+            QMessageBox.critical(self, "Backup Failed", str(exc))
+            return
+
+        self._note_edit.clear()
+        self._refresh_list()
+        QMessageBox.information(
+            self,
+            "✅ Backup Created",
+            f"Backup created successfully.\n\nFile: {entry.label}\nSize: {entry.size_label}",
+        )
+
+    # ------------------------------------------------------------------
+    def _on_restore(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._entries):
+            return
+
+        entry = self._entries[row]
+        reply = QMessageBox.question(
+            self,
+            "Restore Backup",
+            f"Restore backup:\n{entry.label}\n\n"
+            "This will overwrite existing files in your PCSX2 directories.\n"
+            "Proceed?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            from src.core.backup_manager import restore_backup
+            count = restore_backup(entry, self._config)
+        except FileNotFoundError:
+            QMessageBox.critical(self, "Restore Failed", "Archive file not found on disk.")
+            self._refresh_list()
+            return
+        except Exception as exc:
+            QMessageBox.critical(self, "Restore Failed", str(exc))
+            return
+
+        QMessageBox.information(
+            self,
+            "✅ Restore Complete",
+            f"Successfully restored {count} file(s) from:\n{entry.label}",
+        )
+
+    # ------------------------------------------------------------------
+    def _on_delete(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._entries):
+            return
+
+        entry = self._entries[row]
+        reply = QMessageBox.question(
+            self,
+            "Delete Backup",
+            f"Permanently delete:\n{entry.label}\n\nThis cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        from src.core.backup_manager import delete_backup
+        ok = delete_backup(entry)
+        if ok:
+            self._refresh_list()
+        else:
+            QMessageBox.warning(self, "Delete Failed", "Could not delete the backup archive.")
+
+    # ------------------------------------------------------------------
+    def _on_open_dir(self):
+        try:
+            from src.core.backup_manager import get_backup_dir
+            backup_dir = get_backup_dir(self._config)
+        except Exception:
+            return
+
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(backup_dir)))

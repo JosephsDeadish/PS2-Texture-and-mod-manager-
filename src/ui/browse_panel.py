@@ -1842,6 +1842,16 @@ class BrowsePanel(BasePanel):
         conflict_btn.clicked.connect(self._open_conflict_resolver)
         toolbar.addWidget(conflict_btn)
 
+        backup_btn = QPushButton("💾 Backup / Restore")
+        backup_btn.setToolTip(
+            "Create, browse and restore ZIP backups of your PCSX2 managed content:\n"
+            "• PNACH cheat files\n"
+            "• Cover art images\n"
+            "• Texture packs"
+        )
+        backup_btn.clicked.connect(self._open_backup_manager)
+        toolbar.addWidget(backup_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -2216,6 +2226,12 @@ class BrowsePanel(BasePanel):
         """Open the Conflict Resolver dialog."""
         from src.ui.widgets import ConflictResolverDialog
         dlg = ConflictResolverDialog(self.config, self)
+        dlg.exec()
+
+    def _open_backup_manager(self):
+        """Open the Backup Manager dialog."""
+        from src.ui.widgets import BackupManagerDialog
+        dlg = BackupManagerDialog(self.config, self)
         dlg.exec()
 
     def _open_url(self, url: str):
