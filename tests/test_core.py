@@ -5595,3 +5595,361 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         result = scan_unmanaged_texture_packs(self.tmpdir)
         serials = [p.serial for p in result]
         self.assertEqual(serials, sorted(serials))
+
+
+# ---------------------------------------------------------------------------
+# Tests for installed_scanner
+# ---------------------------------------------------------------------------
+
+class TestInstalledScanner(unittest.TestCase):
+    """scan_all() and per-type scanners in installed_scanner."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_serial_dir(self, base, serial, subdir="replacements", files=("tex.png",)):
+        d = Path(base) / serial / subdir
+        d.mkdir(parents=True, exist_ok=True)
+        for f in files:
+            (d / f).write_bytes(b"DATA")
+        return d
+
+    def _make_pnach(self, base, crc="F0A235B4"):
+        p = Path(base)
+        p.mkdir(parents=True, exist_ok=True)
+        fp = p / f"{crc}.pnach"
+        fp.write_text("[EE]\npatch=1,EE,00123456,word,00000001", encoding="utf-8")
+        return fp
+
+    def _make_cover(self, base, serial="SLUS-20062"):
+        p = Path(base)
+        p.mkdir(parents=True, exist_ok=True)
+        fp = p / f"{serial}.png"
+        fp.write_bytes(b"\x89PNG")
+        return fp
+
+    # scan_pnach ----------------------------------------------------------
+
+    def test_scan_pnach_empty_path(self):
+        from src.core.installed_scanner import scan_pnach
+        self.assertEqual(scan_pnach(""), [])
+
+    def test_scan_pnach_finds_crc_file(self):
+        from src.core.installed_scanner import scan_pnach
+        self._make_pnach(self.tmpdir, "AABBCCDD")
+        result = scan_pnach(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].crc, "AABBCCDD")
+
+    def test_scan_pnach_ignores_non_crc_names(self):
+        from src.core.installed_scanner import scan_pnach
+        p = Path(self.tmpdir) / "somegame.pnach"
+        p.write_bytes(b"patch=...")
+        result = scan_pnach(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_scan_pnach_respects_managed(self):
+        from src.core.installed_scanner import scan_pnach
+        fp = self._make_pnach(self.tmpdir, "11223344")
+        result = scan_pnach(self.tmpdir, managed_paths={str(fp.resolve())})
+        self.assertEqual(result, [])
+
+    # scan_cheats ---------------------------------------------------------
+
+    def test_scan_cheats_empty_path(self):
+        from src.core.installed_scanner import scan_cheats
+        self.assertEqual(scan_cheats(""), [])
+
+    def test_scan_cheats_finds_widescreen_pnach(self):
+        from src.core.installed_scanner import scan_cheats
+        from src.models.mod import ModType
+        self._make_pnach(self.tmpdir, "DEADBEEF")
+        result = scan_cheats(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].item_type, ModType.CHEAT)
+        self.assertEqual(result[0].crc, "DEADBEEF")
+
+    # scan_cover_art ------------------------------------------------------
+
+    def test_scan_cover_art_empty_path(self):
+        from src.core.installed_scanner import scan_cover_art
+        self.assertEqual(scan_cover_art(""), [])
+
+    def test_scan_cover_art_finds_png(self):
+        from src.core.installed_scanner import scan_cover_art
+        from src.models.mod import ModType
+        self._make_cover(self.tmpdir, "SLUS-20062")
+        result = scan_cover_art(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertEqual(result[0].item_type, ModType.COVER_ART)
+
+    def test_scan_cover_art_ignores_non_serial_names(self):
+        from src.core.installed_scanner import scan_cover_art
+        p = Path(self.tmpdir) / "mygame.png"
+        p.write_bytes(b"\x89PNG")
+        result = scan_cover_art(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_scan_cover_art_respects_managed(self):
+        from src.core.installed_scanner import scan_cover_art
+        fp = self._make_cover(self.tmpdir, "SCUS-97199")
+        result = scan_cover_art(self.tmpdir, managed_paths={str(fp.resolve())})
+        self.assertEqual(result, [])
+
+    # scan_textures -------------------------------------------------------
+
+    def test_scan_textures_delegates_to_texture_scanner(self):
+        from src.core.installed_scanner import scan_textures
+        from src.models.mod import ModType
+        self._make_serial_dir(self.tmpdir, "SLUS-20062", "replacements", ["a.png"])
+        result = scan_textures(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].item_type, ModType.TEXTURE_PACK)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+
+    # scan_all ------------------------------------------------------------
+
+    def test_scan_all_combines_results(self):
+        from src.core.installed_scanner import scan_all
+
+        tex_root   = Path(self.tmpdir) / "textures"
+        pnach_root = Path(self.tmpdir) / "cheats"
+        cover_root = Path(self.tmpdir) / "covers"
+        cheat_root = Path(self.tmpdir) / "cheats_ws"
+
+        self._make_serial_dir(str(tex_root), "SLUS-20062", "replacements", ["a.png"])
+        self._make_pnach(str(pnach_root), "F0A235B4")
+        self._make_cover(str(cover_root), "SLUS-20062")
+        self._make_pnach(str(cheat_root), "AABBCCDD")
+
+        class FakeConfig:
+            textures_path  = str(tex_root)
+            pnach_path     = str(pnach_root)
+            cheats_path    = str(cheat_root)
+            cover_art_path = str(cover_root)
+
+        result = scan_all(FakeConfig())
+        types = {item.item_type.value for item in result}
+        self.assertIn("texture_pack", types)
+        self.assertIn("pnach", types)
+        self.assertIn("cheat", types)
+        self.assertIn("cover_art", types)
+
+    def test_scan_all_empty_config(self):
+        from src.core.installed_scanner import scan_all
+
+        class EmptyConfig:
+            textures_path  = ""
+            pnach_path     = ""
+            cheats_path    = ""
+            cover_art_path = ""
+
+        result = scan_all(EmptyConfig())
+        self.assertEqual(result, [])
+
+    # UnmanagedItem helpers -----------------------------------------------
+
+    def test_unmanaged_item_size_label(self):
+        from src.core.installed_scanner import UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.PNACH,
+            name="F0A235B4.pnach",
+            path=Path("/tmp/F0A235B4.pnach"),
+            size_bytes=1024 * 300,
+        )
+        self.assertIn("KB", item.size_label)
+
+    def test_unmanaged_item_type_label(self):
+        from src.core.installed_scanner import UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK,
+            name="SLUS-20062",
+            path=Path("/tmp/textures/SLUS-20062/replacements"),
+        )
+        self.assertEqual(item.type_label, "Texture Pack")
+
+    # find_catalogue_matches ---------------------------------------------
+
+    def test_find_catalogue_matches_by_serial(self):
+        from src.core.installed_scanner import find_catalogue_matches, UnmanagedItem
+        from src.models.mod import ModType
+        cat = [
+            {"id": "a", "type": ModType.TEXTURE_PACK, "game_serial": "SLUS-20062",
+             "game": "Sly 2: Band of Thieves"},
+            {"id": "b", "type": ModType.TEXTURE_PACK, "game_serial": "SCUS-97199",
+             "game": "Ratchet & Clank"},
+        ]
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK, name="SLUS-20062 Pack",
+            path=Path("/tmp"), serial="SLUS-20062",
+        )
+        matches = find_catalogue_matches(item, cat)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["id"], "a")
+
+    def test_find_catalogue_matches_returns_empty_if_no_match(self):
+        from src.core.installed_scanner import find_catalogue_matches, UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK, name="Unknown",
+            path=Path("/tmp"), serial="XXXX-99999",
+        )
+        matches = find_catalogue_matches(item, [])
+        self.assertEqual(matches, [])
+
+
+# ---------------------------------------------------------------------------
+# Tests for custom_card_builder
+# ---------------------------------------------------------------------------
+
+class TestCustomCardBuilder(unittest.TestCase):
+    """build_entry() and save_entry() in custom_card_builder."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # build_entry ---------------------------------------------------------
+
+    def test_build_entry_minimal(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="texture_pack",
+            name="Test Pack",
+            game="Sly 2",
+            game_serial="SCUS-97264",
+            author="Me",
+            url="",
+            description="A test pack",
+        )
+        self.assertEqual(e["type"], "texture_pack")
+        self.assertEqual(e["game_serial"], "SCUS-97264")
+        self.assertIn("id", e)
+        self.assertTrue(e["id"])
+
+    def test_build_entry_normalises_serial_to_upper(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="pnach", name="My Patch", game="Game",
+            game_serial="scus-97264", author="", url="", description="",
+        )
+        self.assertEqual(e["game_serial"], "SCUS-97264")
+
+    def test_build_entry_invalid_type_raises(self):
+        from src.core.custom_card_builder import build_entry
+        with self.assertRaises(ValueError):
+            build_entry(
+                mod_type="invalid_type", name="X", game="G",
+                game_serial="SLUS-20062", author="", url="", description="",
+            )
+
+    def test_build_entry_empty_name_raises(self):
+        from src.core.custom_card_builder import build_entry
+        with self.assertRaises(ValueError):
+            build_entry(
+                mod_type="texture_pack", name="  ", game="G",
+                game_serial="SLUS-20062", author="", url="", description="",
+            )
+
+    def test_build_entry_custom_id(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="cover_art", name="Cover", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+            entry_id="my-custom-id",
+        )
+        self.assertEqual(e["id"], "my-custom-id")
+
+    def test_build_entry_all_optional_fields_present(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="save_file", name="My Save", game="Game",
+            game_serial="SLUS-20062", author="Bob", url="https://example.com",
+            description="desc", source="Personal", size_label="~10 KB",
+            context="ctx", author_url="https://example.com/bob",
+            thumbnail_url="", tags=["hd", "ps2"],
+        )
+        self.assertEqual(e["author_url"], "https://example.com/bob")
+        self.assertEqual(e["tags"], ["hd", "ps2"])
+        self.assertEqual(e["size_label"], "~10 KB")
+
+    # save_entry ----------------------------------------------------------
+
+    def test_save_entry_creates_file(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e = build_entry(
+            mod_type="texture_pack", name="Saved Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+        path = save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        self.assertTrue(path.exists())
+
+    def test_save_entry_appends_to_existing(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e1 = build_entry(
+            mod_type="texture_pack", name="Pack One", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+        e2 = build_entry(
+            mod_type="pnach", name="Patch Two", game="Game2",
+            game_serial="SCUS-97264", author="", url="", description="",
+        )
+        save_entry(e1, user_catalogue_dir=Path(self.tmpdir))
+        save_entry(e2, user_catalogue_dir=Path(self.tmpdir))
+        import json
+        data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
+        self.assertEqual(len(data), 2)
+
+    def test_save_entry_duplicate_id_gets_new_id(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e = build_entry(
+            mod_type="texture_pack", name="Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+            entry_id="dup-id",
+        )
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))  # same id
+        import json
+        data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
+        ids = [d["id"] for d in data]
+        self.assertEqual(len(set(ids)), 2, "Duplicate ID should have been renamed")
+
+    def test_save_entry_no_id_raises(self):
+        from src.core.custom_card_builder import save_entry
+        with self.assertRaises(ValueError):
+            save_entry({"id": ""}, user_catalogue_dir=Path(self.tmpdir))
+
+    def test_saved_entry_is_valid_catalogue_json(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        from src.core.catalogue_loader import load_user_catalogue
+        e = build_entry(
+            mod_type="texture_pack", name="Valid Pack", game="Sly 2",
+            game_serial="SCUS-97264", author="Tester",
+            url="https://example.com", description="Test desc",
+        )
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["name"], "Valid Pack")
+
+    # generate_id ---------------------------------------------------------
+
+    def test_generate_id_is_string(self):
+        from src.core.custom_card_builder import generate_id
+        gid = generate_id("My Pack", "SCUS-97264")
+        self.assertIsInstance(gid, str)
+        self.assertTrue(gid)
+
+    def test_generate_id_unique_per_call(self):
+        from src.core.custom_card_builder import generate_id
+        ids = {generate_id("Pack", "SCUS-97264") for _ in range(20)}
+        # All 20 should be unique (random suffix)
+        self.assertGreater(len(ids), 1)

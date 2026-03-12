@@ -1815,6 +1815,22 @@ class BrowsePanel(BasePanel):
         cover_art_btn.clicked.connect(self._open_cover_art_dialog)
         toolbar.addWidget(cover_art_btn)
 
+        scan_btn = QPushButton("🔍 Scan PCSX2 Folder")
+        scan_btn.setToolTip(
+            "Scan your PCSX2 directory for texture packs, PNACH files, and cover art\n"
+            "that were installed outside of PS2 Mod Manager so you can manage them here"
+        )
+        scan_btn.clicked.connect(self._open_installed_scanner)
+        toolbar.addWidget(scan_btn)
+
+        create_card_btn = QPushButton("✏ New Custom Card")
+        create_card_btn.setToolTip(
+            "Create a catalogue card for a mod not in the built-in catalogue.\n"
+            "Cards are saved to your personal user_catalogue/ folder."
+        )
+        create_card_btn.clicked.connect(self._open_custom_card_dialog)
+        toolbar.addWidget(create_card_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -2171,6 +2187,18 @@ class BrowsePanel(BasePanel):
     def _open_cover_art_dialog(self):
         """Open the Cover Art download dialog from the toolbar."""
         dlg = CoverDownloadDialog(self.config, self)
+        dlg.exec()
+
+    def _open_installed_scanner(self):
+        """Open the Installed Content Scanner dialog."""
+        from src.ui.widgets import InstalledScannerDialog
+        dlg = InstalledScannerDialog(self.config, self)
+        dlg.exec()
+
+    def _open_custom_card_dialog(self):
+        """Open the Custom Card creator dialog."""
+        from src.ui.widgets import CustomCardDialog
+        dlg = CustomCardDialog(self)
         dlg.exec()
 
     def _open_url(self, url: str):

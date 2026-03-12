@@ -9,6 +9,7 @@ from PyQt6.QtCore import Qt, QSize, pyqtSignal, QThread
 from PyQt6.QtGui import QPixmap, QFont, QIcon
 from PyQt6.QtWidgets import (
     QCheckBox,
+    QComboBox,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -27,6 +28,10 @@ from PyQt6.QtWidgets import (
     QGridLayout,
     QTextEdit,
     QMessageBox,
+    QListWidget,
+    QListWidgetItem,
+    QSplitter,
+    QTabWidget,
 )
 
 from src.models.mod import ModInfo, ModType, ConflictInfo
@@ -2311,3 +2316,412 @@ class PnachCodeBuilderDialog(QDialog):
                                               self._dir_edit.text())
         if d:
             self._dir_edit.setText(d)
+
+
+
+# ---------------------------------------------------------------------------
+# CustomCardDialog — create a catalogue card for a pre-existing mod
+# ---------------------------------------------------------------------------
+
+class CustomCardDialog(QDialog):
+    """Form dialog for creating a custom catalogue entry (card) for a
+    pre-existing mod that is not in the built-in catalogue.
+
+    After the user fills in the form and accepts, the entry is written to the
+    ``user_catalogue/my_cards.json`` file next to the application executable.
+    The entry then appears in the Browse panel after a catalogue reload.
+
+    Parameters
+    ----------
+    parent:
+        Parent widget.
+    prefill:
+        Optional dict of field values to pre-populate the form.  Useful when
+        opening this dialog from :class:`InstalledScannerDialog` with data
+        auto-detected from a scanned item.
+    """
+
+    #: Emitted with the newly created entry dict when the user accepts.
+    card_created = pyqtSignal(dict)
+
+    def __init__(self, parent=None, *, prefill: dict = None):
+        super().__init__(parent)
+        self._prefill = prefill or {}
+        self.setWindowTitle("✏  Create Custom Catalogue Card")
+        self.setMinimumWidth(560)
+        self._build_ui()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+
+        # Header
+        hdr = QLabel(
+            "Fill in the details below to add this mod to your personal catalogue.\n"
+            "Fields marked * are required."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        form = QGridLayout()
+        form.setColumnStretch(1, 1)
+        form.setSpacing(6)
+        row = 0
+
+        def _add_row(label_text, widget, hint=""):
+            nonlocal row
+            lbl = QLabel(label_text)
+            lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            form.addWidget(lbl, row, 0)
+            form.addWidget(widget, row, 1)
+            if hint:
+                hint_lbl = QLabel(f"<small><i>{hint}</i></small>")
+                hint_lbl.setWordWrap(True)
+                row += 1
+                form.addWidget(hint_lbl, row, 1)
+            row += 1
+
+        # Type *
+        self._type_combo = QComboBox()
+        for val, lbl in [
+            ("texture_pack", "Texture Pack"),
+            ("pnach",        "PNACH Patch"),
+            ("save_file",    "Memory Card Save"),
+            ("cheat",        "Widescreen / Cheat Patch"),
+            ("cover_art",    "Cover Art"),
+        ]:
+            self._type_combo.addItem(lbl, val)
+        prefill_type = self._prefill.get("type", "")
+        if hasattr(prefill_type, "value"):
+            prefill_type = prefill_type.value
+        for i in range(self._type_combo.count()):
+            if self._type_combo.itemData(i) == prefill_type:
+                self._type_combo.setCurrentIndex(i)
+                break
+        _add_row("Type *:", self._type_combo)
+
+        # Name *
+        self._name_edit = QLineEdit(self._prefill.get("name", ""))
+        self._name_edit.setPlaceholderText("e.g. Sly 2 HD Textures")
+        _add_row("Name *:", self._name_edit)
+
+        # Game *
+        self._game_edit = QLineEdit(self._prefill.get("game", ""))
+        self._game_edit.setPlaceholderText("e.g. Sly 2: Band of Thieves")
+        _add_row("Game *:", self._game_edit)
+
+        # Serial *
+        self._serial_edit = QLineEdit(self._prefill.get("game_serial", ""))
+        self._serial_edit.setPlaceholderText("e.g. SCUS-97264")
+        _add_row("Serial *:", self._serial_edit, hint="PS2 disc serial (XX(X)-NNNNN)")
+
+        # Author
+        self._author_edit = QLineEdit(self._prefill.get("author", ""))
+        self._author_edit.setPlaceholderText("e.g. YourName")
+        _add_row("Author:", self._author_edit)
+
+        # URL
+        self._url_edit = QLineEdit(self._prefill.get("url", ""))
+        self._url_edit.setPlaceholderText("https://…  (leave blank for personal packs)")
+        _add_row("URL:", self._url_edit)
+
+        # Description
+        self._desc_edit = QTextEdit()
+        self._desc_edit.setPlaceholderText("Short description shown in the catalogue card")
+        self._desc_edit.setPlainText(self._prefill.get("description", ""))
+        self._desc_edit.setFixedHeight(64)
+        _add_row("Description:", self._desc_edit)
+
+        # Source
+        self._source_edit = QLineEdit(self._prefill.get("source", "Personal"))
+        self._source_edit.setPlaceholderText("e.g. Personal, GameFront, GBAtemp")
+        _add_row("Source:", self._source_edit)
+
+        # Size label
+        self._size_edit = QLineEdit(self._prefill.get("size_label", ""))
+        self._size_edit.setPlaceholderText("e.g. ~250 MB  (auto-detected if path set)")
+        _add_row("Size:", self._size_edit)
+
+        layout.addLayout(form)
+
+        # Status label (errors shown here)
+        self._status = QLabel("")
+        self._status.setStyleSheet("color: #e74c3c;")
+        self._status.setWordWrap(True)
+        layout.addWidget(self._status)
+
+        # Buttons
+        btns = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok |
+            QDialogButtonBox.StandardButton.Cancel
+        )
+        btns.button(QDialogButtonBox.StandardButton.Ok).setText("💾 Save Card")
+        btns.accepted.connect(self._on_accept)
+        btns.rejected.connect(self.reject)
+        layout.addWidget(btns)
+
+    # ------------------------------------------------------------------
+    def _on_accept(self):
+        from src.core.custom_card_builder import build_entry, save_entry, VALID_MOD_TYPES
+
+        mod_type    = self._type_combo.currentData() or "texture_pack"
+        name        = self._name_edit.text().strip()
+        game        = self._game_edit.text().strip()
+        serial      = self._serial_edit.text().strip().upper()
+        author      = self._author_edit.text().strip()
+        url         = self._url_edit.text().strip()
+        description = self._desc_edit.toPlainText().strip()
+        source      = self._source_edit.text().strip() or "Personal"
+        size_label  = self._size_edit.text().strip()
+
+        # Validate
+        errors = []
+        if not name:
+            errors.append("• Name is required.")
+        if not game:
+            errors.append("• Game is required.")
+        if not serial:
+            errors.append("• Serial is required.")
+
+        if errors:
+            self._status.setText("\n".join(errors))
+            return
+
+        try:
+            entry = build_entry(
+                mod_type=mod_type,
+                name=name,
+                game=game,
+                game_serial=serial,
+                author=author,
+                url=url,
+                description=description,
+                source=source,
+                size_label=size_label,
+            )
+        except ValueError as exc:
+            self._status.setText(str(exc))
+            return
+
+        try:
+            out_path = save_entry(entry)
+        except Exception as exc:
+            QMessageBox.critical(self, "Save Error", f"Could not save card:\n{exc}")
+            return
+
+        QMessageBox.information(
+            self, "✅ Card Saved",
+            f"Your custom catalogue card has been saved to:\n{out_path}\n\n"
+            "Use the 🔄 Reload button in the Browse panel to see it."
+        )
+        self.card_created.emit(entry)
+        self.accept()
+
+
+# ---------------------------------------------------------------------------
+# InstalledScannerDialog — detect pre-existing PCSX2 content
+# ---------------------------------------------------------------------------
+
+class InstalledScannerDialog(QDialog):
+    """Scans the PCSX2 directory for content that was installed outside of the
+    PS2 Mod Manager so it can be registered and managed.
+
+    The scanner checks for:
+
+    * Texture packs (``textures/<SERIAL>/replacements/``)
+    * PNACH patches (``cheats/*.pnach``)
+    * Widescreen / cheat patches (``cheats_ws/*.pnach``)
+    * Cover art images (``covers/<SERIAL>.png``)
+
+    For each found item the dialog suggests matching catalogue entries (if any)
+    or offers to open the :class:`CustomCardDialog` to create a new one.
+
+    Parameters
+    ----------
+    config:
+        Current :class:`~src.models.mod.AppConfig` instance (provides PCSX2
+        paths and any ``managed_paths`` info).
+    parent:
+        Parent widget.
+    """
+
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self._config = config
+        self._items = []          # list[UnmanagedItem]
+        self._catalogue = []      # full catalogue for matching
+        self.setWindowTitle("🔍  Scan for Unmanaged PCSX2 Content")
+        self.setMinimumSize(820, 560)
+        self._build_ui()
+        self._run_scan()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Header
+        hdr = QLabel(
+            "PS2 Mod Manager has scanned your PCSX2 folder for content that was\n"
+            "installed outside of the manager.  Select an item to see suggested\n"
+            "catalogue matches, or create a custom card for it."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        # Splitter: item list (left) + detail panel (right)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # --- Left: list of found items ---
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._list_widget = QListWidget()
+        self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.currentRowChanged.connect(self._on_item_selected)
+        left_layout.addWidget(self._list_widget)
+
+        # Re-scan button
+        rescan_btn = QPushButton("🔄 Re-scan")
+        rescan_btn.clicked.connect(self._run_scan)
+        left_layout.addWidget(rescan_btn)
+
+        splitter.addWidget(left)
+
+        # --- Right: detail + match panel ---
+        right = QWidget()
+        right_layout = QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._detail_label = QLabel("← Select an item from the list")
+        self._detail_label.setWordWrap(True)
+        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+        right_layout.addWidget(self._detail_label)
+
+        match_lbl = QLabel("Suggested catalogue matches:")
+        right_layout.addWidget(match_lbl)
+
+        self._match_list = QListWidget()
+        self._match_list.setAlternatingRowColors(True)
+        right_layout.addWidget(self._match_list)
+
+        action_row = QHBoxLayout()
+
+        self._create_btn = QPushButton("✏  Create Custom Card")
+        self._create_btn.setToolTip(
+            "Open the card creator to add this item to your personal catalogue"
+        )
+        self._create_btn.setEnabled(False)
+        self._create_btn.clicked.connect(self._on_create_card)
+        action_row.addWidget(self._create_btn)
+
+        action_row.addStretch()
+
+        right_layout.addLayout(action_row)
+        splitter.addWidget(right)
+        splitter.setSizes([300, 500])
+        layout.addWidget(splitter, 1)
+
+        # Close button
+        close_btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        close_btns.rejected.connect(self.reject)
+        layout.addWidget(close_btns)
+
+    # ------------------------------------------------------------------
+    def _run_scan(self):
+        self._list_widget.clear()
+        self._match_list.clear()
+        self._detail_label.setText("⏳ Scanning…")
+        QApplication.processEvents()
+
+        try:
+            from src.core.installed_scanner import scan_all, find_catalogue_matches
+            from src.core.catalogue_loader import CATALOGUE
+        except Exception as exc:
+            self._detail_label.setText(f"Scan failed: {exc}")
+            return
+
+        self._catalogue = CATALOGUE
+        self._items = scan_all(self._config)
+
+        if not self._items:
+            self._detail_label.setText(
+                "✅ No unmanaged content found.\n\n"
+                "All PCSX2 texture packs, PNACH files, and cover art images "
+                "appear to be managed by PS2 Mod Manager (or the relevant "
+                "PCSX2 directories are empty / not configured)."
+            )
+            return
+
+        for item in self._items:
+            label = f"[{item.type_label}]  {item.name}"
+            if item.suggested_game:
+                label += f"  –  {item.suggested_game}"
+            elif item.serial:
+                label += f"  –  {item.serial}"
+            list_item = QListWidgetItem(label)
+            self._list_widget.addItem(list_item)
+
+        self._detail_label.setText(
+            f"Found {len(self._items)} unmanaged item(s).  "
+            "Select one to see suggested matches."
+        )
+        self._create_btn.setEnabled(False)
+
+    # ------------------------------------------------------------------
+    def _on_item_selected(self, row: int):
+        if row < 0 or row >= len(self._items):
+            return
+
+        from src.core.installed_scanner import find_catalogue_matches
+
+        item = self._items[row]
+        self._create_btn.setEnabled(True)
+
+        # Detail text
+        lines = [
+            f"<b>{item.name}</b>",
+            f"Type: {item.type_label}",
+        ]
+        if item.serial:
+            lines.append(f"Serial: {item.serial}")
+        if item.suggested_game:
+            lines.append(f"Game: {item.suggested_game}")
+        if item.crc:
+            lines.append(f"CRC: {item.crc}")
+        lines.append(f"Size: {item.size_label}  |  Files: {item.file_count}")
+        lines.append(f"Path: <small>{item.path}</small>")
+        self._detail_label.setText("<br>".join(lines))
+
+        # Catalogue matches
+        self._match_list.clear()
+        matches = find_catalogue_matches(item, self._catalogue, limit=8)
+        if matches:
+            for m in matches:
+                mtext = (
+                    f"{m.get('name', '')}  –  {m.get('game', '')}  "
+                    f"[{m.get('author', '')}]"
+                )
+                self._match_list.addItem(mtext)
+        else:
+            self._match_list.addItem("(no catalogue matches found — create a custom card)")
+
+    # ------------------------------------------------------------------
+    def _on_create_card(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._items):
+            return
+        item = self._items[row]
+
+        prefill = {
+            "type":        item.item_type,
+            "name":        item.name,
+            "game":        item.suggested_game,
+            "game_serial": item.serial,
+            "size_label":  item.size_label,
+        }
+
+        dlg = CustomCardDialog(self, prefill=prefill)
+        dlg.exec()
