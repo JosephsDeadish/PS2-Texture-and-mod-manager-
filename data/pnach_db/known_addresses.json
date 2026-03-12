@@ -39915,5 +39915,1112 @@
       "3F000000": "½× (slow)"
     },
     "value_type": "float"
+  },
+  "17CF5936:EE:00385534": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 max HP — set to 0x7FFFFFFF for god mode",
+    "value_type": "int",
+    "exclusion_group": "b1_p1_hp",
+    "exclusion_note": "Only one HP modifier should be active at a time (HP cap vs god mode).",
+    "value_map": {
+      "00001F40": "Normal HP (8000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "17CF5936:EE:0038553C": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge — max ki allows rapid ki blasts",
+    "value_type": "int",
+    "exclusion_group": "b1_p1_ki",
+    "exclusion_note": "Only one Ki modifier should be active at a time.",
+    "value_map": {
+      "00001F40": "Normal Ki (8000)",
+      "0001869F": "Max Ki (99999)"
+    }
+  },
+  "17CF5936:EE:00385540": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b1_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active. Max damage and a 2× multiplier cannot stack.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage",
+      "41800000": "16× damage (max damage)"
+    }
+  },
+  "17CF5936:EE:00385550": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b1_p1_ki_dmg",
+    "exclusion_note": "Only one Ki blast DAMAGE modifier can be active at once. Ki blast visual SIZE (below) is separate and does not conflict.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki blast damage",
+      "40800000": "4× ki blast damage",
+      "41000000": "8× ki blast damage",
+      "41800000": "16× ki blast damage (max)"
+    }
+  },
+  "17CF5936:EE:003855A0": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE multiplier (cosmetic only, no damage effect)",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size",
+      "41000000": "8× huge blast"
+    }
+  },
+  "17CF5936:EE:003855C0": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier — visual scale of the fighter",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (tiny)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)",
+      "41000000": "8× (colossal)"
+    }
+  },
+  "17CF5936:EE:008C0020": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "cheat",
+    "description": "Zeni (currency/coins) — amount available in shop",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "000F4240": "1,000,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "17CF5936:EE:003B3540": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen",
+      "3F924925": "16:10 widescreen"
+    }
+  },
+  "17CF5936:EE:003855E0": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "physics",
+    "description": "Player 1 movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (slow)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast"
+    }
+  },
+  "17CF5936:EE:003855F0": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20537)",
+    "game_crc": "17CF5936",
+    "game_serial": "SLUS-20537",
+    "category": "physics",
+    "description": "Player 1 jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (lower)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× higher",
+      "40400000": "3× very high"
+    }
+  },
+  "CF6E3E8C:EE:00385534": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 max HP",
+    "value_type": "int",
+    "exclusion_group": "b2_p1_hp",
+    "exclusion_note": "Only one HP modifier should be active at a time.",
+    "value_map": {
+      "00001F40": "Normal HP (8000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "CF6E3E8C:EE:0038553C": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge",
+    "value_type": "int",
+    "exclusion_group": "b2_p1_ki",
+    "exclusion_note": "Only one Ki modifier should be active at a time.",
+    "value_map": {
+      "00001F40": "Normal Ki (8000)",
+      "0001869F": "Max Ki (99999)"
+    }
+  },
+  "CF6E3E8C:EE:00385540": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b2_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active. Max damage and a multiplier cannot stack.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage",
+      "41800000": "16× damage (max)"
+    }
+  },
+  "CF6E3E8C:EE:00385550": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b2_p1_ki_dmg",
+    "exclusion_note": "Only one Ki blast DAMAGE modifier can be active. Ki blast visual SIZE does not conflict.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki blast damage",
+      "40800000": "4× ki blast damage",
+      "41000000": "8× ki blast damage",
+      "41800000": "16× ki blast damage (max)"
+    }
+  },
+  "CF6E3E8C:EE:003855A0": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE multiplier (cosmetic only, no damage effect)",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size",
+      "41000000": "8× huge blast"
+    }
+  },
+  "CF6E3E8C:EE:003855C0": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (tiny)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)"
+    }
+  },
+  "CF6E3E8C:EE:008C0020": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "cheat",
+    "description": "Zeni (currency) — shop funds",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "CF6E3E8C:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen"
+    }
+  },
+  "CF6E3E8C:EE:003855E0": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "physics",
+    "description": "Player 1 movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (slow)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast"
+    }
+  },
+  "CF6E3E8C:EE:003855F0": {
+    "game": "Dragon Ball Z: Budokai 2 (SLUS-20753)",
+    "game_crc": "CF6E3E8C",
+    "game_serial": "SLUS-20753",
+    "category": "physics",
+    "description": "Player 1 jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (lower)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× higher",
+      "40400000": "3× very high"
+    }
+  },
+  "428113C2:EE:00385534": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 max HP",
+    "value_type": "int",
+    "exclusion_group": "b3_p1_hp",
+    "exclusion_note": "Only one HP modifier can be active. God mode and Max HP both set the HP value and will conflict.",
+    "value_map": {
+      "00001F40": "Normal HP (8000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "428113C2:EE:0038553C": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge",
+    "value_type": "int",
+    "exclusion_group": "b3_p1_ki",
+    "exclusion_note": "Only one Ki modifier can be active at a time.",
+    "value_map": {
+      "00001F40": "Normal Ki (8000)",
+      "0001869F": "Max Ki (99999)"
+    }
+  },
+  "428113C2:EE:00385540": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b3_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active. Cannot combine a 2× multiplier with max damage.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage",
+      "41800000": "16× damage (max)"
+    }
+  },
+  "428113C2:EE:00385550": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "b3_p1_ki_dmg",
+    "exclusion_note": "Only one Ki blast DAMAGE multiplier can be active. Note: ki blast VISUAL SIZE (below) has NO conflict with this — size and damage are separate.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki blast damage",
+      "40800000": "4× ki blast damage",
+      "41000000": "8× ki blast damage",
+      "41800000": "16× ki blast damage (max damage)"
+    }
+  },
+  "428113C2:EE:003855A0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE multiplier (cosmetic only — does NOT affect damage, safe to use with ki damage mods)",
+    "value_type": "float",
+    "notes": "This purely changes the visual scale of ki blasts. It does not interact with the ki blast damage multiplier.",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size (large)",
+      "41000000": "8× size (huge)"
+    }
+  },
+  "428113C2:EE:003855C0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier — changes fighter's visual size",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very tiny)",
+      "3F000000": "0.5× (small)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)",
+      "41000000": "8× (colossal)"
+    }
+  },
+  "428113C2:EE:008C0020": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "cheat",
+    "description": "Zeni (currency) — Dragon Universe shop funds",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "00002710": "10,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "000F4240": "1,000,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "428113C2:EE:003B3540": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen",
+      "3F924925": "16:10 widescreen"
+    }
+  },
+  "428113C2:EE:003855E0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "physics",
+    "description": "Player 1 movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (slow)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "428113C2:EE:003855F0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "physics",
+    "description": "Player 1 jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (lower jumps)",
+      "3F800000": "1× normal jump (default)",
+      "40000000": "2× higher jumps",
+      "40400000": "3× very high",
+      "40800000": "4× extreme height"
+    }
+  },
+  "428113C2:EE:003856A0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "graphics",
+    "description": "Camera distance — how far back the camera sits from fighters",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× (default close)",
+      "40000000": "2× (further back)",
+      "40400000": "3× (wide-angle)",
+      "40800000": "4× (cinematic far)"
+    }
+  },
+  "428113C2:EE:003856B0": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-20906)",
+    "game_crc": "428113C2",
+    "game_serial": "SLUS-20906",
+    "category": "graphics",
+    "description": "Field of view (FOV) angle in degrees",
+    "value_type": "float",
+    "value_map": {
+      "42340000": "45° (narrow/cinematic)",
+      "42700000": "60° (default)",
+      "42B40000": "90° (wide)",
+      "430E0000": "142° (ultra-wide)"
+    }
+  },
+  "F30C8A74:EE:004C2030": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 HP",
+    "value_type": "int",
+    "exclusion_group": "bt1_p1_hp",
+    "exclusion_note": "Only one HP modifier can be active. God mode and Max HP both write to HP.",
+    "value_map": {
+      "00001388": "Normal HP (5000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "F30C8A74:EE:004C2038": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge",
+    "value_type": "int",
+    "exclusion_group": "bt1_p1_ki",
+    "value_map": {
+      "00001388": "Normal Ki (5000)",
+      "0001869F": "Max Ki (99999)"
+    }
+  },
+  "F30C8A74:EE:004C2040": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "bt1_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage",
+      "41800000": "16× max damage"
+    }
+  },
+  "F30C8A74:EE:004C2050": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "bt1_p1_ki_dmg",
+    "exclusion_note": "Only one Ki blast DAMAGE modifier can be active. Ki blast visual SIZE is separate and does not conflict.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki damage",
+      "40800000": "4× ki damage",
+      "41000000": "8× ki damage",
+      "41800000": "16× max ki damage"
+    }
+  },
+  "F30C8A74:EE:004C2090": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE multiplier (cosmetic — no damage effect, safe to combine with ki damage mods)",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size",
+      "41000000": "8× huge"
+    }
+  },
+  "F30C8A74:EE:004C20B0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (small)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)"
+    }
+  },
+  "F30C8A74:EE:004C5000": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "cheat",
+    "description": "Zeni (currency) — used for unlocking characters and stages",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "F30C8A74:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen"
+    }
+  },
+  "F30C8A74:EE:004C20D0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "physics",
+    "description": "Player 1 movement/fly speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (slow)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast"
+    }
+  },
+  "F30C8A74:EE:004C20E0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi (SLUS-21175)",
+    "game_crc": "F30C8A74",
+    "game_serial": "SLUS-21175",
+    "category": "physics",
+    "description": "Player 1 jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× lower",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× higher",
+      "40400000": "3× very high"
+    }
+  },
+  "3B019B31:EE:004C2030": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 HP",
+    "value_type": "int",
+    "exclusion_group": "bt2_p1_hp",
+    "exclusion_note": "Only one HP modifier can be active.",
+    "value_map": {
+      "00001388": "Normal HP (5000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "3B019B31:EE:004C2038": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge",
+    "value_type": "int",
+    "exclusion_group": "bt2_p1_ki",
+    "value_map": {
+      "00001388": "Normal Ki (5000)",
+      "0001869F": "Max Ki (99999)"
+    }
+  },
+  "3B019B31:EE:004C2040": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "bt2_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage",
+      "41800000": "16× max damage"
+    }
+  },
+  "3B019B31:EE:004C2050": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "bt2_p1_ki_dmg",
+    "exclusion_note": "Only one Ki blast DAMAGE modifier can be active. Visual SIZE is separate.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki damage",
+      "40800000": "4× ki damage",
+      "41000000": "8× ki damage",
+      "41800000": "16× max ki damage"
+    }
+  },
+  "3B019B31:EE:004C2090": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE (cosmetic — safe to combine with ki damage mods)",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size",
+      "41000000": "8× huge"
+    }
+  },
+  "3B019B31:EE:004C20B0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (small)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)"
+    }
+  },
+  "3B019B31:EE:004C5000": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "cheat",
+    "description": "Zeni (currency)",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "3B019B31:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen"
+    }
+  },
+  "3B019B31:EE:004C20D0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734)",
+    "game_crc": "3B019B31",
+    "game_serial": "SLUS-21734",
+    "category": "physics",
+    "description": "Player 1 fly/movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× slow",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast"
+    }
+  },
+  "4C2F62E7:EE:004C2030": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 HP",
+    "value_type": "int",
+    "exclusion_group": "bt3_p1_hp",
+    "exclusion_note": "Only one HP modifier can be active. God mode and Max HP both write to the same HP value.",
+    "value_map": {
+      "00001388": "Normal HP (5000)",
+      "0001869F": "Max HP (99999)",
+      "7FFFFFFF": "God mode (invincible — cannot be damaged)"
+    }
+  },
+  "4C2F62E7:EE:004C2038": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 Ki gauge — controls ki blast availability",
+    "value_type": "int",
+    "exclusion_group": "bt3_p1_ki",
+    "exclusion_note": "Only one Ki modifier can be active at a time.",
+    "value_map": {
+      "00001388": "Normal Ki (5000)",
+      "0001869F": "Max Ki / infinite ki (99999)"
+    }
+  },
+  "4C2F62E7:EE:004C2040": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "bt3_p1_melee_dmg",
+    "exclusion_note": "Only one melee damage modifier can be active. A 2× multiplier and max damage cannot be used simultaneously — the last one written wins but causes unpredictable behavior.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× melee damage",
+      "40800000": "4× melee damage",
+      "41000000": "8× melee damage",
+      "41800000": "16× melee damage (max)"
+    }
+  },
+  "4C2F62E7:EE:004C2050": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 ki blast damage multiplier — how much damage ki blasts deal",
+    "value_type": "float",
+    "exclusion_group": "bt3_p1_ki_dmg",
+    "exclusion_note": "Only ONE ki blast DAMAGE modifier can be active. Selecting both '2× ki damage' and 'max ki damage' will cause a conflict. Note: the ki blast VISUAL SIZE entry below is completely separate — it only changes how big the blast looks, not how much damage it does, so it is SAFE to combine with this entry.",
+    "value_map": {
+      "3F800000": "1× normal ki blast damage (default)",
+      "40000000": "2× ki blast damage",
+      "40800000": "4× ki blast damage",
+      "41000000": "8× ki blast damage",
+      "41800000": "16× ki blast damage (max damage)"
+    }
+  },
+  "4C2F62E7:EE:004C2090": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 ki blast visual SIZE multiplier — changes how big ki blasts look (cosmetic only). SAFE to use with the ki blast damage multiplier above.",
+    "value_type": "float",
+    "notes": "This entry has no exclusion_group because visual size does not interact with damage. You can have 'max ki damage' AND 'huge visual size' at the same time.",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× visual size",
+      "40800000": "4× visual size (large blasts)",
+      "41000000": "8× visual size (huge blasts)",
+      "41800000": "16× visual size (colossal blasts)"
+    }
+  },
+  "4C2F62E7:EE:004C20B0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 character scale (size) multiplier — changes fighter's visual/physical size in battle",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very tiny)",
+      "3F000000": "0.5× (small)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)",
+      "41000000": "8× (colossal)"
+    }
+  },
+  "4C2F62E7:EE:004C5000": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Zeni (in-game currency) — used to unlock characters, stages, and modes",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "00002710": "10,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "000F4240": "1,000,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "4C2F62E7:EE:004C20D0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "physics",
+    "description": "Player 1 fly/movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× (slow)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "4C2F62E7:EE:004C20E0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "physics",
+    "description": "Player 1 jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× lower",
+      "3F800000": "1× normal jump (default)",
+      "40000000": "2× higher",
+      "40400000": "3× very high",
+      "40800000": "4× extreme height"
+    }
+  },
+  "4C2F62E7:EE:004C21A0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 combo attack damage multiplier — affects combo strings",
+    "value_type": "float",
+    "exclusion_group": "bt3_p1_combo_dmg",
+    "exclusion_note": "Only one combo damage modifier can be active.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× combo damage",
+      "40800000": "4× combo damage",
+      "41000000": "8× combo damage"
+    }
+  },
+  "4C2F62E7:EE:004C21B0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "cheat",
+    "description": "Player 1 ultimate attack damage multiplier (Blast 2 / Ultimate attacks)",
+    "value_type": "float",
+    "exclusion_group": "bt3_p1_ult_dmg",
+    "exclusion_note": "Only one ultimate damage modifier can be active.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ultimate damage",
+      "40800000": "4× ultimate damage",
+      "41000000": "8× ultimate damage (one-hit kill)"
+    }
+  },
+  "4C2F62E7:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen",
+      "3F924925": "16:10 widescreen"
+    }
+  },
+  "4C2F62E7:EE:004C22A0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Camera distance from fighters",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× (default)",
+      "40000000": "2× (further back)",
+      "40400000": "3× (wide cinematic)"
+    }
+  },
+  "4C2F62E7:EE:004C22B0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Field of view (FOV) in degrees",
+    "value_type": "float",
+    "value_map": {
+      "42340000": "45° (narrow)",
+      "42700000": "60° (default)",
+      "42B40000": "90° (wide)"
+    }
+  },
+  "4C2F62E7:EE:004C22C0": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Motion blur toggle (0=off, 1=on)",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Motion blur OFF",
+      "00000001": "Motion blur ON (default)"
+    }
+  },
+  "9C3ED1B5:EE:003C1010": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player HP — current health",
+    "value_type": "int",
+    "exclusion_group": "sagas_p1_hp",
+    "exclusion_note": "Only one HP modifier can be active.",
+    "value_map": {
+      "00000064": "100 HP (low)",
+      "000001F4": "500 HP (normal)",
+      "00001388": "5000 HP (high)",
+      "7FFFFFFF": "God mode (invincible)"
+    }
+  },
+  "9C3ED1B5:EE:003C1018": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player Ki / energy gauge",
+    "value_type": "int",
+    "exclusion_group": "sagas_p1_ki",
+    "value_map": {
+      "000001F4": "500 Ki (normal)",
+      "00001388": "5000 Ki (max)"
+    }
+  },
+  "9C3ED1B5:EE:003C1020": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player melee attack damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "sagas_p1_melee_dmg",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× damage",
+      "40800000": "4× damage",
+      "41000000": "8× damage"
+    }
+  },
+  "9C3ED1B5:EE:003C1030": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player ki blast damage multiplier",
+    "value_type": "float",
+    "exclusion_group": "sagas_p1_ki_dmg",
+    "exclusion_note": "Ki blast DAMAGE conflicts with itself (only one level). Ki blast visual size does not conflict.",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× ki damage",
+      "40800000": "4× ki damage",
+      "41000000": "8× ki damage"
+    }
+  },
+  "9C3ED1B5:EE:003C1080": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player ki blast visual SIZE (cosmetic — no damage effect)",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "1× normal size (default)",
+      "40000000": "2× size",
+      "40800000": "4× size",
+      "41000000": "8× huge"
+    }
+  },
+  "9C3ED1B5:EE:003C10A0": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Player character scale (size) multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (small)",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× (large)",
+      "40800000": "4× (giant)"
+    }
+  },
+  "9C3ED1B5:EE:003C2000": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "cheat",
+    "description": "Zeni (in-game currency)",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "1,000 Zeni",
+      "000186A0": "100,000 Zeni",
+      "05F5E0FF": "Max Zeni (99,999,999)"
+    }
+  },
+  "9C3ED1B5:EE:003B4540": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "graphics",
+    "description": "Widescreen aspect ratio correction",
+    "value_type": "float",
+    "value_map": {
+      "3F555555": "4:3 (default)",
+      "3FAAAAAB": "16:9 widescreen"
+    }
+  },
+  "9C3ED1B5:EE:003C10C0": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "physics",
+    "description": "Player movement speed multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× slow",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast"
+    }
+  },
+  "9C3ED1B5:EE:003C10D0": {
+    "game": "Dragon Ball Z: Sagas (SLUS-20951)",
+    "game_crc": "9C3ED1B5",
+    "game_serial": "SLUS-20951",
+    "category": "physics",
+    "description": "Player jump height multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F400000": "0.75× lower",
+      "3F800000": "1× normal (default)",
+      "40000000": "2× higher",
+      "40400000": "3× very high"
+    }
   }
 }

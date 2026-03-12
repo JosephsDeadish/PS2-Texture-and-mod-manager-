@@ -4379,10 +4379,10 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 2700 entries."""
+        """Known addresses DB should have grown beyond 2800 entries (wave 8)."""
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 2700, "PNACH DB should have more than 2700 entries after expansion")
+        self.assertGreater(n, 2800, "PNACH DB should have more than 2800 entries after wave-8 expansion")
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
@@ -4533,6 +4533,124 @@ class TestPnachAnalyzer(unittest.TestCase):
         bad = [(k, e["value_type"]) for k, e in db.items()
                if e.get("value_type") and e["value_type"] not in valid]
         self.assertEqual(bad, [], f"Entries with invalid value_type: {bad[:5]}")
+
+    # ------------------------------------------------------------------
+    # check_exclusion_conflicts tests
+    # ------------------------------------------------------------------
+
+    def test_check_exclusion_conflicts_no_conflict(self):
+        """Two entries with different exclusion groups should not conflict."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage 2×", "exclusion_group": "bt3_p1_ki_dmg"},
+            {"description": "Ki blast visual SIZE 2×", "exclusion_group": ""},  # no group
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(conflicts, [], "Different groups should not conflict")
+
+    def test_check_exclusion_conflicts_detects_mutex(self):
+        """Two entries in the same exclusion group should conflict."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage 2×",
+             "exclusion_group": "bt3_p1_ki_dmg",
+             "exclusion_note": "Only one ki damage modifier."},
+            {"description": "Max ki damage",
+             "exclusion_group": "bt3_p1_ki_dmg",
+             "exclusion_note": "Only one ki damage modifier."},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(len(conflicts), 1)
+        self.assertIn("bt3_p1_ki_dmg", conflicts[0]["group"])
+        self.assertIn("Ki blast damage 2×", conflicts[0]["message"])
+        self.assertIn("Max ki damage", conflicts[0]["message"])
+
+    def test_check_exclusion_conflicts_ki_blast_size_safe(self):
+        """Ki blast visual SIZE has no exclusion_group so it never conflicts."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage multiplier 2×",
+             "exclusion_group": "bt3_p1_ki_dmg"},
+            {"description": "Ki blast visual SIZE 4× (cosmetic)",
+             "exclusion_group": ""},  # intentionally no group
+            {"description": "Max ki damage",
+             "exclusion_group": "bt3_p1_ki_dmg"},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        # The ki_dmg group conflicts; SIZE entry does not contribute to any conflict
+        self.assertEqual(len(conflicts), 1)
+        msgs = " ".join(c["message"] for c in conflicts)
+        self.assertNotIn("visual SIZE", msgs)
+
+    def test_check_exclusion_conflicts_empty_list(self):
+        """Empty list should return no conflicts."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        self.assertEqual(check_exclusion_conflicts([]), [])
+
+    def test_check_exclusion_conflicts_single_entry(self):
+        """A single selected entry cannot conflict with itself."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [{"description": "Ki blast 2×", "exclusion_group": "bt3_ki_dmg"}]
+        self.assertEqual(check_exclusion_conflicts(entries), [])
+
+    def test_check_exclusion_conflicts_three_in_same_group(self):
+        """Three entries in the same group should produce one conflict report."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Melee 2×", "exclusion_group": "melee_dmg"},
+            {"description": "Melee 4×", "exclusion_group": "melee_dmg"},
+            {"description": "Max melee", "exclusion_group": "melee_dmg"},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(len(conflicts), 1)
+        # All three descriptions should appear in the message
+        self.assertIn("Melee 2×", conflicts[0]["message"])
+        self.assertIn("Melee 4×", conflicts[0]["message"])
+        self.assertIn("Max melee", conflicts[0]["message"])
+
+    def test_db_has_dbz_entries_with_exclusion_groups(self):
+        """DBZ entries in the DB should have exclusion_group for damage/HP/Ki."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        dbz = [v for v in db.values() if "budokai" in v.get("game", "").lower()
+               or "tenkaichi" in v.get("game", "").lower()
+               or "sagas" in v.get("game", "").lower()]
+        self.assertGreater(len(dbz), 20, "Should have at least 20 DBZ DB entries")
+        # At least some should have exclusion_group
+        with_group = [v for v in dbz if v.get("exclusion_group")]
+        self.assertGreater(len(with_group), 5, "DBZ entries should have exclusion_group fields")
+
+    def test_db_ki_blast_size_has_no_exclusion_group(self):
+        """Ki blast VISUAL SIZE entries should NOT have an exclusion_group (they are safe to stack)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        size_entries = [
+            v for v in db.values()
+            if "ki blast" in v.get("description", "").lower()
+            and "size" in v.get("description", "").lower()
+            and "cosmetic" in v.get("description", "").lower()
+        ]
+        # All cosmetic ki blast size entries should be group-free
+        bad = [v["description"] for v in size_entries if v.get("exclusion_group")]
+        self.assertEqual(bad, [],
+                         f"Ki blast SIZE (cosmetic) entries should have NO exclusion_group: {bad}")
+
+    def test_db_exclusion_group_entries_have_valid_format(self):
+        """exclusion_group values must be non-empty strings when present."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        bad = [
+            (k, v.get("exclusion_group"))
+            for k, v in db.items()
+            if "exclusion_group" in v and not isinstance(v["exclusion_group"], str)
+        ]
+        self.assertEqual(bad, [], f"exclusion_group must be a string: {bad[:3]}")
 
 
 class TestTextureFilePickerLogic(unittest.TestCase):

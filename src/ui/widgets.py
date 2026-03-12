@@ -1595,8 +1595,8 @@ class PnachCodeBuilderDialog(QDialog):
         layout.addWidget(hdr)
 
         intro = QLabel(
-            "Select a game, tick the effects you want, choose preset values where offered,\n"
-            "then click Install to write a merged .pnach to your PCSX2 cheats folder."
+            "Select a game, tick the effects you want, then choose a value from the dropdown\n"
+            "(or type a custom number for money/speed/etc.)  Click Install when ready."
         )
         intro.setStyleSheet("color: #9090b0; font-size: 12px;")
         intro.setWordWrap(True)
@@ -1761,7 +1761,7 @@ class PnachCodeBuilderDialog(QDialog):
 
         self._status_lbl.setText(
             f"✅ Loaded {len(entries)} DB entries for {self._game_serial}. "
-            "Tick effects and choose preset values, then click Install."
+            "Tick effects and choose values from the dropdowns, then click Install."
         )
 
     def _make_effect_row(self, entry: dict) -> QWidget:
@@ -1772,6 +1772,10 @@ class PnachCodeBuilderDialog(QDialog):
         (e.g. ``1000`` for money or ``90.0`` for FOV degrees).  A live hex
         preview label updates as they type so they can see exactly what PNACH
         code will be written.
+
+        When an entry has an ``exclusion_group`` the row is visually tagged so
+        the user understands only one option from that group can be active at a
+        time (e.g. you can't stack "ki damage 2×" with "max ki damage").
         """
         from PyQt6.QtWidgets import QComboBox as QCBox
         from src.core.pnach_analyzer import value_to_pnach_hex
@@ -1783,13 +1787,17 @@ class PnachCodeBuilderDialog(QDialog):
         proc = parts[1] if len(parts) > 1 else "EE"
         addr = parts[2] if len(parts) > 2 else "00000000"
 
-        desc       = entry.get("description", addr)
-        value_map  = entry.get("value_map", {})
-        value_type = entry.get("value_type", "")   # "int" | "float" | "bool" | ""
+        desc           = entry.get("description", addr)
+        value_map      = entry.get("value_map", {})
+        value_type     = entry.get("value_type", "")   # "int" | "float" | "bool" | ""
+        excl_group     = entry.get("exclusion_group", "").strip()
+        excl_note      = entry.get("exclusion_note", "").strip()
 
         frame = QFrame()
+        # Highlight frames that belong to an exclusion group with a subtle border
+        border_color = "#3a2a60" if excl_group else "#2a2a50"
         frame.setStyleSheet(
-            "QFrame { background: #1a1a2e; border: 1px solid #2a2a50;"
+            f"QFrame {{ background: #1a1a2e; border: 1px solid {border_color};"
             " border-radius: 4px; margin: 1px; }"
         )
         row = QHBoxLayout(frame)
@@ -1807,17 +1815,41 @@ class PnachCodeBuilderDialog(QDialog):
         desc_lbl.setWordWrap(False)
         row.addWidget(desc_lbl, 1)
 
+        # ── Exclusion group tag (shown when entry is in a mutex group) ─
+        if excl_group:
+            # Show a small warning tag
+            tag_tooltip = (
+                excl_note
+                or f"Only ONE option from group '{excl_group}' can be active "
+                   "at a time. Enabling this will disable other effects in "
+                   "the same group."
+            )
+            excl_tag = QLabel("⚠ excl")
+            excl_tag.setStyleSheet(
+                "color: #e0a030; font-size: 10px; font-style: italic;"
+                " background: #2a1a10; border-radius: 3px; padding: 1px 4px;"
+            )
+            excl_tag.setToolTip(tag_tooltip)
+            row.addWidget(excl_tag)
+
         # ── Address badge ─────────────────────────────────────────────
         addr_lbl = QLabel(f"[{proc}:{addr}]")
         addr_lbl.setStyleSheet("color: #505080; font-family: monospace; font-size: 11px;")
         row.addWidget(addr_lbl)
 
-        # ── Preset combo ──────────────────────────────────────────────
+        # ── Value dropdown (shown when value_map is available) ────────
         value_combo = None
         if value_map:
+            val_header = QLabel("Value:")
+            val_header.setStyleSheet("color: #7090c0; font-size: 11px;")
+            row.addWidget(val_header)
+
             value_combo = QCBox()
-            value_combo.setMinimumWidth(190)
-            value_combo.setToolTip("Pick a preset value")
+            value_combo.setMinimumWidth(200)
+            value_combo.setToolTip(
+                "Select a value for this effect.\n"
+                "Options are labeled by what they do (e.g. 'double height', 'normal speed')."
+            )
             default_first = sorted(value_map.items(), key=lambda kv: (
                 0 if "default" in kv[1].lower() or "1×" in kv[1] or "4:3" in kv[1] else 1,
                 kv[1],
@@ -1826,7 +1858,7 @@ class PnachCodeBuilderDialog(QDialog):
                 value_combo.addItem(label, hex_val)
             row.addWidget(value_combo)
         else:
-            placeholder = QLabel("(no presets)")
+            placeholder = QLabel("(no options)")
             placeholder.setStyleSheet("color: #505060; font-size: 11px; font-style: italic;")
             row.addWidget(placeholder)
 
@@ -1894,15 +1926,17 @@ class PnachCodeBuilderDialog(QDialog):
 
         # ── Store all references ──────────────────────────────────────
         self._patch_widgets.append({
-            "check":        chk,
-            "value_combo":  value_combo,
-            "custom_edit":  custom_edit,
-            "value_type":   value_type,
-            "crc":          crc,
-            "proc":         proc,
-            "addr":         addr,
-            "description":  desc,
-            "value_map":    value_map,
+            "check":           chk,
+            "value_combo":     value_combo,
+            "custom_edit":     custom_edit,
+            "value_type":      value_type,
+            "crc":             crc,
+            "proc":            proc,
+            "addr":            addr,
+            "description":     desc,
+            "value_map":       value_map,
+            "exclusion_group": excl_group,
+            "exclusion_note":  excl_note,
         })
 
         return frame
@@ -1917,14 +1951,26 @@ class PnachCodeBuilderDialog(QDialog):
         Value resolution priority:
         1. If the user typed a custom value in the free-text field (and it
            parses without error), use that.
-        2. Otherwise use the selected preset in the combo-box.
+        2. Otherwise use the selected option in the dropdown.
         3. Fall back to ``00000000``.
+
+        Conflicts include:
+        * Address conflicts: two selected entries write to the same address.
+        * Exclusion-group conflicts: two selected entries share the same
+          ``exclusion_group`` value, meaning they are mutually exclusive (e.g.
+          a 2× damage multiplier and a max-damage cheat both target the same
+          game variable).  The user must disable one before installing.
+
+        Note: an entry with a ki-blast *visual* size modifier deliberately has
+        NO exclusion_group, so it is always safe to combine with ki-damage
+        multipliers (they control different things).
         """
-        from src.core.pnach_analyzer import value_to_pnach_hex
+        from src.core.pnach_analyzer import value_to_pnach_hex, check_exclusion_conflicts
 
         selected = []
         addr_seen: dict = {}
         conflicts = []
+        selected_for_excl: list = []
 
         for pw in self._patch_widgets:
             if not pw["check"].isChecked():
@@ -1943,10 +1989,10 @@ class PnachCodeBuilderDialog(QDialog):
                     if hx:
                         hex_val = hx
                     else:
-                        # Invalid custom input — fall through to preset
+                        # Invalid custom input — fall through to dropdown
                         pass
 
-            # 2. Preset combo (used when custom is empty or invalid)
+            # 2. Dropdown option (used when custom is empty or invalid)
             if hex_val == "00000000":
                 value_combo = pw.get("value_combo")
                 if value_combo is not None and value_combo.isEnabled():
@@ -1954,7 +2000,7 @@ class PnachCodeBuilderDialog(QDialog):
                 elif pw.get("value_map"):
                     hex_val = list(pw["value_map"].keys())[0]
 
-            # ── Conflict detection ─────────────────────────────────────
+            # ── Address conflict detection ─────────────────────────────
             addr_key = f"{pw['proc']}:{pw['addr']}"
             if addr_key in addr_seen:
                 conflicts.append(
@@ -1965,13 +2011,25 @@ class PnachCodeBuilderDialog(QDialog):
                 addr_seen[addr_key] = pw["description"]
 
             selected.append({
-                "processor":   pw["proc"],
-                "address":     pw["addr"],
-                "value":       hex_val,
-                "description": pw["description"],
-                "size":        "extended",
-                "crc":         pw["crc"],
+                "processor":       pw["proc"],
+                "address":         pw["addr"],
+                "value":           hex_val,
+                "description":     pw["description"],
+                "size":            "extended",
+                "crc":             pw["crc"],
+                "exclusion_group": pw.get("exclusion_group", ""),
+                "exclusion_note":  pw.get("exclusion_note", ""),
             })
+            selected_for_excl.append({
+                "description":     pw["description"],
+                "exclusion_group": pw.get("exclusion_group", ""),
+                "exclusion_note":  pw.get("exclusion_note", ""),
+            })
+
+        # ── Exclusion-group conflict detection ─────────────────────────
+        excl_conflicts = check_exclusion_conflicts(selected_for_excl)
+        for ec in excl_conflicts:
+            conflicts.append(ec["message"])
 
         return selected, conflicts
 

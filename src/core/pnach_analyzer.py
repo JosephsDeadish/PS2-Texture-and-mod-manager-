@@ -129,6 +129,62 @@ def group_conflicts_by_function(
     return groups
 
 
+def check_exclusion_conflicts(
+    selected_entries: List[dict],
+) -> List[dict]:
+    """Check a list of selected DB entries for *exclusion group* conflicts.
+
+    Entries that share the same non-empty ``exclusion_group`` field are
+    mutually exclusive — only one may be active at a time.  A typical example
+    is a set of attack-damage multipliers for a fighting game: the user should
+    pick *one* level (2×, 5×, max) rather than stacking them.
+
+    Note that entries with *different* exclusion groups (or no group at all)
+    are allowed together even if they appear related.  For example a
+    "Ki blast visual size" entry (no exclusion group) does **not** conflict
+    with a "Ki blast damage multiplier" entry (in group ``ki_damage_*``).
+
+    Parameters
+    ----------
+    selected_entries:
+        List of entry dicts, each expected to have at least a ``description``
+        key and optionally ``exclusion_group`` and ``exclusion_note`` keys.
+        (Pass only the *checked/enabled* entries.)
+
+    Returns
+    -------
+    A list of conflict dicts.  Each dict has:
+    ``group``       — the exclusion group identifier string
+    ``entries``     — list of (description, exclusion_note) pairs that clash
+    ``message``     — human-readable conflict summary
+    """
+    seen: Dict[str, List[dict]] = {}
+    for entry in selected_entries:
+        grp = entry.get("exclusion_group", "").strip()
+        if not grp:
+            continue
+        seen.setdefault(grp, []).append(entry)
+
+    conflicts = []
+    for grp, entries in seen.items():
+        if len(entries) < 2:
+            continue
+        descs = [e.get("description", "?") for e in entries]
+        note = entries[0].get("exclusion_note", "")
+        if not note:
+            note = (
+                "These effects modify the same game value and cannot be "
+                "combined. Disable all but one."
+            )
+        msg = (
+            f"⚡ Incompatible options selected ({grp}):\n"
+            + "\n".join(f"  • {d}" for d in descs)
+            + f"\n{note}"
+        )
+        conflicts.append({"group": grp, "entries": descs, "message": msg})
+    return conflicts
+
+
 def infer_category(address: str, value: str, size: str = "word") -> str:
     """Heuristically guess a category for an address/value pair.
 
