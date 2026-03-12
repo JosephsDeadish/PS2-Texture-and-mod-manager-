@@ -1,0 +1,430 @@
+{
+  "2EB5B9A9:EE:00385538": {
+    "game": "Spider-Man 2 (SLUS-20782)",
+    "game_crc": "2EB5B9A9",
+    "description": "Jump height multiplier — controls how high Spider-Man jumps",
+    "category": "physics",
+    "notes": "Default value 0x3F800000 (1.0 float). Larger values increase jump height.",
+    "value_map": {
+      "3F800000": "normal height (1.0×)",
+      "40000000": "double height (2.0×)",
+      "40400000": "triple height (3.0×)",
+      "3F400000": "half height (0.75×)"
+    }
+  },
+  "2EB5B9A9:EE:003855A0": {
+    "game": "Spider-Man 2 (SLUS-20782)",
+    "game_crc": "2EB5B9A9",
+    "description": "Swing speed multiplier — controls how fast web-swinging is",
+    "category": "physics",
+    "notes": "Float multiplier applied to horizontal swing velocity.",
+    "value_map": {
+      "3F800000": "normal speed (1.0×)",
+      "40000000": "double speed (2.0×)"
+    }
+  },
+  "2EB5B9A9:EE:003855B4": {
+    "game": "Spider-Man 2 (SLUS-20782)",
+    "game_crc": "2EB5B9A9",
+    "description": "Hero Points — Spider-Man's hero-point counter for unlocks",
+    "category": "cheat",
+    "notes": "Integer counter. Set to a large value for infinite hero points.",
+    "value_map": {
+      "0000270F": "9999 points",
+      "00009999": "unlimited (near-max)"
+    }
+  },
+  "2EB5B9A9:EE:00385620": {
+    "game": "Spider-Man 2 (SLUS-20782)",
+    "game_crc": "2EB5B9A9",
+    "description": "Movement speed — base running/walking speed multiplier",
+    "category": "physics"
+  },
+  "17D68D15:EE:005B4BF0": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "17D68D15",
+    "description": "Player health — current health points for Kratos",
+    "category": "cheat",
+    "notes": "Set to max value for infinite health.",
+    "value_map": {
+      "000003E8": "max health (1000)",
+      "0000270F": "over-cap (cheat)"
+    }
+  },
+  "17D68D15:EE:005B4BF4": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "17D68D15",
+    "description": "Player magic — current magic/mana for Kratos",
+    "category": "cheat"
+  },
+  "17D68D15:EE:005B4C00": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "17D68D15",
+    "description": "Red Orb counter — currency used to upgrade weapons",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 orbs",
+      "000F423F": "999999 orbs (near-max)"
+    }
+  },
+  "17D68D15:EE:00385540": {
+    "game": "God of War (SLUS-20891)",
+    "game_crc": "17D68D15",
+    "description": "Widescreen aspect ratio — horizontal stretch factor for 16:9 output",
+    "category": "graphics",
+    "notes": "Widescreen PNACH patch target. 0x3FAB851F = 16:9 ratio.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B3A9F9D5:EE:00388570": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B3A9F9D5:EE:006D5A90": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Munny (currency) counter",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 munny",
+      "0098967F": "9999999 munny"
+    }
+  },
+  "B3A9F9D5:EE:006D5A94": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Jump height multiplier for Sora",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)"
+    }
+  },
+  "A39517AB:EE:004F6AF8": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
+    "game_crc": "A39517AB",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A39517AB:EE:006D0310": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
+    "game_crc": "A39517AB",
+    "description": "Stamina — Snake's stamina gauge value",
+    "category": "cheat"
+  },
+  "A39517AB:EE:006D0314": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
+    "game_crc": "A39517AB",
+    "description": "Life (health) — Snake's maximum health",
+    "category": "cheat"
+  },
+  "CF0B0D11:EE:004B9E90": {
+    "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
+    "game_crc": "CF0B0D11",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CF0B0D11:EE:007F6B4C": {
+    "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
+    "game_crc": "CF0B0D11",
+    "description": "Ammo counter — current magazine ammo for equipped weapon",
+    "category": "cheat"
+  },
+  "9A5B29A1:EE:003CD218": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9A5B29A1:EE:00B78D30": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "description": "Player money — CJ's current cash",
+    "category": "cheat",
+    "value_map": {
+      "05F5E0FF": "max money ($99,999,999)"
+    }
+  },
+  "9A5B29A1:EE:00B78D34": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "description": "Wanted Level — police star rating (0–6)",
+    "category": "cheat",
+    "value_map": {
+      "00000000": "no wanted level",
+      "00000006": "6-star maximum wanted"
+    }
+  },
+  "9A5B29A1:EE:00B79010": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "description": "Player health — CJ's current health points",
+    "category": "cheat"
+  },
+  "9A5B29A1:EE:00B79014": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "description": "Player armour — CJ's current armour value",
+    "category": "cheat"
+  },
+  "8D057621:EE:003B2340": {
+    "game": "Gran Turismo 4 (SCUS-97328 / SCAJ-20065)",
+    "game_crc": "8D057621",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8D057621:EE:00C3A5C8": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Credits (in-game currency) — player's current GT credit balance",
+    "category": "cheat"
+  },
+  "B9D90F75:EE:003B2340": {
+    "game": "Shadow of the Colossus (SLUS-21195)",
+    "game_crc": "B9D90F75",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B9D90F75:EE:0075B860": {
+    "game": "Shadow of the Colossus (SLUS-21195)",
+    "game_crc": "B9D90F75",
+    "description": "Player health — Wander's health bar",
+    "category": "cheat"
+  },
+  "B9D90F75:EE:0075B864": {
+    "game": "Shadow of the Colossus (SLUS-21195)",
+    "game_crc": "B9D90F75",
+    "description": "Grip strength — how long Wander can hold on to a Colossus",
+    "category": "cheat"
+  },
+  "B4414C0D:EE:005C3B80": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "B4414C0D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B4414C0D:EE:008CF040": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "B4414C0D",
+    "description": "Money (in-game currency) — used to unlock items in Customise",
+    "category": "cheat"
+  },
+  "D697D204:EE:0038AB60": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "D697D204",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D697D204:EE:006B00A8": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "D697D204",
+    "description": "Pesetas (currency) — Leon's current money amount",
+    "category": "cheat"
+  },
+  "D697D204:EE:006B0044": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "D697D204",
+    "description": "Leon's health — current health value",
+    "category": "cheat"
+  },
+  "4A0E5B3A:EE:00388570": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4A0E5B3A:EE:006A2270": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Flashlight toggle — enables/disables James's flashlight",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "flashlight off",
+      "00000001": "flashlight on"
+    }
+  },
+  "F4A7473E:EE:003B1570": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F4A7473E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F4A7473E:EE:007B5040": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F4A7473E",
+    "description": "Red Orbs — currency for upgrades and items",
+    "category": "cheat"
+  },
+  "F4A7473E:EE:007B5044": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F4A7473E",
+    "description": "Dante's health — current HP",
+    "category": "cheat"
+  },
+  "FFF16BAB:EE:004C5870": {
+    "game": "Jak and Daxter (SCUS-97123 alt CRC)",
+    "game_crc": "FFF16BAB",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "FFF16BAB:EE:00832860": {
+    "game": "Jak and Daxter",
+    "game_crc": "FFF16BAB",
+    "description": "Orb count — total Precursor orbs collected",
+    "category": "cheat"
+  },
+  "DA5CC7A3:EE:003C5400": {
+    "game": "Burnout 3: Takedown (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "DA5CC7A3:EE:00830040": {
+    "game": "Burnout 3: Takedown (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Vehicle speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal speed (1.0×)",
+      "40000000": "double speed (2.0×)"
+    }
+  },
+  "3E1CC296:EE:003B4560": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3E1CC296:EE:00826000": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Bolts — Ratchet's in-game currency",
+    "category": "cheat"
+  },
+  "3E1CC296:EE:00826004": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Health orbs — Ratchet's current health",
+    "category": "cheat"
+  },
+  "E2F01792:EE:003C2220": {
+    "game": "Need for Speed: Underground 2 (SLUS-21001)",
+    "game_crc": "E2F01792",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E2F01792:EE:00B12380": {
+    "game": "Need for Speed: Underground 2 (SLUS-21001)",
+    "game_crc": "E2F01792",
+    "description": "Cash (in-game) — player's current money for car upgrades",
+    "category": "cheat"
+  },
+  "43AB7196:EE:003B7FF0": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "43AB7196",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "43AB7196:EE:0068B060": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "43AB7196",
+    "description": "Lives counter — number of lives remaining",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 lives",
+      "00000005": "5 lives (default)"
+    }
+  },
+  "43AB7196:EE:0068B064": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "43AB7196",
+    "description": "Wumpa fruit counter — collected fruits in current level",
+    "category": "cheat"
+  },
+  "F2A5C5CF:EE:003B3A80": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F2A5C5CF:EE:007C1040": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Dragonflies collected — main collectible count",
+    "category": "cheat"
+  },
+  "F2A5C5CF:EE:007C1044": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Gems collected — secondary collectible count",
+    "category": "cheat"
+  }
+}

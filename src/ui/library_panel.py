@@ -367,14 +367,39 @@ class _GameCard(QFrame):
         self._selected = False
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 8, 12, 8)
+        layout.setContentsMargins(10, 6, 10, 6)
         layout.setSpacing(10)
 
-        # Disc icon
-        disc_lbl = QLabel("💿")
-        disc_lbl.setStyleSheet("font-size: 22px;")
-        disc_lbl.setFixedWidth(28)
-        layout.addWidget(disc_lbl)
+        # Cover art thumbnail (48×68 px) or disc icon fallback
+        thumb_lbl = QLabel()
+        thumb_lbl.setFixedSize(48, 68)
+        thumb_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        thumb_lbl.setStyleSheet(
+            "background: #0a0a1a; border: 1px solid #1a1a3a; border-radius: 3px;"
+        )
+        thumb_loaded = False
+        if game.serial:
+            from src.core.config_manager import THUMBNAILS_DIR
+            for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                thumb_path = THUMBNAILS_DIR / f"{game.serial}{ext}"
+                if thumb_path.is_file():
+                    from PyQt6.QtGui import QPixmap
+                    px = QPixmap(str(thumb_path))
+                    if not px.isNull():
+                        thumb_lbl.setPixmap(
+                            px.scaled(48, 68,
+                                      Qt.AspectRatioMode.KeepAspectRatio,
+                                      Qt.TransformationMode.SmoothTransformation)
+                        )
+                        thumb_loaded = True
+                        break
+        if not thumb_loaded:
+            thumb_lbl.setText("💿")
+            thumb_lbl.setStyleSheet(
+                "font-size: 26px; background: #0a0a1a; "
+                "border: 1px solid #1a1a3a; border-radius: 3px;"
+            )
+        layout.addWidget(thumb_lbl)
 
         # Info column
         info_col = QVBoxLayout()

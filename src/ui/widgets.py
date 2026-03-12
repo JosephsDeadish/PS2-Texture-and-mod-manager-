@@ -31,6 +31,325 @@ from PyQt6.QtWidgets import (
 
 from src.models.mod import ModInfo, ModType, ConflictInfo
 
+# ---------------------------------------------------------------------------
+# PnachCodePickerDialog
+# ---------------------------------------------------------------------------
+
+class PnachCodePickerDialog(QDialog):
+    """Let the user build a custom merged PNACH by choosing which mod wins
+    each conflicting address, then merging any non-conflicting codes from all
+    mods.
+
+    After the dialog is accepted, call :meth:`write_merged` to produce the
+    merged ``.pnach`` file.
+    """
+
+    def __init__(self, pnach_conflicts: list, db, parent=None):
+        """
+        *pnach_conflicts* — list of dicts from ``ModManager.detect_pnach_conflicts()``.
+        *db* — ``ModDatabase`` instance.
+        """
+        super().__init__(parent)
+        self.pnach_conflicts = pnach_conflicts
+        self.db = db
+        # Map (game_crc, processor, address) → chosen mod_id  (None = ask user)
+        self._choices: dict = {}
+        self.setWindowTitle("🔧 PNACH Code Picker — Build Custom Merged Patch")
+        self.setMinimumSize(820, 580)
+        self._build_ui()
+
+    # ------------------------------------------------------------------
+    # Build
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        from collections import defaultdict
+        from src.core.pnach_analyzer import describe_patch, group_conflicts_by_function
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(18, 18, 18, 18)
+
+        header = QLabel("🔧  Build Your Own Merged PNACH Patch")
+        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #70b0ff;")
+        layout.addWidget(header)
+
+        intro = QLabel(
+            "For each conflicting memory address, choose which mod's code you want to use.\n"
+            "All non-conflicting codes from every selected mod are automatically included."
+        )
+        intro.setStyleSheet("color: #9090b0; font-size: 12px;")
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        layout.addWidget(sep)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        container = QWidget()
+        c_layout = QVBoxLayout(container)
+        c_layout.setSpacing(8)
+
+        # Group by category using the analyzer
+        grouped = group_conflicts_by_function(self.pnach_conflicts)
+        category_order = ["physics", "gameplay", "graphics", "audio", "cheat",
+                          "hardware_registers", "unknown"]
+        category_labels = {
+            "physics": "⚡ Physics & Movement",
+            "gameplay": "🎮 Gameplay",
+            "graphics": "🖥️ Graphics / Widescreen",
+            "audio": "🔊 Audio",
+            "cheat": "🌟 Cheats & Stats",
+            "hardware_registers": "🔌 Hardware Registers",
+            "unknown": "❓ Unknown / Other",
+        }
+        all_cats = list(grouped.keys())
+        ordered = [c for c in category_order if c in all_cats]
+        ordered += [c for c in all_cats if c not in ordered]
+
+        self._radio_groups: dict = {}  # (crc, proc, addr) → {mod_id: QRadioButton}
+
+        for cat in ordered:
+            conflicts_in_cat = grouped[cat]
+            if not conflicts_in_cat:
+                continue
+
+            cat_label = QLabel(category_labels.get(cat, cat.title()))
+            cat_label.setStyleSheet(
+                "font-weight: bold; color: #b0b0e0; font-size: 13px; margin-top: 8px;"
+            )
+            c_layout.addWidget(cat_label)
+
+            for conflict in conflicts_in_cat:
+                ann = conflict.get("annotation", {})
+                game_crc = conflict.get("game_crc", "")
+                processor = conflict.get("processor", "EE")
+                address = conflict.get("address", "")
+                triple = (game_crc, processor, address)
+
+                mod_a = self.db.get(conflict.get("mod_a_id", ""))
+                mod_b = self.db.get(conflict.get("mod_b_id", ""))
+
+                frame = QFrame()
+                frame.setObjectName("card")
+                frame.setStyleSheet(
+                    "QFrame#card { border: 1px solid #303070; background: #111128; }"
+                )
+                f_lay = QVBoxLayout(frame)
+                f_lay.setSpacing(4)
+
+                # --- Description row ---
+                desc = ann.get("description")
+                if desc:
+                    desc_lbl = QLabel(f"📋  {desc}")
+                    desc_lbl.setStyleSheet(
+                        "color: #d0d0f8; font-size: 13px; font-weight: bold;"
+                    )
+                    desc_lbl.setWordWrap(True)
+                    f_lay.addWidget(desc_lbl)
+
+                addr_row = QHBoxLayout()
+                crc_lbl = QLabel(f"CRC {game_crc}")
+                crc_lbl.setStyleSheet("color: #505070; font-size: 10px; font-family: monospace;")
+                addr_row.addWidget(crc_lbl)
+                proc_lbl = QLabel(processor)
+                proc_lbl.setStyleSheet("color: #505090; font-size: 10px; font-family: monospace;")
+                addr_row.addWidget(proc_lbl)
+                addr_lbl = QLabel(f"0x{address}")
+                addr_lbl.setStyleSheet("color: #a09030; font-family: monospace; font-size: 11px;")
+                addr_row.addWidget(addr_lbl)
+                addr_row.addStretch()
+                f_lay.addLayout(addr_row)
+
+                if ann.get("inferred"):
+                    inferred_lbl = QLabel(
+                        f"  ⚙  Inferred category: {cat} — no specific description available for this address"
+                    )
+                    inferred_lbl.setStyleSheet("color: #707070; font-size: 10px; font-style: italic;")
+                    f_lay.addWidget(inferred_lbl)
+
+                # --- Radio buttons for each option ---
+                from PyQt6.QtWidgets import QRadioButton, QButtonGroup
+                btn_group = QButtonGroup(frame)
+                radio_map = {}
+
+                for mod, val_key in [(mod_a, "value_a"), (mod_b, "value_b")]:
+                    if not mod:
+                        continue
+                    raw_val = conflict.get(val_key, "")
+                    val_note = ann.get("value_note", f"0x{raw_val}")
+                    # Show value interpretation from DB if available
+                    from src.core.pnach_analyzer import describe_patch as dp2
+                    ann2 = dp2(game_crc, processor, address, raw_val)
+                    val_note2 = ann2.get("value_note", f"0x{raw_val}")
+
+                    radio = QRadioButton(
+                        f"  {mod.name}  —  value 0x{raw_val}  ({val_note2})"
+                    )
+                    radio.setStyleSheet("color: #c0c0e8; font-size: 12px;")
+                    btn_group.addButton(radio)
+                    radio_map[mod.id] = radio
+                    f_lay.addWidget(radio)
+
+                # Default: first option selected
+                if radio_map:
+                    list(radio_map.values())[0].setChecked(True)
+
+                self._radio_groups[triple] = (radio_map, btn_group)
+                c_layout.addWidget(frame)
+
+        c_layout.addStretch()
+        scroll.setWidget(container)
+        layout.addWidget(scroll, 1)
+
+        # --- Buttons ---
+        btns = QHBoxLayout()
+        btns.addStretch()
+
+        help_btn = QPushButton("❓ What does each value do?")
+        help_btn.setObjectName("primary_btn")
+        help_btn.clicked.connect(self._show_value_help)
+        btns.addWidget(help_btn)
+
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(self.reject)
+        btns.addWidget(cancel_btn)
+
+        merge_btn = QPushButton("✅ Merge Selected Codes")
+        merge_btn.setObjectName("success_btn")
+        merge_btn.clicked.connect(self._on_merge)
+        btns.addWidget(merge_btn)
+
+        layout.addLayout(btns)
+
+        self._dest_dir: str = ""
+
+    # ------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------
+
+    def _show_value_help(self):
+        """Show a plain-language explanation for the selected conflict."""
+        lines = []
+        for triple, (radio_map, _) in self._radio_groups.items():
+            game_crc, processor, address = triple
+            from src.core.pnach_analyzer import describe_address, describe_patch
+            desc = describe_address(game_crc, processor, address)
+            if desc:
+                lines.append(f"<b>0x{address}</b> ({processor}): {desc}")
+        if lines:
+            QMessageBox.information(
+                self,
+                "Address Descriptions",
+                "<br>".join(lines) if lines else "No descriptions available.",
+            )
+        else:
+            QMessageBox.information(
+                self,
+                "Address Descriptions",
+                "No specific descriptions are available for these addresses.\n"
+                "The analyzer uses heuristics to categorize unknown addresses.",
+            )
+
+    def _on_merge(self):
+        from PyQt6.QtWidgets import QFileDialog as _FD
+        dest = _FD.getExistingDirectory(self, "Choose output folder for merged PNACH")
+        if not dest:
+            return
+        self._dest_dir = dest
+        self.accept()
+
+    def get_choices(self) -> dict:
+        """Return {(game_crc, processor, address): winning_mod_id}."""
+        choices = {}
+        for triple, (radio_map, _) in self._radio_groups.items():
+            for mod_id, radio in radio_map.items():
+                if radio.isChecked():
+                    choices[triple] = mod_id
+                    break
+        return choices
+
+    def dest_dir(self) -> str:
+        return self._dest_dir
+
+    def write_merged(self) -> list:
+        """Build merged PNACH files according to user choices.
+
+        Returns a list of written file paths.
+        """
+        from src.core.pnach import parse_pnach, write_pnach, PnachFile, PatchLine
+        from pathlib import Path as _P
+        import tempfile
+
+        choices = self.get_choices()
+        dest = self._dest_dir
+        if not dest:
+            return []
+
+        # Collect all PNACH files from all involved mods
+        all_mod_ids = set()
+        for c in self.pnach_conflicts:
+            all_mod_ids.add(c.get("mod_a_id", ""))
+            all_mod_ids.add(c.get("mod_b_id", ""))
+        all_mod_ids.discard("")
+
+        # Map CRC → {(processor, address): winning PatchLine}
+        crc_patches: dict = {}
+
+        for mod_id in all_mod_ids:
+            mod = self.db.get(mod_id)
+            if not mod:
+                continue
+            src = _P(mod.path)
+            pnach_files = (
+                list(src.rglob("*.pnach")) if src.is_dir()
+                else [src] if src.suffix.lower() == ".pnach" else []
+            )
+            for pf_path in pnach_files:
+                try:
+                    pf = parse_pnach(str(pf_path))
+                except Exception:
+                    continue
+                crc = pf.game_crc
+                if crc not in crc_patches:
+                    crc_patches[crc] = {"title": pf.game_title, "patches": {}}
+
+                for patch in pf.patches:
+                    if not patch.enabled:
+                        continue
+                    key = (patch.processor.upper(), patch.address.upper())
+                    # Check if this address is a conflict
+                    conflict_triple = (crc, patch.processor.upper(), patch.address.upper())
+                    if conflict_triple in choices:
+                        # Only include this patch if this mod was chosen for this address
+                        if choices[conflict_triple] == mod_id:
+                            crc_patches[crc]["patches"][key] = patch
+                    else:
+                        # Non-conflicting: include from first mod that provides it
+                        if key not in crc_patches[crc]["patches"]:
+                            crc_patches[crc]["patches"][key] = patch
+
+        # Write merged PNACHs
+        written = []
+        for crc, info in crc_patches.items():
+            patches = sorted(info["patches"].values(), key=lambda p: p.address)
+            merged_pf = PnachFile(
+                game_crc=crc,
+                game_title=info.get("title", ""),
+                header_comments=[
+                    "// Custom merged PNACH created by PS2 Mod Manager",
+                    "// Conflicting addresses resolved via PNACH Code Picker",
+                ],
+                patches=patches,
+            )
+            out_path = str(_P(dest) / f"{crc}.pnach")
+            write_pnach(merged_pf, out_path)
+            written.append(out_path)
+
+        return written
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -741,9 +1060,42 @@ class ConflictDialog(QDialog):
         scroll.setWidget(container)
         layout.addWidget(scroll, 1)
 
-        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        btns.rejected.connect(self.accept)
-        layout.addWidget(btns)
+        # Button row: Code Picker (if PNACH conflicts exist) + Close
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+
+        if self.pnach_conflicts:
+            picker_btn = QPushButton("🔧 Open Code Picker — build custom merged PNACH")
+            picker_btn.setObjectName("primary_btn")
+            picker_btn.setToolTip(
+                "Opens the PNACH Code Picker where you can choose exactly which "
+                "code wins for each conflicting address and merge them into a single patch."
+            )
+            picker_btn.clicked.connect(self._open_code_picker)
+            btn_row.addWidget(picker_btn)
+
+        close_btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        close_btn.rejected.connect(self.accept)
+        btn_row.addWidget(close_btn)
+
+        layout.addLayout(btn_row)
+
+    def _open_code_picker(self):
+        from src.ui.widgets import PnachCodePickerDialog
+        dlg = PnachCodePickerDialog(self.pnach_conflicts, self.db, self)
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            written = dlg.write_merged()
+            if written:
+                QMessageBox.information(
+                    self,
+                    "Merged PNACH Written",
+                    f"✅  Wrote {len(written)} merged PNACH file(s):\n\n"
+                    + "\n".join(written)
+                    + "\n\nImport the merged file(s) from the PNACH panel.",
+                )
+            else:
+                QMessageBox.warning(self, "Nothing Written",
+                                    "No PNACH files were written. Choose an output folder.")
 
 
 # ---------------------------------------------------------------------------

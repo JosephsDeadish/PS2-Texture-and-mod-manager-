@@ -4304,3 +4304,76 @@ class TestCatalogueModTypeEnum(unittest.TestCase):
                 len(by_enum), len(by_value),
                 f"Enum vs .value filtering mismatch for {mt}"
             )
+
+
+class TestPnachAnalyzer(unittest.TestCase):
+    """Tests for src.core.pnach_analyzer."""
+
+    def test_known_address_returns_description(self):
+        from src.core.pnach_analyzer import describe_address
+        desc = describe_address("2EB5B9A9", "EE", "00385538")
+        self.assertIsNotNone(desc)
+        self.assertIn("jump", desc.lower())
+
+    def test_unknown_address_returns_none(self):
+        from src.core.pnach_analyzer import describe_address
+        desc = describe_address("DEADBEEF", "EE", "12345678")
+        self.assertIsNone(desc)
+
+    def test_describe_patch_known_returns_full_annotation(self):
+        from src.core.pnach_analyzer import describe_patch
+        ann = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
+        self.assertIsNotNone(ann["description"])
+        self.assertFalse(ann["inferred"])
+        # value_note should contain something (either value_map entry or hex/float)
+        self.assertIsInstance(ann["value_note"], str)
+        self.assertGreater(len(ann["value_note"]), 0)
+
+    def test_describe_patch_unknown_is_inferred(self):
+        from src.core.pnach_analyzer import describe_patch
+        ann = describe_patch("DEADBEEF", "EE", "00123456", "40000000", "word")
+        self.assertIsNone(ann["description"])
+        self.assertTrue(ann["inferred"])
+        self.assertIn("category", ann)
+
+    def test_group_conflicts_by_function(self):
+        from src.core.pnach_analyzer import group_conflicts_by_function
+        conflicts = [
+            {
+                "game_crc": "2EB5B9A9", "processor": "EE", "address": "00385538",
+                "mod_a_id": "a", "value_a": "3F800000",
+                "mod_b_id": "b", "value_b": "40000000",
+            },
+            {
+                "game_crc": "9A5B29A1", "processor": "EE", "address": "003CD218",
+                "mod_a_id": "c", "value_a": "3F800000",
+                "mod_b_id": "d", "value_b": "3FAB851F",
+            },
+        ]
+        grouped = group_conflicts_by_function(conflicts)
+        self.assertIsInstance(grouped, dict)
+        # Both conflicts should be in some category
+        all_entries = [e for entries in grouped.values() for e in entries]
+        self.assertEqual(len(all_entries), 2)
+        # Each enriched entry must have an 'annotation' key
+        for e in all_entries:
+            self.assertIn("annotation", e)
+
+    def test_infer_category_widescreen_float(self):
+        from src.core.pnach_analyzer import infer_category
+        # 0x3FAB851F ≈ 1.3416 — aspect ratio float → physics or similar
+        cat = infer_category("003B2340", "3FAB851F", "word")
+        self.assertIsInstance(cat, str)
+        self.assertGreater(len(cat), 0)
+
+    def test_reload_db_returns_count(self):
+        from src.core.pnach_analyzer import reload_db
+        n = reload_db()
+        self.assertGreater(n, 0)
+
+    def test_db_file_exists(self):
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.assertTrue(db_path.is_file(), "known_addresses.json should exist")
+        data = json.loads(db_path.read_text())
+        self.assertIsInstance(data, dict)
+        self.assertGreater(len(data), 0)
