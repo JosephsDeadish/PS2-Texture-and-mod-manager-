@@ -3072,5 +3072,561 @@
       "3FAB851F": "16:9 widescreen",
       "3F800000": "4:3 standard"
     }
+  },
+  "A9FE1E04:EE:003B4540": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
+    "game_crc": "A9FE1E04",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0B29B9B6:EE:003C4560": {
+    "game": "God of War II (SLUS-21441)",
+    "game_crc": "0B29B9B6",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0B29B9B6:EE:00C00000": {
+    "game": "God of War II (SLUS-21441)",
+    "game_crc": "0B29B9B6",
+    "description": "Red Orbs — currency for upgrades",
+    "category": "cheat"
+  },
+  "6B6D7FF0:EE:003B4540": {
+    "game": "Hitman 2: Silent Assassin (SLUS-20374)",
+    "game_crc": "6B6D7FF0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "6B6D7FF0:EE:00700000": {
+    "game": "Hitman 2: Silent Assassin (SLUS-20374)",
+    "game_crc": "6B6D7FF0",
+    "description": "Saves — mission saves remaining",
+    "category": "cheat"
+  },
+  "BD9A3CCA:EE:003B4540": {
+    "game": "Hitman: Contracts (SLUS-20775)",
+    "game_crc": "BD9A3CCA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "60EB4D80:EE:003B4540": {
+    "game": "Hitman: Blood Money (SLUS-21210)",
+    "game_crc": "60EB4D80",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "60EB4D80:EE:00D00000": {
+    "game": "Hitman: Blood Money (SLUS-21210)",
+    "game_crc": "60EB4D80",
+    "description": "Money — Agency payout for contracts",
+    "category": "cheat"
+  },
+  "2DFAA78D:EE:003C4560": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2DFAA78D:EE:005A0000": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "HP — Ico's health bar",
+    "category": "cheat"
+  },
+  "71E449F4:EE:003B4560": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97120)",
+    "game_crc": "71E449F4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "71E449F4:EE:00700000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97120)",
+    "game_crc": "71E449F4",
+    "description": "Orbs — precursor orbs collected",
+    "category": "cheat"
+  },
+  "8CC3A6A4:EE:003B4540": {
+    "game": "Killzone (SLUS-20845)",
+    "game_crc": "8CC3A6A4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "8CC3A6A4:EE:005A0080": {
+    "game": "Killzone (SLUS-20845)",
+    "game_crc": "8CC3A6A4",
+    "description": "HP — player health",
+    "category": "cheat"
+  },
+  "D3E8D5EC:EE:003C4560": {
+    "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
+    "game_crc": "D3E8D5EC",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D3E8D5EC:EE:00B00000": {
+    "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
+    "game_crc": "D3E8D5EC",
+    "description": "Munny — currency for world cards",
+    "category": "cheat"
+  },
+  "D3E8D5EC:EE:005A0000": {
+    "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
+    "game_crc": "D3E8D5EC",
+    "description": "HP — Sora's current HP",
+    "category": "cheat"
+  },
+  "EF08CCE8:EE:003B4540": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20785)",
+    "game_crc": "EF08CCE8",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "EF08CCE8:EE:005A0080": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20785)",
+    "game_crc": "EF08CCE8",
+    "description": "Life — Snake's stamina/health",
+    "category": "cheat"
+  },
+  "49FBF26F:EE:003B4540": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "game_crc": "49FBF26F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CD6A34C8:EE:003B4540": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
+    "game_crc": "CD6A34C8",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "CD6A34C8:EE:00C00000": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
+    "game_crc": "CD6A34C8",
+    "description": "Cash — in-game currency for car upgrades",
+    "category": "cheat"
+  },
+  "E2FE3066:EE:003B4540": {
+    "game": "Need for Speed: Underground (SLUS-20590)",
+    "game_crc": "E2FE3066",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E2FE3066:EE:00C00000": {
+    "game": "Need for Speed: Underground (SLUS-20590)",
+    "game_crc": "E2FE3066",
+    "description": "Cash — money for mods and upgrades",
+    "category": "cheat"
+  },
+  "A32D9744:EE:003B4540": {
+    "game": "Need for Speed: Underground 2 (SLUS-20811)",
+    "game_crc": "A32D9744",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A32D9744:EE:00C00000": {
+    "game": "Need for Speed: Underground 2 (SLUS-20811)",
+    "game_crc": "A32D9744",
+    "description": "Cash — car modification budget",
+    "category": "cheat"
+  },
+  "0B77FE0C:EE:003B4540": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E8892FC1:EE:003C4560": {
+    "game": "Persona 3 (SLUS-21354)",
+    "game_crc": "E8892FC1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E8892FC1:EE:00B00000": {
+    "game": "Persona 3 (SLUS-21354)",
+    "game_crc": "E8892FC1",
+    "description": "Yen — shopping mall currency",
+    "category": "cheat"
+  },
+  "A47B23C4:EE:003C4560": {
+    "game": "Persona 3 FES (SLUS-21270)",
+    "game_crc": "A47B23C4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F5DD2F45:EE:003C4560": {
+    "game": "Persona 4 (SLUS-21819)",
+    "game_crc": "F5DD2F45",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5741B3B4:EE:003C4560": {
+    "game": "Resident Evil: Outbreak (SLUS-21616)",
+    "game_crc": "5741B3B4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5741B3B4:EE:005A0000": {
+    "game": "Resident Evil: Outbreak (SLUS-21616)",
+    "game_crc": "5741B3B4",
+    "description": "HP — player character health",
+    "category": "cheat"
+  },
+  "31E1BC9B:EE:003C4560": {
+    "game": "Rogue Galaxy (SLUS-21591)",
+    "game_crc": "31E1BC9B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "31E1BC9B:EE:00C00000": {
+    "game": "Rogue Galaxy (SLUS-21591)",
+    "game_crc": "31E1BC9B",
+    "description": "Zeni — party currency for items",
+    "category": "cheat"
+  },
+  "FFAAC65B:EE:003C4560": {
+    "game": "Silent Hill 3 (SLUS-20459)",
+    "game_crc": "FFAAC65B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "FFAAC65B:EE:005A0080": {
+    "game": "Silent Hill 3 (SLUS-20459)",
+    "game_crc": "FFAAC65B",
+    "description": "HP — Heather's current health",
+    "category": "cheat"
+  },
+  "0152E0C7:EE:003C4560": {
+    "game": "Silent Hill 4: The Room (SLUS-20978)",
+    "game_crc": "0152E0C7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "0152E0C7:EE:005A0080": {
+    "game": "Silent Hill 4: The Room (SLUS-20978)",
+    "game_crc": "0152E0C7",
+    "description": "HP — Henry's health",
+    "category": "cheat"
+  },
+  "3A66F702:EE:003B4540": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E327DA03:EE:003B4540": {
+    "game": "SSX 3 (SLUS-20783)",
+    "game_crc": "E327DA03",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3FCB7A3A:EE:003C4560": {
+    "game": "Tales of Symphonia (SLUS-21033)",
+    "game_crc": "3FCB7A3A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3FCB7A3A:EE:00B00000": {
+    "game": "Tales of Symphonia (SLUS-21033)",
+    "game_crc": "3FCB7A3A",
+    "description": "Gald — party currency for items and equipment",
+    "category": "cheat"
+  },
+  "3FCB7A3A:EE:005A0000": {
+    "game": "Tales of Symphonia (SLUS-21033)",
+    "game_crc": "3FCB7A3A",
+    "description": "HP — Lloyd's current hit points",
+    "category": "cheat"
+  },
+  "8CE89B4C:EE:003B4540": {
+    "game": "Tekken 4 (SLUS-20328)",
+    "game_crc": "8CE89B4C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B537D600:EE:003B4540": {
+    "game": "Tekken 5 (SLUS-21219)",
+    "game_crc": "B537D600",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "20E7CC63:EE:003B4540": {
+    "game": "Tony Hawk's Pro Skater 3 (SLUS-20095)",
+    "game_crc": "20E7CC63",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "5C86124C:EE:003B4540": {
+    "game": "Tony Hawk's Underground (SLUS-20731)",
+    "game_crc": "5C86124C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "AA9B2DC0:EE:003C4560": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "AA9B2DC0",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "AA9B2DC0:EE:00B00000": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "AA9B2DC0",
+    "description": "OTH — in-game currency for equipment",
+    "category": "cheat"
+  },
+  "AA9B2DC0:EE:005A0000": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "AA9B2DC0",
+    "description": "HP — Silmeria's current HP",
+    "category": "cheat"
+  },
+  "7D32CF7D:EE:003C4560": {
+    "game": "Xenosaga Episode III: Also Sprach Zarathustra (SLUS-21137)",
+    "game_crc": "7D32CF7D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7D32CF7D:EE:00B00000": {
+    "game": "Xenosaga Episode III: Also Sprach Zarathustra (SLUS-21137)",
+    "game_crc": "7D32CF7D",
+    "description": "G — party funds for equipment upgrades",
+    "category": "cheat"
+  },
+  "F26A89E4:EE:003B4560": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "F26A89E4:EE:00B00000": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Hell — in-game currency (HL) for items",
+    "category": "cheat"
+  },
+  "3C16D0C5:EE:003C4560": {
+    "game": "Shadow of the Colossus (SLUS-20721)",
+    "game_crc": "3C16D0C5",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3C16D0C5:EE:005A0080": {
+    "game": "Shadow of the Colossus (SLUS-20721)",
+    "game_crc": "3C16D0C5",
+    "description": "HP — Wander's health bar",
+    "category": "cheat"
+  },
+  "B0791D8E:EE:003B4540": {
+    "game": "SSX Tricky (SLUS-20301)",
+    "game_crc": "B0791D8E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "AEECF30D:EE:003B4540": {
+    "game": "Zone of the Enders (SLUS-20515)",
+    "game_crc": "AEECF30D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D2A1D042:EE:003B4540": {
+    "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
+    "game_crc": "D2A1D042",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D2A1D042:EE:005A0000": {
+    "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
+    "game_crc": "D2A1D042",
+    "description": "HP — Jehuty's energy/health",
+    "category": "cheat"
+  },
+  "73BC4AAC:EE:003C4560": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "73BC4AAC",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B60DD19A:EE:003C4560": {
+    "game": "Shin Megami Tensei: Digital Devil Saga (SLUS-21020)",
+    "game_crc": "B60DD19A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3F36CFBF:EE:003B4540": {
+    "game": "Need for Speed: ProStreet (SLUS-21658)",
+    "game_crc": "3F36CFBF",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1BC9364D:EE:003C4560": {
+    "game": "Tales of Legendia (SLUS-20594)",
+    "game_crc": "1BC9364D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "1BC9364D:EE:00B00000": {
+    "game": "Tales of Legendia (SLUS-20594)",
+    "game_crc": "1BC9364D",
+    "description": "Gald — party currency",
+    "category": "cheat"
   }
 }
