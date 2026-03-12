@@ -1244,5 +1244,319 @@
     "game_crc": "9AA4CBC1",
     "description": "Gems counter — collectible currency in levels",
     "category": "cheat"
+  },
+  "627B2B89:EE:003B4540": {
+    "game": "Zone of the Enders (SLUS-20216)",
+    "game_crc": "627B2B89",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "627B2B89:EE:00B00000": {
+    "game": "Zone of the Enders (SLUS-20216)",
+    "game_crc": "627B2B89",
+    "description": "EP (Energy Points) — mech weapon energy",
+    "category": "cheat"
+  },
+  "87432EB9:EE:007A0000": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "87432EB9",
+    "description": "Zack Dollars — in-game currency",
+    "category": "cheat"
+  },
+  "A5EC9ADB:EE:003B4540": {
+    "game": "Hot Shots Golf 3 (SCUS-97123)",
+    "game_crc": "A5EC9ADB",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "A5EC9ADB:EE:00A00000": {
+    "game": "Hot Shots Golf 3 (SCUS-97123)",
+    "game_crc": "A5EC9ADB",
+    "description": "Points — experience points for unlocking courses and characters",
+    "category": "cheat"
+  },
+  "9EE5B3D4:EE:003B4540": {
+    "game": "We Love Katamari (SLUS-21174)",
+    "game_crc": "9EE5B3D4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "9EE5B3D4:EE:00A80000": {
+    "game": "We Love Katamari (SLUS-21174)",
+    "game_crc": "9EE5B3D4",
+    "description": "Cousins collected — total related cousins found",
+    "category": "cheat"
+  },
+  "3C67C957:EE:003C4560": {
+    "game": "Xenosaga Episode II: Jenseits von Gut und Böse (SLUS-20892)",
+    "game_crc": "3C67C957",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "3C67C957:EE:00C00000": {
+    "game": "Xenosaga Episode II: Jenseits von Gut und Böse (SLUS-20892)",
+    "game_crc": "3C67C957",
+    "description": "G (gold) — party currency for shops and Segment Addresses",
+    "category": "cheat"
+  },
+  "94A82AAA:EE:003C4560": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
+    "game_crc": "94A82AAA",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "94A82AAA:EE:00C08000": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
+    "game_crc": "94A82AAA",
+    "description": "G (gold) — party money for equipment and items",
+    "category": "cheat"
+  },
+  "2AFF83F8:EE:003B4540": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "2AFF83F8:EE:006A0000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Monkeys caught — total ape count",
+    "category": "cheat"
+  },
+  "4A2FF487:EE:003C4560": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4A2FF487:EE:00C08000": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "G — gold currency for item shops",
+    "category": "cheat"
+  },
+  "D5B16B2D:EE:003B4540": {
+    "game": "Devil May Cry 2 (SLUS-20443)",
+    "game_crc": "D5B16B2D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D5B16B2D:EE:005E0000": {
+    "game": "Devil May Cry 2 (SLUS-20443)",
+    "game_crc": "D5B16B2D",
+    "description": "Proud Souls — orbs used to unlock abilities (equivalent to Red Orbs)",
+    "category": "cheat"
+  },
+  "4B7FDC64:EE:003B4560": {
+    "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
+    "game_crc": "4B7FDC64",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "C0437D3A:EE:003C4560": {
+    "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
+    "game_crc": "C0437D3A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "C0437D3A:EE:007A0080": {
+    "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
+    "game_crc": "C0437D3A",
+    "description": "SP (skill points) — used to unlock scenarios and files",
+    "category": "cheat"
+  },
+  "4F75B0A4:EE:003B4540": {
+    "game": "WWE SmackDown! vs. RAW 2006 (SLUS-21302)",
+    "game_crc": "4F75B0A4",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4F75B0A4:EE:00900000": {
+    "game": "WWE SmackDown! vs. RAW 2006 (SLUS-21302)",
+    "game_crc": "4F75B0A4",
+    "description": "Money — currency for shop purchases and created superstars",
+    "category": "cheat"
+  },
+  "B5CC9F00:EE:003B4540": {
+    "game": "Ultimate Spider-Man (SLUS-21262)",
+    "game_crc": "B5CC9F00",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "B5CC9F00:EE:006C0080": {
+    "game": "Ultimate Spider-Man (SLUS-21262)",
+    "game_crc": "B5CC9F00",
+    "description": "Tokens — collectibles for unlocking concept art",
+    "category": "cheat"
+  },
+  "E2AC3453:EE:003B4540": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "E2AC3453",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "E2AC3453:EE:00B78D00": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "E2AC3453",
+    "description": "Cash — money for car upgrades and pursuit tech",
+    "category": "cheat"
+  },
+  "4A8B4CC9:EE:003C4560": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "4A8B4CC9:EE:00D00000": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "Credits — money to buy AC parts and upgrades",
+    "category": "cheat"
+  },
+  "09E4EC93:EE:003C4560": {
+    "game": "Suikoden III (SLUS-20292)",
+    "game_crc": "09E4EC93",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "09E4EC93:EE:00C00000": {
+    "game": "Suikoden III (SLUS-20292)",
+    "game_crc": "09E4EC93",
+    "description": "Potch — in-game currency for items and equipment",
+    "category": "cheat"
+  },
+  "D14EA600:EE:003C4560": {
+    "game": "Suikoden IV (SLUS-20895)",
+    "game_crc": "D14EA600",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "D14EA600:EE:00C08000": {
+    "game": "Suikoden IV (SLUS-20895)",
+    "game_crc": "D14EA600",
+    "description": "Potch — party currency for ships and items",
+    "category": "cheat"
+  },
+  "7AC53678:EE:003C4560": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "7AC53678",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "7AC53678:EE:009C0000": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "7AC53678",
+    "description": "Gold — Dojo tournament prize money",
+    "category": "cheat"
+  },
+  "00DC3F8E:EE:003B4540": {
+    "game": "Grandia II (SLUS-20048)",
+    "game_crc": "00DC3F8E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "00DC3F8E:EE:00A00000": {
+    "game": "Grandia II (SLUS-20048)",
+    "game_crc": "00DC3F8E",
+    "description": "Gold — currency for item and equipment shops",
+    "category": "cheat"
+  },
+  "BCEC7DBD:EE:003B4540": {
+    "game": "Grandia III (SLUS-21516)",
+    "game_crc": "BCEC7DBD",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
+  },
+  "BCEC7DBD:EE:00A80000": {
+    "game": "Grandia III (SLUS-21516)",
+    "game_crc": "BCEC7DBD",
+    "description": "Gold — currency for shops and Alchemy",
+    "category": "cheat"
+  },
+  "B19F5B04:EE:003B4540": {
+    "game": "Mafia (SLUS-20671)",
+    "game_crc": "B19F5B04",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard"
+    }
   }
 }

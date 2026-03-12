@@ -8988,5 +8988,59 @@
     "is_free": true,
     "nsfw": false,
     "requires_account": true
+  },
+  {
+    "id": "save_forbidden_siren2_all",
+    "name": "Forbidden Siren 2 — All Sightings & Archive",
+    "description": "Save for Forbidden Siren 2 / Siren 2 (SLES-53853 PAL). All archive items and sightings collected.",
+    "author": "GameSavedFiles",
+    "author_url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "direct_download_url": "",
+    "source": "GBAtemp",
+    "game": "Forbidden Siren 2",
+    "game_serial": "SLES-53853",
+    "type": "save_file",
+    "upscale_tech": "",
+    "tags": [
+      "siren",
+      "horror",
+      "save",
+      "complete"
+    ],
+    "thumbnail_url": "",
+    "context": "Import via Memory Card panel. Serial: SLES-53853.",
+    "is_hub": false,
+    "is_complete": true,
+    "is_free": true,
+    "nsfw": false,
+    "requires_account": true
+  },
+  {
+    "id": "save_the_sims2_all",
+    "name": "The Sims 2 — All Lots & Items Unlocked",
+    "description": "Save for The Sims 2 PS2 (SLUS-21102). All lots and reward items unlocked.",
+    "author": "GameSavedFiles",
+    "author_url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "url": "https://gbatemp.net/download/categories/game-saves.1396/",
+    "direct_download_url": "",
+    "source": "GBAtemp",
+    "game": "The Sims 2",
+    "game_serial": "SLUS-21102",
+    "type": "save_file",
+    "upscale_tech": "",
+    "tags": [
+      "sims",
+      "simulation",
+      "save",
+      "all-unlocked"
+    ],
+    "thumbnail_url": "",
+    "context": "Import via Memory Card panel. Serial: SLUS-21102.",
+    "is_hub": false,
+    "is_complete": true,
+    "is_free": true,
+    "nsfw": false,
+    "requires_account": true
   }
 ]
