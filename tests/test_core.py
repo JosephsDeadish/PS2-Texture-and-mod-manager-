@@ -3318,13 +3318,23 @@ class TestCatalogueIntegrity(unittest.TestCase):
             )
 
     def test_no_gbatem_org_typo_in_author_url(self):
-        """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net or gamesavedfiles.com)."""
+        """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net)."""
         for entry in self.catalogue:
             aurl = entry.get("author_url", "")
             self.assertNotIn(
                 "gbatem.org",
                 aurl,
                 f"Entry {entry['id']} author_url contains typo domain 'gbatem.org': {aurl!r}"
+            )
+
+    def test_no_fake_gamesavedfiles_com_in_author_url(self):
+        """author_url must not use gamesavedfiles.com which is a non-existent website."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "gamesavedfiles.com",
+                aurl,
+                f"Entry {entry['id']} author_url uses non-existent domain gamesavedfiles.com: {aurl!r}"
             )
 
     def test_no_wrong_plural_gbatemp_urls(self):
