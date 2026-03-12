@@ -1625,6 +1625,17 @@ class PnachCodeBuilderDialog(QDialog):
         game_row.addWidget(load_btn)
         layout.addLayout(game_row)
 
+        # Verification summary banner (populated by _render_entries)
+        self._verification_banner = QLabel("")
+        self._verification_banner.setWordWrap(True)
+        self._verification_banner.setStyleSheet(
+            "background: #131828; border: 1px solid #2a3060;"
+            " border-radius: 4px; padding: 5px 10px;"
+            " color: #90a0c0; font-size: 11px;"
+        )
+        self._verification_banner.setVisible(False)
+        layout.addWidget(self._verification_banner)
+
         # Scroll area for effect rows
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
@@ -1698,10 +1709,43 @@ class PnachCodeBuilderDialog(QDialog):
     # ------------------------------------------------------------------
 
     def _load_game(self, serial: str):
-        from src.core.pnach_analyzer import entries_for_serial
+        from src.core.pnach_analyzer import entries_for_serial, get_game_verification_summary
         self._game_serial = serial.strip().upper()
         entries = entries_for_serial(self._game_serial)
         self._render_entries(entries)
+
+        # Populate verification summary banner
+        # Use any CRC found in the entries (all entries for a serial share a CRC)
+        crc = ""
+        for e in entries:
+            crc = e.get("game_crc", "").upper()
+            if crc:
+                break
+
+        if crc:
+            summary = get_game_verification_summary(crc)
+            vc      = summary["verification_counts"]
+            cv      = vc.get("community_verified", 0) + vc.get("verified", 0)
+            est     = vc.get("estimated", 0)
+            nw      = vc.get("reported_not_working", 0)
+            cw      = summary["code_method_counts"].get("continuous_write", 0)
+
+            parts = [f"<b>{summary['game_title'] or self._game_serial}</b>"]
+            if cv:
+                parts.append(f"<span style='color:#50c070'>✅ {cv} verified</span>")
+            if est:
+                parts.append(f"<span style='color:#b0a040'>🔬 {est} estimated</span>")
+            if nw:
+                parts.append(f"<span style='color:#c04040'>❌ {nw} not working</span>")
+            if cw:
+                parts.append(
+                    f"<span style='color:#e08030'>⟳ {cw} continuous-write "
+                    "(game resets each frame — these codes must be re-applied every frame)</span>"
+                )
+            self._verification_banner.setText("  ·  ".join(parts))
+            self._verification_banner.setVisible(True)
+        else:
+            self._verification_banner.setVisible(False)
 
     def _render_entries(self, entries: list):
         from PyQt6.QtWidgets import QGroupBox, QRadioButton, QButtonGroup, QComboBox as QCBox
@@ -1790,13 +1834,16 @@ class PnachCodeBuilderDialog(QDialog):
         proc = parts[1] if len(parts) > 1 else "EE"
         addr = parts[2] if len(parts) > 2 else "00000000"
 
-        desc           = entry.get("description", addr)
-        value_map      = entry.get("value_map", {})
-        value_type     = entry.get("value_type", "")   # "int" | "float" | "bool" | "button_combo" | ""
-        excl_group     = entry.get("exclusion_group", "").strip()
-        excl_note      = entry.get("exclusion_note", "").strip()
-        input_compat   = entry.get("input_compat", "").strip()
-        is_estimated   = entry.get("estimated", True)
+        desc             = entry.get("description", addr)
+        value_map        = entry.get("value_map", {})
+        value_type       = entry.get("value_type", "")   # "int" | "float" | "bool" | "button_combo" | ""
+        excl_group       = entry.get("exclusion_group", "").strip()
+        excl_note        = entry.get("exclusion_note", "").strip()
+        input_compat     = entry.get("input_compat", "").strip()
+        is_estimated     = entry.get("estimated", True)
+        verification_status = entry.get("verification_status", "estimated")
+        code_method      = entry.get("code_method", "static_write")
+        patch_type       = entry.get("patch_type", "word")
 
         frame = QFrame()
         # Highlight frames that belong to an exclusion group with a subtle border
@@ -1819,6 +1866,63 @@ class PnachCodeBuilderDialog(QDialog):
         desc_lbl.setStyleSheet("color: #d0d0f0; min-width: 240px;")
         desc_lbl.setWordWrap(False)
         row.addWidget(desc_lbl, 1)
+
+        # ── Verification-status badge ─────────────────────────────────
+        _VS_BADGE: dict = {
+            "verified":             ("✅", "#50c070", "#0a2a0a",
+                                     "Verified — confirmed by hands-on PCSX2 testing"),
+            "community_verified":   ("👥", "#50c070", "#0a2a0a",
+                                     "Community verified — confirmed working by community reports"),
+            "estimated":            ("🔬", "#b0a040", "#201800",
+                                     "Estimated — research-derived address, not yet confirmed.\n"
+                                     "Verify in PCSX2 Debug → Memory Search before relying on it."),
+            "reported_not_working": ("❌", "#c04040", "#2a0a0a",
+                                     "Known not working — reported to fail in at least one version."),
+        }
+        vs_icon, vs_fg, vs_bg, vs_tip = _VS_BADGE.get(
+            verification_status, ("🔬", "#b0a040", "#201800", verification_status)
+        )
+        vs_badge = QLabel(vs_icon)
+        vs_badge.setStyleSheet(
+            f"color: {vs_fg}; background: {vs_bg}; border-radius: 3px;"
+            " padding: 1px 4px; font-size: 11px;"
+        )
+        vs_badge.setToolTip(vs_tip)
+        row.addWidget(vs_badge)
+
+        # ── Code-method badge (only shown for non-static_write) ────────
+        if code_method == "continuous_write":
+            cm_badge = QLabel("⟳")
+            cm_badge.setStyleSheet(
+                "color: #e08030; background: #251500; border-radius: 3px;"
+                " padding: 1px 4px; font-size: 11px;"
+            )
+            cm_badge.setToolTip(
+                "Continuous write — the game resets this value every frame.\n"
+                "A single pnach write may not persist; use a type-C (extended)\n"
+                "cheat or re-apply this patch after each load."
+            )
+            row.addWidget(cm_badge)
+        elif code_method == "conditional":
+            cm_badge = QLabel("❓")
+            cm_badge.setStyleSheet(
+                "color: #7090e0; background: #0a1030; border-radius: 3px;"
+                " padding: 1px 4px; font-size: 11px;"
+            )
+            cm_badge.setToolTip(
+                "Conditional — this patch only applies when a game condition is met."
+            )
+            row.addWidget(cm_badge)
+        elif code_method == "multi_address":
+            cm_badge = QLabel("⊕")
+            cm_badge.setStyleSheet(
+                "color: #a060d0; background: #180a2a; border-radius: 3px;"
+                " padding: 1px 4px; font-size: 11px;"
+            )
+            cm_badge.setToolTip(
+                "Multi-address — this effect requires patching several memory locations."
+            )
+            row.addWidget(cm_badge)
 
         # ── Exclusion group tag (shown when entry is in a mutex group) ─
         if excl_group:
@@ -1875,20 +1979,6 @@ class PnachCodeBuilderDialog(QDialog):
             compat_badge.setStyleSheet(badge_style)
             compat_badge.setToolTip(badge_tip)
             row.addWidget(compat_badge)
-
-        # ── Estimated-address warning badge ───────────────────────────
-        if is_estimated and value_type in ("button_combo", "bool") and "freecam" in desc.lower():
-            est_badge = QLabel("⚠ est.")
-            est_badge.setStyleSheet(
-                "color: #c09040; font-size: 10px; font-style: italic;"
-                " background: #201800; border-radius: 3px; padding: 1px 4px;"
-            )
-            est_badge.setToolTip(
-                "Address is research-estimated — not verified against real hardware "
-                "or a community cheat database.\n"
-                "Verify with PCSX2: Debug → Memory Search before relying on this code."
-            )
-            row.addWidget(est_badge)
 
         # ── Address badge ─────────────────────────────────────────────
         addr_lbl = QLabel(f"[{proc}:{addr}]")
@@ -2017,17 +2107,20 @@ class PnachCodeBuilderDialog(QDialog):
 
         # ── Store all references ──────────────────────────────────────
         self._patch_widgets.append({
-            "check":           chk,
-            "value_combo":     value_combo,
-            "custom_edit":     custom_edit,
-            "value_type":      value_type,
-            "crc":             crc,
-            "proc":            proc,
-            "addr":            addr,
-            "description":     desc,
-            "value_map":       value_map,
-            "exclusion_group": excl_group,
-            "exclusion_note":  excl_note,
+            "check":                chk,
+            "value_combo":          value_combo,
+            "custom_edit":          custom_edit,
+            "value_type":           value_type,
+            "crc":                  crc,
+            "proc":                 proc,
+            "addr":                 addr,
+            "description":          desc,
+            "value_map":            value_map,
+            "exclusion_group":      excl_group,
+            "exclusion_note":       excl_note,
+            "patch_type":           patch_type,
+            "verification_status":  verification_status,
+            "code_method":          code_method,
         })
 
         return frame
@@ -2102,14 +2195,16 @@ class PnachCodeBuilderDialog(QDialog):
                 addr_seen[addr_key] = pw["description"]
 
             selected.append({
-                "processor":       pw["proc"],
-                "address":         pw["addr"],
-                "value":           hex_val,
-                "description":     pw["description"],
-                "size":            "extended",
-                "crc":             pw["crc"],
-                "exclusion_group": pw.get("exclusion_group", ""),
-                "exclusion_note":  pw.get("exclusion_note", ""),
+                "processor":           pw["proc"],
+                "address":             pw["addr"],
+                "value":               hex_val,
+                "description":         pw["description"],
+                "patch_type":          pw.get("patch_type", "word"),
+                "verification_status": pw.get("verification_status", "estimated"),
+                "code_method":         pw.get("code_method", "static_write"),
+                "crc":                 pw["crc"],
+                "exclusion_group":     pw.get("exclusion_group", ""),
+                "exclusion_note":      pw.get("exclusion_note", ""),
             })
             selected_for_excl.append({
                 "description":     pw["description"],
