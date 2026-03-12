@@ -3864,6 +3864,26 @@ class TestCatalogueLoader(unittest.TestCase):
         tp = [e for e in self.catalogue if e["type"] == ModType.TEXTURE_PACK]
         self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
 
+    def test_texture_pack_size_labels(self):
+        """Non-hub texture pack entries should have a size_label field in format '~NNN MB/GB'."""
+        import re
+        from src.models.mod import ModType
+        size_pattern = re.compile(r'^~\d+(\.\d+)?\s*(KB|MB|GB)$')
+        tp = [e for e in self.catalogue
+              if e["type"] == ModType.TEXTURE_PACK and not e.get("is_hub")]
+        missing = [e["id"] for e in tp if not e.get("size_label")]
+        self.assertEqual(
+            missing, [],
+            f"{len(missing)} texture pack entries missing size_label: {missing[:5]}"
+        )
+        bad_format = [e["id"] for e in tp
+                      if e.get("size_label") and not size_pattern.match(e["size_label"])]
+        self.assertEqual(
+            bad_format, [],
+            f"{len(bad_format)} entries have invalid size_label format "
+            f"(expected '~NNN MB/GB'): {bad_format[:5]}"
+        )
+
     def test_has_pnach_entries(self):
         from src.models.mod import ModType
         pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
