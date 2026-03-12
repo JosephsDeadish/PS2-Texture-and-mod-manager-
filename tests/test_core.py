@@ -4935,6 +4935,92 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertEqual(missing_section, [],
                          f"button_combo entries missing SCE section in notes: {missing_section[:5]}")
 
+    # ── Wave 11 accuracy tests ───────────────────────────────────────────────
+
+    def test_all_entries_have_value_type(self):
+        """Every DB entry must have a non-empty value_type field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("value_type")]
+        self.assertEqual(missing, [],
+                         f"{len(missing)} entries missing value_type: {missing[:5]}")
+
+    def test_widescreen_entries_are_float(self):
+        """All widescreen aspect-ratio entries must have value_type='float'."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        self.assertGreater(len(ws), 50, "Should have many widescreen entries")
+        not_float = [v.get("description", "")[:60] for v in ws
+                     if v.get("value_type") != "float"]
+        self.assertEqual(not_float, [],
+                         f"Widescreen entries not typed float: {not_float[:5]}")
+
+    def test_widescreen_value_maps_have_16_9_key(self):
+        """All widescreen entries should have a 16:9 widescreen key in value_map.
+        Accepts both 3FAB851F (≈1.340, used by most games) and
+        3FAAAAAB (=1.333…, used by DBZ Budokai series).
+        """
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Valid 16:9 float keys used across PS2 games
+        valid_16_9_keys = {"3FAB851F", "3FAAAAAB"}
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        missing_key = [
+            v.get("description", "")[:60] for v in ws
+            if not (set(v.get("value_map", {}).keys()) & valid_16_9_keys)
+        ]
+        self.assertEqual(missing_key, [],
+                         f"Widescreen entries without a valid 16:9 key: {missing_key[:5]}")
+
+    def test_cheat_entries_have_non_empty_value_map(self):
+        """All cheat-category entries must have at least one entry in value_map."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        cheats = [v for v in db.values() if v.get("category") == "cheat"]
+        empty_vm = [v.get("description", "")[:60] for v in cheats
+                    if not v.get("value_map")]
+        self.assertEqual(empty_vm, [],
+                         f"Cheat entries with empty value_map: {empty_vm[:5]}")
+
+    def test_valid_value_types_only(self):
+        """Every entry's value_type must be one of the 5 allowed values."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"int", "float", "bool", "button_combo", "button"}
+        invalid = [(v.get("description", "")[:50], v.get("value_type"))
+                   for v in db.values() if v.get("value_type") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid value_type: {invalid[:5]}")
+
+    def test_lives_entries_have_sensible_presets(self):
+        """Lives-counter entries should have at least a '99 lives' preset."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        lives = [v for v in db.values()
+                 if "lives" in v.get("description", "").lower()
+                 and v.get("category") == "cheat"]
+        self.assertGreater(len(lives), 0, "Should have lives entries")
+        for v in lives:
+            self.assertTrue(
+                v.get("value_map"),
+                f"Lives entry has no value_map: {v.get('description', '')}"
+            )
 
 
 class TestTextureFilePickerLogic(unittest.TestCase):

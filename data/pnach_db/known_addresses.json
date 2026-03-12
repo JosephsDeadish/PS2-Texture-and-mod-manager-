@@ -86,7 +86,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20891",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100"
+    }
   },
   "17D68D15:EE:005B4C00": {
     "game": "God of War (SLUS-20891)",
@@ -114,7 +120,8 @@
     },
     "game_serial": "SLUS-20891",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B3A9F9D5:EE:00388570": {
     "game": "Kingdom Hearts (SLUS-20370)",
@@ -127,7 +134,8 @@
     },
     "game_serial": "SLUS-20370",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B3A9F9D5:EE:006D5A90": {
     "game": "Kingdom Hearts (SLUS-20370)",
@@ -168,7 +176,8 @@
     },
     "game_serial": "SLUS-20718",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A39517AB:EE:006D0310": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
@@ -177,7 +186,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20718",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "full (1.0)",
+      "3F000000": "half (0.5)",
+      "3DCCCCCD": "critical (0.1)"
+    }
   },
   "A39517AB:EE:006D0314": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20718)",
@@ -205,7 +220,8 @@
     },
     "game_serial": "SLUS-20554",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF0B0D11:EE:007F6B4C": {
     "game": "Metal Gear Solid 2: Substance (SLUS-20554)",
@@ -214,7 +230,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20554",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000003E7": "999 ammo",
+      "00000063": "99 ammo",
+      "00000009": "9 ammo"
+    }
   },
   "9A5B29A1:EE:003CD218": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
@@ -227,7 +249,8 @@
     },
     "game_serial": "SLUS-20946",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9A5B29A1:EE:00B78D30": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
@@ -278,7 +301,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20946",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100 (default)"
+    }
   },
   "8D057621:EE:003B2340": {
     "game": "Gran Turismo 4 (SCUS-97328 / SCAJ-20065)",
@@ -290,7 +319,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8D057621:EE:00C3A5C8": {
     "game": "Gran Turismo 4 (SCUS-97328)",
@@ -318,7 +348,8 @@
     },
     "game_serial": "SLUS-21195",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B9D90F75:EE:0075B860": {
     "game": "Shadow of the Colossus (SLUS-21195)",
@@ -342,7 +373,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21195",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "full (1.0)",
+      "3F000000": "half (0.5)",
+      "3DCCCCCD": "critical (0.1)"
+    }
   },
   "B4414C0D:EE:005C3B80": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -355,7 +392,8 @@
     },
     "game_serial": "SLUS-21085",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B4414C0D:EE:008CF040": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -383,7 +421,8 @@
     },
     "game_serial": "SLUS-21134",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D697D204:EE:006B00A8": {
     "game": "Resident Evil 4 (SLUS-21134)",
@@ -426,7 +465,8 @@
     },
     "game_serial": "SLUS-20228",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4A0E5B3A:EE:006A2270": {
     "game": "Silent Hill 2 (SLUS-20228)",
@@ -453,7 +493,8 @@
     },
     "game_serial": "SLUS-20216",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F4A7473E:EE:007B5040": {
     "game": "Devil May Cry (SLUS-20216)",
@@ -495,7 +536,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "FFF16BAB:EE:00832860": {
     "game": "Jak and Daxter",
@@ -522,7 +564,8 @@
     },
     "game_serial": "SLUS-20851",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "DA5CC7A3:EE:00830040": {
     "game": "Burnout 3: Takedown (SLUS-20851)",
@@ -549,7 +592,8 @@
     },
     "game_serial": "SCUS-97199",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3E1CC296:EE:00826000": {
     "game": "Ratchet & Clank (SCUS-97199)",
@@ -592,7 +636,8 @@
     },
     "game_serial": "SLUS-21001",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E2F01792:EE:00B12380": {
     "game": "Need for Speed: Underground 2 (SLUS-21001)",
@@ -620,7 +665,8 @@
     },
     "game_serial": "SLUS-20238",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "43AB7196:EE:0068B060": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -633,7 +679,8 @@
     },
     "game_serial": "SLUS-20238",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "43AB7196:EE:0068B064": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -661,7 +708,8 @@
     },
     "game_serial": "SLUS-20062",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F2A5C5CF:EE:007C1040": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -704,7 +752,8 @@
     },
     "game_serial": "SLUS-20979",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CA5B7A61:EE:0068F040": {
     "game": "Crash Twinsanity (SLUS-20979)",
@@ -732,7 +781,8 @@
     },
     "game_serial": "SLUS-21005",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F266B00B:EE:006D5A90": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -769,7 +819,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21005",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100"
+    }
   },
   "A39517AB:EE:003B2340": {
     "game": "Final Fantasy X (SLUS-20312 alt)",
@@ -781,7 +837,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF8ABA10:EE:00388000": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -794,7 +851,8 @@
     },
     "game_serial": "SLUS-20312",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF8ABA10:EE:00C3F000": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -835,7 +893,8 @@
     },
     "game_serial": "SCUS-97113",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2B2570A0:EE:003B5670": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
@@ -848,7 +907,8 @@
     },
     "game_serial": "SCUS-97123",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2B2570A0:EE:00832860": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
@@ -876,7 +936,8 @@
     },
     "game_serial": "SCUS-97265",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A5C02F40:EE:00A82000": {
     "game": "Jak II (SCUS-97265)",
@@ -885,7 +946,13 @@
     "category": "cheat",
     "game_serial": "SCUS-97265",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000064": "100% (full)",
+      "00000032": "50%",
+      "00000000": "0% (empty)"
+    }
   },
   "3F5A3B78:EE:003C5000": {
     "game": "Jak 3 (SCUS-97330)",
@@ -898,7 +965,8 @@
     },
     "game_serial": "SCUS-97330",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7B1B8A6F:EE:003C0000": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
@@ -911,7 +979,8 @@
     },
     "game_serial": "SCUS-97316",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B3A9F9E7:EE:003C4000": {
     "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
@@ -924,7 +993,8 @@
     },
     "game_serial": "SCUS-97501",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A51FB9E1:EE:003C4570": {
     "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
@@ -937,7 +1007,8 @@
     },
     "game_serial": "SCUS-97268",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A51FB9E1:EE:00826004": {
     "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
@@ -965,7 +1036,8 @@
     },
     "game_serial": "SCUS-97353",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "28D4E52B:EE:00A12040": {
     "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
@@ -993,7 +1065,8 @@
     },
     "game_serial": "SLUS-21069",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4A9A1ABE:EE:008C0000": {
     "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
@@ -1021,7 +1094,8 @@
     },
     "game_serial": "SLUS-21522",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6A928BAE:EE:003B4570": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -1034,7 +1108,8 @@
     },
     "game_serial": "SLUS-20743",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6A928BAE:EE:006E0040": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -1076,7 +1151,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1B7A3E32:EE:003B4560": {
     "game": "Zone of the Enders (SLUS-20128)",
@@ -1089,7 +1165,8 @@
     },
     "game_serial": "SLUS-20128",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "44A8A22A:EE:003B4540": {
     "game": "God of War II (SCUS-97481)",
@@ -1102,7 +1179,8 @@
     },
     "game_serial": "SCUS-97481",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "44A8A22A:EE:005B4BF0": {
     "game": "God of War II (SCUS-97481)",
@@ -1126,7 +1204,13 @@
     "category": "cheat",
     "game_serial": "SCUS-97481",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100"
+    }
   },
   "44A8A22A:EE:005B4C00": {
     "game": "God of War II (SCUS-97481)",
@@ -1154,7 +1238,8 @@
     },
     "game_serial": "SLUS-20179",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "C5A26456:EE:003B4560": {
     "game": "Armored Core 3 (SLUS-20392)",
@@ -1167,7 +1252,8 @@
     },
     "game_serial": "SLUS-20392",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "C5A26456:EE:00A82000": {
     "game": "Armored Core 3 (SLUS-20392)",
@@ -1195,7 +1281,8 @@
     },
     "game_serial": "SLUS-20472",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1A9BFCD1:EE:003B4560": {
     "game": "Shadow Hearts: Covenant (SLUS-20845)",
@@ -1208,7 +1295,8 @@
     },
     "game_serial": "SLUS-20845",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1A9BFCD1:EE:00C3A400": {
     "game": "Shadow Hearts: Covenant (SLUS-20845)",
@@ -1236,7 +1324,8 @@
     },
     "game_serial": "SLUS-20433",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E4FD7B8D:EE:00C18000": {
     "game": "Xenosaga Episode I (SLUS-20433)",
@@ -1264,7 +1353,8 @@
     },
     "game_serial": "SLUS-20267",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "66CB9620:EE:003B4560": {
     "game": "Champions: Return to Arms (SLUS-21053)",
@@ -1277,7 +1367,8 @@
     },
     "game_serial": "SLUS-21053",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2FAC5233:EE:003B4560": {
     "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
@@ -1290,7 +1381,8 @@
     },
     "game_serial": "SLUS-20962",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2FAC5233:EE:00B79010": {
     "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
@@ -1318,7 +1410,8 @@
     },
     "game_serial": "SLUS-21115",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1B594C95:EE:00A13000": {
     "game": "Okami (SLUS-21115)",
@@ -1342,7 +1435,13 @@
     "category": "gameplay",
     "game_serial": "SLUS-21115",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000003E7": "999 ammo",
+      "00000063": "99 ammo",
+      "00000009": "9 ammo"
+    }
   },
   "5C7B2BDD:EE:003B4560": {
     "game": "Bully (SLUS-21218)",
@@ -1355,7 +1454,8 @@
     },
     "game_serial": "SLUS-21218",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5C7B2BDD:EE:00B78D30": {
     "game": "Bully (SLUS-21218)",
@@ -1383,7 +1483,8 @@
     },
     "game_serial": "SLUS-21355",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CEEF2AC2:EE:00B12000": {
     "game": "Yakuza (SLUS-21355)",
@@ -1411,7 +1512,8 @@
     },
     "game_serial": "SLUS-21621",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B3B56447:EE:00C28000": {
     "game": "Persona 3 FES (SLUS-21621)",
@@ -1439,7 +1541,8 @@
     },
     "game_serial": "SLUS-21844",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0F6C0DB9:EE:00C18000": {
     "game": "Persona 4 (SLUS-21844)",
@@ -1482,7 +1585,8 @@
     },
     "game_serial": "SLUS-20891",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F0A34C75:EE:005B3F00": {
     "game": "God of War (SLUS-20891)",
@@ -1506,7 +1610,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20891",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100"
+    }
   },
   "F0A34C75:EE:005B3F10": {
     "game": "God of War (SLUS-20891)",
@@ -1534,7 +1644,8 @@
     },
     "game_serial": "SLUS-20145",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "39BB7DF5:EE:006C4000": {
     "game": "Kingdom Hearts (SLUS-20145)",
@@ -1577,7 +1688,8 @@
     },
     "game_serial": "SCUS-97328",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "77E61C8A:EE:00C18000": {
     "game": "Gran Turismo 4 (SCUS-97328)",
@@ -1605,7 +1717,8 @@
     },
     "game_serial": "SLUS-21085",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF5A1A6B:EE:008E0000": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -1633,7 +1746,8 @@
     },
     "game_serial": "SLUS-20213",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9F8B4FD0:EE:003C4560": {
     "game": "Rogue Galaxy (SCUS-97490)",
@@ -1646,7 +1760,8 @@
     },
     "game_serial": "SCUS-97490",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9F8B4FD0:EE:00C08000": {
     "game": "Rogue Galaxy (SCUS-97490)",
@@ -1674,7 +1789,8 @@
     },
     "game_serial": "SLUS-20734",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF5F6552:EE:00C10000": {
     "game": "Star Ocean: Till the End of Time (SLUS-20734)",
@@ -1702,7 +1818,8 @@
     },
     "game_serial": "SLUS-21299",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2CFF5D40:EE:00B82000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
@@ -1730,7 +1847,8 @@
     },
     "game_serial": "SLUS-20957",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3C5B2087:EE:00C08000": {
     "game": "Tales of the Abyss (SLUS-20957)",
@@ -1754,7 +1872,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20957",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000F423F": "999999",
+      "0000270F": "9999",
+      "000003E8": "1000"
+    }
   },
   "4B44E3B7:EE:003C4560": {
     "game": "Disgaea: Hour of Darkness (SLUS-20565)",
@@ -1767,7 +1891,8 @@
     },
     "game_serial": "SLUS-20565",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4B44E3B7:EE:00C00000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20565)",
@@ -1795,7 +1920,8 @@
     },
     "game_serial": "SLUS-21179",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3B75CE2F:EE:003C4560": {
     "game": "Manhunt (SLUS-20853)",
@@ -1808,7 +1934,8 @@
     },
     "game_serial": "SLUS-20853",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5C6EF847:EE:003B4540": {
     "game": "Contra: Shattered Soldier (SLUS-20492)",
@@ -1821,7 +1948,8 @@
     },
     "game_serial": "SLUS-20492",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5C6EF847:EE:006C0040": {
     "game": "Contra: Shattered Soldier (SLUS-20492)",
@@ -1830,7 +1958,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20492",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000063": "99 lives",
+      "0000001E": "30 lives",
+      "00000009": "9 lives"
+    }
   },
   "6A2B7C19:EE:003B4540": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -1843,7 +1977,8 @@
     },
     "game_serial": "SLUS-21065",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6A2B7C19:EE:00B78D00": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -1871,7 +2006,8 @@
     },
     "game_serial": "SLUS-20981",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "11FDFFCE:EE:00740000": {
     "game": "Viewtiful Joe (SLUS-20981)",
@@ -1880,7 +2016,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20981",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000F423F": "999999",
+      "0000270F": "9999",
+      "000003E8": "1000"
+    }
   },
   "60E7D3C0:EE:003C4560": {
     "game": "Haunting Ground (SLUS-21171)",
@@ -1893,7 +2035,8 @@
     },
     "game_serial": "SLUS-21171",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A09B3C1E:EE:003C4560": {
     "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
@@ -1906,7 +2049,8 @@
     },
     "game_serial": "SLUS-21430",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A09B3C1E:EE:00C08000": {
     "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
@@ -1934,7 +2078,8 @@
     },
     "game_serial": "SLUS-20782",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3CF0A5A2:EE:003C4560": {
     "game": "Soul Nomad & the World Eaters (SLUS-21667)",
@@ -1947,7 +2092,8 @@
     },
     "game_serial": "SLUS-21667",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3CF0A5A2:EE:00B82000": {
     "game": "Soul Nomad & the World Eaters (SLUS-21667)",
@@ -1975,7 +2121,8 @@
     },
     "game_serial": "SLUS-20238",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F0A26C87:EE:006E0080": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -2003,7 +2150,8 @@
     },
     "game_serial": "SLUS-20084",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9AA4CBC1:EE:003B4560": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -2016,7 +2164,8 @@
     },
     "game_serial": "SLUS-20062",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9AA4CBC1:EE:00682000": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -2044,7 +2193,8 @@
     },
     "game_serial": "SLUS-20216",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "627B2B89:EE:00B00000": {
     "game": "Zone of the Enders (SLUS-20216)",
@@ -2053,7 +2203,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20216",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000F423F": "999999",
+      "0000270F": "9999",
+      "000003E8": "1000"
+    }
   },
   "87432EB9:EE:007A0000": {
     "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
@@ -2081,7 +2237,8 @@
     },
     "game_serial": "SCUS-97123",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A5EC9ADB:EE:00A00000": {
     "game": "Hot Shots Golf 3 (SCUS-97123)",
@@ -2109,7 +2266,8 @@
     },
     "game_serial": "SLUS-21174",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9EE5B3D4:EE:00A80000": {
     "game": "We Love Katamari (SLUS-21174)",
@@ -2137,7 +2295,8 @@
     },
     "game_serial": "SLUS-20892",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3C67C957:EE:00C00000": {
     "game": "Xenosaga Episode II: Jenseits von Gut und Böse (SLUS-20892)",
@@ -2165,7 +2324,8 @@
     },
     "game_serial": "SLUS-21382",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "94A82AAA:EE:00C08000": {
     "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
@@ -2193,7 +2353,8 @@
     },
     "game_serial": "SCUS-97501",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2AFF83F8:EE:006A0000": {
     "game": "Ape Escape 3 (SCUS-97501)",
@@ -2202,7 +2363,13 @@
     "category": "cheat",
     "game_serial": "SCUS-97501",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100 (default)"
+    }
   },
   "4A2FF487:EE:003C4560": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
@@ -2215,7 +2382,8 @@
     },
     "game_serial": "SLUS-20743",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4A2FF487:EE:00C08000": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
@@ -2243,7 +2411,8 @@
     },
     "game_serial": "SLUS-20443",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D5B16B2D:EE:005E0000": {
     "game": "Devil May Cry 2 (SLUS-20443)",
@@ -2271,7 +2440,8 @@
     },
     "game_serial": "SLUS-20554",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "C0437D3A:EE:003C4560": {
     "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
@@ -2284,7 +2454,8 @@
     },
     "game_serial": "SLUS-21243",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "C0437D3A:EE:007A0080": {
     "game": "Resident Evil Outbreak File #2 (SLUS-21243)",
@@ -2312,7 +2483,8 @@
     },
     "game_serial": "SLUS-21302",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4F75B0A4:EE:00900000": {
     "game": "WWE SmackDown! vs. RAW 2006 (SLUS-21302)",
@@ -2340,7 +2512,8 @@
     },
     "game_serial": "SLUS-21262",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B5CC9F00:EE:006C0080": {
     "game": "Ultimate Spider-Man (SLUS-21262)",
@@ -2368,7 +2541,8 @@
     },
     "game_serial": "SLUS-21202",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E2AC3453:EE:00B78D00": {
     "game": "Need for Speed: Most Wanted (SLUS-21202)",
@@ -2396,7 +2570,8 @@
     },
     "game_serial": "SLUS-20392",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4A8B4CC9:EE:00D00000": {
     "game": "Armored Core 3 (SLUS-20392)",
@@ -2424,7 +2599,8 @@
     },
     "game_serial": "SLUS-20292",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "09E4EC93:EE:00C00000": {
     "game": "Suikoden III (SLUS-20292)",
@@ -2452,7 +2628,8 @@
     },
     "game_serial": "SLUS-20895",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D14EA600:EE:00C08000": {
     "game": "Suikoden IV (SLUS-20895)",
@@ -2480,7 +2657,8 @@
     },
     "game_serial": "SLUS-21085",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7AC53678:EE:009C0000": {
     "game": "Tekken 5 (SLUS-21085)",
@@ -2508,7 +2686,8 @@
     },
     "game_serial": "SLUS-20048",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "00DC3F8E:EE:00A00000": {
     "game": "Grandia II (SLUS-20048)",
@@ -2536,7 +2715,8 @@
     },
     "game_serial": "SLUS-21516",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "BCEC7DBD:EE:00A80000": {
     "game": "Grandia III (SLUS-21516)",
@@ -2564,7 +2744,8 @@
     },
     "game_serial": "SLUS-20671",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3E1DE0F5:EE:003B4540": {
     "game": "Burnout 3: Takedown (SLUS-21077)",
@@ -2577,7 +2758,8 @@
     },
     "game_serial": "SLUS-21077",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3E1DE0F5:EE:00A00000": {
     "game": "Burnout 3: Takedown (SLUS-21077)",
@@ -2605,7 +2787,8 @@
     },
     "game_serial": "SLUS-21197",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "278700A0:EE:00900000": {
     "game": "Burnout Revenge (SLUS-21197)",
@@ -2633,7 +2816,8 @@
     },
     "game_serial": "SLUS-21050",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2B123FE9:EE:00B00000": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
@@ -2661,7 +2845,8 @@
     },
     "game_serial": "SLUS-21173",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7152BCA7:EE:00C00000": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
@@ -2689,7 +2874,8 @@
     },
     "game_serial": "SLUS-20136",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3B0ADBEF:EE:005A0000": {
     "game": "Twisted Metal: Black (SLUS-20136)",
@@ -2717,7 +2903,8 @@
     },
     "game_serial": "SLUS-21090",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B4E1D81B:EE:00900000": {
     "game": "Mortal Kombat: Deception (SLUS-21090)",
@@ -2745,7 +2932,8 @@
     },
     "game_serial": "SLUS-21444",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D1B27F62:EE:00A00000": {
     "game": "Mortal Kombat: Armageddon (SLUS-21444)",
@@ -2773,7 +2961,8 @@
     },
     "game_serial": "SLUS-20672",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "FCC1F0CC:EE:00B00000": {
     "game": "Need for Speed: Underground (SLUS-20672)",
@@ -2801,7 +2990,8 @@
     },
     "game_serial": "SLUS-21466",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3AA8E025:EE:00C00000": {
     "game": "Need for Speed: Carbon (SLUS-21466)",
@@ -2829,7 +3019,8 @@
     },
     "game_serial": "SLUS-20137",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0D1EA753:EE:003C4560": {
     "game": "Silent Hill 4: The Room (SLUS-20814)",
@@ -2842,7 +3033,8 @@
     },
     "game_serial": "SLUS-20814",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0D1EA753:EE:005A0000": {
     "game": "Silent Hill 4: The Room (SLUS-20814)",
@@ -2870,7 +3062,8 @@
     },
     "game_serial": "SLUS-21583",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "C7ED171F:EE:005B0000": {
     "game": "Silent Hill: Origins (SLUS-21583)",
@@ -2898,7 +3091,8 @@
     },
     "game_serial": "SLUS-21615",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8028A9B5:EE:00C08000": {
     "game": "Suikoden V (SLUS-21615)",
@@ -2926,7 +3120,8 @@
     },
     "game_serial": "SLUS-20512",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "ECA23E67:EE:00B00000": {
     "game": "Wild ARMs 3 (SLUS-20512)",
@@ -2954,7 +3149,8 @@
     },
     "game_serial": "SLUS-21183",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "BB7BAC4B:EE:00A80000": {
     "game": "Wild ARMs 4 (SLUS-21183)",
@@ -2982,7 +3178,8 @@
     },
     "game_serial": "SLUS-20152",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B54B0573:EE:006A0000": {
     "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
@@ -3010,7 +3207,8 @@
     },
     "game_serial": "SLUS-21346",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3E9E7B49:EE:00780000": {
     "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
@@ -3038,7 +3236,8 @@
     },
     "game_serial": "SLUS-20358",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "56B39E23:EE:003B4540": {
     "game": "SSX 3 (SLUS-20687)",
@@ -3051,7 +3250,8 @@
     },
     "game_serial": "SLUS-20687",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "09F2E574:EE:003B4540": {
     "game": "Katamari Damacy (SLUS-20775)",
@@ -3064,7 +3264,8 @@
     },
     "game_serial": "SLUS-20775",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3B340B97:EE:003C4560": {
     "game": "Haunting Ground (SLUS-21171)",
@@ -3077,7 +3278,8 @@
     },
     "game_serial": "SLUS-21171",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3B340B97:EE:005A0080": {
     "game": "Haunting Ground (SLUS-21171)",
@@ -3105,7 +3307,8 @@
     },
     "game_serial": "SLUS-21394",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B2E15B01:EE:00C00000": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
@@ -3133,7 +3336,8 @@
     },
     "game_serial": "SLUS-20184",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "24036809:EE:005A0000": {
     "game": "Resident Evil: Code Veronica X (SLUS-20184)",
@@ -3161,7 +3365,8 @@
     },
     "game_serial": "SLUS-21370",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "36C5957B:EE:00600000": {
     "game": "Metal Gear Solid 3: Subsistence (SLUS-21370)",
@@ -3170,7 +3375,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21370",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "value_map": {
+      "3F800000": "full (1.0)",
+      "3F000000": "half (0.5)",
+      "3DCCCCCD": "critical (0.1)"
+    }
   },
   "4C2B4D8D:EE:003B4540": {
     "game": "Jak X: Combat Racing (SLUS-21310)",
@@ -3183,7 +3394,8 @@
     },
     "game_serial": "SLUS-21310",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4C2B4D8D:EE:00700000": {
     "game": "Jak X: Combat Racing (SLUS-21310)",
@@ -3211,7 +3423,8 @@
     },
     "game_serial": "SLUS-21369",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4AE8AFC6:EE:005E0000": {
     "game": "Viewtiful Joe 2 (SLUS-21369)",
@@ -3220,7 +3433,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21369",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000F423F": "999999",
+      "0000270F": "9999",
+      "000003E8": "1000"
+    }
   },
   "1D568F61:EE:003B4540": {
     "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
@@ -3233,7 +3452,8 @@
     },
     "game_serial": "SLUS-20446",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F55CCCF1:EE:003C4560": {
     "game": "Magna Carta: Tears of Blood (SLUS-21158)",
@@ -3246,7 +3466,8 @@
     },
     "game_serial": "SLUS-21158",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F55CCCF1:EE:00B00000": {
     "game": "Magna Carta: Tears of Blood (SLUS-21158)",
@@ -3274,7 +3495,8 @@
     },
     "game_serial": "SLUS-21441",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1E75FE3A:EE:00B08000": {
     "game": "Ys: The Ark of Napishtim (SLUS-21441)",
@@ -3302,7 +3524,8 @@
     },
     "game_serial": "SLUS-20811",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "96660560:EE:00B80000": {
     "game": "Phantom Brave (SLUS-20811)",
@@ -3330,7 +3553,8 @@
     },
     "game_serial": "SLUS-20213",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9F1D2F39:EE:003B4540": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
@@ -3343,7 +3567,8 @@
     },
     "game_serial": "SCUS-97316",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9F1D2F39:EE:00680000": {
     "game": "Sly 2: Band of Thieves (SCUS-97316)",
@@ -3367,7 +3592,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20775",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000003E7": "999 ammo",
+      "00000063": "99 ammo",
+      "00000009": "9 ammo"
+    }
   },
   "3B0ADBEF:EE:00800000": {
     "game": "Twisted Metal: Black (SLUS-20136)",
@@ -3376,7 +3607,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20136",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "0000270F": "9999 (max)",
+      "000003E8": "1000",
+      "00000064": "100 (default)"
+    }
   },
   "A86571F9:EE:003B4540": {
     "game": "Bully / Canis Canem Edit (SLUS-21131)",
@@ -3389,7 +3626,8 @@
     },
     "game_serial": "SLUS-21131",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A86571F9:EE:00700000": {
     "game": "Bully / Canis Canem Edit (SLUS-21131)",
@@ -3432,7 +3670,8 @@
     },
     "game_serial": "SLUS-20355",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D0D8B73B:EE:00900000": {
     "game": "Armored Core 3 (SLUS-20355)",
@@ -3460,7 +3699,8 @@
     },
     "game_serial": "SLUS-21177",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0E7B9852:EE:003B4560": {
     "game": "Dark Cloud (SCUS-97121)",
@@ -3473,7 +3713,8 @@
     },
     "game_serial": "SCUS-97121",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0E7B9852:EE:00C00000": {
     "game": "Dark Cloud (SCUS-97121)",
@@ -3516,7 +3757,8 @@
     },
     "game_serial": "SCUS-97331",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "47AAB3DC:EE:00D00000": {
     "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
@@ -3559,7 +3801,8 @@
     },
     "game_serial": "SLUS-20443",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0BF94D63:EE:005A0000": {
     "game": "Devil May Cry 2 (SLUS-20443)",
@@ -3587,7 +3830,8 @@
     },
     "game_serial": "SLUS-21058",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0EC5F7A0:EE:00700000": {
     "game": "Devil May Cry 3: Special Edition (SLUS-21058)",
@@ -3630,7 +3874,8 @@
     },
     "game_serial": "SLUS-20365",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "471A4AF8:EE:00C08000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
@@ -3658,7 +3903,8 @@
     },
     "game_serial": "SLUS-21440",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4FDB72F2:EE:00C00000": {
     "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
@@ -3686,7 +3932,8 @@
     },
     "game_serial": "SLUS-21683",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "14E7D560:EE:00D00000": {
     "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
@@ -3714,7 +3961,8 @@
     },
     "game_serial": "SLUS-20492",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "33EC7780:EE:00B00000": {
     "game": "Star Ocean: Till the End of Time (SLUS-20492)",
@@ -3757,7 +4005,8 @@
     },
     "game_serial": "SLUS-20970",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "AEF2012F:EE:00C00000": {
     "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
@@ -3800,7 +4049,8 @@
     },
     "game_serial": "SLUS-21053",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1F5D6258:EE:00B00000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21053)",
@@ -3828,7 +4078,8 @@
     },
     "game_serial": "SLUS-21705",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5CC18476:EE:00A00000": {
     "game": "Odin Sphere (SLUS-21705)",
@@ -3871,7 +4122,8 @@
     },
     "game_serial": "SLUS-21721",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CE5B7A3B:EE:00C08000": {
     "game": "Rogue Galaxy (SLUS-21721)",
@@ -3899,7 +4151,8 @@
     },
     "game_serial": "SLUS-21453",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "96B12B74:EE:00A80000": {
     "game": "Grandia III (SLUS-21453)",
@@ -3927,7 +4180,8 @@
     },
     "game_serial": "SLUS-20787",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "76548EF1:EE:00800000": {
     "game": "Dynasty Warriors 4 (SLUS-20787)",
@@ -3954,7 +4208,8 @@
     },
     "game_serial": "SLUS-20685",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8B462B6D:EE:003C4560": {
     "game": "Xenosaga Episode II (SLUS-20831)",
@@ -3967,7 +4222,8 @@
     },
     "game_serial": "SLUS-20831",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8B462B6D:EE:00C00000": {
     "game": "Xenosaga Episode II (SLUS-20831)",
@@ -3995,7 +4251,8 @@
     },
     "game_serial": "SLUS-21765",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6F1E8D2B:EE:00B00000": {
     "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
@@ -4023,7 +4280,8 @@
     },
     "game_serial": "SLUS-20432",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0B6EC3A3:EE:005A0000": {
     "game": "Call of Duty 2: Big Red One (SLUS-20432)",
@@ -4051,7 +4309,8 @@
     },
     "game_serial": "SLUS-20462",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "749BDDCA:EE:003B4540": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
@@ -4064,7 +4323,8 @@
     },
     "game_serial": "SLUS-21207",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "749BDDCA:EE:00C00000": {
     "game": "Dragon Quest VIII: Journey of the Cursed King (SLUS-21207)",
@@ -4107,7 +4367,8 @@
     },
     "game_serial": "SLUS-20766",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2C2B7C50:EE:005A0080": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20766)",
@@ -4116,7 +4377,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20766",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000063": "99 rolls",
+      "0000001E": "30 rolls",
+      "00000000": "0 rolls"
+    }
   },
   "B4289C08:EE:003B4540": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -4129,7 +4396,8 @@
     },
     "game_serial": "SLUS-21065",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B4289C08:EE:00B00000": {
     "game": "Need for Speed: Underground 2 (SLUS-21065)",
@@ -4157,7 +4425,8 @@
     },
     "game_serial": "SLUS-20401",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2B6A5E81:EE:003B4540": {
     "game": "Tekken Tag Tournament (SLUS-20001)",
@@ -4170,7 +4439,8 @@
     },
     "game_serial": "SLUS-20001",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A7B26D14:EE:003B4540": {
     "game": "Mega Man X Collection (SLUS-21303)",
@@ -4183,7 +4453,8 @@
     },
     "game_serial": "SLUS-21303",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8B7C6617:EE:003B4540": {
     "game": "Ape Escape 2 (SCUS-97129)",
@@ -4196,7 +4467,8 @@
     },
     "game_serial": "SCUS-97129",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8B7C6617:EE:00700000": {
     "game": "Ape Escape 2 (SCUS-97129)",
@@ -4224,7 +4496,8 @@
     },
     "game_serial": "SCUS-97480",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6020F8C5:EE:003C4560": {
     "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
@@ -4237,7 +4510,8 @@
     },
     "game_serial": "SLUS-21194",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6020F8C5:EE:00C00000": {
     "game": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-21194)",
@@ -4265,7 +4539,8 @@
     },
     "game_serial": "SLUS-20697",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "BD2AC49F:EE:00700000": {
     "game": "Crash Twinsanity (SLUS-20697)",
@@ -4293,7 +4568,8 @@
     },
     "game_serial": "SLUS-20743",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D7C97CF4:EE:00B00000": {
     "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
@@ -4320,7 +4596,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E99E80B3:EE:00B80000": {
     "game": "Shadow Hearts: From the New World (SLUS-21574 alt)",
@@ -4347,7 +4624,8 @@
     },
     "game_serial": "SLUS-21553",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3A72A7B1:EE:00B08000": {
     "game": "Ys: The Oath in Felghana (SLUS-21553)",
@@ -4375,7 +4653,8 @@
     },
     "game_serial": "SLUS-21052",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F0BDF5C5:EE:00B00000": {
     "game": "Atelier Iris: Eternal Mana (SLUS-21052)",
@@ -4418,7 +4697,8 @@
     },
     "game_serial": "SLUS-21350",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8E9C0D58:EE:00B00000": {
     "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
@@ -4446,7 +4726,8 @@
     },
     "game_serial": "SLUS-21614",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6327AA24:EE:00B00000": {
     "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
@@ -4474,7 +4755,8 @@
     },
     "game_serial": "SLUS-20519",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8A41256F:EE:00B00000": {
     "game": "Baldur's Gate: Dark Alliance (SLUS-20519)",
@@ -4517,7 +4799,8 @@
     },
     "game_serial": "SLUS-20803",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2C23B3EA:EE:00B00000": {
     "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
@@ -4545,7 +4828,8 @@
     },
     "game_serial": "SLUS-21050",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A5B82E82:EE:00900000": {
     "game": "Castlevania: Lament of Innocence (SLUS-21050)",
@@ -4588,7 +4872,8 @@
     },
     "game_serial": "SLUS-21173",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8E3F7DC1:EE:00900000": {
     "game": "Castlevania: Curse of Darkness (SLUS-21173)",
@@ -4616,7 +4901,8 @@
     },
     "game_serial": "SLUS-20789",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "22CA9B7A:EE:00B00000": {
     "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
@@ -4644,7 +4930,8 @@
     },
     "game_serial": "SCUS-97121",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0ADE5CEF:EE:00C00000": {
     "game": "Dark Cloud (SCUS-97121)",
@@ -4672,7 +4959,8 @@
     },
     "game_serial": "SLUS-20821",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "31879F22:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21353)",
@@ -4685,7 +4973,8 @@
     },
     "game_serial": "SLUS-21353",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0EDF6B4B:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21472)",
@@ -4698,7 +4987,8 @@
     },
     "game_serial": "SLUS-21472",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B9FF5B97:EE:003C4560": {
     "game": "Fatal Frame (SLUS-21060)",
@@ -4711,7 +5001,8 @@
     },
     "game_serial": "SLUS-21060",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B9FF5B97:EE:005A0080": {
     "game": "Fatal Frame (SLUS-21060)",
@@ -4720,7 +5011,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21060",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000063": "99 rolls",
+      "0000001E": "30 rolls",
+      "00000000": "0 rolls"
+    }
   },
   "9B4D085A:EE:003C4560": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
@@ -4733,7 +5030,8 @@
     },
     "game_serial": "SLUS-20825",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "9B4D085A:EE:005A0080": {
     "game": "Fatal Frame II: Crimson Butterfly (SLUS-20825)",
@@ -4742,7 +5040,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20825",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000063": "99 rolls",
+      "0000001E": "30 rolls",
+      "00000000": "0 rolls"
+    }
   },
   "7D6C1BF5:EE:003C4560": {
     "game": "Fatal Frame III: The Tormented (SLUS-21161)",
@@ -4755,7 +5059,8 @@
     },
     "game_serial": "SLUS-21161",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7D6C1BF5:EE:005A0080": {
     "game": "Fatal Frame III: The Tormented (SLUS-21161)",
@@ -4764,7 +5069,13 @@
     "category": "cheat",
     "game_serial": "SLUS-21161",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "00000063": "99 rolls",
+      "0000001E": "30 rolls",
+      "00000000": "0 rolls"
+    }
   },
   "F517EEDF:EE:003B4540": {
     "game": "Final Fantasy XII (SLUS-20792)",
@@ -4777,7 +5088,8 @@
     },
     "game_serial": "SLUS-20792",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F517EEDF:EE:00D00000": {
     "game": "Final Fantasy XII (SLUS-20792)",
@@ -4820,7 +5132,8 @@
     },
     "game_serial": "SCUS-97450",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "44A80B4C:EE:00C00000": {
     "game": "God of War II (SCUS-97450)",
@@ -4878,7 +5191,8 @@
     },
     "game_serial": "SCUS-97436",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CF56B7D1:EE:00D00000": {
     "game": "Gran Turismo 4 (SCUS-97436)",
@@ -4906,7 +5220,8 @@
     },
     "game_serial": "SLUS-20069",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6F0E2BEE:EE:00C00000": {
     "game": "Grand Theft Auto III (SLUS-20069)",
@@ -4949,7 +5264,8 @@
     },
     "game_serial": "SLUS-20140",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7AC3B4F3:EE:00C00000": {
     "game": "Grand Theft Auto: Vice City (SLUS-20140)",
@@ -4992,7 +5308,8 @@
     },
     "game_serial": "SLUS-20444",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "399A49CA:EE:00C00000": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20444)",
@@ -5034,7 +5351,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "91A69524:EE:003C4560": {
     "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
@@ -5047,7 +5365,8 @@
     },
     "game_serial": "SLUS-21618",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "91A69524:EE:00B00000": {
     "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
@@ -5075,7 +5394,8 @@
     },
     "game_serial": "SLUS-21750",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D7D7A24B:EE:00B00000": {
     "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
@@ -5103,7 +5423,8 @@
     },
     "game_serial": "SCUS-97129",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B5B7C4AF:EE:00700000": {
     "game": "Ape Escape 2 (SCUS-97129)",
@@ -5112,7 +5433,13 @@
     "category": "cheat",
     "game_serial": "SCUS-97129",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000003E7": "999 ammo",
+      "00000063": "99 ammo",
+      "00000009": "9 ammo"
+    }
   },
   "7AC4D8CA:EE:003B4540": {
     "game": "Ape Escape 3 (SCUS-97480)",
@@ -5125,7 +5452,8 @@
     },
     "game_serial": "SCUS-97480",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "66D3F895:EE:003B4540": {
     "game": "Gran Turismo 4 (SLUS-21163 alt)",
@@ -5137,7 +5465,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "4A85F895:EE:003B4540": {
     "game": "Guitar Hero: World Tour (SLUS-21768)",
@@ -5150,7 +5479,8 @@
     },
     "game_serial": "SLUS-21768",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A9FE1E04:EE:003B4540": {
     "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
@@ -5163,7 +5493,8 @@
     },
     "game_serial": "SLUS-21028",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0B29B9B6:EE:003C4560": {
     "game": "God of War II (SLUS-21441)",
@@ -5176,7 +5507,8 @@
     },
     "game_serial": "SLUS-21441",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0B29B9B6:EE:00C00000": {
     "game": "God of War II (SLUS-21441)",
@@ -5204,7 +5536,8 @@
     },
     "game_serial": "SLUS-20374",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "6B6D7FF0:EE:00700000": {
     "game": "Hitman 2: Silent Assassin (SLUS-20374)",
@@ -5213,7 +5546,13 @@
     "category": "cheat",
     "game_serial": "SLUS-20374",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "value_map": {
+      "000003E7": "999 ammo",
+      "00000063": "99 ammo",
+      "00000009": "9 ammo"
+    }
   },
   "BD9A3CCA:EE:003B4540": {
     "game": "Hitman: Contracts (SLUS-20775)",
@@ -5226,7 +5565,8 @@
     },
     "game_serial": "SLUS-20775",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "60EB4D80:EE:003B4540": {
     "game": "Hitman: Blood Money (SLUS-21210)",
@@ -5239,7 +5579,8 @@
     },
     "game_serial": "SLUS-21210",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "60EB4D80:EE:00D00000": {
     "game": "Hitman: Blood Money (SLUS-21210)",
@@ -5267,7 +5608,8 @@
     },
     "game_serial": "SLUS-20678",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "2DFAA78D:EE:005A0000": {
     "game": "Ico (SLUS-20678)",
@@ -5295,7 +5637,8 @@
     },
     "game_serial": "SCUS-97120",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "71E449F4:EE:00700000": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97120)",
@@ -5323,7 +5666,8 @@
     },
     "game_serial": "SLUS-20845",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8CC3A6A4:EE:005A0080": {
     "game": "Killzone (SLUS-20845)",
@@ -5351,7 +5695,8 @@
     },
     "game_serial": "SLUS-21721",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D3E8D5EC:EE:00B00000": {
     "game": "Kingdom Hearts Re:Chain of Memories (SLUS-21721)",
@@ -5394,7 +5739,8 @@
     },
     "game_serial": "SLUS-20785",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "EF08CCE8:EE:005A0080": {
     "game": "Metal Gear Solid 3: Snake Eater (SLUS-20785)",
@@ -5422,7 +5768,8 @@
     },
     "game_serial": "SLUS-20458",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CD6A34C8:EE:003B4540": {
     "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
@@ -5435,7 +5782,8 @@
     },
     "game_serial": "SLUS-21062",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CD6A34C8:EE:00C00000": {
     "game": "Midnight Club 3: DUB Edition (SLUS-21062)",
@@ -5463,7 +5811,8 @@
     },
     "game_serial": "SLUS-20590",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E2FE3066:EE:00C00000": {
     "game": "Need for Speed: Underground (SLUS-20590)",
@@ -5491,7 +5840,8 @@
     },
     "game_serial": "SLUS-20811",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "A32D9744:EE:00C00000": {
     "game": "Need for Speed: Underground 2 (SLUS-20811)",
@@ -5519,7 +5869,8 @@
     },
     "game_serial": "SLUS-21399",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E8892FC1:EE:003C4560": {
     "game": "Persona 3 (SLUS-21354)",
@@ -5532,7 +5883,8 @@
     },
     "game_serial": "SLUS-21354",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E8892FC1:EE:00B00000": {
     "game": "Persona 3 (SLUS-21354)",
@@ -5560,7 +5912,8 @@
     },
     "game_serial": "SLUS-21270",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F5DD2F45:EE:003C4560": {
     "game": "Persona 4 (SLUS-21819)",
@@ -5573,7 +5926,8 @@
     },
     "game_serial": "SLUS-21819",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5741B3B4:EE:003C4560": {
     "game": "Resident Evil: Outbreak (SLUS-21616)",
@@ -5586,7 +5940,8 @@
     },
     "game_serial": "SLUS-21616",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5741B3B4:EE:005A0000": {
     "game": "Resident Evil: Outbreak (SLUS-21616)",
@@ -5614,7 +5969,8 @@
     },
     "game_serial": "SLUS-21591",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "31E1BC9B:EE:00C00000": {
     "game": "Rogue Galaxy (SLUS-21591)",
@@ -5642,7 +5998,8 @@
     },
     "game_serial": "SLUS-20459",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "FFAAC65B:EE:005A0080": {
     "game": "Silent Hill 3 (SLUS-20459)",
@@ -5670,7 +6027,8 @@
     },
     "game_serial": "SLUS-20978",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "0152E0C7:EE:005A0080": {
     "game": "Silent Hill 4: The Room (SLUS-20978)",
@@ -5698,7 +6056,8 @@
     },
     "game_serial": "SLUS-20574",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "E327DA03:EE:003B4540": {
     "game": "SSX 3 (SLUS-20783)",
@@ -5711,7 +6070,8 @@
     },
     "game_serial": "SLUS-20783",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3FCB7A3A:EE:003C4560": {
     "game": "Tales of Symphonia (SLUS-21033)",
@@ -5724,7 +6084,8 @@
     },
     "game_serial": "SLUS-21033",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3FCB7A3A:EE:00B00000": {
     "game": "Tales of Symphonia (SLUS-21033)",
@@ -5767,7 +6128,8 @@
     },
     "game_serial": "SLUS-20328",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B537D600:EE:003B4540": {
     "game": "Tekken 5 (SLUS-21219)",
@@ -5780,7 +6142,8 @@
     },
     "game_serial": "SLUS-21219",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "20E7CC63:EE:003B4540": {
     "game": "Tony Hawk's Pro Skater 3 (SLUS-20095)",
@@ -5793,7 +6156,8 @@
     },
     "game_serial": "SLUS-20095",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "5C86124C:EE:003B4540": {
     "game": "Tony Hawk's Underground (SLUS-20731)",
@@ -5806,7 +6170,8 @@
     },
     "game_serial": "SLUS-20731",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "AA9B2DC0:EE:003C4560": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
@@ -5819,7 +6184,8 @@
     },
     "game_serial": "SLUS-21299",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "AA9B2DC0:EE:00B00000": {
     "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
@@ -5862,7 +6228,8 @@
     },
     "game_serial": "SLUS-21137",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "7D32CF7D:EE:00B00000": {
     "game": "Xenosaga Episode III: Also Sprach Zarathustra (SLUS-21137)",
@@ -5890,7 +6257,8 @@
     },
     "game_serial": "SLUS-20365",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "F26A89E4:EE:00B00000": {
     "game": "Disgaea: Hour of Darkness (SLUS-20365)",
@@ -5918,7 +6286,8 @@
     },
     "game_serial": "SLUS-20721",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3C16D0C5:EE:005A0080": {
     "game": "Shadow of the Colossus (SLUS-20721)",
@@ -5946,7 +6315,8 @@
     },
     "game_serial": "SLUS-20301",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "AEECF30D:EE:003B4540": {
     "game": "Zone of the Enders (SLUS-20515)",
@@ -5959,7 +6329,8 @@
     },
     "game_serial": "SLUS-20515",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D2A1D042:EE:003B4540": {
     "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
@@ -5972,7 +6343,8 @@
     },
     "game_serial": "SLUS-20541",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "D2A1D042:EE:005A0000": {
     "game": "Zone of the Enders: The 2nd Runner (SLUS-20541)",
@@ -6000,7 +6372,8 @@
     },
     "game_serial": "SCUS-97490",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B60DD19A:EE:003C4560": {
     "game": "Shin Megami Tensei: Digital Devil Saga (SLUS-21020)",
@@ -6013,7 +6386,8 @@
     },
     "game_serial": "SLUS-21020",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3F36CFBF:EE:003B4540": {
     "game": "Need for Speed: ProStreet (SLUS-21658)",
@@ -6026,7 +6400,8 @@
     },
     "game_serial": "SLUS-21658",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1BC9364D:EE:003C4560": {
     "game": "Tales of Legendia (SLUS-20594)",
@@ -6039,7 +6414,8 @@
     },
     "game_serial": "SLUS-20594",
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "1BC9364D:EE:00B00000": {
     "game": "Tales of Legendia (SLUS-20594)",
@@ -6067,7 +6443,8 @@
       "3F800000": "4:3 standard"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8704B825:EE:005A0000": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6231,7 +6608,8 @@
       "00000064": "100 MP (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:005A000C": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6245,7 +6623,8 @@
       "00000064": "100 MP (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:00700004": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6288,7 +6667,8 @@
       "00000000": "0 faeries (none)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:00800000": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6302,7 +6682,8 @@
       "00000001": "1 potion"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:00800004": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6315,7 +6696,8 @@
       "0000000A": "10 mega potions"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:00800008": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6329,7 +6711,8 @@
       "00000000": "0 essence"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "8704B825:EE:003C4564": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6343,7 +6726,8 @@
       "3F000000": "½× (smaller HUD)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "8704B825:EE:003C4568": {
     "game": "Neopets: The Darkest Fairy (SLUS-21238)",
@@ -6427,7 +6811,8 @@
       "00000000": "Normal (off)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "CB8F7C34:EE:0040E340": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6440,7 +6825,8 @@
       "3F800000": "4:3 standard (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "CB8F7C34:EE:0080A400": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6455,7 +6841,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A404": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6470,7 +6857,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A408": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6485,7 +6873,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A40C": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6500,7 +6889,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A410": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6515,7 +6905,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A414": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6530,7 +6921,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080A418": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6545,7 +6937,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B000": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6562,7 +6955,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B004": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6579,7 +6973,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B008": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6596,7 +6991,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B00C": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6613,7 +7009,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B010": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6630,7 +7027,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B014": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6647,7 +7045,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B018": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6664,7 +7063,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B01C": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6681,7 +7081,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B020": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6698,7 +7099,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080B024": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6715,7 +7117,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:0080C000": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6864,7 +7267,8 @@
       "00000000": "0 (none)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "CB8F7C34:EE:00900000": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6905,7 +7309,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "CB8F7C34:EE:0090000C": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
@@ -6932,7 +7337,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "3F9E2D59:EE:0040E340": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -6945,7 +7351,8 @@
       "3F800000": "4:3 standard (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "3F9E2D59:EE:0080A400": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -6960,7 +7367,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A404": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -6975,7 +7383,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A408": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -6990,7 +7399,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A40C": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7005,7 +7415,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A410": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7020,7 +7431,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A414": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7035,7 +7447,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080A418": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7050,7 +7463,8 @@
       "0000270F": "9999 – Always Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B000": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7067,7 +7481,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B004": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7084,7 +7499,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B008": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7101,7 +7517,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B00C": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7118,7 +7535,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B010": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7135,7 +7553,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B014": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7152,7 +7571,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080B018": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7169,7 +7589,8 @@
       "0000000A": "10 – Max"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "3F9E2D59:EE:0080C000": {
     "game": "The Sims 2 (SLUS-21102)",
@@ -7283,7 +7704,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "AF9B5C62:EE:0060A000": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7313,7 +7735,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:0060A008": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7327,7 +7750,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:0060A00C": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7341,7 +7765,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:0060A010": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7355,7 +7780,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:0060A014": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7369,7 +7795,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:0060A018": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7383,7 +7810,8 @@
       "00000001": "1 ammo"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "AF9B5C62:EE:006C0000": {
     "game": "Ratchet & Clank (SCUS-97131)",
@@ -7748,7 +8176,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "F266B00B:EE:0060C000": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -7806,7 +8235,8 @@
       "000001F4": "500 MP"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "F266B00B:EE:006C000C": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -7820,7 +8250,8 @@
       "00000003": "3 (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "F266B00B:EE:006C0010": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -7848,7 +8279,8 @@
       "00000001": "Level 1"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "F266B00B:EE:003E0000": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -7917,7 +8349,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "F266B00B:EE:00900004": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -7944,7 +8377,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "F266B00B:EE:0090000C": {
     "game": "Kingdom Hearts II (SLUS-21005)",
@@ -8016,7 +8450,8 @@
       "000001F4": "500 MP"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "941AE3A4:EE:00D00010": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -8029,7 +8464,8 @@
       "7FFFFFFF": "Max AP (instant overdrive)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "941AE3A4:EE:00D00014": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -8043,7 +8479,8 @@
       "00000019": "25"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "941AE3A4:EE:00D00018": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -8057,7 +8494,8 @@
       "00000019": "25"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "941AE3A4:EE:00D0001C": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -8071,7 +8509,8 @@
       "00000019": "25"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "941AE3A4:EE:00D00020": {
     "game": "Final Fantasy X (SLUS-20312)",
@@ -8133,7 +8572,8 @@
       "00000001": "Open expert grid"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "B7FD7B53:EE:006D5A90": {
     "game": "Shadow of the Colossus (SCUS-97472)",
@@ -8162,7 +8602,8 @@
       "00000064": "100 stamina (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "float"
   },
   "B7FD7B53:EE:006D5A9C": {
     "game": "Shadow of the Colossus (SCUS-97472)",
@@ -8176,7 +8617,8 @@
       "00000064": "100 stamina (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "B7FD7B53:EE:006D5AA0": {
     "game": "Shadow of the Colossus (SCUS-97472)",
@@ -8190,7 +8632,8 @@
       "00000001": "1 arrow"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "B7FD7B53:EE:003E0000": {
     "game": "Shadow of the Colossus (SCUS-97472)",
@@ -8377,7 +8820,8 @@
       "000001F4": "500 magic"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "FB0E6A61:EE:003E0000": {
     "game": "God of War (SCUS-97399)",
@@ -8474,7 +8918,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "44A61C8F:EE:007B0000": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
@@ -8601,7 +9046,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "44A61C8F:EE:00900008": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
@@ -8659,7 +9105,8 @@
       "00000003": "3 lives (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "5D054E5A:EE:003E0000": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -8761,7 +9208,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "5D054E5A:EE:00900008": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
@@ -8804,7 +9252,8 @@
       "00000003": "3 lives (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "A91F4EAE:EE:006C0008": {
     "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
@@ -9035,7 +9484,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "2E01B00C:EE:00900008": {
     "game": "Spider-Man 2 (SLUS-20776)",
@@ -9048,7 +9498,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "880EB41E:EE:006C0000": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -9077,7 +9528,8 @@
       "00000001": "1 sand tank"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "int"
   },
   "880EB41E:EE:003E0000": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -9161,7 +9613,8 @@
       "00000000": "Disabled (0)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "880EB41E:EE:00900008": {
     "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
@@ -9174,7 +9627,8 @@
       "00000000": "Normal time (default)"
     },
     "estimated": true,
-    "input_compat": "not_applicable"
+    "input_compat": "not_applicable",
+    "value_type": "bool"
   },
   "9A5B29A1:EE:00F00000": {
     "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
