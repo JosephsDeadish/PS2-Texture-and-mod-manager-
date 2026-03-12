@@ -475,18 +475,19 @@ class CatalogueCard(QFrame):
 class CoverDownloadDialog(QDialog):
     """Download PS2 cover art from GameTDB by game serial or game title.
 
-    The dialog has two input modes:
-    * **Search by game name** — type part of a game title and click a matching
-      suggestion to auto-fill the serial field.
-    * **Enter serial directly** — type (or paste) the SCUS/SLUS/SLES serial
-      and download immediately.
+    Tabs:
+    * **Single Download** — search by game name to get serial suggestions, then
+      download the cover for the chosen serial.
+    * **Bulk Download** — download cover art for every game detected in the
+      configured game library folder in one click.
     """
 
     def __init__(self, config: AppConfig, parent=None, initial_serial: str = ""):
         super().__init__(parent)
         self.config = config
         self.setWindowTitle("Download Cover Art")
-        self.setMinimumWidth(520)
+        self.setMinimumWidth(560)
+        self.setMinimumHeight(480)
         self._build()
         if initial_serial:
             self._id_edit.setText(initial_serial)
@@ -496,7 +497,7 @@ class CoverDownloadDialog(QDialog):
 
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(16, 16, 16, 16)
 
         # Header
         hdr = QLabel(
@@ -507,13 +508,22 @@ class CoverDownloadDialog(QDialog):
         hdr.setWordWrap(True)
         layout.addWidget(hdr)
 
-        # ── Game Name Search ──────────────────────────────────────────────
+        # ── Tabbed UI ─────────────────────────────────────────────────────
+        self._tabs = QTabWidget()
+        layout.addWidget(self._tabs, 1)
+
+        # ── Tab 1: Single download ────────────────────────────────────────
+        single_widget = QWidget()
+        single_layout = QVBoxLayout(single_widget)
+        single_layout.setSpacing(10)
+        single_layout.setContentsMargins(12, 12, 12, 12)
+
         sep1 = QFrame()
         sep1.setFrameShape(QFrame.Shape.HLine)
         sep1.setFrameShadow(QFrame.Shadow.Sunken)
-        layout.addWidget(sep1)
+        single_layout.addWidget(sep1)
 
-        layout.addWidget(QLabel(
+        single_layout.addWidget(QLabel(
             "<b>Step 1 (optional):</b> Search by game name to find its serial:"
         ))
         search_row = QHBoxLayout()
@@ -521,22 +531,27 @@ class CoverDownloadDialog(QDialog):
         self._search_edit.setPlaceholderText("e.g. God of War, Persona 4, Crash Bandicoot…")
         self._search_edit.textChanged.connect(self._on_search_changed)
         search_row.addWidget(self._search_edit, 1)
-        layout.addLayout(search_row)
+        clear_search_btn = QPushButton("✕")
+        clear_search_btn.setFixedWidth(28)
+        clear_search_btn.setToolTip("Clear search")
+        clear_search_btn.clicked.connect(self._search_edit.clear)
+        search_row.addWidget(clear_search_btn)
+        single_layout.addLayout(search_row)
 
         # Results list — hidden until there are suggestions
         self._suggestions = QListWidget()
-        self._suggestions.setMaximumHeight(130)
+        self._suggestions.setMaximumHeight(140)
         self._suggestions.hide()
         self._suggestions.itemClicked.connect(self._on_suggestion_clicked)
-        layout.addWidget(self._suggestions)
+        single_layout.addWidget(self._suggestions)
 
         # ── Serial / ID field ─────────────────────────────────────────────
         sep2 = QFrame()
         sep2.setFrameShape(QFrame.Shape.HLine)
         sep2.setFrameShadow(QFrame.Shadow.Sunken)
-        layout.addWidget(sep2)
+        single_layout.addWidget(sep2)
 
-        layout.addWidget(QLabel(
+        single_layout.addWidget(QLabel(
             "<b>Step 2:</b> Enter (or confirm) the game serial and click Download:"
         ))
         id_row = QHBoxLayout()
@@ -544,7 +559,7 @@ class CoverDownloadDialog(QDialog):
         self._id_edit = QLineEdit()
         self._id_edit.setPlaceholderText("e.g. SLUS-20062")
         id_row.addWidget(self._id_edit, 1)
-        layout.addLayout(id_row)
+        single_layout.addLayout(id_row)
 
         region_row = QHBoxLayout()
         region_row.addWidget(QLabel("Region:"))
@@ -552,17 +567,19 @@ class CoverDownloadDialog(QDialog):
         self._region_combo.addItems(["EN", "US", "EU", "JP", "KO", "ZHCN"])
         region_row.addWidget(self._region_combo)
         region_row.addStretch()
-        layout.addLayout(region_row)
+        single_layout.addLayout(region_row)
 
         # Status + progress
         self._status = QLabel("")
         self._status.setWordWrap(True)
-        layout.addWidget(self._status)
+        single_layout.addWidget(self._status)
 
         self._progress = QProgressBar()
         self._progress.setRange(0, 0)
         self._progress.hide()
-        layout.addWidget(self._progress)
+        single_layout.addWidget(self._progress)
+
+        single_layout.addStretch()
 
         # Buttons
         btns = QHBoxLayout()
@@ -570,13 +587,85 @@ class CoverDownloadDialog(QDialog):
         self._dl_btn.setObjectName("primary_btn")
         self._dl_btn.clicked.connect(self._download)
         btns.addWidget(self._dl_btn)
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.reject)
-        btns.addWidget(close_btn)
-        layout.addLayout(btns)
+        close_btn1 = QPushButton("Close")
+        close_btn1.clicked.connect(self.reject)
+        btns.addWidget(close_btn1)
+        single_layout.addLayout(btns)
+
+        self._tabs.addTab(single_widget, "🖼 Single Download")
+
+        # ── Tab 2: Bulk download ──────────────────────────────────────────
+        bulk_widget = QWidget()
+        bulk_layout = QVBoxLayout(bulk_widget)
+        bulk_layout.setSpacing(10)
+        bulk_layout.setContentsMargins(12, 12, 12, 12)
+
+        bulk_info = QLabel(
+            "<b>Bulk Download</b> — automatically download cover art for every game "
+            "found in your game library folder. Uses the serial embedded in each "
+            "game's filename (e.g. <code>SLUS-20062</code>). Games with no recognised "
+            "serial are skipped."
+        )
+        bulk_info.setWordWrap(True)
+        bulk_layout.addWidget(bulk_info)
+
+        lib_row = QHBoxLayout()
+        lib_row.addWidget(QLabel("Library folder:"))
+        self._lib_lbl = QLabel(
+            self.config.game_library_path or "<i>not configured — set in Settings</i>"
+        )
+        self._lib_lbl.setWordWrap(True)
+        self._lib_lbl.setStyleSheet("color: #8090b0; font-size: 11px;")
+        lib_row.addWidget(self._lib_lbl, 1)
+        bulk_layout.addLayout(lib_row)
+
+        bulk_region_row = QHBoxLayout()
+        bulk_region_row.addWidget(QLabel("Region for bulk download:"))
+        self._bulk_region_combo = QComboBox()
+        self._bulk_region_combo.addItems(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        bulk_region_row.addWidget(self._bulk_region_combo)
+        bulk_region_row.addStretch()
+        bulk_layout.addLayout(bulk_region_row)
+
+        self._skip_existing_check = QCheckBox("Skip games that already have a cover downloaded")
+        self._skip_existing_check.setChecked(True)
+        bulk_layout.addWidget(self._skip_existing_check)
+
+        # Game list + results
+        bulk_layout.addWidget(QLabel("Games found in library:"))
+        self._bulk_list = QListWidget()
+        self._bulk_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
+        bulk_layout.addWidget(self._bulk_list, 1)
+
+        self._bulk_status = QLabel("")
+        self._bulk_status.setWordWrap(True)
+        bulk_layout.addWidget(self._bulk_status)
+
+        self._bulk_progress = QProgressBar()
+        self._bulk_progress.setRange(0, 100)
+        self._bulk_progress.hide()
+        bulk_layout.addWidget(self._bulk_progress)
+
+        bulk_btns = QHBoxLayout()
+        self._bulk_scan_btn = QPushButton("🔍 Scan Library")
+        self._bulk_scan_btn.clicked.connect(self._bulk_scan)
+        bulk_btns.addWidget(self._bulk_scan_btn)
+        self._bulk_dl_btn = QPushButton("⬇ Download All Covers")
+        self._bulk_dl_btn.setObjectName("primary_btn")
+        self._bulk_dl_btn.setEnabled(False)
+        self._bulk_dl_btn.clicked.connect(self._bulk_download)
+        bulk_btns.addWidget(self._bulk_dl_btn)
+        close_btn2 = QPushButton("Close")
+        close_btn2.clicked.connect(self.reject)
+        bulk_btns.addWidget(close_btn2)
+        bulk_layout.addLayout(bulk_btns)
+
+        self._tabs.addTab(bulk_widget, "📦 Bulk Download (Library)")
 
         # Keep reference so the inner lambda can call it
         self._title_to_serials = title_to_serials
+        # Cache for bulk scan results: list of (serial, display_name)
+        self._bulk_serials: list = []
 
     # ------------------------------------------------------------------
     # Game-name search helpers
@@ -611,7 +700,7 @@ class CoverDownloadDialog(QDialog):
             self._status.setTextFormat(Qt.TextFormat.RichText)
 
     # ------------------------------------------------------------------
-    # Download
+    # Single download
     # ------------------------------------------------------------------
 
     def _download(self):
@@ -634,6 +723,124 @@ class CoverDownloadDialog(QDialog):
                 self._status.setText("❌  Cover not found or download failed.")
             self._dl_btn.setEnabled(True)
             self._progress.hide()
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    # ------------------------------------------------------------------
+    # Bulk download helpers
+    # ------------------------------------------------------------------
+
+    def _bulk_scan(self):
+        """Scan the game library and populate the list with found serials."""
+        from src.core.game_library import scan_library
+        from src.core.game_registry import lookup_game_title
+
+        lib_path = self.config.game_library_path or ""
+        if not lib_path:
+            self._bulk_status.setText(
+                "⚠  No game library path configured. Set it in Settings → Paths."
+            )
+            return
+
+        self._bulk_scan_btn.setEnabled(False)
+        self._bulk_status.setText("Scanning library…")
+        self._bulk_list.clear()
+        self._bulk_serials = []
+
+        def _run():
+            try:
+                games = scan_library(lib_path)
+            except Exception as exc:
+                self._bulk_status.setText(f"❌  Scan failed: {exc}")
+                self._bulk_scan_btn.setEnabled(True)
+                return
+
+            seen: set = set()
+            results = []
+            for g in games:
+                serial = g.serial or ""
+                if not serial or serial in seen:
+                    continue
+                seen.add(serial)
+                title = g.title or lookup_game_title(serial) or serial
+                results.append((serial, title))
+
+            self._bulk_serials = results
+
+            self._bulk_list.clear()
+            if not results:
+                item = QListWidgetItem("No games with recognisable serials found.")
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                self._bulk_list.addItem(item)
+                self._bulk_dl_btn.setEnabled(False)
+            else:
+                for serial, title in results:
+                    self._bulk_list.addItem(f"{serial}  —  {title}")
+                self._bulk_dl_btn.setEnabled(True)
+
+            self._bulk_status.setText(
+                f"Found {len(results)} game(s) with recognised serials."
+            )
+            self._bulk_scan_btn.setEnabled(True)
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _bulk_download(self):
+        """Download covers for all serials found by the last scan."""
+        from src.core.downloader import fetch_gametdb_art
+        from pathlib import Path as _Path
+
+        if not self._bulk_serials:
+            return
+
+        dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
+        region = self._bulk_region_combo.currentText()
+        skip_existing = self._skip_existing_check.isChecked()
+        total = len(self._bulk_serials)
+
+        self._bulk_dl_btn.setEnabled(False)
+        self._bulk_scan_btn.setEnabled(False)
+        self._bulk_progress.setValue(0)
+        self._bulk_progress.setRange(0, total)
+        self._bulk_progress.show()
+
+        def _run():
+            ok = 0
+            skipped = 0
+            failed = 0
+            for i, (serial, title) in enumerate(self._bulk_serials, 1):
+                self._bulk_status.setText(
+                    f"Downloading {i}/{total}: {serial} — {title}…"
+                )
+                self._bulk_progress.setValue(i)
+
+                dest_file = _Path(dest_dir) / f"{serial}.jpg"
+                if skip_existing and dest_file.exists():
+                    skipped += 1
+                    # Mark the list item as skipped
+                    item = self._bulk_list.item(i - 1)
+                    if item:
+                        item.setText(f"⏭  {serial}  —  {title}  (skipped, exists)")
+                    continue
+
+                path = fetch_gametdb_art(serial, dest_dir, region)
+                if path:
+                    ok += 1
+                    item = self._bulk_list.item(i - 1)
+                    if item:
+                        item.setText(f"✅  {serial}  —  {title}")
+                else:
+                    failed += 1
+                    item = self._bulk_list.item(i - 1)
+                    if item:
+                        item.setText(f"❌  {serial}  —  {title}  (not found)")
+
+            self._bulk_status.setText(
+                f"Done — {ok} downloaded, {skipped} skipped, {failed} not found."
+            )
+            self._bulk_progress.hide()
+            self._bulk_dl_btn.setEnabled(True)
+            self._bulk_scan_btn.setEnabled(True)
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -1587,6 +1794,15 @@ class BrowsePanel(BasePanel):
         gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
         toolbar.addWidget(gbatemp_btn)
 
+        cover_art_btn = QPushButton("🖼 Cover Art")
+        cover_art_btn.setToolTip(
+            "Download PS2 cover art from GameTDB.\n"
+            "Search by game name to find the serial automatically,\n"
+            "or type a SCUS/SLUS serial directly."
+        )
+        cover_art_btn.clicked.connect(self._open_cover_art_dialog)
+        toolbar.addWidget(cover_art_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -1938,6 +2154,11 @@ class BrowsePanel(BasePanel):
 
     def _open_gbatemp_scraper(self):
         dlg = GBATempScraperDialog(self.config, self._db, self)
+        dlg.exec()
+
+    def _open_cover_art_dialog(self):
+        """Open the Cover Art download dialog from the toolbar."""
+        dlg = CoverDownloadDialog(self.config, self)
         dlg.exec()
 
     def _open_url(self, url: str):

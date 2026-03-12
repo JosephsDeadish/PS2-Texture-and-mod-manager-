@@ -674,6 +674,50 @@ _KNOWN_SERIALS: dict[str, str] = {
     "SLPS-25387": "Winning Eleven 9 (JP)",
     "SLPM-66069": "Romance of the Three Kingdoms XI (JP)",
     "SLPM-66413": "Valkyria Chronicles (JP)",
+
+    # ── Additional US serials for cover-art entries ───────────────────────────
+
+    # Action / Adventure
+    "SCUS-97481": "God of War II",
+    "SLUS-20785": "Metal Gear Solid 3: Snake Eater",
+    "SLUS-20144": "Metal Gear Solid 2: Sons of Liberty",
+
+    # RPG
+    "SLUS-21819": "Persona 4",
+    "SLUS-21115": "Okami",
+    "SLUS-21207": "Dragon Quest VIII: Journey of the Cursed King",
+    "SLUS-20461": "Xenosaga Episode I: Der Wille zur Macht",
+    "SLUS-21386": "Tales of the Abyss",
+    "SLUS-20734": "Star Ocean: Till the End of Time",
+    "SLUS-21299": "Valkyrie Profile 2: Silmeria",
+    "SLUS-21652": "Ar tonelico: Melody of Elemia",
+    "SLUS-21720": "Soul Nomad and the World Eaters",
+    "SLUS-21281": "Grandia III",
+
+    # Platform / Action
+    "SCUS-97490": "Rogue Galaxy",
+    "SLUS-20816": "Sly 2: Band of Thieves",
+    "SLUS-20518": "Crash Bandicoot: The Wrath of Cortex",
+    "SCUS-97213": "Dark Cloud 2",
+    "SLUS-21435": "We Love Katamari",
+    "SLUS-20108": "Spyro: Enter the Dragonfly",
+
+    # Horror / Action
+    "SLUS-20934": "Fatal Frame II: Crimson Butterfly",
+    "SLUS-20827": "Manhunt",
+    "SLUS-21181": "Indigo Prophecy",
+
+    # Mech / Sci-fi
+    "SLUS-20355": "Armored Core 3",
+
+    # Open World
+    "SLUS-20069": "Grand Theft Auto III",
+
+    # Japan-only
+    "SLPS-25563": "Tales of Symphonia (JP)",
+
+    # Shooter / Action
+    "SLUS-20568": "Contra: Shattered Soldier",
 }
 # fmt: on
 
