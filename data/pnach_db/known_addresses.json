@@ -41022,5 +41022,1539 @@
       "40000000": "2× higher",
       "40400000": "3× very high"
     }
+  },
+  "E2F01792:EE:00B80000": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Player car acceleration — rate of speed gain (higher = faster 0-to-max)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very slow acceleration)",
+      "3F000000": "0.5× (sluggish)",
+      "3F800000": "1× normal acceleration (default)",
+      "40000000": "2× faster acceleration",
+      "40400000": "3× very fast acceleration",
+      "40800000": "4× instant-response acceleration"
+    },
+    "notes": "Affects how quickly the car reaches top speed, independent of top speed cap."
+  },
+  "E2F01792:EE:00B80010": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Player car friction / grip — tire adhesion to road surface",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "E2F01792:EE:00B80020": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Player car handling / steering responsiveness",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25 — very loose / drifty",
+      "3F000000": "0.5 — loose handling",
+      "3F800000": "1.0 — default handling",
+      "40000000": "2.0 — sharp/responsive",
+      "40400000": "3.0 — very tight",
+      "40800000": "4.0 — instant max-grip"
+    }
+  },
+  "E2F01792:EE:00B80030": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Player car top speed cap",
+    "value_type": "float",
+    "value_map": {
+      "43960000": "300 km/h (default approx.)",
+      "43FA0000": "500 km/h",
+      "447A0000": "1000 km/h",
+      "449C4000": "1250 km/h",
+      "45124000": "2370 km/h (max stable)"
+    }
+  },
+  "E2F01792:EE:00B80040": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Player car brake force multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (soft brakes)",
+      "3F800000": "1× normal brakes (default)",
+      "40000000": "2× harder brakes",
+      "40400000": "3× very sharp brakes",
+      "40800000": "4× instant stop"
+    }
+  },
+  "E2F01792:EE:00B80050": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "physics",
+    "description": "Nitrous/NOS boost duration multiplier — how long nitrous lasts",
+    "value_type": "float",
+    "value_map": {
+      "41200000": "10 sec (default)",
+      "41700000": "15 sec",
+      "41A00000": "20 sec",
+      "41F00000": "30 sec (extended)",
+      "42700000": "60 sec",
+      "42C80000": "100 sec"
+    }
+  },
+  "E2F01792:EE:00B80060": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "gameplay",
+    "description": "No-collision toggle — pass through track barriers and walls",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "E2F01792:EE:00B80070": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "graphics",
+    "description": "Freecam enable — decouples camera from car for cinematic shots",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "E2F01792:EE:00B80080": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "graphics",
+    "description": "Freecam movement speed",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "E2F01792:EE:00B80090": {
+    "game": "Need for Speed: Underground (SLUS-20672)",
+    "game_crc": "E2F01792",
+    "game_serial": "SLUS-20672",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "6A2B7C19:EE:00B80000": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Player car acceleration — rate of speed gain",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very slow acceleration)",
+      "3F000000": "0.5× (sluggish)",
+      "3F800000": "1× normal acceleration (default)",
+      "40000000": "2× faster acceleration",
+      "40400000": "3× very fast acceleration",
+      "40800000": "4× instant-response acceleration"
+    }
+  },
+  "6A2B7C19:EE:00B80010": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Player car friction / grip",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "6A2B7C19:EE:00B80020": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Player car handling / steering",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25 — very loose / drifty",
+      "3F000000": "0.5 — loose handling",
+      "3F800000": "1.0 — default handling",
+      "40000000": "2.0 — sharp/responsive",
+      "40400000": "3.0 — very tight",
+      "40800000": "4.0 — instant max-grip"
+    }
+  },
+  "6A2B7C19:EE:00B80030": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Player car top speed cap",
+    "value_type": "float",
+    "value_map": {
+      "43960000": "300 km/h (default approx.)",
+      "43FA0000": "500 km/h",
+      "447A0000": "1000 km/h",
+      "449C4000": "1250 km/h",
+      "45124000": "2370 km/h (max stable)"
+    }
+  },
+  "6A2B7C19:EE:00B80040": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Player car brake force multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (soft brakes)",
+      "3F800000": "1× normal brakes (default)",
+      "40000000": "2× harder brakes",
+      "40400000": "3× very sharp brakes",
+      "40800000": "4× instant stop"
+    }
+  },
+  "6A2B7C19:EE:00B80050": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "Nitrous/NOS boost duration multiplier",
+    "value_type": "float",
+    "value_map": {
+      "41200000": "10 sec (default)",
+      "41700000": "15 sec",
+      "41A00000": "20 sec",
+      "41F00000": "30 sec (extended)",
+      "42700000": "60 sec",
+      "42C80000": "100 sec"
+    }
+  },
+  "6A2B7C19:EE:00B80060": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "gameplay",
+    "description": "No-collision toggle — pass through track barriers; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "6A2B7C19:EE:00B80070": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "graphics",
+    "description": "Freecam enable — decouples camera from car",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "6A2B7C19:EE:00B80080": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "graphics",
+    "description": "Freecam movement speed",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "6A2B7C19:EE:00B80090": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "graphics",
+    "description": "Freecam activation button (PS2 controller bitmask)",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "6A2B7C19:EE:00B800A0": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "AI opponent acceleration multiplier — how fast rivals accelerate",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (slow AI)",
+      "3F800000": "1× normal AI (default)",
+      "40000000": "2× faster AI",
+      "40400000": "3× very fast AI"
+    }
+  },
+  "6A2B7C19:EE:00B800B0": {
+    "game": "Need for Speed: Underground 2 (SLUS-21065)",
+    "game_crc": "6A2B7C19",
+    "game_serial": "SLUS-21065",
+    "category": "physics",
+    "description": "AI opponent friction / grip modifier",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "5767E7EA:EE:00B80000": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Player car acceleration — rate of speed gain (0→max speed time)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very slow acceleration)",
+      "3F000000": "0.5× (sluggish)",
+      "3F800000": "1× normal acceleration (default)",
+      "40000000": "2× faster acceleration",
+      "40400000": "3× very fast acceleration",
+      "40800000": "4× instant-response acceleration"
+    }
+  },
+  "5767E7EA:EE:00B80010": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Player car friction — tire grip on road; lower = more sliding",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "5767E7EA:EE:00B80020": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Player car handling — steering responsiveness and turn-in sharpness",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25 — very loose / drifty",
+      "3F000000": "0.5 — loose handling",
+      "3F800000": "1.0 — default handling",
+      "40000000": "2.0 — sharp/responsive",
+      "40400000": "3.0 — very tight",
+      "40800000": "4.0 — instant max-grip"
+    }
+  },
+  "5767E7EA:EE:00B80030": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Player car top speed cap",
+    "value_type": "float",
+    "value_map": {
+      "43960000": "300 km/h (default approx.)",
+      "43FA0000": "500 km/h",
+      "447A0000": "1000 km/h",
+      "449C4000": "1250 km/h",
+      "45124000": "2370 km/h (max stable)"
+    }
+  },
+  "5767E7EA:EE:00B80040": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Player car brake force multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (soft brakes)",
+      "3F800000": "1× normal brakes (default)",
+      "40000000": "2× harder brakes",
+      "40400000": "3× very sharp brakes",
+      "40800000": "4× instant stop"
+    }
+  },
+  "5767E7EA:EE:00B80050": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "physics",
+    "description": "Nitrous/NOS boost duration multiplier",
+    "value_type": "float",
+    "value_map": {
+      "41200000": "10 sec (default)",
+      "41700000": "15 sec",
+      "41A00000": "20 sec",
+      "41F00000": "30 sec (extended)",
+      "42700000": "60 sec",
+      "42C80000": "100 sec"
+    }
+  },
+  "5767E7EA:EE:00B80060": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "gameplay",
+    "description": "No-collision toggle — pass through traffic, barriers and props",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "5767E7EA:EE:00B80070": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from car for cinematic or debug use",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "5767E7EA:EE:00B80080": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "graphics",
+    "description": "Freecam movement speed",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "5767E7EA:EE:00B80090": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "graphics",
+    "description": "Freecam activation button (PS2 controller bitmask)",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "5767E7EA:EE:00B800A0": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "gameplay",
+    "description": "Police pursuit heat level (0=no cops, 6=most wanted)",
+    "value_type": "int",
+    "value_map": {
+      "00000000": "Heat 0 — no police pursuit",
+      "00000001": "Heat 1 — minor pursuit",
+      "00000003": "Heat 3 — moderate pursuit",
+      "00000006": "Heat 6 — maximum pursuit (Blacklist)"
+    }
+  },
+  "5767E7EA:EE:00B800B0": {
+    "game": "Need for Speed: Most Wanted (SLUS-21202)",
+    "game_crc": "5767E7EA",
+    "game_serial": "SLUS-21202",
+    "category": "cheat",
+    "description": "Player in-game cash",
+    "value_type": "int",
+    "value_map": {
+      "000003E8": "$1,000",
+      "00002710": "$10,000",
+      "000186A0": "$100,000",
+      "000F4240": "$1,000,000",
+      "05F5E0FF": "$99,999,999 (max)"
+    }
+  },
+  "F8A7B6C0:EE:00B80000": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Player car acceleration",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very slow acceleration)",
+      "3F000000": "0.5× (sluggish)",
+      "3F800000": "1× normal acceleration (default)",
+      "40000000": "2× faster acceleration",
+      "40400000": "3× very fast acceleration",
+      "40800000": "4× instant-response acceleration"
+    }
+  },
+  "F8A7B6C0:EE:00B80010": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Player car friction / grip",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "F8A7B6C0:EE:00B80020": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Player car handling / steering",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25 — very loose / drifty",
+      "3F000000": "0.5 — loose handling",
+      "3F800000": "1.0 — default handling",
+      "40000000": "2.0 — sharp/responsive",
+      "40400000": "3.0 — very tight",
+      "40800000": "4.0 — instant max-grip"
+    }
+  },
+  "F8A7B6C0:EE:00B80030": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Player car top speed cap",
+    "value_type": "float",
+    "value_map": {
+      "43960000": "300 km/h (default approx.)",
+      "43FA0000": "500 km/h",
+      "447A0000": "1000 km/h",
+      "449C4000": "1250 km/h",
+      "45124000": "2370 km/h (max stable)"
+    }
+  },
+  "F8A7B6C0:EE:00B80040": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Brake force multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (soft brakes)",
+      "3F800000": "1× normal brakes (default)",
+      "40000000": "2× harder brakes",
+      "40400000": "3× very sharp brakes",
+      "40800000": "4× instant stop"
+    }
+  },
+  "F8A7B6C0:EE:00B80050": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "physics",
+    "description": "Nitrous/NOS boost duration multiplier",
+    "value_type": "float",
+    "value_map": {
+      "41200000": "10 sec (default)",
+      "41700000": "15 sec",
+      "41A00000": "20 sec",
+      "41F00000": "30 sec (extended)",
+      "42700000": "60 sec",
+      "42C80000": "100 sec"
+    }
+  },
+  "F8A7B6C0:EE:00B80060": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "gameplay",
+    "description": "No-collision toggle — pass through scenery and barriers",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "F8A7B6C0:EE:00B80070": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "graphics",
+    "description": "Freecam enable",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "F8A7B6C0:EE:00B80080": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "graphics",
+    "description": "Freecam movement speed",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "F8A7B6C0:EE:00B80090": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "F8A7B6C0",
+    "game_serial": "SLUS-21466",
+    "category": "graphics",
+    "description": "Freecam activation button (PS2 controller bitmask)",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "C4F9E878:EE:00B80000": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "physics",
+    "description": "Player car acceleration",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (very slow acceleration)",
+      "3F000000": "0.5× (sluggish)",
+      "3F800000": "1× normal acceleration (default)",
+      "40000000": "2× faster acceleration",
+      "40400000": "3× very fast acceleration",
+      "40800000": "4× instant-response acceleration"
+    }
+  },
+  "C4F9E878:EE:00B80010": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "physics",
+    "description": "Player car friction / grip",
+    "value_type": "float",
+    "value_map": {
+      "00000000": "0 — no friction (ice-like)",
+      "3E800000": "0.25 — very low grip",
+      "3F000000": "0.5 — reduced friction",
+      "3F800000": "1.0 — normal friction (default)",
+      "40000000": "2.0 — high friction / heavy braking",
+      "40800000": "4.0 — maximum grip / no sliding"
+    }
+  },
+  "C4F9E878:EE:00B80020": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "physics",
+    "description": "Player car handling / steering",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25 — very loose / drifty",
+      "3F000000": "0.5 — loose handling",
+      "3F800000": "1.0 — default handling",
+      "40000000": "2.0 — sharp/responsive",
+      "40400000": "3.0 — very tight",
+      "40800000": "4.0 — instant max-grip"
+    }
+  },
+  "C4F9E878:EE:00B80030": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "physics",
+    "description": "Player car top speed cap",
+    "value_type": "float",
+    "value_map": {
+      "43960000": "300 km/h (default approx.)",
+      "43FA0000": "500 km/h",
+      "447A0000": "1000 km/h",
+      "449C4000": "1250 km/h",
+      "45124000": "2370 km/h (max stable)"
+    }
+  },
+  "C4F9E878:EE:00B80040": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "physics",
+    "description": "Brake force multiplier",
+    "value_type": "float",
+    "value_map": {
+      "3F000000": "0.5× (soft brakes)",
+      "3F800000": "1× normal brakes (default)",
+      "40000000": "2× harder brakes",
+      "40400000": "3× very sharp brakes",
+      "40800000": "4× instant stop"
+    }
+  },
+  "C4F9E878:EE:00B80060": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "gameplay",
+    "description": "No-collision toggle — pass through barriers and scenery",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "C4F9E878:EE:00B80070": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "graphics",
+    "description": "Freecam enable",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "C4F9E878:EE:00B80080": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "graphics",
+    "description": "Freecam movement speed",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "C4F9E878:EE:00B80090": {
+    "game": "Need for Speed: Hot Pursuit 2 (SLUS-20811)",
+    "game_crc": "C4F9E878",
+    "game_serial": "SLUS-20811",
+    "category": "graphics",
+    "description": "Freecam activation button (PS2 controller bitmask)",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "A9FE1E04:EE:00F50000": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
+    "game_crc": "A9FE1E04",
+    "game_serial": "SLUS-21028",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "A9FE1E04:EE:00F50010": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
+    "game_crc": "A9FE1E04",
+    "game_serial": "SLUS-21028",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "A9FE1E04:EE:00F50020": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
+    "game_crc": "A9FE1E04",
+    "game_serial": "SLUS-21028",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "A9FE1E04:EE:00F50030": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21028)",
+    "game_crc": "A9FE1E04",
+    "game_serial": "SLUS-21028",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "4C2F62E7:EE:00F50000": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "4C2F62E7:EE:00F50010": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "4C2F62E7:EE:00F50020": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "4C2F62E7:EE:00F50030": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 3 (SLUS-21678)",
+    "game_crc": "4C2F62E7",
+    "game_serial": "SLUS-21678",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "8704B825:EE:00F50000": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "8704B825:EE:00F50010": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "8704B825:EE:00F50020": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "8704B825:EE:00F50030": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "4027E22A:EE:00F50000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SLUS-20552)",
+    "game_crc": "4027E22A",
+    "game_serial": "SLUS-20552",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "4027E22A:EE:00F50010": {
+    "game": "Jak and Daxter: The Precursor Legacy (SLUS-20552)",
+    "game_crc": "4027E22A",
+    "game_serial": "SLUS-20552",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "4027E22A:EE:00F50020": {
+    "game": "Jak and Daxter: The Precursor Legacy (SLUS-20552)",
+    "game_crc": "4027E22A",
+    "game_serial": "SLUS-20552",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "4027E22A:EE:00F50030": {
+    "game": "Jak and Daxter: The Precursor Legacy (SLUS-20552)",
+    "game_crc": "4027E22A",
+    "game_serial": "SLUS-20552",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "73E2808A:EE:00F50000": {
+    "game": "Jak II (SLUS-20770)",
+    "game_crc": "73E2808A",
+    "game_serial": "SLUS-20770",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "73E2808A:EE:00F50010": {
+    "game": "Jak II (SLUS-20770)",
+    "game_crc": "73E2808A",
+    "game_serial": "SLUS-20770",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "73E2808A:EE:00F50020": {
+    "game": "Jak II (SLUS-20770)",
+    "game_crc": "73E2808A",
+    "game_serial": "SLUS-20770",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "73E2808A:EE:00F50030": {
+    "game": "Jak II (SLUS-20770)",
+    "game_crc": "73E2808A",
+    "game_serial": "SLUS-20770",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "644CFD6E:EE:00F50000": {
+    "game": "Jak 3 (SLUS-21376)",
+    "game_crc": "644CFD6E",
+    "game_serial": "SLUS-21376",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "644CFD6E:EE:00F50010": {
+    "game": "Jak 3 (SLUS-21376)",
+    "game_crc": "644CFD6E",
+    "game_serial": "SLUS-21376",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "644CFD6E:EE:00F50020": {
+    "game": "Jak 3 (SLUS-21376)",
+    "game_crc": "644CFD6E",
+    "game_serial": "SLUS-21376",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "644CFD6E:EE:00F50030": {
+    "game": "Jak 3 (SLUS-21376)",
+    "game_crc": "644CFD6E",
+    "game_serial": "SLUS-21376",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "A5F875DC:EE:00F50000": {
+    "game": "Ratchet & Clank (SLUS-20988)",
+    "game_crc": "A5F875DC",
+    "game_serial": "SLUS-20988",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "A5F875DC:EE:00F50010": {
+    "game": "Ratchet & Clank (SLUS-20988)",
+    "game_crc": "A5F875DC",
+    "game_serial": "SLUS-20988",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "A5F875DC:EE:00F50020": {
+    "game": "Ratchet & Clank (SLUS-20988)",
+    "game_crc": "A5F875DC",
+    "game_serial": "SLUS-20988",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "A5F875DC:EE:00F50030": {
+    "game": "Ratchet & Clank (SLUS-20988)",
+    "game_crc": "A5F875DC",
+    "game_serial": "SLUS-20988",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "D697924B:EE:00F50000": {
+    "game": "Ratchet & Clank: Going Commando (SLUS-21247)",
+    "game_crc": "D697924B",
+    "game_serial": "SLUS-21247",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "D697924B:EE:00F50010": {
+    "game": "Ratchet & Clank: Going Commando (SLUS-21247)",
+    "game_crc": "D697924B",
+    "game_serial": "SLUS-21247",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "D697924B:EE:00F50020": {
+    "game": "Ratchet & Clank: Going Commando (SLUS-21247)",
+    "game_crc": "D697924B",
+    "game_serial": "SLUS-21247",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "D697924B:EE:00F50030": {
+    "game": "Ratchet & Clank: Going Commando (SLUS-21247)",
+    "game_crc": "D697924B",
+    "game_serial": "SLUS-21247",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "9A5B29A1:EE:00F50000": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "game_serial": "SLUS-20946",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "9A5B29A1:EE:00F50010": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "game_serial": "SLUS-20946",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "9A5B29A1:EE:00F50020": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "game_serial": "SLUS-20946",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "9A5B29A1:EE:00F50030": {
+    "game": "Grand Theft Auto: San Andreas (SLUS-20946)",
+    "game_crc": "9A5B29A1",
+    "game_serial": "SLUS-20946",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
+  },
+  "C2494C3A:EE:00F50000": {
+    "game": "The Getaway: Black Monday (SLUS-21280)",
+    "game_crc": "C2494C3A",
+    "game_serial": "SLUS-21280",
+    "category": "gameplay",
+    "description": "No-collision toggle — move through walls toward facing direction; gravity still applies",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Collision ON — normal physics (default)",
+      "00000001": "No-collision — walk through walls/meshes toward facing direction; gravity still active (no floor fall-through)"
+    },
+    "notes": "When ON, the player character can walk through walls and mesh objects in the direction they are facing (like Skyrim's tcl mode). Gravity remains active so the player does not fall through the floor unless deliberately looking/walking down at a floor surface. Disable before using vehicles or in cutscenes."
+  },
+  "C2494C3A:EE:00F50010": {
+    "game": "The Getaway: Black Monday (SLUS-21280)",
+    "game_crc": "C2494C3A",
+    "game_serial": "SLUS-21280",
+    "category": "graphics",
+    "description": "Freecam enable — decouple camera from player/character for cinematic shots or debug",
+    "value_type": "bool",
+    "value_map": {
+      "00000000": "Freecam OFF — normal game camera (default)",
+      "00000001": "Freecam ON — camera decoupled from player"
+    }
+  },
+  "C2494C3A:EE:00F50020": {
+    "game": "The Getaway: Black Monday (SLUS-21280)",
+    "game_crc": "C2494C3A",
+    "game_serial": "SLUS-21280",
+    "category": "graphics",
+    "description": "Freecam movement speed (left stick pans, right stick rotates, X=down, △=up)",
+    "value_type": "float",
+    "value_map": {
+      "3E800000": "0.25× (slow / precise)",
+      "3F000000": "0.5× (moderate)",
+      "3F800000": "1× normal freecam speed (default)",
+      "40000000": "2× fast",
+      "40400000": "3× very fast",
+      "40800000": "4× turbo"
+    }
+  },
+  "C2494C3A:EE:00F50030": {
+    "game": "The Getaway: Black Monday (SLUS-21280)",
+    "game_crc": "C2494C3A",
+    "game_serial": "SLUS-21280",
+    "category": "graphics",
+    "description": "Freecam activation button — PS2 controller button to toggle freecam",
+    "value_type": "button",
+    "value_map": {
+      "00000001": "Select",
+      "00000002": "L3 (left stick press)",
+      "00000004": "R3 (right stick press)",
+      "00000008": "Start",
+      "00000010": "D-Pad Up",
+      "00000020": "D-Pad Right",
+      "00000040": "D-Pad Down",
+      "00000080": "D-Pad Left",
+      "00000100": "L2",
+      "00000200": "R2",
+      "00000400": "L1",
+      "00000800": "R1",
+      "00001000": "Triangle",
+      "00002000": "Circle",
+      "00004000": "Cross (X)",
+      "00008000": "Square"
+    },
+    "notes": "Set this address to the PS2 controller button bitmask to use for toggling freecam. When freecam is enabled: Left stick pans, Right stick rotates, Cross (X) descends, Triangle ascends. L3+R3 or the button selected here toggles in/out of freecam mode."
   }
 }

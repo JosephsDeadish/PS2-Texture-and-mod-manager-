@@ -1840,16 +1840,28 @@ class PnachCodeBuilderDialog(QDialog):
         # ── Value dropdown (shown when value_map is available) ────────
         value_combo = None
         if value_map:
-            val_header = QLabel("Value:")
+            # Choose context-sensitive header label
+            if value_type == "button":
+                val_header = QLabel("Button:")
+            else:
+                val_header = QLabel("Value:")
             val_header.setStyleSheet("color: #7090c0; font-size: 11px;")
             row.addWidget(val_header)
 
             value_combo = QCBox()
-            value_combo.setMinimumWidth(200)
-            value_combo.setToolTip(
-                "Select a value for this effect.\n"
-                "Options are labeled by what they do (e.g. 'double height', 'normal speed')."
-            )
+            if value_type == "button":
+                value_combo.setMinimumWidth(240)
+                value_combo.setToolTip(
+                    "Select the PS2 controller button that will activate this feature.\n"
+                    "Left stick pans camera, right stick rotates, Cross (X) descends, "
+                    "Triangle ascends.\nOnly one button can be assigned at a time."
+                )
+            else:
+                value_combo.setMinimumWidth(200)
+                value_combo.setToolTip(
+                    "Select a value for this effect.\n"
+                    "Options are labeled by what they do (e.g. 'double height', 'normal speed')."
+                )
             default_first = sorted(value_map.items(), key=lambda kv: (
                 0 if "default" in kv[1].lower() or "1×" in kv[1] or "4:3" in kv[1] else 1,
                 kv[1],

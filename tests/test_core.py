@@ -4379,10 +4379,10 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 2800 entries (wave 8)."""
+        """Known addresses DB should have grown beyond 2900 entries (wave 8+NFS)."""
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 2800, "PNACH DB should have more than 2800 entries after wave-8 expansion")
+        self.assertGreater(n, 2900, "PNACH DB should have more than 2900 entries after wave-8 NFS expansion")
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
@@ -4529,7 +4529,7 @@ class TestPnachAnalyzer(unittest.TestCase):
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
-        valid = {"int", "float", "bool"}
+        valid = {"int", "float", "bool", "button"}
         bad = [(k, e["value_type"]) for k, e in db.items()
                if e.get("value_type") and e["value_type"] not in valid]
         self.assertEqual(bad, [], f"Entries with invalid value_type: {bad[:5]}")
@@ -4651,6 +4651,93 @@ class TestPnachAnalyzer(unittest.TestCase):
             if "exclusion_group" in v and not isinstance(v["exclusion_group"], str)
         ]
         self.assertEqual(bad, [], f"exclusion_group must be a string: {bad[:3]}")
+
+    # ------------------------------------------------------------------
+    # NFS physics, no-collision, freecam, button value_type tests
+    # ------------------------------------------------------------------
+
+    def test_db_has_nfs_physics_entries(self):
+        """NFS games should have acceleration, friction, and handling entries."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs = [v for v in db.values() if "need for speed" in v.get("game", "").lower()]
+        # Check acceleration entries exist
+        accel = [v for v in nfs if "acceleration" in v.get("description", "").lower()]
+        self.assertGreater(len(accel), 0, "NFS entries should include acceleration")
+        friction = [v for v in nfs if "friction" in v.get("description", "").lower()]
+        self.assertGreater(len(friction), 0, "NFS entries should include friction")
+        handling = [v for v in nfs if "handling" in v.get("description", "").lower()]
+        self.assertGreater(len(handling), 0, "NFS entries should include handling")
+
+    def test_db_has_no_collision_entries(self):
+        """No-collision toggle entries should exist in the DB."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nocol = [v for v in db.values() if "no-collision" in v.get("description", "").lower()]
+        self.assertGreater(len(nocol), 3, "Should have no-collision entries for multiple games")
+
+    def test_db_has_freecam_entries(self):
+        """Freecam enable and button entries should exist in the DB."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        freecam = [v for v in db.values() if "freecam" in v.get("description", "").lower()]
+        self.assertGreater(len(freecam), 5, "Should have freecam entries for multiple games")
+        btn_entries = [v for v in freecam if v.get("value_type") == "button"]
+        self.assertGreater(len(btn_entries), 0,
+                           "Freecam entries should include button-type activation entries")
+
+    def test_db_button_type_entries_have_ps2_buttons(self):
+        """button value_type entries must have a value_map with PS2 button names."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        btn_entries = [v for v in db.values() if v.get("value_type") == "button"]
+        self.assertGreater(len(btn_entries), 0, "Should have button-type entries")
+        for e in btn_entries:
+            vm = e.get("value_map", {})
+            self.assertGreater(len(vm), 5, "Button value_map should have PS2 button options")
+            # At least one entry should mention a PS2 button name
+            labels = " ".join(vm.values()).lower()
+            has_button = any(b in labels for b in ["cross", "triangle", "circle", "square", "l1", "r1"])
+            self.assertTrue(has_button, f"Button value_map should mention PS2 button names: {vm}")
+
+    def test_no_collision_entries_have_bool_type(self):
+        """No-collision toggle entries should use value_type=bool."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nocol = [v for v in db.values()
+                 if "no-collision" in v.get("description", "").lower()]
+        bad = [v["description"][:50] for v in nocol if v.get("value_type") != "bool"]
+        self.assertEqual(bad, [], f"No-collision entries should have value_type=bool: {bad}")
+
+    def test_nfs_freecam_button_has_ps2_map(self):
+        """NFS freecam activation button entries should have PS2 button choices."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs_fc_btn = [
+            v for v in db.values()
+            if "need for speed" in v.get("game", "").lower()
+            and v.get("value_type") == "button"
+        ]
+        self.assertGreater(len(nfs_fc_btn), 0,
+                           "NFS games should have freecam button-type entries")
+        for e in nfs_fc_btn:
+            vm = e.get("value_map", {})
+            # Should have L3 and R3 options at minimum
+            all_labels = " ".join(vm.values())
+            self.assertIn("L3", all_labels)
+            self.assertIn("R3", all_labels)
 
 
 class TestTextureFilePickerLogic(unittest.TestCase):

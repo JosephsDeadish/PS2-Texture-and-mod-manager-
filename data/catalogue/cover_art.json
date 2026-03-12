@@ -8120,5 +8120,74 @@
     "upscale_tech": "",
     "direct_download_url": "",
     "game": "The Urbz: Sims in the City"
+  },
+  {
+    "id": "cover_nfs_carbon",
+    "name": "Need for Speed: Carbon — Cover Art",
+    "description": "Official box art cover image.",
+    "context": "",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-21466",
+    "type": "cover",
+    "game_serial": "SLUS-21466",
+    "source": "GameTDB",
+    "game": "Need for Speed: Carbon",
+    "thumbnail_url": "",
+    "tags": [
+      "nfs",
+      "racing"
+    ],
+    "download_action": "",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_nfs_hp2",
+    "name": "Need for Speed: Hot Pursuit 2 — Cover Art",
+    "description": "Official box art cover image.",
+    "context": "",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20811",
+    "type": "cover",
+    "game_serial": "SLUS-20811",
+    "source": "GameTDB",
+    "game": "Need for Speed: Hot Pursuit 2",
+    "thumbnail_url": "",
+    "tags": [
+      "nfs",
+      "racing"
+    ],
+    "download_action": "",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_nfs_prostreet",
+    "name": "Need for Speed: ProStreet — Cover Art",
+    "description": "Official box art cover image.",
+    "context": "",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-21399",
+    "type": "cover",
+    "game_serial": "SLUS-21399",
+    "source": "GameTDB",
+    "game": "Need for Speed: ProStreet",
+    "thumbnail_url": "",
+    "tags": [
+      "nfs",
+      "racing"
+    ],
+    "download_action": "",
+    "direct_download_url": "",
+    "upscale_tech": ""
   }
 ]
