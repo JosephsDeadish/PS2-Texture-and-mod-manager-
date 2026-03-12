@@ -6822,3 +6822,287 @@ class TestDownloadHistory(unittest.TestCase):
         loaded = _load(self.cfg)
         self.assertEqual(len(loaded), MAX_HISTORY_ENTRIES)
 
+
+
+class TestModNotes(unittest.TestCase):
+    """Tests for src.core.mod_notes."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # --- imports -----------------------------------------------------------
+
+    def test_import(self):
+        from src.core.mod_notes import (
+            NoteEntry,
+            get_notes_file,
+            upsert_note,
+            get_note,
+            list_notes,
+            delete_note,
+            clear_notes,
+            export_notes_csv,
+        )
+
+    # --- NoteEntry properties ----------------------------------------------
+
+    def test_note_entry_type_label_texture_pack(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="SH2 HD",
+                      mod_type="texture_pack")
+        self.assertIn("Texture Pack", n.type_label)
+
+    def test_note_entry_type_label_pnach(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="WS Patch",
+                      mod_type="pnach")
+        self.assertIn("PNACH", n.type_label)
+
+    def test_note_entry_type_label_unknown_defaults_other(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="unknown_type")
+        self.assertIn("Other", n.type_label)
+
+    def test_note_entry_short_text_short(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="pnach", text="hello")
+        self.assertEqual(n.short_text, "hello")
+
+    def test_note_entry_short_text_truncated(self):
+        from src.core.mod_notes import NoteEntry
+        long_text = "a" * 100
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="pnach", text=long_text)
+        self.assertTrue(n.short_text.endswith("…"))
+        self.assertLessEqual(len(n.short_text), 82)
+
+    # --- serialisation round-trip ------------------------------------------
+
+    def test_to_dict_from_dict_roundtrip(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(
+            id="abc", entry_id="eid1", entry_title="SH2 HD",
+            mod_type="texture_pack", serial="SLUS-20228",
+            text="Great pack!", created_at="2025-01-01T00:00:00+00:00",
+            updated_at="2025-06-01T00:00:00+00:00",
+        )
+        n2 = NoteEntry.from_dict(n.to_dict())
+        self.assertEqual(n.id, n2.id)
+        self.assertEqual(n.entry_id, n2.entry_id)
+        self.assertEqual(n.entry_title, n2.entry_title)
+        self.assertEqual(n.text, n2.text)
+        self.assertEqual(n.serial, n2.serial)
+
+    # --- get_notes_file ----------------------------------------------------
+
+    def test_get_notes_file_returns_path(self):
+        from src.core.mod_notes import get_notes_file
+        p = get_notes_file(self.cfg)
+        self.assertIsInstance(p, Path)
+        self.assertTrue(str(p).endswith("mod_notes.json"))
+
+    # --- upsert_note (create) ----------------------------------------------
+
+    def test_upsert_note_creates_new(self):
+        from src.core.mod_notes import upsert_note, get_note
+        n = upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                        mod_type="texture_pack", serial="SLUS-20228",
+                        text="First note")
+        self.assertIsNotNone(n.id)
+        self.assertEqual(n.entry_id, "e1")
+        self.assertEqual(n.text, "First note")
+        self.assertTrue(n.created_at)
+        self.assertTrue(n.updated_at)
+
+    def test_upsert_note_persists_to_disk(self):
+        from src.core.mod_notes import upsert_note, get_notes_file
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="stored")
+        p = get_notes_file(self.cfg)
+        self.assertTrue(p.exists())
+        import json as _json
+        data = _json.loads(p.read_text())
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["text"], "stored")
+
+    # --- upsert_note (update) ----------------------------------------------
+
+    def test_upsert_note_updates_existing(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="v1")
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="v2 updated")
+        notes = list_notes(self.cfg)
+        self.assertEqual(len(notes), 1)
+        self.assertEqual(notes[0].text, "v2 updated")
+
+    def test_upsert_note_does_not_duplicate(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        for _ in range(3):
+            upsert_note(self.cfg, entry_id="e1", entry_title="SH2",
+                        mod_type="pnach", text="note")
+        self.assertEqual(len(list_notes(self.cfg)), 1)
+
+    # --- get_note ----------------------------------------------------------
+
+    def test_get_note_returns_correct(self):
+        from src.core.mod_notes import upsert_note, get_note
+        upsert_note(self.cfg, entry_id="e1", entry_title="Mod A",
+                    mod_type="pnach", text="note A")
+        upsert_note(self.cfg, entry_id="e2", entry_title="Mod B",
+                    mod_type="pnach", text="note B")
+        n = get_note(self.cfg, "e1")
+        self.assertIsNotNone(n)
+        self.assertEqual(n.text, "note A")
+
+    def test_get_note_returns_none_when_absent(self):
+        from src.core.mod_notes import get_note
+        self.assertIsNone(get_note(self.cfg, "nonexistent"))
+
+    # --- list_notes --------------------------------------------------------
+
+    def test_list_notes_all(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="texture_pack", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="y")
+        notes = list_notes(self.cfg)
+        self.assertEqual(len(notes), 2)
+
+    def test_list_notes_empty_when_no_file(self):
+        from src.core.mod_notes import list_notes
+        self.assertEqual(list_notes(self.cfg), [])
+
+    def test_list_notes_filter_mod_type(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="texture_pack", text="tp")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="pn")
+        tp = list_notes(self.cfg, mod_type="texture_pack")
+        self.assertEqual(len(tp), 1)
+        self.assertEqual(tp[0].mod_type, "texture_pack")
+
+    def test_list_notes_filter_serial(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", serial="SLUS-20228", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", serial="SLES-54053", text="y")
+        results = list_notes(self.cfg, serial="SLUS-20228")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].serial, "SLUS-20228")
+
+    def test_list_notes_filter_query_title(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="Silent Hill 2 HD",
+                    mod_type="texture_pack", text="great")
+        upsert_note(self.cfg, entry_id="b", entry_title="God of War",
+                    mod_type="texture_pack", text="also great")
+        results = list_notes(self.cfg, query="silent")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entry_id, "a")
+
+    def test_list_notes_filter_query_text(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="Mod A",
+                    mod_type="pnach", text="installed v3 successfully")
+        upsert_note(self.cfg, entry_id="b", entry_title="Mod B",
+                    mod_type="pnach", text="waiting to test")
+        results = list_notes(self.cfg, query="v3")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entry_id, "a")
+
+    def test_list_notes_sorted_by_updated_desc(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="first")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="second")
+        notes = list_notes(self.cfg)
+        # Most recently upserted (b) should appear first
+        self.assertEqual(notes[0].entry_id, "b")
+
+    # --- delete_note -------------------------------------------------------
+
+    def test_delete_note_removes_entry(self):
+        from src.core.mod_notes import upsert_note, delete_note, list_notes
+        upsert_note(self.cfg, entry_id="keep", entry_title="Keep",
+                    mod_type="pnach", text="keep me")
+        upsert_note(self.cfg, entry_id="remove", entry_title="Remove",
+                    mod_type="pnach", text="delete me")
+        result = delete_note(self.cfg, "remove")
+        self.assertTrue(result)
+        remaining = list_notes(self.cfg)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0].entry_id, "keep")
+
+    def test_delete_note_missing_returns_false(self):
+        from src.core.mod_notes import delete_note
+        self.assertFalse(delete_note(self.cfg, "does_not_exist"))
+
+    # --- clear_notes -------------------------------------------------------
+
+    def test_clear_notes_returns_count(self):
+        from src.core.mod_notes import upsert_note, clear_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="y")
+        count = clear_notes(self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_clear_notes_empties_store(self):
+        from src.core.mod_notes import upsert_note, clear_notes, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="x")
+        clear_notes(self.cfg)
+        self.assertEqual(list_notes(self.cfg), [])
+
+    # --- export_notes_csv --------------------------------------------------
+
+    def test_export_csv_creates_file(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="a", entry_title="SH2",
+                    mod_type="texture_pack", text="note")
+        csv_path = export_notes_csv(self.cfg)
+        self.assertTrue(os.path.isfile(csv_path))
+
+    def test_export_csv_has_header_and_row(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="slus_20228", entry_title="SH2 HD",
+                    mod_type="texture_pack", serial="SLUS-20228",
+                    text="Looks great at 4K")
+        csv_path = export_notes_csv(self.cfg)
+        import csv as csv_mod
+        with open(csv_path, newline="", encoding="utf-8") as fh:
+            rows = list(csv_mod.DictReader(fh))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["entry_title"], "SH2 HD")
+        self.assertEqual(rows[0]["serial"], "SLUS-20228")
+        self.assertEqual(rows[0]["text"], "Looks great at 4K")
+
+    def test_export_csv_custom_path(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="x", entry_title="X",
+                    mod_type="other", text="test")
+        out = os.path.join(self.tmpdir, "my_notes.csv")
+        result = export_notes_csv(self.cfg, path=out)
+        self.assertEqual(result, out)
+        self.assertTrue(os.path.isfile(out))

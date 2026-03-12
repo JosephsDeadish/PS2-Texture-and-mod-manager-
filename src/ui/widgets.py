@@ -3534,3 +3534,358 @@ class DownloadHistoryDialog(QDialog):
             "✅ Export Complete",
             f"History exported to:\n{result}",
         )
+
+
+class ModNotesDialog(QDialog):
+    """View, edit, search and manage personal notes for catalogue entries.
+
+    Notes are persisted in ``mod_notes.json`` next to the application
+    executable.  Each note is keyed to a catalogue entry via a stable
+    *entry_id* string.
+
+    The dialog lets the user:
+
+    * Browse all notes with optional mod-type and free-text search filters.
+    * Create a new note from scratch or edit an existing one.
+    * Delete individual notes.
+    * Clear all notes at once.
+    * Export all notes to a CSV file.
+
+    Parameters
+    ----------
+    config:
+        Current :class:`~src.models.mod.AppConfig` instance.
+    parent:
+        Parent widget.
+    """
+
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self._config = config
+        self._notes  = []   # list[NoteEntry] — currently displayed
+        self.setWindowTitle("📝  Mod Notes")
+        self.setMinimumSize(900, 560)
+        self._build_ui()
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Header
+        hdr = QLabel(
+            "Write personal notes about texture packs, PNACH patches and other "
+            "catalogue entries.  Notes are stored locally and are never shared."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        # Filter row
+        filter_row = QHBoxLayout()
+
+        filter_row.addWidget(QLabel("Type:"))
+        self._type_combo = QComboBox()
+        self._type_combo.addItems([
+            "All",
+            "🎨 Texture Pack",
+            "🔧 PNACH Patch",
+            "🖼 Cover Art",
+            "💾 Game Save",
+            "🕹 Cheat",
+            "📦 Other",
+        ])
+        self._type_combo.currentIndexChanged.connect(self._refresh)
+        filter_row.addWidget(self._type_combo)
+
+        filter_row.addWidget(QLabel("Search:"))
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Filter by title or note text…")
+        self._search_edit.textChanged.connect(self._refresh)
+        filter_row.addWidget(self._search_edit, 1)
+
+        filter_row.addStretch()
+        layout.addLayout(filter_row)
+
+        # Splitter: list (left) + editor (right)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # Left — note list
+        left = QWidget()
+        ll   = QVBoxLayout(left)
+        ll.setContentsMargins(0, 0, 0, 0)
+
+        self._list_widget = QListWidget()
+        self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.currentRowChanged.connect(self._on_selection_changed)
+        ll.addWidget(self._list_widget)
+        splitter.addWidget(left)
+
+        # Right — editor panel
+        right = QWidget()
+        rl    = QVBoxLayout(right)
+        rl.setContentsMargins(4, 0, 0, 0)
+
+        self._title_label = QLabel("← Select a note or create a new one")
+        self._title_label.setWordWrap(True)
+        font = self._title_label.font()
+        font.setBold(True)
+        self._title_label.setFont(font)
+        rl.addWidget(self._title_label)
+
+        self._meta_label = QLabel("")
+        self._meta_label.setWordWrap(True)
+        self._meta_label.setTextFormat(Qt.TextFormat.RichText)
+        rl.addWidget(self._meta_label)
+
+        rl.addWidget(QLabel("Note:"))
+        self._text_edit = QTextEdit()
+        self._text_edit.setPlaceholderText("Write your note here…")
+        self._text_edit.setEnabled(False)
+        rl.addWidget(self._text_edit, 1)
+
+        edit_row = QHBoxLayout()
+
+        self._save_btn = QPushButton("💾 Save Note")
+        self._save_btn.setToolTip("Save changes to the current note")
+        self._save_btn.setEnabled(False)
+        self._save_btn.clicked.connect(self._on_save_note)
+        edit_row.addWidget(self._save_btn)
+
+        self._delete_btn = QPushButton("🗑  Delete Note")
+        self._delete_btn.setToolTip("Permanently remove this note")
+        self._delete_btn.setEnabled(False)
+        self._delete_btn.clicked.connect(self._on_delete_note)
+        edit_row.addWidget(self._delete_btn)
+
+        edit_row.addStretch()
+        rl.addLayout(edit_row)
+
+        splitter.addWidget(right)
+        splitter.setStretchFactor(0, 2)
+        splitter.setStretchFactor(1, 3)
+        layout.addWidget(splitter, 1)
+
+        # Bottom row
+        bottom_row = QHBoxLayout()
+
+        new_btn = QPushButton("✏  New Note")
+        new_btn.setToolTip("Create a note for a new catalogue entry")
+        new_btn.clicked.connect(self._on_new_note)
+        bottom_row.addWidget(new_btn)
+
+        clear_btn = QPushButton("🗑  Clear All Notes")
+        clear_btn.setToolTip("Delete every note — this cannot be undone")
+        clear_btn.clicked.connect(self._on_clear)
+        bottom_row.addWidget(clear_btn)
+
+        export_btn = QPushButton("📤 Export CSV")
+        export_btn.setToolTip("Save all notes to a CSV file")
+        export_btn.clicked.connect(self._on_export_csv)
+        bottom_row.addWidget(export_btn)
+
+        bottom_row.addStretch()
+
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.accept)
+        bottom_row.addWidget(close_btn)
+
+        layout.addLayout(bottom_row)
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    _TYPE_MAP = {
+        "All": None,
+        "🎨 Texture Pack": "texture_pack",
+        "🔧 PNACH Patch":  "pnach",
+        "🖼 Cover Art":    "cover_art",
+        "💾 Game Save":    "save",
+        "🕹 Cheat":        "cheat",
+        "📦 Other":        "other",
+    }
+
+    def _refresh(self):
+        type_text   = self._type_combo.currentText()
+        query_text  = self._search_edit.text().strip()
+        type_filter = self._TYPE_MAP.get(type_text)
+
+        try:
+            from src.core.mod_notes import list_notes
+            self._notes = list_notes(
+                self._config,
+                mod_type=type_filter,
+                query=query_text if query_text else None,
+            )
+        except Exception as exc:
+            self._notes = []
+            self._meta_label.setText(f"<i>Could not read notes: {exc}</i>")
+
+        self._list_widget.clear()
+        for note in self._notes:
+            label = f"{note.type_label}  {note.entry_title}"
+            if note.serial:
+                label += f"  [{note.serial}]"
+            self._list_widget.addItem(label)
+
+        # Clear editor
+        self._title_label.setText("← Select a note or create a new one")
+        self._meta_label.setText("")
+        self._text_edit.setEnabled(False)
+        self._text_edit.clear()
+        self._save_btn.setEnabled(False)
+        self._delete_btn.setEnabled(False)
+
+    # ------------------------------------------------------------------
+    def _on_selection_changed(self, row: int):
+        if row < 0 or row >= len(self._notes):
+            self._title_label.setText("← Select a note or create a new one")
+            self._meta_label.setText("")
+            self._text_edit.setEnabled(False)
+            self._text_edit.clear()
+            self._save_btn.setEnabled(False)
+            self._delete_btn.setEnabled(False)
+            return
+
+        note = self._notes[row]
+        self._title_label.setText(note.entry_title)
+        meta_parts = [f"<b>Type:</b> {note.type_label}"]
+        if note.serial:
+            meta_parts.append(f"<b>Serial:</b> {note.serial}")
+        meta_parts.append(f"<b>Created:</b> {note.created_at[:10]}")
+        meta_parts.append(f"<b>Updated:</b> {note.updated_at[:10]}")
+        self._meta_label.setText("&nbsp;&nbsp;".join(meta_parts))
+
+        self._text_edit.setEnabled(True)
+        self._text_edit.setPlainText(note.text)
+        self._save_btn.setEnabled(True)
+        self._delete_btn.setEnabled(True)
+        # Store current note for save/delete ops
+        self._current_note = note
+
+    # ------------------------------------------------------------------
+    def _on_save_note(self):
+        note = getattr(self, "_current_note", None)
+        if note is None:
+            return
+        new_text = self._text_edit.toPlainText()
+        try:
+            from src.core.mod_notes import upsert_note
+            upsert_note(
+                self._config,
+                entry_id    = note.entry_id,
+                entry_title = note.entry_title,
+                mod_type    = note.mod_type,
+                serial      = note.serial,
+                text        = new_text,
+            )
+        except Exception as exc:
+            QMessageBox.critical(self, "Save Failed", str(exc))
+            return
+
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _on_delete_note(self):
+        note = getattr(self, "_current_note", None)
+        if note is None:
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Delete Note",
+            f"Permanently delete the note for:\n\n{note.entry_title}",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        from src.core.mod_notes import delete_note
+        delete_note(self._config, note.entry_id)
+        self._current_note = None
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _on_new_note(self):
+        """Open a small input dialog to bootstrap a new note."""
+        from PyQt6.QtWidgets import QInputDialog
+
+        title, ok = QInputDialog.getText(
+            self, "New Note", "Entry title (mod name):"
+        )
+        if not ok or not title.strip():
+            return
+
+        # Derive a simple slug from the title
+        import re
+        slug = re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_") or "note"
+
+        # Pick the current type filter or default to "other"
+        type_text   = self._type_combo.currentText()
+        mod_type    = self._TYPE_MAP.get(type_text) or "other"
+
+        try:
+            from src.core.mod_notes import upsert_note
+            note = upsert_note(
+                self._config,
+                entry_id    = slug,
+                entry_title = title.strip(),
+                mod_type    = mod_type,
+            )
+        except Exception as exc:
+            QMessageBox.critical(self, "Error", str(exc))
+            return
+
+        self._refresh()
+        # Select the newly created note
+        for i, n in enumerate(self._notes):
+            if n.entry_id == note.entry_id:
+                self._list_widget.setCurrentRow(i)
+                break
+
+    # ------------------------------------------------------------------
+    def _on_clear(self):
+        reply = QMessageBox.question(
+            self,
+            "Clear All Notes",
+            "Delete ALL notes?\n\nThis cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        from src.core.mod_notes import clear_notes
+        count = clear_notes(self._config)
+        self._current_note = None
+        self._refresh()
+        QMessageBox.information(
+            self,
+            "✅ Notes Cleared",
+            f"Removed {count} note{'s' if count != 1 else ''}.",
+        )
+
+    # ------------------------------------------------------------------
+    def _on_export_csv(self):
+        from PyQt6.QtWidgets import QFileDialog as _QFD
+        path, _ = _QFD.getSaveFileName(
+            self,
+            "Export Mod Notes CSV",
+            "mod_notes.csv",
+            "CSV files (*.csv)",
+        )
+        if not path:
+            return
+
+        try:
+            from src.core.mod_notes import export_notes_csv
+            result = export_notes_csv(self._config, path=path)
+        except Exception as exc:
+            QMessageBox.critical(self, "Export Failed", str(exc))
+            return
+
+        QMessageBox.information(
+            self,
+            "✅ Export Complete",
+            f"Notes exported to:\n{result}",
+        )

@@ -1862,6 +1862,16 @@ class BrowsePanel(BasePanel):
         history_btn.clicked.connect(self._open_download_history)
         toolbar.addWidget(history_btn)
 
+        notes_btn = QPushButton("📝 Notes")
+        notes_btn.setToolTip(
+            "Write and manage personal notes for catalogue entries:\n"
+            "• Attach free-text annotations to any texture pack, PNACH or save\n"
+            "• Filter notes by mod type or search text\n"
+            "• Export all notes to a CSV file"
+        )
+        notes_btn.clicked.connect(self._open_mod_notes)
+        toolbar.addWidget(notes_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -2248,6 +2258,12 @@ class BrowsePanel(BasePanel):
         """Open the Download History dialog."""
         from src.ui.widgets import DownloadHistoryDialog
         dlg = DownloadHistoryDialog(self.config, self)
+        dlg.exec()
+
+    def _open_mod_notes(self):
+        """Open the Mod Notes dialog."""
+        from src.ui.widgets import ModNotesDialog
+        dlg = ModNotesDialog(self.config, self)
         dlg.exec()
 
     def _open_url(self, url: str):
