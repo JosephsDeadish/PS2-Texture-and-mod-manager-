@@ -56,3 +56,6 @@ desktop.ini
 
 # Application data (user-specific, not committed)
 *.json.bak
+data/mods.json
+data/thumbnails/
+user_catalogue/*.json
