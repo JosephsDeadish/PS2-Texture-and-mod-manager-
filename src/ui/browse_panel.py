@@ -1831,6 +1831,17 @@ class BrowsePanel(BasePanel):
         create_card_btn.clicked.connect(self._open_custom_card_dialog)
         toolbar.addWidget(create_card_btn)
 
+        conflict_btn = QPushButton("⚠ Resolve Conflicts")
+        conflict_btn.setToolTip(
+            "Scan your installed PCSX2 content for conflicts:\n"
+            "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
+            "• PNACH patches writing to the same memory address\n"
+            "• Multiple cover-art images for the same serial\n"
+            "• Merged texture packs that may override each other"
+        )
+        conflict_btn.clicked.connect(self._open_conflict_resolver)
+        toolbar.addWidget(conflict_btn)
+
         reload_btn = QPushButton("🔄 Reload")
         reload_btn.setToolTip("Clear all filters and reload the catalogue")
         reload_btn.clicked.connect(self._reload_catalogue)
@@ -2199,6 +2210,12 @@ class BrowsePanel(BasePanel):
         """Open the Custom Card creator dialog."""
         from src.ui.widgets import CustomCardDialog
         dlg = CustomCardDialog(self)
+        dlg.exec()
+
+    def _open_conflict_resolver(self):
+        """Open the Conflict Resolver dialog."""
+        from src.ui.widgets import ConflictResolverDialog
+        dlg = ConflictResolverDialog(self.config, self)
         dlg.exec()
 
     def _open_url(self, url: str):

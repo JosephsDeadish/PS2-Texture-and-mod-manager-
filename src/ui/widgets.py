@@ -2725,3 +2725,257 @@ class InstalledScannerDialog(QDialog):
 
         dlg = CustomCardDialog(self, prefill=prefill)
         dlg.exec()
+
+
+# ---------------------------------------------------------------------------
+# ConflictResolverDialog — detect and resolve conflicts between installed content
+# ---------------------------------------------------------------------------
+
+class ConflictResolverDialog(QDialog):
+    """Scans installed PCSX2 content for conflicts — situations where two or
+    more items would interfere with each other at runtime.
+
+    Detected conflict types include:
+
+    * Duplicate CRC ``.pnach`` files in both ``cheats/`` and ``cheats_ws/``
+    * Two ``.pnach`` files patching the **same EE memory address** for the same CRC
+    * Multiple cover-art images for the same PS2 serial
+    * Multiple texture sub-packs merged into one replacements folder
+
+    Each conflict shows its severity (❌ Error / ⚠️ Warning / ℹ️ Info), a
+    detailed description, and a suggested resolution.  Where safe, an
+    **Auto-fix** button removes redundant files automatically.
+
+    Parameters
+    ----------
+    config:
+        Current :class:`~src.models.mod.AppConfig` instance providing PCSX2 paths.
+    parent:
+        Parent widget.
+    """
+
+    def __init__(self, config, parent=None):
+        super().__init__(parent)
+        self._config    = config
+        self._conflicts = []       # list[Conflict]
+        self.setWindowTitle("⚠  Conflict Resolver")
+        self.setMinimumSize(860, 560)
+        self._build_ui()
+        self._run_scan()
+
+    # ------------------------------------------------------------------
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # Header
+        hdr = QLabel(
+            "PS2 Mod Manager has scanned your installed content for conflicts.\n"
+            "Select a conflict from the list on the left to see details and\n"
+            "suggested resolutions on the right."
+        )
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
+
+        # Splitter: conflict list (left) + detail panel (right)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        # --- Left: list of conflicts ---
+        left = QWidget()
+        left_layout = QVBoxLayout(left)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._summary_label = QLabel("")
+        self._summary_label.setWordWrap(True)
+        left_layout.addWidget(self._summary_label)
+
+        self._list_widget = QListWidget()
+        self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.currentRowChanged.connect(self._on_conflict_selected)
+        left_layout.addWidget(self._list_widget)
+
+        rescan_btn = QPushButton("🔄 Re-scan")
+        rescan_btn.clicked.connect(self._run_scan)
+        left_layout.addWidget(rescan_btn)
+
+        splitter.addWidget(left)
+
+        # --- Right: detail panel ---
+        right = QWidget()
+        right_layout = QVBoxLayout(right)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._detail_label = QLabel("← Select a conflict from the list")
+        self._detail_label.setWordWrap(True)
+        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self._detail_label.setTextFormat(Qt.TextFormat.RichText)
+        right_layout.addWidget(self._detail_label, 1)
+
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        right_layout.addWidget(sep)
+
+        # Resolution row
+        res_lbl = QLabel("<b>Suggested Resolution:</b>")
+        right_layout.addWidget(res_lbl)
+
+        self._resolution_label = QLabel("")
+        self._resolution_label.setWordWrap(True)
+        right_layout.addWidget(self._resolution_label)
+
+        # Files involved
+        files_lbl = QLabel("<b>Files involved:</b>")
+        right_layout.addWidget(files_lbl)
+
+        self._files_list = QListWidget()
+        self._files_list.setMaximumHeight(110)
+        self._files_list.setAlternatingRowColors(True)
+        right_layout.addWidget(self._files_list)
+
+        # Action buttons
+        action_row = QHBoxLayout()
+
+        self._autofix_btn = QPushButton("🔧 Auto-Fix")
+        self._autofix_btn.setToolTip("Automatically resolve this conflict (where safe)")
+        self._autofix_btn.setEnabled(False)
+        self._autofix_btn.clicked.connect(self._on_auto_fix)
+        action_row.addWidget(self._autofix_btn)
+
+        open_folder_btn = QPushButton("📂 Open Folder")
+        open_folder_btn.setToolTip("Open the folder containing the conflicting file(s)")
+        open_folder_btn.clicked.connect(self._on_open_folder)
+        action_row.addWidget(open_folder_btn)
+
+        action_row.addStretch()
+        right_layout.addLayout(action_row)
+
+        splitter.addWidget(right)
+        splitter.setSizes([280, 560])
+        layout.addWidget(splitter, 1)
+
+        # Close button
+        close_btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        close_btns.rejected.connect(self.reject)
+        layout.addWidget(close_btns)
+
+    # ------------------------------------------------------------------
+    def _run_scan(self):
+        self._list_widget.clear()
+        self._detail_label.setText("⏳ Scanning for conflicts…")
+        self._resolution_label.setText("")
+        self._files_list.clear()
+        self._autofix_btn.setEnabled(False)
+        QApplication.processEvents()
+
+        try:
+            from src.core.conflict_resolver import resolve_all_conflicts
+        except Exception as exc:
+            self._detail_label.setText(f"Scan failed: {exc}")
+            return
+
+        self._conflicts = resolve_all_conflicts(self._config)
+
+        if not self._conflicts:
+            self._summary_label.setText("✅ No conflicts found!")
+            self._detail_label.setText(
+                "✅ No conflicts detected.\n\n"
+                "All installed content appears consistent.  PNACH files, "
+                "texture packs, and cover art images are not conflicting with "
+                "each other."
+            )
+            return
+
+        errors   = sum(1 for c in self._conflicts if c.severity == "error")
+        warnings = sum(1 for c in self._conflicts if c.severity == "warning")
+        infos    = sum(1 for c in self._conflicts if c.severity == "info")
+
+        parts = []
+        if errors:
+            parts.append(f"{errors} error(s)")
+        if warnings:
+            parts.append(f"{warnings} warning(s)")
+        if infos:
+            parts.append(f"{infos} info")
+        self._summary_label.setText(f"Found: {', '.join(parts)}")
+
+        for conflict in self._conflicts:
+            label = f"{conflict.severity_label}  {conflict.title}"
+            item = QListWidgetItem(label)
+            item.setForeground(
+                __import__('PyQt6.QtGui', fromlist=['QColor']).QColor(conflict.severity_color)
+            )
+            self._list_widget.addItem(item)
+
+        self._detail_label.setText(
+            f"Found <b>{len(self._conflicts)}</b> conflict(s).  "
+            "Select one for details."
+        )
+
+    # ------------------------------------------------------------------
+    def _on_conflict_selected(self, row: int):
+        if row < 0 or row >= len(self._conflicts):
+            return
+
+        conflict = self._conflicts[row]
+
+        color = conflict.severity_color
+        detail_html = (
+            f"<b style='color:{color}'>{conflict.severity_label}</b><br>"
+            f"<b>{conflict.title}</b><br><br>"
+            f"{conflict.description.replace(chr(10), '<br>')}"
+        )
+        self._detail_label.setText(detail_html)
+        self._resolution_label.setText(conflict.resolution)
+
+        self._files_list.clear()
+        for path in conflict.items:
+            self._files_list.addItem(str(path))
+
+        self._autofix_btn.setEnabled(conflict.can_auto_fix)
+
+    # ------------------------------------------------------------------
+    def _on_auto_fix(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._conflicts):
+            return
+
+        conflict = self._conflicts[row]
+        reply = QMessageBox.question(
+            self,
+            "Auto-Fix Conflict",
+            f"This will:\n{conflict.resolution}\n\nProceed?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            from src.core.conflict_resolver import auto_fix_conflict
+            ok, message = auto_fix_conflict(conflict)
+        except Exception as exc:
+            QMessageBox.critical(self, "Auto-Fix Error", str(exc))
+            return
+
+        if ok:
+            QMessageBox.information(self, "✅ Fixed", message)
+            self._run_scan()
+        else:
+            QMessageBox.warning(self, "Auto-Fix Failed", message)
+
+    # ------------------------------------------------------------------
+    def _on_open_folder(self):
+        row = self._list_widget.currentRow()
+        if row < 0 or row >= len(self._conflicts):
+            return
+
+        conflict = self._conflicts[row]
+        if not conflict.items:
+            return
+
+        from PyQt6.QtGui import QDesktopServices
+        from PyQt6.QtCore import QUrl
+
+        folder = conflict.items[0]
+        if folder.is_file():
+            folder = folder.parent
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))

@@ -5953,3 +5953,334 @@ class TestCustomCardBuilder(unittest.TestCase):
         ids = {generate_id("Pack", "SCUS-97264") for _ in range(20)}
         # All 20 should be unique (random suffix)
         self.assertGreater(len(ids), 1)
+
+
+# ===========================================================================
+# TestConflictResolver
+# ===========================================================================
+
+class TestConflictResolver(unittest.TestCase):
+    """Tests for src.core.conflict_resolver — conflict detection and resolution."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # -----------------------------------------------------------------------
+    # Module import
+    # -----------------------------------------------------------------------
+
+    def test_import(self):
+        from src.core.conflict_resolver import (
+            Conflict, ConflictSeverity,
+            resolve_pnach_conflicts,
+            resolve_cover_art_conflicts,
+            resolve_texture_conflicts,
+            resolve_all_conflicts,
+            auto_fix_conflict,
+        )
+
+    # -----------------------------------------------------------------------
+    # Conflict dataclass
+    # -----------------------------------------------------------------------
+
+    def test_conflict_severity_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.ERROR,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("❌", c.severity_label)
+
+    def test_conflict_severity_warning_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.WARNING,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("⚠", c.severity_label)
+
+    def test_conflict_severity_info_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.INFO,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("ℹ", c.severity_label)
+
+    def test_conflict_item_names(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        p = Path("/tmp/F0A235B4.pnach")
+        c = Conflict(
+            conflict_type="pnach_duplicate_crc",
+            severity=ConflictSeverity.WARNING,
+            title="Test",
+            description="desc",
+            items=[p],
+        )
+        self.assertEqual(c.item_names, ["F0A235B4.pnach"])
+
+    def test_conflict_severity_color_not_empty(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        for sev in ConflictSeverity:
+            c = Conflict(conflict_type="t", severity=sev, title="t", description="d")
+            self.assertTrue(c.severity_color.startswith("#"))
+
+    # -----------------------------------------------------------------------
+    # resolve_pnach_conflicts — no conflict (empty dirs)
+    # -----------------------------------------------------------------------
+
+    def test_pnach_conflict_empty_dirs(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir  = os.path.join(self.tmpdir, "cheats")
+        cheats_ws   = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    def test_pnach_conflict_missing_dirs(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        conflicts = resolve_pnach_conflicts("", "")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_pnach_conflicts — duplicate CRC across folders
+    # -----------------------------------------------------------------------
+
+    def test_pnach_duplicate_crc_detected(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "AABBCCDD"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            "// patch A\npatch=1,EE,00100000,word,12345678\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            "// patch B\npatch=1,EE,00200000,word,FFFFFFFF\n"
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertIn(crc, conflicts[0].title)
+        # Different addresses → warning, not error
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.WARNING)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
+        self.assertEqual(len(conflicts[0].items), 2)
+
+    def test_pnach_address_clash_detected(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "11223344"
+        shared_addr = "00300000"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{shared_addr},word,12345678\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{shared_addr},word,DEADBEEF\n"
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.ERROR)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
+        self.assertIn(shared_addr.upper(), conflicts[0].description)
+
+    def test_pnach_non_crc_files_ignored(self):
+        """Files that are not 8-hex-digit CRC filenames must be ignored."""
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        Path(os.path.join(cheats_dir, "README.txt")).write_text("hi")
+        Path(os.path.join(cheats_ws, "mycheat.pnach")).write_text("// not a CRC name")
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    def test_pnach_unique_crcs_no_conflict(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        Path(os.path.join(cheats_dir,  "AABBCCDD.pnach")).write_text("patch=1,EE,00100000,word,0\n")
+        Path(os.path.join(cheats_ws, "11223344.pnach")).write_text("patch=1,EE,00200000,word,0\n")
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_cover_art_conflicts
+    # -----------------------------------------------------------------------
+
+    def test_cover_art_no_duplicates(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "SCES-50003.png")).write_bytes(b"PNG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_cover_art_duplicate_detected(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts, ConflictSeverity
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "SLUS-20062.jpg")).write_bytes(b"JPG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
+        self.assertEqual(conflicts[0].conflict_type, "cover_art_duplicate")
+        self.assertIn("SLUS-20062", conflicts[0].title)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_cover_art_non_serial_ignored(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "background.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "background.jpg")).write_bytes(b"JPG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_cover_art_missing_dir(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        conflicts = resolve_cover_art_conflicts("")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_texture_conflicts
+    # -----------------------------------------------------------------------
+
+    def test_texture_no_conflict_single_pack(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts
+        tex_dir = os.path.join(self.tmpdir, "textures")
+        repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
+        os.makedirs(repl)
+        Path(os.path.join(repl, "texture.dds")).write_bytes(b"DDS")
+        conflicts = resolve_texture_conflicts(tex_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_texture_merged_packs_detected(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts, ConflictSeverity
+        tex_dir = os.path.join(self.tmpdir, "textures")
+        repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
+        os.makedirs(os.path.join(repl, "PackAlpha"))
+        os.makedirs(os.path.join(repl, "PackBeta"))
+        os.makedirs(os.path.join(repl, "PackGamma"))
+        conflicts = resolve_texture_conflicts(tex_dir)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
+        self.assertEqual(conflicts[0].conflict_type, "texture_pack_merged")
+        self.assertIn("SLUS-20062", conflicts[0].title)
+
+    def test_texture_missing_dir(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts
+        conflicts = resolve_texture_conflicts("")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_all_conflicts — empty config
+    # -----------------------------------------------------------------------
+
+    def test_resolve_all_empty_config(self):
+        from src.core.conflict_resolver import resolve_all_conflicts
+
+        class EmptyConfig:
+            pnach_path     = ""
+            cheats_path    = ""
+            cover_art_path = ""
+            textures_path  = ""
+
+        conflicts = resolve_all_conflicts(EmptyConfig())
+        self.assertEqual(conflicts, [])
+
+    def test_resolve_all_sorted_severity(self):
+        """resolve_all_conflicts must sort errors before warnings before infos."""
+        from src.core.conflict_resolver import resolve_all_conflicts, ConflictSeverity
+
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        os.makedirs(covers_dir)
+
+        # Create an address clash (ERROR)
+        crc = "DEADBEEF"
+        addr = "00400000"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{addr},word,11111111\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{addr},word,22222222\n"
+        )
+
+        # Create a cover art duplicate (INFO)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"P")
+        Path(os.path.join(covers_dir, "SLUS-20062.jpg")).write_bytes(b"J")
+
+        class Cfg:
+            pnach_path     = cheats_dir
+            cheats_path    = cheats_ws
+            cover_art_path = covers_dir
+            textures_path  = ""
+
+        conflicts = resolve_all_conflicts(Cfg())
+        self.assertGreaterEqual(len(conflicts), 2)
+        severities = [c.severity for c in conflicts]
+        # error should come before info
+        error_idx = next(i for i, s in enumerate(severities) if s == ConflictSeverity.ERROR)
+        info_idx  = next(i for i, s in enumerate(severities) if s == ConflictSeverity.INFO)
+        self.assertLess(error_idx, info_idx)
+
+    # -----------------------------------------------------------------------
+    # auto_fix_conflict — cover art
+    # -----------------------------------------------------------------------
+
+    def test_auto_fix_cover_art_removes_non_png(self):
+        from src.core.conflict_resolver import (
+            resolve_cover_art_conflicts, auto_fix_conflict
+        )
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        png = Path(os.path.join(covers_dir, "SLUS-20062.png"))
+        jpg = Path(os.path.join(covers_dir, "SLUS-20062.jpg"))
+        png.write_bytes(b"PNG")
+        jpg.write_bytes(b"JPG")
+
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(len(conflicts), 1)
+        ok, msg = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok)
+        self.assertTrue(png.exists(), "PNG must be kept")
+        self.assertFalse(jpg.exists(), "JPG must be deleted")
+
+    def test_auto_fix_non_fixable_returns_false(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity, auto_fix_conflict
+        c = Conflict(
+            conflict_type="pnach_duplicate_crc",
+            severity=ConflictSeverity.WARNING,
+            title="test",
+            description="desc",
+            can_auto_fix=False,
+        )
+        ok, msg = auto_fix_conflict(c)
+        self.assertFalse(ok)
