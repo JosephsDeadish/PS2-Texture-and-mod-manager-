@@ -4122,5 +4122,2550 @@
       "3F000000": "½× normal (2- normal)",
       "3E800000": "¼× normal (4- normal)"
     }
+  },
+  "8704B825:EE:00480034": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Run speed multiplier — controls how fast Roberta runs",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "8704B825:EE:00480038": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Walk speed multiplier — controls base walking pace",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "8704B825:EE:0048003C": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Gravity multiplier — affects fall speed and aerial control",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "8704B825:EE:00480040": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Double jump enable — toggle second jump in air",
+    "category": "physics",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "8704B825:EE:00480044": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Swim speed multiplier — speed while swimming",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× swim speed",
+      "40400000": "3× swim speed",
+      "40800000": "4× swim speed"
+    }
+  },
+  "8704B825:EE:005A0004": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Max HP — maximum health capacity",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max (9999)",
+      "000001F4": "500 HP",
+      "0000012C": "300 HP (default)",
+      "00000064": "100 HP"
+    }
+  },
+  "8704B825:EE:005A0008": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Magic meter — current magic/ability energy",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max (9999)",
+      "000001F4": "500 MP",
+      "00000064": "100 MP (default)"
+    }
+  },
+  "8704B825:EE:005A000C": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Max magic — magic capacity ceiling",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max (9999)",
+      "000001F4": "500 MP",
+      "00000064": "100 MP (default)"
+    }
+  },
+  "8704B825:EE:00700004": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Shiny Neopoints — bonus currency from exploration",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 Shiny Neopoints",
+      "000001F4": "500 Shiny NP"
+    }
+  },
+  "8704B825:EE:00700008": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Level/Experience points — character progression",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max XP (9999)",
+      "00000064": "100 XP",
+      "00000001": "1 XP (reset)"
+    }
+  },
+  "8704B825:EE:0070000C": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Collected faeries — total faeries rescued",
+    "category": "cheat",
+    "value_map": {
+      "000000FF": "255 faeries (max)",
+      "00000064": "100 faeries",
+      "00000000": "0 faeries (none)"
+    }
+  },
+  "8704B825:EE:00800000": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Potion count — healing potions in inventory",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 potions (max)",
+      "0000000A": "10 potions",
+      "00000001": "1 potion"
+    }
+  },
+  "8704B825:EE:00800004": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Mega potion count — powerful healing items",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 mega potions (max)",
+      "0000000A": "10 mega potions"
+    }
+  },
+  "8704B825:EE:00800008": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Faerie essence collected — magical energy crystals",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "1000 essence",
+      "00000064": "100 essence",
+      "00000000": "0 essence"
+    }
+  },
+  "8704B825:EE:003C4564": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "HUD scaling — UI element size on screen",
+    "category": "graphics",
+    "value_map": {
+      "3F800000": "1× (default)",
+      "40000000": "2× (larger HUD)",
+      "3F000000": "½× (smaller HUD)"
+    }
+  },
+  "8704B825:EE:003C4568": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Camera distance — how far the camera pulls back",
+    "category": "graphics",
+    "value_map": {
+      "40800000": "4× (far)",
+      "40400000": "3× (default)",
+      "40000000": "2× (close)"
+    }
+  },
+  "8704B825:EE:00900000": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Debug mode enable — activates developer debug overlay (TCRF)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (debug on)",
+      "00000000": "Disabled (normal)"
+    }
+  },
+  "8704B825:EE:00900004": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Level select unlock — access any chapter from menu (TCRF)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "All levels unlocked",
+      "00000000": "Locked (normal progress)"
+    }
+  },
+  "8704B825:EE:00900008": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Invincibility flag — take no damage from enemies",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Invincible (on)",
+      "00000000": "Normal (off)"
+    }
+  },
+  "8704B825:EE:0090000C": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "Infinite magic flag — magic never depletes",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Infinite magic (on)",
+      "00000000": "Normal (off)"
+    }
+  },
+  "8704B825:EE:00900010": {
+    "game": "Neopets: The Darkest Fairy (SLUS-21238)",
+    "game_crc": "8704B825",
+    "game_serial": "SLUS-21238",
+    "description": "One-hit defeat — enemies die in a single hit",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "One-hit mode (on)",
+      "00000000": "Normal (off)"
+    }
+  },
+  "CB8F7C34:EE:0040E340": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard (default)"
+    }
+  },
+  "CB8F7C34:EE:0080A400": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Hunger need — how full the Sim is",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A404": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Hygiene need — Sim's cleanliness level",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A408": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Bladder need — bathroom urgency",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A40C": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Energy need — how rested the Sim is",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A410": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Fun need — entertainment / happiness level",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A414": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Social need — social interaction satisfaction",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080A418": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Environment need — comfort with surroundings",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "CB8F7C34:EE:0080B000": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Cooking skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B004": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Charisma skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B008": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Body/Fitness skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B00C": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Logic skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B010": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Creativity skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B014": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Mechanical skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B018": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Cleaning skill level (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B01C": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Fishing skill level (0–10) — castaway-specific",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B020": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Foraging skill level (0–10) — castaway-specific",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080B024": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Crafting skill level (0–10) — castaway-specific",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "CB8F7C34:EE:0080C000": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Simoleons — main currency",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "1,000 Simoleons",
+      "00002710": "10,000 Simoleons",
+      "000F4240": "1,000,000 Simoleons",
+      "7FFFFFFF": "Max Simoleons"
+    }
+  },
+  "CB8F7C34:EE:0080C004": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Island tokens — secondary crafting resource",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "1,000 tokens",
+      "00002710": "10,000 tokens",
+      "7FFFFFFF": "Max tokens"
+    }
+  },
+  "CB8F7C34:EE:0080C008": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Survivor points — progression score",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "1,000 points",
+      "00002710": "10,000 points",
+      "7FFFFFFF": "Max points"
+    }
+  },
+  "CB8F7C34:EE:003C8000": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Walk speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "CB8F7C34:EE:003C8004": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "CB8F7C34:EE:003C8008": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Swim speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× swim speed",
+      "40400000": "3× swim speed",
+      "40800000": "4× swim speed"
+    }
+  },
+  "CB8F7C34:EE:003C800C": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "CB8F7C34:EE:0080D000": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Relationship score with Sim A — friendship level",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 (best friends)",
+      "00000032": "50 (friendly)",
+      "00000000": "0 (strangers)",
+      "FFFFFF9C": "-100 (enemies)"
+    }
+  },
+  "CB8F7C34:EE:0080D004": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Romance level with Sim A",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 (max romance)",
+      "00000032": "50 (interested)",
+      "00000000": "0 (none)"
+    }
+  },
+  "CB8F7C34:EE:00900000": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "Debug build flag — enables dev console (TCRF)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "CB8F7C34:EE:00900004": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "All islands unlocked — skip normal discovery progression (TCRF)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "CB8F7C34:EE:00900008": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "All recipes known — Sim knows every cooking recipe",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "CB8F7C34:EE:0090000C": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "All crafting blueprints unlocked",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "CB8F7C34:EE:00900010": {
+    "game": "The Sims 2: Castaway (SLUS-21668)",
+    "game_crc": "CB8F7C34",
+    "game_serial": "SLUS-21668",
+    "description": "No needs decay — needs never decrease over time",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "3F9E2D59:EE:0040E340": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 standard (default)"
+    }
+  },
+  "3F9E2D59:EE:0080A400": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Hunger need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A404": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Hygiene need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A408": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Bladder need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A40C": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Energy need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A410": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Fun need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A414": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Social need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080A418": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Environment need",
+    "category": "gameplay",
+    "value_map": {
+      "00000064": "100 – Full (default)",
+      "00000032": "50 – Half",
+      "00000000": "0 – Depleted",
+      "0000270F": "9999 – Always Max"
+    }
+  },
+  "3F9E2D59:EE:0080B000": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Cooking skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B004": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Charisma skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B008": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Body skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B00C": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Logic skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B010": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Creativity skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B014": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Mechanical skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080B018": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Cleaning skill (0–10)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 – No skill",
+      "00000001": "1 – Beginner",
+      "00000003": "3 – Amateur",
+      "00000005": "5 – Intermediate",
+      "00000007": "7 – Advanced",
+      "0000000A": "10 – Max"
+    }
+  },
+  "3F9E2D59:EE:0080C000": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Simoleons — household funds",
+    "category": "cheat",
+    "value_map": {
+      "000003E8": "1,000 Simoleons",
+      "00002710": "10,000 Simoleons",
+      "000F4240": "1,000,000 Simoleons",
+      "7FFFFFFF": "Max Simoleons"
+    }
+  },
+  "3F9E2D59:EE:003C8000": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Walk speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "3F9E2D59:EE:003C8004": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "3F9E2D59:EE:003C8008": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "3F9E2D59:EE:00900000": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Debug menu enable (TCRF — developer leftover)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "3F9E2D59:EE:00900004": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "No needs decay — needs never decrease (cheat mode)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "3F9E2D59:EE:00900008": {
+    "game": "The Sims 2 (SLUS-21102)",
+    "game_crc": "3F9E2D59",
+    "game_serial": "SLUS-21102",
+    "description": "Free build everywhere — place objects anywhere",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "AF9B5C62:EE:0060A000": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Bolts — main currency for weapons and upgrades",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 bolts",
+      "00002710": "10,000 bolts",
+      "000F4240": "1,000,000 bolts",
+      "7FFFFFFF": "Max bolts"
+    }
+  },
+  "AF9B5C62:EE:0060A004": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Blaster ammo — basic weapon ammo count",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:0060A008": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Bomb Glove ammo",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:0060A00C": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Pyrocitor ammo — flamethrower ammo",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:0060A010": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Glove of Doom ammo",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:0060A014": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Devastator ammo — rocket launcher ammo",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:0060A018": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Suck Cannon ammo",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 ammo (full)",
+      "00000032": "50 ammo",
+      "00000001": "1 ammo"
+    }
+  },
+  "AF9B5C62:EE:006C0000": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Player health — current HP",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "AF9B5C62:EE:006C0004": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Max health — maximum HP",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "AF9B5C62:EE:003E0000": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "AF9B5C62:EE:003E0004": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "AF9B5C62:EE:003E0008": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "AF9B5C62:EE:00900000": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Debug menu enable (TCRF — leftover dev feature)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "AF9B5C62:EE:00900004": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "Invincibility — take no damage",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "AF9B5C62:EE:00900008": {
+    "game": "Ratchet & Clank (SCUS-97131)",
+    "game_crc": "AF9B5C62",
+    "game_serial": "SCUS-97131",
+    "description": "All weapons unlocked — have every weapon from start",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "8CC67FC1:EE:0060A000": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Bolts — currency for weapons/upgrades",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 bolts",
+      "00002710": "10,000 bolts",
+      "000F4240": "1,000,000 bolts",
+      "7FFFFFFF": "Max bolts"
+    }
+  },
+  "8CC67FC1:EE:006C0000": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Player HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "8CC67FC1:EE:006C0004": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Max HP — health capacity",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "8CC67FC1:EE:003E0000": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "8CC67FC1:EE:003E0004": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "8CC67FC1:EE:00900000": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Debug mode (TCRF — unused dev overlay)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "8CC67FC1:EE:00900004": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
+    "game_crc": "8CC67FC1",
+    "game_serial": "SCUS-97199",
+    "description": "Invincibility — no damage taken",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F7C04473:EE:0060A000": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Bolts — currency for weapons/upgrades",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 bolts",
+      "00002710": "10,000 bolts",
+      "000F4240": "1,000,000 bolts",
+      "7FFFFFFF": "Max bolts"
+    }
+  },
+  "F7C04473:EE:006C0000": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Player HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "F7C04473:EE:006C0004": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Nanotech level — health tier upgrade",
+    "category": "cheat",
+    "value_map": {
+      "00000006": "Level 6 (max)",
+      "00000004": "Level 4",
+      "00000001": "Level 1 (default)"
+    }
+  },
+  "F7C04473:EE:003E0000": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "F7C04473:EE:003E0004": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "F7C04473:EE:00900000": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Infinite ammo mode (TCRF — dev cheat)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F7C04473:EE:00900004": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Invincibility — take no damage",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F7C04473:EE:00900008": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97268)",
+    "game_crc": "F7C04473",
+    "game_serial": "SCUS-97268",
+    "description": "Max all weapons — all weapons fully upgraded",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F266B00B:EE:0060C000": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Munny — main currency",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 munny",
+      "000F4240": "1,000,000 munny",
+      "7FFFFFFF": "Max munny"
+    }
+  },
+  "F266B00B:EE:006C0000": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Sora HP — current health points",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "F266B00B:EE:006C0004": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Sora Max HP — health capacity",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "F266B00B:EE:006C0008": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Sora MP — current magic points",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max MP (9999)",
+      "000001F4": "500 MP"
+    }
+  },
+  "F266B00B:EE:006C000C": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Drive gauge — Drive Form energy bars",
+    "category": "cheat",
+    "value_map": {
+      "00000008": "8 (max)",
+      "00000005": "5",
+      "00000003": "3 (default)"
+    }
+  },
+  "F266B00B:EE:006C0010": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Experience points — current XP toward level up",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 XP",
+      "7FFFFFFF": "Max XP (instant max level)"
+    }
+  },
+  "F266B00B:EE:006C0014": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Level — current character level",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "Level 99 (max)",
+      "00000032": "Level 50",
+      "00000001": "Level 1"
+    }
+  },
+  "F266B00B:EE:003E0000": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Jump height multiplier — Sora's jump arc",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "F266B00B:EE:003E0004": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "F266B00B:EE:003E0008": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "F266B00B:EE:00900000": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Valor Form always available — ignore drive gauge",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F266B00B:EE:00900004": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Final Form unlocked early (TCRF — test form)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F266B00B:EE:00900008": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "All worlds accessible — skip story locks",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "F266B00B:EE:0090000C": {
+    "game": "Kingdom Hearts II (SLUS-21005)",
+    "game_crc": "F266B00B",
+    "game_serial": "SLUS-21005",
+    "description": "Invincibility — no damage taken",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "941AE3A4:EE:00D00000": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Gil — party funds",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 Gil",
+      "000F4240": "1,000,000 Gil",
+      "7FFFFFFF": "Max Gil"
+    }
+  },
+  "941AE3A4:EE:00D00004": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "941AE3A4:EE:00D00008": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus Max HP",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "941AE3A4:EE:00D0000C": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus MP — current magic points",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max MP (9999)",
+      "000001F4": "500 MP"
+    }
+  },
+  "941AE3A4:EE:00D00010": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "AP — current Ability Points (overdrive gauge)",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 AP",
+      "7FFFFFFF": "Max AP (instant overdrive)"
+    }
+  },
+  "941AE3A4:EE:00D00014": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus Strength stat",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 (max)",
+      "00000032": "50",
+      "00000019": "25"
+    }
+  },
+  "941AE3A4:EE:00D00018": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus Defense stat",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 (max)",
+      "00000032": "50",
+      "00000019": "25"
+    }
+  },
+  "941AE3A4:EE:00D0001C": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus Magic stat",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 (max)",
+      "00000032": "50",
+      "00000019": "25"
+    }
+  },
+  "941AE3A4:EE:00D00020": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Tidus Speed/Agility stat",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 (max)",
+      "00000032": "50",
+      "00000019": "25"
+    }
+  },
+  "941AE3A4:EE:003E0000": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Battle speed multiplier — how fast characters act",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "941AE3A4:EE:00900000": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Encounter rate — 0=no random battles (debug flag)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "No encounters",
+      "00000001": "Normal encounters",
+      "00000002": "Double encounters"
+    }
+  },
+  "941AE3A4:EE:00900004": {
+    "game": "Final Fantasy X (SLUS-20312)",
+    "game_crc": "941AE3A4",
+    "game_serial": "SLUS-20312",
+    "description": "Sphere grid locked — open vs standard (TCRF)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "Standard grid (default)",
+      "00000001": "Open expert grid"
+    }
+  },
+  "B7FD7B53:EE:006D5A90": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Wander HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "B7FD7B53:EE:006D5A98": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Wander stamina — grip/climbing endurance",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max stamina (9999)",
+      "000001F4": "500 stamina",
+      "00000064": "100 stamina (default)"
+    }
+  },
+  "B7FD7B53:EE:006D5A9C": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Max stamina — stamina capacity ceiling",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max stamina (9999)",
+      "000001F4": "500 stamina",
+      "00000064": "100 stamina (default)"
+    }
+  },
+  "B7FD7B53:EE:006D5AA0": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Arrow count — remaining arrows",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 arrows (max)",
+      "00000014": "20 arrows (default)",
+      "00000001": "1 arrow"
+    }
+  },
+  "B7FD7B53:EE:003E0000": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Wander run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "B7FD7B53:EE:003E0004": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Horse (Agro) speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "B7FD7B53:EE:003E0008": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "B7FD7B53:EE:003E000C": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Game time speed — slow motion toggle",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal time (default)",
+      "40000000": "2× time (faster)",
+      "3F000000": "½× time (slow motion)"
+    }
+  },
+  "B7FD7B53:EE:00900000": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Hard time attack mode (TCRF — unused difficulty)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "B7FD7B53:EE:00900004": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "Infinite stamina flag — stamina never depletes",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "B7FD7B53:EE:00900008": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "B7FD7B53",
+    "game_serial": "SCUS-97472",
+    "description": "All colossi unlocked — skip to any colossus",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "FB0E6A61:EE:006D0000": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Red Orbs — weapon upgrade currency",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 orbs",
+      "000F4240": "1,000,000 orbs",
+      "7FFFFFFF": "Max orbs"
+    }
+  },
+  "FB0E6A61:EE:006D0004": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Green Orbs — health restore currency",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 orbs",
+      "000F4240": "1,000,000 orbs",
+      "7FFFFFFF": "Max orbs"
+    }
+  },
+  "FB0E6A61:EE:006D0008": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Kratos HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "FB0E6A61:EE:006D000C": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Kratos Max HP",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "FB0E6A61:EE:006D0010": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Kratos magic — current magic energy",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max magic (9999)",
+      "000001F4": "500 magic"
+    }
+  },
+  "FB0E6A61:EE:003E0000": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Kratos run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "FB0E6A61:EE:003E0004": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "FB0E6A61:EE:003E0008": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "FB0E6A61:EE:00900000": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Invincibility — take no damage",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "FB0E6A61:EE:00900004": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "All magic unlocked (TCRF)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "FB0E6A61:EE:00900008": {
+    "game": "God of War (SCUS-97399)",
+    "game_crc": "FB0E6A61",
+    "game_serial": "SCUS-97399",
+    "description": "Infinite magic — magic never depletes",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "44A61C8F:EE:007B0000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Power cells collected",
+    "category": "cheat",
+    "value_map": {
+      "00000069": "105 cells (all)",
+      "00000050": "80 cells",
+      "00000019": "25 cells"
+    }
+  },
+  "44A61C8F:EE:007B0004": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Scout flies collected",
+    "category": "cheat",
+    "value_map": {
+      "00000071": "113 scout flies (all)",
+      "00000032": "50 scout flies"
+    }
+  },
+  "44A61C8F:EE:006C0000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Jak HP — eco health cells",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "44A61C8F:EE:003E0000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "44A61C8F:EE:003E0004": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "44A61C8F:EE:003E0008": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "44A61C8F:EE:00900000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Debug mode (TCRF — Naughty Dog debug leftover)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "44A61C8F:EE:00900004": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "Dark eco immunity — dark eco doesn't hurt Jak",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "44A61C8F:EE:00900008": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "44A61C8F",
+    "game_serial": "SCUS-97124",
+    "description": "All power cells found — complete game flag",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "5D054E5A:EE:006C0000": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Gems collected — current total gems",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 gems",
+      "000F4240": "1,000,000 gems",
+      "7FFFFFFF": "Max gems"
+    }
+  },
+  "5D054E5A:EE:006C0004": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Dragonflies rescued",
+    "category": "cheat",
+    "value_map": {
+      "0000004E": "78 dragonflies (all)",
+      "00000019": "25 dragonflies",
+      "00000000": "0 (none)"
+    }
+  },
+  "5D054E5A:EE:006C0008": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Lives remaining",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 lives",
+      "00000009": "9 lives",
+      "00000003": "3 lives (default)"
+    }
+  },
+  "5D054E5A:EE:003E0000": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Jump height multiplier — Spyro's jump arc",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "5D054E5A:EE:003E0004": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Flight speed multiplier — speed while gliding/flying",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "5D054E5A:EE:003E0008": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "5D054E5A:EE:003E000C": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "5D054E5A:EE:00900000": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Invincibility — no damage from enemies",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "5D054E5A:EE:00900004": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "Infinite flight time — no landing required",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "5D054E5A:EE:00900008": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "5D054E5A",
+    "game_serial": "SLUS-20062",
+    "description": "All levels unlocked (TCRF — test content access)",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "A91F4EAE:EE:006C0000": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Wumpa fruit — fruit collected this level",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "9999 wumpa fruit",
+      "00000063": "99 wumpa",
+      "00000000": "0 wumpa"
+    }
+  },
+  "A91F4EAE:EE:006C0004": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Lives remaining",
+    "category": "cheat",
+    "value_map": {
+      "00000063": "99 lives",
+      "00000009": "9 lives",
+      "00000003": "3 lives (default)"
+    }
+  },
+  "A91F4EAE:EE:006C0008": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Gems collected — level completion gems",
+    "category": "cheat",
+    "value_map": {
+      "00000000": "0 (none)",
+      "00000028": "40 gems (all)",
+      "00000014": "20 gems"
+    }
+  },
+  "A91F4EAE:EE:003E0000": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "A91F4EAE:EE:003E0004": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "A91F4EAE:EE:003E0008": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "A91F4EAE:EE:00900000": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "Invincibility — no damage",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "A91F4EAE:EE:00900004": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "A91F4EAE",
+    "game_serial": "SLUS-20238",
+    "description": "All power gems collected (TCRF)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "2E01B00C:EE:006C0000": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Spider-Man HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "2E01B00C:EE:006C0004": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Hero points — reputation currency",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max hero points (9999)",
+      "000003E8": "1,000 hero pts",
+      "00000064": "100 hero pts"
+    }
+  },
+  "2E01B00C:EE:003E0000": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "2E01B00C:EE:003E0004": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Web swing speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "2E01B00C:EE:003E0008": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Run speed multiplier (on foot)",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "2E01B00C:EE:003E000C": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Gravity multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal gravity (default)",
+      "3F000000": "½× gravity (floaty)",
+      "3E800000": "¼× gravity (moon-like)",
+      "40000000": "2× gravity (heavy)",
+      "40800000": "4× gravity (crushing)",
+      "3D4CCCCD": "0.05× gravity (near-zero)"
+    }
+  },
+  "2E01B00C:EE:00900000": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Invincibility (TCRF — dev mode)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "2E01B00C:EE:00900004": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "All upgrades purchased",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "2E01B00C:EE:00900008": {
+    "game": "Spider-Man 2 (SLUS-20776)",
+    "game_crc": "2E01B00C",
+    "game_serial": "SLUS-20776",
+    "description": "Infinite web fluid — web never runs out",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "880EB41E:EE:006C0000": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Prince HP — current health",
+    "category": "cheat",
+    "value_map": {
+      "0000270F": "Max HP (9999)",
+      "000001F4": "500 HP",
+      "00000064": "100 HP (default)"
+    }
+  },
+  "880EB41E:EE:006C0004": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Sand tanks — rewind charges available",
+    "category": "cheat",
+    "value_map": {
+      "00000007": "7 sand tanks (max)",
+      "00000004": "4 sand tanks",
+      "00000001": "1 sand tank"
+    }
+  },
+  "880EB41E:EE:003E0000": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "41400000": "12× normal",
+      "3F000000": "½× (lower)",
+      "3E800000": "¼× (very low)"
+    }
+  },
+  "880EB41E:EE:003E0004": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Run speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "880EB41E:EE:003E0008": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Wall run duration multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "1× normal (default)",
+      "40000000": "2× normal",
+      "40400000": "3× normal",
+      "40800000": "4× normal",
+      "40C00000": "6× normal",
+      "3F000000": "½× (slower)",
+      "3E800000": "¼× (very slow)"
+    }
+  },
+  "880EB41E:EE:00900000": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Invincibility — no damage (TCRF dev mode)",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "880EB41E:EE:00900004": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Infinite sand — time rewind always available",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "Enabled (1)",
+      "00000000": "Disabled (0)"
+    }
+  },
+  "880EB41E:EE:00900008": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
+    "game_crc": "880EB41E",
+    "game_serial": "SLUS-20743",
+    "description": "Slow motion always active — constant time dilation",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "Always slow motion",
+      "00000000": "Normal time (default)"
+    }
   }
 }
