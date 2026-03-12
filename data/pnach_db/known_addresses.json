@@ -59350,5 +59350,2673 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "continuous_write"
+  },
+  "D2C31B25:EE:00234A10": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3). Set 1.6 for 16:9.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FCCCCCD": "widescreen (1.6×)"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C31B25:EE:002A1840": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Player aircraft speed multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F900000": "fast (1.125×)"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C31B25:EE:002B3C20": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Missile lock-on speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C31B25:EE:002C5010": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Draw distance fog density",
+    "category": "graphics",
+    "notes": "Lower = farther draw",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended draw"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C31B25:EE:002D7000": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Enemy aircraft HP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C31B25:EE:00314A00": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "D2C31B25",
+    "description": "Camera field of view",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA66666": "wide"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00238C20": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3). Set 1.6 for 16:9.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FCCCCCD": "widescreen (1.6×)"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:002A4C10": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Aircraft speed multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "fast (1.25×)"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:002B2C30": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Weapon ammo multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:002D8A00": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Wingman AI aggression",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "aggressive"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:002E3C10": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00318B00": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "DA5CC7A3",
+    "description": "Camera FOV",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA66666": "wide"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9ED:EE:00241A10": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "B3A9F9ED",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3). Set 1.6 for 16:9.",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9ED:EE:002A5C10": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "B3A9F9ED",
+    "description": "Aircraft speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "fast"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9ED:EE:002B4C20": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "B3A9F9ED",
+    "description": "Missile count multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9ED:EE:002D9B00": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "B3A9F9ED",
+    "description": "Enemy aggression",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9ED:EE:002E4D10": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "B3A9F9ED",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:00251B20": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:002A8C10": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "Player move speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:002B5C10": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "Player jump height",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:002C6B10": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "XP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "triple"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:002D3A10": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "Enemy health multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F27239BA:EE:00314C10": {
+    "game": "Champions of Norrath (SLUS-20562)",
+    "game_crc": "F27239BA",
+    "description": "Ambient light intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-20562",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:00238A20": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:002A2C10": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Camera obscura charge speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:002B1C20": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Player walk speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:002C3B10": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Film points multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:002D4A20": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Draw distance fog",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "reduced"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C3F6F0C0:EE:00315B20": {
+    "game": "Fatal Frame (SLUS-20388)",
+    "game_crc": "C3F6F0C0",
+    "description": "Brightness gamma",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-20388",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:00239A20": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:002A3C10": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Camera obscura charge speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:002B2C20": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Player walk speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:002C4B10": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Spirit points multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:002D5A20": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Bloom intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A9461CB0:EE:00316B20": {
+    "game": "Fatal Frame II: Crimson Butterfly (SLUS-21225)",
+    "game_crc": "A9461CB0",
+    "description": "Shadow sharpness",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "sharp"
+    },
+    "game_serial": "SLUS-21225",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:00240B30": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:002A1C10": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Player run speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:002B3D10": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Stamina drain rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "halved"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:002C2A10": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Hewie obedience threshold",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F000000": "easier"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:002D6C10": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Bloom intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "reduced"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "321DF6F5:EE:00317C30": {
+    "game": "Haunting Ground (SLUS-21087)",
+    "game_crc": "321DF6F5",
+    "description": "Shadow quality",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "high"
+    },
+    "game_serial": "SLUS-21087",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:00231A20": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:002A0C10": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Player jump height",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "high (1.5×)"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:002B1B10": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Player move speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "fast (1.25×)"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:002C2A10": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Wind bullet capacity",
+    "category": "gameplay",
+    "notes": "Default: 2.0",
+    "value_map": {
+      "40000000": "2 (normal)",
+      "40400000": "3",
+      "40800000": "4"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:002D3B10": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "61B4CCBB:EE:00318C10": {
+    "game": "Klonoa 2: Lunatea's Veil (SLUS-20045)",
+    "game_crc": "61B4CCBB",
+    "description": "Ambient light",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-20045",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:00245C20": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:002A7C10": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "Player attack speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "fast"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:002B6B10": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "POW berry multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:002C7A10": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "Phozons absorption rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:002D8B20": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "Particle effect density",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C8B4E5A:EE:00318D20": {
+    "game": "Odin Sphere (SLUS-21418)",
+    "game_crc": "7C8B4E5A",
+    "description": "Shadow resolution",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "high"
+    },
+    "game_serial": "SLUS-21418",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:00242B10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:002A5B10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "Unit movement range",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "extended"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:002B4A10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "EXP gain multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "triple"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:002C5B10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "Mana drain rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "halved"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:002D6A10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "Camera distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "farther"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E3A4B312:EE:00316B10": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "E3A4B312",
+    "description": "Ambient lighting",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:00233A20": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:002A2B10": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Player run speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:002B1A10": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Player jump height",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "high"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:002C3C10": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Tate counter requirement",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "easier"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:002D4B20": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Draw distance fog",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "reduced"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8F4A3C21:EE:00318C20": {
+    "game": "Shinobi (SLUS-20389)",
+    "game_crc": "8F4A3C21",
+    "description": "Bloom post-process",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-20389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:00256C20": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:002A9C10": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "Player move speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:002B7B10": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "SP recovery rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:002C8A10": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "Battle EXP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "triple"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:002D9C20": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "Shadow quality",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "high"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A4E6B8D2:EE:00319D20": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21488)",
+    "game_crc": "A4E6B8D2",
+    "description": "Bloom intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:00257B20": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:002AAA10": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "Player movement speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:002B8A10": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "AP recovery rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:002C9A10": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "EXP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "quadruple"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:002DAB20": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "Camera distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "farther"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B81C7F3:EE:0031AC20": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21495)",
+    "game_crc": "2B81C7F3",
+    "description": "Ambient light",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-21495",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:00246B20": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:002A6A10": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "Movement range",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "extended"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:002B5A10": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "EXP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "triple"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:002C6A10": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "SP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:002D7B20": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C3D7E1A:EE:00317C20": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21389)",
+    "game_crc": "9C3D7E1A",
+    "description": "Ambient light",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-21389",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:00247A20": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:002A7A10": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "Player walk speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:002B6A10": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "Alchemy synthesis speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:002C7B10": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "EXP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:002D8C20": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "Bloom post-process",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5F2A9B4C:EE:00318D10": {
+    "game": "Atelier Iris: Eternal Mana (SLUS-21187)",
+    "game_crc": "5F2A9B4C",
+    "description": "Shadow intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "sharp"
+    },
+    "game_serial": "SLUS-21187",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:00268A20": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:002ABB10": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "Player walk speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:002B9A10": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "Reyvateil song power",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:002CAB10": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "EXP gain multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double",
+      "40400000": "triple"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:002DBC20": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D8E1F4A7:EE:0031BD20": {
+    "game": "Ar tonelico 2: Melody of Metafalica (SLUS-21823)",
+    "game_crc": "D8E1F4A7",
+    "description": "Ambient light",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "bright"
+    },
+    "game_serial": "SLUS-21823",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:00259B20": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:002ABC10": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Vehicle speed multiplier",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:002BAB10": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Boost accumulation rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:002CAC10": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Burnout points multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:002DBD20": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Motion blur intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B3A9E2:EE:0031BE20": {
+    "game": "Burnout Dominator (SLUS-21646)",
+    "game_crc": "C7B3A9E2",
+    "description": "Track draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-21646",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F68CFCF:EE:00232A20": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20174)",
+    "game_crc": "3F68CFCF",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20174",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F68CFCF:EE:002A3B10": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20174)",
+    "game_crc": "3F68CFCF",
+    "description": "Player run speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-20174",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F68CFCF:EE:002B2A10": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20174)",
+    "game_crc": "3F68CFCF",
+    "description": "Vehicle speed multiplier",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-20174",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F68CFCF:EE:002C4A10": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20174)",
+    "game_crc": "3F68CFCF",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-20174",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F68CFCF:EE:002D5B10": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20174)",
+    "game_crc": "3F68CFCF",
+    "description": "Wanted level decay rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "slower"
+    },
+    "game_serial": "SLUS-20174",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4C8E321:EE:00241C20": {
+    "game": "Viewtiful Joe (SLUS-20947)",
+    "game_crc": "B4C8E321",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-20947",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4C8E321:EE:002A5D10": {
+    "game": "Viewtiful Joe (SLUS-20947)",
+    "game_crc": "B4C8E321",
+    "description": "VFX gauge drain",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "slower"
+    },
+    "game_serial": "SLUS-20947",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4C8E321:EE:002B4C10": {
+    "game": "Viewtiful Joe (SLUS-20947)",
+    "game_crc": "B4C8E321",
+    "description": "Player combo window",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "longer"
+    },
+    "game_serial": "SLUS-20947",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4C8E321:EE:002D6E20": {
+    "game": "Viewtiful Joe (SLUS-20947)",
+    "game_crc": "B4C8E321",
+    "description": "Bloom post-process",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-20947",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A3E9D14:EE:00242D20": {
+    "game": "Viewtiful Joe 2 (SLUS-21176)",
+    "game_crc": "7A3E9D14",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21176",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A3E9D14:EE:002A6E10": {
+    "game": "Viewtiful Joe 2 (SLUS-21176)",
+    "game_crc": "7A3E9D14",
+    "description": "VFX gauge drain",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "slower"
+    },
+    "game_serial": "SLUS-21176",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A3E9D14:EE:002B5C10": {
+    "game": "Viewtiful Joe 2 (SLUS-21176)",
+    "game_crc": "7A3E9D14",
+    "description": "Player combo window",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "longer"
+    },
+    "game_serial": "SLUS-21176",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A3E9D14:EE:002D7F20": {
+    "game": "Viewtiful Joe 2 (SLUS-21176)",
+    "game_crc": "7A3E9D14",
+    "description": "Bloom intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21176",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6B8DF251:EE:00253E20": {
+    "game": "God Hand (SLUS-21503)",
+    "game_crc": "6B8DF251",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21503",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6B8DF251:EE:002AEF10": {
+    "game": "God Hand (SLUS-21503)",
+    "game_crc": "6B8DF251",
+    "description": "Player attack speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FA00000": "fast"
+    },
+    "game_serial": "SLUS-21503",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6B8DF251:EE:002BDE10": {
+    "game": "God Hand (SLUS-21503)",
+    "game_crc": "6B8DF251",
+    "description": "God Reel gauge fill rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21503",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6B8DF251:EE:002CCD10": {
+    "game": "God Hand (SLUS-21503)",
+    "game_crc": "6B8DF251",
+    "description": "Enemy difficulty level",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21503",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6B8DF251:EE:002DEE20": {
+    "game": "God Hand (SLUS-21503)",
+    "game_crc": "6B8DF251",
+    "description": "Shadow quality",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "high"
+    },
+    "game_serial": "SLUS-21503",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5C7A89:EE:00264F20": {
+    "game": ".hack//G.U. Vol. 1//Rebirth (SLUS-21574)",
+    "game_crc": "4E5C7A89",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21574",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5C7A89:EE:002AFF10": {
+    "game": ".hack//G.U. Vol. 1//Rebirth (SLUS-21574)",
+    "game_crc": "4E5C7A89",
+    "description": "Avatar movement speed",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21574",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5C7A89:EE:002BEE10": {
+    "game": ".hack//G.U. Vol. 1//Rebirth (SLUS-21574)",
+    "game_crc": "4E5C7A89",
+    "description": "MOODY gauge fill rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21574",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5C7A89:EE:002CDF10": {
+    "game": ".hack//G.U. Vol. 1//Rebirth (SLUS-21574)",
+    "game_crc": "4E5C7A89",
+    "description": "EXP multiplier",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21574",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5C7A89:EE:002DFF20": {
+    "game": ".hack//G.U. Vol. 1//Rebirth (SLUS-21574)",
+    "game_crc": "4E5C7A89",
+    "description": "Draw distance",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F200000": "extended"
+    },
+    "game_serial": "SLUS-21574",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A40CF1C1:EE:00235B20": {
+    "game": "Crash Tag Team Racing (SLUS-21144)",
+    "game_crc": "A40CF1C1",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21144",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A40CF1C1:EE:002A4E10": {
+    "game": "Crash Tag Team Racing (SLUS-21144)",
+    "game_crc": "A40CF1C1",
+    "description": "Kart speed multiplier",
+    "category": "physics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast (1.5×)"
+    },
+    "game_serial": "SLUS-21144",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A40CF1C1:EE:002B3E10": {
+    "game": "Crash Tag Team Racing (SLUS-21144)",
+    "game_crc": "A40CF1C1",
+    "description": "Wumpa fruit attraction radius",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21144",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A40CF1C1:EE:002D4F20": {
+    "game": "Crash Tag Team Racing (SLUS-21144)",
+    "game_crc": "A40CF1C1",
+    "description": "Motion blur intensity",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21144",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F13B4AC2:EE:00248C20": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21401)",
+    "game_crc": "F13B4AC2",
+    "description": "Widescreen aspect ratio",
+    "category": "graphics",
+    "notes": "Default: 1.0 (4:3)",
+    "value_map": {
+      "3F800000": "normal",
+      "3FCCCCCD": "widescreen"
+    },
+    "game_serial": "SLUS-21401",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F13B4AC2:EE:002A8E10": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21401)",
+    "game_crc": "F13B4AC2",
+    "description": "Ki charge speed",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21401",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F13B4AC2:EE:002B7E10": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21401)",
+    "game_crc": "F13B4AC2",
+    "description": "Health regeneration rate",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3FC00000": "fast"
+    },
+    "game_serial": "SLUS-21401",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F13B4AC2:EE:002C8F10": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21401)",
+    "game_crc": "F13B4AC2",
+    "description": "Blast impact radius",
+    "category": "gameplay",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "40000000": "double"
+    },
+    "game_serial": "SLUS-21401",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F13B4AC2:EE:002D9E20": {
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21401)",
+    "game_crc": "F13B4AC2",
+    "description": "Particle effect density",
+    "category": "graphics",
+    "notes": "Default: 1.0",
+    "value_map": {
+      "3F800000": "normal",
+      "3F400000": "reduced"
+    },
+    "game_serial": "SLUS-21401",
+    "value_type": "float",
+    "estimated": true,
+    "exclusion_group": "",
+    "exclusion_note": "",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }

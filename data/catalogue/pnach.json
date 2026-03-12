@@ -17439,5 +17439,33 @@
     "is_free": true,
     "requires_account": true,
     "is_complete": true
+  },
+  {
+    "id": "crash_tag_team_racing_pnach",
+    "name": "Crash Tag Team Racing — Widescreen Fix + Enhancements",
+    "description": "Widescreen (16:9), improved draw distance and other game enhancements for Crash Tag Team Racing.",
+    "context": "Crash Tag Team Racing (SLUS-21144). Place the .pnach file in the PCSX2 cheats directory.",
+    "author": "PS2Wide",
+    "author_url": "https://github.com/PS2ClassicsVault/PS2-WIDE",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://github.com/PS2ClassicsVault/PS2-WIDE",
+    "type": "pnach",
+    "game_serial": "SLUS-21144",
+    "source": "PS2Wide",
+    "game": "Crash Tag Team Racing",
+    "thumbnail_url": "",
+    "tags": [
+      "widescreen",
+      "pnach",
+      "fix",
+      "ps2wide"
+    ],
+    "download_action": "",
+    "direct_download_url": "",
+    "upscale_tech": "",
+    "is_free": true,
+    "requires_account": false,
+    "pnach_crc": "A40CF1C1"
   }
 ]
