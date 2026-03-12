@@ -331,3 +331,65 @@ def reload_db() -> int:
     global _DB
     _DB = _load_db()
     return len(_DB)
+
+
+# ---------------------------------------------------------------------------
+# Custom value conversion
+# ---------------------------------------------------------------------------
+
+def value_to_pnach_hex(text: str, value_type: str) -> tuple[str | None, str | None]:
+    """Convert a user-supplied string to an 8-char uppercase PNACH hex value.
+
+    Parameters
+    ----------
+    text:       The user's input, e.g. ``"1000"``, ``"1,000"``, ``"2.5"``.
+    value_type: ``"int"`` for whole-number values (money, HP, counts) or
+                ``"float"`` for IEEE-754 single-precision values (speed
+                multipliers, gravity, FOV degrees, etc.).
+
+    Returns
+    -------
+    A ``(hex_str, error_msg)`` pair.  On success ``hex_str`` is an 8-char
+    uppercase hex string and ``error_msg`` is ``None``.  On failure
+    ``hex_str`` is ``None`` and ``error_msg`` is a user-friendly message.
+
+    Examples
+    --------
+    >>> value_to_pnach_hex("1000", "int")
+    ('000003E8', None)
+    >>> value_to_pnach_hex("1,000,000", "int")
+    ('000F4240', None)
+    >>> value_to_pnach_hex("2.5", "float")
+    ('40200000', None)
+    >>> value_to_pnach_hex("90", "float")   # 90° FOV
+    ('42B40000', None)
+    >>> value_to_pnach_hex("abc", "int")
+    (None, "Enter a whole number (e.g. 1000 or 1,000,000)")
+    """
+    clean = text.strip().replace(",", "").replace("_", "")
+    if not clean:
+        return None, "Value is empty"
+
+    if value_type == "int":
+        try:
+            val = int(clean)
+        except ValueError:
+            return None, "Enter a whole number (e.g. 1000 or 1,000,000)"
+        if val < 0:
+            # Represent as two's-complement signed 32-bit
+            val = val & 0xFFFFFFFF
+        val = min(val, 0xFFFFFFFF)
+        return f"{val:08X}", None
+
+    if value_type == "float":
+        try:
+            fval = float(clean)
+        except ValueError:
+            return None, "Enter a decimal number (e.g. 2.5 or 90.0)"
+        try:
+            packed = struct.pack(">f", fval)
+        except struct.error:
+            return None, "Value out of range for a 32-bit float"
+        return packed.hex().upper(), None
+
+    return None, f"Unknown value_type: {value_type!r}"

@@ -1765,18 +1765,27 @@ class PnachCodeBuilderDialog(QDialog):
         )
 
     def _make_effect_row(self, entry: dict) -> QWidget:
-        """Build a single effect row: checkbox + description + optional value picker."""
+        """Build a single effect row: checkbox + description + value picker.
+
+        For entries with ``value_type`` = ``"int"`` or ``"float"`` the row also
+        shows a custom text-input field so the user can type an arbitrary value
+        (e.g. ``1000`` for money or ``90.0`` for FOV degrees).  A live hex
+        preview label updates as they type so they can see exactly what PNACH
+        code will be written.
+        """
         from PyQt6.QtWidgets import QComboBox as QCBox
+        from src.core.pnach_analyzer import value_to_pnach_hex
 
         key = entry.get("key", "")
         # Parse address from key: CRC:PROC:ADDR
         parts = key.split(":")
-        crc = parts[0] if len(parts) > 0 else ""
+        crc  = parts[0] if len(parts) > 0 else ""
         proc = parts[1] if len(parts) > 1 else "EE"
         addr = parts[2] if len(parts) > 2 else "00000000"
 
-        desc = entry.get("description", addr)
-        value_map: dict = entry.get("value_map", {})
+        desc       = entry.get("description", addr)
+        value_map  = entry.get("value_map", {})
+        value_type = entry.get("value_type", "")   # "int" | "float" | "bool" | ""
 
         frame = QFrame()
         frame.setStyleSheet(
@@ -1785,53 +1794,115 @@ class PnachCodeBuilderDialog(QDialog):
         )
         row = QHBoxLayout(frame)
         row.setContentsMargins(8, 4, 8, 4)
-        row.setSpacing(10)
+        row.setSpacing(8)
 
-        # Checkbox
+        # ── Checkbox ──────────────────────────────────────────────────
         chk = QCheckBox()
         chk.setToolTip("Enable this effect")
         row.addWidget(chk)
 
-        # Description label
+        # ── Description ───────────────────────────────────────────────
         desc_lbl = QLabel(desc)
-        desc_lbl.setStyleSheet("color: #d0d0f0; min-width: 260px;")
+        desc_lbl.setStyleSheet("color: #d0d0f0; min-width: 240px;")
         desc_lbl.setWordWrap(False)
         row.addWidget(desc_lbl, 1)
 
-        # Address label
+        # ── Address badge ─────────────────────────────────────────────
         addr_lbl = QLabel(f"[{proc}:{addr}]")
         addr_lbl.setStyleSheet("color: #505080; font-family: monospace; font-size: 11px;")
         row.addWidget(addr_lbl)
 
-        # Value picker
+        # ── Preset combo ──────────────────────────────────────────────
         value_combo = None
         if value_map:
             value_combo = QCBox()
-            value_combo.setMinimumWidth(200)
-            # Sort: put "default" / "1x normal" first
-            items = list(value_map.items())
-            # heuristic: sort by key lexicographically but prefer "default" entries first
-            default_first = sorted(items, key=lambda kv: (
+            value_combo.setMinimumWidth(190)
+            value_combo.setToolTip("Pick a preset value")
+            default_first = sorted(value_map.items(), key=lambda kv: (
                 0 if "default" in kv[1].lower() or "1×" in kv[1] or "4:3" in kv[1] else 1,
-                kv[1]
+                kv[1],
             ))
             for hex_val, label in default_first:
                 value_combo.addItem(label, hex_val)
             row.addWidget(value_combo)
         else:
-            placeholder = QLabel("(no value options)")
+            placeholder = QLabel("(no presets)")
             placeholder.setStyleSheet("color: #505060; font-size: 11px; font-style: italic;")
             row.addWidget(placeholder)
 
-        # Store references for later retrieval
+        # ── Custom value input (int / float entries only) ─────────────
+        custom_edit  = None
+        custom_label = None   # live hex preview
+
+        if value_type in ("int", "float"):
+            sep = QLabel("or")
+            sep.setStyleSheet("color: #6060a0; font-size: 11px;")
+            row.addWidget(sep)
+
+            custom_edit = QLineEdit()
+            custom_edit.setMaximumWidth(110)
+            custom_edit.setClearButtonEnabled(True)
+            if value_type == "int":
+                custom_edit.setPlaceholderText("e.g. 1000")
+                custom_edit.setToolTip(
+                    "Type any whole number (e.g. 1000 or 1,000,000).\n"
+                    "The application will convert it to the correct PNACH code."
+                )
+            else:
+                custom_edit.setPlaceholderText("e.g. 2.5")
+                custom_edit.setToolTip(
+                    "Type any decimal number (e.g. 2.5 for 2.5× speed, "
+                    "or 90.0 for 90° FOV).\n"
+                    "The application will convert it to IEEE 754 hex for you."
+                )
+
+            # Live hex preview label
+            custom_label = QLabel("")
+            custom_label.setStyleSheet(
+                "color: #50d090; font-family: monospace; font-size: 11px; min-width: 80px;"
+            )
+            custom_label.setToolTip("PNACH hex that will be written")
+
+            def _on_custom_changed(text, _vtype=value_type,
+                                   _lbl=custom_label, _combo=value_combo):
+                """Update the live hex preview and dim the combo when custom is active."""
+                text = text.strip()
+                if not text:
+                    _lbl.setText("")
+                    if _combo:
+                        _combo.setEnabled(True)
+                    return
+                hx, err = value_to_pnach_hex(text, _vtype)
+                if hx:
+                    _lbl.setText(f"→ {hx}")
+                    _lbl.setStyleSheet(
+                        "color: #50d090; font-family: monospace; font-size: 11px;"
+                    )
+                    if _combo:
+                        _combo.setEnabled(False)   # custom overrides preset
+                else:
+                    _lbl.setText(err or "?")
+                    _lbl.setStyleSheet(
+                        "color: #e05050; font-family: monospace; font-size: 11px;"
+                    )
+                    if _combo:
+                        _combo.setEnabled(True)
+
+            custom_edit.textChanged.connect(_on_custom_changed)
+            row.addWidget(custom_edit)
+            row.addWidget(custom_label)
+
+        # ── Store all references ──────────────────────────────────────
         self._patch_widgets.append({
-            "check": chk,
-            "value_combo": value_combo,
-            "crc": crc,
-            "proc": proc,
-            "addr": addr,
-            "description": desc,
-            "value_map": value_map,
+            "check":        chk,
+            "value_combo":  value_combo,
+            "custom_edit":  custom_edit,
+            "value_type":   value_type,
+            "crc":          crc,
+            "proc":         proc,
+            "addr":         addr,
+            "description":  desc,
+            "value_map":    value_map,
         })
 
         return frame
@@ -1841,7 +1912,16 @@ class PnachCodeBuilderDialog(QDialog):
     # ------------------------------------------------------------------
 
     def _collect_selected_patches(self) -> tuple:
-        """Return (patches: list[dict], conflicts: list[str])."""
+        """Return (patches: list[dict], conflicts: list[str]).
+
+        Value resolution priority:
+        1. If the user typed a custom value in the free-text field (and it
+           parses without error), use that.
+        2. Otherwise use the selected preset in the combo-box.
+        3. Fall back to ``00000000``.
+        """
+        from src.core.pnach_analyzer import value_to_pnach_hex
+
         selected = []
         addr_seen: dict = {}
         conflicts = []
@@ -1849,14 +1929,32 @@ class PnachCodeBuilderDialog(QDialog):
         for pw in self._patch_widgets:
             if not pw["check"].isChecked():
                 continue
-            value_combo = pw["value_combo"]
-            if value_combo is not None:
-                hex_val = value_combo.currentData() or "00000000"
-            else:
-                # No value options — use the first value in DB or zero
-                vm = pw.get("value_map", {})
-                hex_val = list(vm.keys())[0] if vm else "00000000"
 
+            # ── Resolve hex value ──────────────────────────────────────
+            hex_val = "00000000"
+            vtype = pw.get("value_type", "")
+
+            # 1. Custom free-text field (int / float entries)
+            custom_edit = pw.get("custom_edit")
+            if custom_edit is not None:
+                raw = custom_edit.text().strip()
+                if raw and vtype in ("int", "float"):
+                    hx, err = value_to_pnach_hex(raw, vtype)
+                    if hx:
+                        hex_val = hx
+                    else:
+                        # Invalid custom input — fall through to preset
+                        pass
+
+            # 2. Preset combo (used when custom is empty or invalid)
+            if hex_val == "00000000":
+                value_combo = pw.get("value_combo")
+                if value_combo is not None and value_combo.isEnabled():
+                    hex_val = value_combo.currentData() or "00000000"
+                elif pw.get("value_map"):
+                    hex_val = list(pw["value_map"].keys())[0]
+
+            # ── Conflict detection ─────────────────────────────────────
             addr_key = f"{pw['proc']}:{pw['addr']}"
             if addr_key in addr_seen:
                 conflicts.append(
@@ -1867,12 +1965,12 @@ class PnachCodeBuilderDialog(QDialog):
                 addr_seen[addr_key] = pw["description"]
 
             selected.append({
-                "processor": pw["proc"],
-                "address": pw["addr"],
-                "value": hex_val,
+                "processor":   pw["proc"],
+                "address":     pw["addr"],
+                "value":       hex_val,
                 "description": pw["description"],
-                "size": "extended",
-                "crc": pw["crc"],
+                "size":        "extended",
+                "crc":         pw["crc"],
             })
 
         return selected, conflicts

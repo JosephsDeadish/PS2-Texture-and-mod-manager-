@@ -4379,10 +4379,10 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 435 entries."""
+        """Known addresses DB should have grown beyond 2700 entries."""
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 435, "PNACH DB should have more than 435 entries after expansion")
+        self.assertGreater(n, 2700, "PNACH DB should have more than 2700 entries after expansion")
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
@@ -4397,6 +4397,142 @@ class TestPnachAnalyzer(unittest.TestCase):
         ann_upper = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
         ann_lower = describe_patch("2EB5B9A9", "EE", "00385538", "3f800000", "word")
         self.assertEqual(ann_upper["value_note"], ann_lower["value_note"])
+
+    # ------------------------------------------------------------------
+    # value_to_pnach_hex tests
+    # ------------------------------------------------------------------
+
+    def test_value_to_pnach_hex_int_basic(self):
+        """Integer 1000 → 000003E8."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000003E8")
+
+    def test_value_to_pnach_hex_int_with_commas(self):
+        """1,000,000 with commas → 000F4240."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1,000,000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000F4240")
+
+    def test_value_to_pnach_hex_int_zero(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("0", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000000")
+
+    def test_value_to_pnach_hex_int_large(self):
+        """9999 → 0000270F."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("9999", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "0000270F")
+
+    def test_value_to_pnach_hex_int_max(self):
+        """Max 32-bit value."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("4294967295", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "FFFFFFFF")
+
+    def test_value_to_pnach_hex_int_bad_input(self):
+        """Non-numeric returns error."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("abc", "int")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_float_one(self):
+        """1.0 → 3F800000 (IEEE 754)."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "3F800000")
+
+    def test_value_to_pnach_hex_float_two(self):
+        """2.0 → 40000000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("2.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "40000000")
+
+    def test_value_to_pnach_hex_float_half(self):
+        """0.5 → 3F000000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("0.5", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "3F000000")
+
+    def test_value_to_pnach_hex_float_fov_90(self):
+        """90.0 degrees FOV → 42B40000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("90.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "42B40000")
+
+    def test_value_to_pnach_hex_float_fov_120(self):
+        """120.0 degrees FOV → 42F00000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("120.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "42F00000")
+
+    def test_value_to_pnach_hex_float_two_point_five(self):
+        """2.5 → 40200000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("2.5", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "40200000")
+
+    def test_value_to_pnach_hex_float_bad_input(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("not_a_number", "float")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_empty_returns_error(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("", "int")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_unknown_type(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("100", "unknown")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_int_strips_underscores(self):
+        """Python-style 1_000_000 separators should work."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1_000_000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000F4240")
+
+    def test_db_entries_have_value_type_for_physics(self):
+        """All physics entries should have value_type=float."""
+        from src.core.pnach_analyzer import reload_db
+        import json
+        from pathlib import Path
+        reload_db()
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        physics = [e for e in db.values() if e.get("category") == "physics"]
+        missing = [e["description"][:40] for e in physics if not e.get("value_type")]
+        self.assertEqual(missing, [],
+                         f"Physics entries missing value_type: {missing[:5]}")
+
+    def test_db_entries_value_type_is_valid(self):
+        """Every entry with value_type must use a known type string."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        valid = {"int", "float", "bool"}
+        bad = [(k, e["value_type"]) for k, e in db.items()
+               if e.get("value_type") and e["value_type"] not in valid]
+        self.assertEqual(bad, [], f"Entries with invalid value_type: {bad[:5]}")
 
 
 class TestTextureFilePickerLogic(unittest.TestCase):
