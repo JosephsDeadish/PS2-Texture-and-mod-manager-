@@ -13006,5 +13006,80 @@
     "requires_account": false,
     "is_complete": true,
     "size_label": ""
+  },
+  {
+    "id": "cover_burnout_revenge",
+    "name": "Burnout Revenge — Cover Art (GameTDB)",
+    "description": "Official cover art for Burnout Revenge (SLUS-21150) from GameTDB.",
+    "context": "US serial: SLUS-21150.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS21150",
+    "type": "cover_art",
+    "game_serial": "SLUS-21150",
+    "source": "GameTDB",
+    "game": "Burnout Revenge",
+    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21150.png",
+    "tags": [
+      "cover-art",
+      "burnout",
+      "revenge",
+      "racing",
+      "gametdb"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_bully",
+    "name": "Bully — Cover Art (GameTDB)",
+    "description": "Official cover art for Bully (SLUS-21269) from GameTDB.",
+    "context": "US serial: SLUS-21269.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS21269",
+    "type": "cover_art",
+    "game_serial": "SLUS-21269",
+    "source": "GameTDB",
+    "game": "Bully",
+    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21269.png",
+    "tags": [
+      "cover-art",
+      "bully",
+      "gametdb"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_mk_armageddon",
+    "name": "Mortal Kombat: Armageddon — Cover Art (GameTDB)",
+    "description": "Official cover art for Mortal Kombat: Armageddon (SLUS-21444) from GameTDB.",
+    "context": "US serial: SLUS-21444.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS21444",
+    "type": "cover_art",
+    "game_serial": "SLUS-21444",
+    "source": "GameTDB",
+    "game": "Mortal Kombat: Armageddon",
+    "thumbnail_url": "https://www.gametdb.com/wiitdb/artwork/cover3D/US/SLUS21444.png",
+    "tags": [
+      "cover-art",
+      "mortal-kombat",
+      "fighting",
+      "gametdb"
+    ],
+    "download_action": "cover_by_id",
+    "direct_download_url": "",
+    "upscale_tech": ""
   }
 ]

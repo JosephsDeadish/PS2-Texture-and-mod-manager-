@@ -68629,5 +68629,4426 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00820010": {
+    "game": "Burnout 3: Takedown (SLUS-20625)",
+    "game_crc": "DA5CC7A3",
+    "description": "Boost bar — time remaining on boost",
+    "category": "cheat",
+    "notes": "Default 0x43C80000 (~400.0 float). Max boost duration.",
+    "value_map": {
+      "43C80000": "full boost (default)",
+      "44FA0000": "extended boost (2000.0)"
+    },
+    "game_serial": "SLUS-20625",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00820014": {
+    "game": "Burnout 3: Takedown (SLUS-20625)",
+    "game_crc": "DA5CC7A3",
+    "description": "Crash credits — score multiplier in Crash mode",
+    "category": "cheat",
+    "notes": "Integer value for Crash mode score.",
+    "value_map": {
+      "00000000": "zero",
+      "000F4240": "1,000,000"
+    },
+    "game_serial": "SLUS-20625",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00820020": {
+    "game": "Burnout 3: Takedown (SLUS-20625)",
+    "game_crc": "DA5CC7A3",
+    "description": "Race position — current place in race (1=1st)",
+    "category": "cheat",
+    "notes": "Integer 1-8. 1 = first place.",
+    "value_map": {
+      "00000001": "1st place"
+    },
+    "game_serial": "SLUS-20625",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:00820030": {
+    "game": "Burnout 3: Takedown (SLUS-20625)",
+    "game_crc": "DA5CC7A3",
+    "description": "Lap number — current lap counter",
+    "category": "cheat",
+    "notes": "Integer, current lap.",
+    "value_map": {
+      "00000001": "lap 1",
+      "00000002": "lap 2"
+    },
+    "game_serial": "SLUS-20625",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DA5CC7A3:EE:008200A0": {
+    "game": "Burnout 3: Takedown (SLUS-20625)",
+    "game_crc": "DA5CC7A3",
+    "description": "Traffic density — number of traffic cars",
+    "category": "misc",
+    "notes": "Lower = less traffic. 0 = no traffic.",
+    "value_map": {
+      "00000000": "no traffic",
+      "00000005": "low traffic",
+      "0000000F": "high traffic (default)"
+    },
+    "game_serial": "SLUS-20625",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1DE0F5:EE:00820010": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Boost bar — time remaining on boost",
+    "category": "cheat",
+    "notes": "Default 0x43C80000 (~400.0 float). Max boost duration.",
+    "value_map": {
+      "43C80000": "full boost (default)",
+      "44FA0000": "extended boost (2000.0)"
+    },
+    "game_serial": "SLUS-21077",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1DE0F5:EE:00820014": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Crash credits — score multiplier in Crash mode",
+    "category": "cheat",
+    "notes": "Integer value for Crash mode score.",
+    "value_map": {
+      "00000000": "zero",
+      "000F4240": "1,000,000"
+    },
+    "game_serial": "SLUS-21077",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1DE0F5:EE:00820020": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Race position — current place in race (1=1st)",
+    "category": "cheat",
+    "notes": "Integer 1-8. 1 = first place.",
+    "value_map": {
+      "00000001": "1st place"
+    },
+    "game_serial": "SLUS-21077",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1DE0F5:EE:00820030": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Lap number — current lap counter",
+    "category": "cheat",
+    "notes": "Integer, current lap.",
+    "value_map": {
+      "00000001": "lap 1",
+      "00000002": "lap 2"
+    },
+    "game_serial": "SLUS-21077",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1DE0F5:EE:008200A0": {
+    "game": "Burnout 3: Takedown (SLUS-21077)",
+    "game_crc": "3E1DE0F5",
+    "description": "Traffic density — number of traffic cars",
+    "category": "misc",
+    "notes": "Lower = less traffic. 0 = no traffic.",
+    "value_map": {
+      "00000000": "no traffic",
+      "00000005": "low traffic",
+      "0000000F": "high traffic (default)"
+    },
+    "game_serial": "SLUS-21077",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1CD5CC9D:EE:00820010": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Boost bar — time remaining on boost",
+    "category": "cheat",
+    "notes": "Default 0x43C80000 (~400.0 float). Max boost duration.",
+    "value_map": {
+      "43C80000": "full boost (default)",
+      "44FA0000": "extended boost (2000.0)"
+    },
+    "game_serial": "SLUS-20462",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1CD5CC9D:EE:00820014": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Crash credits — score multiplier in Crash mode",
+    "category": "cheat",
+    "notes": "Integer value for Crash mode score.",
+    "value_map": {
+      "00000000": "zero",
+      "000F4240": "1,000,000"
+    },
+    "game_serial": "SLUS-20462",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1CD5CC9D:EE:00820020": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Race position — current place in race (1=1st)",
+    "category": "cheat",
+    "notes": "Integer 1-8. 1 = first place.",
+    "value_map": {
+      "00000001": "1st place"
+    },
+    "game_serial": "SLUS-20462",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1CD5CC9D:EE:00820030": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Lap number — current lap counter",
+    "category": "cheat",
+    "notes": "Integer, current lap.",
+    "value_map": {
+      "00000001": "lap 1",
+      "00000002": "lap 2"
+    },
+    "game_serial": "SLUS-20462",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1CD5CC9D:EE:008200A0": {
+    "game": "Burnout 3: Takedown (SLUS-20462)",
+    "game_crc": "1CD5CC9D",
+    "description": "Traffic density — number of traffic cars",
+    "category": "misc",
+    "notes": "Lower = less traffic. 0 = no traffic.",
+    "value_map": {
+      "00000000": "no traffic",
+      "00000005": "low traffic",
+      "0000000F": "high traffic (default)"
+    },
+    "game_serial": "SLUS-20462",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B7C6617:EE:00700004": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Lives — remaining player lives",
+    "category": "cheat",
+    "notes": "Integer. Default 3 lives.",
+    "value_map": {
+      "00000003": "3 lives (default)",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B7C6617:EE:00700008": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Specter Coins — total collected",
+    "category": "cheat",
+    "notes": "Integer. Coins used to unlock gadgets.",
+    "value_map": {
+      "00000000": "no coins",
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B7C6617:EE:0070000C": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Monkey count — monkeys remaining in level",
+    "category": "cheat",
+    "notes": "Integer, monkeys still loose.",
+    "value_map": {
+      "00000000": "all caught"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B7C6617:EE:003B4544": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "8B7C6617",
+    "description": "Camera distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier for camera zoom distance.",
+    "value_map": {
+      "3F800000": "default (1.0×)",
+      "40000000": "further (2.0×)"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B5B7C4AF:EE:00700004": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Lives — remaining player lives",
+    "category": "cheat",
+    "notes": "Integer. Default 3 lives.",
+    "value_map": {
+      "00000003": "3 lives (default)",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B5B7C4AF:EE:00700008": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Specter Coins — total collected",
+    "category": "cheat",
+    "notes": "Integer. Coins used to unlock gadgets.",
+    "value_map": {
+      "00000000": "no coins",
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B5B7C4AF:EE:0070000C": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Monkey count — monkeys remaining in level",
+    "category": "cheat",
+    "notes": "Integer, monkeys still loose.",
+    "value_map": {
+      "00000000": "all caught"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B5B7C4AF:EE:003B4544": {
+    "game": "Ape Escape 2 (SCUS-97129)",
+    "game_crc": "B5B7C4AF",
+    "description": "Camera distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier for camera zoom distance.",
+    "value_map": {
+      "3F800000": "default (1.0×)",
+      "40000000": "further (2.0×)"
+    },
+    "game_serial": "SCUS-97129",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE44FD7A:EE:00750000": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "CE44FD7A",
+    "description": "Lives — player life count",
+    "category": "cheat",
+    "notes": "Integer. Default 3.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE44FD7A:EE:00750004": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "CE44FD7A",
+    "description": "Specter Coins — collected count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE44FD7A:EE:00750008": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "CE44FD7A",
+    "description": "Monkey count — loose monkeys in level",
+    "category": "cheat",
+    "notes": "0 = all caught.",
+    "value_map": {
+      "00000000": "all caught"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7AC4D8CA:EE:00750000": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "7AC4D8CA",
+    "description": "Lives — player life count",
+    "category": "cheat",
+    "notes": "Integer. Default 3.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7AC4D8CA:EE:00750004": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "7AC4D8CA",
+    "description": "Specter Coins — collected count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7AC4D8CA:EE:00750008": {
+    "game": "Ape Escape 3 (SCUS-97480)",
+    "game_crc": "7AC4D8CA",
+    "description": "Monkey count — loose monkeys in level",
+    "category": "cheat",
+    "notes": "0 = all caught.",
+    "value_map": {
+      "00000000": "all caught"
+    },
+    "game_serial": "SCUS-97480",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00750000": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Lives — player life count",
+    "category": "cheat",
+    "notes": "Integer. Default 3.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00750004": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Specter Coins — collected count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2AFF83F8:EE:00750008": {
+    "game": "Ape Escape 3 (SCUS-97501)",
+    "game_crc": "2AFF83F8",
+    "description": "Monkey count — loose monkeys in level",
+    "category": "cheat",
+    "notes": "0 = all caught.",
+    "value_map": {
+      "00000000": "all caught"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D568F61:EE:00800000": {
+    "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
+    "game_crc": "1D568F61",
+    "description": "P1 health — Player 1 health bar value",
+    "category": "cheat",
+    "notes": "Integer. Max typically 16000.",
+    "value_map": {
+      "00003E80": "max health (16000)",
+      "00000000": "KO"
+    },
+    "game_serial": "SLUS-20446",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D568F61:EE:00800004": {
+    "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
+    "game_crc": "1D568F61",
+    "description": "P2 health — Player 2 health bar value",
+    "category": "cheat",
+    "notes": "Integer. Max typically 16000.",
+    "value_map": {
+      "00003E80": "max health (16000)",
+      "00000000": "KO"
+    },
+    "game_serial": "SLUS-20446",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D568F61:EE:00800010": {
+    "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
+    "game_crc": "1D568F61",
+    "description": "Match timer — time remaining in round",
+    "category": "cheat",
+    "notes": "Integer seconds.",
+    "value_map": {
+      "0000003C": "60 seconds",
+      "00000000": "time up"
+    },
+    "game_serial": "SLUS-20446",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D568F61:EE:00800014": {
+    "game": "Capcom vs. SNK 2: Mark of the Millennium 2001 (SLUS-20446)",
+    "game_crc": "1D568F61",
+    "description": "Round wins P1 — P1 rounds won",
+    "category": "cheat",
+    "notes": "Integer rounds won.",
+    "value_map": {
+      "00000002": "2 rounds (match win)"
+    },
+    "game_serial": "SLUS-20446",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7152BCA7:EE:003B4540": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 aspect fix.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7152BCA7:EE:00A00000": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "HP — Hector's current health points",
+    "category": "cheat",
+    "notes": "Integer. Max HP varies by level.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000FFFF": "max HP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7152BCA7:EE:00A00004": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "MP — Mana Points for magic abilities",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 MP",
+      "0000FFFF": "max MP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7152BCA7:EE:00A00008": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "Gold — currency for upgrades",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7152BCA7:EE:00A0000C": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "7152BCA7",
+    "description": "Experience — current XP",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 XP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E3F7DC1:EE:003B4540": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 aspect fix.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E3F7DC1:EE:00A00000": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "HP — Hector's current health points",
+    "category": "cheat",
+    "notes": "Integer. Max HP varies by level.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000FFFF": "max HP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E3F7DC1:EE:00A00004": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "MP — Mana Points for magic abilities",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 MP",
+      "0000FFFF": "max MP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E3F7DC1:EE:00A00008": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "Gold — currency for upgrades",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E3F7DC1:EE:00A0000C": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21173)",
+    "game_crc": "8E3F7DC1",
+    "description": "Experience — current XP",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 XP"
+    },
+    "game_serial": "SLUS-21173",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:003B4540": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen patch.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21050",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00850000": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "HP — Leon's current health",
+    "category": "cheat",
+    "notes": "Integer HP value.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21050",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00850004": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "Gold — currency amount",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-21050",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00850008": {
+    "game": "Castlevania: Lament of Innocence (SLUS-21050)",
+    "game_crc": "2B123FE9",
+    "description": "Experience points",
+    "category": "cheat",
+    "notes": "Integer XP.",
+    "value_map": {
+      "000F4240": "1,000,000 XP"
+    },
+    "game_serial": "SLUS-21050",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B6EC3A3:EE:00900000": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Player health — current HP",
+    "category": "cheat",
+    "notes": "Float. Default 1.0 = full health. 0.0 = dead.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "00000000": "dead (0.0)"
+    },
+    "game_serial": "SLUS-20432",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B6EC3A3:EE:00900010": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Primary ammo — current magazine count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000000FF": "255 rounds"
+    },
+    "game_serial": "SLUS-20432",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B6EC3A3:EE:00900014": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Grenade count — number of grenades",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 grenades"
+    },
+    "game_serial": "SLUS-20432",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B6EC3A3:EE:00900018": {
+    "game": "Call of Duty 2: Big Red One (SLUS-20432)",
+    "game_crc": "0B6EC3A3",
+    "description": "Mission timer — time remaining for timed objectives",
+    "category": "cheat",
+    "notes": "Float seconds.",
+    "value_map": {
+      "461C4000": "10000.0 seconds"
+    },
+    "game_serial": "SLUS-20432",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B54B0573:EE:00A50000": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Standard missiles — loadout count",
+    "category": "cheat",
+    "notes": "Integer missiles remaining.",
+    "value_map": {
+      "00000063": "99 missiles"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B54B0573:EE:00A50004": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Special weapons — special weapon ammo count",
+    "category": "cheat",
+    "notes": "Integer special ammo.",
+    "value_map": {
+      "00000063": "99 specials"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B54B0573:EE:00A50008": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Score multiplier — mission score bonus",
+    "category": "cheat",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "×1 (normal)",
+      "40000000": "×2 score"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B54B0573:EE:00A50010": {
+    "game": "Ace Combat 04: Shattered Skies (SLUS-20152)",
+    "game_crc": "B54B0573",
+    "description": "Player HP — aircraft hit points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000FFFF": "max HP"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E9E7B49:EE:00A60000": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "3E9E7B49",
+    "description": "Standard missiles — current count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 missiles"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E9E7B49:EE:00A60004": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "3E9E7B49",
+    "description": "Special weapon ammo count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 specials"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E9E7B49:EE:00A60008": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "3E9E7B49",
+    "description": "Zenny — currency for upgrades",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Zenny"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "91A69524:EE:00950000": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "Gold — GP currency for shopping",
+    "category": "cheat",
+    "notes": "Integer GP.",
+    "value_map": {
+      "000F4240": "1,000,000 GP"
+    },
+    "game_serial": "SLUS-21618",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "91A69524:EE:00950004": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "HP — Haseo's current health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21618",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "91A69524:EE:00950008": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "SP — Skill Points",
+    "category": "cheat",
+    "notes": "Integer SP.",
+    "value_map": {
+      "0000270F": "9999 SP"
+    },
+    "game_serial": "SLUS-21618",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "91A69524:EE:0095000C": {
+    "game": ".hack//G.U. Vol. 2//Reminisce (SLUS-21618)",
+    "game_crc": "91A69524",
+    "description": "EXP — Experience points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 EXP"
+    },
+    "game_serial": "SLUS-21618",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7D7A24B:EE:00960000": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "Gold — GP currency",
+    "category": "cheat",
+    "notes": "Integer GP.",
+    "value_map": {
+      "000F4240": "1,000,000 GP"
+    },
+    "game_serial": "SLUS-21750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7D7A24B:EE:00960004": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "HP — Haseo's current health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7D7A24B:EE:00960008": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "SP — Skill Points",
+    "category": "cheat",
+    "notes": "Integer SP.",
+    "value_map": {
+      "0000270F": "9999 SP"
+    },
+    "game_serial": "SLUS-21750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7D7A24B:EE:0096000C": {
+    "game": ".hack//G.U. Vol. 3//Redemption (SLUS-21750)",
+    "game_crc": "D7D7A24B",
+    "description": "EXP — Experience points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 EXP"
+    },
+    "game_serial": "SLUS-21750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D0D8B73B:EE:00A80000": {
+    "game": "Armored Core 3 (SLUS-20355)",
+    "game_crc": "D0D8B73B",
+    "description": "Credits — in-game currency",
+    "category": "cheat",
+    "notes": "Integer credits.",
+    "value_map": {
+      "000F4240": "1,000,000 credits"
+    },
+    "game_serial": "SLUS-20355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D0D8B73B:EE:00A80004": {
+    "game": "Armored Core 3 (SLUS-20355)",
+    "game_crc": "D0D8B73B",
+    "description": "AP — Armored Core hit points",
+    "category": "cheat",
+    "notes": "Integer AP.",
+    "value_map": {
+      "00004E20": "20,000 AP (max)"
+    },
+    "game_serial": "SLUS-20355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D0D8B73B:EE:00A80008": {
+    "game": "Armored Core 3 (SLUS-20355)",
+    "game_crc": "D0D8B73B",
+    "description": "EN — Energy gauge for boosters/weapons",
+    "category": "cheat",
+    "notes": "Integer EN.",
+    "value_map": {
+      "00004E20": "20,000 EN (max)"
+    },
+    "game_serial": "SLUS-20355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5A26456:EE:003B4540": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5A26456:EE:00A80000": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "Credits — in-game currency",
+    "category": "cheat",
+    "notes": "Integer credits.",
+    "value_map": {
+      "000F4240": "1,000,000 credits"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5A26456:EE:00A80004": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "AP — Armored Core hit points",
+    "category": "cheat",
+    "notes": "Integer AP.",
+    "value_map": {
+      "00004E20": "20,000 AP (max)"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5A26456:EE:00A80008": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "C5A26456",
+    "description": "EN — Energy gauge for boosters/weapons",
+    "category": "cheat",
+    "notes": "Integer EN.",
+    "value_map": {
+      "00004E20": "20,000 EN (max)"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8B4CC9:EE:003B4540": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8B4CC9:EE:00A80000": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "Credits — in-game currency",
+    "category": "cheat",
+    "notes": "Integer credits.",
+    "value_map": {
+      "000F4240": "1,000,000 credits"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8B4CC9:EE:00A80004": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "AP — Armored Core hit points",
+    "category": "cheat",
+    "notes": "Integer AP.",
+    "value_map": {
+      "00004E20": "20,000 AP (max)"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8B4CC9:EE:00A80008": {
+    "game": "Armored Core 3 (SLUS-20392)",
+    "game_crc": "4A8B4CC9",
+    "description": "EN — Energy gauge for boosters/weapons",
+    "category": "cheat",
+    "notes": "Integer EN.",
+    "value_map": {
+      "00004E20": "20,000 EN (max)"
+    },
+    "game_serial": "SLUS-20392",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1A7F49AB:EE:00A90000": {
+    "game": "Armored Core: Nine Breaker (SLUS-21177)",
+    "game_crc": "1A7F49AB",
+    "description": "Credits — in-game currency",
+    "category": "cheat",
+    "notes": "Integer credits.",
+    "value_map": {
+      "000F4240": "1,000,000 credits"
+    },
+    "game_serial": "SLUS-21177",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1A7F49AB:EE:00A90004": {
+    "game": "Armored Core: Nine Breaker (SLUS-21177)",
+    "game_crc": "1A7F49AB",
+    "description": "AP — current hit points",
+    "category": "cheat",
+    "notes": "Integer AP.",
+    "value_map": {
+      "00004E20": "max AP"
+    },
+    "game_serial": "SLUS-21177",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1A7F49AB:EE:00A90008": {
+    "game": "Armored Core: Nine Breaker (SLUS-21177)",
+    "game_crc": "1A7F49AB",
+    "description": "Mission timer — seconds remaining",
+    "category": "cheat",
+    "notes": "Float seconds.",
+    "value_map": {
+      "461C4000": "10000.0 seconds"
+    },
+    "game_serial": "SLUS-21177",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A2FF487:EE:003B4540": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 aspect fix.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A2FF487:EE:00B00000": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "Gold — currency for shops",
+    "category": "cheat",
+    "notes": "Integer gold.",
+    "value_map": {
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A2FF487:EE:00B00004": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "Kharg HP — lead character health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A2FF487:EE:00B00008": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "4A2FF487",
+    "description": "Darc HP — second protagonist health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7C97CF4:EE:00B00004": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "D7C97CF4",
+    "description": "Kharg HP — lead character health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D7C97CF4:EE:00B00008": {
+    "game": "Arc the Lad: Twilight of the Spirits (SLUS-20743)",
+    "game_crc": "D7C97CF4",
+    "description": "Darc HP — second protagonist health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E9C0D58:EE:00B10000": {
+    "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
+    "game_crc": "8E9C0D58",
+    "description": "Cole — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Cole"
+    },
+    "game_serial": "SLUS-21350",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E9C0D58:EE:00B10004": {
+    "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
+    "game_crc": "8E9C0D58",
+    "description": "HP — Felt's current health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21350",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8E9C0D58:EE:00B10008": {
+    "game": "Atelier Iris 2: The Azoth of Destiny (SLUS-21350)",
+    "game_crc": "8E9C0D58",
+    "description": "MP — Felt's magic points",
+    "category": "cheat",
+    "notes": "Integer MP.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-21350",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6327AA24:EE:00B20000": {
+    "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
+    "game_crc": "6327AA24",
+    "description": "Cole — currency for items",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Cole"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6327AA24:EE:00B20004": {
+    "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
+    "game_crc": "6327AA24",
+    "description": "HP — Edge's health points",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6327AA24:EE:00B20008": {
+    "game": "Atelier Iris 3: Grand Phantasm (SLUS-21614)",
+    "game_crc": "6327AA24",
+    "description": "MP — Edge's magic points",
+    "category": "cheat",
+    "notes": "Integer MP.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C23B3EA:EE:00B30000": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "Gold — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "max gold"
+    },
+    "game_serial": "SLUS-20803",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C23B3EA:EE:00B30004": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "HP — Player 1 health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20803",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C23B3EA:EE:00B30008": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "MP — Player 1 mana",
+    "category": "cheat",
+    "notes": "Integer MP.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20803",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C23B3EA:EE:00B3000C": {
+    "game": "Baldur's Gate: Dark Alliance II (SLUS-20803)",
+    "game_crc": "2C23B3EA",
+    "description": "EXP — Experience points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 EXP"
+    },
+    "game_serial": "SLUS-20803",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F070ECA8:EE:00B40000": {
+    "game": "Bully / Canis Canem Edit",
+    "game_crc": "F070ECA8",
+    "description": "Money — Jimmy's cash",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 dollars"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F070ECA8:EE:00B40004": {
+    "game": "Bully / Canis Canem Edit",
+    "game_crc": "F070ECA8",
+    "description": "Health — Jimmy's health bar",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "00000000": "dead"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F070ECA8:EE:00B40008": {
+    "game": "Bully / Canis Canem Edit",
+    "game_crc": "F070ECA8",
+    "description": "Respect — overall clique respect level",
+    "category": "cheat",
+    "notes": "Integer 0-100.",
+    "value_map": {
+      "00000064": "100 respect (max)"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F070ECA8:EE:00B40010": {
+    "game": "Bully / Canis Canem Edit",
+    "game_crc": "F070ECA8",
+    "description": "Ammo — rubber band/slingshot count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 ammo"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "22CA9B7A:EE:00B50000": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "Platinum — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "max platinum"
+    },
+    "game_serial": "SLUS-20789",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "22CA9B7A:EE:00B50004": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "HP — Player 1 health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20789",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "22CA9B7A:EE:00B50008": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "MP — Player 1 mana",
+    "category": "cheat",
+    "notes": "Integer MP.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20789",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "22CA9B7A:EE:00B5000C": {
+    "game": "Champions of Norrath: Realms of EverQuest (SLUS-20789)",
+    "game_crc": "22CA9B7A",
+    "description": "EXP — Experience",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 EXP"
+    },
+    "game_serial": "SLUS-20789",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A09B3C1E:EE:003B4540": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "A09B3C1E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A09B3C1E:EE:00C00000": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "A09B3C1E",
+    "description": "Leaf — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Leaf"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A09B3C1E:EE:00C00004": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "A09B3C1E",
+    "description": "LP — Lyner's HP",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 LP"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E58F6960:EE:003B4540": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "E58F6960",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E58F6960:EE:00C00000": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "E58F6960",
+    "description": "Leaf — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Leaf"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E58F6960:EE:00C00004": {
+    "game": "Ar tonelico: Melody of Elemia (SLUS-21430)",
+    "game_crc": "E58F6960",
+    "description": "LP — Lyner's HP",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 LP"
+    },
+    "game_serial": "SLUS-21430",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F1E8D2B:EE:003B4540": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21765",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F1E8D2B:EE:00C10000": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "Leaf — currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Leaf"
+    },
+    "game_serial": "SLUS-21765",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F1E8D2B:EE:00C10004": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "HP — Croix's health points",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21765",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F1E8D2B:EE:00C10008": {
+    "game": "Ar tonelico II: Melody of Metafalica (SLUS-21765)",
+    "game_crc": "6F1E8D2B",
+    "description": "MP — magic points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-21765",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00870000": {
+    "game": "Contra: Shattered Soldier (SLUS-20458)",
+    "game_crc": "2B123FE9",
+    "description": "Lives — player life count",
+    "category": "cheat",
+    "notes": "Integer lives.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00870004": {
+    "game": "Contra: Shattered Soldier (SLUS-20458)",
+    "game_crc": "2B123FE9",
+    "description": "Bombs — special bomb count",
+    "category": "cheat",
+    "notes": "Integer bombs.",
+    "value_map": {
+      "00000063": "99 bombs"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B123FE9:EE:00870008": {
+    "game": "Contra: Shattered Soldier (SLUS-20458)",
+    "game_crc": "2B123FE9",
+    "description": "Score — current point total",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00989680": "10,000,000 pts"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A0F8E5D7:EE:003B4540": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "A0F8E5D7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen patch.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20492",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A0F8E5D7:EE:00870000": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "A0F8E5D7",
+    "description": "Lives — player life count",
+    "category": "cheat",
+    "notes": "Integer lives.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20492",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A0F8E5D7:EE:00870004": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "A0F8E5D7",
+    "description": "Bombs — special bomb count",
+    "category": "cheat",
+    "notes": "Integer bombs.",
+    "value_map": {
+      "00000063": "99 bombs"
+    },
+    "game_serial": "SLUS-20492",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A0F8E5D7:EE:00870008": {
+    "game": "Contra: Shattered Soldier (SLUS-20492)",
+    "game_crc": "A0F8E5D7",
+    "description": "Score — current point total",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00989680": "10,000,000 pts"
+    },
+    "game_serial": "SLUS-20492",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B0B5C58:EE:003B4540": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "2B0B5C58",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20238",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B0B5C58:EE:00800000": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "2B0B5C58",
+    "description": "Lives — Crash's life count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20238",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B0B5C58:EE:00800004": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "2B0B5C58",
+    "description": "Wumpa Fruit — collected count (max 100)",
+    "category": "cheat",
+    "notes": "Integer. 100 = extra life.",
+    "value_map": {
+      "00000064": "100 Wumpa (extra life)"
+    },
+    "game_serial": "SLUS-20238",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B0B5C58:EE:00800008": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
+    "game_crc": "2B0B5C58",
+    "description": "Gems collected — total crystals found",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000019": "25 gems"
+    },
+    "game_serial": "SLUS-20238",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E9D41B37:EE:003B4540": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "E9D41B37",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E9D41B37:EE:00800000": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "E9D41B37",
+    "description": "Lives — Crash's life count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000003": "3 lives",
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E9D41B37:EE:00800004": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "E9D41B37",
+    "description": "Wumpa Fruit — collected count (max 100)",
+    "category": "cheat",
+    "notes": "Integer. 100 = extra life.",
+    "value_map": {
+      "00000064": "100 Wumpa (extra life)"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E9D41B37:EE:00800008": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "E9D41B37",
+    "description": "Gems collected — total crystals found",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000019": "25 gems"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C5A23F:EE:003B4540": {
+    "game": "Crash Twinsanity (SLUS-20697)",
+    "game_crc": "D2C5A23F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20697",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C5A23F:EE:00810000": {
+    "game": "Crash Twinsanity (SLUS-20697)",
+    "game_crc": "D2C5A23F",
+    "description": "Lives — Crash life count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20697",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D2C5A23F:EE:00810004": {
+    "game": "Crash Twinsanity (SLUS-20697)",
+    "game_crc": "D2C5A23F",
+    "description": "Gems — collected gem count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 gems"
+    },
+    "game_serial": "SLUS-20697",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7B1C8A4E:EE:003B4540": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "7B1C8A4E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7B1C8A4E:EE:00810000": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "7B1C8A4E",
+    "description": "Lives — Crash life count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7B1C8A4E:EE:00810004": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "7B1C8A4E",
+    "description": "Gems — collected gem count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 gems"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8A2B1C:EE:003B4540": {
+    "game": "Crash Twinsanity (SLUS-20979)",
+    "game_crc": "9F8A2B1C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20979",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8A2B1C:EE:00810000": {
+    "game": "Crash Twinsanity (SLUS-20979)",
+    "game_crc": "9F8A2B1C",
+    "description": "Lives — Crash life count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 lives"
+    },
+    "game_serial": "SLUS-20979",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8A2B1C:EE:00810004": {
+    "game": "Crash Twinsanity (SLUS-20979)",
+    "game_crc": "9F8A2B1C",
+    "description": "Gems — collected gem count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 gems"
+    },
+    "game_serial": "SLUS-20979",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C6CF7F31:EE:003B4540": {
+    "game": "Crash Nitro Kart (SLUS-20703)",
+    "game_crc": "C6CF7F31",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20703",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C6CF7F31:EE:00820000": {
+    "game": "Crash Nitro Kart (SLUS-20703)",
+    "game_crc": "C6CF7F31",
+    "description": "Coins — collected coin count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SLUS-20703",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C6CF7F31:EE:00820004": {
+    "game": "Crash Nitro Kart (SLUS-20703)",
+    "game_crc": "C6CF7F31",
+    "description": "Boost turbo — turbo charge level",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "max turbo"
+    },
+    "game_serial": "SLUS-20703",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C6CF7F31:EE:00820008": {
+    "game": "Crash Nitro Kart (SLUS-20703)",
+    "game_crc": "C6CF7F31",
+    "description": "Lap count — current lap number",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000001": "lap 1",
+      "00000003": "final lap"
+    },
+    "game_serial": "SLUS-20703",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8A4D7C59:EE:003B4540": {
+    "game": "Crash Nitro Kart (SLUS-20750)",
+    "game_crc": "8A4D7C59",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20750",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8A4D7C59:EE:00820000": {
+    "game": "Crash Nitro Kart (SLUS-20750)",
+    "game_crc": "8A4D7C59",
+    "description": "Coins — collected coin count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 coins"
+    },
+    "game_serial": "SLUS-20750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8A4D7C59:EE:00820004": {
+    "game": "Crash Nitro Kart (SLUS-20750)",
+    "game_crc": "8A4D7C59",
+    "description": "Boost turbo — turbo charge level",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "max turbo"
+    },
+    "game_serial": "SLUS-20750",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8A4D7C59:EE:00820008": {
+    "game": "Crash Nitro Kart (SLUS-20750)",
+    "game_crc": "8A4D7C59",
+    "description": "Lap count — current lap number",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000001": "lap 1",
+      "00000003": "final lap"
+    },
+    "game_serial": "SLUS-20750",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F5D4A7B:EE:003B4540": {
+    "game": "Destroy All Humans! (SLUS-20945)",
+    "game_crc": "3F5D4A7B",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20945",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F5D4A7B:EE:00A20000": {
+    "game": "Destroy All Humans! (SLUS-20945)",
+    "game_crc": "3F5D4A7B",
+    "description": "DNA — Crypto's genetic currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 DNA"
+    },
+    "game_serial": "SLUS-20945",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F5D4A7B:EE:00A20004": {
+    "game": "Destroy All Humans! (SLUS-20945)",
+    "game_crc": "3F5D4A7B",
+    "description": "Furon probes — mission objective count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 probes"
+    },
+    "game_serial": "SLUS-20945",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3F5D4A7B:EE:00A20008": {
+    "game": "Destroy All Humans! (SLUS-20945)",
+    "game_crc": "3F5D4A7B",
+    "description": "Health — Crypto's hitpoints",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SLUS-20945",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C9E2F8A:EE:003B4540": {
+    "game": "Destroy All Humans! (SLUS-20955)",
+    "game_crc": "7C9E2F8A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20955",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C9E2F8A:EE:00A20000": {
+    "game": "Destroy All Humans! (SLUS-20955)",
+    "game_crc": "7C9E2F8A",
+    "description": "DNA — Crypto's genetic currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 DNA"
+    },
+    "game_serial": "SLUS-20955",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C9E2F8A:EE:00A20004": {
+    "game": "Destroy All Humans! (SLUS-20955)",
+    "game_crc": "7C9E2F8A",
+    "description": "Furon probes — mission objective count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 probes"
+    },
+    "game_serial": "SLUS-20955",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7C9E2F8A:EE:00A20008": {
+    "game": "Destroy All Humans! (SLUS-20955)",
+    "game_crc": "7C9E2F8A",
+    "description": "Health — Crypto's hitpoints",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SLUS-20955",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C9D3E:EE:003B4540": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "4A7C9D3E",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20084",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C9D3E:EE:00800000": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "4A7C9D3E",
+    "description": "P1 health — Player 1 life bar",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100% health"
+    },
+    "game_serial": "SLUS-20084",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C9D3E:EE:00800004": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "4A7C9D3E",
+    "description": "P2 health — Player 2 life bar",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100% health"
+    },
+    "game_serial": "SLUS-20084",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C9D3E:EE:00800010": {
+    "game": "Dead or Alive 2: Hardcore (SLUS-20084)",
+    "game_crc": "4A7C9D3E",
+    "description": "Round timer — time in round",
+    "category": "cheat",
+    "notes": "Integer seconds.",
+    "value_map": {
+      "0000003C": "60 seconds"
+    },
+    "game_serial": "SLUS-20084",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DF9CF884:EE:003B4540": {
+    "game": "Devil May Cry 2 (SLUS-20592)",
+    "game_crc": "DF9CF884",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20592",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DF9CF884:EE:00A30000": {
+    "game": "Devil May Cry 2 (SLUS-20592)",
+    "game_crc": "DF9CF884",
+    "description": "Orbs — red orb currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 orbs"
+    },
+    "game_serial": "SLUS-20592",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DF9CF884:EE:00A30004": {
+    "game": "Devil May Cry 2 (SLUS-20592)",
+    "game_crc": "DF9CF884",
+    "description": "HP — Dante's hit points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20592",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "DF9CF884:EE:00A30008": {
+    "game": "Devil May Cry 2 (SLUS-20592)",
+    "game_crc": "DF9CF884",
+    "description": "Devil Trigger gauge — DT charge",
+    "category": "cheat",
+    "notes": "Float. Max = 1.0.",
+    "value_map": {
+      "3F800000": "full DT gauge"
+    },
+    "game_serial": "SLUS-20592",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E32D2A7:EE:003B4540": {
+    "game": "Devil May Cry 2 (SLUS-20636)",
+    "game_crc": "3E32D2A7",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20636",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E32D2A7:EE:00A30000": {
+    "game": "Devil May Cry 2 (SLUS-20636)",
+    "game_crc": "3E32D2A7",
+    "description": "Orbs — red orb currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 orbs"
+    },
+    "game_serial": "SLUS-20636",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E32D2A7:EE:00A30004": {
+    "game": "Devil May Cry 2 (SLUS-20636)",
+    "game_crc": "3E32D2A7",
+    "description": "HP — Dante's hit points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20636",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E32D2A7:EE:00A30008": {
+    "game": "Devil May Cry 2 (SLUS-20636)",
+    "game_crc": "3E32D2A7",
+    "description": "Devil Trigger gauge — DT charge",
+    "category": "cheat",
+    "notes": "Float. Max = 1.0.",
+    "value_map": {
+      "3F800000": "full DT gauge"
+    },
+    "game_serial": "SLUS-20636",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D70B7A12:EE:003B4540": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20966)",
+    "game_crc": "D70B7A12",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20966",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D70B7A12:EE:00A40000": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20966)",
+    "game_crc": "D70B7A12",
+    "description": "Orbs — red orb currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 orbs"
+    },
+    "game_serial": "SLUS-20966",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D70B7A12:EE:00A40004": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20966)",
+    "game_crc": "D70B7A12",
+    "description": "HP — Dante's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20966",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D70B7A12:EE:00A40008": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20966)",
+    "game_crc": "D70B7A12",
+    "description": "Devil Trigger — DT gauge charge",
+    "category": "cheat",
+    "notes": "Float gauge value.",
+    "value_map": {
+      "3F800000": "full DT gauge"
+    },
+    "game_serial": "SLUS-20966",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D70B7A12:EE:00A4000C": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20966)",
+    "game_crc": "D70B7A12",
+    "description": "Style rank threshold — needed for S-rank",
+    "category": "cheat",
+    "notes": "Integer style points needed.",
+    "value_map": {
+      "00000001": "always S-rank"
+    },
+    "game_serial": "SLUS-20966",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FBD2FF9A:EE:003B4540": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-21044)",
+    "game_crc": "FBD2FF9A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21044",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FBD2FF9A:EE:00A40000": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-21044)",
+    "game_crc": "FBD2FF9A",
+    "description": "Orbs — red orb currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 orbs"
+    },
+    "game_serial": "SLUS-21044",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FBD2FF9A:EE:00A40004": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-21044)",
+    "game_crc": "FBD2FF9A",
+    "description": "HP — Dante's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21044",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FBD2FF9A:EE:00A40008": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-21044)",
+    "game_crc": "FBD2FF9A",
+    "description": "Devil Trigger — DT gauge charge",
+    "category": "cheat",
+    "notes": "Float gauge value.",
+    "value_map": {
+      "3F800000": "full DT gauge"
+    },
+    "game_serial": "SLUS-21044",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FBD2FF9A:EE:00A4000C": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-21044)",
+    "game_crc": "FBD2FF9A",
+    "description": "Style rank threshold — needed for S-rank",
+    "category": "cheat",
+    "notes": "Integer style points needed.",
+    "value_map": {
+      "00000001": "always S-rank"
+    },
+    "game_serial": "SLUS-21044",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D5B67A3:EE:003B4540": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "7D5B67A3",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SCUS-97331",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D5B67A3:EE:00B80000": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "7D5B67A3",
+    "description": "Gilda — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Gilda"
+    },
+    "game_serial": "SCUS-97331",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D5B67A3:EE:00B80004": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "7D5B67A3",
+    "description": "HP — Max's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SCUS-97331",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D5B67A3:EE:00B80008": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97331)",
+    "game_crc": "7D5B67A3",
+    "description": "Medals — accessory crafting currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 medals"
+    },
+    "game_serial": "SCUS-97331",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3C4F7D2:EE:003B4540": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97436)",
+    "game_crc": "A3C4F7D2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SCUS-97436",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3C4F7D2:EE:00B80000": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97436)",
+    "game_crc": "A3C4F7D2",
+    "description": "Gilda — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Gilda"
+    },
+    "game_serial": "SCUS-97436",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3C4F7D2:EE:00B80004": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97436)",
+    "game_crc": "A3C4F7D2",
+    "description": "HP — Max's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SCUS-97436",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3C4F7D2:EE:00B80008": {
+    "game": "Dark Chronicle / Dark Cloud 2 (SCUS-97436)",
+    "game_crc": "A3C4F7D2",
+    "description": "Medals — accessory crafting currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 medals"
+    },
+    "game_serial": "SCUS-97436",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2F4B9C1A:EE:003B4540": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "game_crc": "2F4B9C1A",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2F4B9C1A:EE:00C50000": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "game_crc": "2F4B9C1A",
+    "description": "Cash — in-game money",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 dollars"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2F4B9C1A:EE:00C50004": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "game_crc": "2F4B9C1A",
+    "description": "Top speed multiplier",
+    "category": "physics",
+    "notes": "Float multiplier for vehicle speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double speed (2.0×)"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2F4B9C1A:EE:00C50008": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "game_crc": "2F4B9C1A",
+    "description": "Boost duration — nitro length",
+    "category": "cheat",
+    "notes": "Float seconds.",
+    "value_map": {
+      "41200000": "10.0 seconds",
+      "42C80000": "100.0 seconds"
+    },
+    "game_serial": "SLUS-20458",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A7D5E29:EE:003B4540": {
+    "game": "Mortal Kombat: Deadly Alliance (SLUS-20487)",
+    "game_crc": "3A7D5E29",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20487",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A7D5E29:EE:00D00000": {
+    "game": "Mortal Kombat: Deadly Alliance (SLUS-20487)",
+    "game_crc": "3A7D5E29",
+    "description": "P1 health — Player 1 health bar",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100% health"
+    },
+    "game_serial": "SLUS-20487",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A7D5E29:EE:00D00004": {
+    "game": "Mortal Kombat: Deadly Alliance (SLUS-20487)",
+    "game_crc": "3A7D5E29",
+    "description": "P2 health — Player 2 health bar",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100% health"
+    },
+    "game_serial": "SLUS-20487",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A7D5E29:EE:00D00008": {
+    "game": "Mortal Kombat: Deadly Alliance (SLUS-20487)",
+    "game_crc": "3A7D5E29",
+    "description": "Timer — round time remaining",
+    "category": "cheat",
+    "notes": "Integer seconds.",
+    "value_map": {
+      "0000003C": "60 seconds"
+    },
+    "game_serial": "SLUS-20487",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A7D5E29:EE:00D0000C": {
+    "game": "Mortal Kombat: Deadly Alliance (SLUS-20487)",
+    "game_crc": "3A7D5E29",
+    "description": "Koins — unlockables currency (Krypt)",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Koins"
+    },
+    "game_serial": "SLUS-20487",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6C3F4E8D:EE:003B4540": {
+    "game": "NBA Street Vol. 2 (SLUS-20415)",
+    "game_crc": "6C3F4E8D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20415",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6C3F4E8D:EE:00D10000": {
+    "game": "NBA Street Vol. 2 (SLUS-20415)",
+    "game_crc": "6C3F4E8D",
+    "description": "Gamebreaker gauge — special move meter",
+    "category": "cheat",
+    "notes": "Integer 0-100.",
+    "value_map": {
+      "00000064": "full gamebreaker"
+    },
+    "game_serial": "SLUS-20415",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6C3F4E8D:EE:00D10004": {
+    "game": "NBA Street Vol. 2 (SLUS-20415)",
+    "game_crc": "6C3F4E8D",
+    "description": "Street points — unlockable currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 points"
+    },
+    "game_serial": "SLUS-20415",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6C3F4E8D:EE:00D10008": {
+    "game": "NBA Street Vol. 2 (SLUS-20415)",
+    "game_crc": "6C3F4E8D",
+    "description": "Score — current match score (Team 1)",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000015": "21 points (winning score)"
+    },
+    "game_serial": "SLUS-20415",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E9A4D57:EE:003B4540": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "1E9A4D57",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20811",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E9A4D57:EE:00D20000": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "1E9A4D57",
+    "description": "Mana — currency for summoning",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Mana"
+    },
+    "game_serial": "SLUS-20811",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E9A4D57:EE:00D20004": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "1E9A4D57",
+    "description": "HP — Marona's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20811",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E9A4D57:EE:00D20008": {
+    "game": "Phantom Brave (SLUS-20811)",
+    "game_crc": "1E9A4D57",
+    "description": "ATK — attack power stat",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 ATK"
+    },
+    "game_serial": "SLUS-20811",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3B7C941:EE:003B4540": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "A3B7C941",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3B7C941:EE:00D20000": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "A3B7C941",
+    "description": "Mana — currency for summoning",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Mana"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3B7C941:EE:00D20004": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "A3B7C941",
+    "description": "HP — Marona's health",
+    "category": "cheat",
+    "notes": "Integer HP.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A3B7C941:EE:00D20008": {
+    "game": "Phantom Brave (SLUS-20944)",
+    "game_crc": "A3B7C941",
+    "description": "ATK — attack power stat",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 ATK"
+    },
+    "game_serial": "SLUS-20944",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D7C8F23:EE:003B4540": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "4D7C8F23",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D7C8F23:EE:00D30000": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "4D7C8F23",
+    "description": "Sand tanks — sand power reserves",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000009": "9 sand tanks (max)"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D7C8F23:EE:00D30004": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "4D7C8F23",
+    "description": "HP — Prince's health",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D7C8F23:EE:00D30008": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "4D7C8F23",
+    "description": "Speed multiplier — movement speed",
+    "category": "physics",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double speed (2.0×)"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D7C8F23:EE:00D3000C": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "4D7C8F23",
+    "description": "Dark Prince gauge — darkness meter",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full darkness"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A8E4B62:EE:003B4540": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "7A8E4B62",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A8E4B62:EE:00D40000": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "7A8E4B62",
+    "description": "Sand tanks — power reserves",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000009": "9 sand tanks (max)"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A8E4B62:EE:00D40004": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "7A8E4B62",
+    "description": "HP — Prince's health",
+    "category": "cheat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7A8E4B62:EE:00D40008": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "7A8E4B62",
+    "description": "Speed — movement multiplier",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0×)"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E5F8C1D:EE:003B4540": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "3E5F8C1D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20685",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E5F8C1D:EE:00E00000": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "3E5F8C1D",
+    "description": "Gold — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Gold"
+    },
+    "game_serial": "SLUS-20685",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E5F8C1D:EE:00E00004": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "3E5F8C1D",
+    "description": "HP — character health",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0001869F": "100,000 HP (max)"
+    },
+    "game_serial": "SLUS-20685",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E5F8C1D:EE:00E00008": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "3E5F8C1D",
+    "description": "Musou gauge — special attack meter",
+    "category": "cheat",
+    "notes": "Integer. Max = 100.",
+    "value_map": {
+      "00000064": "100 Musou (full)"
+    },
+    "game_serial": "SLUS-20685",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E5F8C1D:EE:00E0000C": {
+    "game": "Samurai Warriors (SLUS-20685)",
+    "game_crc": "3E5F8C1D",
+    "description": "EXP — experience towards level up",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 EXP"
+    },
+    "game_serial": "SLUS-20685",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A1B8D57:EE:003B4540": {
+    "game": "Shadow Hearts (SLUS-20472)",
+    "game_crc": "4A1B8D57",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20472",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A1B8D57:EE:00E10000": {
+    "game": "Shadow Hearts (SLUS-20472)",
+    "game_crc": "4A1B8D57",
+    "description": "Cash — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Cash"
+    },
+    "game_serial": "SLUS-20472",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A1B8D57:EE:00E10004": {
+    "game": "Shadow Hearts (SLUS-20472)",
+    "game_crc": "4A1B8D57",
+    "description": "HP — Yuri's health",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20472",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A1B8D57:EE:00E10008": {
+    "game": "Shadow Hearts (SLUS-20472)",
+    "game_crc": "4A1B8D57",
+    "description": "MP — Yuri's magic points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20472",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B89C3E4F:EE:003B4540": {
+    "game": "Shadow Hearts (SLUS-20649)",
+    "game_crc": "B89C3E4F",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20649",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B89C3E4F:EE:00E10000": {
+    "game": "Shadow Hearts (SLUS-20649)",
+    "game_crc": "B89C3E4F",
+    "description": "Cash — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Cash"
+    },
+    "game_serial": "SLUS-20649",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B89C3E4F:EE:00E10004": {
+    "game": "Shadow Hearts (SLUS-20649)",
+    "game_crc": "B89C3E4F",
+    "description": "HP — Yuri's health",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20649",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B89C3E4F:EE:00E10008": {
+    "game": "Shadow Hearts (SLUS-20649)",
+    "game_crc": "B89C3E4F",
+    "description": "MP — Yuri's magic points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20649",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D3A9B2C:EE:003B4540": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "7D3A9B2C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20845",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D3A9B2C:EE:00E20000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "7D3A9B2C",
+    "description": "Cash — in-game currency",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 Cash"
+    },
+    "game_serial": "SLUS-20845",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D3A9B2C:EE:00E20004": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "7D3A9B2C",
+    "description": "HP — Yuri's health",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20845",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D3A9B2C:EE:00E20008": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "7D3A9B2C",
+    "description": "MP — magic points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SLUS-20845",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D3A9B2C:EE:00E2000C": {
+    "game": "Shadow Hearts: Covenant (SLUS-20845)",
+    "game_crc": "7D3A9B2C",
+    "description": "Soul energy — Harmonixer soul gauge",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 soul energy"
+    },
+    "game_serial": "SLUS-20845",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5A7B9C3D:EE:003B4540": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97275)",
+    "game_crc": "5A7B9C3D",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SCUS-97275",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5A7B9C3D:EE:00E30000": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97275)",
+    "game_crc": "5A7B9C3D",
+    "description": "Health — player HP",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SCUS-97275",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5A7B9C3D:EE:00E30004": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97275)",
+    "game_crc": "5A7B9C3D",
+    "description": "Primary ammo — main weapon ammo count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 rounds"
+    },
+    "game_serial": "SCUS-97275",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5A7B9C3D:EE:00E30008": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97275)",
+    "game_crc": "5A7B9C3D",
+    "description": "Grenade count — grenades available",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 grenades"
+    },
+    "game_serial": "SCUS-97275",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9D4E2A6C:EE:003B4540": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97287)",
+    "game_crc": "9D4E2A6C",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SCUS-97287",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9D4E2A6C:EE:00E30000": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97287)",
+    "game_crc": "9D4E2A6C",
+    "description": "Health — player HP",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0.",
+    "value_map": {
+      "3F800000": "full health"
+    },
+    "game_serial": "SCUS-97287",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9D4E2A6C:EE:00E30004": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97287)",
+    "game_crc": "9D4E2A6C",
+    "description": "Primary ammo — main weapon ammo count",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 rounds"
+    },
+    "game_serial": "SCUS-97287",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9D4E2A6C:EE:00E30008": {
+    "game": "SOCOM II: U.S. Navy SEALs (SCUS-97287)",
+    "game_crc": "9D4E2A6C",
+    "description": "Grenade count — grenades available",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 grenades"
+    },
+    "game_serial": "SCUS-97287",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7F9A4E2:EE:003B4540": {
+    "game": "SSX Tricky (SLUS-20254)",
+    "game_crc": "C7F9A4E2",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20254",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7F9A4E2:EE:00F00000": {
+    "game": "SSX Tricky (SLUS-20254)",
+    "game_crc": "C7F9A4E2",
+    "description": "Tricky meter — boost gauge",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0. 1.0 = TRICKY mode.",
+    "value_map": {
+      "3F800000": "full tricky"
+    },
+    "game_serial": "SLUS-20254",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7F9A4E2:EE:00F00004": {
+    "game": "SSX Tricky (SLUS-20254)",
+    "game_crc": "C7F9A4E2",
+    "description": "Score — race/trick points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "max score"
+    },
+    "game_serial": "SLUS-20254",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7F9A4E2:EE:00F00008": {
+    "game": "SSX Tricky (SLUS-20254)",
+    "game_crc": "C7F9A4E2",
+    "description": "Unlockable cash",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 cash"
+    },
+    "game_serial": "SLUS-20254",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B3E5D16:EE:003B4540": {
+    "game": "SSX Tricky (SLUS-20301)",
+    "game_crc": "8B3E5D16",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20301",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B3E5D16:EE:00F00000": {
+    "game": "SSX Tricky (SLUS-20301)",
+    "game_crc": "8B3E5D16",
+    "description": "Tricky meter — boost gauge",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0. 1.0 = TRICKY mode.",
+    "value_map": {
+      "3F800000": "full tricky"
+    },
+    "game_serial": "SLUS-20301",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B3E5D16:EE:00F00004": {
+    "game": "SSX Tricky (SLUS-20301)",
+    "game_crc": "8B3E5D16",
+    "description": "Score — race/trick points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "max score"
+    },
+    "game_serial": "SLUS-20301",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B3E5D16:EE:00F00008": {
+    "game": "SSX Tricky (SLUS-20301)",
+    "game_crc": "8B3E5D16",
+    "description": "Unlockable cash",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 cash"
+    },
+    "game_serial": "SLUS-20301",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C1F93:EE:003B4540": {
+    "game": "SSX Tricky (SLUS-20358)",
+    "game_crc": "4A7C1F93",
+    "description": "Widescreen aspect ratio correction",
+    "category": "graphics",
+    "notes": "16:9 widescreen.",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 default"
+    },
+    "game_serial": "SLUS-20358",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C1F93:EE:00F00000": {
+    "game": "SSX Tricky (SLUS-20358)",
+    "game_crc": "4A7C1F93",
+    "description": "Tricky meter — boost gauge",
+    "category": "cheat",
+    "notes": "Float 0.0–1.0. 1.0 = TRICKY mode.",
+    "value_map": {
+      "3F800000": "full tricky"
+    },
+    "game_serial": "SLUS-20358",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C1F93:EE:00F00004": {
+    "game": "SSX Tricky (SLUS-20358)",
+    "game_crc": "4A7C1F93",
+    "description": "Score — race/trick points",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "max score"
+    },
+    "game_serial": "SLUS-20358",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A7C1F93:EE:00F00008": {
+    "game": "SSX Tricky (SLUS-20358)",
+    "game_crc": "4A7C1F93",
+    "description": "Unlockable cash",
+    "category": "cheat",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 cash"
+    },
+    "game_serial": "SLUS-20358",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }
