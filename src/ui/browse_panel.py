@@ -338,11 +338,23 @@ class CatalogueCard(QFrame):
             ctx_lbl.setToolTip(self.entry["context"])
             layout.addWidget(ctx_lbl)
 
-        # Upscale tech
+        # Upscale tech + size label row
+        meta_row = QHBoxLayout()
+        meta_row.setSpacing(8)
         if self.entry.get("upscale_tech"):
             tech_lbl = QLabel(f"⚙ {self.entry['upscale_tech']}")
             tech_lbl.setStyleSheet("color: #6080a0; font-size: 10px;")
-            layout.addWidget(tech_lbl)
+            meta_row.addWidget(tech_lbl)
+        if self.entry.get("size_label"):
+            size_lbl = QLabel(f"📦 {self.entry['size_label']}")
+            size_lbl.setStyleSheet(
+                "color: #60a060; font-size: 10px; font-weight: bold;"
+            )
+            size_lbl.setToolTip("Approximate download size of this pack")
+            meta_row.addWidget(size_lbl)
+        meta_row.addStretch()
+        if meta_row.count() > 1:  # only add row if at least one item present
+            layout.addLayout(meta_row)
 
         # Tags
         if self.entry.get("tags"):

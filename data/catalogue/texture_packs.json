@@ -24,7 +24,8 @@
     "upscale_tech": "",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~50 MB"
   },
   {
     "id": "eragon_hd_textures",
@@ -54,7 +55,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "patreon_147372741_hd_textures",
@@ -85,7 +87,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "patreon_147372741_lights",
@@ -116,7 +119,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_gow1_textures",
@@ -147,7 +151,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_gow2_textures",
@@ -178,7 +183,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_kh1_textures",
@@ -209,7 +215,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_kh2_textures",
@@ -240,7 +247,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_ffx_textures",
@@ -271,7 +279,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_ff12_textures",
@@ -302,7 +311,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_sotc_textures",
@@ -333,7 +343,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_ico_textures",
@@ -363,7 +374,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_sh2_textures",
@@ -395,7 +407,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_sh3_textures",
@@ -427,7 +440,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_dmc3_textures",
@@ -458,7 +472,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_re4_textures",
@@ -489,7 +504,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_mgs2_textures",
@@ -520,7 +536,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_mgs3_textures",
@@ -551,7 +568,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_persona3_textures",
@@ -583,7 +601,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_persona4_textures",
@@ -615,7 +634,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_okami_textures",
@@ -645,7 +665,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_gtasa_textures",
@@ -676,7 +697,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_dbz_bt3_textures",
@@ -709,7 +731,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_tekken5_textures",
@@ -740,7 +763,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_dqviii_textures",
@@ -772,7 +796,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_jak_textures",
@@ -803,7 +828,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_ratchet_clank_textures",
@@ -833,7 +859,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~400 MB"
   },
   {
     "id": "doti_sly_cooper_textures",
@@ -863,7 +890,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_crash_woc_textures",
@@ -894,7 +922,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_spyro_textures",
@@ -925,7 +954,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_dark_cloud_textures",
@@ -956,7 +986,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_star_ocean3_textures",
@@ -988,7 +1019,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_gt4_textures",
@@ -1020,7 +1052,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_burnout3_textures",
@@ -1052,7 +1085,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_bully_textures",
@@ -1083,7 +1117,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_xenosaga_textures",
@@ -1115,7 +1150,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_dmc1_textures",
@@ -1146,7 +1182,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_re_code_veronica_textures",
@@ -1178,7 +1215,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_hack_gu_textures",
@@ -1210,7 +1248,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~600 MB"
   },
   {
     "id": "doti_pop_sot_textures",
@@ -1241,7 +1280,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "doti_onimusha_textures",
@@ -1271,7 +1311,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "doti_zone_of_enders_textures",
@@ -1303,7 +1344,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~500 MB"
   },
   {
     "id": "spyro_anb_6x_extra_detail",
@@ -1335,7 +1377,8 @@
     "upscale_tech": "ESRGAN 6×",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~1.5 GB"
   },
   {
     "id": "spyro_anb_6x_only",
@@ -1367,7 +1410,8 @@
     "upscale_tech": "ESRGAN 6×",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~1.2 GB"
   },
   {
     "id": "spyro_anb_4x_anime",
@@ -1399,7 +1443,8 @@
     "upscale_tech": "ESRGAN 4× anime",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~650 MB"
   },
   {
     "id": "spyro_anb_mediafire_folder",
@@ -1430,7 +1475,8 @@
     "upscale_tech": "ESRGAN 4×–6×",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~1400 MB"
   },
   {
     "id": "patreon_post_148478705",
@@ -1459,7 +1505,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~80 MB"
   },
   {
     "id": "patreon_post_148718606",
@@ -1487,7 +1534,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": false,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~300 MB"
   },
   {
     "id": "patreon_post_148894264",
@@ -1517,7 +1565,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": false,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_baroque_textures",
@@ -1547,7 +1596,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_shadow_hearts_textures",
@@ -1576,7 +1626,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_shadow_hearts_covenant_textures",
@@ -1606,7 +1657,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_suikoden5_textures",
@@ -1635,7 +1687,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_mana_khemia_textures",
@@ -1665,7 +1718,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_atelier_iris3_textures",
@@ -1695,7 +1749,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_la_pucelle_textures",
@@ -1725,7 +1780,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_disgaea_textures",
@@ -1755,7 +1811,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_ar_tonelico_textures",
@@ -1784,7 +1841,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_grandia3_textures",
@@ -1813,7 +1871,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_radiata_stories_textures",
@@ -1843,7 +1902,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_xenosaga2_textures",
@@ -1873,7 +1933,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_xenosaga3_textures",
@@ -1903,7 +1964,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_wild_arms4_textures",
@@ -1932,7 +1994,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_tales_of_legendia_textures",
@@ -1962,7 +2025,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_tales_of_rebirth_textures",
@@ -1992,7 +2056,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_arc_the_lad_end_of_darkness_textures",
@@ -2020,7 +2085,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_tales_of_the_abyss_textures",
@@ -2049,7 +2115,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_dq8_textures",
@@ -2078,7 +2145,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_ff12_textures",
@@ -2107,7 +2175,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_persona3_textures",
@@ -2136,7 +2205,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_star_ocean_till_end_of_time_textures",
@@ -2165,7 +2235,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_tales_of_destiny2_textures",
@@ -2194,7 +2265,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_wild_arms5_textures",
@@ -2222,7 +2294,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_atelier_iris2_textures",
@@ -2251,7 +2324,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_ar_tonelico2_textures",
@@ -2279,7 +2353,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_mana_khemia2_textures",
@@ -2308,7 +2383,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_dot_hack_infection_textures",
@@ -2336,7 +2412,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "gb_gow1_hd_textures",
@@ -2363,7 +2440,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gb_kh2_hd_textures",
@@ -2391,7 +2469,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gh_dark_cloud2_textures",
@@ -2419,7 +2498,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~80 MB"
   },
   {
     "id": "gh_persona3_hd_textures",
@@ -2446,7 +2526,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_ffx_hd_textures",
@@ -2473,7 +2554,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_sh2_hd_textures",
@@ -2500,7 +2582,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_re4_hd_textures",
@@ -2527,7 +2610,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gbatemp_gt4_hd_textures",
@@ -2555,7 +2639,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_mgs3_hd_textures",
@@ -2582,7 +2667,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_okami_hd_textures",
@@ -2609,7 +2695,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_sotc_hd_textures",
@@ -2636,7 +2723,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_jak3_hd_textures",
@@ -2664,7 +2752,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_ico_hd_textures",
@@ -2691,7 +2780,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_bully_hd_textures",
@@ -2719,7 +2809,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_gta3_hd_textures",
@@ -2748,7 +2839,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gbatemp_gta_vc_hd_textures",
@@ -2777,7 +2869,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_dmc1_hd_textures",
@@ -2805,7 +2898,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "cckrizalid_xenosaga_ep1_textures",
@@ -2834,7 +2928,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_tales_of_destiny_textures",
@@ -2863,7 +2958,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_tales_of_eternia_textures",
@@ -2892,7 +2988,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_tales_of_symphonia_textures",
@@ -2921,7 +3018,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_persona1_textures",
@@ -2951,7 +3049,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_digital_devil_saga_textures",
@@ -2980,7 +3079,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_digital_devil_saga2_textures",
@@ -3009,7 +3109,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_nocturne_textures",
@@ -3038,7 +3139,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_rogue_galaxy_textures",
@@ -3068,7 +3170,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_valkyrie_profile2_textures",
@@ -3098,7 +3201,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_odin_sphere_textures",
@@ -3128,7 +3232,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_grim_grimoire_textures",
@@ -3158,7 +3263,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_haunting_ground_textures",
@@ -3187,7 +3293,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_shadow_hearts_ftnw_textures",
@@ -3216,7 +3323,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_growlanser_textures",
@@ -3245,7 +3353,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_atelier_iris1_textures",
@@ -3275,7 +3384,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_dot_hack_mutation_textures",
@@ -3304,7 +3414,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_dot_hack_outbreak_textures",
@@ -3333,7 +3444,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_dot_hack_quarantine_textures",
@@ -3362,7 +3474,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_dot_hack_gu2_textures",
@@ -3391,7 +3504,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_dot_hack_gu3_textures",
@@ -3420,7 +3534,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_grandia2_textures",
@@ -3449,7 +3564,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_grandia_xtreme_textures",
@@ -3478,7 +3594,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_ico_textures",
@@ -3507,7 +3624,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_sotc_textures",
@@ -3536,7 +3654,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_gow_textures",
@@ -3565,7 +3684,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_gow2_textures",
@@ -3594,7 +3714,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_ffx2_textures",
@@ -3624,7 +3745,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_ff10_textures",
@@ -3654,7 +3776,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_mgs2_textures",
@@ -3683,7 +3806,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_mgs3_textures",
@@ -3712,7 +3836,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_re4_textures",
@@ -3741,7 +3866,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_re_code_veronica_textures",
@@ -3770,7 +3896,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_sh2_textures",
@@ -3799,7 +3926,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_sh3_textures",
@@ -3828,7 +3956,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_sh4_textures",
@@ -3857,7 +3986,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_kh1_textures",
@@ -3886,7 +4016,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_kh2_textures",
@@ -3915,7 +4046,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_jak_textures",
@@ -3945,7 +4077,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_jak2_textures",
@@ -3974,7 +4107,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_jak3_textures",
@@ -4003,7 +4137,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_ratchet_clank1_textures",
@@ -4033,7 +4168,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_ratchet_clank2_textures",
@@ -4063,7 +4199,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_ratchet_clank3_textures",
@@ -4093,7 +4230,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_sly1_textures",
@@ -4122,7 +4260,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_sly2_textures",
@@ -4151,7 +4290,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_sly3_textures",
@@ -4180,7 +4320,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_dark_cloud_textures",
@@ -4209,7 +4350,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_dark_cloud2_textures",
@@ -4239,7 +4381,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_ffxi_textures",
@@ -4269,7 +4412,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_bully_textures",
@@ -4299,7 +4443,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_gta3_textures",
@@ -4329,7 +4474,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_gta_vc_textures",
@@ -4359,7 +4505,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_gta_sa_textures",
@@ -4389,7 +4536,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_gt4_textures",
@@ -4418,7 +4566,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_gt3_textures",
@@ -4447,7 +4596,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_dmc2_textures",
@@ -4477,7 +4627,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_tekken5_textures",
@@ -4506,7 +4657,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_tekken4_textures",
@@ -4535,7 +4687,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_sc3_textures",
@@ -4564,7 +4717,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_dbz_bt3_textures",
@@ -4594,7 +4748,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_dbz_bt2_textures",
@@ -4624,7 +4779,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_re1_textures",
@@ -4653,7 +4809,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_ffxi_reg_textures",
@@ -4683,7 +4840,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_mgs1_textures",
@@ -4712,7 +4870,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_devil_summoner_textures",
@@ -4741,7 +4900,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_devil_summoner2_textures",
@@ -4770,7 +4930,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "gbatemp_spyro_anb_textures",
@@ -4797,7 +4958,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gbatemp_crash_twoc_textures",
@@ -4825,7 +4987,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_crash_bash_textures",
@@ -4853,7 +5016,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_crash_twinsanity_textures",
@@ -4881,7 +5045,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_ape_escape3_textures",
@@ -4909,7 +5074,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_rogue_galaxy_textures",
@@ -4937,7 +5103,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_valkyrie_profile2_textures",
@@ -4965,7 +5132,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_odin_sphere_textures",
@@ -4993,7 +5161,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_digital_devil_saga_textures",
@@ -5021,7 +5190,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_persona4_textures",
@@ -5049,7 +5219,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_xenosaga_textures",
@@ -5077,7 +5248,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_sly1_textures",
@@ -5105,7 +5277,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_sly3_textures",
@@ -5133,7 +5306,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_mgs2_textures",
@@ -5161,7 +5335,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_sc3_textures",
@@ -5189,7 +5364,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_nba_street3_textures",
@@ -5217,7 +5393,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "gbatemp_tony_hawk3_textures",
@@ -5245,7 +5422,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gbatemp_tony_hawk4_textures",
@@ -5273,7 +5451,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_dmc2_textures",
@@ -5302,7 +5481,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_star_wars_bf2_textures",
@@ -5331,7 +5511,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_nfsu2_textures",
@@ -5359,7 +5540,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gbatemp_nfsc_textures",
@@ -5387,7 +5569,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_haunt_ground_textures",
@@ -5415,7 +5598,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_hot_shots_golf4_textures",
@@ -5444,7 +5628,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_twisted_metal_bh_textures",
@@ -5472,7 +5657,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_socom2_textures",
@@ -5500,7 +5686,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_god_hand_textures",
@@ -5529,7 +5716,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_viewtiful_joe_textures",
@@ -5558,7 +5746,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_viewtiful_joe2_textures",
@@ -5587,7 +5776,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_katamari2_textures",
@@ -5615,7 +5805,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_ace_combat5_textures",
@@ -5643,7 +5834,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_ace_combat04_textures",
@@ -5671,7 +5863,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "gbatemp_jak_dexter_textures",
@@ -5700,7 +5893,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_jak2_textures",
@@ -5728,7 +5922,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "gbatemp_onimusha3_textures",
@@ -5757,7 +5952,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_dragon_quest8_textures",
@@ -5785,7 +5981,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "gbatemp_star_ocean3_textures",
@@ -5813,7 +6010,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_ff12_textures",
@@ -5842,7 +6040,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "gbatemp_radiata_stories_textures",
@@ -5870,7 +6069,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_shin_megami_nocturne_textures",
@@ -5898,7 +6098,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gh_sly_cooper_textures",
@@ -5926,7 +6127,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "gh_ratchet_clank_textures",
@@ -5955,7 +6157,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gh_jak_daxter_textures",
@@ -5984,7 +6187,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "gh_spyro_anb_textures",
@@ -6012,7 +6216,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~100 MB"
   },
   {
     "id": "gh_gow1_textures",
@@ -6040,7 +6245,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~150 MB"
   },
   {
     "id": "gh_gow2_textures",
@@ -6068,7 +6274,8 @@
     "upscale_tech": "ESRGAN",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~80 MB"
   },
   {
     "id": "gh_silent_hill2_textures",
@@ -6096,7 +6303,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gh_ffx_textures",
@@ -6125,7 +6333,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gh_re4_textures",
@@ -6153,7 +6362,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "gh_sotc_textures",
@@ -6180,7 +6390,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "ps2home_crash_bandicoot_textures",
@@ -6207,7 +6418,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "ps2home_spyro_anb_textures",
@@ -6234,7 +6446,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "ps2home_tekken5_textures",
@@ -6261,7 +6474,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "ps2home_soul_calibur3_textures",
@@ -6288,7 +6502,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "ps2home_burnout3_textures",
@@ -6315,7 +6530,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "ps2home_gta_sa_textures",
@@ -6342,7 +6558,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "ps2home_mgs3_textures",
@@ -6369,7 +6586,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "ps2home_re4_textures",
@@ -6396,7 +6614,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "cckrizalid_ar_tonelico_ep1_remaster_textures",
@@ -6425,7 +6644,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_atelier_iris_eternal_textures",
@@ -6454,7 +6674,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_growlanser_wotl_textures",
@@ -6483,7 +6704,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_phantom_brave_textures",
@@ -6513,7 +6735,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_makai_kingdom_textures",
@@ -6543,7 +6766,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_disgaea2_textures",
@@ -6573,7 +6797,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_la_pucelle_ragnarok_textures",
@@ -6603,7 +6828,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_soul_nomad_textures",
@@ -6633,7 +6859,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_ar_tonelico2_remaster_textures",
@@ -6662,7 +6889,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_mana_khemia_alchemists_textures",
@@ -6691,7 +6919,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_suikoden3_textures",
@@ -6721,7 +6950,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_suikoden4_textures",
@@ -6751,7 +6981,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_breath_of_fire_v_textures",
@@ -6781,7 +7012,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_legaia2_textures",
@@ -6810,7 +7042,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_rouge_galaxy_extend_textures",
@@ -6840,7 +7073,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_tales_of_graces_ps2_textures",
@@ -6869,7 +7103,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_wild_arms3_textures",
@@ -6898,7 +7133,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_wild_arms_alter_code_textures",
@@ -6927,7 +7163,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_xenosaga1_remaster_textures",
@@ -6956,7 +7193,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_xenosaga2_remaster_textures",
@@ -6985,7 +7223,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_xenosaga3_remaster_textures",
@@ -7014,7 +7253,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_grandia3_remaster_textures",
@@ -7043,7 +7283,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_luminous_arc_textures",
@@ -7072,7 +7313,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_atelier_iris2_extra_textures",
@@ -7101,7 +7343,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_atelier_iris3_extra_textures",
@@ -7130,7 +7373,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_pop_sot_textures",
@@ -7159,7 +7403,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_pop_ww_textures",
@@ -7188,7 +7433,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_pop_t2t_textures",
@@ -7217,7 +7463,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_crash_twinsanity_textures",
@@ -7246,7 +7493,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "asasega_crash_nitro_kart_textures",
@@ -7275,7 +7523,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_crash_tag_team_textures",
@@ -7304,7 +7553,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_ratchet_clank_rac_textures",
@@ -7333,7 +7583,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "asasega_sly2_textures",
@@ -7362,7 +7613,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "asasega_dbz_bt3_textures",
@@ -7391,7 +7643,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "asasega_dbz_bt2_textures",
@@ -7420,7 +7673,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_nfs_mw_textures",
@@ -7449,7 +7703,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "asasega_nfs_hp2_textures",
@@ -7478,7 +7733,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_star_wars_bf1_textures",
@@ -7507,7 +7763,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_star_wars_bf2_full_textures",
@@ -7536,7 +7793,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "asasega_sc2_textures",
@@ -7565,7 +7823,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_doa2_textures",
@@ -7594,7 +7853,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_virtua_fighter4_textures",
@@ -7624,7 +7884,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "asasega_wwe_smackdown_textures",
@@ -7653,7 +7914,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "asasega_ace_combat_zero_textures",
@@ -7682,7 +7944,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_zone_of_enders2_textures",
@@ -7712,7 +7975,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_silent_hill4_textures",
@@ -7741,7 +8005,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "asasega_haunting_ground_textures",
@@ -7770,7 +8035,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_re_dead_aim_textures",
@@ -7799,7 +8065,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_twisted_metal_bh_textures",
@@ -7828,7 +8095,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "asasega_god_hand_textures",
@@ -7858,7 +8126,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_viewtiful_joe_textures",
@@ -7888,7 +8157,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_viewtiful_joe2_textures",
@@ -7918,7 +8188,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "asasega_katamari_damacy_textures",
@@ -7947,7 +8218,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_katamari2_textures",
@@ -7976,7 +8248,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_socom2_textures",
@@ -8005,7 +8278,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_socom3_textures",
@@ -8034,7 +8308,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "asasega_gt4_prologue_textures",
@@ -8063,7 +8338,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_f1_2005_textures",
@@ -8092,7 +8368,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "asasega_kinetica_textures",
@@ -8121,7 +8398,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "kozarovv_onimusha_warlords_textures",
@@ -8151,7 +8429,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "kozarovv_onimusha2_textures",
@@ -8181,7 +8460,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "kozarovv_sly2_hd_textures",
@@ -8210,7 +8490,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "kozarovv_jak_dexter_textures",
@@ -8240,7 +8521,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "kozarovv_ratchet_clank2_textures",
@@ -8270,7 +8552,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "kozarovv_ratchet_clank3_textures",
@@ -8300,7 +8583,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "sly4dead_spyro_ehe_textures",
@@ -8329,7 +8613,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "sly4dead_crash_bandicoot_textures",
@@ -8358,7 +8643,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "sly4dead_crash_nitro_kart_textures",
@@ -8387,7 +8673,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_okami_textures",
@@ -8416,7 +8703,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_ico_textures",
@@ -8445,7 +8733,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_sotc_textures",
@@ -8474,7 +8763,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_gt4_textures",
@@ -8503,7 +8793,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_ffx_textures",
@@ -8533,7 +8824,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_sh2_textures",
@@ -8562,7 +8854,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_re4_textures",
@@ -8591,7 +8884,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_kh1_textures",
@@ -8620,7 +8914,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_kh2_textures",
@@ -8649,7 +8944,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_persona3_textures",
@@ -8678,7 +8974,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_persona4_textures",
@@ -8707,7 +9004,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_ffxii_textures",
@@ -8737,7 +9035,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_mgs2_textures",
@@ -8766,7 +9065,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_mgs3_textures",
@@ -8795,7 +9095,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_dmc3_textures",
@@ -8824,7 +9125,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_jak_daxter_textures",
@@ -8854,7 +9156,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_ratchet_clank_textures",
@@ -8884,7 +9187,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_gow1_textures",
@@ -8913,7 +9217,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_gow2_textures",
@@ -8942,7 +9247,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_dark_cloud_textures",
@@ -8971,7 +9277,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_dark_cloud2_textures",
@@ -9000,7 +9307,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_dq8_textures",
@@ -9029,7 +9337,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_rogue_galaxy_textures",
@@ -9058,7 +9367,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_fatal_frame_textures",
@@ -9087,7 +9397,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_fatal_frame2_textures",
@@ -9116,7 +9427,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_fatal_frame3_textures",
@@ -9145,7 +9457,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_clock_tower3_textures",
@@ -9174,7 +9487,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_rule_of_rose_textures",
@@ -9203,7 +9517,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_haunting_ground_extend_textures",
@@ -9232,7 +9547,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_primal_textures",
@@ -9261,7 +9577,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_rygar_textures",
@@ -9290,7 +9607,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_shadow_of_rome_textures",
@@ -9320,7 +9638,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_legacy_kain_defiance_textures",
@@ -9349,7 +9668,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_soul_reaver2_textures",
@@ -9378,7 +9698,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_blood_omen2_textures",
@@ -9407,7 +9728,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_castlevania_loi_textures",
@@ -9437,7 +9759,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_castlevania_cod_textures",
@@ -9467,7 +9790,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_psi_ops_textures",
@@ -9496,7 +9820,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_way_samurai2_textures",
@@ -9525,7 +9850,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_mark_of_kri_textures",
@@ -9554,7 +9880,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_shinobi_textures",
@@ -9584,7 +9911,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_nightshade_textures",
@@ -9614,7 +9942,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_ys_ark_napishtim_textures",
@@ -9644,7 +9973,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_ys_felghana_textures",
@@ -9674,7 +10004,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_steambot_chronicles_textures",
@@ -9703,7 +10034,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_persona_textures",
@@ -9734,7 +10066,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_persona2_ep_textures",
@@ -9765,7 +10098,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_front_mission4_textures",
@@ -9795,7 +10129,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_front_mission5_textures",
@@ -9825,7 +10160,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_ring_of_red_textures",
@@ -9855,7 +10191,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_disgaea1_extend_textures",
@@ -9885,7 +10222,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_phantom_brave_extend_textures",
@@ -9915,7 +10253,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_cross_edge_textures",
@@ -9944,7 +10283,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_time_crisis3_textures",
@@ -9974,7 +10314,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_king_of_fighters_xi_textures",
@@ -10004,7 +10345,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_capcom_vs_snk2_textures",
@@ -10034,7 +10376,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_mvc2_textures",
@@ -10064,7 +10407,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_mortal_kombat_deception_textures",
@@ -10093,7 +10437,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_mortal_kombat_armageddon_textures",
@@ -10122,7 +10467,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_guilty_gear_xx_textures",
@@ -10152,7 +10498,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_street_fighter_anniversary_textures",
@@ -10182,7 +10529,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_naruto_un5_textures",
@@ -10211,7 +10559,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_naruto_un3_textures",
@@ -10240,7 +10589,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_dbz_infinite_world_textures",
@@ -10269,7 +10619,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_dbz_budokai3_extend_textures",
@@ -10298,7 +10649,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_klonoa2_textures",
@@ -10328,7 +10680,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_sonic_heroes_textures",
@@ -10358,7 +10711,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_shadow_the_hedgehog_textures",
@@ -10389,7 +10743,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_ty_tasmanian_tiger_textures",
@@ -10418,7 +10773,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_ty_tasmanian_tiger2_textures",
@@ -10447,7 +10803,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_psychonauts_textures",
@@ -10477,7 +10834,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_baldurs_gate_da_textures",
@@ -10506,7 +10864,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_baldurs_gate_da2_textures",
@@ -10535,7 +10894,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_champions_of_norrath_textures",
@@ -10565,7 +10925,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_champions_return_to_arms_textures",
@@ -10594,7 +10955,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_destroy_all_humans_textures",
@@ -10623,7 +10985,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_destroy_all_humans2_textures",
@@ -10652,7 +11015,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_timesplitters2_textures",
@@ -10681,7 +11045,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_timesplitters_fp_textures",
@@ -10710,7 +11075,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_killzone_textures",
@@ -10739,7 +11105,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_black_textures",
@@ -10769,7 +11136,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "cckrizalid_ssx_tricky_textures",
@@ -10799,7 +11167,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_ssx3_textures",
@@ -10829,7 +11198,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_ridge_racer_v_textures",
@@ -10859,7 +11229,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_wipeout_fusion_textures",
@@ -10889,7 +11260,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_burnout_dominator_textures",
@@ -10919,7 +11291,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_nfs_underground1_textures",
@@ -10948,7 +11321,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "cckrizalid_nfs_most_wanted_extend_textures",
@@ -10977,7 +11351,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "asasega_jak_x_textures",
@@ -11006,7 +11381,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_tenchu_woh_textures",
@@ -11035,7 +11411,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_tenchu_fs_textures",
@@ -11064,7 +11441,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_shinobi_hd_textures",
@@ -11093,7 +11471,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "asasega_onimusha_dod_textures",
@@ -11123,7 +11502,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "asasega_ssx3_hd_textures",
@@ -11152,7 +11532,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "asasega_dbz_infinite_world_textures",
@@ -11181,7 +11562,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "asasega_burnout_dominator_textures",
@@ -11210,7 +11592,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "asasega_mega_man_x8_textures",
@@ -11240,7 +11623,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "asasega_mega_man_x7_textures",
@@ -11270,7 +11654,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": true,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "kozarovv_psychonauts_hd_textures",
@@ -11299,7 +11684,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "kozarovv_baldurs_gate_da_textures",
@@ -11328,7 +11714,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "kozarovv_champions_of_norrath_textures",
@@ -11357,7 +11744,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "kozarovv_destroy_all_humans_textures",
@@ -11386,7 +11774,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "kozarovv_klonoa2_hd_textures",
@@ -11415,7 +11804,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "kozarovv_sonic_heroes_hd_textures",
@@ -11444,7 +11834,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_fatal_frame_textures",
@@ -11473,7 +11864,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_fatal_frame2_textures",
@@ -11502,7 +11894,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_castlevania_loi_textures",
@@ -11531,7 +11924,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_castlevania_cod_textures",
@@ -11560,7 +11954,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_rygar_textures",
@@ -11589,7 +11984,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_klonoa2_textures",
@@ -11618,7 +12014,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_primal_textures",
@@ -11647,7 +12044,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_jak_x_textures",
@@ -11676,7 +12074,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_tenchu_woh_textures",
@@ -11705,7 +12104,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_shinobi_textures",
@@ -11734,7 +12134,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_ssx3_textures",
@@ -11763,7 +12164,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_killzone_textures",
@@ -11792,7 +12194,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_timesplitters_fp_textures",
@@ -11821,7 +12224,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_mega_man_x8_textures",
@@ -11850,7 +12254,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_ys_ark_napishtim_textures",
@@ -11879,7 +12284,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_re_outbreak_textures",
@@ -11908,7 +12314,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_re_outbreak2_textures",
@@ -11937,7 +12344,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_spiderman2_textures",
@@ -11966,7 +12374,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_ultimate_spiderman_textures",
@@ -11995,7 +12404,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_thug_textures",
@@ -12025,7 +12435,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_thug2_textures",
@@ -12055,7 +12466,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_thaw_textures",
@@ -12085,7 +12497,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_wwe_smackdown_pain_textures",
@@ -12115,7 +12528,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_wwe_svr_textures",
@@ -12145,7 +12559,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_ape_escape2_textures",
@@ -12174,7 +12589,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_contra_shattered_textures",
@@ -12204,7 +12620,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_mafia_textures",
@@ -12234,7 +12651,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_indigo_prophecy_textures",
@@ -12263,7 +12681,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_dbz_budokai1_textures",
@@ -12293,7 +12712,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_dbz_budokai2_textures",
@@ -12323,7 +12743,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_manhunt_textures",
@@ -12353,7 +12774,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_nba_street_v2_textures",
@@ -12383,7 +12805,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_socom1_textures",
@@ -12413,7 +12836,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_burnout_revenge_textures",
@@ -12442,7 +12866,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_hot_shots_golf3_textures",
@@ -12472,7 +12897,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_atv_fury2_textures",
@@ -12502,7 +12928,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_armored_core3_textures",
@@ -12532,7 +12959,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_armored_core_nexus_textures",
@@ -12562,7 +12990,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_wwe_smackdown_sym_textures",
@@ -12592,7 +13021,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_sly2_textures",
@@ -12622,7 +13052,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_sly3_textures",
@@ -12652,7 +13083,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_gran_turismo3_textures",
@@ -12682,7 +13114,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "gamebanana_spongebob_btfd_textures",
@@ -12709,7 +13142,8 @@
     "upscale_tech": "",
     "is_free": true,
     "requires_account": false,
-    "is_complete": false
+    "is_complete": false,
+    "size_label": ""
   },
   {
     "id": "berion_jak3_textures",
@@ -12739,7 +13173,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~180 MB"
   },
   {
     "id": "berion_ratchet_deadlocked_textures",
@@ -12768,7 +13203,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_grandia2_textures",
@@ -12797,7 +13233,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_grandia3_textures",
@@ -12826,7 +13263,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~150 MB"
   },
   {
     "id": "berion_we_love_katamari_textures",
@@ -12855,7 +13293,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_haunting_ground_textures",
@@ -12884,7 +13323,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_viewtiful_joe_textures",
@@ -12913,7 +13353,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~100 MB"
   },
   {
     "id": "berion_sly1_textures",
@@ -12942,7 +13383,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_zone_of_enders_textures",
@@ -12972,7 +13414,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "berion_zone_of_enders2_textures",
@@ -13002,7 +13445,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_jak2_textures",
@@ -13032,7 +13476,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_ratchet_clank2_textures",
@@ -13061,7 +13506,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~80 MB"
   },
   {
     "id": "berion_ratchet_clank3_textures",
@@ -13090,7 +13536,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_suikoden3_textures",
@@ -13119,7 +13566,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_suikoden4_textures",
@@ -13148,7 +13596,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "berion_ar_tonelico_textures",
@@ -13177,7 +13626,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_soul_nomad_textures",
@@ -13206,7 +13656,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~250 MB"
   },
   {
     "id": "berion_disgaea_textures",
@@ -13235,7 +13686,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~200 MB"
   },
   {
     "id": "berion_shadow_hearts_textures",
@@ -13264,7 +13716,8 @@
     "upscale_tech": "AI",
     "is_free": true,
     "requires_account": false,
-    "is_complete": true
+    "is_complete": true,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_drakengard_textures",
@@ -13293,7 +13746,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_drakengard2_textures",
@@ -13323,7 +13777,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_mortal_kombat_da_textures",
@@ -13353,7 +13808,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_tekken_tag_textures",
@@ -13383,7 +13839,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_gradius5_textures",
@@ -13413,7 +13870,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~80 MB"
   },
   {
     "id": "cckrizalid_forbidden_siren_textures",
@@ -13443,7 +13901,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_forbidden_siren2_textures",
@@ -13473,7 +13932,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "cckrizalid_gta_lcs_textures",
@@ -13503,7 +13963,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "cckrizalid_gta_vcs_textures",
@@ -13533,7 +13994,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "cckrizalid_beyond_good_evil_textures",
@@ -13562,7 +14024,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_crash_tag_team_textures",
@@ -13592,7 +14055,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "cckrizalid_guitar_hero_textures",
@@ -13622,7 +14086,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "cckrizalid_guitar_hero2_textures",
@@ -13653,7 +14118,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "cckrizalid_guitar_hero3_textures",
@@ -13684,7 +14150,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "cckrizalid_star_wars_battlefront_textures",
@@ -13715,7 +14182,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "cckrizalid_nba_street_v3_textures",
@@ -13745,7 +14213,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "cckrizalid_wwe_smackdown_raw2006_textures",
@@ -13775,7 +14244,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "cckrizalid_virtua_fighter4_evo_textures",
@@ -13804,7 +14274,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "ps2home_drakengard_textures",
@@ -13832,7 +14303,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "ps2home_guitar_hero_textures",
@@ -13861,7 +14333,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "ps2home_beyond_good_evil_textures",
@@ -13889,7 +14362,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "ps2home_gta_lcs_textures",
@@ -13918,7 +14392,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "ps2home_gta_vcs_textures",
@@ -13947,7 +14422,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "ps2home_mortal_kombat_da_textures",
@@ -13976,7 +14452,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "ps2home_wipeout_fusion_textures",
@@ -14005,7 +14482,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "ps2home_tekken_tag_textures",
@@ -14034,7 +14512,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "ps2home_gradius5_textures",
@@ -14063,7 +14542,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "ps2home_star_wars_battlefront_textures",
@@ -14092,7 +14572,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "gbatemp_drakengard_textures",
@@ -14120,7 +14601,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~30 MB"
   },
   {
     "id": "gbatemp_gta_lcs_textures",
@@ -14149,7 +14631,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_gta_vcs_textures",
@@ -14178,7 +14661,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~60 MB"
   },
   {
     "id": "gbatemp_guitar_hero2_textures",
@@ -14207,7 +14691,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~50 MB"
   },
   {
     "id": "gbatemp_burnout1_textures",
@@ -14235,7 +14720,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~40 MB"
   },
   {
     "id": "gbatemp_burnout2_textures",
@@ -14264,7 +14750,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": true
+    "requires_account": true,
+    "size_label": "~30 MB"
   },
   {
     "id": "cckrizalid_jak_x_textures",
@@ -14294,7 +14781,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_ape_escape2_textures",
@@ -14323,7 +14811,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~100 MB"
   },
   {
     "id": "cckrizalid_ape_escape3_textures",
@@ -14352,7 +14841,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_crash_titans_textures",
@@ -14382,7 +14872,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~250 MB"
   },
   {
     "id": "cckrizalid_wwe_raw2007_textures",
@@ -14412,7 +14903,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~150 MB"
   },
   {
     "id": "cckrizalid_hot_shots_golf3_textures",
@@ -14441,7 +14933,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~120 MB"
   },
   {
     "id": "cckrizalid_spyro_anb_textures",
@@ -14471,7 +14964,8 @@
     "is_complete": true,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~150 MB"
   },
   {
     "id": "ps2home_jak_x_textures",
@@ -14500,7 +14994,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "ps2home_ape_escape2_textures",
@@ -14528,7 +15023,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "ps2home_hot_shots_golf3_textures",
@@ -14556,7 +15052,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "ps2home_star_ocean3_textures",
@@ -14584,7 +15081,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "ps2home_wwe_raw2007_textures",
@@ -14613,7 +15111,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "ps2home_crash_titans_textures",
@@ -14641,7 +15140,8 @@
     "is_complete": false,
     "is_free": true,
     "nsfw": false,
-    "requires_account": false
+    "requires_account": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_hack_gu1_slus21574",
@@ -14669,7 +15169,8 @@
     "thumbnail_url": "",
     "context": "Search for .hack//G.U. Vol.1//Rebirth in the mega-library thread. Serial: SLUS-21574.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ace_combat04_slus20152",
@@ -14697,7 +15198,8 @@
     "thumbnail_url": "",
     "context": "Search for Ace Combat 04: Shattered Skies in the mega-library thread. Serial: SLUS-20152.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ace_combat_zero_slus21346",
@@ -14725,7 +15227,8 @@
     "thumbnail_url": "",
     "context": "Search for Ace Combat Zero: The Belkan War in the mega-library thread. Serial: SLUS-21346.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_ac_nexus_slus20938",
@@ -14753,7 +15256,8 @@
     "thumbnail_url": "",
     "context": "Search for Armored Core: Nexus in the mega-library thread. Serial: SLUS-20938.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_ac_silent_line_slus20715",
@@ -14781,7 +15285,8 @@
     "thumbnail_url": "",
     "context": "Search for Armored Core: Silent Line in the mega-library thread. Serial: SLUS-20715.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ac_last_raven_slus21456",
@@ -14809,7 +15314,8 @@
     "thumbnail_url": "",
     "context": "Search for Armored Core: Last Raven in the mega-library thread. Serial: SLUS-21456.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_burnout3_slus21077",
@@ -14837,7 +15343,8 @@
     "thumbnail_url": "",
     "context": "Search for Burnout 3: Takedown in the mega-library thread. Serial: SLUS-21077.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_burnout_revenge_slus21197",
@@ -14865,7 +15372,8 @@
     "thumbnail_url": "",
     "context": "Search for Burnout Revenge in the mega-library thread. Serial: SLUS-21197.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_capcom_vs_snk2_slus20446",
@@ -14893,7 +15401,8 @@
     "thumbnail_url": "",
     "context": "Search for Capcom vs. SNK 2: Mark of the Millennium 2001 in the mega-library thread. Serial: SLUS-20446.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_contra_ss_slus20568",
@@ -14921,7 +15430,8 @@
     "thumbnail_url": "",
     "context": "Search for Contra: Shattered Soldier in the mega-library thread. Serial: SLUS-20568.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_dmc1_slus20062b",
@@ -14949,7 +15459,8 @@
     "thumbnail_url": "",
     "context": "Search for Devil May Cry in the mega-library thread. Serial: SLUS-20062.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_makai_kingdom_slus21085b",
@@ -14978,7 +15489,8 @@
     "thumbnail_url": "",
     "context": "Search for Makai Kingdom: Chronicles of the Sacred Tome in the mega-library thread. Serial: SLUS-21085.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_mgs3_subsistence_slus21370",
@@ -15006,7 +15518,8 @@
     "thumbnail_url": "",
     "context": "Search for Metal Gear Solid 3: Subsistence in the mega-library thread. Serial: SLUS-21070.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_sotc_slus21041b",
@@ -15034,7 +15547,8 @@
     "thumbnail_url": "",
     "context": "Search for Shadow of the Colossus in the mega-library thread. Serial: SLUS-21041.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_daxter_slus21458b",
@@ -15062,7 +15576,8 @@
     "thumbnail_url": "",
     "context": "Search for Daxter in the mega-library thread. Serial: SLUS-21458.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_katamari_damacy_slus20775",
@@ -15090,7 +15605,8 @@
     "thumbnail_url": "",
     "context": "Search for Katamari Damacy in the mega-library thread. Serial: SLUS-20727.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_kh1_fm_slus20773b",
@@ -15118,7 +15634,8 @@
     "thumbnail_url": "",
     "context": "Search for Kingdom Hearts in the mega-library thread. Serial: SLUS-20773.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_magna_carta_slus21158",
@@ -15146,7 +15663,8 @@
     "thumbnail_url": "",
     "context": "Search for Magna Carta: Tears of Blood in the mega-library thread. Serial: SLUS-21158.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_manhunt2_slus21680",
@@ -15174,7 +15692,8 @@
     "thumbnail_url": "",
     "context": "Search for Manhunt 2 in the mega-library thread. Serial: SLUS-21680.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_maximo_slus20017",
@@ -15202,7 +15721,8 @@
     "thumbnail_url": "",
     "context": "Search for Maximo: Ghosts to Glory in the mega-library thread. Serial: SLUS-20017.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_nfs_ug1_slus20672",
@@ -15230,7 +15750,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Underground in the mega-library thread. Serial: SLUS-20672.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_nfs_carbon_slus21466",
@@ -15258,7 +15779,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Carbon in the mega-library thread. Serial: SLUS-21466.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_nfs_hp2_slus20137",
@@ -15286,7 +15808,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Hot Pursuit 2 in the mega-library thread. Serial: SLUS-20137.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_r_c_1_scus97198b",
@@ -15314,7 +15837,8 @@
     "thumbnail_url": "",
     "context": "Search for Ratchet & Clank in the mega-library thread. Serial: SCUS-97198.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_r_c_3_scus97199b",
@@ -15342,7 +15866,8 @@
     "thumbnail_url": "",
     "context": "Search for Ratchet & Clank: Up Your Arsenal in the mega-library thread. Serial: SCUS-97199.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_re_code_veronica_slus20184",
@@ -15370,7 +15895,8 @@
     "thumbnail_url": "",
     "context": "Search for Resident Evil: Code Veronica X in the mega-library thread. Serial: SLUS-20184.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_re4_slus21134b",
@@ -15398,7 +15924,8 @@
     "thumbnail_url": "",
     "context": "Search for Resident Evil 4 in the mega-library thread. Serial: SLUS-21134.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_sh_origins_slus21583",
@@ -15426,7 +15953,8 @@
     "thumbnail_url": "",
     "context": "Search for Silent Hill: Origins in the mega-library thread. Serial: SLUS-21583.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_sly2_scus97316b",
@@ -15454,7 +15982,8 @@
     "thumbnail_url": "",
     "context": "Search for Sly 2: Band of Thieves in the mega-library thread. Serial: SCUS-97316.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_twisted_metal_black_slus20136",
@@ -15482,7 +16011,8 @@
     "thumbnail_url": "",
     "context": "Search for Twisted Metal: Black in the mega-library thread. Serial: SLUS-20136.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_sw_battlefront_slus20898b",
@@ -15510,7 +16040,8 @@
     "thumbnail_url": "",
     "context": "Search for Star Wars: Battlefront in the mega-library thread. Serial: SLUS-20898.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_sw_battlefront2_slus21240b",
@@ -15538,7 +16069,8 @@
     "thumbnail_url": "",
     "context": "Search for Star Wars: Battlefront II in the mega-library thread. Serial: SLUS-21240.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_thug2_slus21065b",
@@ -15566,7 +16098,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Underground 2 in the mega-library thread. Serial: SLUS-21065.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_thaw_slus21396",
@@ -15594,7 +16127,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's American Wasteland in the mega-library thread. Serial: SLUS-21396.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_vj1_slus20981b",
@@ -15622,7 +16156,8 @@
     "thumbnail_url": "",
     "context": "Search for Viewtiful Joe in the mega-library thread. Serial: SLUS-20981.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_vj2_slus21369",
@@ -15650,7 +16185,8 @@
     "thumbnail_url": "",
     "context": "Search for Viewtiful Joe 2 in the mega-library thread. Serial: SLUS-21369.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_wild_arms3_slus20512",
@@ -15678,7 +16214,8 @@
     "thumbnail_url": "",
     "context": "Search for Wild ARMs 3 in the mega-library thread. Serial: SLUS-20512.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_wild_arms4_slus21183",
@@ -15706,7 +16243,8 @@
     "thumbnail_url": "",
     "context": "Search for Wild ARMs 4 in the mega-library thread. Serial: SLUS-21183.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_wild_arms5_slus21574b",
@@ -15734,7 +16272,8 @@
     "thumbnail_url": "",
     "context": "Search for Wild ARMs 5 in the mega-library thread. Serial: SLUS-21749.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_xenosaga1_slus20469b",
@@ -15762,7 +16301,8 @@
     "thumbnail_url": "",
     "context": "Search for Xenosaga Episode I: Der Wille zur Macht in the mega-library thread. Serial: SLUS-20469.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_zoe2_slus20744b",
@@ -15790,7 +16330,8 @@
     "thumbnail_url": "",
     "context": "Search for Zone of the Enders: The 2nd Runner in the mega-library thread. Serial: SLUS-20744.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_ar_tonelico2_slus21765",
@@ -15818,7 +16359,8 @@
     "thumbnail_url": "",
     "context": "Search for Ar tonelico II: Melody of Metafalica in the mega-library thread. Serial: SLUS-21765.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ar_tonelico_slus21652",
@@ -15846,7 +16388,8 @@
     "thumbnail_url": "",
     "context": "Search for Ar tonelico: Melody of Elemia in the mega-library thread. Serial: SLUS-21652.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_arc_lad_tos_slus20743",
@@ -15874,7 +16417,8 @@
     "thumbnail_url": "",
     "context": "Search for Arc the Lad: Twilight of the Spirits in the mega-library thread. Serial: SLUS-20743.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_ac3_slus20355",
@@ -15902,7 +16446,8 @@
     "thumbnail_url": "",
     "context": "Search for Armored Core 3 in the mega-library thread. Serial: SLUS-20355.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ac_nine_breaker_slus21177",
@@ -15930,7 +16475,8 @@
     "thumbnail_url": "",
     "context": "Search for Armored Core: Nine Breaker in the mega-library thread. Serial: SLUS-21177.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_bully_slus21131",
@@ -15958,7 +16504,8 @@
     "thumbnail_url": "",
     "context": "Search for Bully / Canis Canem Edit in the mega-library thread. Serial: SLUS-21131.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_burnout3_slus20462",
@@ -15986,7 +16533,8 @@
     "thumbnail_url": "",
     "context": "Search for Burnout 3: Takedown in the mega-library thread. Serial: SLUS-20462.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_cod_bro_slus20432",
@@ -16014,7 +16562,8 @@
     "thumbnail_url": "",
     "context": "Search for Call of Duty 2: Big Red One in the mega-library thread. Serial: SLUS-20432.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_dark_cloud2_scus97331",
@@ -16042,7 +16591,8 @@
     "thumbnail_url": "",
     "context": "Search for Dark Cloud 2 / Dark Chronicle in the mega-library thread. Serial: SCUS-97331.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_dmc3_slus21058",
@@ -16070,7 +16620,8 @@
     "thumbnail_url": "",
     "context": "Search for Devil May Cry 3: Special Edition in the mega-library thread. Serial: SLUS-21058.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_disgaea2_slus21440",
@@ -16099,7 +16650,8 @@
     "thumbnail_url": "",
     "context": "Search for Disgaea 2: Cursed Memories in the mega-library thread. Serial: SLUS-21440.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_disgaea3_slus21683",
@@ -16128,7 +16680,8 @@
     "thumbnail_url": "",
     "context": "Search for Disgaea 3: Absence of Justice in the mega-library thread. Serial: SLUS-21683.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_dq8_slus21207b",
@@ -16156,7 +16709,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Quest VIII: Journey of the Cursed King in the mega-library thread. Serial: SLUS-21207.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_gta_sa_slus20946b",
@@ -16184,7 +16738,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto: San Andreas in the mega-library thread. Serial: SLUS-20946.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_ico_slus20727b",
@@ -16212,7 +16767,8 @@
     "thumbnail_url": "",
     "context": "Search for Ico in the mega-library thread. Serial: SLUS-20727.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_kh2_slus21005b",
@@ -16240,7 +16796,8 @@
     "thumbnail_url": "",
     "context": "Search for Kingdom Hearts II in the mega-library thread. Serial: SLUS-21005.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_makai_kingdom_slus21085c",
@@ -16268,7 +16825,8 @@
     "thumbnail_url": "",
     "context": "Search for Makai Kingdom: Chronicles of the Sacred Tome in the mega-library thread. Serial: SLUS-21085.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_mm_x_slus21303",
@@ -16296,7 +16854,8 @@
     "thumbnail_url": "",
     "context": "Search for Mega Man X Collection in the mega-library thread. Serial: SLUS-21303.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_nfs_ug2_slus21065c",
@@ -16324,7 +16883,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Underground 2 in the mega-library thread. Serial: SLUS-21065.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_smt_dds_slus21090b",
@@ -16352,7 +16912,8 @@
     "thumbnail_url": "",
     "context": "Search for Shin Megami Tensei: Digital Devil Saga in the mega-library thread. Serial: SLUS-21090.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_vf4_evo_slus20831",
@@ -16380,7 +16941,8 @@
     "thumbnail_url": "",
     "context": "Search for Virtua Fighter 4 Evolution in the mega-library thread. Serial: SLUS-20831.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_dynasty_warriors4_slus20787",
@@ -16408,7 +16970,8 @@
     "thumbnail_url": "",
     "context": "Search for Dynasty Warriors 4 in the mega-library thread. Serial: SLUS-20787.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_samurai_warriors_slus20685",
@@ -16436,7 +16999,8 @@
     "thumbnail_url": "",
     "context": "Search for Samurai Warriors in the mega-library thread. Serial: SLUS-20685.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_xenosaga2_slus21469",
@@ -16464,7 +17028,8 @@
     "thumbnail_url": "",
     "context": "Search for Xenosaga Episode II: Jenseits von Gut und Böse in the mega-library thread. Serial: SLUS-21469.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_mgs2_slus20448",
@@ -16492,7 +17057,8 @@
     "thumbnail_url": "",
     "context": "Search for Metal Gear Solid 2: Sons of Liberty in the mega-library thread. Serial: SLUS-20448.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_ico_slus20727_standard",
@@ -16520,7 +17086,8 @@
     "thumbnail_url": "",
     "context": "Search for Ico in the mega-library thread. Serial: SLUS-20727.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ff12_slus21622b",
@@ -16548,7 +17115,8 @@
     "thumbnail_url": "",
     "context": "Search for Final Fantasy XII in the mega-library thread. Serial: SLUS-21622.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_dmc3_slus21194",
@@ -16576,7 +17144,8 @@
     "thumbnail_url": "",
     "context": "Search for Devil May Cry 3: Dante's Awakening in the mega-library thread. Serial: SLUS-21194.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_crash_twinsanity_slus20697",
@@ -16604,7 +17173,8 @@
     "thumbnail_url": "",
     "context": "Search for Crash Twinsanity in the mega-library thread. Serial: SLUS-20697.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_hack_gu2_slus21618",
@@ -16632,7 +17202,8 @@
     "thumbnail_url": "",
     "context": "Search for .hack//G.U. Vol. 2//Reminisce in the mega-library thread. Serial: SLUS-21618.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_hack_gu3_slus21750",
@@ -16660,7 +17231,8 @@
     "thumbnail_url": "",
     "context": "Search for .hack//G.U. Vol. 3//Redemption in the mega-library thread. Serial: SLUS-21750.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_ape_escape2_scus97129b",
@@ -16688,7 +17260,8 @@
     "thumbnail_url": "",
     "context": "Search for Ape Escape 2 in the mega-library thread. Serial: SCUS-97129.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_ape_escape3_scus97480b",
@@ -16716,7 +17289,8 @@
     "thumbnail_url": "",
     "context": "Search for Ape Escape 3 in the mega-library thread. Serial: SCUS-97480.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_atelier_iris1_slus21052",
@@ -16744,7 +17318,8 @@
     "thumbnail_url": "",
     "context": "Search for Atelier Iris: Eternal Mana in the mega-library thread. Serial: SLUS-21052.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_atelier_iris2_slus21350",
@@ -16772,7 +17347,8 @@
     "thumbnail_url": "",
     "context": "Search for Atelier Iris 2: The Azoth of Destiny in the mega-library thread. Serial: SLUS-21350.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_atelier_iris3_slus21614",
@@ -16800,7 +17376,8 @@
     "thumbnail_url": "",
     "context": "Search for Atelier Iris 3: Grand Phantasm in the mega-library thread. Serial: SLUS-21614.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_bg_da_slus20519",
@@ -16828,7 +17405,8 @@
     "thumbnail_url": "",
     "context": "Search for Baldur's Gate: Dark Alliance in the mega-library thread. Serial: SLUS-20519.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_bg_da_slus20772",
@@ -16856,7 +17434,8 @@
     "thumbnail_url": "",
     "context": "Search for Baldur's Gate: Dark Alliance in the mega-library thread. Serial: SLUS-20772.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_bg_da2_slus20803",
@@ -16884,7 +17463,8 @@
     "thumbnail_url": "",
     "context": "Search for Baldur's Gate: Dark Alliance II in the mega-library thread. Serial: SLUS-20803.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_bg_da2_slus20846",
@@ -16912,7 +17492,8 @@
     "thumbnail_url": "",
     "context": "Search for Baldur's Gate: Dark Alliance II in the mega-library thread. Serial: SLUS-20846.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_cv_loi_slus21050",
@@ -16940,7 +17521,8 @@
     "thumbnail_url": "",
     "context": "Search for Castlevania: Lament of Innocence in the mega-library thread. Serial: SLUS-21050.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_cv_cod_slus21173",
@@ -16968,7 +17550,8 @@
     "thumbnail_url": "",
     "context": "Search for Castlevania: Curse of Darkness in the mega-library thread. Serial: SLUS-21173.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_con_slus20789",
@@ -16996,7 +17579,8 @@
     "thumbnail_url": "",
     "context": "Search for Champions of Norrath: Realms of EverQuest in the mega-library thread. Serial: SLUS-20789.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_dark_cloud_scus97121",
@@ -17024,7 +17608,8 @@
     "thumbnail_url": "",
     "context": "Search for Dark Cloud in the mega-library thread. Serial: SCUS-97121.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_dmc2_slus20626",
@@ -17052,7 +17637,8 @@
     "thumbnail_url": "",
     "context": "Search for Devil May Cry 2 in the mega-library thread. Serial: SLUS-20626.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_dbz_budokai2_slus20821",
@@ -17080,7 +17666,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Ball Z: Budokai 2 in the mega-library thread. Serial: SLUS-20821.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_dbz_bt2_slus21353",
@@ -17108,7 +17695,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Ball Z: Budokai Tenkaichi 2 in the mega-library thread. Serial: SLUS-21353.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_dbz_bt3_slus21472",
@@ -17136,7 +17724,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Ball Z: Budokai Tenkaichi 3 in the mega-library thread. Serial: SLUS-21472.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_dq8_slus21275",
@@ -17164,7 +17753,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Quest VIII: Journey of the Cursed King in the mega-library thread. Serial: SLUS-21275.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ff1_slus21060",
@@ -17192,7 +17782,8 @@
     "thumbnail_url": "",
     "context": "Search for Fatal Frame in the mega-library thread. Serial: SLUS-21060.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ff2_slus20825",
@@ -17220,7 +17811,8 @@
     "thumbnail_url": "",
     "context": "Search for Fatal Frame II: Crimson Butterfly in the mega-library thread. Serial: SLUS-20825.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_ff2_slus20934",
@@ -17248,7 +17840,8 @@
     "thumbnail_url": "",
     "context": "Search for Fatal Frame II: Crimson Butterfly in the mega-library thread. Serial: SLUS-20934.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ff3_slus21161",
@@ -17276,7 +17869,8 @@
     "thumbnail_url": "",
     "context": "Search for Fatal Frame III: The Tormented in the mega-library thread. Serial: SLUS-21161.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ff12_slus20792",
@@ -17304,7 +17898,8 @@
     "thumbnail_url": "",
     "context": "Search for Final Fantasy XII in the mega-library thread. Serial: SLUS-20792.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_ff12_slus20911",
@@ -17332,7 +17927,8 @@
     "thumbnail_url": "",
     "context": "Search for Final Fantasy XII in the mega-library thread. Serial: SLUS-20911.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_ff12_slus21162",
@@ -17360,7 +17956,8 @@
     "thumbnail_url": "",
     "context": "Search for Final Fantasy XII in the mega-library thread. Serial: SLUS-21162.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_gow2_scus97450",
@@ -17388,7 +17985,8 @@
     "thumbnail_url": "",
     "context": "Search for God of War II in the mega-library thread. Serial: SCUS-97450.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_gt3_slus20486",
@@ -17416,7 +18014,8 @@
     "thumbnail_url": "",
     "context": "Search for Gran Turismo 3: A-spec in the mega-library thread. Serial: SLUS-20486.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_gt4_scus97436",
@@ -17444,7 +18043,8 @@
     "thumbnail_url": "",
     "context": "Search for Gran Turismo 4 in the mega-library thread. Serial: SCUS-97436.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_gt4_slus21163",
@@ -17472,7 +18072,8 @@
     "thumbnail_url": "",
     "context": "Search for Gran Turismo 4 in the mega-library thread. Serial: SLUS-21163.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_gta3_slus20069",
@@ -17500,7 +18101,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto III in the mega-library thread. Serial: SLUS-20069.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_gta_vc_slus20140",
@@ -17528,7 +18130,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto: Vice City in the mega-library thread. Serial: SLUS-20140.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_gta_sa_slus20444",
@@ -17556,7 +18159,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto: San Andreas in the mega-library thread. Serial: SLUS-20444.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_gta_sa_slus20688",
@@ -17584,7 +18188,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto: San Andreas in the mega-library thread. Serial: SLUS-20688.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_grandia3_slus21281",
@@ -17612,7 +18217,8 @@
     "thumbnail_url": "",
     "context": "Search for Grandia III in the mega-library thread. Serial: SLUS-21281.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_hm_awlse_slus21234",
@@ -17640,7 +18246,8 @@
     "thumbnail_url": "",
     "context": "Search for Harvest Moon: A Wonderful Life Special Edition in the mega-library thread. Serial: SLUS-21234.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_gh_aerosmith_slus21669",
@@ -17668,7 +18275,8 @@
     "thumbnail_url": "",
     "context": "Search for Guitar Hero: Aerosmith in the mega-library thread. Serial: SLUS-21669.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_gh_wt_slus21768",
@@ -17696,7 +18304,8 @@
     "thumbnail_url": "",
     "context": "Search for Guitar Hero: World Tour in the mega-library thread. Serial: SLUS-21768.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_dbz_b3_slus21028",
@@ -17724,7 +18333,8 @@
     "thumbnail_url": "",
     "context": "Search for Dragon Ball Z: Budokai 3 in the mega-library thread. Serial: SLUS-21028.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_dmc2_slus20443",
@@ -17752,7 +18362,8 @@
     "thumbnail_url": "",
     "context": "Search for Devil May Cry 2 in the mega-library thread. Serial: SLUS-20443.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_gow2_slus21441",
@@ -17780,7 +18391,8 @@
     "thumbnail_url": "",
     "context": "Search for God of War II in the mega-library thread. Serial: SLUS-21441.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_gta3_slus20769",
@@ -17808,7 +18420,8 @@
     "thumbnail_url": "",
     "context": "Search for Grand Theft Auto III in the mega-library thread. Serial: SLUS-20769.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_hitman2_slus20374",
@@ -17836,7 +18449,8 @@
     "thumbnail_url": "",
     "context": "Search for Hitman 2: Silent Assassin in the mega-library thread. Serial: SLUS-20374.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_hitman_contracts_slus20775",
@@ -17864,7 +18478,8 @@
     "thumbnail_url": "",
     "context": "Search for Hitman: Contracts in the mega-library thread. Serial: SLUS-20775.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_hitman_bm_slus21210",
@@ -17892,7 +18507,8 @@
     "thumbnail_url": "",
     "context": "Search for Hitman: Blood Money in the mega-library thread. Serial: SLUS-21210.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_ico_slus20678",
@@ -17920,7 +18536,8 @@
     "thumbnail_url": "",
     "context": "Search for Ico in the mega-library thread. Serial: SLUS-20678.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_jak_scus97120",
@@ -17948,7 +18565,8 @@
     "thumbnail_url": "",
     "context": "Search for Jak and Daxter: The Precursor Legacy in the mega-library thread. Serial: SCUS-97120.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_jak_slus20636",
@@ -17976,7 +18594,8 @@
     "thumbnail_url": "",
     "context": "Search for Jak and Daxter: The Precursor Legacy in the mega-library thread. Serial: SLUS-20636.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_killzone_slus20845",
@@ -18004,7 +18623,8 @@
     "thumbnail_url": "",
     "context": "Search for Killzone in the mega-library thread. Serial: SLUS-20845.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_kh_recom_slus21721",
@@ -18032,7 +18652,8 @@
     "thumbnail_url": "",
     "context": "Search for Kingdom Hearts Re:Chain of Memories in the mega-library thread. Serial: SLUS-21721.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_mgs3_slus20785",
@@ -18060,7 +18681,8 @@
     "thumbnail_url": "",
     "context": "Search for Metal Gear Solid 3: Snake Eater in the mega-library thread. Serial: SLUS-20785.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_mgs3_slus20770",
@@ -18088,7 +18710,8 @@
     "thumbnail_url": "",
     "context": "Search for Metal Gear Solid 3: Snake Eater in the mega-library thread. Serial: SLUS-20770.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_mc2_slus20458",
@@ -18116,7 +18739,8 @@
     "thumbnail_url": "",
     "context": "Search for Midnight Club II in the mega-library thread. Serial: SLUS-20458.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_mc3_slus21062",
@@ -18144,7 +18768,8 @@
     "thumbnail_url": "",
     "context": "Search for Midnight Club 3: DUB Edition in the mega-library thread. Serial: SLUS-21062.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_mc3r_slus21342",
@@ -18172,7 +18797,8 @@
     "thumbnail_url": "",
     "context": "Search for Midnight Club 3: DUB Edition (Remix) in the mega-library thread. Serial: SLUS-21342.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_nfs_ug_slus20590",
@@ -18200,7 +18826,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Underground in the mega-library thread. Serial: SLUS-20590.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_nfs_ug2_slus20811",
@@ -18228,7 +18855,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Underground 2 in the mega-library thread. Serial: SLUS-20811.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_nfs_carbon_slus21399",
@@ -18256,7 +18884,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: Carbon in the mega-library thread. Serial: SLUS-21399.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_nfs_prostreet_slus21658",
@@ -18284,7 +18913,8 @@
     "thumbnail_url": "",
     "context": "Search for Need for Speed: ProStreet in the mega-library thread. Serial: SLUS-21658.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_okami_slus21277",
@@ -18312,7 +18942,8 @@
     "thumbnail_url": "",
     "context": "Search for Okami in the mega-library thread. Serial: SLUS-21277.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_okami_slus21597",
@@ -18340,7 +18971,8 @@
     "thumbnail_url": "",
     "context": "Search for Okami in the mega-library thread. Serial: SLUS-21597.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_p3fes_slus21270",
@@ -18368,7 +19000,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 3 FES in the mega-library thread. Serial: SLUS-21270.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_p3fes_slus21310",
@@ -18396,7 +19029,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 3 FES in the mega-library thread. Serial: SLUS-21310.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_p3fes_slus21810",
@@ -18424,7 +19058,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 3 FES in the mega-library thread. Serial: SLUS-21810.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_p3_slus21354",
@@ -18452,7 +19087,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 3 in the mega-library thread. Serial: SLUS-21354.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_p4_slus21819",
@@ -18480,7 +19116,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 4 in the mega-library thread. Serial: SLUS-21819.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_p4_slus21922",
@@ -18508,7 +19145,8 @@
     "thumbnail_url": "",
     "context": "Search for Persona 4 in the mega-library thread. Serial: SLUS-21922.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_pop_tt_slus21237",
@@ -18536,7 +19174,8 @@
     "thumbnail_url": "",
     "context": "Search for Prince of Persia: The Two Thrones in the mega-library thread. Serial: SLUS-21237.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_re_outbreak_slus21616",
@@ -18564,7 +19203,8 @@
     "thumbnail_url": "",
     "context": "Search for Resident Evil: Outbreak in the mega-library thread. Serial: SLUS-21616.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_re_dead_aim_slus21200",
@@ -18592,7 +19232,8 @@
     "thumbnail_url": "",
     "context": "Search for Resident Evil: Dead Aim in the mega-library thread. Serial: SLUS-21200.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_rogue_galaxy_slus21591",
@@ -18620,7 +19261,8 @@
     "thumbnail_url": "",
     "context": "Search for Rogue Galaxy in the mega-library thread. Serial: SLUS-21591.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_rogue_galaxy_scus97490",
@@ -18648,7 +19290,8 @@
     "thumbnail_url": "",
     "context": "Search for Rogue Galaxy in the mega-library thread. Serial: SCUS-97490.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_sh_cov_slus20973",
@@ -18676,7 +19319,8 @@
     "thumbnail_url": "",
     "context": "Search for Shadow Hearts: Covenant in the mega-library thread. Serial: SLUS-20973.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_sh_fnw_slus21494",
@@ -18704,7 +19348,8 @@
     "thumbnail_url": "",
     "context": "Search for Shadow Hearts: From the New World in the mega-library thread. Serial: SLUS-21494.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_sh3_slus20507",
@@ -18732,7 +19377,8 @@
     "thumbnail_url": "",
     "context": "Search for Silent Hill 3 in the mega-library thread. Serial: SLUS-20507.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_sh4_slus20978",
@@ -18760,7 +19406,8 @@
     "thumbnail_url": "",
     "context": "Search for Silent Hill 4: The Room in the mega-library thread. Serial: SLUS-20978.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_sly2_scus97404",
@@ -18788,7 +19435,8 @@
     "thumbnail_url": "",
     "context": "Search for Sly 2: Band of Thieves in the mega-library thread. Serial: SCUS-97404.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_sly3_scus97492",
@@ -18816,7 +19464,8 @@
     "thumbnail_url": "",
     "context": "Search for Sly 3: Honor Among Thieves in the mega-library thread. Serial: SCUS-97492.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_sc2_slus20574",
@@ -18844,7 +19493,8 @@
     "thumbnail_url": "",
     "context": "Search for SoulCalibur II in the mega-library thread. Serial: SLUS-20574.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_sc2_slus20591",
@@ -18872,7 +19522,8 @@
     "thumbnail_url": "",
     "context": "Search for SoulCalibur II in the mega-library thread. Serial: SLUS-20591.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_star_ocean_slus20734",
@@ -18900,7 +19551,8 @@
     "thumbnail_url": "",
     "context": "Search for Star Ocean: Till the End of Time in the mega-library thread. Serial: SLUS-20734.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_star_ocean_slus21205",
@@ -18928,7 +19580,8 @@
     "thumbnail_url": "",
     "context": "Search for Star Ocean: Till the End of Time Director's Cut in the mega-library thread. Serial: SLUS-21205.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ssx3_slus20783",
@@ -18956,7 +19609,8 @@
     "thumbnail_url": "",
     "context": "Search for SSX 3 in the mega-library thread. Serial: SLUS-20783.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_ssx_tricky_slus20301",
@@ -18984,7 +19638,8 @@
     "thumbnail_url": "",
     "context": "Search for SSX Tricky in the mega-library thread. Serial: SLUS-20301.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_tales_symphonia_slus21033",
@@ -19012,7 +19667,8 @@
     "thumbnail_url": "",
     "context": "Search for Tales of Symphonia in the mega-library thread. Serial: SLUS-21033.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_tales_legendia_slus20594",
@@ -19040,7 +19696,8 @@
     "thumbnail_url": "",
     "context": "Search for Tales of Legendia in the mega-library thread. Serial: SLUS-20594.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_tekken4_slus20328",
@@ -19068,7 +19725,8 @@
     "thumbnail_url": "",
     "context": "Search for Tekken 4 in the mega-library thread. Serial: SLUS-20328.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_tekken4_slus20882",
@@ -19096,7 +19754,8 @@
     "thumbnail_url": "",
     "context": "Search for Tekken 4 in the mega-library thread. Serial: SLUS-20882.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_tekken5_slus21219",
@@ -19124,7 +19783,8 @@
     "thumbnail_url": "",
     "context": "Search for Tekken 5 in the mega-library thread. Serial: SLUS-21219.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_thps3_slus20095",
@@ -19152,7 +19812,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Pro Skater 3 in the mega-library thread. Serial: SLUS-20095.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_thps4_slus20480",
@@ -19180,7 +19841,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Pro Skater 4 in the mega-library thread. Serial: SLUS-20480.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~20 MB"
   },
   {
     "id": "tp_thug_slus20731",
@@ -19208,7 +19870,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Underground in the mega-library thread. Serial: SLUS-20731.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_thug2_slus20907",
@@ -19236,7 +19899,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Underground 2 in the mega-library thread. Serial: SLUS-20907.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_thaw_slus21079",
@@ -19264,7 +19928,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's American Wasteland in the mega-library thread. Serial: SLUS-21079.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_th_project8_scus97731",
@@ -19292,7 +19957,8 @@
     "thumbnail_url": "",
     "context": "Search for Tony Hawk's Project 8 in the mega-library thread. Serial: SCUS-97731.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_vp2_slus21299",
@@ -19320,7 +19986,8 @@
     "thumbnail_url": "",
     "context": "Search for Valkyrie Profile 2: Silmeria in the mega-library thread. Serial: SLUS-21299.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_wa4_slus21383",
@@ -19348,7 +20015,8 @@
     "thumbnail_url": "",
     "context": "Search for Wild Arms 4 in the mega-library thread. Serial: SLUS-21383.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_xeno3_slus21137",
@@ -19376,7 +20044,8 @@
     "thumbnail_url": "",
     "context": "Search for Xenosaga Episode III: Also Sprach Zarathustra in the mega-library thread. Serial: SLUS-21137.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_zoe_slus20515",
@@ -19404,7 +20073,8 @@
     "thumbnail_url": "",
     "context": "Search for Zone of the Enders in the mega-library thread. Serial: SLUS-20515.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_zoe2_slus20541",
@@ -19432,7 +20102,8 @@
     "thumbnail_url": "",
     "context": "Search for Zone of the Enders: The 2nd Runner in the mega-library thread. Serial: SLUS-20541.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_smt_dds_slus21020",
@@ -19460,7 +20131,8 @@
     "thumbnail_url": "",
     "context": "Search for Shin Megami Tensei: Digital Devil Saga in the mega-library thread. Serial: SLUS-21020.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_disgaea_slus20365",
@@ -19488,7 +20160,8 @@
     "thumbnail_url": "",
     "context": "Search for Disgaea: Hour of Darkness in the mega-library thread. Serial: SLUS-20365.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_sotc_slus20721",
@@ -19516,7 +20189,8 @@
     "thumbnail_url": "",
     "context": "Search for Shadow of the Colossus in the mega-library thread. Serial: SLUS-20721.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~60 MB"
   },
   {
     "id": "tp_sh3_slus20459",
@@ -19544,7 +20218,8 @@
     "thumbnail_url": "",
     "context": "Search for Silent Hill 3 in the mega-library thread. Serial: SLUS-20459.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_neopets_slus21238",
@@ -19572,7 +20247,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-21238.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_neopets_sces54023",
@@ -19600,7 +20276,8 @@
     "thumbnail_url": "",
     "context": "Serial: SCES-54023.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_sims_castaway_characters",
@@ -19628,7 +20305,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-21668.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~30 MB"
   },
   {
     "id": "tp_sims_castaway_environment",
@@ -19656,7 +20334,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-21668.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_sims_castaway_objects",
@@ -19684,7 +20363,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-21668.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_sims_castaway_ui",
@@ -19712,7 +20392,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-21668.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   },
   {
     "id": "tp_spyro_edf_slus20062",
@@ -19740,7 +20421,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-20062.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~40 MB"
   },
   {
     "id": "tp_crash_woc_slus20238",
@@ -19768,7 +20450,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-20238.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~50 MB"
   },
   {
     "id": "tp_spiderman2_slus20776",
@@ -19796,7 +20479,8 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-20776.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~25 MB"
   },
   {
     "id": "tp_pop_sot_slus20743",
@@ -19824,6 +20508,7 @@
     "thumbnail_url": "",
     "context": "Serial: SLUS-20743.",
     "is_hub": false,
-    "nsfw": false
+    "nsfw": false,
+    "size_label": "~15 MB"
   }
 ]

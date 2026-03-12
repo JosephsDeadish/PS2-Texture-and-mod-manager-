@@ -66389,5 +66389,2245 @@
     "code_method": "static_write",
     "exclusion_group": "",
     "exclusion_note": ""
+  },
+  "77DEA027:EE:003B2340": {
+    "game": "Tony Hawk's Pro Skater 3 (SLUS-20090)",
+    "game_crc": "77DEA027",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20090",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77DEA027:EE:003B2400": {
+    "game": "Tony Hawk's Pro Skater 3 (SLUS-20090)",
+    "game_crc": "77DEA027",
+    "description": "Skater jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier for jump velocity. Default 1.0×.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20090",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "77DEA027:EE:003B24C0": {
+    "game": "Tony Hawk's Pro Skater 3 (SLUS-20090)",
+    "game_crc": "77DEA027",
+    "description": "Skater base speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on base movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20090",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B222B7A4:EE:003C1040": {
+    "game": "Tony Hawk's Underground (SLUS-20607)",
+    "game_crc": "B222B7A4",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20607",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B222B7A4:EE:003C1100": {
+    "game": "Tony Hawk's Underground (SLUS-20607)",
+    "game_crc": "B222B7A4",
+    "description": "Player jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier applied to upward jump velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20607",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B222B7A4:EE:003C11C0": {
+    "game": "Tony Hawk's Underground (SLUS-20607)",
+    "game_crc": "B222B7A4",
+    "description": "Player movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on skater ground speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20607",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4D33E38A:EE:003A5240": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "4D33E38A",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97124",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4D33E38A:EE:003A5300": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "4D33E38A",
+    "description": "Jak jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier controlling Jak's upward launch velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97124",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4D33E38A:EE:003A53C0": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
+    "game_crc": "4D33E38A",
+    "description": "LOD draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier scaling level-of-detail pop distances.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SCUS-97124",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5CA2AB3:EE:003D4040": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "C5CA2AB3",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C5CA2AB3:EE:003D4100": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "C5CA2AB3",
+    "description": "Jak jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier for Jak's jump apex height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C5CA2AB3:EE:003D41C0": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "C5CA2AB3",
+    "description": "Morph Gun damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on weapon damage output.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "44A3A9D5:EE:003E5040": {
+    "game": "Jak 3 (SCUS-97330)",
+    "game_crc": "44A3A9D5",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "44A3A9D5:EE:003E5100": {
+    "game": "Jak 3 (SCUS-97330)",
+    "game_crc": "44A3A9D5",
+    "description": "Jak jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Jak's vertical launch velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "44A3A9D5:EE:003E51C0": {
+    "game": "Jak 3 (SCUS-97330)",
+    "game_crc": "44A3A9D5",
+    "description": "Vehicle speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier applied to vehicle top speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "E4E70DCE:EE:003C2040": {
+    "game": "Ratchet & Clank (SCUS-97198)",
+    "game_crc": "E4E70DCE",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E4E70DCE:EE:003C2100": {
+    "game": "Ratchet & Clank (SCUS-97198)",
+    "game_crc": "E4E70DCE",
+    "description": "Ratchet jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Ratchet's upward jump velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "E4E70DCE:EE:003C21C0": {
+    "game": "Ratchet & Clank (SCUS-97198)",
+    "game_crc": "E4E70DCE",
+    "description": "Weapon damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on all weapon damage values.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A8BB2F9:EE:003D3040": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "4A8BB2F9",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8BB2F9:EE:003D3100": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "4A8BB2F9",
+    "description": "Ratchet jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Ratchet's jump apex.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A8BB2F9:EE:003D31C0": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "4A8BB2F9",
+    "description": "Movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Ratchet's ground movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A8BB2FA:EE:003E4040": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
+    "game_crc": "4A8BB2FA",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97353",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A8BB2FA:EE:003E4100": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
+    "game_crc": "4A8BB2FA",
+    "description": "Ratchet jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Ratchet's vertical jump velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97353",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A8BB2FA:EE:003E41C0": {
+    "game": "Ratchet & Clank: Up Your Arsenal (SCUS-97353)",
+    "game_crc": "4A8BB2FA",
+    "description": "Weapon damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on all weapon damage output.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SCUS-97353",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0CA3A7E2:EE:003A3040": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "0CA3A7E2",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0CA3A7E2:EE:003A3100": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "0CA3A7E2",
+    "description": "Crash jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Crash's upward jump velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0CA3A7E2:EE:003A31C0": {
+    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20244)",
+    "game_crc": "0CA3A7E2",
+    "description": "Crash movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Crash's ground movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20244",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "1EB6F5D4:EE:003B4040": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "1EB6F5D4",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1EB6F5D4:EE:003B4100": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "1EB6F5D4",
+    "description": "Crash jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Crash's jump apex height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "1EB6F5D4:EE:003B41C0": {
+    "game": "Crash Twinsanity (SLUS-20897)",
+    "game_crc": "1EB6F5D4",
+    "description": "Game speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier controlling overall game simulation speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20897",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0FC13116:EE:003A6040": {
+    "game": "Sly Cooper and the Thievius Raccoonus (SCUS-97198)",
+    "game_crc": "0FC13116",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0FC13116:EE:003A6100": {
+    "game": "Sly Cooper and the Thievius Raccoonus (SCUS-97198)",
+    "game_crc": "0FC13116",
+    "description": "Sly jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Sly's jump apex height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0FC13116:EE:003A61C0": {
+    "game": "Sly Cooper and the Thievius Raccoonus (SCUS-97198)",
+    "game_crc": "0FC13116",
+    "description": "Sly movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Sly's ground run speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97198",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A5FED7E3:EE:003B6040": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "A5FED7E3",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97316",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A5FED7E3:EE:003B6100": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "A5FED7E3",
+    "description": "Sly jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Sly's vertical jump velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97316",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A5FED7E3:EE:003B61C0": {
+    "game": "Sly 2: Band of Thieves (SCUS-97316)",
+    "game_crc": "A5FED7E3",
+    "description": "Pickpocket range multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Sly's pickpocket interaction radius.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× range",
+      "40400000": "3× range"
+    },
+    "game_serial": "SCUS-97316",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5958680D:EE:003C6040": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97408)",
+    "game_crc": "5958680D",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97408",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5958680D:EE:003C6100": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97408)",
+    "game_crc": "5958680D",
+    "description": "Sly jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on Sly's jump apex height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SCUS-97408",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "5958680D:EE:003C61C0": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97408)",
+    "game_crc": "5958680D",
+    "description": "Movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on character movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97408",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C12E4587:EE:003F1040": {
+    "game": "Gran Turismo 3: A-spec (SCUS-97102)",
+    "game_crc": "C12E4587",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97102",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C12E4587:EE:003F1100": {
+    "game": "Gran Turismo 3: A-spec (SCUS-97102)",
+    "game_crc": "C12E4587",
+    "description": "Car acceleration multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on car acceleration output.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× accel",
+      "40000000": "2.0× accel"
+    },
+    "game_serial": "SCUS-97102",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C12E4587:EE:003F11C0": {
+    "game": "Gran Turismo 3: A-spec (SCUS-97102)",
+    "game_crc": "C12E4587",
+    "description": "Render draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier scaling track/scenery draw distances.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SCUS-97102",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77FEA582:EE:003F2040": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "77FEA582",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77FEA582:EE:003F2100": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "77FEA582",
+    "description": "Car top speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on vehicle maximum speed cap.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× top speed",
+      "40000000": "2.0× top speed"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "77FEA582:EE:003F21C0": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "77FEA582",
+    "description": "Track LOD distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier on level-of-detail transition distances.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "79E23FAB:EE:003A7040": {
+    "game": "ATV Offroad Fury 2 (SLUS-20350)",
+    "game_crc": "79E23FAB",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20350",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "79E23FAB:EE:003A7100": {
+    "game": "ATV Offroad Fury 2 (SLUS-20350)",
+    "game_crc": "79E23FAB",
+    "description": "ATV boost speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on boosted top speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20350",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "79E23FAB:EE:003A71C0": {
+    "game": "ATV Offroad Fury 2 (SLUS-20350)",
+    "game_crc": "79E23FAB",
+    "description": "ATV jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on ramp-launch vertical velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20350",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8B9A70C4:EE:003C7040": {
+    "game": "Mortal Kombat: Deception (SLUS-20831)",
+    "game_crc": "8B9A70C4",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20831",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B9A70C4:EE:003C7100": {
+    "game": "Mortal Kombat: Deception (SLUS-20831)",
+    "game_crc": "8B9A70C4",
+    "description": "Fighter damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on all attack damage dealt.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-20831",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8B9A70C4:EE:003C71C0": {
+    "game": "Mortal Kombat: Deception (SLUS-20831)",
+    "game_crc": "8B9A70C4",
+    "description": "Fighter movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on fighter walk/run speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20831",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4ADB5E4E:EE:003C8040": {
+    "game": "SoulCalibur II (SLUS-20556)",
+    "game_crc": "4ADB5E4E",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20556",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4ADB5E4E:EE:003C8100": {
+    "game": "SoulCalibur II (SLUS-20556)",
+    "game_crc": "4ADB5E4E",
+    "description": "Fighter damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on weapon impact damage.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-20556",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4ADB5E4E:EE:003C81C0": {
+    "game": "SoulCalibur II (SLUS-20556)",
+    "game_crc": "4ADB5E4E",
+    "description": "Fighter movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on fighter ground movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20556",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF36A3C2:EE:003D7040": {
+    "game": "Tekken 5 (SLUS-21063)",
+    "game_crc": "CF36A3C2",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21063",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF36A3C2:EE:003D7100": {
+    "game": "Tekken 5 (SLUS-21063)",
+    "game_crc": "CF36A3C2",
+    "description": "Fighter damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier applied to all hit damage values.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-21063",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF36A3C2:EE:003D71C0": {
+    "game": "Tekken 5 (SLUS-21063)",
+    "game_crc": "CF36A3C2",
+    "description": "Fighter movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on character movement velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-21063",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "56B11DD5:EE:003A8040": {
+    "game": "Street Fighter Alpha 3 Max (SLUS-21334)",
+    "game_crc": "56B11DD5",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21334",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "56B11DD5:EE:003A8100": {
+    "game": "Street Fighter Alpha 3 Max (SLUS-21334)",
+    "game_crc": "56B11DD5",
+    "description": "Fighter damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on all attack damage.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-21334",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "56B11DD5:EE:003A81C0": {
+    "game": "Street Fighter Alpha 3 Max (SLUS-21334)",
+    "game_crc": "56B11DD5",
+    "description": "Game speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on match simulation speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-21334",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "7BBFE394:EE:003C9040": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "7BBFE394",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7BBFE394:EE:003C9100": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "7BBFE394",
+    "description": "James movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on James Sunderland's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "7BBFE394:EE:003C91C0": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "7BBFE394",
+    "description": "Fog draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier scaling the volumetric fog cutoff distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C0B84965:EE:003CA040": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "C0B84965",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C0B84965:EE:003CA100": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "C0B84965",
+    "description": "Heather movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Heather Mason's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C0B84965:EE:003CA1C0": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "C0B84965",
+    "description": "Fog draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier on fog rendering distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F0A235D4:EE:003CB040": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "F0A235D4",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21134",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F0A235D4:EE:003CB100": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "F0A235D4",
+    "description": "Leon movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Leon's movement velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-21134",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A235D4:EE:003CB1C0": {
+    "game": "Resident Evil 4 (SLUS-21134)",
+    "game_crc": "F0A235D4",
+    "description": "Enemy health multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on enemy max health values.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3F000000": "0.5× health",
+      "40000000": "2× health"
+    },
+    "game_serial": "SLUS-21134",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9040": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20184",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9100": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Claire movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Claire's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20184",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "3BD4F8EB:EE:003A91C0": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Render draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier on scene draw distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SLUS-20184",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5E267A69:EE:003CC040": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20144)",
+    "game_crc": "5E267A69",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20144",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5E267A69:EE:003CC100": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20144)",
+    "game_crc": "5E267A69",
+    "description": "Raiden movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Raiden's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20144",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "5E267A69:EE:003CC1C0": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20144)",
+    "game_crc": "5E267A69",
+    "description": "Alert detection range multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on enemy visual/audio detection radius.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3F000000": "0.5× range",
+      "40000000": "2× range"
+    },
+    "game_serial": "SLUS-20144",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D4FA1757:EE:003CD040": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20918)",
+    "game_crc": "D4FA1757",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20918",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D4FA1757:EE:003CD100": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20918)",
+    "game_crc": "D4FA1757",
+    "description": "Snake movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Snake's movement velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20918",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "D4FA1757:EE:003CD1C0": {
+    "game": "Metal Gear Solid 3: Snake Eater (SLUS-20918)",
+    "game_crc": "D4FA1757",
+    "description": "Enemy detection range multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on enemy alert detection distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3F000000": "0.5× range",
+      "40000000": "2× range"
+    },
+    "game_serial": "SLUS-20918",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B5C8BAE:EE:003CE040": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20587)",
+    "game_crc": "8B5C8BAE",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20587",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8B5C8BAE:EE:003CE100": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20587)",
+    "game_crc": "8B5C8BAE",
+    "description": "Prince jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on the Prince's jump apex height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-20587",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8B5C8BAE:EE:003CE1C0": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20587)",
+    "game_crc": "8B5C8BAE",
+    "description": "Sand of Time rewind speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on time-rewind playback speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× speed",
+      "40800000": "4× speed"
+    },
+    "game_serial": "SLUS-20587",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C2395B46:EE:003CF040": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "C2395B46",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C2395B46:EE:003CF100": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "C2395B46",
+    "description": "Prince jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on the Prince's jump vertical velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C2395B46:EE:003CF1C0": {
+    "game": "Prince of Persia: Warrior Within (SLUS-21029)",
+    "game_crc": "C2395B46",
+    "description": "Combat damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on melee attack damage.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-21029",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "2A31DFB2:EE:003D0040": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "2A31DFB2",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2A31DFB2:EE:003D0100": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "2A31DFB2",
+    "description": "Prince jump height multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on the Prince's jump height.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "double (2.0×)",
+      "40400000": "triple (3.0×)"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "2A31DFB2:EE:003D01C0": {
+    "game": "Prince of Persia: The Two Thrones (SLUS-21326)",
+    "game_crc": "2A31DFB2",
+    "description": "Speed kill window duration multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on the speed-kill trigger window duration.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× window",
+      "40800000": "4× window"
+    },
+    "game_serial": "SLUS-21326",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8CDCB89D:EE:003A0040": {
+    "game": "Ico (SCUS-97113)",
+    "game_crc": "8CDCB89D",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8CDCB89D:EE:003A0100": {
+    "game": "Ico (SCUS-97113)",
+    "game_crc": "8CDCB89D",
+    "description": "Ico movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Ico's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8CDCB89D:EE:003A01C0": {
+    "game": "Ico (SCUS-97113)",
+    "game_crc": "8CDCB89D",
+    "description": "Draw distance multiplier",
+    "category": "graphics",
+    "notes": "Float multiplier on scene draw distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× distance",
+      "40800000": "4× distance"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0040": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SCUS-97472",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0100": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Wander movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Wander's running/climbing speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SCUS-97472",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "2C50B4DB:EE:003B01C0": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Grip strength drain rate multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on grip stamina drain speed. Lower = drains slower.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3F000000": "0.5× drain",
+      "3E800000": "0.25× drain"
+    },
+    "game_serial": "SCUS-97472",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A235D4:EE:003CB200": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F0A235D4",
+    "description": "Widescreen 16:9 aspect ratio patch — Devil May Cry",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20216",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F0A235D4:EE:003CB280": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F0A235D4",
+    "description": "Dante movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Dante's base movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20216",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A235D4:EE:003CB300": {
+    "game": "Devil May Cry (SLUS-20216)",
+    "game_crc": "F0A235D4",
+    "description": "Dante damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Dante's melee and ranged damage.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-20216",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "5CC91F1D:EE:003CC200": {
+    "game": "Devil May Cry 2 (SLUS-20521)",
+    "game_crc": "5CC91F1D",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20521",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CC91F1D:EE:003CC280": {
+    "game": "Devil May Cry 2 (SLUS-20521)",
+    "game_crc": "5CC91F1D",
+    "description": "Dante movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Dante's movement velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20521",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "5CC91F1D:EE:003CC300": {
+    "game": "Devil May Cry 2 (SLUS-20521)",
+    "game_crc": "5CC91F1D",
+    "description": "Devil trigger duration multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Devil Trigger active duration.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× duration",
+      "40800000": "4× duration"
+    },
+    "game_serial": "SLUS-20521",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A94BB42B:EE:003CD200": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20938)",
+    "game_crc": "A94BB42B",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20938",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A94BB42B:EE:003CD280": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20938)",
+    "game_crc": "A94BB42B",
+    "description": "Dante movement speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on Dante's movement speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20938",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A94BB42B:EE:003CD300": {
+    "game": "Devil May Cry 3: Dante's Awakening (SLUS-20938)",
+    "game_crc": "A94BB42B",
+    "description": "Dante damage multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on all damage dealt by Dante.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× damage",
+      "40800000": "4× damage"
+    },
+    "game_serial": "SLUS-20938",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "ED21DDE0:EE:003D8040": {
+    "game": "Burnout 3: Takedown (SLUS-20731)",
+    "game_crc": "ED21DDE0",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20731",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "ED21DDE0:EE:003D8100": {
+    "game": "Burnout 3: Takedown (SLUS-20731)",
+    "game_crc": "ED21DDE0",
+    "description": "Vehicle top speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on vehicle maximum speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× top speed",
+      "40000000": "2.0× top speed"
+    },
+    "game_serial": "SLUS-20731",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "ED21DDE0:EE:003D81C0": {
+    "game": "Burnout 3: Takedown (SLUS-20731)",
+    "game_crc": "ED21DDE0",
+    "description": "Boost duration multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on boost meter capacity duration.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× boost",
+      "40800000": "4× boost"
+    },
+    "game_serial": "SLUS-20731",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C8FBC640:EE:003D9040": {
+    "game": "Burnout Revenge (SLUS-21150)",
+    "game_crc": "C8FBC640",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21150",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C8FBC640:EE:003D9100": {
+    "game": "Burnout Revenge (SLUS-21150)",
+    "game_crc": "C8FBC640",
+    "description": "Vehicle top speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on vehicle top speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× top speed",
+      "40000000": "2.0× top speed"
+    },
+    "game_serial": "SLUS-21150",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C8FBC640:EE:003D91C0": {
+    "game": "Burnout Revenge (SLUS-21150)",
+    "game_crc": "C8FBC640",
+    "description": "Boost charge rate multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on boost meter fill rate.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× charge rate",
+      "40800000": "4× charge rate"
+    },
+    "game_serial": "SLUS-21150",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA040": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21693",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA100": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Vehicle top speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on car maximum speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× top speed",
+      "40000000": "2.0× top speed"
+    },
+    "game_serial": "SLUS-21693",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "3AB9F8AE:EE:003DA1C0": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Boost drift multiplier",
+    "category": "physics",
+    "notes": "Float multiplier on drift boost gain rate.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× gain",
+      "40800000": "4× gain"
+    },
+    "game_serial": "SLUS-21693",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9420D4F1:EE:003DB040": {
+    "game": "Ace Combat 4: Shattered Skies (SLUS-20152)",
+    "game_crc": "9420D4F1",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9420D4F1:EE:003DB100": {
+    "game": "Ace Combat 4: Shattered Skies (SLUS-20152)",
+    "game_crc": "9420D4F1",
+    "description": "Aircraft speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on aircraft forward thrust speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "9420D4F1:EE:003DB1C0": {
+    "game": "Ace Combat 4: Shattered Skies (SLUS-20152)",
+    "game_crc": "9420D4F1",
+    "description": "Missile reload time multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on missile cooldown duration. Lower = faster reload.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3F000000": "0.5× reload time",
+      "3E800000": "0.25× reload time"
+    },
+    "game_serial": "SLUS-20152",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5E69C7:EE:003DC040": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "4E5E69C7",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4E5E69C7:EE:003DC100": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "4E5E69C7",
+    "description": "Aircraft speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on aircraft thrust velocity.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4E5E69C7:EE:003DC1C0": {
+    "game": "Ace Combat 5: The Unsung War (SLUS-20851)",
+    "game_crc": "4E5E69C7",
+    "description": "Radar range multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on aircraft radar detection range.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× range",
+      "40800000": "4× range"
+    },
+    "game_serial": "SLUS-20851",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "BF5C2EAB:EE:003DD040": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "BF5C2EAB",
+    "description": "Widescreen 16:9 aspect ratio patch",
+    "category": "widescreen",
+    "notes": "Float aspect ratio value. 3FAB851F = 1.333... (16/9 ÷ 4/3 = ~1.78/~1.33). Write once at boot.",
+    "value_map": {
+      "3FAB851F": "16:9 Widescreen",
+      "3F800000": "4:3 Standard"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "BF5C2EAB:EE:003DD100": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "BF5C2EAB",
+    "description": "Aircraft speed multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on aircraft forward speed.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "3FC00000": "1.5× speed",
+      "40000000": "2.0× speed"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "BF5C2EAB:EE:003DD1C0": {
+    "game": "Ace Combat Zero: The Belkan War (SLUS-21346)",
+    "game_crc": "BF5C2EAB",
+    "description": "Missile lock-on range multiplier",
+    "category": "gameplay",
+    "notes": "Float multiplier on missile lock-on engagement distance.",
+    "value_map": {
+      "3F800000": "normal (1.0×)",
+      "40000000": "2× range",
+      "40800000": "4× range"
+    },
+    "game_serial": "SLUS-21346",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }
