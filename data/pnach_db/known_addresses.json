@@ -82986,5 +82986,4627 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C2080": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Max HP \u2014 maximum health points for Sora",
+    "category": "player",
+    "notes": "Default value 60 (0x3C) at level 1; increases with level-ups.",
+    "value_map": {
+      "0000003C": "default level 1 (60)",
+      "000000C8": "200 HP",
+      "000001F4": "500 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C2084": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Current HP \u2014 Sora's current health value",
+    "category": "player",
+    "notes": "Set equal to Max HP address for full health. Value 0 causes game-over screen.",
+    "value_map": {
+      "0000003C": "60 (default full)",
+      "000000C8": "200",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B3A9F9D5:EE:006C2090": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Max MP \u2014 maximum magic points for Sora",
+    "category": "player",
+    "notes": "Default is 100. Increases with certain level-ups.",
+    "value_map": {
+      "00000064": "default (100)",
+      "000000C8": "200 MP",
+      "000001F4": "500 MP"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C20A0": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Munny \u2014 currency used in shops across worlds",
+    "category": "player",
+    "notes": "32-bit unsigned integer. Max practical cap around 9999.",
+    "value_map": {
+      "0000270F": "9999 (near cap)",
+      "00001388": "5000",
+      "00000064": "100"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C2200": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "Ability points (AP) \u2014 points used to equip abilities",
+    "category": "player",
+    "notes": "Default starts low; increases with level. Determines how many abilities can be equipped.",
+    "value_map": {
+      "00000014": "20 AP",
+      "00000032": "50 AP",
+      "00000064": "100 AP"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C2210": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "EXP multiplier \u2014 scales experience gained from defeated enemies",
+    "category": "progression",
+    "notes": "Float multiplier; 1.0 is normal rate.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)",
+      "40800000": "quad (4.0\u00d7)"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9D5:EE:006C2220": {
+    "game": "Kingdom Hearts (SLUS-20370)",
+    "game_crc": "B3A9F9D5",
+    "description": "MP charge rate \u2014 speed at which MP regenerates after full depletion",
+    "category": "magic",
+    "notes": "Float; higher value refills MP faster.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "fast (2.0\u00d7)",
+      "40400000": "very fast (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20370",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3A600": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Credits \u2014 player's in-game currency balance",
+    "category": "economy",
+    "notes": "32-bit integer. Max displayed in UI is 99,999,999.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 (max display)",
+      "00989680": "10,000,000",
+      "000F4240": "1,000,000"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3B000": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Tire wear multiplier \u2014 rate at which tires degrade during a race",
+    "category": "physics",
+    "notes": "Float; lower values slow tire wear.",
+    "value_map": {
+      "3F800000": "normal wear (1.0\u00d7)",
+      "3F000000": "half wear (0.5\u00d7)",
+      "00000000": "no wear (0.0\u00d7)"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3B010": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Grip multiplier \u2014 tire grip level affecting handling and cornering",
+    "category": "physics",
+    "notes": "Float; values above 1.0 improve grip beyond normal.",
+    "value_map": {
+      "3F800000": "normal grip (1.0\u00d7)",
+      "40000000": "double grip (2.0\u00d7)",
+      "3F000000": "reduced grip (0.5\u00d7)"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3B020": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Engine power multiplier \u2014 scales engine output",
+    "category": "physics",
+    "notes": "Float multiplier applied to power output.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double power (2.0\u00d7)",
+      "40400000": "triple power (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3B030": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Fuel consumption rate \u2014 rate of fuel use per lap (endurance races)",
+    "category": "physics",
+    "notes": "Float; 0.0 disables fuel consumption.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half consumption",
+      "00000000": "no fuel use"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:003B2400": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "Race position \u2014 current finishing position in the race",
+    "category": "race",
+    "notes": "Integer 1-based position; writing 1 sets player to first place display (visual only).",
+    "value_map": {
+      "00000001": "1st place",
+      "00000002": "2nd place",
+      "00000006": "6th place"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8D057621:EE:00C3C000": {
+    "game": "Gran Turismo 4 (SCUS-97328)",
+    "game_crc": "8D057621",
+    "description": "PP (Performance Points) limit override \u2014 allowed PP for a race",
+    "category": "tuning",
+    "notes": "Integer value. Standard limit varies by event.",
+    "value_map": {
+      "000003E8": "1000 PP",
+      "000002EE": "750 PP",
+      "00000258": "600 PP"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A0E5B3A:EE:006A2280": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "James HP \u2014 current health points for James Sunderland",
+    "category": "player",
+    "notes": "Float; 1.0 is full health, 0.0 is death.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "3F000000": "50% health (0.5)",
+      "3E800000": "25% health (0.25)"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A0E5B3A:EE:006A2300": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Handgun ammo \u2014 current handgun bullet count",
+    "category": "inventory",
+    "notes": "Integer ammo count.",
+    "value_map": {
+      "0000004B": "75 rounds",
+      "00000063": "99 rounds",
+      "00000019": "25 rounds"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A0E5B3A:EE:006A2310": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Shotgun shells \u2014 current shotgun ammunition",
+    "category": "inventory",
+    "notes": "Integer count.",
+    "value_map": {
+      "00000032": "50 shells",
+      "00000063": "99 shells"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A0E5B3A:EE:006A2320": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Rifle ammo \u2014 current hunting rifle ammunition",
+    "category": "inventory",
+    "notes": "Integer count.",
+    "value_map": {
+      "00000032": "50 rounds",
+      "00000063": "99 rounds"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A0E5B3A:EE:006A2400": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Flashlight battery \u2014 current battery charge (affects light radius)",
+    "category": "inventory",
+    "notes": "Float 0.0-1.0 where 1.0 is fully charged.",
+    "value_map": {
+      "3F800000": "full charge (1.0)",
+      "3F000000": "half charge (0.5)",
+      "3E800000": "low charge (0.25)"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A0E5B3A:EE:006A2500": {
+    "game": "Silent Hill 2 (SLUS-20228)",
+    "game_crc": "4A0E5B3A",
+    "description": "Movement speed multiplier \u2014 James walking/running speed scalar",
+    "category": "physics",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "normal speed (1.0\u00d7)",
+      "40000000": "double speed (2.0\u00d7)",
+      "3F400000": "1.25\u00d7 speed"
+    },
+    "game_serial": "SLUS-20228",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1CC296:EE:00826010": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Bolt count \u2014 player's current bolt currency",
+    "category": "economy",
+    "notes": "32-bit integer.",
+    "value_map": {
+      "000F4240": "1,000,000 bolts",
+      "0001E848": "125,000 bolts",
+      "000003E8": "1,000 bolts"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1CC296:EE:00826020": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Ratchet HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer; 0 causes death.",
+    "value_map": {
+      "00000004": "4 HP (default max)",
+      "00000010": "16 HP (upgraded)",
+      "00000028": "40 HP"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "3E1CC296:EE:00826030": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Max HP \u2014 maximum hit points",
+    "category": "player",
+    "notes": "Integer; increases through Nanotech upgrades.",
+    "value_map": {
+      "00000004": "4 HP (starting)",
+      "00000010": "16 HP",
+      "00000028": "40 HP"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1CC296:EE:00826040": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Jump height multiplier \u2014 vertical jump force scalar",
+    "category": "physics",
+    "notes": "Float; default 1.0.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1CC296:EE:00826050": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Move speed multiplier \u2014 player movement speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "fast (2.0\u00d7)",
+      "3F400000": "1.25\u00d7"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3E1CC296:EE:003B4570": {
+    "game": "Ratchet & Clank (SCUS-97199)",
+    "game_crc": "3E1CC296",
+    "description": "Invincibility frames \u2014 duration of post-hit invulnerability",
+    "category": "player",
+    "notes": "Integer frame count; higher value = longer invincibility window.",
+    "value_map": {
+      "0000001E": "30 frames (default)",
+      "0000003C": "60 frames",
+      "000000FF": "255 frames (near permanent)"
+    },
+    "game_serial": "SCUS-97199",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C1050": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Gem count \u2014 collected gems in current level",
+    "category": "economy",
+    "notes": "Integer total gems collected.",
+    "value_map": {
+      "00000000": "0 gems",
+      "00001388": "5000 gems",
+      "0000270F": "9999 gems"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C1060": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Spyro lives \u2014 extra lives remaining",
+    "category": "player",
+    "notes": "Integer; reaching 0 shows game over.",
+    "value_map": {
+      "00000003": "3 lives (default)",
+      "00000063": "99 lives",
+      "0000000A": "10 lives"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C1070": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Flame breath power \u2014 strength of Spyro's fire attack",
+    "category": "combat",
+    "notes": "Float multiplier for flame damage.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C1080": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Hover flight duration \u2014 time Spyro can hover before landing",
+    "category": "physics",
+    "notes": "Float seconds.",
+    "value_map": {
+      "40400000": "3.0 seconds (default)",
+      "40800000": "4.0 seconds",
+      "41200000": "10.0 seconds"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C10A0": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Dragonfly count \u2014 number of dragonflies rescued",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "none rescued",
+      "0000004B": "75 rescued",
+      "00000096": "150 rescued"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F2A5C5CF:EE:007C10C0": {
+    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
+    "game_crc": "F2A5C5CF",
+    "description": "Move speed multiplier \u2014 Spyro's ground movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20062",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF8ABA10:EE:00C3F040": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "Gil \u2014 in-game currency amount",
+    "category": "economy",
+    "notes": "32-bit integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gil (max)",
+      "000F4240": "1,000,000 gil",
+      "000186A0": "100,000 gil"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF8ABA10:EE:00C3F060": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "Tidus HP \u2014 Tidus current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 HP",
+      "00002710": "10000 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF8ABA10:EE:00C3F080": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "Tidus Max HP \u2014 Tidus maximum health",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF8ABA10:EE:00C3F0A0": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "Overdrive gauge \u2014 Tidus overdrive/limit bar charge",
+    "category": "combat",
+    "notes": "Integer 0-100.",
+    "value_map": {
+      "00000064": "full (100)",
+      "00000032": "half (50)",
+      "00000000": "empty (0)"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF8ABA10:EE:00C3F0C0": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "Random encounter rate \u2014 frequency of random enemy encounters",
+    "category": "gameplay",
+    "notes": "Float; 0.0 disables random encounters.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half rate (0.5\u00d7)",
+      "00000000": "no encounters (0.0\u00d7)"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF8ABA10:EE:00C3F0E0": {
+    "game": "Final Fantasy X (SLUS-20312 alt)",
+    "game_crc": "CF8ABA10",
+    "description": "AP gain multiplier \u2014 Ability Points earned after battle",
+    "category": "progression",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20312",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A5C02F40:EE:00A82010": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Dark Jak energy \u2014 dark eco meter fill level",
+    "category": "player",
+    "notes": "Float 0.0-1.0 where 1.0 is fully charged.",
+    "value_map": {
+      "3F800000": "full dark eco (1.0)",
+      "3F000000": "half (0.5)",
+      "00000000": "empty (0.0)"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A5C02F40:EE:00A82020": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Jak HP \u2014 current health hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000004": "4 cells (starting)",
+      "00000010": "16 cells",
+      "00000064": "100 cells"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A5C02F40:EE:00A82030": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Gun ammo \u2014 yellow eco gun ammunition",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 ammo",
+      "000001F4": "500 ammo",
+      "0000270F": "9999 ammo"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A5C02F40:EE:00A82050": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Scatter gun ammo \u2014 red eco scatter gun bullets",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 ammo",
+      "000001F4": "500 ammo",
+      "0000270F": "9999 ammo"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A5C02F40:EE:00A82070": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Move speed multiplier \u2014 Jak's ground movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "fast (2.0\u00d7)",
+      "40400000": "very fast (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A5C02F40:EE:00A82090": {
+    "game": "Jak II (SCUS-97265)",
+    "game_crc": "A5C02F40",
+    "description": "Jump height multiplier \u2014 Jak's vertical jump force",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97265",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9E7:EE:003C4010": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Coins \u2014 collectible coins for the current episode",
+    "category": "economy",
+    "notes": "Integer count.",
+    "value_map": {
+      "00000000": "0 coins",
+      "00000064": "100 coins",
+      "000003E8": "1000 coins"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9E7:EE:003C4020": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Sly HP \u2014 current health hits remaining",
+    "category": "player",
+    "notes": "Integer; 0 causes death.",
+    "value_map": {
+      "00000004": "4 hits (default)",
+      "00000008": "8 hits",
+      "00000010": "16 hits"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B3A9F9E7:EE:003C4040": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Gadget energy \u2014 power for gadget abilities",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full energy",
+      "3F000000": "half energy",
+      "00000000": "empty"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B3A9F9E7:EE:003C4060": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Sprint speed multiplier \u2014 Sly's running movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9E7:EE:003C4080": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Jump height multiplier \u2014 Sly's jump vertical force scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9E7:EE:00B00000": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Clue bottle detection radius \u2014 range at which clue bottles highlight",
+    "category": "gameplay",
+    "notes": "Float in game units.",
+    "value_map": {
+      "40400000": "default radius (3.0)",
+      "40800000": "larger radius (4.0)",
+      "41200000": "large radius (10.0)"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3A9F9E7:EE:00B00020": {
+    "game": "Sly 3: Honor Among Thieves (SCUS-97501)",
+    "game_crc": "B3A9F9E7",
+    "description": "Thiefnet points \u2014 accumulated bonus shop currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "0 points",
+      "000003E8": "1000 points",
+      "0000270F": "9999 points"
+    },
+    "game_serial": "SCUS-97501",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A51FB9E1:EE:00826010": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Bolt count \u2014 current bolt currency",
+    "category": "economy",
+    "notes": "32-bit integer.",
+    "value_map": {
+      "000F4240": "1,000,000 bolts",
+      "0001E848": "125,000 bolts",
+      "000003E8": "1,000 bolts"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A51FB9E1:EE:00826020": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Ratchet HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000010": "16 HP",
+      "00000028": "40 HP",
+      "00000064": "100 HP"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "A51FB9E1:EE:00826030": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Weapon XP multiplier \u2014 experience gained per enemy hit",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A51FB9E1:EE:00826050": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Jump height multiplier \u2014 Ratchet's vertical jump force",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A51FB9E1:EE:00826070": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Movement speed multiplier \u2014 Ratchet's ground speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "fast (2.0\u00d7)",
+      "3F400000": "1.25\u00d7"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A51FB9E1:EE:003C4580": {
+    "game": "Ratchet & Clank: Going Commando (SCUS-97268)",
+    "game_crc": "A51FB9E1",
+    "description": "Raritanium collected \u2014 currency for weapon upgrades",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 raritanium",
+      "00002710": "10000 raritanium"
+    },
+    "game_serial": "SCUS-97268",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A9A1ABE:EE:008C0010": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Player 1 HP \u2014 health bar value for player 1",
+    "category": "combat",
+    "notes": "Float 0.0 to max value.",
+    "value_map": {
+      "461C4000": "default full HP (10000.0)",
+      "43480000": "200 HP",
+      "00000000": "0 HP (KO)"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A9A1ABE:EE:008C0020": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Player 1 Ki gauge \u2014 energy for special moves",
+    "category": "combat",
+    "notes": "Float; full bar typically 7 bars at 10000 each.",
+    "value_map": {
+      "461C4000": "full ki (10000.0)",
+      "45C35000": "half ki (6250.0)",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4A9A1ABE:EE:008C0030": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Zenie \u2014 in-game currency for the Dragon Universe shop",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 zenie",
+      "000F4240": "1,000,000 zenie",
+      "000186A0": "100,000 zenie"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A9A1ABE:EE:008C0040": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Player 1 attack power multiplier \u2014 damage dealt by player 1",
+    "category": "combat",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A9A1ABE:EE:008C0050": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Dragon Ball collection count \u2014 how many Dragon Balls have been gathered",
+    "category": "progression",
+    "notes": "Integer 0-7.",
+    "value_map": {
+      "00000007": "all 7 Dragon Balls",
+      "00000004": "4 Dragon Balls",
+      "00000000": "none"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4A9A1ABE:EE:008C0060": {
+    "game": "Dragon Ball Z: Budokai 3 (SLUS-21069)",
+    "game_crc": "4A9A1ABE",
+    "description": "Player 2 HP \u2014 health for the opponent",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "461C4000": "full HP (10000.0)",
+      "00000000": "0 HP (instant KO)"
+    },
+    "game_serial": "SLUS-21069",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6A928BAE:EE:006E0050": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743 alt)",
+    "game_crc": "6A928BAE",
+    "description": "Sand tank count \u2014 number of filled sand tanks available",
+    "category": "player",
+    "notes": "Integer 0-9; each tank allows one rewind use.",
+    "value_map": {
+      "00000009": "9 tanks (max)",
+      "00000006": "6 tanks",
+      "00000003": "3 tanks"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6A928BAE:EE:006E0060": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743 alt)",
+    "game_crc": "6A928BAE",
+    "description": "Prince HP \u2014 current health orb count",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000006": "6 HP (default)",
+      "0000000C": "12 HP",
+      "00000014": "20 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6A928BAE:EE:006E0070": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743 alt)",
+    "game_crc": "6A928BAE",
+    "description": "Max HP \u2014 maximum health orbs available",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000006": "6 HP (default)",
+      "0000000C": "12 HP",
+      "00000014": "20 HP"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A928BAE:EE:006E0080": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743 alt)",
+    "game_crc": "6A928BAE",
+    "description": "Movement speed multiplier \u2014 Prince's running speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A928BAE:EE:006E0090": {
+    "game": "Prince of Persia: The Sands of Time (SLUS-20743 alt)",
+    "game_crc": "6A928BAE",
+    "description": "Wall run duration \u2014 time Prince can run along walls",
+    "category": "physics",
+    "notes": "Float in seconds.",
+    "value_map": {
+      "40400000": "3.0 seconds",
+      "40800000": "4.0 seconds",
+      "41200000": "10.0 seconds"
+    },
+    "game_serial": "SLUS-20743",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "52F2E55D:EE:00210010": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Ico stamina \u2014 grip stamina for climbing and hanging",
+    "category": "player",
+    "notes": "Float 0.0-1.0; depletes while hanging.",
+    "value_map": {
+      "3F800000": "full stamina (1.0)",
+      "3F000000": "half stamina (0.5)",
+      "00000000": "empty"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "52F2E55D:EE:00210020": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Sword damage multiplier \u2014 damage dealt per sword swing",
+    "category": "combat",
+    "notes": "Float multiplier.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "52F2E55D:EE:00210030": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Movement speed multiplier \u2014 Ico's run speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "52F2E55D:EE:002D0010": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Yorda shadow health \u2014 health of Yorda's link to light",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "fully linked (1.0)",
+      "3F000000": "half link",
+      "00000000": "taken by shadows"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "52F2E55D:EE:002D0020": {
+    "game": "Ico (SCUS-97113 alt)",
+    "game_crc": "52F2E55D",
+    "description": "Jump height multiplier \u2014 Ico's vertical jump force",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SCUS-97113",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CEEF2AC2:EE:00B12010": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Yen \u2014 Kiryu's money balance",
+    "category": "economy",
+    "notes": "32-bit integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 yen",
+      "000F4240": "1,000,000 yen",
+      "000186A0": "100,000 yen"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CEEF2AC2:EE:00B12020": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Kiryu HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 HP",
+      "00002710": "10000 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CEEF2AC2:EE:00B12030": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Heat gauge \u2014 Kiryu's heat action meter fill",
+    "category": "combat",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full heat (1.0)",
+      "3F000000": "half heat",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CEEF2AC2:EE:00B12040": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Experience points \u2014 total XP accumulated for levelling",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 XP",
+      "000F4240": "1,000,000 XP"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CEEF2AC2:EE:00B12050": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Attack power multiplier \u2014 damage Kiryu deals per hit",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CEEF2AC2:EE:003C4550": {
+    "game": "Yakuza (SLUS-21355)",
+    "game_crc": "CEEF2AC2",
+    "description": "Defense multiplier \u2014 damage reduction factor",
+    "category": "combat",
+    "notes": "Float; higher reduces incoming damage.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double defense",
+      "41200000": "10\u00d7 defense"
+    },
+    "game_serial": "SLUS-21355",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3B56447:EE:00C28010": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Yen \u2014 money held by the protagonist",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 yen",
+      "000F4240": "1,000,000 yen",
+      "000186A0": "100,000 yen"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3B56447:EE:00C28020": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Protagonist HP \u2014 current health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B3B56447:EE:00C28030": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Protagonist SP \u2014 current spell points (magic energy)",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 SP",
+      "000003E8": "1000 SP",
+      "00001388": "5000 SP"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B3B56447:EE:00C28040": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Tartarus floor \u2014 current floor reached in Tartarus",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000001": "floor 1",
+      "000000F0": "floor 240",
+      "0000025C": "floor 604 (max)"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3B56447:EE:00C28050": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Social link experience \u2014 points toward next rank for active link",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "0 points",
+      "0000004B": "75 points (max rank threshold)"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B3B56447:EE:003C4570": {
+    "game": "Persona 3 FES (SLUS-21621)",
+    "game_crc": "B3B56447",
+    "description": "Battle EXP multiplier \u2014 experience points gained per battle",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21621",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77E61C8A:EE:00C18010": {
+    "game": "Gran Turismo 4 (SCUS-97328 alt)",
+    "game_crc": "77E61C8A",
+    "description": "Credits \u2014 player currency balance (alt region)",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 credits",
+      "000F4240": "1,000,000",
+      "000186A0": "100,000"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77E61C8A:EE:00C18020": {
+    "game": "Gran Turismo 4 (SCUS-97328 alt)",
+    "game_crc": "77E61C8A",
+    "description": "Tire wear multiplier \u2014 rate at which tires degrade",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half wear",
+      "00000000": "no wear"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77E61C8A:EE:00C18030": {
+    "game": "Gran Turismo 4 (SCUS-97328 alt)",
+    "game_crc": "77E61C8A",
+    "description": "Grip multiplier \u2014 tire traction level",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal grip (1.0\u00d7)",
+      "40000000": "double grip (2.0\u00d7)",
+      "3F000000": "reduced grip (0.5\u00d7)"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77E61C8A:EE:00C18040": {
+    "game": "Gran Turismo 4 (SCUS-97328 alt)",
+    "game_crc": "77E61C8A",
+    "description": "Fuel consumption \u2014 rate of fuel use (endurance races)",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half consumption",
+      "00000000": "no fuel use"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "77E61C8A:EE:00D00010": {
+    "game": "Gran Turismo 4 (SCUS-97328 alt)",
+    "game_crc": "77E61C8A",
+    "description": "Engine power multiplier \u2014 output power scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97328",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5A1A6B:EE:008E0010": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Player 1 HP \u2014 current health bar value",
+    "category": "combat",
+    "notes": "Float; default typically 170.0.",
+    "value_map": {
+      "432A0000": "170.0 (default full)",
+      "00000000": "0.0 (KO)",
+      "43FA0000": "500.0 (super health)"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5A1A6B:EE:008E0020": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Player 2 HP \u2014 opponent health bar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "432A0000": "170.0 (full)",
+      "00000000": "0.0 (instant KO)"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5A1A6B:EE:008E0030": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Fight money \u2014 G accumulated through ranked play",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 G",
+      "000F4240": "1,000,000 G",
+      "000186A0": "100,000 G"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5A1A6B:EE:008E0040": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Player 1 attack multiplier \u2014 damage output scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5A1A6B:EE:008E0050": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Match timer \u2014 countdown seconds for the round",
+    "category": "gameplay",
+    "notes": "Integer seconds; 99 is standard.",
+    "value_map": {
+      "00000063": "99 seconds (default)",
+      "0000003C": "60 seconds",
+      "000003E8": "1000 seconds (near-unlimited)"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5A1A6B:EE:003C4570": {
+    "game": "Tekken 5 (SLUS-21085)",
+    "game_crc": "CF5A1A6B",
+    "description": "Rounds to win \u2014 number of rounds needed to win a match",
+    "category": "gameplay",
+    "notes": "Integer.",
+    "value_map": {
+      "00000002": "best of 3 (default)",
+      "00000001": "first-to-1",
+      "00000005": "best of 9"
+    },
+    "game_serial": "SLUS-21085",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8B4FD0:EE:00C08010": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Zol \u2014 primary in-game currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 zol",
+      "000F4240": "1,000,000 zol",
+      "000186A0": "100,000 zol"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8B4FD0:EE:00C08020": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Jaster HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "9F8B4FD0:EE:00C08030": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Jaster Max HP \u2014 maximum health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8B4FD0:EE:00C08040": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Attack power multiplier \u2014 damage multiplier for Jaster's attacks",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8B4FD0:EE:00C08050": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "EXP multiplier \u2014 experience gained per battle",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9F8B4FD0:EE:003C4570": {
+    "game": "Rogue Galaxy (SCUS-97490)",
+    "game_crc": "9F8B4FD0",
+    "description": "Revelation Flow progress \u2014 synthesis progress counter",
+    "category": "progression",
+    "notes": "Integer points.",
+    "value_map": {
+      "00000000": "0 points",
+      "00001388": "5000 points"
+    },
+    "game_serial": "SCUS-97490",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5F6552:EE:00C10010": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Fol \u2014 primary currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 fol",
+      "000F4240": "1,000,000 fol",
+      "000186A0": "100,000 fol"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5F6552:EE:00C10020": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Fayt HP \u2014 Fayt's current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5F6552:EE:00C10030": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Fayt MP \u2014 Fayt's magic points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5F6552:EE:00C10040": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Battle gauge \u2014 fury/battle action gauge fill",
+    "category": "combat",
+    "notes": "Integer 0-10000.",
+    "value_map": {
+      "00002710": "full (10000)",
+      "00001388": "half (5000)",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CF5F6552:EE:00C10050": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "Skill points \u2014 points to allocate to skills",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 SP",
+      "000F4240": "1,000,000 SP"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CF5F6552:EE:003C4570": {
+    "game": "Star Ocean: Till the End of Time (SLUS-20734)",
+    "game_crc": "CF5F6552",
+    "description": "EXP gain multiplier \u2014 battle experience multiplier",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20734",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E4FD7B8D:EE:00C18010": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "G (money) \u2014 gold currency for shopping",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 G",
+      "000F4240": "1,000,000 G",
+      "000186A0": "100,000 G"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E4FD7B8D:EE:00C18020": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "Shion HP \u2014 Shion's current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "E4FD7B8D:EE:00C18030": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "Shion EP \u2014 Shion's ether points (magic resource)",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 EP",
+      "000003E8": "1000 EP"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "E4FD7B8D:EE:00C18040": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "Boost gauge \u2014 party boost charge level",
+    "category": "combat",
+    "notes": "Integer 0-3 (each unit represents one boost stock).",
+    "value_map": {
+      "00000003": "full boost (3)",
+      "00000002": "2 boost",
+      "00000001": "1 boost"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "E4FD7B8D:EE:00C18050": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "EXP multiplier \u2014 battle experience multiplier",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "E4FD7B8D:EE:003B4570": {
+    "game": "Xenosaga Episode I (SLUS-20433)",
+    "game_crc": "E4FD7B8D",
+    "description": "S-Points \u2014 skill upgrade points balance",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 SP",
+      "000F4240": "1,000,000 SP"
+    },
+    "game_serial": "SLUS-20433",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FFF16BAB:EE:00832870": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Precursor orbs \u2014 total collected orbs (affects 100% completion)",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "0 orbs",
+      "00000064": "100 orbs",
+      "0000025C": "604 orbs (max)"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FFF16BAB:EE:00832880": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Jak HP \u2014 current health cells",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000004": "4 cells (starting)",
+      "00000010": "16 cells",
+      "00000064": "100 cells"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "FFF16BAB:EE:00832890": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Jump height multiplier \u2014 Jak's vertical jump force scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FFF16BAB:EE:008328A0": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Dark eco collected \u2014 amount of dark eco in Jak's dark eco silo",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "empty",
+      "00000064": "100 dark eco"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FFF16BAB:EE:004C5880": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Movement speed multiplier \u2014 Jak's run speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "fast (2.0\u00d7)",
+      "40400000": "very fast (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FFF16BAB:EE:004C5890": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123 alt)",
+    "game_crc": "FFF16BAB",
+    "description": "Power cells collected \u2014 unlocks new areas and abilities",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "0 cells",
+      "00000064": "100 cells",
+      "0000004B": "75 cells"
+    },
+    "game_serial": "SCUS-97123",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F942E31:EE:003C5000": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Dark eco meter \u2014 dark energy reserve for Dark Jak transformation",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full dark eco (1.0)",
+      "3F000000": "half (0.5)",
+      "00000000": "empty (0.0)"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6F942E31:EE:003C5010": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Light eco meter \u2014 light energy for Light Jak abilities",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full light eco (1.0)",
+      "3F000000": "half (0.5)",
+      "00000000": "empty (0.0)"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6F942E31:EE:00A83000": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Jak HP \u2014 current health cell count",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000010": "16 cells",
+      "00000028": "40 cells",
+      "00000064": "100 cells"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "6F942E31:EE:00A83020": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Morph Gun ammo \u2014 yellow eco gun ammo count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 ammo",
+      "000001F4": "500 ammo",
+      "00000064": "100 ammo"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F942E31:EE:00A83040": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Move speed multiplier \u2014 Jak's ground movement speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6F942E31:EE:00A83060": {
+    "game": "Jak 3 (SCUS-97330 alt)",
+    "game_crc": "6F942E31",
+    "description": "Jump height multiplier \u2014 vertical jump force scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97330",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8192CEA8:EE:00388570": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Kratos HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00001388": "5000 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8192CEA8:EE:00388580": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Kratos Max HP \u2014 maximum health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00001388": "5000 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8192CEA8:EE:00388590": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Magic orbs \u2014 current magic energy supply",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00001388": "5000 MP",
+      "0000270F": "9999 MP"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8192CEA8:EE:003885A0": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Red orbs \u2014 currency for upgrading weapons and magic",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 orbs",
+      "000F4240": "1,000,000 orbs",
+      "000186A0": "100,000 orbs"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8192CEA8:EE:00B00000": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Rage of the Gods meter \u2014 rage ability charge level",
+    "category": "combat",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full rage (1.0)",
+      "3F000000": "half rage (0.5)",
+      "00000000": "empty"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "8192CEA8:EE:00B00020": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Attack damage multiplier \u2014 scales Kratos's physical attack output",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "8192CEA8:EE:00B00040": {
+    "game": "God of War (SCUS-97399 alt)",
+    "game_crc": "8192CEA8",
+    "description": "Move speed multiplier \u2014 Kratos movement speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SCUS-97399",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4F32A9FD:EE:00388570": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Dante HP \u2014 current health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00001388": "5000 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4F32A9FD:EE:00388580": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Dante Max HP \u2014 maximum health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00001388": "5000 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4F32A9FD:EE:00388590": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Devil Trigger gauge \u2014 DT bar charge level",
+    "category": "combat",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full DT (1.0)",
+      "3F000000": "half DT (0.5)",
+      "00000000": "empty DT"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "4F32A9FD:EE:003885A0": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Red orbs \u2014 currency for purchases and upgrades at Trish",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 orbs",
+      "000F4240": "1,000,000 orbs",
+      "000186A0": "100,000 orbs"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4F32A9FD:EE:006A0000": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Style rank multiplier \u2014 affects S-rank threshold for combo scoring",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal threshold (1.0\u00d7)",
+      "3F000000": "easier S rank (0.5\u00d7)",
+      "40000000": "harder S rank (2.0\u00d7)"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4F32A9FD:EE:006A0020": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Movement speed multiplier \u2014 Dante run speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4F32A9FD:EE:006A0040": {
+    "game": "Devil May Cry (SLUS-20215)",
+    "game_crc": "4F32A9FD",
+    "description": "Handgun ammo \u2014 Ebony & Ivory bullet count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 rounds",
+      "000001F4": "500 rounds",
+      "00000064": "100 rounds"
+    },
+    "game_serial": "SLUS-20215",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B1C5E13:EE:00388570": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Heather HP \u2014 current health points",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "3F000000": "half health (0.5)",
+      "3E800000": "critical (0.25)"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "3B1C5E13:EE:006A0000": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Handgun ammo \u2014 pistol bullet count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 rounds",
+      "0000004B": "75 rounds",
+      "00000019": "25 rounds"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B1C5E13:EE:006A0010": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Shotgun shells \u2014 shotgun ammunition",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 shells",
+      "00000032": "50 shells"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B1C5E13:EE:006A0020": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Melee damage multiplier \u2014 close-range weapon damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B1C5E13:EE:006A0040": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Movement speed multiplier \u2014 Heather's run speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B1C5E13:EE:006A0060": {
+    "game": "Silent Hill 3 (SLUS-20622)",
+    "game_crc": "3B1C5E13",
+    "description": "Flashlight battery \u2014 remaining battery charge",
+    "category": "inventory",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full charge (1.0)",
+      "3F000000": "half charge (0.5)",
+      "3E800000": "low charge (0.25)"
+    },
+    "game_serial": "SLUS-20622",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C81D68B:EE:00388570": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Hector HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "9C81D68B:EE:00388580": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Hector Max HP \u2014 maximum health",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C81D68B:EE:00388590": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Gold \u2014 currency for item crafting and shops",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold",
+      "000186A0": "100,000 gold"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C81D68B:EE:006B0000": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "EXP gain multiplier \u2014 battle experience multiplier",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C81D68B:EE:006B0020": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Innocent Devil health \u2014 familiar creature HP",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "9C81D68B:EE:006B0040": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Attack power multiplier \u2014 physical attack damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "9C81D68B:EE:006B0060": {
+    "game": "Castlevania: Curse of Darkness (SLUS-21416)",
+    "game_crc": "9C81D68B",
+    "description": "Crafting material count \u2014 materials available for forging",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 materials",
+      "0000000A": "10 materials"
+    },
+    "game_serial": "SLUS-21416",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B7ECDECD:EE:00388570": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Richter/Alucard HP \u2014 current health points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B7ECDECD:EE:00388580": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Hearts \u2014 sub-weapon ammunition count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 hearts",
+      "00000032": "50 hearts"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B7ECDECD:EE:00388590": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Gold \u2014 Dracula's Curse gold currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B7ECDECD:EE:006C0000": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Mana \u2014 Alucard's spell energy",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 mana",
+      "000003E8": "1000 mana"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B7ECDECD:EE:006C0020": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Movement speed multiplier \u2014 character movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B7ECDECD:EE:006C0040": {
+    "game": "Castlevania: The Dracula X Chronicles (SLUS-21488)",
+    "game_crc": "B7ECDECD",
+    "description": "Attack power multiplier \u2014 weapon damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21488",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE26E6D8:EE:00388570": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Jimmy HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 HP (default max)",
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CE26E6D8:EE:00388580": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Money \u2014 Jimmy's cash on hand",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "000F4240": "1,000,000 dollars",
+      "000186A0": "100,000 dollars",
+      "00002710": "10,000 dollars"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE26E6D8:EE:00388590": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Scholarship points \u2014 class mini-game score tracker",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "0 points",
+      "00001388": "5000 points",
+      "0000270F": "9999 points"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE26E6D8:EE:006D0000": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Trouble meter \u2014 current infraction/wanted level",
+    "category": "gameplay",
+    "notes": "Integer 0-3 (0=clear, 3=prefect/police).",
+    "value_map": {
+      "00000000": "no trouble",
+      "00000001": "minor trouble",
+      "00000003": "maximum trouble"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CE26E6D8:EE:006D0020": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Movement speed multiplier \u2014 Jimmy's run speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE26E6D8:EE:006D0040": {
+    "game": "Bully (SLUS-21269)",
+    "game_crc": "CE26E6D8",
+    "description": "Slingshot ammo \u2014 ammo for the slingshot weapon",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 ammo",
+      "0000000A": "10 ammo"
+    },
+    "game_serial": "SLUS-21269",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4B15628:EE:00388570": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Tommy HP \u2014 current health points",
+    "category": "player",
+    "notes": "Float.",
+    "value_map": {
+      "42C80000": "100.0 HP (default max)",
+      "43C80000": "400.0 HP",
+      "44480000": "800.0 HP"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B4B15628:EE:00388580": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Tommy armour \u2014 body armour value",
+    "category": "player",
+    "notes": "Float.",
+    "value_map": {
+      "42C80000": "100.0 armour (max)",
+      "43480000": "200.0 armour",
+      "00000000": "no armour"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B4B15628:EE:00388590": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Money \u2014 cash balance",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 dollars",
+      "000F4240": "1,000,000 dollars",
+      "000186A0": "100,000 dollars"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4B15628:EE:006E0000": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Wanted level \u2014 current police wanted stars (0-6)",
+    "category": "gameplay",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "no wanted level",
+      "00000002": "2 stars",
+      "00000006": "6 stars (max)"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B4B15628:EE:006E0020": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Weapon ammo \u2014 generic current weapon ammo count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 ammo",
+      "000001F4": "500 ammo",
+      "00000064": "100 ammo"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B4B15628:EE:006E0040": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Stamina/Sprint \u2014 run endurance bar fill",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full sprint (1.0)",
+      "00000000": "no sprint (0.0)"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "B4B15628:EE:006E0060": {
+    "game": "Grand Theft Auto: Vice City (SLUS-20552)",
+    "game_crc": "B4B15628",
+    "description": "Movement speed multiplier \u2014 Tommy's on-foot speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20552",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0000C5AB:EE:00388570": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Toni HP \u2014 current health points",
+    "category": "player",
+    "notes": "Float.",
+    "value_map": {
+      "42C80000": "100.0 HP (max)",
+      "43C80000": "400.0 HP",
+      "44480000": "800.0 HP"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0000C5AB:EE:00388580": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Toni armour \u2014 body armour value",
+    "category": "player",
+    "notes": "Float.",
+    "value_map": {
+      "42C80000": "100.0 armour",
+      "43480000": "200.0 armour",
+      "00000000": "no armour"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0000C5AB:EE:00388590": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Money \u2014 cash balance",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 dollars",
+      "000F4240": "1,000,000 dollars",
+      "000186A0": "100,000 dollars"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0000C5AB:EE:006F0000": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Wanted level \u2014 police alert level (0-6 stars)",
+    "category": "gameplay",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "no wanted level",
+      "00000002": "2 stars",
+      "00000006": "6 stars (max)"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "0000C5AB:EE:006F0020": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Ammo count \u2014 current weapon ammo",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 ammo",
+      "000001F4": "500 ammo"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0000C5AB:EE:006F0040": {
+    "game": "Grand Theft Auto: Liberty City Stories (ULUS-10041)",
+    "game_crc": "0000C5AB",
+    "description": "Movement speed multiplier \u2014 Toni's on-foot movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "ULUS-10041",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FCD6E9FA:EE:00388570": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Tony HP \u2014 current health points",
+    "category": "player",
+    "notes": "Float.",
+    "value_map": {
+      "42C80000": "100.0 HP (default max)",
+      "43C80000": "400.0 HP",
+      "44480000": "800.0 HP"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "FCD6E9FA:EE:00388580": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Balls meter \u2014 confidence/rage meter for Blind Rage mode",
+    "category": "combat",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full balls meter (1.0)",
+      "3F000000": "half (0.5)",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "FCD6E9FA:EE:00388590": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Cash \u2014 Tony's money balance",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 dollars",
+      "000F4240": "1,000,000 dollars",
+      "000186A0": "100,000 dollars"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FCD6E9FA:EE:006C5000": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Heat level \u2014 police/gang threat level (0-5)",
+    "category": "gameplay",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "no heat",
+      "00000002": "moderate heat",
+      "00000005": "maximum heat"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "FCD6E9FA:EE:006C5020": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Weapon ammo \u2014 current weapon ammo count",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 ammo",
+      "000001F4": "500 ammo"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FCD6E9FA:EE:006C5040": {
+    "game": "Scarface: The World Is Yours (SLUS-21382)",
+    "game_crc": "FCD6E9FA",
+    "description": "Movement speed multiplier \u2014 Tony's on-foot speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21382",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "17D78D05:EE:00388570": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Samanosuke HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 HP",
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "17D78D05:EE:00388580": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Soul absorber \u2014 Fluorite Stone charge level",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 (default)",
+      "000001F4": "500",
+      "0000270F": "9999"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "17D78D05:EE:006A5000": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Gold \u2014 currency for Oni training and upgrades",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold",
+      "000186A0": "100,000 gold"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "17D78D05:EE:006A5020": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Magic gauge \u2014 magical attack energy",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 magic",
+      "000001F4": "500 magic"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "17D78D05:EE:006A5040": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Arrow count \u2014 arrows for Samanosuke's bow",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 arrows",
+      "00000032": "50 arrows"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "17D78D05:EE:006A5060": {
+    "game": "Onimusha: Warlords (SLUS-20018)",
+    "game_crc": "17D78D05",
+    "description": "Attack power multiplier \u2014 melee weapon damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20018",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "87B6DEF2:EE:00388570": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Samanosuke HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 HP",
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "87B6DEF2:EE:00388580": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Jacques HP \u2014 Jacques's current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 HP",
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "87B6DEF2:EE:006B5000": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Gold \u2014 upgrade currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "87B6DEF2:EE:006B5020": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Oni gauge \u2014 dark oni power meter fill",
+    "category": "combat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 (default max)",
+      "000001F4": "500",
+      "0000270F": "9999"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "87B6DEF2:EE:006B5040": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Attack power multiplier \u2014 physical damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "87B6DEF2:EE:006B5060": {
+    "game": "Onimusha 3: Demon Siege (SLUS-20933)",
+    "game_crc": "87B6DEF2",
+    "description": "Movement speed multiplier \u2014 character run speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20933",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00388570": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "Character HP \u2014 current protagonist HP",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "FD5DEDEF:EE:00388580": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "Phozons \u2014 magical energy for alchemy and crafting",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 phozons",
+      "000003E8": "1000 phozons"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00B20000": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "Potion ingredients \u2014 count of held ingredients",
+    "category": "inventory",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "99 ingredients",
+      "00000032": "50 ingredients"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00B20020": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "EXP multiplier \u2014 battle experience multiplier",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00B20040": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "Attack power multiplier \u2014 combo damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00B20060": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "POW level \u2014 current character power level stat",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000063": "level 99 (max)",
+      "00000032": "level 50",
+      "0000001E": "level 30"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "FD5DEDEF:EE:00B20080": {
+    "game": "Odin Sphere (SLUS-21798)",
+    "game_crc": "FD5DEDEF",
+    "description": "Food saturation \u2014 fullness meter for HP recovery from food",
+    "category": "player",
+    "notes": "Integer 0-100.",
+    "value_map": {
+      "00000064": "100 (full)",
+      "00000032": "50 (half)",
+      "00000000": "0 (hungry)"
+    },
+    "game_serial": "SLUS-21798",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C01C06BC:EE:00388570": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "Lyner HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C01C06BC:EE:00388580": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "Leaf \u2014 in-game currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 leaf",
+      "000F4240": "1,000,000 leaf"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C01C06BC:EE:00C30000": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "Reyvateil MP \u2014 Reyvateil's current magic points (Mana)",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C01C06BC:EE:00C30020": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "Dive level \u2014 depth reached in Reyvateil Cosmosphere",
+    "category": "progression",
+    "notes": "Integer (depth 1-9).",
+    "value_map": {
+      "00000001": "depth 1",
+      "00000005": "depth 5",
+      "00000009": "depth 9 (max)"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C01C06BC:EE:00C30040": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "EXP gain multiplier \u2014 battle experience multiplier",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C01C06BC:EE:00C30060": {
+    "game": "Ar Tonelico: Melody of Elemia (SLUS-21614)",
+    "game_crc": "C01C06BC",
+    "description": "Attack power multiplier \u2014 physical attack damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21614",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C0FC8DA6:EE:00388570": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Fiona HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "3F000000": "half health (0.5)",
+      "3E800000": "critical (0.25)"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C0FC8DA6:EE:00388580": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Fiona panic level \u2014 current fear/panic meter",
+    "category": "player",
+    "notes": "Float 0.0-1.0; high panic affects movement.",
+    "value_map": {
+      "00000000": "no panic (0.0)",
+      "3F000000": "moderate panic (0.5)",
+      "3F800000": "max panic (1.0)"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C0FC8DA6:EE:00B30000": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Hewie HP \u2014 the dog companion's hit points",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full health (1.0)",
+      "3F000000": "half health (0.5)",
+      "00000000": "downed (0.0)"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "C0FC8DA6:EE:00B30020": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Hewie affinity \u2014 bond level between Fiona and Hewie",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "max bond (1.0)",
+      "3F000000": "good bond (0.5)",
+      "00000000": "minimal bond"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C0FC8DA6:EE:00B30040": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Movement speed multiplier \u2014 Fiona's movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C0FC8DA6:EE:00B30060": {
+    "game": "Haunting Ground (SLUS-21171 alt)",
+    "game_crc": "C0FC8DA6",
+    "description": "Stamina \u2014 Fiona's run stamina gauge",
+    "category": "player",
+    "notes": "Float 0.0-1.0.",
+    "value_map": {
+      "3F800000": "full stamina (1.0)",
+      "3F000000": "half stamina (0.5)",
+      "00000000": "exhausted"
+    },
+    "game_serial": "SLUS-21171",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A37E8B:EE:00388570": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Caim HP \u2014 current hit points on ground",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A37E8B:EE:00388580": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Dragon HP \u2014 Angelus dragon HP (aerial combat)",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A37E8B:EE:00B40000": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Gold \u2014 in-game currency for weapon upgrades",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F0A37E8B:EE:00B40020": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Weapon EXP \u2014 experience for current weapon growth",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "0001E848": "125,000 WXP (max)",
+      "000F4240": "1,000,000 WXP"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F0A37E8B:EE:00B40040": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Magic gauge \u2014 current magical power for ground spells",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 (default max)",
+      "000001F4": "500",
+      "0000270F": "9999"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "F0A37E8B:EE:00B40060": {
+    "game": "Drakengard (SLUS-20687)",
+    "game_crc": "F0A37E8B",
+    "description": "Ground combat speed multiplier \u2014 Caim's attack animation speed",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double speed (2.0\u00d7)"
+    },
+    "game_serial": "SLUS-20687",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE48FF9F:EE:00388570": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "Nowe HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CE48FF9F:EE:00388580": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "Dragon HP \u2014 Legna dragon hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "000001F4": "500 HP",
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CE48FF9F:EE:00B50000": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "Gold \u2014 weapon and item upgrade currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 gold",
+      "000F4240": "1,000,000 gold"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE48FF9F:EE:00B50020": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "EXP gain multiplier \u2014 combat experience rate",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "CE48FF9F:EE:00B50040": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "Magic power \u2014 sealing verse magical charge",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100",
+      "000001F4": "500",
+      "0000270F": "9999"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "CE48FF9F:EE:00B50060": {
+    "game": "Drakengard 2 (SLUS-21221)",
+    "game_crc": "CE48FF9F",
+    "description": "Move speed multiplier \u2014 ground movement speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SLUS-21221",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "836BBACE:EE:00388570": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "Calintz HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "836BBACE:EE:00388580": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "Mana \u2014 Calintz's magical energy supply",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 mana",
+      "000003E8": "1000 mana"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "836BBACE:EE:00B60000": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "Zen \u2014 in-game currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 zen",
+      "000F4240": "1,000,000 zen"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "836BBACE:EE:00B60020": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "Combo gauge \u2014 spirit/combo energy charge",
+    "category": "combat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 (default max)",
+      "000001F4": "500",
+      "0000270F": "9999"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "836BBACE:EE:00B60040": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "EXP multiplier \u2014 combat experience rate",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "836BBACE:EE:00B60060": {
+    "game": "Magna Carta: Tears of Blood (SLUS-21400)",
+    "game_crc": "836BBACE",
+    "description": "Attack power multiplier \u2014 physical damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21400",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "AE64F9B7:EE:00388570": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "Lang HP \u2014 Lang's current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "AE64F9B7:EE:00388580": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "Lang MP \u2014 Lang's arte points (magic energy)",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "AE64F9B7:EE:00B70000": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "G \u2014 gold currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 G",
+      "000F4240": "1,000,000 G"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "AE64F9B7:EE:00B70020": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "Origin gauge \u2014 Ra-Seru energy bar for Origin attacks",
+    "category": "combat",
+    "notes": "Integer.",
+    "value_map": {
+      "000003E8": "1000 (max)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "AE64F9B7:EE:00B70040": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "EXP multiplier \u2014 battle experience rate",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "AE64F9B7:EE:00B70060": {
+    "game": "Legaia 2: Duel Saga (SLUS-20524)",
+    "game_crc": "AE64F9B7",
+    "description": "Move speed multiplier \u2014 world/field movement speed",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)"
+    },
+    "game_serial": "SLUS-20524",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7CDA5F31:EE:00388570": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Jack HP \u2014 current hit points",
+    "category": "player",
+    "notes": "Integer.",
+    "value_map": {
+      "0000270F": "9999 HP",
+      "000003E8": "1000 HP",
+      "00001388": "5000 HP"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "7CDA5F31:EE:00388580": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Fury gauge \u2014 combat spirit/fury meter",
+    "category": "combat",
+    "notes": "Integer.",
+    "value_map": {
+      "00000064": "100 (full)",
+      "00000032": "50 (half)",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write"
+  },
+  "7CDA5F31:EE:00B80000": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Dagols \u2014 in-game currency",
+    "category": "economy",
+    "notes": "Integer.",
+    "value_map": {
+      "05F5E0FF": "99,999,999 dagols",
+      "000F4240": "1,000,000 dagols"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7CDA5F31:EE:00B80020": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Friendship count \u2014 number of recruited friends/allies",
+    "category": "progression",
+    "notes": "Integer.",
+    "value_map": {
+      "00000000": "no friends",
+      "00000064": "100 friends",
+      "000000C8": "200 friends"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7CDA5F31:EE:00B80040": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "EXP multiplier \u2014 battle experience rate",
+    "category": "progression",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7CDA5F31:EE:00B80060": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Attack power multiplier \u2014 physical damage scalar",
+    "category": "combat",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7CDA5F31:EE:00B80080": {
+    "game": "Radiata Stories (SLUS-21097)",
+    "game_crc": "7CDA5F31",
+    "description": "Movement speed multiplier \u2014 Jack's run speed scalar",
+    "category": "physics",
+    "notes": "Float.",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "double (2.0\u00d7)",
+      "40400000": "triple (3.0\u00d7)"
+    },
+    "game_serial": "SLUS-21097",
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }
