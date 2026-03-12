@@ -746,6 +746,18 @@ _KNOWN_SERIALS: dict[str, str] = {
 
     # Sports / Wrestling
     "SLUS-21302": "WWE SmackDown! vs. RAW 2006",
+    "SLUS-21424": "WWE SmackDown vs. RAW 2007",
+
+    # Platform
+    "SLUS-21282": "Ape Escape 3",
+    "SLUS-21372": "The Legend of Spyro: A New Beginning",
+    "SCES-02705": "Crash Bash (PAL)",
+
+    # Action
+    "SLUS-21322": "Viewtiful Joe: Red Hot Rumble",
+
+    # Racing
+    "SCUS-97328": "Gran Turismo 4",
 }
 # fmt: on
 

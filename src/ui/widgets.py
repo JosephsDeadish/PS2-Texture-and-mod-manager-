@@ -482,6 +482,38 @@ class ConflictDialog(QDialog):
             quick_row.addWidget(ignore_btn)
             f_layout.addLayout(quick_row)
 
+            # ── "Disable loser" resolution row ──────────────────────────
+            disable_row = QHBoxLayout()
+            disable_a_btn = QPushButton(f"🚫 Disable '{mod_a.name}'")
+            disable_a_btn.setStyleSheet(
+                "background:#2a0a0a; color:#d06060; border-radius:4px; font-size:10px;"
+            )
+            disable_b_btn = QPushButton(f"🚫 Disable '{mod_b.name}'")
+            disable_b_btn.setStyleSheet(
+                "background:#2a0a0a; color:#d06060; border-radius:4px; font-size:10px;"
+            )
+
+            def _make_disable_resolver(target_mod):
+                def _resolve():
+                    target_mod.enabled = False
+                    self.db.update(target_mod)
+                    from PyQt6.QtWidgets import QMessageBox
+                    QMessageBox.information(
+                        self,
+                        "Conflict Resolved",
+                        f"'{target_mod.name}' has been disabled.\n"
+                        "Re-enable it any time from the mod panel.",
+                    )
+                return _resolve
+
+            disable_a_btn.clicked.connect(_make_disable_resolver(mod_a))
+            disable_b_btn.clicked.connect(_make_disable_resolver(mod_b))
+            disable_row.addWidget(QLabel("Or disable one mod:"))
+            disable_row.addWidget(disable_a_btn)
+            disable_row.addWidget(disable_b_btn)
+            disable_row.addStretch()
+            f_layout.addLayout(disable_row)
+
             # ── Per-file resolution (expandable) ────────────────────────
             if conflict.conflicting_files:
                 toggle_btn = QPushButton(
