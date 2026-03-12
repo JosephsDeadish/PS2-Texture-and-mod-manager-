@@ -24,6 +24,8 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -471,25 +473,74 @@ class CatalogueCard(QFrame):
 # ---------------------------------------------------------------------------
 
 class CoverDownloadDialog(QDialog):
-    def __init__(self, config: AppConfig, parent=None):
+    """Download PS2 cover art from GameTDB by game serial or game title.
+
+    The dialog has two input modes:
+    * **Search by game name** — type part of a game title and click a matching
+      suggestion to auto-fill the serial field.
+    * **Enter serial directly** — type (or paste) the SCUS/SLUS/SLES serial
+      and download immediately.
+    """
+
+    def __init__(self, config: AppConfig, parent=None, initial_serial: str = ""):
         super().__init__(parent)
         self.config = config
         self.setWindowTitle("Download Cover Art")
-        self.setMinimumWidth(460)
+        self.setMinimumWidth(520)
         self._build()
+        if initial_serial:
+            self._id_edit.setText(initial_serial)
 
     def _build(self):
+        from src.core.game_registry import title_to_serials
+
         layout = QVBoxLayout(self)
-        layout.setSpacing(12)
+        layout.setSpacing(10)
         layout.setContentsMargins(20, 20, 20, 20)
 
-        layout.addWidget(QLabel(
-            "Enter the PS2 game serial/ID (e.g. SLUS-20062) to download its cover art\n"
-            "from GameTDB (https://www.gametdb.com). Cover art is provided free of charge."
-        ))
+        # Header
+        hdr = QLabel(
+            "Download PS2 cover art from "
+            "<a href='https://www.gametdb.com'>GameTDB</a> — free, high-quality scans."
+        )
+        hdr.setOpenExternalLinks(True)
+        hdr.setWordWrap(True)
+        layout.addWidget(hdr)
 
+        # ── Game Name Search ──────────────────────────────────────────────
+        sep1 = QFrame()
+        sep1.setFrameShape(QFrame.Shape.HLine)
+        sep1.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(sep1)
+
+        layout.addWidget(QLabel(
+            "<b>Step 1 (optional):</b> Search by game name to find its serial:"
+        ))
+        search_row = QHBoxLayout()
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("e.g. God of War, Persona 4, Crash Bandicoot…")
+        self._search_edit.textChanged.connect(self._on_search_changed)
+        search_row.addWidget(self._search_edit, 1)
+        layout.addLayout(search_row)
+
+        # Results list — hidden until there are suggestions
+        self._suggestions = QListWidget()
+        self._suggestions.setMaximumHeight(130)
+        self._suggestions.hide()
+        self._suggestions.itemClicked.connect(self._on_suggestion_clicked)
+        layout.addWidget(self._suggestions)
+
+        # ── Serial / ID field ─────────────────────────────────────────────
+        sep2 = QFrame()
+        sep2.setFrameShape(QFrame.Shape.HLine)
+        sep2.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(sep2)
+
+        layout.addWidget(QLabel(
+            "<b>Step 2:</b> Enter (or confirm) the game serial and click Download:"
+        ))
         id_row = QHBoxLayout()
-        id_row.addWidget(QLabel("Game ID:"))
+        id_row.addWidget(QLabel("Serial:"))
         self._id_edit = QLineEdit()
         self._id_edit.setPlaceholderText("e.g. SLUS-20062")
         id_row.addWidget(self._id_edit, 1)
@@ -503,6 +554,7 @@ class CoverDownloadDialog(QDialog):
         region_row.addStretch()
         layout.addLayout(region_row)
 
+        # Status + progress
         self._status = QLabel("")
         self._status.setWordWrap(True)
         layout.addWidget(self._status)
@@ -512,8 +564,9 @@ class CoverDownloadDialog(QDialog):
         self._progress.hide()
         layout.addWidget(self._progress)
 
+        # Buttons
         btns = QHBoxLayout()
-        self._dl_btn = QPushButton("⬇ Download")
+        self._dl_btn = QPushButton("⬇ Download Cover")
         self._dl_btn.setObjectName("primary_btn")
         self._dl_btn.clicked.connect(self._download)
         btns.addWidget(self._dl_btn)
@@ -522,17 +575,56 @@ class CoverDownloadDialog(QDialog):
         btns.addWidget(close_btn)
         layout.addLayout(btns)
 
+        # Keep reference so the inner lambda can call it
+        self._title_to_serials = title_to_serials
+
+    # ------------------------------------------------------------------
+    # Game-name search helpers
+    # ------------------------------------------------------------------
+
+    def _on_search_changed(self, text: str):
+        """Populate the suggestions list from the game registry."""
+        self._suggestions.clear()
+        text = text.strip()
+        if len(text) < 2:
+            self._suggestions.hide()
+            return
+        hits = self._title_to_serials(text)
+        if not hits:
+            self._suggestions.hide()
+            return
+        for serial, title in hits[:20]:
+            item = QListWidgetItem(f"{serial}  —  {title}")
+            item.setData(Qt.ItemDataRole.UserRole, serial)
+            self._suggestions.addItem(item)
+        self._suggestions.show()
+
+    def _on_suggestion_clicked(self, item: "QListWidgetItem"):
+        """Fill the serial field when the user clicks a suggestion."""
+        serial = item.data(Qt.ItemDataRole.UserRole)
+        if serial:
+            self._id_edit.setText(serial)
+            self._suggestions.hide()
+            self._status.setText(
+                f"Serial set to <b>{serial}</b> — click Download to fetch cover art."
+            )
+            self._status.setTextFormat(Qt.TextFormat.RichText)
+
+    # ------------------------------------------------------------------
+    # Download
+    # ------------------------------------------------------------------
+
     def _download(self):
         from src.core.downloader import fetch_gametdb_art
         game_id = self._id_edit.text().strip()
         if not game_id:
-            self._status.setText("⚠  Please enter a Game ID")
+            self._status.setText("⚠  Please enter a Game ID or search by name above")
             return
         dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
         region = self._region_combo.currentText()
         self._dl_btn.setEnabled(False)
         self._progress.show()
-        self._status.setText(f"Downloading cover for {game_id}...")
+        self._status.setText(f"Downloading cover for {game_id}…")
 
         def _run():
             path = fetch_gametdb_art(game_id, dest_dir, region)
@@ -1429,8 +1521,10 @@ class _CatalogueTabContent(QWidget):
         from PyQt6.QtCore import QUrl
         QDesktopServices.openUrl(QUrl(url))
 
-    def _download_cover(self, _entry: dict):
-        dlg = CoverDownloadDialog(self.config, self)
+    def _download_cover(self, entry: dict):
+        # Pre-fill the serial from the catalogue entry if available
+        initial_serial = entry.get("game_serial", "")
+        dlg = CoverDownloadDialog(self.config, self, initial_serial=initial_serial)
         dlg.exec()
 
 
