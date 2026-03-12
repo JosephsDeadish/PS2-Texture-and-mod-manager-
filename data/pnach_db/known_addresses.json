@@ -79439,5 +79439,3552 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
+  },
+  "0B77FE0C:EE:00C00000": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Cash \u2014 money for car upgrades and crew",
+    "category": "progression",
+    "value_map": {
+      "00000000": "$0",
+      "000F4240": "$1,000,000"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B77FE0C:EE:003B4600": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Vehicle top speed multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "half speed (0.5\u00d7)"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B77FE0C:EE:003B4700": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Nitrous recharge rate multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40400000": "3\u00d7 recharge",
+      "3E800000": "slow (0.25\u00d7)"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B77FE0C:EE:003B4800": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Heat level \u2014 police pursuit intensity",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "heat 0 (no pursuit)",
+      "00000001": "heat 1",
+      "00000005": "heat 5 (max)"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B77FE0C:EE:003B4900": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Handling responsiveness multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F400000": "understeery (0.75\u00d7)",
+      "3FC00000": "sharp (1.5\u00d7)"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0B77FE0C:EE:003B4A00": {
+    "game": "Need for Speed: Carbon (SLUS-21399)",
+    "game_crc": "0B77FE0C",
+    "description": "Police pursuit timer \u2014 seconds until pursuit ends",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "instant end",
+      "41C80000": "25 s default",
+      "42C80000": "100 s"
+    },
+    "game_serial": "SLUS-21399",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AA8E025:EE:003B4600": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Vehicle top speed multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "half speed (0.5\u00d7)"
+    },
+    "game_serial": "SLUS-21466",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AA8E025:EE:003B4700": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Nitrous recharge rate multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40400000": "3\u00d7 recharge",
+      "3E800000": "slow (0.25\u00d7)"
+    },
+    "game_serial": "SLUS-21466",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AA8E025:EE:003B4800": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Heat level \u2014 police pursuit intensity",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "heat 0 (no pursuit)",
+      "00000001": "heat 1",
+      "00000005": "heat 5 (max)"
+    },
+    "game_serial": "SLUS-21466",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AA8E025:EE:003B4900": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Handling responsiveness multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F400000": "0.75\u00d7 (under)",
+      "3FC00000": "1.5\u00d7 (sharp)"
+    },
+    "game_serial": "SLUS-21466",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AA8E025:EE:003B4A00": {
+    "game": "Need for Speed: Carbon (SLUS-21466)",
+    "game_crc": "3AA8E025",
+    "description": "Police pursuit countdown timer (seconds)",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 s (instant)",
+      "41C80000": "25 s default",
+      "42C80000": "100 s"
+    },
+    "game_serial": "SLUS-21466",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3600": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "P1 health \u2014 player 1 life bar",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500 (super)"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3700": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "P2 health \u2014 player 2 life bar",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500 (super)"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3800": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "Super meter \u2014 special move charge",
+    "category": "combat",
+    "value_map": {
+      "00000000": "empty",
+      "00000064": "full (100)",
+      "000000C8": "200 (double)"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3900": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "Damage multiplier \u2014 all attack damage scaling",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 damage",
+      "3F000000": "0.5\u00d7 damage"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3A00": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "Fight countdown timer",
+    "category": "gameplay",
+    "value_map": {
+      "42700000": "60 s (default)",
+      "43160000": "150 s",
+      "00000000": "no timer"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1D5CC6E7:EE:003C3B00": {
+    "game": "Mortal Kombat: Armageddon (SLUS-21522)",
+    "game_crc": "1D5CC6E7",
+    "description": "Player movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "0.5\u00d7 speed"
+    },
+    "game_serial": "SLUS-21522",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B2570A0:EE:00830000": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Eco cell health \u2014 Jak's current eco health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (no health)",
+      "00000003": "3 (default)",
+      "00000009": "9 cells"
+    },
+    "game_serial": "SCUS-97123",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B2570A0:EE:00830100": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Dark eco meter \u2014 dark eco collected",
+    "category": "character",
+    "value_map": {
+      "00000000": "empty",
+      "00000064": "full (100)",
+      "000001F4": "500"
+    },
+    "game_serial": "SCUS-97123",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B2570A0:EE:003B5700": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F400000": "0.75\u00d7 speed"
+    },
+    "game_serial": "SCUS-97123",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B2570A0:EE:003B5800": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 height",
+      "3F000000": "0.5\u00d7 height"
+    },
+    "game_serial": "SCUS-97123",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2B2570A0:EE:003B5900": {
+    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97123)",
+    "game_crc": "2B2570A0",
+    "description": "Eco collection radius multiplier",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40400000": "3\u00d7 radius",
+      "3FC00000": "1.5\u00d7 radius"
+    },
+    "game_serial": "SCUS-97123",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4600": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "P1 health \u2014 player 1 life bar",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000000A0": "160 (full default)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4700": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "P2 health \u2014 player 2 life bar",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000000A0": "160 (full default)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4800": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "Soul gauge \u2014 soul charge meter",
+    "category": "combat",
+    "value_map": {
+      "00000000": "empty",
+      "00000064": "full (100)",
+      "000000C8": "double (200)"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4900": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "Damage multiplier \u2014 attack power scaling",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 damage",
+      "3F000000": "0.5\u00d7 damage"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4A00": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "Round countdown timer",
+    "category": "gameplay",
+    "value_map": {
+      "42700000": "60 s (default)",
+      "43160000": "150 s",
+      "00000000": "no timer"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A66F702:EE:003B4B00": {
+    "game": "SoulCalibur II (SLUS-20574)",
+    "game_crc": "3A66F702",
+    "description": "Player movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "0.5\u00d7 speed"
+    },
+    "game_serial": "SLUS-20574",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0000": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "Player HP \u2014 Raiden/Snake life points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500 (default)",
+      "00000BB8": "3000"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0100": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "M9 tranquilizer ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "0000001E": "30 (default)",
+      "000000FF": "255 rounds"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0200": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "FAMAS assault rifle ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "00000046": "70 (default)",
+      "000000FF": "255 rounds"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0300": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "Alert timer \u2014 seconds until caution/evasion",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 s (instant)",
+      "42700000": "60 s default",
+      "43160000": "150 s"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0400": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "Dog tag count \u2014 collected ID tags",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 tags",
+      "00000032": "50 tags",
+      "000000FF": "255 tags"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1540CFB5:EE:004A0500": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "1540CFB5",
+    "description": "Suppressor durability remaining",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 (broken)",
+      "00000064": "100 (new)",
+      "000003E8": "1000 (infinite-like)"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0000": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Player HP \u2014 Raiden life points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500 (default)",
+      "00000BB8": "3000"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0100": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "FAMAS assault rifle ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "00000046": "70 (default)",
+      "000000FF": "255 rounds"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0200": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Alert timer \u2014 seconds until evasion phase",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 s (instant end)",
+      "42700000": "60 s default",
+      "43160000": "150 s"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0300": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Dog tag count \u2014 ID tags collected",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 tags",
+      "00000032": "50 tags",
+      "000000FF": "255 tags"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0400": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Stamina/ration meter \u2014 hunger gauge",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (starving)",
+      "000001F4": "500 (full)",
+      "00000BB8": "3000"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "21181211:EE:004B0500": {
+    "game": "Metal Gear Solid 2: Sons of Liberty (SLUS-20213)",
+    "game_crc": "21181211",
+    "description": "Ration count \u2014 healing items held",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rations",
+      "00000009": "9 (default max)",
+      "0000003C": "60 rations"
+    },
+    "game_serial": "SLUS-20213",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0000": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Cash Tucker health \u2014 life percentage",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0100": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Pistol ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "0000000C": "12 (default mag)",
+      "000000FF": "255 rounds"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0200": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Shotgun ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 shells",
+      "00000006": "6 (default)",
+      "0000003C": "60 shells"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0300": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Stamina bar \u2014 run endurance",
+    "category": "character",
+    "value_map": {
+      "3F800000": "full (1.0)",
+      "3F000000": "half (0.5)",
+      "00000000": "empty"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0400": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Stars wanted level \u2014 enemy alert intensity",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 stars (undetected)",
+      "00000001": "1 star",
+      "00000003": "3 stars (max)"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3B75CE2F:EE:005A0500": {
+    "game": "Manhunt (SLUS-20853)",
+    "game_crc": "3B75CE2F",
+    "description": "Execution scene quality rating",
+    "category": "cheat",
+    "value_map": {
+      "00000001": "hasty (1)",
+      "00000002": "violent (2)",
+      "00000003": "gruesome (3)"
+    },
+    "game_serial": "SLUS-20853",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA280": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Boost recharge rate multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 recharge",
+      "3F000000": "half recharge"
+    },
+    "game_serial": "SLUS-21693",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA340": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Crash damage resistance multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 tougher",
+      "00000000": "instant crash"
+    },
+    "game_serial": "SLUS-21693",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA400": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Takedown power multiplier",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 takedown force",
+      "3F000000": "0.5\u00d7"
+    },
+    "game_serial": "SLUS-21693",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA4C0": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Vehicle handling multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F400000": "0.75\u00d7 (loose)",
+      "3FC00000": "1.5\u00d7 (tight)"
+    },
+    "game_serial": "SLUS-21693",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3AB9F8AE:EE:003DA580": {
+    "game": "Burnout Dominator (SLUS-21693)",
+    "game_crc": "3AB9F8AE",
+    "description": "Boost duration multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 duration",
+      "40800000": "4\u00d7 duration"
+    },
+    "game_serial": "SLUS-21693",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "0A2A7DE0:00A00000": {
+    "game": "Crash: Mind over Mutant",
+    "game_crc": "0A2A7DE0",
+    "game_serial": "SLUS-21758",
+    "description": "Crash health \u2014 hit points",
+    "category": "character",
+    "notes": "Estimated Crash health address",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "0A2A7DE0:00A00100": {
+    "game": "Crash: Mind over Mutant",
+    "game_crc": "0A2A7DE0",
+    "game_serial": "SLUS-21758",
+    "description": "Wumpa fruit count",
+    "category": "inventory",
+    "notes": "Estimated Wumpa fruit address",
+    "value_map": {
+      "00000000": "0 fruit",
+      "0000001A": "26 (extra life threshold)",
+      "000000FF": "255"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "0A2A7DE0:00A00200": {
+    "game": "Crash: Mind over Mutant",
+    "game_crc": "0A2A7DE0",
+    "game_serial": "SLUS-21758",
+    "description": "Mojo collected \u2014 experience currency",
+    "category": "progression",
+    "notes": "Estimated mojo/XP address",
+    "value_map": {
+      "00000000": "0 mojo",
+      "000186A0": "100,000",
+      "001E8480": "2,000,000"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "0A2A7DE0:00A00300": {
+    "game": "Crash: Mind over Mutant",
+    "game_crc": "0A2A7DE0",
+    "game_serial": "SLUS-21758",
+    "description": "Titan mutant health",
+    "category": "character",
+    "notes": "Estimated active titan HP address",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "0A2A7DE0:00A00400": {
+    "game": "Crash: Mind over Mutant",
+    "game_crc": "0A2A7DE0",
+    "game_serial": "SLUS-21758",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "notes": "Estimated jump height float address",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 height",
+      "3F000000": "0.5\u00d7 height"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "B2E15B01:EE:00C00100": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "Leader HP \u2014 front-line character health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000003E8": "1000",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B2E15B01:EE:00C00200": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "Leader SP \u2014 mana/special points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 SP",
+      "000001F4": "500 SP",
+      "00001388": "5000 SP"
+    },
+    "game_serial": "SLUS-21394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B2E15B01:EE:00C00300": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "Bonus Gauge \u2014 chain battle combo meter",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0%",
+      "00000064": "100% (bonus stage)",
+      "000000C8": "200%"
+    },
+    "game_serial": "SLUS-21394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B2E15B01:EE:00C00400": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "EXP multiplier \u2014 experience gain scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "B2E15B01:EE:00C00500": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21394)",
+    "game_crc": "B2E15B01",
+    "description": "ATK stat modifier \u2014 party attack power",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0",
+      "0000006E": "110 (normal)",
+      "000003E8": "1000"
+    },
+    "game_serial": "SLUS-21394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4FDB72F2:EE:00C00100": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "Leader HP \u2014 front-line character health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000003E8": "1000",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21440",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4FDB72F2:EE:00C00200": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "Leader SP \u2014 mana/special points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 SP",
+      "000001F4": "500 SP",
+      "00001388": "5000 SP"
+    },
+    "game_serial": "SLUS-21440",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4FDB72F2:EE:00C00300": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "Bonus Gauge \u2014 chain battle combo meter",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0%",
+      "00000064": "100% (bonus stage)",
+      "000000C8": "200%"
+    },
+    "game_serial": "SLUS-21440",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4FDB72F2:EE:00C00400": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "EXP points earned multiplier",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21440",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "4FDB72F2:EE:00C00500": {
+    "game": "Disgaea 2: Cursed Memories (SLUS-21440)",
+    "game_crc": "4FDB72F2",
+    "description": "Movement range \u2014 squares a unit can move",
+    "category": "gameplay",
+    "value_map": {
+      "00000003": "3 (low)",
+      "00000006": "6 (normal)",
+      "0000000F": "15 (high)"
+    },
+    "game_serial": "SLUS-21440",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00100": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Leader HP \u2014 front character health points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000003E8": "1000",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00200": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Leader SP \u2014 mana/skill points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 SP",
+      "000001F4": "500 SP",
+      "00001388": "5000 SP"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00300": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Bonus Gauge \u2014 chain combo meter",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0%",
+      "00000064": "100% (bonus stage)",
+      "000000C8": "200%"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00400": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "ATK modifier \u2014 attack power value",
+    "category": "combat",
+    "value_map": {
+      "0000006E": "110 (default)",
+      "000001F4": "500",
+      "000003E8": "1000"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00500": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Movement range \u2014 squares per turn",
+    "category": "gameplay",
+    "value_map": {
+      "00000003": "3 (low)",
+      "00000006": "6 (normal)",
+      "0000000F": "15 (max)"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "14E7D560:EE:00D00600": {
+    "game": "Disgaea 3: Absence of Justice (SLUS-21683)",
+    "game_crc": "14E7D560",
+    "description": "Magichange turn counter",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "1 turn",
+      "00000003": "3 (default)",
+      "0000000A": "10 turns"
+    },
+    "game_serial": "SLUS-21683",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F26A89E4:EE:00B00100": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Laharl HP \u2014 overlord health points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000003E8": "1000",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20365",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F26A89E4:EE:00B00200": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Laharl SP \u2014 special move points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 SP",
+      "000001F4": "500 SP",
+      "00001388": "5000 SP"
+    },
+    "game_serial": "SLUS-20365",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F26A89E4:EE:00B00300": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Bonus Gauge \u2014 chain combo meter",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0%",
+      "00000064": "100% (bonus stage)",
+      "000000C8": "200%"
+    },
+    "game_serial": "SLUS-20365",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F26A89E4:EE:00B00400": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Enemy count modifier \u2014 units on map",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "1 enemy",
+      "00000005": "5 (default)",
+      "0000000A": "10 enemies"
+    },
+    "game_serial": "SLUS-20365",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "F26A89E4:EE:00B00500": {
+    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
+    "game_crc": "F26A89E4",
+    "description": "Movement range \u2014 squares per turn",
+    "category": "gameplay",
+    "value_map": {
+      "00000003": "3 (low)",
+      "00000006": "6 (normal)",
+      "0000000F": "15 (max)"
+    },
+    "game_serial": "SLUS-20365",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A6167B5A:00B00000": {
+    "game": "Disgaea: Hour of Darkness",
+    "game_crc": "A6167B5A",
+    "game_serial": "SLUS-20523",
+    "description": "HL \u2014 in-game currency",
+    "category": "progression",
+    "notes": "Estimated HL/currency address",
+    "value_map": {
+      "00000000": "0 HL",
+      "000F4240": "1,000,000 HL",
+      "05F5E100": "100,000,000 HL"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "A6167B5A:00B00100": {
+    "game": "Disgaea: Hour of Darkness",
+    "game_crc": "A6167B5A",
+    "game_serial": "SLUS-20523",
+    "description": "Laharl HP \u2014 overlord health",
+    "category": "character",
+    "notes": "Estimated Laharl HP address",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000003E8": "1000",
+      "00002710": "10,000"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "A6167B5A:00B00200": {
+    "game": "Disgaea: Hour of Darkness",
+    "game_crc": "A6167B5A",
+    "game_serial": "SLUS-20523",
+    "description": "Laharl SP \u2014 special move points",
+    "category": "character",
+    "notes": "Estimated SP/mana address",
+    "value_map": {
+      "00000000": "0 SP",
+      "000001F4": "500",
+      "00001388": "5000"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "A6167B5A:00B00300": {
+    "game": "Disgaea: Hour of Darkness",
+    "game_crc": "A6167B5A",
+    "game_serial": "SLUS-20523",
+    "description": "Bonus Gauge \u2014 chain battle meter",
+    "category": "gameplay",
+    "notes": "Estimated Bonus Gauge address",
+    "value_map": {
+      "00000000": "0%",
+      "00000064": "100%",
+      "000000C8": "200%"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "A6167B5A:00B00400": {
+    "game": "Disgaea: Hour of Darkness",
+    "game_crc": "A6167B5A",
+    "game_serial": "SLUS-20523",
+    "description": "Movement range \u2014 squares per turn",
+    "category": "gameplay",
+    "notes": "Estimated movement range address",
+    "value_map": {
+      "00000003": "3",
+      "00000006": "6 (default)",
+      "0000000F": "15 (max)"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00000": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "Cole HP \u2014 protagonist health",
+    "category": "character",
+    "notes": "Estimated protagonist HP address",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000001F4": "500 (default)",
+      "00002710": "10,000"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00100": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "MP \u2014 mana points for skills",
+    "category": "character",
+    "notes": "Estimated MP address",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200 MP",
+      "000003E8": "1000 MP"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00200": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "DP \u2014 craft/synthesis points",
+    "category": "inventory",
+    "notes": "Estimated craft DP address",
+    "value_map": {
+      "00000000": "0 DP",
+      "00000064": "100 DP",
+      "000003E8": "1000 DP"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00300": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "ATK modifier \u2014 party attack stat",
+    "category": "combat",
+    "notes": "Estimated ATK stat address",
+    "value_map": {
+      "00000032": "50 (low)",
+      "0000006E": "110 (default)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00400": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "EXP multiplier \u2014 experience gain rate",
+    "category": "progression",
+    "notes": "Estimated EXP multiplier address",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "03AFC852:00C00500": {
+    "game": "Mana Khemia: Alchemists of Al-Revis",
+    "game_crc": "03AFC852",
+    "game_serial": "SLUS-21713",
+    "description": "Item count \u2014 synthesized items held",
+    "category": "inventory",
+    "notes": "Estimated item stack count address",
+    "value_map": {
+      "00000001": "1",
+      "00000009": "9 (default max)",
+      "00000063": "99"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00000": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "Raze HP \u2014 protagonist health",
+    "category": "character",
+    "notes": "Estimated protagonist HP address",
+    "value_map": {
+      "00000000": "0 (KO)",
+      "000001F4": "500 (default)",
+      "00002710": "10,000"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00100": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "MP \u2014 mana points for skills",
+    "category": "character",
+    "notes": "Estimated MP address",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200 MP",
+      "000003E8": "1000 MP"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00200": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "DP \u2014 craft/synthesis points",
+    "category": "inventory",
+    "notes": "Estimated craft DP address",
+    "value_map": {
+      "00000000": "0 DP",
+      "00000064": "100 DP",
+      "000003E8": "1000 DP"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00300": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "ATK modifier \u2014 party attack stat",
+    "category": "combat",
+    "notes": "Estimated ATK stat address",
+    "value_map": {
+      "00000032": "50 (low)",
+      "0000006E": "110 (default)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00400": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "Mana crystal count \u2014 summoning resource",
+    "category": "inventory",
+    "notes": "Estimated mana crystal address",
+    "value_map": {
+      "00000000": "0 crystals",
+      "00000009": "9",
+      "00000063": "99 (max)"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1B5D5161:00C00500": {
+    "game": "Mana Khemia 2: Fall of Alchemy",
+    "game_crc": "1B5D5161",
+    "game_serial": "SLUS-21846",
+    "description": "EXP multiplier \u2014 experience gain rate",
+    "category": "progression",
+    "notes": "Estimated EXP multiplier address",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "2CFF5D40:EE:00B82100": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Silmeria HP \u2014 valkyrie health points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500 (default)",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2CFF5D40:EE:00B82200": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "AP \u2014 attack points for skills",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 AP",
+      "00000064": "100 AP",
+      "000003E8": "1000 AP"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2CFF5D40:EE:00B82300": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Seal points \u2014 crystal sealing resource",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "0 seals",
+      "00000014": "20 (default)",
+      "000000FF": "255"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2CFF5D40:EE:00B82400": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "EXP multiplier \u2014 experience gain scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2CFF5D40:EE:00B82500": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Einherjar gem purification level",
+    "category": "progression",
+    "value_map": {
+      "00000001": "level 1",
+      "00000005": "level 5",
+      "0000000A": "level 10"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2CFF5D40:EE:00B82600": {
+    "game": "Valkyrie Profile 2: Silmeria (SLUS-21299)",
+    "game_crc": "2CFF5D40",
+    "description": "Einherjar party member count",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 members",
+      "00000003": "3 (default)",
+      "00000009": "9 members"
+    },
+    "game_serial": "SLUS-21299",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08100": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Adol HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500 (default)",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08200": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Emela sword level",
+    "category": "progression",
+    "value_map": {
+      "00000001": "level 1",
+      "00000005": "level 5",
+      "00000009": "level 9 (max)"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08300": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Ericcil sword level",
+    "category": "progression",
+    "value_map": {
+      "00000001": "level 1",
+      "00000005": "level 5",
+      "00000009": "level 9 (max)"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08400": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "EXP \u2014 current experience points",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 EXP",
+      "0001E848": "125,000",
+      "001E8480": "2,000,000"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08500": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Item quantity \u2014 held item stack count",
+    "category": "inventory",
+    "value_map": {
+      "00000001": "1",
+      "00000009": "9",
+      "00000063": "99 (max)"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E75FE3A:EE:00B08600": {
+    "game": "Ys: The Ark of Napishtim (SLUS-21441)",
+    "game_crc": "1E75FE3A",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F400000": "0.75\u00d7 speed"
+    },
+    "game_serial": "SLUS-21441",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08100": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Adol HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500 (default)",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08200": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Skill points \u2014 special attack charge",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 SP",
+      "00000064": "100 SP (full)",
+      "000000C8": "200 SP"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08300": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "ATK power modifier \u2014 attack damage stat",
+    "category": "combat",
+    "value_map": {
+      "00000032": "50",
+      "0000006E": "110 (default)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08400": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "EXP multiplier \u2014 leveling speed",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08500": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Book of Ys collectible count",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 books",
+      "00000006": "6 (complete set)",
+      "00000008": "8"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3A72A7B1:EE:00B08600": {
+    "game": "Ys: The Oath in Felghana (SLUS-21553)",
+    "game_crc": "3A72A7B1",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F400000": "0.75\u00d7 speed"
+    },
+    "game_serial": "SLUS-21553",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0280": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Wander vitality \u2014 health bar maximum",
+    "category": "character",
+    "value_map": {
+      "3F800000": "1.0\u00d7 (default)",
+      "40000000": "2\u00d7 vitality",
+      "3F000000": "0.5\u00d7 vitality"
+    },
+    "game_serial": "SCUS-97472",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0340": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Agro horse movement speed multiplier",
+    "category": "vehicle",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F400000": "0.75\u00d7 speed"
+    },
+    "game_serial": "SCUS-97472",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0400": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Colossus stagger multiplier \u2014 stun buildup",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 stagger",
+      "3F000000": "0.5\u00d7"
+    },
+    "game_serial": "SCUS-97472",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B04C0": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Time of day \u2014 world lighting cycle position",
+    "category": "visual",
+    "value_map": {
+      "3F800000": "day (1.0)",
+      "3F000000": "sunrise (0.5)",
+      "3E800000": "night (0.25)"
+    },
+    "game_serial": "SCUS-97472",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2C50B4DB:EE:003B0580": {
+    "game": "Shadow of the Colossus (SCUS-97472)",
+    "game_crc": "2C50B4DB",
+    "description": "Wander stamina drain rate multiplier",
+    "category": "character",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half drain (0.5\u00d7)",
+      "40000000": "2\u00d7 drain"
+    },
+    "game_serial": "SCUS-97472",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2DFAA78D:EE:005A0100": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Ico movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F400000": "0.75\u00d7 speed"
+    },
+    "game_serial": "SLUS-20678",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2DFAA78D:EE:005A0200": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Gate time limit \u2014 castle door closing timer",
+    "category": "gameplay",
+    "value_map": {
+      "00000000": "no timer",
+      "42700000": "60 s",
+      "43160000": "150 s"
+    },
+    "game_serial": "SLUS-20678",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2DFAA78D:EE:005A0300": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Yorda shadow resistance \u2014 darkness health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (captured instantly)",
+      "00000064": "100",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20678",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2DFAA78D:EE:005A0400": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Stick attack power",
+    "category": "combat",
+    "value_map": {
+      "00000001": "1 (weak)",
+      "00000003": "3 (default)",
+      "00000009": "9 (strong)"
+    },
+    "game_serial": "SLUS-20678",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "2DFAA78D:EE:005A0500": {
+    "game": "Ico (SLUS-20678)",
+    "game_crc": "2DFAA78D",
+    "description": "Jump height multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 height",
+      "3F000000": "0.5\u00d7 height"
+    },
+    "game_serial": "SLUS-20678",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "33C6E576:EE:003B4100": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20394)",
+    "game_crc": "33C6E576",
+    "description": "P1 health bar \u2014 life points",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000003E8": "1000 (full default)",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "33C6E576:EE:003B4200": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20394)",
+    "game_crc": "33C6E576",
+    "description": "P2 health bar \u2014 life points",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000003E8": "1000 (full default)",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "33C6E576:EE:003B4300": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20394)",
+    "game_crc": "33C6E576",
+    "description": "Damage multiplier \u2014 all damage scaling",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 damage",
+      "3F000000": "0.5\u00d7 damage"
+    },
+    "game_serial": "SLUS-20394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "33C6E576:EE:003B4400": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20394)",
+    "game_crc": "33C6E576",
+    "description": "Ki charge rate multiplier",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 charge rate",
+      "40800000": "4\u00d7 charge"
+    },
+    "game_serial": "SLUS-20394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "33C6E576:EE:003B4500": {
+    "game": "Dragon Ball Z: Budokai (SLUS-20394)",
+    "game_crc": "33C6E576",
+    "description": "Capsule slots \u2014 equipment capacity",
+    "category": "inventory",
+    "value_map": {
+      "00000007": "7 (default)",
+      "0000000F": "15",
+      "0000001F": "31"
+    },
+    "game_serial": "SLUS-20394",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "371C1949:EE:002F0000": {
+    "game": "Devil May Cry 2 (SLUS-20617)",
+    "game_crc": "371C1949",
+    "description": "Devil Trigger gauge \u2014 DT meter",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (empty)",
+      "00000064": "100 (full)",
+      "000000C8": "200 (double)"
+    },
+    "game_serial": "SLUS-20617",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "371C1949:EE:002F8000": {
+    "game": "Devil May Cry 2 (SLUS-20617)",
+    "game_crc": "371C1949",
+    "description": "Stylish rank multiplier",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 style gain",
+      "40800000": "4\u00d7"
+    },
+    "game_serial": "SLUS-20617",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "371C1949:EE:00300000": {
+    "game": "Devil May Cry 2 (SLUS-20617)",
+    "game_crc": "371C1949",
+    "description": "White Orbs \u2014 Devil Trigger refill",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 orbs",
+      "00000064": "100 orbs",
+      "000003E8": "1000 orbs"
+    },
+    "game_serial": "SLUS-20617",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "371C1949:EE:00308000": {
+    "game": "Devil May Cry 2 (SLUS-20617)",
+    "game_crc": "371C1949",
+    "description": "Pistol Ebony & Ivory ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "000000FF": "255 rounds",
+      "0000FFFF": "65535 rounds"
+    },
+    "game_serial": "SLUS-20617",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "371C1949:EE:00310000": {
+    "game": "Devil May Cry 2 (SLUS-20617)",
+    "game_crc": "371C1949",
+    "description": "Player attack power modifier",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 attack",
+      "40800000": "4\u00d7 attack"
+    },
+    "game_serial": "SLUS-20617",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9280": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Claire HP \u2014 life bar value",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "00000064": "100 (full)",
+      "000001F4": "500"
+    },
+    "game_serial": "SLUS-20184",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9340": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Primary weapon ammo count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 rounds",
+      "0000000F": "15 (pistol default)",
+      "000000FF": "255"
+    },
+    "game_serial": "SLUS-20184",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9400": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Herb item count",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 herbs",
+      "00000009": "9",
+      "00000063": "99 (max)"
+    },
+    "game_serial": "SLUS-20184",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A94C0": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Ink ribbon count \u2014 save item supply",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 ribbons",
+      "00000009": "9",
+      "00000063": "99 (max)"
+    },
+    "game_serial": "SLUS-20184",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "3BD4F8EB:EE:003A9580": {
+    "game": "Resident Evil Code: Veronica X (SLUS-20184)",
+    "game_crc": "3BD4F8EB",
+    "description": "Enemy HP modifier \u2014 all enemy health",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "0.5\u00d7 (weaker)",
+      "40000000": "2\u00d7 (harder)"
+    },
+    "game_serial": "SLUS-20184",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "1E9DAD32:003B0000": {
+    "game": "Virtua Fighter 4: Evolution",
+    "game_crc": "1E9DAD32",
+    "game_serial": "SLUS-20710",
+    "description": "P1 health \u2014 player 1 life bar",
+    "category": "combat",
+    "notes": "Estimated P1 HP address",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000000A0": "160 (default)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1E9DAD32:003B0100": {
+    "game": "Virtua Fighter 4: Evolution",
+    "game_crc": "1E9DAD32",
+    "game_serial": "SLUS-20710",
+    "description": "P2 health \u2014 player 2 life bar",
+    "category": "combat",
+    "notes": "Estimated P2 HP address",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000000A0": "160 (default)",
+      "000001F4": "500"
+    },
+    "value_type": "int",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1E9DAD32:003B0200": {
+    "game": "Virtua Fighter 4: Evolution",
+    "game_crc": "1E9DAD32",
+    "game_serial": "SLUS-20710",
+    "description": "Round timer \u2014 countdown seconds",
+    "category": "gameplay",
+    "notes": "Estimated round timer address",
+    "value_map": {
+      "42700000": "60 s (default)",
+      "43160000": "150 s",
+      "00000000": "no timer"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1E9DAD32:003B0300": {
+    "game": "Virtua Fighter 4: Evolution",
+    "game_crc": "1E9DAD32",
+    "game_serial": "SLUS-20710",
+    "description": "Ring size multiplier",
+    "category": "visual",
+    "notes": "Estimated ring size address",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 size",
+      "3F000000": "0.5\u00d7 size"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "1E9DAD32:003B0400": {
+    "game": "Virtua Fighter 4: Evolution",
+    "game_crc": "1E9DAD32",
+    "game_serial": "SLUS-20710",
+    "description": "Damage multiplier \u2014 all attack damage",
+    "category": "combat",
+    "notes": "Estimated damage multiplier address",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 damage",
+      "3F000000": "0.5\u00d7"
+    },
+    "value_type": "float",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "exclusion_group": "",
+    "exclusion_note": ""
+  },
+  "7E7D7B87:EE:003B4540": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00000": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "Gold \u2014 party currency for shops",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 gold",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00100": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "Yuki HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00200": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "Yuki MP \u2014 mana for special moves",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00300": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "EXP multiplier \u2014 battle experience scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00400": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "IP gauge \u2014 interrupt point meter",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 IP",
+      "00000064": "100 (full)",
+      "000000C8": "200"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7E7D7B87:EE:00C00500": {
+    "game": "Grandia III (SLUS-21609)",
+    "game_crc": "7E7D7B87",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "0.5\u00d7 speed"
+    },
+    "game_serial": "SLUS-21609",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:003B4540": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00000": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Potch \u2014 party currency",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 Potch",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00100": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Prince HP \u2014 protagonist health points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00200": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Prince MP \u2014 magic/skill points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200",
+      "000003E8": "1000"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00300": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Stars of Destiny count \u2014 recruited allies",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 recruited",
+      "0000006E": "108 (all stars)",
+      "00000037": "55"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00400": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "EXP multiplier \u2014 battle experience scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "6A6B22A1:EE:00D00500": {
+    "game": "Suikoden V (SLUS-21151)",
+    "game_crc": "6A6B22A1",
+    "description": "Rune slot power modifier",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 power",
+      "3F000000": "0.5\u00d7"
+    },
+    "game_serial": "SLUS-21151",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:003B4540": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00000": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Gold \u2014 credits/currency",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 G",
+      "000F4240": "1,000,000 G",
+      "05F5E100": "100,000,000 G"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00100": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Shion HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00200": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Shion EP \u2014 ether points for skills",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 EP",
+      "000000C8": "200 EP",
+      "000003E8": "1000 EP"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00300": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "AG \u2014 action gauge/turn meter",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 AG",
+      "00000064": "100 AG (max)",
+      "000000C8": "200 AG"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00400": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Boost gauge \u2014 priority turn resource",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 boosts",
+      "00000003": "3 (default max)",
+      "00000009": "9 boosts"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "A790F8C9:EE:00C00500": {
+    "game": "Xenosaga Episode I: Der Wille zur Macht (SLUS-20469)",
+    "game_crc": "A790F8C9",
+    "description": "Decoder count \u2014 dungeon keys",
+    "category": "inventory",
+    "value_map": {
+      "00000000": "0 decoders",
+      "00000009": "9",
+      "00000063": "99"
+    },
+    "game_serial": "SLUS-20469",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:003B4540": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00000": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "Gella \u2014 party currency",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 Gella",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00100": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "Jude HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00200": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "FP \u2014 force points for ARM abilities",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 FP",
+      "00000064": "100 FP",
+      "000003E8": "1000 FP"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00300": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "EXP multiplier \u2014 battle experience scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00400": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "Force ability points \u2014 skill unlock resource",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 FAP",
+      "0000006E": "110",
+      "000003E8": "1000"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "5CE36D2C:EE:00C00500": {
+    "game": "Wild Arms 4 (SLUS-20887)",
+    "game_crc": "5CE36D2C",
+    "description": "HEX grid movement range",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "1 hex",
+      "00000003": "3 (default)",
+      "00000007": "7 hexes"
+    },
+    "game_serial": "SLUS-20887",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:003B4540": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00000": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "Gella \u2014 party currency",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 Gella",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00100": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "Dean HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00200": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "FP \u2014 force points for ARM skills",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 FP",
+      "00000064": "100 FP",
+      "000003E8": "1000 FP"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00300": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "EXP multiplier \u2014 battle experience scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00400": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "HEX team boost gauge",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (no boost)",
+      "00000064": "100 (max)",
+      "000000C8": "200"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "7D9D0E40:EE:00C00500": {
+    "game": "Wild Arms 5 (SLUS-21842)",
+    "game_crc": "7D9D0E40",
+    "description": "HEX control range \u2014 grid territory size",
+    "category": "gameplay",
+    "value_map": {
+      "00000001": "1 HEX",
+      "00000003": "3 (default)",
+      "00000007": "7 HEXes"
+    },
+    "game_serial": "SLUS-21842",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:003B4540": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00000": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Macca \u2014 in-game currency",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0 Macca",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00100": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Demi-fiend HP \u2014 protagonist health",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00200": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Demi-fiend MP \u2014 magic points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00300": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Magatama power level \u2014 equipped magatama tier",
+    "category": "progression",
+    "value_map": {
+      "00000001": "level 1",
+      "00000005": "level 5",
+      "0000000A": "level 10"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00400": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "EXP multiplier \u2014 leveling speed",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00500": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Demon negotiation success rate modifier",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 success rate",
+      "3F000000": "0.5\u00d7"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "D3F182E8:EE:00B00600": {
+    "game": "Shin Megami Tensei: Nocturne (SLUS-20922)",
+    "game_crc": "D3F182E8",
+    "description": "Movement speed multiplier",
+    "category": "physics",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "40000000": "2\u00d7 speed",
+      "3F000000": "0.5\u00d7 speed"
+    },
+    "game_serial": "SLUS-20922",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:003B4540": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Widescreen aspect ratio \u2014 16:9 correction",
+    "category": "visual",
+    "value_map": {
+      "3FAB851F": "16:9 widescreen",
+      "3F800000": "4:3 normal"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00000": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Cash \u2014 party funds",
+    "category": "progression",
+    "value_map": {
+      "00000000": "0",
+      "000F4240": "1,000,000",
+      "05F5E100": "100,000,000"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00100": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Yuri HP \u2014 protagonist health points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 (dead)",
+      "000001F4": "500",
+      "00002710": "10,000"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00200": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Yuri MP \u2014 magic/mana points",
+    "category": "character",
+    "value_map": {
+      "00000000": "0 MP",
+      "000000C8": "200 MP",
+      "000003E8": "1000 MP"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00300": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Judgment Ring accuracy modifier",
+    "category": "combat",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3FC00000": "1.5\u00d7 (easier)",
+      "3F400000": "0.75\u00d7 (harder)"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00400": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Fusion gauge \u2014 soul energy meter",
+    "category": "combat",
+    "value_map": {
+      "00000000": "0 (empty)",
+      "00000064": "100 (full)",
+      "000000C8": "200"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "int",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00500": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "EXP multiplier \u2014 battle experience scaling",
+    "category": "progression",
+    "value_map": {
+      "3F800000": "1\u00d7 (normal)",
+      "40000000": "2\u00d7 EXP",
+      "40800000": "4\u00d7 EXP"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
+  },
+  "C7B16C2C:EE:00C00600": {
+    "game": "Shadow Hearts: Covenant (SLUS-20929)",
+    "game_crc": "C7B16C2C",
+    "description": "Malice gauge \u2014 monster spawn rate modifier",
+    "category": "gameplay",
+    "value_map": {
+      "3F800000": "normal (1.0\u00d7)",
+      "3F000000": "half malice (0.5\u00d7)",
+      "40000000": "2\u00d7 malice"
+    },
+    "game_serial": "SLUS-20929",
+    "estimated": true,
+    "input_compat": "not_applicable",
+    "value_type": "float",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write"
   }
 }
