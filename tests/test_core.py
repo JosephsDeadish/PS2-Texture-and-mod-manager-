@@ -5022,6 +5022,159 @@ class TestPnachAnalyzer(unittest.TestCase):
                 f"Lives entry has no value_map: {v.get('description', '')}"
             )
 
+    # ── Wave 12 verification & code-method tests ─────────────────────────────
+
+    def test_all_entries_have_verification_status(self):
+        """Every DB entry must have a non-empty verification_status field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"verified", "community_verified", "estimated", "reported_not_working"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("verification_status")]
+        self.assertEqual(missing, [],
+                         f"Entries missing verification_status: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("verification_status"))
+                   for v in db.values()
+                   if v.get("verification_status") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid verification_status: {invalid[:5]}")
+
+    def test_all_entries_have_patch_type(self):
+        """Every DB entry must have a valid patch_type field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"word", "short", "byte", "extended"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("patch_type")]
+        self.assertEqual(missing, [],
+                         f"Entries missing patch_type: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("patch_type"))
+                   for v in db.values()
+                   if v.get("patch_type") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid patch_type: {invalid[:5]}")
+
+    def test_all_entries_have_code_method(self):
+        """Every DB entry must have a valid code_method field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"static_write", "continuous_write", "conditional", "multi_address"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("code_method")]
+        self.assertEqual(missing, [],
+                         f"Entries missing code_method: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("code_method"))
+                   for v in db.values()
+                   if v.get("code_method") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid code_method: {invalid[:5]}")
+
+    def test_widescreen_entries_are_static_write(self):
+        """All widescreen entries should use static_write (written once per boot)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        not_static = [(v.get("description", "")[:60], v.get("code_method"))
+                      for v in ws if v.get("code_method") != "static_write"]
+        self.assertEqual(not_static, [],
+                         f"Widescreen entries not static_write: {not_static[:5]}")
+
+    def test_get_game_verification_summary_api(self):
+        """get_game_verification_summary should return correct structure for a known game."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        # Spider-Man 2 is well-represented in the DB
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Find a CRC that has entries
+        crc = next(v["game_crc"] for v in db.values() if v.get("game_crc"))
+        result = get_game_verification_summary(crc)
+
+        self.assertIn("game_title", result)
+        self.assertIn("total_entries", result)
+        self.assertIn("verification_counts", result)
+        self.assertIn("code_method_counts", result)
+        self.assertIn("patch_type_counts", result)
+        self.assertIn("community_verified", result)
+        self.assertIn("estimated", result)
+        self.assertIn("not_working", result)
+        self.assertIn("methods_used", result)
+        self.assertIn("has_continuous_writes", result)
+        self.assertIn("has_multi_address", result)
+        self.assertIn("notes", result)
+        self.assertGreater(result["total_entries"], 0)
+        self.assertIsInstance(result["notes"], str)
+        self.assertGreater(len(result["notes"]), 10)
+
+    def test_get_game_verification_summary_unknown_crc(self):
+        """get_game_verification_summary with unknown CRC returns empty summary."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        result = get_game_verification_summary("00000000")
+        self.assertEqual(result["total_entries"], 0)
+        self.assertEqual(result["community_verified"], [])
+        self.assertIn("No DB entries", result["notes"])
+
+    def test_generate_pnach_text_includes_verification_comments(self):
+        """generate_pnach_text should tag estimated patches in comments."""
+        from src.core.pnach_analyzer import generate_pnach_text
+        patches = [
+            {
+                "processor": "EE",
+                "address": "00B80090",
+                "value": "00000001",
+                "description": "Test freecam enable",
+                "patch_type": "word",
+                "verification_status": "estimated",
+                "code_method": "continuous_write",
+            },
+            {
+                "processor": "EE",
+                "address": "00200000",
+                "value": "3FAB851F",
+                "description": "Widescreen",
+                "patch_type": "word",
+                "verification_status": "community_verified",
+                "code_method": "static_write",
+            },
+        ]
+        text = generate_pnach_text("2EB5B9A9", "Test Game", patches)
+        self.assertIn("estimated — verify", text)
+        self.assertIn("continuous — game resets", text)
+        self.assertIn("[verified]", text)
+        self.assertIn("patch=1,EE,00B80090,word,00000001", text)
+        self.assertIn("patch=1,EE,00200000,word,3FAB851F", text)
+
+    def test_verification_status_constants_exported(self):
+        """VERIFICATION_STATUS_LABELS and CODE_METHOD_LABELS must be exported."""
+        from src.core import pnach_analyzer as pa
+        self.assertIn("estimated",           pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("community_verified",  pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("verified",            pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("static_write",        pa.CODE_METHOD_LABELS)
+        self.assertIn("continuous_write",    pa.CODE_METHOD_LABELS)
+        self.assertIn("word",                pa.PATCH_TYPE_LABELS)
+
+    def test_most_entries_have_word_patch_type(self):
+        """The vast majority of entries should use 'word' patch_type (32-bit writes)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        word_count = sum(1 for v in db.values() if v.get("patch_type") == "word")
+        total = len(db)
+        self.assertGreater(word_count / total, 0.90,
+                           f"Expected >90% word patches; got {word_count}/{total}")
+
 
 class TestTextureFilePickerLogic(unittest.TestCase):
     """Tests for TextureFilePickerDialog.write_merged() logic without a real UI."""

@@ -335,7 +335,14 @@ def generate_pnach_text(
       * ``address``    — 8 hex-digit address string
       * ``value``      — 8 hex-digit value string
       * ``description``— optional human-readable label (emitted as a comment)
-      * ``size``       — optional size keyword (default ``"extended"``)
+      * ``size``       — optional size keyword.  If absent, falls back to the
+                         ``patch_type`` field from the DB entry if present,
+                         otherwise defaults to ``"word"``.
+      * ``code_method``— optional code method (from DB).  Entries with
+                         ``code_method="continuous_write"`` emit an extra
+                         comment warning that the patch must be re-applied
+                         each frame (use extended/type-C cheats if needed).
+      * ``verification_status`` — optional; emitted as a comment tag.
 
     The returned string is ready to be written to ``<CRC>.pnach``.
     """
@@ -346,11 +353,27 @@ def generate_pnach_text(
     ]
     for p in patches:
         desc = (p.get("description") or "").strip()
+        vs   = p.get("verification_status", "")
+        cm   = p.get("code_method", "")
+
+        # Build the comment line with optional verification / method tags
+        comment_parts = []
         if desc:
-            lines.append(f"// {desc}")
-        proc = p.get("processor", "EE").upper()
-        addr = p.get("address", "00000000").upper().zfill(8)
-        size = p.get("size", "extended")
+            comment_parts.append(desc)
+        if vs in ("estimated",):
+            comment_parts.append("[estimated — verify address before use]")
+        if vs in ("community_verified", "verified"):
+            comment_parts.append("[verified]")
+        if cm == "continuous_write":
+            comment_parts.append("[continuous — game resets each frame]")
+
+        if comment_parts:
+            lines.append(f"// {' | '.join(comment_parts)}")
+
+        proc  = p.get("processor", "EE").upper()
+        addr  = p.get("address", "00000000").upper().zfill(8)
+        # Prefer explicit "size", then "patch_type" from DB, then "word"
+        size  = p.get("size") or p.get("patch_type") or "word"
         value = p.get("value", "00000000").upper().zfill(8)
         lines.append(f"patch=1,{proc},{addr},{size},{value}")
     return "\n".join(lines) + "\n"
@@ -478,6 +501,171 @@ def check_freecam_compatibility(game_crc: str) -> List[dict]:
             "notes":        entry.get("notes", ""),
         })
     return out
+
+
+# ---------------------------------------------------------------------------
+# Per-game verification summary
+# ---------------------------------------------------------------------------
+
+#: Human-readable labels for each verification_status value.
+VERIFICATION_STATUS_LABELS: Dict[str, str] = {
+    "verified":              "✅ Verified — confirmed by hands-on PCSX2 testing",
+    "community_verified":    "👥 Community verified — confirmed by community reports",
+    "estimated":             "🔬 Estimated — research-derived address, not yet confirmed",
+    "reported_not_working":  "❌ Not working — known to fail in at least one version",
+}
+
+#: Human-readable labels for each code_method value.
+CODE_METHOD_LABELS: Dict[str, str] = {
+    "static_write":    "Static write — patch is written once and persists",
+    "continuous_write":"Continuous write — patch must be re-applied every frame",
+    "conditional":     "Conditional — patch only applies when a condition is met",
+    "multi_address":   "Multi-address — effect requires patching several locations",
+}
+
+#: Human-readable labels for each patch_type (PCSX2 size keyword).
+PATCH_TYPE_LABELS: Dict[str, str] = {
+    "word":     "word (32-bit) — most cheats and floats",
+    "short":    "short (16-bit) — 16-bit counters",
+    "byte":     "byte (8-bit) — single-byte flags",
+    "extended": "extended — conditional/multi-line pnach cheat",
+}
+
+
+def get_game_verification_summary(game_crc: str) -> dict:
+    """Return a per-game summary of verification status and code methods.
+
+    Parameters
+    ----------
+    game_crc:
+        Uppercase 8-char CRC for the game (e.g. ``"2EB5B9A9"``).
+
+    Returns
+    -------
+    A dict with the following keys:
+
+    ``game_title``           — display title from first matching DB entry
+    ``game_serial``          — serial from first matching entry
+    ``total_entries``        — total DB entries for this game
+    ``verification_counts``  — dict mapping status → count
+    ``code_method_counts``   — dict mapping method → count
+    ``patch_type_counts``    — dict mapping patch_type → count
+    ``community_verified``   — list of (description, code_method) for verified entries
+    ``estimated``            — list of (description, code_method) for estimated entries
+    ``not_working``          — list of (description, reason) for known-broken entries
+    ``methods_used``         — sorted list of unique code_method values present
+    ``has_continuous_writes``— bool, True if any entry requires continuous writes
+    ``has_multi_address``    — bool, True if any entry spans multiple addresses
+    ``notes``                — human-readable summary string
+    """
+    crc = game_crc.strip().upper()
+    matching = [(key, entry) for key, entry in _DB.items()
+                if entry.get("game_crc", "").upper() == crc]
+
+    if not matching:
+        return {
+            "game_title": "",
+            "game_serial": "",
+            "total_entries": 0,
+            "verification_counts": {},
+            "code_method_counts": {},
+            "patch_type_counts": {},
+            "community_verified": [],
+            "estimated": [],
+            "not_working": [],
+            "methods_used": [],
+            "has_continuous_writes": False,
+            "has_multi_address": False,
+            "notes": f"No DB entries found for CRC {crc}.",
+        }
+
+    first_entry = matching[0][1]
+    game_title = first_entry.get("game", "")
+    game_serial = first_entry.get("game_serial", "")
+
+    v_counts: Dict[str, int] = {}
+    cm_counts: Dict[str, int] = {}
+    pt_counts: Dict[str, int] = {}
+    verified_list: List[dict] = []
+    estimated_list: List[dict] = []
+    not_working_list: List[dict] = []
+
+    for _key, entry in matching:
+        vs = entry.get("verification_status", "estimated")
+        cm = entry.get("code_method", "static_write")
+        pt = entry.get("patch_type", "word")
+        desc = entry.get("description", "")
+        cat  = entry.get("category", "")
+
+        v_counts[vs] = v_counts.get(vs, 0) + 1
+        cm_counts[cm] = cm_counts.get(cm, 0) + 1
+        pt_counts[pt] = pt_counts.get(pt, 0) + 1
+
+        if vs in ("verified", "community_verified"):
+            verified_list.append({
+                "description": desc,
+                "category":    cat,
+                "code_method": cm,
+                "patch_type":  pt,
+                "value_type":  entry.get("value_type", ""),
+            })
+        elif vs == "reported_not_working":
+            not_working_list.append({
+                "description": desc,
+                "notes":       entry.get("notes", ""),
+            })
+        else:
+            estimated_list.append({
+                "description": desc,
+                "category":    cat,
+                "code_method": cm,
+                "patch_type":  pt,
+            })
+
+    methods_used = sorted(set(cm_counts.keys()))
+    has_cw = "continuous_write" in cm_counts
+    has_ma = "multi_address" in cm_counts
+
+    # Build a plain-English notes paragraph
+    total = len(matching)
+    cv_count = v_counts.get("community_verified", 0) + v_counts.get("verified", 0)
+    est_count = v_counts.get("estimated", 0)
+    nw_count  = v_counts.get("reported_not_working", 0)
+
+    notes_parts = [
+        f"{game_title}: {total} DB entries.",
+        f"  {cv_count} community/verified, {est_count} estimated, {nw_count} known-broken.",
+    ]
+    if has_cw:
+        notes_parts.append(
+            f"  ⚠ {cm_counts['continuous_write']} entries require continuous writes "
+            "(game resets the value each frame — use type-C/extended pnach if available)."
+        )
+    if has_ma:
+        notes_parts.append(
+            f"  ℹ {cm_counts['multi_address']} entries span multiple addresses for one effect."
+        )
+    if est_count > 0:
+        notes_parts.append(
+            f"  🔬 {est_count} addresses are research-derived and unverified; "
+            "confirm in PCSX2 Debug → Memory Search before use."
+        )
+
+    return {
+        "game_title":           game_title,
+        "game_serial":          game_serial,
+        "total_entries":        total,
+        "verification_counts":  v_counts,
+        "code_method_counts":   cm_counts,
+        "patch_type_counts":    pt_counts,
+        "community_verified":   verified_list,
+        "estimated":            estimated_list,
+        "not_working":          not_working_list,
+        "methods_used":         methods_used,
+        "has_continuous_writes":has_cw,
+        "has_multi_address":    has_ma,
+        "notes":                "\n".join(notes_parts),
+    }
 
 
 # ---------------------------------------------------------------------------
