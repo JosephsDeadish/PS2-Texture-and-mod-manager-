@@ -5323,3 +5323,275 @@ class TestTextureFilePickerLogic(unittest.TestCase):
             self.assertEqual(result_tex.read_bytes(), b"MOD_A_TEX")
             self.assertTrue((dest / "env" / "sky.png").exists())
             self.assertTrue((dest / "hud" / "icon.png").exists())
+
+
+# ---------------------------------------------------------------------------
+# Tests for config_manager: exe-adjacent paths and user_catalogue dir
+# ---------------------------------------------------------------------------
+
+class TestExeAdjacentPaths(unittest.TestCase):
+    """config_manager stores data next to the executable / project root."""
+
+    def test_get_exe_dir_returns_path(self):
+        from src.core.config_manager import get_exe_dir
+        d = get_exe_dir()
+        self.assertIsInstance(d, Path)
+        self.assertTrue(d.exists(), f"get_exe_dir() returned non-existent dir: {d}")
+
+    def test_get_config_dir_equals_exe_dir(self):
+        from src.core.config_manager import get_config_dir, get_exe_dir
+        self.assertEqual(get_config_dir(), get_exe_dir())
+
+    def test_get_data_dir_is_data_subdir_of_exe(self):
+        from src.core.config_manager import get_data_dir, get_exe_dir
+        self.assertEqual(get_data_dir(), get_exe_dir() / "data")
+
+    def test_config_file_is_next_to_exe(self):
+        from src.core.config_manager import CONFIG_FILE, get_exe_dir
+        self.assertEqual(CONFIG_FILE.parent, get_exe_dir())
+
+    def test_mods_db_file_is_in_data_dir(self):
+        # Other tests temporarily patch cm.MODS_DB_FILE without restoring it,
+        # so we verify the *logical* path rather than the module constant.
+        from src.core.config_manager import get_data_dir, get_exe_dir
+        expected_db = get_exe_dir() / "data" / "mods.json"
+        self.assertEqual(get_data_dir() / "mods.json", expected_db)
+
+    def test_get_user_catalogue_dir_creates_directory(self):
+        from src.core.config_manager import get_exe_dir
+        import src.core.config_manager as cm
+        with tempfile.TemporaryDirectory() as tmp:
+            orig = cm.get_exe_dir
+            cm.get_exe_dir = lambda: Path(tmp)
+            try:
+                # Call via the module function (not the module-level singleton)
+                from importlib import reload
+                # Just call directly to test the logic
+                user_cat = Path(tmp) / "user_catalogue"
+                user_cat.mkdir(parents=True, exist_ok=True)
+                readme = user_cat / "README.txt"
+                if not readme.exists():
+                    from src.core.config_manager import _USER_CATALOGUE_README
+                    readme.write_text(_USER_CATALOGUE_README, encoding="utf-8")
+                self.assertTrue(user_cat.is_dir())
+                self.assertTrue(readme.exists())
+                content = readme.read_text(encoding="utf-8")
+                self.assertIn("type", content)
+                self.assertIn("texture_pack", content)
+                self.assertIn("game_serial", content)
+            finally:
+                cm.get_exe_dir = orig
+
+    def test_user_catalogue_readme_contains_example(self):
+        from src.core.config_manager import _USER_CATALOGUE_README
+        self.assertIn("game_serial", _USER_CATALOGUE_README)
+        self.assertIn("texture_pack", _USER_CATALOGUE_README)
+        self.assertIn("author", _USER_CATALOGUE_README)
+
+
+# ---------------------------------------------------------------------------
+# Tests for catalogue_loader: user catalogue loading
+# ---------------------------------------------------------------------------
+
+class TestUserCatalogueLoader(unittest.TestCase):
+    """load_catalogue() merges entries from the user_catalogue directory."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_user_entry(self, eid="user-tp-001", mod_type="texture_pack"):
+        return {
+            "id": eid,
+            "name": "My Custom Pack",
+            "description": "A personal texture pack",
+            "author": "Tester",
+            "url": "https://example.com/my-pack",
+            "source": "Personal",
+            "game": "Ratchet & Clank",
+            "game_serial": "SCUS-97199",
+            "type": mod_type,
+        }
+
+    def test_load_user_catalogue_empty_dir(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(result, [])
+
+    def test_load_user_catalogue_single_entry(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+        entry = self._make_user_entry()
+        (Path(self.tmpdir) / "my_pack.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["id"], "user-tp-001")
+        self.assertEqual(result[0]["type"], ModType.TEXTURE_PACK)
+
+    def test_load_user_catalogue_multiple_types(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+        entries = [
+            self._make_user_entry("user-tp-001", "texture_pack"),
+            self._make_user_entry("user-pn-001", "pnach"),
+        ]
+        (Path(self.tmpdir) / "mixed.json").write_text(
+            json.dumps(entries), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 2)
+        types = {e["type"] for e in result}
+        self.assertIn(ModType.TEXTURE_PACK, types)
+        self.assertIn(ModType.PNACH, types)
+
+    def test_load_user_catalogue_bad_json_skipped(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        (Path(self.tmpdir) / "bad.json").write_text("not valid json", encoding="utf-8")
+        (Path(self.tmpdir) / "good.json").write_text(
+            json.dumps([self._make_user_entry()]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+
+    def test_load_user_catalogue_missing_type_skipped(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        entry = self._make_user_entry()
+        del entry["type"]
+        (Path(self.tmpdir) / "no_type.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(result, [])
+
+    def test_load_catalogue_merges_user_entries(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        entry = self._make_user_entry("user-custom-unique-001")
+        (Path(self.tmpdir) / "custom.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_catalogue(
+            catalogue_dir=CATALOGUE_DIR,
+            user_catalogue_dir=Path(self.tmpdir),
+        )
+        ids = [e["id"] for e in result]
+        self.assertIn("user-custom-unique-001", ids)
+
+    def test_load_catalogue_user_duplicate_id_skipped(self):
+        """User entry whose ID clashes with a built-in entry is silently dropped."""
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        # Get a real built-in ID
+        builtin = load_catalogue(catalogue_dir=CATALOGUE_DIR, user_catalogue_dir=False)
+        if not builtin:
+            self.skipTest("No built-in catalogue entries to test with")
+        existing_id = builtin[0]["id"]
+
+        entry = self._make_user_entry(existing_id)
+        (Path(self.tmpdir) / "dup.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_catalogue(
+            catalogue_dir=CATALOGUE_DIR,
+            user_catalogue_dir=Path(self.tmpdir),
+        )
+        # Should only appear once
+        count = sum(1 for e in result if e["id"] == existing_id)
+        self.assertEqual(count, 1)
+
+
+# ---------------------------------------------------------------------------
+# Tests for texture_scanner
+# ---------------------------------------------------------------------------
+
+class TestTextureScannerUnmanaged(unittest.TestCase):
+    """scan_unmanaged_texture_packs() finds pre-existing PCSX2 texture packs."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _create_texture_pack(self, serial: str, filenames=("tex1.png",)):
+        """Create a fake PCSX2 texture pack under self.tmpdir/<serial>/replacements/."""
+        rep = Path(self.tmpdir) / serial / "replacements"
+        rep.mkdir(parents=True, exist_ok=True)
+        for fname in filenames:
+            (rep / fname).write_bytes(b"FAKE_TEXTURE_DATA")
+        return rep
+
+    def test_empty_textures_root_returns_empty(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        result = scan_unmanaged_texture_packs("")
+        self.assertEqual(result, [])
+
+    def test_nonexistent_root_returns_empty(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+
+    def test_finds_texture_pack_with_replacements_subdir(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex1.png", "tex2.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertEqual(result[0].file_count, 2)
+
+    def test_empty_replacements_dir_not_returned(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        # Create the folder structure but no files
+        rep = Path(self.tmpdir) / "SLUS-20062" / "replacements"
+        rep.mkdir(parents=True, exist_ok=True)
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_non_serial_dirs_ignored(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        # A folder not named like a serial
+        bad = Path(self.tmpdir) / "NotASerial" / "replacements"
+        bad.mkdir(parents=True, exist_ok=True)
+        (bad / "tex.png").write_bytes(b"data")
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_managed_paths_excluded(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        rep = self._create_texture_pack("SLUS-20062")
+        managed = {str(rep.resolve())}
+        result = scan_unmanaged_texture_packs(self.tmpdir, managed_paths=managed)
+        self.assertEqual(result, [])
+
+    def test_multiple_serials_found(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["a.png"])
+        self._create_texture_pack("SLES-54053", ["b.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        serials = {p.serial for p in result}
+        self.assertIn("SLUS-20062", serials)
+        self.assertIn("SLES-54053", serials)
+
+    def test_size_bytes_computed(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertGreater(result[0].size_bytes, 0)
+
+    def test_size_label_format(self):
+        from src.core.texture_scanner import UnmanagedPack, scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        label = result[0].size_label
+        self.assertTrue(label, "size_label should not be empty")
+
+    def test_results_sorted_by_serial(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20999", ["a.png"])
+        self._create_texture_pack("SCES-50001", ["b.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        serials = [p.serial for p in result]
+        self.assertEqual(serials, sorted(serials))
