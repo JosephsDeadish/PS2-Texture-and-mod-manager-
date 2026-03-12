@@ -3306,6 +3306,38 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     f"Hub entry {entry['id']} still uses a bare site homepage for author_url: {aurl!r}"
                 )
 
+    def test_no_search_member_urls_in_author_url(self):
+        """author_url must never point to a member search page (e.g. /search/members/?name=X).
+        Author links should go directly to the author's profile page, not a search results page."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "search/members",
+                aurl,
+                f"Entry {entry['id']} author_url is a member-search page (not a profile): {aurl!r}"
+            )
+
+    def test_no_gbatem_org_typo_in_author_url(self):
+        """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net or gamesavedfiles.com)."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "gbatem.org",
+                aurl,
+                f"Entry {entry['id']} author_url contains typo domain 'gbatem.org': {aurl!r}"
+            )
+
+    def test_no_wrong_plural_gbatemp_urls(self):
+        """Catalogue 'url' must not use '/downloads/categories/' (wrong plural).
+        GBAtemp download URLs use the singular '/download/categories/' path."""
+        for entry in self.catalogue:
+            url = entry.get("url", "")
+            self.assertNotIn(
+                "/downloads/categories/",
+                url,
+                f"Entry {entry['id']} url uses wrong plural '/downloads/': {url!r}"
+            )
+
     def test_nsfw_present_and_bool(self):
         """Every entry must declare nsfw: True or False."""
         for entry in self.catalogue:
