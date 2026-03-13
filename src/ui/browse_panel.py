@@ -1178,9 +1178,8 @@ class DownloadInstallDialog(QDialog):
                     return
                 # Schedule _run_download back on the main thread so that Qt
                 # widget reads (mod type combo, etc.) happen on the correct thread.
-                _resolved = url
                 QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                QTimer.singleShot(0, lambda: self._run_download(raw_url, _resolved))
+                QTimer.singleShot(0, lambda r=url: self._run_download(raw_url, r))
 
             threading.Thread(target=_resolve_then_download, daemon=True).start()
             return
@@ -1524,7 +1523,7 @@ class PnachGitHubDialog(QDialog):
                                 author="PCSX2 Team",
                                 source_url=(
                                     "https://github.com/PCSX2/widescreen_patches/blob/"
-                                    f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
+                                    f"master/{patch.get('filename', f\"{patch['crc']}.pnach\")}"
                                 ),
                                 files=[path],
                                 size_bytes=pnach_file_path.stat().st_size if pnach_file_path.exists() else 0,

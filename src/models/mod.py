@@ -1,6 +1,6 @@
 """Data models for PS2 Mod Manager."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields as _dataclass_fields
 from enum import Enum
 from typing import Optional
 import json
@@ -71,7 +71,14 @@ class ModInfo:
     def from_dict(cls, data: dict) -> "ModInfo":
         data = dict(data)
         data["mod_type"] = ModType(data["mod_type"])
-        return cls(**data)
+        # Ignore unknown keys so that a mods.json written by a newer version of
+        # the app (which may contain extra fields) can be loaded by an older
+        # version without crashing.  Without this filter, cls(**data) raises
+        # TypeError for unexpected keyword arguments, which is caught in
+        # ModDatabase._load() and silently wipes the entire mod database.
+        known = {f.name for f in _dataclass_fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in known}
+        return cls(**filtered)
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), indent=2)

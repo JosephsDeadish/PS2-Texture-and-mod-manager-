@@ -76,6 +76,27 @@ class TestModInfoSerialization(unittest.TestCase):
         self.assertEqual(restored.textures_path, cfg.textures_path)
         self.assertFalse(restored.first_run)
 
+    def test_from_dict_ignores_unknown_keys(self):
+        """ModInfo.from_dict must silently ignore keys not in the dataclass.
+
+        Without this behaviour a mods.json written by a newer version of the
+        app (which may have extra fields) would raise TypeError when loaded by
+        an older version.  ModDatabase._load() catches TypeError and resets the
+        entire database to {}, silently losing all tracked mods.
+        """
+        data = {
+            "id": "abc",
+            "name": "My Mod",
+            "mod_type": "texture_pack",
+            "path": "/tmp/mymod",
+            "future_field_added_in_v2": "some_value",
+            "another_new_field": 99,
+        }
+        mod = ModInfo.from_dict(data)
+        self.assertEqual(mod.id, "abc")
+        self.assertEqual(mod.name, "My Mod")
+        self.assertEqual(mod.mod_type, ModType.TEXTURE_PACK)
+
 
 class TestConfigManager(unittest.TestCase):
     """Test configuration persistence."""
@@ -532,6 +553,25 @@ class TestArchiveExtraction(unittest.TestCase):
         with zipfile.ZipFile(bad_zip, "w") as zf:
             zf.writestr("../evil.txt", "bad content")
         dest = str(Path(self.tmpdir) / "safe")
+        with self.assertRaises(ArchiveError):
+            extract_archive(bad_zip, dest)
+
+    def test_extract_zip_rejects_backslash_path_traversal(self):
+        """ZIP members with backslash-encoded traversal must be rejected.
+
+        On POSIX systems, pathlib.Path('..\\\\evil.txt').parts returns the
+        whole string as one component so the '..' check is bypassed.  The
+        fixed _safe_name() replaces '\\\\' with '/' before parsing, catching
+        sequences like '..\\\\evil.txt' or 'foo\\\\..\\\\bar'.
+        """
+        from src.core.archive import extract_archive, ArchiveError
+        import zipfile
+        bad_zip = str(Path(self.tmpdir) / "backslash_bad.zip")
+        # Craft a member whose filename contains a backslash traversal
+        with zipfile.ZipFile(bad_zip, "w") as zf:
+            info = zipfile.ZipInfo("..\\evil.txt")
+            zf.writestr(info, "evil content")
+        dest = str(Path(self.tmpdir) / "safe2")
         with self.assertRaises(ArchiveError):
             extract_archive(bad_zip, dest)
 
