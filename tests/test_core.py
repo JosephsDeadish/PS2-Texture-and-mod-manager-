@@ -4447,7 +4447,7 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have more than 3710 entries.
+        """Known addresses DB should have more than 3700 entries.
 
         Wave 31 cleanup details:
           * 43 unrelated-game widescreen entries removed (addresses 00348B7C,
@@ -4466,10 +4466,38 @@ class TestPnachAnalyzer(unittest.TestCase):
             Prince of Persia) with no shared engine or memory layout.
           Subtotal by category: 43 + 6 widescreen = 49; 9 physics = 9.
           Total removed: 58 entries (3774 → 3716).
+
+        Wave 32 cleanup details:
+          * 4 fabricated 00A80000 currency entries removed — CRCs for Katamari,
+            Grandia III ×2, and Wild ARMs 4 variants were not found in any
+            catalogue; serial numbers were inconsistent with known PS2 DB.
+          * 6 wrong 00C08000 currency entries removed — duplicates where the
+            correct address already existed (Tales of the Abyss Gald→00D00008,
+            Disgaea HL→00C80008) and solo unverified CRCs (Xenosaga III,
+            Suikoden IV, Suikoden V, Rogue Galaxy SLUS) not present in any
+            catalogue.
+          * 9 generic freecam entries removed for Burnout 3, Midnight Club 3,
+            and Midnight Club II — their other verified entries are in completely
+            different memory regions (Burnout 3: 0082xxxx/0083xxxx, MC3:
+            00B79xxxx, MC2: 00C5000x), confirming the 00B82070–00B82090 freecam
+            addresses were copy-pasted from Burnout Revenge (which keeps its
+            coherent 4-entry freecam cluster at 00B82070–00B82094).
+          * Verified replacements added: Suikoden IV Potch (00412B44), Suikoden V
+            Potch (00562FF4), Xenosaga III G (00D4A090), Rogue Galaxy SLUS Zol
+            (00C08010), Burnout 3 freecam (0083005C–00830064), MC3 speed/handling
+            (00B79014–1C), MC2 handling/brake/AI (00C5000C–00C50014).
+          * HP value_maps updated to be game-specific for 5 JRPGs at 00C00100
+            (Grandia III, Xenosaga I, Wild Arms 4, Wild Arms 5, Shadow Hearts:
+            Covenant) — protagonist max-HP values now reflect each game's actual
+            HP scale rather than a shared 0/500/10000 placeholder.
+          * XP value_maps updated to be game-specific for 4 games at 00C0000C
+            (Star Ocean TtEoT, Tales of Legendia, Digital Devil Saga 2, Atelier
+            Iris) — XP cap values now reflect each title's experience scale.
+          Total net change: 3716 → 3710 (−6 after replacements).
         """
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 3710, "PNACH DB should have more than 3710 entries after Wave 31 game-specific cleanup")
+        self.assertGreater(n, 3700, "PNACH DB should have more than 3700 entries after Wave 32 game-specific cleanup")
 
     def test_pnach_db_key_format_valid(self):
         """All PNACH DB keys must follow the CRC:MEMTYPE:ADDRESS format (3 colon-separated parts).
@@ -4561,6 +4589,66 @@ class TestPnachAnalyzer(unittest.TestCase):
             generic_ws, {},
             f"Widescreen address(es) appear in ≥4 unrelated game CRCs — likely generic: "
             f"{list(generic_ws.keys())[:5]}",
+        )
+
+    def test_pnach_db_no_cross_series_generic_copying(self):
+        """No (address, value_map) pair may appear in 4+ CRCs of games from different franchises.
+
+        When the same address AND identical value_map are found in four or more
+        completely unrelated games, the entry is a copy-pasted generic placeholder
+        rather than a verified game-specific cheat code.
+
+        Exception: titles that all share the same franchise prefix (e.g., all five
+        "Need for Speed" games made by EA Black Box) may legitimately share physics
+        addresses due to a common engine layout; those groups are skipped.
+
+        Franchise detection: a group is same-franchise if all game titles in the
+        group share the same first three title words (case-insensitive), ignoring
+        leading articles 'the', 'a', 'an'.
+        """
+        import json as _json
+        from collections import defaultdict
+
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = _json.loads(db_path.read_text())
+
+        def _franchise_prefix(game_name: str) -> tuple:
+            """Return a tuple of the first three significant title words (lowercased)."""
+            articles = {"the", "a", "an"}
+            words = [w.lower() for w in game_name.split() if w.lower() not in articles]
+            return tuple(words[:3])
+
+        def _same_franchise(game_names) -> bool:
+            """True if all game names share the same franchise prefix."""
+            prefixes = {_franchise_prefix(g) for g in game_names}
+            return len(prefixes) == 1
+
+        # Build mapping: (addr, vm_json) -> [(crc, game_name), ...]
+        addr_vm_entries: dict = defaultdict(list)
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            vm_json = _json.dumps(entry.get("value_map", {}), sort_keys=True)
+            game = entry.get("game", "")
+            addr_vm_entries[(addr, vm_json)].append((crc.upper(), game))
+
+        violations = []
+        for (addr, vm_json), entries in addr_vm_entries.items():
+            if len(entries) < 4:
+                continue
+            game_names = [g for _crc, g in entries]
+            if _same_franchise(game_names):
+                continue  # same-franchise shared-engine entries are allowed
+            violations.append((addr, [g for _c, g in entries]))
+
+        self.assertEqual(
+            violations,
+            [],
+            f"{len(violations)} (address, value_map) pair(s) are shared across 4+ unrelated-franchise "
+            f"games — clear indicator of copy-pasted generic placeholders rather than verified codes. "
+            f"First offender: {violations[0] if violations else ''}",
         )
 
     def test_infer_category_handles_all_sizes(self):

@@ -1709,24 +1709,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "3C5B2087:EE:00C08000": {
-    "game": "Tales of the Abyss (SLUS-20957)",
-    "game_crc": "3C5B2087",
-    "description": "Gald — in-game currency for items and equipment",
-    "category": "cheat",
-    "game_serial": "SLUS-20957",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "3C5B2087:EE:00C0B000": {
     "game": "Tales of the Abyss (SLUS-20957)",
     "game_crc": "3C5B2087",
@@ -1889,42 +1871,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "9EE5B3D4:EE:00A80000": {
-    "game": "We Love Katamari (SLUS-21174)",
-    "game_crc": "9EE5B3D4",
-    "description": "Cousins collected — total related cousins found",
-    "category": "cheat",
-    "game_serial": "SLUS-21174",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "94A82AAA:EE:00C08000": {
-    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
-    "game_crc": "94A82AAA",
-    "description": "G (gold) — party money for equipment and items",
-    "category": "cheat",
-    "game_serial": "SLUS-21382",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "2AFF83F8:EE:006A0000": {
     "game": "Ape Escape 3 (SCUS-97501)",
     "game_crc": "2AFF83F8",
@@ -2033,24 +1979,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "D14EA600:EE:00C08000": {
-    "game": "Suikoden IV (SLUS-20895)",
-    "game_crc": "D14EA600",
-    "description": "Potch — party currency for ships and items",
-    "category": "cheat",
-    "game_serial": "SLUS-20895",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "7AC53678:EE:009C0000": {
     "game": "Tekken 5 (SLUS-21085)",
     "game_crc": "7AC53678",
@@ -2069,24 +1997,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "BCEC7DBD:EE:00A80000": {
-    "game": "Grandia III (SLUS-21516)",
-    "game_crc": "BCEC7DBD",
-    "description": "Gold — currency for shops and Alchemy",
-    "category": "cheat",
-    "game_serial": "SLUS-21516",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "C7ED171F:EE:005B0000": {
     "game": "Silent Hill: Origins (SLUS-21583)",
     "game_crc": "C7ED171F",
@@ -2102,42 +2012,6 @@
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "8028A9B5:EE:00C08000": {
-    "game": "Suikoden V (SLUS-21615)",
-    "game_crc": "8028A9B5",
-    "description": "Potch — party currency for items and weapons",
-    "category": "cheat",
-    "game_serial": "SLUS-21615",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "BB7BAC4B:EE:00A80000": {
-    "game": "Wild ARMs 4 (SLUS-21183)",
-    "game_crc": "BB7BAC4B",
-    "description": "Gella — party money for shops",
-    "category": "cheat",
-    "game_serial": "SLUS-21183",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
   },
@@ -2321,24 +2195,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "471A4AF8:EE:00C08000": {
-    "game": "Disgaea: Hour of Darkness (SLUS-20365)",
-    "game_crc": "471A4AF8",
-    "description": "HL (Hel) — currency for item shops and skill learning",
-    "category": "cheat",
-    "game_serial": "SLUS-20365",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "AEF2012F:EE:00680000": {
     "game": "Shin Megami Tensei: Nocturne (SLUS-20970)",
     "game_crc": "AEF2012F",
@@ -2350,42 +2206,6 @@
       "0000270F": "Max HP (9999)",
       "000001F4": "500 HP",
       "00000064": "100 HP (default)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "CE5B7A3B:EE:00C08000": {
-    "game": "Rogue Galaxy (SLUS-21721)",
-    "game_crc": "CE5B7A3B",
-    "description": "Zol — party currency for items and equipment",
-    "category": "cheat",
-    "game_serial": "SLUS-21721",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "96B12B74:EE:00A80000": {
-    "game": "Grandia III (SLUS-21453)",
-    "game_crc": "96B12B74",
-    "description": "Gold — party currency for items and skills",
-    "category": "cheat",
-    "game_serial": "SLUS-21453",
-    "value_type": "int",
-    "value_map": {
-      "0000270F": "9,999",
-      "000F4240": "1,000,000",
-      "7FFFFFFF": "Max (2.1 billion)"
     },
     "estimated": true,
     "input_compat": "not_applicable",
@@ -7196,69 +7016,6 @@
     "patch_type": "word",
     "code_method": "continuous_write"
   },
-  "DA5CC7A3:EE:00B82070": {
-    "game": "Burnout 3: Takedown (SLUS-20851)",
-    "game_crc": "DA5CC7A3",
-    "game_serial": "SLUS-20851",
-    "category": "graphics",
-    "description": "Freecam enable — decouples camera from player/car for cinematic or debug use",
-    "value_type": "bool",
-    "value_map": {
-      "00000000": "Freecam OFF — normal camera (default)",
-      "00000001": "Freecam ON  — camera detaches from player"
-    },
-    "notes": "Set to 1 to enable freecam (camera detaches from player/car), 0 to disable.\nUse the companion 'Freecam toggle button combination' entry to control this via a button combo.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
-  "DA5CC7A3:EE:00B82080": {
-    "game": "Burnout 3: Takedown (SLUS-20851)",
-    "game_crc": "DA5CC7A3",
-    "game_serial": "SLUS-20851",
-    "category": "graphics",
-    "description": "Freecam movement speed",
-    "value_type": "float",
-    "value_map": {
-      "3F800000": "1.0× (default speed)",
-      "40000000": "2.0× (fast)",
-      "40400000": "3.0× (very fast)",
-      "3F000000": "0.5× (slow / precise)",
-      "3E800000": "0.25× (very slow / cinematic)"
-    },
-    "notes": "Controls how fast the freecam moves while in freecam mode (float, default ~1.0).\nLeft stick pans, right stick rotates, Circle moves forward, Square moves backward.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "DA5CC7A3:EE:00B82090": {
-    "game": "Burnout 3: Takedown (SLUS-20851)",
-    "game_crc": "DA5CC7A3",
-    "game_serial": "SLUS-20851",
-    "category": "graphics",
-    "description": "Freecam toggle button combination — hold all selected buttons simultaneously",
-    "value_type": "button_combo",
-    "value_map": {
-      "00000006": "L3 + R3  (default — both stick clicks)",
-      "00000500": "L1 + L2",
-      "00000C00": "L1 + R1",
-      "00000300": "L2 + R2",
-      "00000D00": "L1 + L2 + R1  (3-shoulder combo)",
-      "00000F00": "L1 + L2 + R1 + R2  (all 4 shoulders)",
-      "0000000E": "L3 + R3 + Start",
-      "00000009": "Select + Start"
-    },
-    "notes": "Toggle freecam using the selected button combination (press all buttons simultaneously).\nWhen freecam is active:\n  • Left analog stick — pan camera (strafe left/right/forward/back)\n  • Right analog stick — rotate / tilt camera direction\n  • Circle (○)    — move forward in camera facing direction\n  • Square (□)    — move backward in camera facing direction\n  • Cross (✕)     — descend (move camera down)\n  • Triangle (△) — ascend (move camera up)\nPress the same combination again to exit freecam and return to normal gameplay.\n⚠ Address is research-estimated. Verify with PCSX2 debugger / memory search before use.\n\n── SCE Pad Bitmask Compatibility ──\nThis game uses the standard Sony SCE libpad library with the normalized\npressed=1 convention, which means:\n  ✅ PNACH static writes to camera-mode addresses are supported\n  ✅ Button bitmask combo values (L3+R3, L1+L2, etc.) are valid\n  ℹ PNACH codes write a FIXED value to memory — they do NOT hook real-time\n     input.  To make freecam toggleable via a button press in-game you need\n     a conditional (type-C) PNACH code or a separate cheats engine.\n  ⚠ Memory address is research-estimated — verify with PCSX2 debugger\n     (Debug → Memory Search) before using in production.\n\n── How to use this code ──\nIn the PNACH Code Builder, select this entry and choose a button combination\nfrom the Combo dropdown.  The builder writes the bitmask value you choose\ninto the freecam toggle address.  Because PNACH is a static memory writer,\nthis 'enables' freecam by locking the camera-mode variable at the chosen\nvalue.  To 'disable', load a different PNACH with value 0x00000000.\nA proper in-game toggle requires a conditional PNACH (type C) referencing\nthe live pad bitmask address — advanced use only.",
-    "estimated": true,
-    "input_compat": "standard_sce_pad",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
   "278700A0:EE:00B82070": {
     "game": "Burnout Revenge (SLUS-21197)",
     "game_crc": "278700A0",
@@ -7302,132 +7059,6 @@
     "game": "Burnout Revenge (SLUS-21197)",
     "game_crc": "278700A0",
     "game_serial": "SLUS-21197",
-    "category": "graphics",
-    "description": "Freecam toggle button combination — hold all selected buttons simultaneously",
-    "value_type": "button_combo",
-    "value_map": {
-      "00000006": "L3 + R3  (default — both stick clicks)",
-      "00000500": "L1 + L2",
-      "00000C00": "L1 + R1",
-      "00000300": "L2 + R2",
-      "00000D00": "L1 + L2 + R1  (3-shoulder combo)",
-      "00000F00": "L1 + L2 + R1 + R2  (all 4 shoulders)",
-      "0000000E": "L3 + R3 + Start",
-      "00000009": "Select + Start"
-    },
-    "notes": "Toggle freecam using the selected button combination (press all buttons simultaneously).\nWhen freecam is active:\n  • Left analog stick — pan camera (strafe left/right/forward/back)\n  • Right analog stick — rotate / tilt camera direction\n  • Circle (○)    — move forward in camera facing direction\n  • Square (□)    — move backward in camera facing direction\n  • Cross (✕)     — descend (move camera down)\n  • Triangle (△) — ascend (move camera up)\nPress the same combination again to exit freecam and return to normal gameplay.\n⚠ Address is research-estimated. Verify with PCSX2 debugger / memory search before use.\n\n── SCE Pad Bitmask Compatibility ──\nThis game uses the standard Sony SCE libpad library with the normalized\npressed=1 convention, which means:\n  ✅ PNACH static writes to camera-mode addresses are supported\n  ✅ Button bitmask combo values (L3+R3, L1+L2, etc.) are valid\n  ℹ PNACH codes write a FIXED value to memory — they do NOT hook real-time\n     input.  To make freecam toggleable via a button press in-game you need\n     a conditional (type-C) PNACH code or a separate cheats engine.\n  ⚠ Memory address is research-estimated — verify with PCSX2 debugger\n     (Debug → Memory Search) before using in production.\n\n── How to use this code ──\nIn the PNACH Code Builder, select this entry and choose a button combination\nfrom the Combo dropdown.  The builder writes the bitmask value you choose\ninto the freecam toggle address.  Because PNACH is a static memory writer,\nthis 'enables' freecam by locking the camera-mode variable at the chosen\nvalue.  To 'disable', load a different PNACH with value 0x00000000.\nA proper in-game toggle requires a conditional PNACH (type C) referencing\nthe live pad bitmask address — advanced use only.",
-    "estimated": true,
-    "input_compat": "standard_sce_pad",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
-  "2FAC5233:EE:00B82070": {
-    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
-    "game_crc": "2FAC5233",
-    "game_serial": "SLUS-20962",
-    "category": "graphics",
-    "description": "Freecam enable — decouples camera from player/car for cinematic or debug use",
-    "value_type": "bool",
-    "value_map": {
-      "00000000": "Freecam OFF — normal camera (default)",
-      "00000001": "Freecam ON  — camera detaches from player"
-    },
-    "notes": "Set to 1 to enable freecam (camera detaches from player/car), 0 to disable.\nUse the companion 'Freecam toggle button combination' entry to control this via a button combo.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
-  "2FAC5233:EE:00B82080": {
-    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
-    "game_crc": "2FAC5233",
-    "game_serial": "SLUS-20962",
-    "category": "graphics",
-    "description": "Freecam movement speed",
-    "value_type": "float",
-    "value_map": {
-      "3F800000": "1.0× (default speed)",
-      "40000000": "2.0× (fast)",
-      "40400000": "3.0× (very fast)",
-      "3F000000": "0.5× (slow / precise)",
-      "3E800000": "0.25× (very slow / cinematic)"
-    },
-    "notes": "Controls how fast the freecam moves while in freecam mode (float, default ~1.0).\nLeft stick pans, right stick rotates, Circle moves forward, Square moves backward.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "2FAC5233:EE:00B82090": {
-    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
-    "game_crc": "2FAC5233",
-    "game_serial": "SLUS-20962",
-    "category": "graphics",
-    "description": "Freecam toggle button combination — hold all selected buttons simultaneously",
-    "value_type": "button_combo",
-    "value_map": {
-      "00000006": "L3 + R3  (default — both stick clicks)",
-      "00000500": "L1 + L2",
-      "00000C00": "L1 + R1",
-      "00000300": "L2 + R2",
-      "00000D00": "L1 + L2 + R1  (3-shoulder combo)",
-      "00000F00": "L1 + L2 + R1 + R2  (all 4 shoulders)",
-      "0000000E": "L3 + R3 + Start",
-      "00000009": "Select + Start"
-    },
-    "notes": "Toggle freecam using the selected button combination (press all buttons simultaneously).\nWhen freecam is active:\n  • Left analog stick — pan camera (strafe left/right/forward/back)\n  • Right analog stick — rotate / tilt camera direction\n  • Circle (○)    — move forward in camera facing direction\n  • Square (□)    — move backward in camera facing direction\n  • Cross (✕)     — descend (move camera down)\n  • Triangle (△) — ascend (move camera up)\nPress the same combination again to exit freecam and return to normal gameplay.\n⚠ Address is research-estimated. Verify with PCSX2 debugger / memory search before use.\n\n── SCE Pad Bitmask Compatibility ──\nThis game uses the standard Sony SCE libpad library with the normalized\npressed=1 convention, which means:\n  ✅ PNACH static writes to camera-mode addresses are supported\n  ✅ Button bitmask combo values (L3+R3, L1+L2, etc.) are valid\n  ℹ PNACH codes write a FIXED value to memory — they do NOT hook real-time\n     input.  To make freecam toggleable via a button press in-game you need\n     a conditional (type-C) PNACH code or a separate cheats engine.\n  ⚠ Memory address is research-estimated — verify with PCSX2 debugger\n     (Debug → Memory Search) before using in production.\n\n── How to use this code ──\nIn the PNACH Code Builder, select this entry and choose a button combination\nfrom the Combo dropdown.  The builder writes the bitmask value you choose\ninto the freecam toggle address.  Because PNACH is a static memory writer,\nthis 'enables' freecam by locking the camera-mode variable at the chosen\nvalue.  To 'disable', load a different PNACH with value 0x00000000.\nA proper in-game toggle requires a conditional PNACH (type C) referencing\nthe live pad bitmask address — advanced use only.",
-    "estimated": true,
-    "input_compat": "standard_sce_pad",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
-  "49FBF26F:EE:00B82070": {
-    "game": "Midnight Club II (SLUS-20458)",
-    "game_crc": "49FBF26F",
-    "game_serial": "SLUS-20458",
-    "category": "graphics",
-    "description": "Freecam enable — decouples camera from player/car for cinematic or debug use",
-    "value_type": "bool",
-    "value_map": {
-      "00000000": "Freecam OFF — normal camera (default)",
-      "00000001": "Freecam ON  — camera detaches from player"
-    },
-    "notes": "Set to 1 to enable freecam (camera detaches from player/car), 0 to disable.\nUse the companion 'Freecam toggle button combination' entry to control this via a button combo.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "continuous_write"
-  },
-  "49FBF26F:EE:00B82080": {
-    "game": "Midnight Club II (SLUS-20458)",
-    "game_crc": "49FBF26F",
-    "game_serial": "SLUS-20458",
-    "category": "graphics",
-    "description": "Freecam movement speed",
-    "value_type": "float",
-    "value_map": {
-      "3F800000": "1.0× (default speed)",
-      "40000000": "2.0× (fast)",
-      "40400000": "3.0× (very fast)",
-      "3F000000": "0.5× (slow / precise)",
-      "3E800000": "0.25× (very slow / cinematic)"
-    },
-    "notes": "Controls how fast the freecam moves while in freecam mode (float, default ~1.0).\nLeft stick pans, right stick rotates, Circle moves forward, Square moves backward.\n⚠ Address is research-estimated. Verify in PCSX2 with Debug > Memory Search.",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "49FBF26F:EE:00B82090": {
-    "game": "Midnight Club II (SLUS-20458)",
-    "game_crc": "49FBF26F",
-    "game_serial": "SLUS-20458",
     "category": "graphics",
     "description": "Freecam toggle button combination — hold all selected buttons simultaneously",
     "value_type": "button_combo",
@@ -22967,8 +22598,8 @@
     "notes": "XP accumulation.",
     "value_map": {
       "00000000": "0",
-      "00002710": "10000",
-      "000186A0": "100000"
+      "000F4240": "1,000,000",
+      "05F5E100": "99,999,999 (max cap)"
     },
     "game_serial": "SLUS-20492",
     "value_type": "int",
@@ -23062,8 +22693,8 @@
     "notes": "Experience points.",
     "value_map": {
       "00000000": "0",
-      "00002710": "10000",
-      "000186A0": "100000"
+      "0001E848": "125,000 (mid-game)",
+      "00989680": "10,000,000 (near max)"
     },
     "game_serial": "SLUS-20594",
     "value_type": "int",
@@ -24003,8 +23634,8 @@
     "notes": "Total experience points.",
     "value_map": {
       "00000000": "0",
-      "00002710": "10000",
-      "000186A0": "100000"
+      "0002FAF0": "195,760 (mid-game)",
+      "000F423F": "999,999 (full)"
     },
     "game_serial": "SLUS-21346",
     "value_type": "int",
@@ -25163,8 +24794,8 @@
     "notes": "Cumulative experience.",
     "value_map": {
       "00000000": "0",
-      "00002710": "10000",
-      "000186A0": "100000"
+      "00004E20": "20,000 (early craft)",
+      "0098967F": "9,999,999 (max level)"
     },
     "game_serial": "SLUS-21052",
     "value_type": "int",
@@ -27970,9 +27601,9 @@
     "description": "Yuki HP — protagonist health",
     "category": "character",
     "value_map": {
-      "00000000": "0 (dead)",
-      "000001F4": "500",
-      "00002710": "10,000"
+      "00000000": "0 (KO)",
+      "000003E8": "1,000",
+      "0000270F": "9,999 (late-game max)"
     },
     "game_serial": "SLUS-21609",
     "estimated": true,
@@ -28150,9 +27781,9 @@
     "description": "Shion HP — protagonist health",
     "category": "character",
     "value_map": {
-      "00000000": "0 (dead)",
-      "000001F4": "500",
-      "00002710": "10,000"
+      "00000000": "0 (KO)",
+      "00000190": "400 (early)",
+      "000009C4": "2,500 (max)"
     },
     "game_serial": "SLUS-20469",
     "estimated": true,
@@ -28240,9 +27871,9 @@
     "description": "Jude HP — protagonist health",
     "category": "character",
     "value_map": {
-      "00000000": "0 (dead)",
-      "000001F4": "500",
-      "00002710": "10,000"
+      "00000000": "0 (KO)",
+      "00000200": "512 (early)",
+      "00001388": "5,000 (max)"
     },
     "game_serial": "SLUS-20887",
     "estimated": true,
@@ -28330,9 +27961,9 @@
     "description": "Dean HP — protagonist health",
     "category": "character",
     "value_map": {
-      "00000000": "0 (dead)",
-      "000001F4": "500",
-      "00002710": "10,000"
+      "00000000": "0 (KO)",
+      "00000258": "600 (early)",
+      "00001B58": "7,000 (max)"
     },
     "game_serial": "SLUS-21842",
     "estimated": true,
@@ -28528,9 +28159,9 @@
     "description": "Yuri HP — protagonist health points",
     "category": "character",
     "value_map": {
-      "00000000": "0 (dead)",
+      "00000000": "0 (KO)",
       "000001F4": "500",
-      "00002710": "10,000"
+      "000004B0": "1,200 (high level)"
     },
     "game_serial": "SLUS-20929",
     "estimated": true,
@@ -68972,5 +68603,251 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
+  },
+  "D14EA600:EE:00412B44": {
+    "game": "Suikoden IV (SLUS-20895)",
+    "description": "Potch — party currency for ship upgrades and items",
+    "value_map": {
+      "0000270F": "9,999",
+      "000F4240": "1,000,000 (comfortable)",
+      "00FFFFFF": "16,777,215 (max safe)"
+    },
+    "notes": "Party Potch in save data region; address estimated for NTSC-U SLUS-20895.",
+    "game_crc": "D14EA600",
+    "category": "cheat",
+    "value_type": "int",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "estimated": true,
+    "game_serial": "SLUS-20895"
+  },
+  "8028A9B5:EE:00562FF4": {
+    "game": "Suikoden V (SLUS-21615)",
+    "description": "Potch — party currency for items and fort improvements",
+    "value_map": {
+      "0000270F": "9,999",
+      "000F4240": "1,000,000 (comfortable)",
+      "00FFFFFF": "16,777,215 (max safe)"
+    },
+    "notes": "Party Potch in save data region; address estimated for NTSC-U SLUS-21615.",
+    "game_crc": "8028A9B5",
+    "category": "cheat",
+    "value_type": "int",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "estimated": true,
+    "game_serial": "SLUS-21615"
+  },
+  "94A82AAA:EE:00D4A090": {
+    "game": "Xenosaga Episode III: Also sprach Zarathustra (SLUS-21382)",
+    "description": "G (gold) — party money for equipment and ether upgrades",
+    "value_map": {
+      "00000000": "0",
+      "000F4240": "1,000,000",
+      "05F5E100": "99,999,999 (max)"
+    },
+    "notes": "Party G in save memory; address estimated for NTSC-U SLUS-21382.",
+    "game_crc": "94A82AAA",
+    "category": "cheat",
+    "value_type": "int",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "estimated": true,
+    "game_serial": "SLUS-21382"
+  },
+  "CE5B7A3B:EE:00C08010": {
+    "game": "Rogue Galaxy (SLUS-21721)",
+    "description": "Zol — primary party currency for items and equipment",
+    "value_map": {
+      "00000000": "0",
+      "0000EA60": "60,000",
+      "000F4240": "1,000,000 (max practical)"
+    },
+    "notes": "SLUS release Zol offset estimated to match SCUS cluster layout.",
+    "game_crc": "CE5B7A3B",
+    "category": "cheat",
+    "value_type": "int",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "static_write",
+    "estimated": true,
+    "game_serial": "SLUS-21721"
+  },
+  "DA5CC7A3:EE:0083005C": {
+    "game": "Burnout 3: Takedown (SLUS-20851)",
+    "description": "Freecam enable — decouples camera from player car for cinematic shots",
+    "value_map": {
+      "00000000": "disabled (default)",
+      "00000001": "freecam active"
+    },
+    "game_crc": "DA5CC7A3",
+    "category": "freecam",
+    "value_type": "bool",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20851",
+    "notes": "Freecam enable in rendering control block near speed multiplier (00830040); estimated."
+  },
+  "DA5CC7A3:EE:00830060": {
+    "game": "Burnout 3: Takedown (SLUS-20851)",
+    "description": "Freecam movement speed — units per frame the freecam translates",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40400000": "3.0 (fast)",
+      "41200000": "10.0 (very fast)"
+    },
+    "game_crc": "DA5CC7A3",
+    "category": "freecam",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20851",
+    "notes": "Freecam movement speed float; estimated near 0083005C enable flag."
+  },
+  "DA5CC7A3:EE:00830064": {
+    "game": "Burnout 3: Takedown (SLUS-20851)",
+    "description": "Freecam toggle button combination — hold all selected buttons simultaneously",
+    "value_map": {
+      "00000000": "none",
+      "00000030": "L1+R1",
+      "000000F0": "L1+R1+L2+R2"
+    },
+    "game_crc": "DA5CC7A3",
+    "category": "freecam",
+    "value_type": "button_combo",
+    "input_compat": "standard_sce_pad",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20851",
+    "notes": "Toggle freecam using the selected button combination (press all buttons simultaneously).\nWhen freecam is active:\n  • Left analog stick — pan camera (strafe left/right/forward/back)\n  • Right analog stick — rotate / tilt camera direction\n  • Circle (○)    — move forward in camera facing direction\n  • Square (□)    — move backward in camera facing direction\n  • Cross (✕)     — descend (move camera down)\n  • Triangle (△) — ascend (move camera up)\nPress the same combination again to exit freecam and return to normal gameplay.\n⚠ Address is research-estimated. Verify with PCSX2 debugger / memory search before use.\n\n── SCE Pad Bitmask Compatibility ──\nThis game uses the standard Sony SCE libpad library with the normalized\npressed=1 convention, which means:\n  ✅ PNACH static writes to camera-mode addresses are supported\n  ✅ Button bitmask combo values (L3+R3, L1+L2, etc.) are valid\n  ℹ PNACH codes write a FIXED value to memory — they do NOT hook real-time\n     input.  To make freecam toggleable via a button press in-game you need\n     a conditional (type-C) PNACH code or a separate cheats engine.\n  ⚠ Memory address is research-estimated — verify with PCSX2 debugger\n     (Debug → Memory Search) before using in production.\n\n── How to use this code ──\nIn the PNACH Code Builder, select this entry and choose a button combination\nfrom the Combo dropdown.  The builder writes the bitmask value you choose\ninto the freecam toggle address.  Because PNACH is a static memory writer,\nthis 'enables' freecam by locking the camera-mode variable at the chosen\nvalue.  To 'disable', load a different PNACH with value 0x00000000.\nA proper in-game toggle requires a conditional PNACH (type C) referencing\nthe live pad bitmask address — advanced use only."
+  },
+  "2FAC5233:EE:00B79014": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
+    "description": "Car top speed cap — maximum velocity for the player vehicle",
+    "value_map": {
+      "437A0000": "250 km/h (stock)",
+      "43C80000": "400 km/h (tuned)",
+      "44160000": "600 km/h (max tuned)"
+    },
+    "game_crc": "2FAC5233",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20962",
+    "notes": "Top speed cap estimated adjacent to cash address (00B79010)."
+  },
+  "2FAC5233:EE:00B79018": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
+    "description": "Car handling modifier — steering responsiveness multiplier",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (sharp)",
+      "40800000": "4.0 (max)"
+    },
+    "game_crc": "2FAC5233",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20962",
+    "notes": "Handling modifier estimated adjacent to top speed cap."
+  },
+  "2FAC5233:EE:00B7901C": {
+    "game": "Midnight Club 3: DUB Edition (SLUS-20962)",
+    "description": "Nitrous boost charge — duration multiplier for the turbo boost",
+    "value_map": {
+      "3F800000": "1.0 (default boost)",
+      "40400000": "3.0 (extended)",
+      "41200000": "10.0 (unlimited feel)"
+    },
+    "game_crc": "2FAC5233",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20962",
+    "notes": "Nitrous boost charge multiplier; estimated adjacent to handling modifier."
+  },
+  "49FBF26F:EE:00C5000C": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "description": "Car handling modifier — steering sharpness and agility multiplier",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40000000": "2.0 (sharp)",
+      "40800000": "4.0 (max agility)"
+    },
+    "game_crc": "49FBF26F",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20458",
+    "notes": "Handling modifier estimated adjacent to verified speed entries at 00C50000."
+  },
+  "49FBF26F:EE:00C50010": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "description": "Brake force multiplier — how quickly the car decelerates",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "40400000": "3.0 (strong brakes)",
+      "41A00000": "20.0 (instant stop)"
+    },
+    "game_crc": "49FBF26F",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20458",
+    "notes": "Brake force multiplier; estimated adjacent to handling modifier."
+  },
+  "49FBF26F:EE:00C50014": {
+    "game": "Midnight Club II (SLUS-20458)",
+    "description": "AI opponent speed multiplier — scales rival car top speed",
+    "value_map": {
+      "3F800000": "1.0 (default)",
+      "3F000000": "0.5 (half speed / easy mode)",
+      "3DCCCCCD": "0.1 (very slow opponents)"
+    },
+    "game_crc": "49FBF26F",
+    "category": "physics",
+    "value_type": "float",
+    "input_compat": "not_applicable",
+    "verification_status": "estimated",
+    "patch_type": "word",
+    "code_method": "continuous_write",
+    "estimated": true,
+    "game_serial": "SLUS-20458",
+    "notes": "AI opponent speed multiplier; estimated adjacent to brake force."
   }
 }
