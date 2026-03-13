@@ -18679,5 +18679,415 @@
     "game_crcs": [
       "2B3CF29C"
     ]
+  },
+  {
+    "id": "cheats_cool_boarders_2001",
+    "name": "Cool Boarders 2001 — PCSX2 Cheat DB",
+    "description": "Community cheats for Cool Boarders 2001 (SCUS-97108) — via PCSX2 cheat database.",
+    "game": "Cool Boarders 2001",
+    "game_serial": "SCUS-97108",
+    "game_crcs": [
+      "0993962D"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/0993962D.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "snowboarding",
+      "sports",
+      "extreme-sports"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_fifa_soccer_2005",
+    "name": "FIFA Soccer 2005 — PCSX2 Cheat DB",
+    "description": "Community cheats for FIFA Soccer 2005 (SLUS-21051) — via PCSX2 cheat database.",
+    "game": "FIFA Soccer 2005",
+    "game_serial": "SLUS-21051",
+    "game_crcs": [
+      "972611BB"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/972611BB.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "soccer",
+      "sports",
+      "fifa"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_grand_theft_auto_liberty_city_stories",
+    "name": "Grand Theft Auto: Liberty City Stories — PCSX2 Cheat DB",
+    "description": "Community cheats for Grand Theft Auto: Liberty City Stories (SLUS-21423) — via PCSX2 cheat database.",
+    "game": "Grand Theft Auto: Liberty City Stories",
+    "game_serial": "SLUS-21423",
+    "game_crcs": [
+      "0000C5AB"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/0000C5AB.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "action",
+      "open-world",
+      "gta"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_grandia_xtreme",
+    "name": "Grandia Xtreme — PCSX2 Cheat DB",
+    "description": "Community cheats for Grandia Xtreme (SLUS-20417) — via PCSX2 cheat database.",
+    "game": "Grandia Xtreme",
+    "game_serial": "SLUS-20417",
+    "game_crcs": [
+      "8C4A4146"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/8C4A4146.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "rpg",
+      "action-rpg",
+      "grandia"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_heroes_of_the_pacific",
+    "name": "Heroes of the Pacific — PCSX2 Cheat DB",
+    "description": "Community cheats for Heroes of the Pacific (SLUS-20943) — via PCSX2 cheat database.",
+    "game": "Heroes of the Pacific",
+    "game_serial": "SLUS-20943",
+    "game_crcs": [
+      "83FB515E"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/83FB515E.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "flight-sim",
+      "action",
+      "wwii"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_kinetica",
+    "name": "Kinetica — PCSX2 Cheat DB",
+    "description": "Community cheats for Kinetica (SCUS-97132) — via PCSX2 cheat database.",
+    "game": "Kinetica",
+    "game_serial": "SCUS-97132",
+    "game_crcs": [
+      "D39C08F5"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/D39C08F5.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "racing",
+      "futuristic",
+      "sports"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_knockout_kings_2002",
+    "name": "Knockout Kings 2002 — PCSX2 Cheat DB",
+    "description": "Community cheats for Knockout Kings 2002 (SLUS-20369) — via PCSX2 cheat database.",
+    "game": "Knockout Kings 2002",
+    "game_serial": "SLUS-20369",
+    "game_crcs": [
+      "36FEEE3A"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/36FEEE3A.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "boxing",
+      "sports",
+      "fighting"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_mlb_slugfest_2006",
+    "name": "MLB Slugfest 2006 — PCSX2 Cheat DB",
+    "description": "Community cheats for MLB Slugfest 2006 (SLUS-21342) — via PCSX2 cheat database.",
+    "game": "MLB Slugfest 2006",
+    "game_serial": "SLUS-21342",
+    "game_crcs": [
+      "F6D977AE"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/F6D977AE.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "baseball",
+      "sports",
+      "mlb"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_marvel_vs_capcom_2",
+    "name": "Marvel vs. Capcom 2 — PCSX2 Cheat DB",
+    "description": "Community cheats for Marvel vs. Capcom 2 (SLUS-20486) — via PCSX2 cheat database.",
+    "game": "Marvel vs. Capcom 2",
+    "game_serial": "SLUS-20486",
+    "game_crcs": [
+      "4D228733"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/4D228733.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "fighting",
+      "2d-fighter",
+      "marvel",
+      "capcom"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_outlaw_tennis",
+    "name": "Outlaw Tennis — PCSX2 Cheat DB",
+    "description": "Community cheats for Outlaw Tennis (SLUS-21190) — via PCSX2 cheat database.",
+    "game": "Outlaw Tennis",
+    "game_serial": "SLUS-21190",
+    "game_crcs": [
+      "61692A69"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/61692A69.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "tennis",
+      "sports",
+      "arcade"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_primal",
+    "name": "Primal — PCSX2 Cheat DB",
+    "description": "Community cheats for Primal (SCUS-97142) — via PCSX2 cheat database.",
+    "game": "Primal",
+    "game_serial": "SCUS-97142",
+    "game_crcs": [
+      "FCD89DC3"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/FCD89DC3.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "action-adventure",
+      "fantasy",
+      "third-person"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_rtx_red_rock",
+    "name": "RTX Red Rock — PCSX2 Cheat DB",
+    "description": "Community cheats for RTX Red Rock (SLUS-20491) — via PCSX2 cheat database.",
+    "game": "RTX Red Rock",
+    "game_serial": "SLUS-20491",
+    "game_crcs": [
+      "E349C1D4"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/E349C1D4.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "action",
+      "third-person-shooter",
+      "sci-fi"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_savage_skies",
+    "name": "Savage Skies — PCSX2 Cheat DB",
+    "description": "Community cheats for Savage Skies (SLUS-20430) — via PCSX2 cheat database.",
+    "game": "Savage Skies",
+    "game_serial": "SLUS-20430",
+    "game_crcs": [
+      "D195B670"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/D195B670.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "flight",
+      "action",
+      "arcade"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_speed_kings",
+    "name": "Speed Kings — PCSX2 Cheat DB",
+    "description": "Community cheats for Speed Kings (SLUS-20584) — via PCSX2 cheat database.",
+    "game": "Speed Kings",
+    "game_serial": "SLUS-20584",
+    "game_crcs": [
+      "C90920FC"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/C90920FC.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "racing",
+      "motorcycles",
+      "sports"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_the_italian_job",
+    "name": "The Italian Job — PCSX2 Cheat DB",
+    "description": "Community cheats for The Italian Job (SLUS-20784) — via PCSX2 cheat database.",
+    "game": "The Italian Job",
+    "game_serial": "SLUS-20784",
+    "game_crcs": [
+      "A74B4C3D"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/A74B4C3D.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "racing",
+      "action",
+      "driving"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_thrillville",
+    "name": "Thrillville — PCSX2 Cheat DB",
+    "description": "Community cheats for Thrillville (SLUS-21413) — via PCSX2 cheat database.",
+    "game": "Thrillville",
+    "game_serial": "SLUS-21413",
+    "game_crcs": [
+      "A4315184"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/A4315184.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "simulation",
+      "theme-park",
+      "management"
+    ],
+    "is_hub": false,
+    "nsfw": false
+  },
+  {
+    "id": "cheats_tony_hawks_project_8",
+    "name": "Tony Hawk's Project 8 — PCSX2 Cheat DB",
+    "description": "Community cheats for Tony Hawk's Project 8 (SLUS-21444) — via PCSX2 cheat database.",
+    "game": "Tony Hawk's Project 8",
+    "game_serial": "SLUS-21444",
+    "game_crcs": [
+      "D4D7B720"
+    ],
+    "direct_download_url": "https://raw.githubusercontent.com/PCSX2/pcsx2/master/bin/resources/cheats_ni/D4D7B720.pnach",
+    "download_action": "",
+    "source": "PCSX2 CheatDB",
+    "author": "PCSX2 Community",
+    "author_url": "https://github.com/PCSX2/pcsx2",
+    "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/resources/cheats_ni",
+    "type": "cheat",
+    "tags": [
+      "skateboarding",
+      "sports",
+      "extreme-sports",
+      "tony-hawk"
+    ],
+    "is_hub": false,
+    "nsfw": false
   }
 ]
