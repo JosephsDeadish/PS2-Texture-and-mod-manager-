@@ -335,6 +335,8 @@ _KNOWN_SERIALS: dict[str, str] = {
     # Family / Action-Adventure
     "SLUS-21228": "Eragon",
     "SLES-54053": "Eragon (PAL)",
+    "SLUS-21238": "Neopets: The Darkest Fairy",
+    "SCES-54023": "Neopets: The Darkest Fairy (PAL)",
 
     # Simulation / Strategy
     "SLUS-21102": "The Sims 2",
@@ -345,6 +347,81 @@ _KNOWN_SERIALS: dict[str, str] = {
     # Sports
     "SLUS-21024": "WWE SmackDown! vs. RAW 2006",
     "SLUS-21497": "WWE SmackDown! vs. RAW 2008",
+    "SLUS-20787": "WWE SmackDown! Here Comes the Pain",
+    "SLUS-20427": "WWE SmackDown! Shut Your Mouth",
+    "SLUS-20901": "WWE SmackDown! vs. RAW",
+    "SLUS-20415": "NBA Street Vol. 2",
+    "SLUS-20915": "NBA Street Vol. 3",
+    "SCUS-97123": "Hot Shots Golf 3",
+    "SCUS-97216": "ATV Off-Road Fury 2",
+    "SCUS-97334": "ATV Off-Road Fury 3",
+    "SCUS-97470": "ATV Off-Road Fury 4",
+
+    # Action / Open World
+    "SLUS-20671": "Mafia",
+    "SLUS-20853": "Manhunt",
+    "SLUS-21179": "Indigo Prophecy",
+
+    # Action / Combat
+    "SLUS-20776": "Spider-Man 2",
+    "SLUS-21262": "Ultimate Spider-Man",
+    "SLUS-20492": "Contra: Shattered Soldier",
+    "SLUS-20765": "Resident Evil Outbreak",
+    "SLUS-21243": "Resident Evil Outbreak File #2",
+
+    # Skateboarding / Sports Action
+    "SLUS-20782": "Tony Hawk's Underground",
+    "SLUS-21256": "Tony Hawk's American Wasteland",
+    "SCUS-97731": "Tony Hawk's Project 8",
+
+    # Platform
+    "SLUS-20683": "SpongeBob SquarePants: Battle for Bikini Bottom",
+    "SLUS-20685": "Ape Escape 2",
+    "SCUS-97501": "Ape Escape 3",
+
+    # Mecha / Action
+    "SLUS-20392": "Armored Core 3",
+    "SLUS-20715": "Armored Core: Silent Line",
+    "SLUS-20938": "Armored Core: Nexus",
+    "SLUS-21456": "Armored Core: Last Raven",
+
+    # Racing
+    "SLUS-21242": "Burnout Revenge",
+    "SLUS-20462": "Burnout 3: Takedown",
+
+    # JRPG / RPG
+    "SLUS-20048": "Grandia II",
+    "SLUS-21516": "Grandia III",
+    "SLUS-21430": "Ar tonelico: Melody of Elemia",
+    "SLUS-21765": "Ar tonelico II: Melody of Metafalica",
+    "SLUS-21667": "Soul Nomad & the World Eaters",
+    "SLUS-21174": "We Love Katamari",
+    "SLUS-21171": "Haunting Ground",
+    "SLUS-20981": "Viewtiful Joe",
+    "SLUS-21065": "Viewtiful Joe 2",
+    "SLUS-20854": "Shadow Hearts: Covenant",
+    "SLUS-21266": "Shadow Hearts: From the New World",
+    "SLUS-20743": "Arc the Lad: Twilight of the Spirits",
+    "SLUS-20892": "Xenosaga Episode II",
+    "SLUS-21382": "Xenosaga Episode III",
+    "SLUS-21033": "Tales of Symphonia",
+    "SLUS-21858": "Tales of Legendia",
+    "SLUS-20858": "Tales of Destiny",
+    "SLUS-21023": "Wild Arms: Alter Code F",
+    "SLUS-21383": "Wild Arms 4",
+    "SLUS-21749": "Wild Arms 5",
+    "SLUS-20292": "Suikoden III",
+    "SLUS-20895": "Suikoden IV",
+    "SLUS-21354": "Persona 3",
+    "SLUS-20443": "Devil May Cry 2",
+    "SLUS-21216": "Devil May Cry 3: Special Edition",
+    "SLUS-20216": "Zone of the Enders",
+    "SLUS-20553": "Zone of the Enders: The 2nd Runner",
+    "SLUS-21060": "Fatal Frame",
+    "SLUS-20825": "Fatal Frame II: Crimson Butterfly",
+    "SLUS-21161": "Fatal Frame III: The Tormented",
+    "SLUS-20519": "Baldur's Gate: Dark Alliance",
+    "SLUS-20846": "Baldur's Gate: Dark Alliance II",
 
     # ── Europe — PAL (SLES / SCES) ────────────────────────────────────────────
 
@@ -599,6 +676,90 @@ _KNOWN_SERIALS: dict[str, str] = {
     "SLPS-25387": "Winning Eleven 9 (JP)",
     "SLPM-66069": "Romance of the Three Kingdoms XI (JP)",
     "SLPM-66413": "Valkyria Chronicles (JP)",
+
+    # ── Additional US serials for cover-art entries ───────────────────────────
+
+    # Action / Adventure
+    "SCUS-97481": "God of War II",
+    "SLUS-20785": "Metal Gear Solid 3: Snake Eater",
+    "SLUS-20144": "Metal Gear Solid 2: Sons of Liberty",
+
+    # RPG
+    "SLUS-21819": "Persona 4",
+    "SLUS-21115": "Okami",
+    "SLUS-21207": "Dragon Quest VIII: Journey of the Cursed King",
+    "SLUS-20461": "Xenosaga Episode I: Der Wille zur Macht",
+    "SLUS-21386": "Tales of the Abyss",
+    "SLUS-20734": "Star Ocean: Till the End of Time",
+    "SLUS-21299": "Valkyrie Profile 2: Silmeria",
+    "SLUS-21652": "Ar tonelico: Melody of Elemia",
+    "SLUS-21720": "Soul Nomad and the World Eaters",
+    "SLUS-21281": "Grandia III",
+
+    # Platform / Action
+    "SCUS-97490": "Rogue Galaxy",
+    "SLUS-20816": "Sly 2: Band of Thieves",
+    "SLUS-20518": "Crash Bandicoot: The Wrath of Cortex",
+    "SCUS-97213": "Dark Cloud 2",
+    "SLUS-21435": "We Love Katamari",
+    "SLUS-20108": "Spyro: Enter the Dragonfly",
+
+    # Horror / Action
+    "SLUS-20934": "Fatal Frame II: Crimson Butterfly",
+    "SLUS-20827": "Manhunt",
+    "SLUS-21181": "Indigo Prophecy",
+
+    # Mech / Sci-fi
+    "SLUS-20355": "Armored Core 3",
+
+    # Open World
+    "SLUS-20069": "Grand Theft Auto III",
+
+    # Japan-only
+    "SLPS-25563": "Tales of Symphonia (JP)",
+
+    # Shooter / Action
+    "SLUS-20568": "Contra: Shattered Soldier",
+
+    # ── Additional serials for texture/PNACH/save catalogue entries ──────────
+
+    # Action RPG
+    "SLUS-20707": "Drakengard",
+    "SLUS-21134": "Drakengard 2",
+
+    # Shoot-em-up
+    "SLUS-21080": "Gradius V",
+
+    # Horror
+    "SLUS-20700": "Forbidden Siren",
+    "SLES-53853": "Forbidden Siren 2 (PAL)",
+
+    # Open World
+    "SLUS-21590": "Grand Theft Auto: Vice City Stories",
+
+    # Action Adventure
+    "SLUS-20959": "Beyond Good & Evil",
+
+    # Shooter
+    "SLUS-20898": "Star Wars: Battlefront",
+
+    # Racing
+    "SLUS-20489": "Burnout 2: Point of Impact",
+
+    # Sports / Wrestling
+    "SLUS-21302": "WWE SmackDown! vs. RAW 2006",
+    "SLUS-21424": "WWE SmackDown vs. RAW 2007",
+
+    # Platform
+    "SLUS-21282": "Ape Escape 3",
+    "SLUS-21372": "The Legend of Spyro: A New Beginning",
+    "SCES-02705": "Crash Bash (PAL)",
+
+    # Action
+    "SLUS-21322": "Viewtiful Joe: Red Hot Rumble",
+
+    # Racing
+    "SCUS-97328": "Gran Turismo 4",
 }
 # fmt: on
 

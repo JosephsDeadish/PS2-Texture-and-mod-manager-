@@ -6,6 +6,7 @@ from typing import List
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import (
+    QCheckBox,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -140,9 +141,20 @@ class ModPanel(BasePanel):
         updates_btn.clicked.connect(self._check_updates)
         toolbar.addWidget(updates_btn)
 
+        # PNACH Code Builder button — only visible on PNACH panel
+        if self.mod_type == ModType.PNACH:
+            builder_btn = QPushButton("🧩 Build from DB")
+            builder_btn.setToolTip(
+                "Open the PNACH Code Builder — select effects from the known-address\n"
+                "database for your game and generate a merged .pnach file"
+            )
+            builder_btn.setObjectName("primary_btn")
+            builder_btn.clicked.connect(self._open_code_builder)
+            toolbar.addWidget(builder_btn)
+
         content.addLayout(toolbar)
 
-        # ---- Author filter row ----
+        # ---- Author + library filter row ----
         author_row = QHBoxLayout()
         author_row.setSpacing(6)
 
@@ -161,6 +173,16 @@ class ModPanel(BasePanel):
         refresh_authors_btn.setToolTip("Refresh author list")
         refresh_authors_btn.clicked.connect(self._refresh_author_filter)
         author_row.addWidget(refresh_authors_btn)
+
+        # Game library filter — only show mods for games you own
+        self._library_filter_check = QCheckBox("🎮 My Library Only")
+        self._library_filter_check.setToolTip(
+            "Show only mods whose game serial matches a disc image\n"
+            "in your Game Library folder (configure in Settings)."
+        )
+        self._library_filter_check.setStyleSheet("color: #80b0ff; font-size: 12px;")
+        self._library_filter_check.stateChanged.connect(self._apply_filter)
+        author_row.addWidget(self._library_filter_check)
 
         author_row.addStretch()
 
@@ -230,6 +252,7 @@ class ModPanel(BasePanel):
     def _apply_filter(self):
         query = self._search.text().lower()
         author_filter = self._author_filter.currentData() or ""
+        library_only = self._library_filter_check.isChecked()
         mods = self.db.by_type(self.mod_type)
         sort_idx = self._sort_combo.currentIndex()
 
@@ -244,6 +267,17 @@ class ModPanel(BasePanel):
 
         if author_filter:
             mods = [m for m in mods if m.author == author_filter]
+
+        if library_only:
+            lib_serials = self._get_library_serials()
+            if lib_serials:
+                mods = [
+                    m for m in mods
+                    if m.game_id and m.game_id.upper() in lib_serials
+                ]
+            # If library is empty / unset, show nothing to avoid confusion
+            else:
+                mods = []
 
         sort_keys = [
             lambda m: m.name.lower(),
@@ -418,6 +452,21 @@ class ModPanel(BasePanel):
         else:
             self.navigate_to_author_type.emit(author, target_type)
 
+    def _get_library_serials(self) -> frozenset:
+        """Return the set of game serials detected in the configured game library.
+
+        Returns an empty frozenset if no library path is configured or no
+        disc images with recognisable serials are found.
+        """
+        path = getattr(self.config, "game_library_path", "")
+        if not path:
+            return frozenset()
+        try:
+            from src.core.game_library import get_library_serials
+            return get_library_serials(path)
+        except Exception:
+            return frozenset()
+
     def _filter_by_author(self, author: str):
         """Set the author filter dropdown to *author* and refresh the list."""
         idx = self._author_filter.findData(author)
@@ -487,16 +536,59 @@ class ModPanel(BasePanel):
 
     def _show_conflicts(self):
         conflicts = self.manager.detect_conflicts(self.mod_type)
-        if not conflicts:
+        pnach_conflicts = []
+        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+            try:
+                pnach_conflicts = self.manager.detect_pnach_conflicts(self.mod_type)
+            except Exception:
+                pass
+
+        if not conflicts and not pnach_conflicts:
             QMessageBox.information(
                 self, "No Conflicts", "No conflicts detected between enabled mods! ✅"
             )
             return
-        dlg = ConflictDialog(conflicts, self.db, self)
+        dlg = ConflictDialog(conflicts, self.db, self, pnach_conflicts=pnach_conflicts)
         dlg.exec()
         self._apply_filter()
 
-    def _check_updates(self):
+    def _open_code_builder(self):
+        """Open the PNACH Code Builder dialog for the current game context."""
+        from src.ui.widgets import PnachCodeBuilderDialog
+        from src.core.config_manager import AppConfig
+
+        # Try to determine cheats dir from config
+        cheats_dir = ""
+        try:
+            cfg = AppConfig.load()
+            pcsx2_root = cfg.pcsx2_path or ""
+            if pcsx2_root:
+                from src.core.pcsx2_layout import detect_pcsx2_subfolders
+                paths = detect_pcsx2_subfolders(pcsx2_root)
+                cheats_dir = paths.get("pnach_path", "")
+        except Exception:
+            pass
+
+        # Try to pre-fill the game serial from the current library filter
+        serial = ""
+        try:
+            if hasattr(self, '_library_filter_check') and self._library_filter_check.isChecked():
+                # Get currently shown mods and infer serial from them
+                mods = self.manager.list_mods(self.mod_type)
+                enabled_serials = {m.game_id for m in mods if m.enabled and m.game_id}
+                if len(enabled_serials) == 1:
+                    serial = enabled_serials.pop()
+        except Exception:
+            pass
+
+        dlg = PnachCodeBuilderDialog(
+            game_serial=serial,
+            cheats_dir=cheats_dir,
+            parent=self,
+        )
+        dlg.exec()
+
+
         """
         Run the update checker for all mods in this panel that have a source URL.
         Results are shown in a summary dialog; mods with available updates get an

@@ -840,6 +840,76 @@ class ModManager:
 
         return shadowed
 
+    def resolve_conflict(
+        self,
+        conflict: ConflictInfo,
+        winner_id: str,
+    ) -> bool:
+        """
+        Resolve a conflict by giving *winner_id* a higher priority than the
+        other mod in the conflict pair.
+
+        Returns ``True`` if the resolution was applied, ``False`` if either
+        mod is not found in the database.
+        """
+        loser_id = (
+            conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
+        )
+        winner = self.db.get(winner_id)
+        loser = self.db.get(loser_id)
+        if not winner or not loser:
+            return False
+        winner.priority = max(winner.priority, loser.priority) + 1
+        self.db.update(winner)
+        return True
+
+    def resolve_conflict_disable_loser(
+        self,
+        conflict: ConflictInfo,
+        winner_id: str,
+    ) -> bool:
+        """
+        Resolve a conflict by **disabling** the losing mod entirely.
+
+        Returns ``True`` if the resolution was applied, ``False`` if either
+        mod is not found.
+        """
+        loser_id = (
+            conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
+        )
+        loser = self.db.get(loser_id)
+        if not loser:
+            return False
+        loser.enabled = False
+        self.db.update(loser)
+        return True
+
+    def summary_for_game(self, serial: str) -> dict:
+        """
+        Return a summary dict for the given PS2 game serial containing:
+        ``total``, ``enabled``, ``disabled``, ``conflicts`` counts,
+        and ``mods`` (list of ModInfo).
+
+        Useful for the Library panel and dashboard game-specific views.
+        """
+        serial = (serial or "").upper()
+        mods = [m for m in self.db.all() if (m.game_id or "").upper() == serial]
+        enabled = [m for m in mods if m.enabled]
+        disabled = [m for m in mods if not m.enabled]
+        conflicts = self.detect_conflicts()
+        mod_ids = {m.id for m in mods}
+        game_conflicts = [
+            c for c in conflicts
+            if c.mod_a_id in mod_ids or c.mod_b_id in mod_ids
+        ]
+        return {
+            "total": len(mods),
+            "enabled": len(enabled),
+            "disabled": len(disabled),
+            "conflicts": len(game_conflicts),
+            "mods": mods,
+        }
+
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------

@@ -22,6 +22,7 @@ from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.browse_panel import BrowsePanel
 from src.ui.dashboard import DashboardPanel
+from src.ui.library_panel import LibraryPanel
 from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow):
         nav_items = [
             ("🏠", "Dashboard"),
             ("🌐", "Browse"),
+            ("🎮", "My Library"),
             ("🎨", "Texture Packs"),
             ("🔧", "PNACH Patches"),
             ("🖼️", "Cover Art"),
@@ -164,32 +166,36 @@ class MainWindow(QMainWindow):
         self._browse_panel.set_db(self.db)
         self._stack.addWidget(self._browse_panel)       # index 1
 
+        self._library_panel = LibraryPanel(self.db, self.config)
+        self._library_panel.browse_game.connect(self._on_library_browse_game)
+        self._stack.addWidget(self._library_panel)      # index 2
+
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
-        self._stack.addWidget(self._texture_panel)      # index 2
+        self._stack.addWidget(self._texture_panel)      # index 3
 
         self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config)
-        self._stack.addWidget(self._pnach_panel)        # index 3
+        self._stack.addWidget(self._pnach_panel)        # index 4
 
         self._cover_panel = ModPanel(ModType.COVER_ART, self.db, self.config)
-        self._stack.addWidget(self._cover_panel)        # index 4
+        self._stack.addWidget(self._cover_panel)        # index 5
 
         self._memcard_panel = MemoryCardPanel(self.config)
-        self._stack.addWidget(self._memcard_panel)      # index 5
+        self._stack.addWidget(self._memcard_panel)      # index 6
 
         self._cheat_panel = ModPanel(ModType.CHEAT, self.db, self.config)
-        self._stack.addWidget(self._cheat_panel)        # index 6
+        self._stack.addWidget(self._cheat_panel)        # index 7
 
         self._settings_panel = SettingsPanel(self.config)
         self._settings_panel.settings_saved.connect(self._on_settings_saved)
         self._settings_panel.rerun_wizard.connect(self._run_wizard)
-        self._stack.addWidget(self._settings_panel)     # index 7
+        self._stack.addWidget(self._settings_panel)     # index 8
 
         # Wire cross-panel "see more by author" navigation
         _panel_nav_index = {
-            ModType.TEXTURE_PACK: 2,
-            ModType.PNACH: 3,
-            ModType.COVER_ART: 4,
-            ModType.CHEAT: 6,
+            ModType.TEXTURE_PACK: 3,
+            ModType.PNACH: 4,
+            ModType.COVER_ART: 5,
+            ModType.CHEAT: 7,
         }
         for panel in (
             self._texture_panel,
@@ -212,6 +218,7 @@ class MainWindow(QMainWindow):
             self._memcard_panel,
             self._cheat_panel,
             self._browse_panel,
+            self._library_panel,
             self._settings_panel,
         ):
             panel.status_message.connect(self._show_status)
@@ -257,6 +264,13 @@ class MainWindow(QMainWindow):
     # Handlers
     # ------------------------------------------------------------------
 
+    def _on_library_browse_game(self, serial: str):
+        """Navigate to the Browse panel and pre-filter by *serial*."""
+        self._activate_nav(1)  # Browse is at index 1
+        if hasattr(self._browse_panel, "filter_by_serial"):
+            self._browse_panel.filter_by_serial(serial)
+        self._show_status(f"Browsing catalogue for {serial}")
+
     def _on_settings_saved(self, config: AppConfig):
         self.config = config
         self._dashboard.config = config
@@ -266,6 +280,7 @@ class MainWindow(QMainWindow):
         self._memcard_panel.config = config
         self._cheat_panel.config = config
         self._browse_panel.config = config
+        self._library_panel.config = config
         self._dashboard.refresh()
 
     def _show_status(self, msg: str):
@@ -328,4 +343,8 @@ class MainWindow(QMainWindow):
                     panel._apply_filter()
                 except Exception:
                     pass
+            try:
+                self._library_panel.refresh()
+            except Exception:
+                pass
 

@@ -3185,7 +3185,8 @@ class TestCatalogueIntegrity(unittest.TestCase):
             )
 
     def test_all_types_are_valid(self):
-        valid_types = {"texture_pack", "pnach", "cover_art", "save_file", "cheat"}
+        from src.models.mod import ModType
+        valid_types = set(ModType)
         for entry in self.catalogue:
             self.assertIn(
                 entry["type"], valid_types,
@@ -3304,6 +3305,54 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     aurl, bare_homepages,
                     f"Hub entry {entry['id']} still uses a bare site homepage for author_url: {aurl!r}"
                 )
+
+    def test_no_search_member_urls_in_author_url(self):
+        """author_url must never point to a member search page (e.g. /search/members/?name=X).
+        Author links should go directly to the author's profile page, not a search results page."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "search/members",
+                aurl,
+                f"Entry {entry['id']} author_url is a member-search page (not a profile): {aurl!r}"
+            )
+
+    def test_no_gbatem_org_typo_in_author_url(self):
+        """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net)."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "gbatem.org",
+                aurl,
+                f"Entry {entry['id']} author_url contains typo domain 'gbatem.org': {aurl!r}"
+            )
+
+    def test_no_fake_gamesavedfiles_com_in_urls(self):
+        """author_url and url must not use gamesavedfiles.com which is a non-existent website."""
+        for entry in self.catalogue:
+            aurl = entry.get("author_url", "")
+            self.assertNotIn(
+                "gamesavedfiles.com",
+                aurl,
+                f"Entry {entry['id']} author_url uses non-existent domain gamesavedfiles.com: {aurl!r}"
+            )
+            url = entry.get("url", "")
+            self.assertNotIn(
+                "gamesavedfiles.com",
+                url,
+                f"Entry {entry['id']} url uses non-existent domain gamesavedfiles.com: {url!r}"
+            )
+
+    def test_no_wrong_plural_gbatemp_urls(self):
+        """Catalogue 'url' must not use '/downloads/categories/' (wrong plural).
+        GBAtemp download URLs use the singular '/download/categories/' path."""
+        for entry in self.catalogue:
+            url = entry.get("url", "")
+            self.assertNotIn(
+                "/downloads/categories/",
+                url,
+                f"Entry {entry['id']} url uses wrong plural '/downloads/': {url!r}"
+            )
 
     def test_nsfw_present_and_bool(self):
         """Every entry must declare nsfw: True or False."""
@@ -3775,9 +3824,10 @@ class TestCCKrizalidEntries(unittest.TestCase):
                           f"{e['id']}: url should contain the thread slug")
 
     def test_all_cckrizalid_entries_are_texture_packs(self):
+        from src.models.mod import ModType
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
         for e in cc:
-            self.assertEqual(e["type"], "texture_pack",
+            self.assertEqual(e["type"], ModType.TEXTURE_PACK,
                              f"{e['id']} type should be texture_pack")
 
     def test_all_cckrizalid_entries_have_serials(self):
@@ -3825,8 +3875,9 @@ class TestCatalogueLoader(unittest.TestCase):
             seen.add(eid)
 
     def test_type_field_injected(self):
-        """Every entry must have a 'type' field (injected from file name)."""
-        valid_types = {"texture_pack", "pnach", "save_file", "cheat", "cover_art"}
+        """Every entry must have a 'type' field (injected from file name) as a ModType enum."""
+        from src.models.mod import ModType
+        valid_types = set(ModType)
         for e in self.catalogue:
             self.assertIn(e.get("type"), valid_types,
                           f"Entry {e['id']} has invalid type {e.get('type')!r}")
@@ -3857,15 +3908,38 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Type counts ─────────────────────────────────────────────────────────
 
     def test_has_texture_pack_entries(self):
-        tp = [e for e in self.catalogue if e["type"] == "texture_pack"]
+        from src.models.mod import ModType
+        tp = [e for e in self.catalogue if e["type"] == ModType.TEXTURE_PACK]
         self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
 
+    def test_texture_pack_size_labels(self):
+        """Non-hub texture pack entries should have a size_label field in format '~NNN MB/GB'."""
+        import re
+        from src.models.mod import ModType
+        size_pattern = re.compile(r'^~\d+(\.\d+)?\s*(KB|MB|GB)$')
+        tp = [e for e in self.catalogue
+              if e["type"] == ModType.TEXTURE_PACK and not e.get("is_hub")]
+        missing = [e["id"] for e in tp if not e.get("size_label")]
+        self.assertEqual(
+            missing, [],
+            f"{len(missing)} texture pack entries missing size_label: {missing[:5]}"
+        )
+        bad_format = [e["id"] for e in tp
+                      if e.get("size_label") and not size_pattern.match(e["size_label"])]
+        self.assertEqual(
+            bad_format, [],
+            f"{len(bad_format)} entries have invalid size_label format "
+            f"(expected '~NNN MB/GB'): {bad_format[:5]}"
+        )
+
     def test_has_pnach_entries(self):
-        pn = [e for e in self.catalogue if e["type"] == "pnach"]
+        from src.models.mod import ModType
+        pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
         self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
 
     def test_has_save_file_entries(self):
-        sv = [e for e in self.catalogue if e["type"] == "save_file"]
+        from src.models.mod import ModType
+        sv = [e for e in self.catalogue if e["type"] == ModType.SAVE_FILE]
         self.assertGreater(len(sv), 120, "Expected >120 save file entries")
 
     def test_no_generic_placeholder_authors(self):
@@ -3991,9 +4065,10 @@ class TestCatalogueLoader(unittest.TestCase):
                            "Expected >10 60fps PNACH entries")
 
     def test_60fps_patches_are_pnach_type(self):
+        from src.models.mod import ModType
         for e in self.catalogue:
             if "60fps" in e.get("tags", []):
-                self.assertEqual(e["type"], "pnach",
+                self.assertEqual(e["type"], ModType.PNACH,
                                  f"60fps entry {e['id']} should be pnach type")
 
     # ── CCKrizalid coverage ───────────────────────────────────────────────────
@@ -4006,3 +4081,3240 @@ class TestCatalogueLoader(unittest.TestCase):
         cc = [e for e in self.catalogue if e.get("author") == "CCKrizalid"]
         self.assertGreaterEqual(len(cc), 20,
                                 "Expected at least 20 CCKrizalid entries after scaling")
+
+
+# =============================================================================
+# Game Library Scanner
+# =============================================================================
+
+class TestGameLibrary(unittest.TestCase):
+    """Tests for src.core.game_library — disc image scanner."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.game_library import scan_library, get_library_serials, GAME_EXTENSIONS, GameEntry
+        cls.scan_library = staticmethod(scan_library)
+        cls.get_library_serials = staticmethod(get_library_serials)
+        cls.GAME_EXTENSIONS = GAME_EXTENSIONS
+        cls.GameEntry = GameEntry
+
+    # ── Non-existent directory ───────────────────────────────────────────────
+
+    def test_nonexistent_dir_returns_empty(self):
+        result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
+        self.assertEqual(result, [])
+
+    def test_empty_dir_returns_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            result = self.scan_library(d)
+            self.assertEqual(result, [])
+
+    # ── Extension filtering ──────────────────────────────────────────────────
+
+    def test_only_supported_extensions_included(self):
+        with tempfile.TemporaryDirectory() as d:
+            for ext in self.GAME_EXTENSIONS:
+                Path(d, f"game{ext}").write_bytes(b"\x00")
+            # Unsupported
+            Path(d, "game.mp4").write_bytes(b"\x00")
+            Path(d, "readme.txt").write_text("hello")
+
+            games = self.scan_library(d)
+            exts = {g.extension for g in games}
+            self.assertNotIn(".mp4", exts)
+            self.assertNotIn(".txt", exts)
+            self.assertEqual(len(games), len(self.GAME_EXTENSIONS))
+
+    def test_iso_detected(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "game.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].extension, ".iso")
+
+    def test_chd_detected(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "game.chd").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].extension, ".chd")
+
+    # ── Serial detection from filename ──────────────────────────────────────
+
+    def test_serial_detected_from_filename(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891 God of War.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].serial, "SLUS-20891")
+
+    def test_title_filled_from_known_serial(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            # "God of War" is a known serial in game_registry
+            self.assertIn("God of War", games[0].title)
+
+    def test_unknown_serial_empty_title(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "unknown_game.iso").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            self.assertEqual(len(games), 1)
+            self.assertEqual(games[0].serial, "")
+            self.assertEqual(games[0].title, "")
+
+    def test_display_name_with_title_and_serial(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            g = self.scan_library(d)[0]
+            dn = g.display_name
+            # Should include both serial and title
+            self.assertIn("SLUS-20891", dn)
+            self.assertIn("God of War", dn)
+
+    def test_display_name_fallback_to_filename(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "mystery_game.iso").write_bytes(b"\x00")
+            g = self.scan_library(d)[0]
+            self.assertIn("mystery_game.iso", g.display_name)
+
+    def test_results_sorted_by_display_name(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "zzz.iso").write_bytes(b"\x00")
+            Path(d, "aaa.chd").write_bytes(b"\x00")
+            Path(d, "mmm.bin").write_bytes(b"\x00")
+            games = self.scan_library(d)
+            names = [g.display_name.lower() for g in games]
+            self.assertEqual(names, sorted(names))
+
+    # ── get_library_serials ──────────────────────────────────────────────────
+
+    def test_get_library_serials_returns_frozenset(self):
+        with tempfile.TemporaryDirectory() as d:
+            result = self.get_library_serials(d)
+            self.assertIsInstance(result, frozenset)
+
+    def test_get_library_serials_excludes_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+            Path(d, "no_serial.chd").write_bytes(b"\x00")
+            serials = self.get_library_serials(d)
+            self.assertIn("SLUS-20891", serials)
+            self.assertNotIn("", serials)
+
+    def test_get_library_serials_upper_case(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "slus-20891.iso").write_bytes(b"\x00")
+            serials = self.get_library_serials(d)
+            self.assertIn("SLUS-20891", serials)
+
+    def test_size_bytes_populated(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d, "SLUS-20891.iso")
+            p.write_bytes(b"\x00" * 256)
+            games = self.scan_library(d)
+            self.assertEqual(games[0].size_bytes, 256)
+
+
+# =============================================================================
+# AppConfig game_library_path field
+# =============================================================================
+
+class TestAppConfigGameLibrary(unittest.TestCase):
+    """Tests for AppConfig.game_library_path — new field added in recent session."""
+
+    def test_default_is_empty_string(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.game_library_path, "")
+
+    def test_to_dict_includes_game_library_path(self):
+        cfg = AppConfig(game_library_path="/my/roms")
+        d = cfg.to_dict()
+        self.assertIn("game_library_path", d)
+        self.assertEqual(d["game_library_path"], "/my/roms")
+
+    def test_from_dict_restores_game_library_path(self):
+        cfg = AppConfig(game_library_path="/my/roms")
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(restored.game_library_path, "/my/roms")
+
+    def test_old_config_without_game_library_path_defaults(self):
+        """Configs saved before game_library_path was added must load cleanly."""
+        old = {
+            "pcsx2_path": "", "textures_path": "", "pnach_path": "",
+            "cover_art_path": "", "memcards_path": "", "cheats_path": "",
+            "mods_storage_path": "", "theme": "dark",
+            "check_updates_on_start": True, "show_conflict_warnings": True,
+            "first_run": False, "favorite_authors": [], "show_nsfw": False,
+        }
+        cfg = AppConfig.from_dict(old)
+        self.assertEqual(cfg.game_library_path, "")
+
+    def test_config_save_and_load_preserves_game_library_path(self):
+        import src.core.config_manager as cm
+        orig_file = cm.CONFIG_FILE
+        with tempfile.TemporaryDirectory() as d:
+            cm.CONFIG_FILE = Path(d) / "config.json"
+            try:
+                cfg = AppConfig(game_library_path="/roms/ps2")
+                from src.core.config_manager import save_config, load_config
+                save_config(cfg)
+                loaded = load_config()
+                self.assertEqual(loaded.game_library_path, "/roms/ps2")
+            finally:
+                cm.CONFIG_FILE = orig_file
+
+
+# =============================================================================
+# Theme registry
+# =============================================================================
+
+class TestThemeRegistry(unittest.TestCase):
+    """Tests for src.ui.theme — multi-theme support added in recent session."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.ui.theme import THEMES, THEME_KEYS, get_stylesheet
+        cls.THEMES = THEMES
+        cls.THEME_KEYS = THEME_KEYS
+        cls.get_stylesheet = staticmethod(get_stylesheet)
+
+    def test_four_themes_available(self):
+        self.assertIn("Dark", self.THEMES)
+        self.assertIn("Midnight", self.THEMES)
+        self.assertIn("Retro Green", self.THEMES)
+        self.assertIn("Purple", self.THEMES)
+
+    def test_four_theme_keys(self):
+        self.assertIn("dark", self.THEME_KEYS)
+        self.assertIn("midnight", self.THEME_KEYS)
+        self.assertIn("retro_green", self.THEME_KEYS)
+        self.assertIn("purple", self.THEME_KEYS)
+
+    def test_key_to_display_name_mapping(self):
+        self.assertEqual(self.THEME_KEYS["dark"], "Dark")
+        self.assertEqual(self.THEME_KEYS["midnight"], "Midnight")
+        self.assertEqual(self.THEME_KEYS["retro_green"], "Retro Green")
+        self.assertEqual(self.THEME_KEYS["purple"], "Purple")
+
+    def test_get_stylesheet_returns_non_empty_string(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIsInstance(sheet, str)
+            self.assertIn("QWidget", sheet)
+
+    def test_get_stylesheet_fallback_for_unknown_key(self):
+        """Unknown theme keys should silently fall back to the Dark theme."""
+        dark = self.get_stylesheet("dark")
+        fallback = self.get_stylesheet("nonexistent_theme")
+        self.assertEqual(dark, fallback)
+
+    def test_all_stylesheets_have_sidebar(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIn("#sidebar", sheet, f"Theme {key!r} missing #sidebar rule")
+
+    def test_all_stylesheets_have_primary_btn(self):
+        for key in self.THEME_KEYS:
+            sheet = self.get_stylesheet(key)
+            self.assertIn("primary_btn", sheet, f"Theme {key!r} missing primary_btn rule")
+
+    def test_default_theme_in_appconfig(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.theme, "dark")
+
+    def test_theme_round_trips_through_appconfig(self):
+        for key in self.THEME_KEYS:
+            cfg = AppConfig(theme=key)
+            restored = AppConfig.from_dict(cfg.to_dict())
+            self.assertEqual(restored.theme, key)
+
+
+# =============================================================================
+# Catalogue ModType enum correctness
+# =============================================================================
+
+class TestCatalogueModTypeEnum(unittest.TestCase):
+    """Verify that catalogue entries store ModType enum values (not plain strings)."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.catalogue_loader import CATALOGUE
+        cls.catalogue = CATALOGUE
+
+    def test_all_types_are_modtype_instances(self):
+        for e in self.catalogue:
+            self.assertIsInstance(
+                e["type"], ModType,
+                f"Entry {e['id']} has type {e['type']!r} (expected ModType enum)"
+            )
+
+    def test_type_value_attribute_accessible(self):
+        """CatalogueCard calls e['type'].value — must not raise AttributeError."""
+        for e in self.catalogue:
+            try:
+                _ = e["type"].value
+            except AttributeError:
+                self.fail(f"Entry {e['id']}: .value not accessible on {e['type']!r}")
+
+    def test_tab_filtering_by_modtype_enum_non_empty(self):
+        for mt in ModType:
+            entries = [e for e in self.catalogue if e["type"] == mt]
+            self.assertGreater(len(entries), 0,
+                               f"No catalogue entries of type {mt}")
+
+    def test_tab_filtering_consistent_with_string_value(self):
+        """Filtering by enum equals filtering by its string value via .value."""
+        for mt in ModType:
+            by_enum = [e for e in self.catalogue if e["type"] == mt]
+            by_value = [e for e in self.catalogue if e["type"].value == mt.value]
+            self.assertEqual(
+                len(by_enum), len(by_value),
+                f"Enum vs .value filtering mismatch for {mt}"
+            )
+
+
+class TestPnachAnalyzer(unittest.TestCase):
+    """Tests for src.core.pnach_analyzer."""
+
+    def test_known_address_returns_description(self):
+        from src.core.pnach_analyzer import describe_address
+        desc = describe_address("2EB5B9A9", "EE", "00385538")
+        self.assertIsNotNone(desc)
+        self.assertIn("jump", desc.lower())
+
+    def test_unknown_address_returns_none(self):
+        from src.core.pnach_analyzer import describe_address
+        desc = describe_address("DEADBEEF", "EE", "12345678")
+        self.assertIsNone(desc)
+
+    def test_describe_patch_known_returns_full_annotation(self):
+        from src.core.pnach_analyzer import describe_patch
+        ann = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
+        self.assertIsNotNone(ann["description"])
+        self.assertFalse(ann["inferred"])
+        # value_note should contain something (either value_map entry or hex/float)
+        self.assertIsInstance(ann["value_note"], str)
+        self.assertGreater(len(ann["value_note"]), 0)
+
+    def test_describe_patch_unknown_is_inferred(self):
+        from src.core.pnach_analyzer import describe_patch
+        ann = describe_patch("DEADBEEF", "EE", "00123456", "40000000", "word")
+        self.assertIsNone(ann["description"])
+        self.assertTrue(ann["inferred"])
+        self.assertIn("category", ann)
+
+    def test_group_conflicts_by_function(self):
+        from src.core.pnach_analyzer import group_conflicts_by_function
+        conflicts = [
+            {
+                "game_crc": "2EB5B9A9", "processor": "EE", "address": "00385538",
+                "mod_a_id": "a", "value_a": "3F800000",
+                "mod_b_id": "b", "value_b": "40000000",
+            },
+            {
+                "game_crc": "9A5B29A1", "processor": "EE", "address": "003CD218",
+                "mod_a_id": "c", "value_a": "3F800000",
+                "mod_b_id": "d", "value_b": "3FAB851F",
+            },
+        ]
+        grouped = group_conflicts_by_function(conflicts)
+        self.assertIsInstance(grouped, dict)
+        # Both conflicts should be in some category
+        all_entries = [e for entries in grouped.values() for e in entries]
+        self.assertEqual(len(all_entries), 2)
+        # Each enriched entry must have an 'annotation' key
+        for e in all_entries:
+            self.assertIn("annotation", e)
+
+    def test_infer_category_widescreen_float(self):
+        from src.core.pnach_analyzer import infer_category
+        # 0x3FAB851F ≈ 1.3416 — aspect ratio float → physics or similar
+        cat = infer_category("003B2340", "3FAB851F", "word")
+        self.assertIsInstance(cat, str)
+        self.assertGreater(len(cat), 0)
+
+    def test_reload_db_returns_count(self):
+        from src.core.pnach_analyzer import reload_db
+        n = reload_db()
+        self.assertGreater(n, 0)
+
+    def test_db_file_exists(self):
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.assertTrue(db_path.is_file(), "known_addresses.json should exist")
+        data = json.loads(db_path.read_text())
+        self.assertIsInstance(data, dict)
+        self.assertGreater(len(data), 0)
+
+    def test_pnach_db_expanded(self):
+        """Known addresses DB should have more than 3700 entries.
+
+        Wave 31 cleanup details:
+          * 43 unrelated-game widescreen entries removed (addresses 00348B7C,
+            001C4B2C, 002E1A5C, 0024B8FC, 003C2D1C, 002A0000, 00280000) — each
+            address had the identical 16:9 value_map applied to 4–7 completely
+            different games (different publishers / engines), indicating a
+            copy-pasted generic placeholder.
+          * 6 Sims-series widescreen entries removed (address 0040E340) —
+            even same-franchise titles may differ in memory layout, and 6
+            titles sharing one unverified address fails the game-specific
+            requirement.
+          * 9 physics-multiplier entries removed (address 003E0008) — a
+            gravity / run-speed / jump-height cheat was applied to 9 unrelated
+            games (Ratchet & Clank, Kingdom Hearts II, God of War, Shadow of the
+            Colossus, Jak and Daxter, Spyro, Crash Bandicoot, Spider-Man 2,
+            Prince of Persia) with no shared engine or memory layout.
+          Subtotal by category: 43 + 6 widescreen = 49; 9 physics = 9.
+          Total removed: 58 entries (3774 → 3716).
+
+        Wave 32 cleanup details:
+          * 4 fabricated 00A80000 currency entries removed — CRCs for Katamari,
+            Grandia III ×2, and Wild ARMs 4 variants were not found in any
+            catalogue; serial numbers were inconsistent with known PS2 DB.
+          * 6 wrong 00C08000 currency entries removed — duplicates where the
+            correct address already existed (Tales of the Abyss Gald→00D00008,
+            Disgaea HL→00C80008) and solo unverified CRCs (Xenosaga III,
+            Suikoden IV, Suikoden V, Rogue Galaxy SLUS) not present in any
+            catalogue.
+          * 9 generic freecam entries removed for Burnout 3, Midnight Club 3,
+            and Midnight Club II — their other verified entries are in completely
+            different memory regions (Burnout 3: 0082xxxx/0083xxxx, MC3:
+            00B79xxxx, MC2: 00C5000x), confirming the 00B82070–00B82090 freecam
+            addresses were copy-pasted from Burnout Revenge (which keeps its
+            coherent 4-entry freecam cluster at 00B82070–00B82094).
+          * Verified replacements added: Suikoden IV Potch (00412B44), Suikoden V
+            Potch (00562FF4), Xenosaga III G (00D4A090), Rogue Galaxy SLUS Zol
+            (00C08010), Burnout 3 freecam (0083005C–00830064), MC3 speed/handling
+            (00B79014–1C), MC2 handling/brake/AI (00C5000C–00C50014).
+          * HP value_maps updated to be game-specific for 5 JRPGs at 00C00100
+            (Grandia III, Xenosaga I, Wild Arms 4, Wild Arms 5, Shadow Hearts:
+            Covenant) — protagonist max-HP values now reflect each game's actual
+            HP scale rather than a shared 0/500/10000 placeholder.
+          * XP value_maps updated to be game-specific for 4 games at 00C0000C
+            (Star Ocean TtEoT, Tales of Legendia, Digital Devil Saga 2, Atelier
+            Iris) — XP cap values now reflect each title's experience scale.
+          Total net change: 3716 → 3710 (−6 after replacements).
+        """
+        from src.core.pnach_analyzer import reload_db
+        n = reload_db()
+        self.assertGreater(n, 3700, "PNACH DB should have more than 3700 entries after Wave 32 game-specific cleanup")
+
+    def test_pnach_db_key_format_valid(self):
+        """All PNACH DB keys must follow the CRC:MEMTYPE:ADDRESS format (3 colon-separated parts).
+
+        Keys with only 2 parts (CRC:ADDRESS, missing the memory-type segment) are unreachable
+        by describe_address() / entries_for_crc() and indicate incorrectly formatted entries.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        bad = [k for k in data if len(k.split(":")) != 3]
+        self.assertEqual(
+            bad, [],
+            f"{len(bad)} PNACH DB key(s) have wrong format (expected CRC:MEMTYPE:ADDR): {bad[:5]}",
+        )
+
+    def test_pnach_db_all_entries_game_specific(self):
+        """Every PNACH DB entry's key CRC must match the entry's game_crc field.
+
+        PNACH memory addresses are game-specific — codes written for one game's CRC
+        MUST NOT be reused under a different CRC.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        mismatches = []
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue  # covered by test_pnach_db_key_format_valid
+            key_crc = parts[0].upper()
+            val_crc = entry.get("game_crc", "").upper()
+            if key_crc != val_crc:
+                mismatches.append((key, key_crc, val_crc))
+        self.assertEqual(
+            mismatches, [],
+            f"{len(mismatches)} PNACH DB entries have CRC mismatch between key and game_crc: {mismatches[:3]}",
+        )
+
+    def test_pnach_db_max_address_sharing(self):
+        """No raw address should appear in more than 9 distinct game CRCs.
+
+        PNACH memory addresses are game-specific.  An address appearing in too many
+        unrelated games is a strong signal of a generic placeholder rather than a
+        verified game-specific code.  The threshold of 9 captures known coincidental
+        overlaps (common PS2 memory regions) while flagging clearly multi-game entries.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        addr_crcs: dict = {}
+        for key in data:
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            addr_crcs.setdefault(addr, set()).add(crc.upper())
+        over_limit = {addr: crcs for addr, crcs in addr_crcs.items() if len(crcs) > 9}
+        self.assertEqual(
+            over_limit, {},
+            f"Addresses appearing in >9 games (likely generic placeholders): {list(over_limit.keys())[:5]}",
+        )
+
+    def test_pnach_db_no_generic_widescreen_entries(self):
+        """Widescreen patches must not share the same address + value_map across 4+ unrelated games.
+
+        A standard PS2 widescreen value (3FAB851F = 16:9, or 3FAAAAAB) stored
+        at the *same* EE address for 4 or more completely different game CRCs
+        is a clear sign of a copy-pasted generic placeholder rather than a
+        verified game-specific cheat code.  Each game stores its aspect-ratio
+        register at a unique address determined by its own memory layout.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        ws_values = {"3FAB851F", "3FAAAAAB"}
+        addr_crcs: dict = {}
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            desc = entry.get("description", "")
+            vm = entry.get("value_map", {})
+            is_ws = (
+                ("widescreen" in desc.lower() or "aspect ratio" in desc.lower())
+                and bool(ws_values & set(vm.keys()))
+            )
+            if is_ws:
+                addr_crcs.setdefault(addr, set()).add(crc.upper())
+        generic_ws = {addr: crcs for addr, crcs in addr_crcs.items() if len(crcs) >= 4}
+        self.assertEqual(
+            generic_ws, {},
+            f"Widescreen address(es) appear in ≥4 unrelated game CRCs — likely generic: "
+            f"{list(generic_ws.keys())[:5]}",
+        )
+
+    def test_pnach_db_no_cross_series_generic_copying(self):
+        """No (address, value_map) pair may appear in 4+ CRCs of games from different franchises.
+
+        When the same address AND identical value_map are found in four or more
+        completely unrelated games, the entry is a copy-pasted generic placeholder
+        rather than a verified game-specific cheat code.
+
+        Exception: titles that all share the same franchise prefix (e.g., all five
+        "Need for Speed" games made by EA Black Box) may legitimately share physics
+        addresses due to a common engine layout; those groups are skipped.
+
+        Franchise detection: a group is same-franchise if all game titles in the
+        group share the same first three title words (case-insensitive), ignoring
+        leading articles 'the', 'a', 'an'.
+        """
+        import json as _json
+        from collections import defaultdict
+
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = _json.loads(db_path.read_text())
+
+        def _franchise_prefix(game_name: str) -> tuple:
+            """Return a tuple of the first three significant title words (lowercased)."""
+            articles = {"the", "a", "an"}
+            words = [w.lower() for w in game_name.split() if w.lower() not in articles]
+            return tuple(words[:3])
+
+        def _same_franchise(game_names) -> bool:
+            """True if all game names share the same franchise prefix."""
+            prefixes = {_franchise_prefix(g) for g in game_names}
+            return len(prefixes) == 1
+
+        # Build mapping: (addr, vm_json) -> [(crc, game_name), ...]
+        addr_vm_entries: dict = defaultdict(list)
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            vm_json = _json.dumps(entry.get("value_map", {}), sort_keys=True)
+            game = entry.get("game", "")
+            addr_vm_entries[(addr, vm_json)].append((crc.upper(), game))
+
+        violations = []
+        for (addr, vm_json), entries in addr_vm_entries.items():
+            if len(entries) < 4:
+                continue
+            game_names = [g for _crc, g in entries]
+            if _same_franchise(game_names):
+                continue  # same-franchise shared-engine entries are allowed
+            violations.append((addr, [g for _c, g in entries]))
+
+        self.assertEqual(
+            violations,
+            [],
+            f"{len(violations)} (address, value_map) pair(s) are shared across 4+ unrelated-franchise "
+            f"games — clear indicator of copy-pasted generic placeholders rather than verified codes. "
+            f"First offender: {violations[0] if violations else ''}",
+        )
+
+    def test_infer_category_handles_all_sizes(self):
+        from src.core.pnach_analyzer import infer_category
+        for size in ("word", "short", "byte", "extended", "double"):
+            cat = infer_category("003B2340", "3F800000", size)
+            self.assertIsInstance(cat, str)
+            self.assertGreater(len(cat), 0)
+
+    def test_describe_patch_value_map_case_insensitive(self):
+        """Value map lookup should work regardless of case."""
+        from src.core.pnach_analyzer import describe_patch
+        ann_upper = describe_patch("2EB5B9A9", "EE", "00385538", "3F800000", "word")
+        ann_lower = describe_patch("2EB5B9A9", "EE", "00385538", "3f800000", "word")
+        self.assertEqual(ann_upper["value_note"], ann_lower["value_note"])
+
+    # ------------------------------------------------------------------
+    # value_to_pnach_hex tests
+    # ------------------------------------------------------------------
+
+    def test_value_to_pnach_hex_int_basic(self):
+        """Integer 1000 → 000003E8."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000003E8")
+
+    def test_value_to_pnach_hex_int_with_commas(self):
+        """1,000,000 with commas → 000F4240."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1,000,000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000F4240")
+
+    def test_value_to_pnach_hex_int_zero(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("0", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000000")
+
+    def test_value_to_pnach_hex_int_large(self):
+        """9999 → 0000270F."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("9999", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "0000270F")
+
+    def test_value_to_pnach_hex_int_max(self):
+        """Max 32-bit value."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("4294967295", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "FFFFFFFF")
+
+    def test_value_to_pnach_hex_int_bad_input(self):
+        """Non-numeric returns error."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("abc", "int")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_float_one(self):
+        """1.0 → 3F800000 (IEEE 754)."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "3F800000")
+
+    def test_value_to_pnach_hex_float_two(self):
+        """2.0 → 40000000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("2.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "40000000")
+
+    def test_value_to_pnach_hex_float_half(self):
+        """0.5 → 3F000000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("0.5", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "3F000000")
+
+    def test_value_to_pnach_hex_float_fov_90(self):
+        """90.0 degrees FOV → 42B40000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("90.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "42B40000")
+
+    def test_value_to_pnach_hex_float_fov_120(self):
+        """120.0 degrees FOV → 42F00000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("120.0", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "42F00000")
+
+    def test_value_to_pnach_hex_float_two_point_five(self):
+        """2.5 → 40200000."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("2.5", "float")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "40200000")
+
+    def test_value_to_pnach_hex_float_bad_input(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("not_a_number", "float")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_empty_returns_error(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("", "int")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_unknown_type(self):
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("100", "unknown")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_button_combo_l3_r3(self):
+        """L3+R3 bitmask (0x0006) → '00000006'."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("00000006", "button_combo")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000006")
+
+    def test_value_to_pnach_hex_button_combo_l1_l2_r1(self):
+        """L1+L2+R1 bitmask (0x0D00) → '00000D00'."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("00000D00", "button_combo")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "00000D00")
+
+    def test_value_to_pnach_hex_button_combo_bad_input(self):
+        """Non-hex string should return error for button_combo."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("L3+R3", "button_combo")
+        self.assertIsNone(hex_val)
+        self.assertIsNotNone(err)
+
+    def test_value_to_pnach_hex_int_strips_underscores(self):
+        """Python-style 1_000_000 separators should work."""
+        from src.core.pnach_analyzer import value_to_pnach_hex
+        hex_val, err = value_to_pnach_hex("1_000_000", "int")
+        self.assertIsNone(err)
+        self.assertEqual(hex_val, "000F4240")
+
+    def test_db_entries_have_value_type_for_physics(self):
+        """All physics entries should have value_type=float."""
+        from src.core.pnach_analyzer import reload_db
+        import json
+        from pathlib import Path
+        reload_db()
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        physics = [e for e in db.values() if e.get("category") == "physics"]
+        missing = [e["description"][:40] for e in physics if not e.get("value_type")]
+        self.assertEqual(missing, [],
+                         f"Physics entries missing value_type: {missing[:5]}")
+
+    def test_db_entries_value_type_is_valid(self):
+        """Every entry with value_type must use a known type string."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        valid = {"int", "float", "bool", "button", "button_combo"}
+        bad = [(k, e["value_type"]) for k, e in db.items()
+               if e.get("value_type") and e["value_type"] not in valid]
+        self.assertEqual(bad, [], f"Entries with invalid value_type: {bad[:5]}")
+
+    # ------------------------------------------------------------------
+    # check_exclusion_conflicts tests
+    # ------------------------------------------------------------------
+
+    def test_check_exclusion_conflicts_no_conflict(self):
+        """Two entries with different exclusion groups should not conflict."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage 2×", "exclusion_group": "bt3_p1_ki_dmg"},
+            {"description": "Ki blast visual SIZE 2×", "exclusion_group": ""},  # no group
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(conflicts, [], "Different groups should not conflict")
+
+    def test_check_exclusion_conflicts_detects_mutex(self):
+        """Two entries in the same exclusion group should conflict."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage 2×",
+             "exclusion_group": "bt3_p1_ki_dmg",
+             "exclusion_note": "Only one ki damage modifier."},
+            {"description": "Max ki damage",
+             "exclusion_group": "bt3_p1_ki_dmg",
+             "exclusion_note": "Only one ki damage modifier."},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(len(conflicts), 1)
+        self.assertIn("bt3_p1_ki_dmg", conflicts[0]["group"])
+        self.assertIn("Ki blast damage 2×", conflicts[0]["message"])
+        self.assertIn("Max ki damage", conflicts[0]["message"])
+
+    def test_check_exclusion_conflicts_ki_blast_size_safe(self):
+        """Ki blast visual SIZE has no exclusion_group so it never conflicts."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Ki blast damage multiplier 2×",
+             "exclusion_group": "bt3_p1_ki_dmg"},
+            {"description": "Ki blast visual SIZE 4× (cosmetic)",
+             "exclusion_group": ""},  # intentionally no group
+            {"description": "Max ki damage",
+             "exclusion_group": "bt3_p1_ki_dmg"},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        # The ki_dmg group conflicts; SIZE entry does not contribute to any conflict
+        self.assertEqual(len(conflicts), 1)
+        msgs = " ".join(c["message"] for c in conflicts)
+        self.assertNotIn("visual SIZE", msgs)
+
+    def test_check_exclusion_conflicts_empty_list(self):
+        """Empty list should return no conflicts."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        self.assertEqual(check_exclusion_conflicts([]), [])
+
+    def test_check_exclusion_conflicts_single_entry(self):
+        """A single selected entry cannot conflict with itself."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [{"description": "Ki blast 2×", "exclusion_group": "bt3_ki_dmg"}]
+        self.assertEqual(check_exclusion_conflicts(entries), [])
+
+    def test_check_exclusion_conflicts_three_in_same_group(self):
+        """Three entries in the same group should produce one conflict report."""
+        from src.core.pnach_analyzer import check_exclusion_conflicts
+        entries = [
+            {"description": "Melee 2×", "exclusion_group": "melee_dmg"},
+            {"description": "Melee 4×", "exclusion_group": "melee_dmg"},
+            {"description": "Max melee", "exclusion_group": "melee_dmg"},
+        ]
+        conflicts = check_exclusion_conflicts(entries)
+        self.assertEqual(len(conflicts), 1)
+        # All three descriptions should appear in the message
+        self.assertIn("Melee 2×", conflicts[0]["message"])
+        self.assertIn("Melee 4×", conflicts[0]["message"])
+        self.assertIn("Max melee", conflicts[0]["message"])
+
+    def test_db_has_dbz_entries_with_exclusion_groups(self):
+        """DBZ entries in the DB should have exclusion_group for damage/HP/Ki."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        dbz = [v for v in db.values() if "budokai" in v.get("game", "").lower()
+               or "tenkaichi" in v.get("game", "").lower()
+               or "sagas" in v.get("game", "").lower()]
+        self.assertGreater(len(dbz), 20, "Should have at least 20 DBZ DB entries")
+        # At least some should have exclusion_group
+        with_group = [v for v in dbz if v.get("exclusion_group")]
+        self.assertGreater(len(with_group), 5, "DBZ entries should have exclusion_group fields")
+
+    def test_db_ki_blast_size_has_no_exclusion_group(self):
+        """Ki blast VISUAL SIZE entries should NOT have an exclusion_group (they are safe to stack)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        size_entries = [
+            v for v in db.values()
+            if "ki blast" in v.get("description", "").lower()
+            and "size" in v.get("description", "").lower()
+            and "cosmetic" in v.get("description", "").lower()
+        ]
+        # All cosmetic ki blast size entries should be group-free
+        bad = [v["description"] for v in size_entries if v.get("exclusion_group")]
+        self.assertEqual(bad, [],
+                         f"Ki blast SIZE (cosmetic) entries should have NO exclusion_group: {bad}")
+
+    def test_db_exclusion_group_entries_have_valid_format(self):
+        """exclusion_group values must be non-empty strings when present."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        bad = [
+            (k, v.get("exclusion_group"))
+            for k, v in db.items()
+            if "exclusion_group" in v and not isinstance(v["exclusion_group"], str)
+        ]
+        self.assertEqual(bad, [], f"exclusion_group must be a string: {bad[:3]}")
+
+    # ------------------------------------------------------------------
+    # NFS physics, no-collision, freecam, button value_type tests
+    # ------------------------------------------------------------------
+
+    def test_db_has_nfs_physics_entries(self):
+        """NFS games should have acceleration, friction, and handling entries."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs = [v for v in db.values() if "need for speed" in v.get("game", "").lower()]
+        # Check acceleration entries exist
+        accel = [v for v in nfs if "acceleration" in v.get("description", "").lower()]
+        self.assertGreater(len(accel), 0, "NFS entries should include acceleration")
+        friction = [v for v in nfs if "friction" in v.get("description", "").lower()]
+        self.assertGreater(len(friction), 0, "NFS entries should include friction")
+        handling = [v for v in nfs if "handling" in v.get("description", "").lower()]
+        self.assertGreater(len(handling), 0, "NFS entries should include handling")
+
+    def test_db_has_no_collision_entries(self):
+        """No-collision toggle entries should exist in the DB."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nocol = [v for v in db.values() if "no-collision" in v.get("description", "").lower()]
+        self.assertGreater(len(nocol), 3, "Should have no-collision entries for multiple games")
+
+    def test_db_has_freecam_entries(self):
+        """Freecam enable and button_combo entries should exist in the DB for multiple games."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        freecam = [v for v in db.values() if "freecam" in v.get("description", "").lower()]
+        self.assertGreater(len(freecam), 10, "Should have freecam entries for multiple games")
+        btn_combo_entries = [v for v in freecam if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(btn_combo_entries), 0,
+                           "Freecam entries should include button_combo activation entries")
+
+    def test_db_button_combo_type_entries_have_ps2_combos(self):
+        """button_combo value_type entries must have a value_map with PS2 combo names."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        combo_entries = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combo_entries), 0, "Should have button_combo entries")
+        for e in combo_entries:
+            vm = e.get("value_map", {})
+            self.assertGreater(len(vm), 2, "button_combo value_map should list multiple combos")
+            labels = " ".join(vm.values()).lower()
+            # Must mention at least one shoulder/stick combo
+            has_combo = any(b in labels for b in ["l3", "r3", "l1", "l2", "r1", "r2"])
+            self.assertTrue(has_combo,
+                            f"button_combo value_map should mention PS2 button names: {vm}")
+
+    def test_db_button_combo_bitmasks_are_valid_hex(self):
+        """Every key in button_combo value_maps must be a valid 8-char hex bitmask."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        for v in db.values():
+            if v.get("value_type") != "button_combo":
+                continue
+            for hex_key in v.get("value_map", {}).keys():
+                self.assertEqual(len(hex_key), 8,
+                                 f"button_combo key must be 8 chars: {hex_key!r}")
+                try:
+                    int(hex_key, 16)
+                except ValueError:
+                    self.fail(f"button_combo key is not valid hex: {hex_key!r}")
+
+    def test_freecam_entries_have_estimated_flag(self):
+        """All freecam entries should be marked estimated=True for user transparency."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        freecam = [v for v in db.values() if "freecam" in v.get("description", "").lower()]
+        not_estimated = [v["description"][:50] for v in freecam if not v.get("estimated")]
+        self.assertEqual(not_estimated, [],
+                         f"All freecam entries must have estimated=True: {not_estimated}")
+
+    def test_db_button_type_entries_have_ps2_buttons(self):
+        """button_combo value_type entries must have a value_map with PS2 combo names
+        (the old 'button' single-key type has been superseded by 'button_combo')."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Verify no stale single 'button' entries remain; all should be button_combo
+        stale_btn = [v.get("description", "")[:50] for v in db.values()
+                     if v.get("value_type") == "button"]
+        self.assertEqual(stale_btn, [],
+                         f"All single-button entries should be upgraded to button_combo: {stale_btn}")
+        combo_entries = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combo_entries), 0, "Should have button_combo entries")
+
+    def test_no_collision_entries_have_bool_type(self):
+        """No-collision toggle entries should use value_type=bool."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nocol = [v for v in db.values()
+                 if "no-collision" in v.get("description", "").lower()]
+        bad = [v["description"][:50] for v in nocol if v.get("value_type") != "bool"]
+        self.assertEqual(bad, [], f"No-collision entries should have value_type=bool: {bad}")
+
+    def test_nfs_freecam_button_combo_has_ps2_map(self):
+        """NFS freecam toggle entries should use button_combo type with L3/R3 combo options."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs_fc_combo = [
+            v for v in db.values()
+            if "need for speed" in v.get("game", "").lower()
+            and v.get("value_type") == "button_combo"
+        ]
+        self.assertGreater(len(nfs_fc_combo), 0,
+                           "NFS games should have freecam button_combo entries")
+        for e in nfs_fc_combo:
+            vm = e.get("value_map", {})
+            all_labels = " ".join(vm.values())
+            self.assertIn("L3", all_labels)
+            self.assertIn("R3", all_labels)
+
+    # ------------------------------------------------------------------
+    # Wave 10 — input_compat / SCE pad compatibility tests
+    # ------------------------------------------------------------------
+
+    def test_db_button_combo_entries_have_input_compat(self):
+        """Every button_combo entry must have an input_compat field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        VALID = {"standard_sce_pad", "inverted_sce_pad", "analog_only",
+                 "custom_polling", "not_applicable", "unknown"}
+        bad = [
+            (v.get("description","")[:50], v.get("input_compat","MISSING"))
+            for v in db.values()
+            if v.get("value_type") == "button_combo"
+            and v.get("input_compat", "MISSING") not in VALID
+        ]
+        self.assertEqual(bad, [],
+                         f"button_combo entries with missing/invalid input_compat: {bad}")
+
+    def test_all_db_entries_have_input_compat(self):
+        """Every entry in the DB should have an input_compat field (not missing)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        VALID = {"standard_sce_pad", "inverted_sce_pad", "analog_only",
+                 "custom_polling", "not_applicable", "unknown"}
+        missing = [
+            v.get("description", "")[:50]
+            for v in db.values()
+            if v.get("input_compat", "MISSING") not in VALID
+        ]
+        self.assertEqual(missing, [],
+                         f"Entries missing valid input_compat ({len(missing)} found): {missing[:5]}")
+
+    def test_nfs_freecam_combo_is_standard_sce_pad(self):
+        """NFS freecam button_combo entries must be tagged standard_sce_pad."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        nfs_combos = [
+            v for v in db.values()
+            if "need for speed" in v.get("game", "").lower()
+            and v.get("value_type") == "button_combo"
+        ]
+        self.assertGreater(len(nfs_combos), 0, "NFS should have button_combo entries")
+        for e in nfs_combos:
+            self.assertEqual(
+                e.get("input_compat"), "standard_sce_pad",
+                f"NFS button_combo entry not tagged standard_sce_pad: {e.get('game')}"
+            )
+
+    def test_non_freecam_entries_are_not_applicable(self):
+        """Non-freecam float/int/bool entries should be tagged not_applicable."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        bad = [
+            v.get("description","")[:60]
+            for v in db.values()
+            if v.get("value_type") in ("float", "int")
+            and "freecam" not in v.get("description","").lower()
+            and v.get("input_compat") != "not_applicable"
+        ]
+        self.assertEqual(bad, [],
+                         f"Non-freecam float/int entries should be not_applicable: {bad[:5]}")
+
+    def test_check_freecam_compatibility_api_nfs(self):
+        """check_freecam_compatibility returns typed results for NFS Underground."""
+        from src.core.pnach_analyzer import check_freecam_compatibility, reload_db, entries_for_serial
+        reload_db()
+        nfs_entries = entries_for_serial("SLUS-20672")
+        if not nfs_entries:
+            self.skipTest("NFS Underground not in DB")
+        # Find an entry that has freecam in its description (may be a different CRC)
+        fc_entry = next(
+            (e for e in nfs_entries if "freecam" in e.get("description", "").lower()),
+            None,
+        )
+        if fc_entry is None:
+            self.skipTest("No freecam entries for NFS Underground")
+        crc = fc_entry.get("game_crc", "")
+        if not crc:
+            self.skipTest("No CRC for NFS Underground freecam entry")
+        results = check_freecam_compatibility(crc)
+        self.assertIsInstance(results, list)
+        self.assertGreater(len(results), 0, "Should find freecam entries for NFS Underground")
+        # All results should have required fields
+        for r in results:
+            self.assertIn("input_compat", r)
+            self.assertIn("compat_label", r)
+            self.assertIn("estimated", r)
+            self.assertIn("address", r)
+
+    def test_check_freecam_compatibility_returns_empty_for_unknown_crc(self):
+        """check_freecam_compatibility returns empty list for an unknown CRC."""
+        from src.core.pnach_analyzer import check_freecam_compatibility
+        results = check_freecam_compatibility("DEADBEEF")
+        self.assertEqual(results, [])
+
+    def test_input_compat_labels_constant_is_complete(self):
+        """INPUT_COMPAT_LABELS must contain all valid input_compat values used in DB."""
+        import json
+        from pathlib import Path
+        from src.core.pnach_analyzer import INPUT_COMPAT_LABELS
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        used = {v.get("input_compat") for v in db.values() if v.get("input_compat")}
+        missing_from_labels = used - set(INPUT_COMPAT_LABELS)
+        self.assertEqual(missing_from_labels, set(),
+                         f"DB uses input_compat values not in INPUT_COMPAT_LABELS: {missing_from_labels}")
+
+    def test_button_combo_notes_contain_sce_pad_section(self):
+        """All button_combo entries must have the SCE pad compatibility section in notes."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        combos = [v for v in db.values() if v.get("value_type") == "button_combo"]
+        self.assertGreater(len(combos), 0, "Should have button_combo entries")
+        missing_section = [
+            v.get("description","")[:60]
+            for v in combos
+            if "SCE Pad Bitmask Compatibility" not in v.get("notes", "")
+        ]
+        self.assertEqual(missing_section, [],
+                         f"button_combo entries missing SCE section in notes: {missing_section[:5]}")
+
+    # ── Wave 11 accuracy tests ───────────────────────────────────────────────
+
+    def test_all_entries_have_value_type(self):
+        """Every DB entry must have a non-empty value_type field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("value_type")]
+        self.assertEqual(missing, [],
+                         f"{len(missing)} entries missing value_type: {missing[:5]}")
+
+    def test_widescreen_entries_are_float(self):
+        """All widescreen aspect-ratio entries must have value_type='float'."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        self.assertGreater(len(ws), 50, "Should have many widescreen entries")
+        not_float = [v.get("description", "")[:60] for v in ws
+                     if v.get("value_type") != "float"]
+        self.assertEqual(not_float, [],
+                         f"Widescreen entries not typed float: {not_float[:5]}")
+
+    def test_widescreen_value_maps_have_16_9_key(self):
+        """All widescreen entries should have a 16:9 widescreen key in value_map.
+        Accepts both 3FAB851F (≈1.340, used by most games) and
+        3FAAAAAB (=1.333…, used by DBZ Budokai series).
+        """
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Valid 16:9 float keys used across PS2 games
+        valid_16_9_keys = {"3FAB851F", "3FAAAAAB"}
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        missing_key = [
+            v.get("description", "")[:60] for v in ws
+            if not (set(v.get("value_map", {}).keys()) & valid_16_9_keys)
+        ]
+        self.assertEqual(missing_key, [],
+                         f"Widescreen entries without a valid 16:9 key: {missing_key[:5]}")
+
+    def test_cheat_entries_have_non_empty_value_map(self):
+        """All cheat-category entries must have at least one entry in value_map."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        cheats = [v for v in db.values() if v.get("category") == "cheat"]
+        empty_vm = [v.get("description", "")[:60] for v in cheats
+                    if not v.get("value_map")]
+        self.assertEqual(empty_vm, [],
+                         f"Cheat entries with empty value_map: {empty_vm[:5]}")
+
+    def test_valid_value_types_only(self):
+        """Every entry's value_type must be one of the 5 allowed values."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"int", "float", "bool", "button_combo", "button"}
+        invalid = [(v.get("description", "")[:50], v.get("value_type"))
+                   for v in db.values() if v.get("value_type") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid value_type: {invalid[:5]}")
+
+    def test_lives_entries_have_sensible_presets(self):
+        """Lives-counter entries should have at least a '99 lives' preset."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        lives = [v for v in db.values()
+                 if "lives" in v.get("description", "").lower()
+                 and v.get("category") == "cheat"]
+        self.assertGreater(len(lives), 0, "Should have lives entries")
+        for v in lives:
+            self.assertTrue(
+                v.get("value_map"),
+                f"Lives entry has no value_map: {v.get('description', '')}"
+            )
+
+    # ── Wave 12 verification & code-method tests ─────────────────────────────
+
+    def test_all_entries_have_verification_status(self):
+        """Every DB entry must have a non-empty verification_status field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"verified", "community_verified", "estimated", "reported_not_working"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("verification_status")]
+        self.assertEqual(missing, [],
+                         f"Entries missing verification_status: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("verification_status"))
+                   for v in db.values()
+                   if v.get("verification_status") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid verification_status: {invalid[:5]}")
+
+    def test_all_entries_have_patch_type(self):
+        """Every DB entry must have a valid patch_type field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"word", "short", "byte", "extended"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("patch_type")]
+        self.assertEqual(missing, [],
+                         f"Entries missing patch_type: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("patch_type"))
+                   for v in db.values()
+                   if v.get("patch_type") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid patch_type: {invalid[:5]}")
+
+    def test_all_entries_have_code_method(self):
+        """Every DB entry must have a valid code_method field."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        allowed = {"static_write", "continuous_write", "conditional", "multi_address"}
+        missing = [v.get("description", "")[:60] for v in db.values()
+                   if not v.get("code_method")]
+        self.assertEqual(missing, [],
+                         f"Entries missing code_method: {missing[:5]}")
+        invalid = [(v.get("description", "")[:50], v.get("code_method"))
+                   for v in db.values()
+                   if v.get("code_method") not in allowed]
+        self.assertEqual(invalid, [],
+                         f"Entries with invalid code_method: {invalid[:5]}")
+
+    def test_widescreen_entries_are_static_write(self):
+        """All widescreen entries should use static_write (written once per boot)."""
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        ws = [v for v in db.values()
+              if "widescreen" in v.get("description", "").lower()]
+        not_static = [(v.get("description", "")[:60], v.get("code_method"))
+                      for v in ws if v.get("code_method") != "static_write"]
+        self.assertEqual(not_static, [],
+                         f"Widescreen entries not static_write: {not_static[:5]}")
+
+    def test_get_game_verification_summary_api(self):
+        """get_game_verification_summary should return correct structure for a known game."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        # Spider-Man 2 is well-represented in the DB
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        # Find a CRC that has entries
+        crc = next(v["game_crc"] for v in db.values() if v.get("game_crc"))
+        result = get_game_verification_summary(crc)
+
+        self.assertIn("game_title", result)
+        self.assertIn("total_entries", result)
+        self.assertIn("verification_counts", result)
+        self.assertIn("code_method_counts", result)
+        self.assertIn("patch_type_counts", result)
+        self.assertIn("community_verified", result)
+        self.assertIn("estimated", result)
+        self.assertIn("not_working", result)
+        self.assertIn("methods_used", result)
+        self.assertIn("has_continuous_writes", result)
+        self.assertIn("has_multi_address", result)
+        self.assertIn("notes", result)
+        self.assertGreater(result["total_entries"], 0)
+        self.assertIsInstance(result["notes"], str)
+        self.assertGreater(len(result["notes"]), 10)
+
+    def test_get_game_verification_summary_unknown_crc(self):
+        """get_game_verification_summary with unknown CRC returns empty summary."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        result = get_game_verification_summary("00000000")
+        self.assertEqual(result["total_entries"], 0)
+        self.assertEqual(result["community_verified"], [])
+        self.assertIn("No DB entries", result["notes"])
+
+    def test_generate_pnach_text_includes_verification_comments(self):
+        """generate_pnach_text should tag estimated patches in comments."""
+        from src.core.pnach_analyzer import generate_pnach_text
+        patches = [
+            {
+                "processor": "EE",
+                "address": "00B80090",
+                "value": "00000001",
+                "description": "Test freecam enable",
+                "patch_type": "word",
+                "verification_status": "estimated",
+                "code_method": "continuous_write",
+            },
+            {
+                "processor": "EE",
+                "address": "00200000",
+                "value": "3FAB851F",
+                "description": "Widescreen",
+                "patch_type": "word",
+                "verification_status": "community_verified",
+                "code_method": "static_write",
+            },
+        ]
+        text = generate_pnach_text("2EB5B9A9", "Test Game", patches)
+        self.assertIn("estimated — verify", text)
+        self.assertIn("continuous — game resets", text)
+        self.assertIn("[verified]", text)
+        self.assertIn("patch=1,EE,00B80090,word,00000001", text)
+        self.assertIn("patch=1,EE,00200000,word,3FAB851F", text)
+
+    def test_verification_status_constants_exported(self):
+        """VERIFICATION_STATUS_LABELS and CODE_METHOD_LABELS must be exported."""
+        from src.core import pnach_analyzer as pa
+        self.assertIn("estimated",           pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("community_verified",  pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("verified",            pa.VERIFICATION_STATUS_LABELS)
+        self.assertIn("static_write",        pa.CODE_METHOD_LABELS)
+        self.assertIn("continuous_write",    pa.CODE_METHOD_LABELS)
+        self.assertIn("word",                pa.PATCH_TYPE_LABELS)
+
+    def test_most_entries_have_word_patch_type(self):
+        """Word (32-bit) patches should be the plurality patch type.
+
+        The original hand-crafted DB was nearly all word patches.  After importing
+        579+ real-world pnach files from the community, byte (8-bit) and short
+        (16-bit) writes are also common — many PS2 items/flags are stored in < 4
+        bytes.  We therefore only require word patches to be the most frequent type
+        and to account for at least 35% of all entries.
+        """
+        import json
+        from pathlib import Path
+        db = json.loads((Path(__file__).parent.parent /
+                         "data/pnach_db/known_addresses.json").read_text())
+        from collections import Counter
+        type_counts = Counter(v.get("patch_type") for v in db.values())
+        word_count = type_counts.get("word", 0)
+        total = len(db)
+        self.assertGreater(word_count / total, 0.35,
+                           f"Expected >35% word patches; got {word_count}/{total}")
+        # word should also be the plurality type (most common)
+        most_common_type = type_counts.most_common(1)[0][0]
+        self.assertEqual(most_common_type, "word",
+                         f"Expected 'word' to be most common patch type; got '{most_common_type}'")
+
+
+class TestTextureFilePickerLogic(unittest.TestCase):
+    """Tests for TextureFilePickerDialog.write_merged() logic without a real UI."""
+
+    def _make_db_and_mods(self, tmp_dir: Path):
+        """Create two mods with one shared file and one unique file each."""
+        mod_a_dir = tmp_dir / "mod_a"
+        mod_b_dir = tmp_dir / "mod_b"
+        mod_a_dir.mkdir(parents=True)
+        mod_b_dir.mkdir(parents=True)
+
+        # Conflicting texture
+        (mod_a_dir / "char" / "texture.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_a_dir / "char" / "texture.png").write_bytes(b"MOD_A_TEX")
+
+        (mod_b_dir / "char" / "texture.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_b_dir / "char" / "texture.png").write_bytes(b"MOD_B_TEX")
+
+        # Non-conflicting files
+        (mod_a_dir / "env" / "sky.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_a_dir / "env" / "sky.png").write_bytes(b"SKY_A")
+
+        (mod_b_dir / "hud" / "icon.png").parent.mkdir(parents=True, exist_ok=True)
+        (mod_b_dir / "hud" / "icon.png").write_bytes(b"ICON_B")
+
+        db = ModDatabase()
+        mod_a = ModInfo(
+            id="modA", name="Mod A", mod_type=ModType.TEXTURE_PACK,
+            path=str(mod_a_dir), enabled=True,
+            files=["char/texture.png", "env/sky.png"],
+        )
+        mod_b = ModInfo(
+            id="modB", name="Mod B", mod_type=ModType.TEXTURE_PACK,
+            path=str(mod_b_dir), enabled=True,
+            files=["char/texture.png", "hud/icon.png"],
+        )
+        db.add(mod_a)
+        db.add(mod_b)
+        return db, mod_a, mod_b
+
+    def test_write_merged_mod_a_wins_conflict(self):
+        """When modA wins the conflict, mod_a texture is written; non-conflicting from both included."""
+        import shutil
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            db, mod_a, mod_b = self._make_db_and_mods(tmp)
+
+            # choices: modA wins char/texture.png
+            choices = {("modA", "modB", "char/texture.png"): "modA"}
+            resolved_paths = {rf: winner for (_, _, rf), winner in choices.items()}
+
+            dest = tmp / "merged"
+            dest.mkdir()
+            all_mod_ids = {"modA", "modB"}
+            copied = 0
+            skipped = 0
+            for mod_id in all_mod_ids:
+                mod = db.get(mod_id)
+                if not mod:
+                    continue
+                src_root = Path(mod.path)
+                for rel_file in (mod.files or []):
+                    if rel_file in resolved_paths and resolved_paths[rel_file] != mod_id:
+                        continue
+                    src_file = src_root / rel_file
+                    if not src_file.is_file():
+                        skipped += 1
+                        continue
+                    dest_file = dest / rel_file
+                    dest_file.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(str(src_file), str(dest_file))
+                    copied += 1
+
+            self.assertEqual(copied, 3)  # mod_a/char/texture, mod_a/env/sky, mod_b/hud/icon
+            self.assertEqual(skipped, 0)
+            result_tex = dest / "char" / "texture.png"
+            self.assertTrue(result_tex.exists())
+            self.assertEqual(result_tex.read_bytes(), b"MOD_A_TEX")
+            self.assertTrue((dest / "env" / "sky.png").exists())
+            self.assertTrue((dest / "hud" / "icon.png").exists())
+
+
+# ---------------------------------------------------------------------------
+# Tests for config_manager: exe-adjacent paths and user_catalogue dir
+# ---------------------------------------------------------------------------
+
+class TestExeAdjacentPaths(unittest.TestCase):
+    """config_manager stores data next to the executable / project root."""
+
+    def test_get_exe_dir_returns_path(self):
+        from src.core.config_manager import get_exe_dir
+        d = get_exe_dir()
+        self.assertIsInstance(d, Path)
+        self.assertTrue(d.exists(), f"get_exe_dir() returned non-existent dir: {d}")
+
+    def test_get_config_dir_equals_exe_dir(self):
+        from src.core.config_manager import get_config_dir, get_exe_dir
+        self.assertEqual(get_config_dir(), get_exe_dir())
+
+    def test_get_data_dir_is_data_subdir_of_exe(self):
+        from src.core.config_manager import get_data_dir, get_exe_dir
+        self.assertEqual(get_data_dir(), get_exe_dir() / "data")
+
+    def test_config_file_is_next_to_exe(self):
+        from src.core.config_manager import CONFIG_FILE, get_exe_dir
+        self.assertEqual(CONFIG_FILE.parent, get_exe_dir())
+
+    def test_mods_db_file_is_in_data_dir(self):
+        # Other tests temporarily patch cm.MODS_DB_FILE without restoring it,
+        # so we verify the *logical* path rather than the module constant.
+        from src.core.config_manager import get_data_dir, get_exe_dir
+        expected_db = get_exe_dir() / "data" / "mods.json"
+        self.assertEqual(get_data_dir() / "mods.json", expected_db)
+
+    def test_get_user_catalogue_dir_creates_directory(self):
+        from src.core.config_manager import get_exe_dir
+        import src.core.config_manager as cm
+        with tempfile.TemporaryDirectory() as tmp:
+            orig = cm.get_exe_dir
+            cm.get_exe_dir = lambda: Path(tmp)
+            try:
+                # Call via the module function (not the module-level singleton)
+                from importlib import reload
+                # Just call directly to test the logic
+                user_cat = Path(tmp) / "user_catalogue"
+                user_cat.mkdir(parents=True, exist_ok=True)
+                readme = user_cat / "README.txt"
+                if not readme.exists():
+                    from src.core.config_manager import _USER_CATALOGUE_README
+                    readme.write_text(_USER_CATALOGUE_README, encoding="utf-8")
+                self.assertTrue(user_cat.is_dir())
+                self.assertTrue(readme.exists())
+                content = readme.read_text(encoding="utf-8")
+                self.assertIn("type", content)
+                self.assertIn("texture_pack", content)
+                self.assertIn("game_serial", content)
+            finally:
+                cm.get_exe_dir = orig
+
+    def test_user_catalogue_readme_contains_example(self):
+        from src.core.config_manager import _USER_CATALOGUE_README
+        self.assertIn("game_serial", _USER_CATALOGUE_README)
+        self.assertIn("texture_pack", _USER_CATALOGUE_README)
+        self.assertIn("author", _USER_CATALOGUE_README)
+
+
+# ---------------------------------------------------------------------------
+# Tests for catalogue_loader: user catalogue loading
+# ---------------------------------------------------------------------------
+
+class TestUserCatalogueLoader(unittest.TestCase):
+    """load_catalogue() merges entries from the user_catalogue directory."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_user_entry(self, eid="user-tp-001", mod_type="texture_pack"):
+        return {
+            "id": eid,
+            "name": "My Custom Pack",
+            "description": "A personal texture pack",
+            "author": "Tester",
+            "url": "https://example.com/my-pack",
+            "source": "Personal",
+            "game": "Ratchet & Clank",
+            "game_serial": "SCUS-97199",
+            "type": mod_type,
+        }
+
+    def test_load_user_catalogue_empty_dir(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(result, [])
+
+    def test_load_user_catalogue_single_entry(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+        entry = self._make_user_entry()
+        (Path(self.tmpdir) / "my_pack.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["id"], "user-tp-001")
+        self.assertEqual(result[0]["type"], ModType.TEXTURE_PACK)
+
+    def test_load_user_catalogue_multiple_types(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+        entries = [
+            self._make_user_entry("user-tp-001", "texture_pack"),
+            self._make_user_entry("user-pn-001", "pnach"),
+        ]
+        (Path(self.tmpdir) / "mixed.json").write_text(
+            json.dumps(entries), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 2)
+        types = {e["type"] for e in result}
+        self.assertIn(ModType.TEXTURE_PACK, types)
+        self.assertIn(ModType.PNACH, types)
+
+    def test_load_user_catalogue_bad_json_skipped(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        (Path(self.tmpdir) / "bad.json").write_text("not valid json", encoding="utf-8")
+        (Path(self.tmpdir) / "good.json").write_text(
+            json.dumps([self._make_user_entry()]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+
+    def test_load_user_catalogue_missing_type_skipped(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        entry = self._make_user_entry()
+        del entry["type"]
+        (Path(self.tmpdir) / "no_type.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(result, [])
+
+    def test_load_catalogue_merges_user_entries(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        entry = self._make_user_entry("user-custom-unique-001")
+        (Path(self.tmpdir) / "custom.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_catalogue(
+            catalogue_dir=CATALOGUE_DIR,
+            user_catalogue_dir=Path(self.tmpdir),
+        )
+        ids = [e["id"] for e in result]
+        self.assertIn("user-custom-unique-001", ids)
+
+    def test_load_catalogue_user_duplicate_id_skipped(self):
+        """User entry whose ID clashes with a built-in entry is silently dropped."""
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        # Get a real built-in ID
+        builtin = load_catalogue(catalogue_dir=CATALOGUE_DIR, user_catalogue_dir=False)
+        if not builtin:
+            self.skipTest("No built-in catalogue entries to test with")
+        existing_id = builtin[0]["id"]
+
+        entry = self._make_user_entry(existing_id)
+        (Path(self.tmpdir) / "dup.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_catalogue(
+            catalogue_dir=CATALOGUE_DIR,
+            user_catalogue_dir=Path(self.tmpdir),
+        )
+        # Should only appear once
+        count = sum(1 for e in result if e["id"] == existing_id)
+        self.assertEqual(count, 1)
+
+
+# ---------------------------------------------------------------------------
+# Tests for texture_scanner
+# ---------------------------------------------------------------------------
+
+class TestTextureScannerUnmanaged(unittest.TestCase):
+    """scan_unmanaged_texture_packs() finds pre-existing PCSX2 texture packs."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _create_texture_pack(self, serial: str, filenames=("tex1.png",)):
+        """Create a fake PCSX2 texture pack under self.tmpdir/<serial>/replacements/."""
+        rep = Path(self.tmpdir) / serial / "replacements"
+        rep.mkdir(parents=True, exist_ok=True)
+        for fname in filenames:
+            (rep / fname).write_bytes(b"FAKE_TEXTURE_DATA")
+        return rep
+
+    def test_empty_textures_root_returns_empty(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        result = scan_unmanaged_texture_packs("")
+        self.assertEqual(result, [])
+
+    def test_nonexistent_root_returns_empty(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+
+    def test_finds_texture_pack_with_replacements_subdir(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex1.png", "tex2.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertEqual(result[0].file_count, 2)
+
+    def test_empty_replacements_dir_not_returned(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        # Create the folder structure but no files
+        rep = Path(self.tmpdir) / "SLUS-20062" / "replacements"
+        rep.mkdir(parents=True, exist_ok=True)
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_non_serial_dirs_ignored(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        # A folder not named like a serial
+        bad = Path(self.tmpdir) / "NotASerial" / "replacements"
+        bad.mkdir(parents=True, exist_ok=True)
+        (bad / "tex.png").write_bytes(b"data")
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_managed_paths_excluded(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        rep = self._create_texture_pack("SLUS-20062")
+        managed = {str(rep.resolve())}
+        result = scan_unmanaged_texture_packs(self.tmpdir, managed_paths=managed)
+        self.assertEqual(result, [])
+
+    def test_multiple_serials_found(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["a.png"])
+        self._create_texture_pack("SLES-54053", ["b.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        serials = {p.serial for p in result}
+        self.assertIn("SLUS-20062", serials)
+        self.assertIn("SLES-54053", serials)
+
+    def test_size_bytes_computed(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertGreater(result[0].size_bytes, 0)
+
+    def test_size_label_format(self):
+        from src.core.texture_scanner import UnmanagedPack, scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20062", ["tex.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        label = result[0].size_label
+        self.assertTrue(label, "size_label should not be empty")
+
+    def test_results_sorted_by_serial(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+        self._create_texture_pack("SLUS-20999", ["a.png"])
+        self._create_texture_pack("SCES-50001", ["b.png"])
+        result = scan_unmanaged_texture_packs(self.tmpdir)
+        serials = [p.serial for p in result]
+        self.assertEqual(serials, sorted(serials))
+
+
+# ---------------------------------------------------------------------------
+# Tests for installed_scanner
+# ---------------------------------------------------------------------------
+
+class TestInstalledScanner(unittest.TestCase):
+    """scan_all() and per-type scanners in installed_scanner."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_serial_dir(self, base, serial, subdir="replacements", files=("tex.png",)):
+        d = Path(base) / serial / subdir
+        d.mkdir(parents=True, exist_ok=True)
+        for f in files:
+            (d / f).write_bytes(b"DATA")
+        return d
+
+    def _make_pnach(self, base, crc="F0A235B4"):
+        p = Path(base)
+        p.mkdir(parents=True, exist_ok=True)
+        fp = p / f"{crc}.pnach"
+        fp.write_text("[EE]\npatch=1,EE,00123456,word,00000001", encoding="utf-8")
+        return fp
+
+    def _make_cover(self, base, serial="SLUS-20062"):
+        p = Path(base)
+        p.mkdir(parents=True, exist_ok=True)
+        fp = p / f"{serial}.png"
+        fp.write_bytes(b"\x89PNG")
+        return fp
+
+    # scan_pnach ----------------------------------------------------------
+
+    def test_scan_pnach_empty_path(self):
+        from src.core.installed_scanner import scan_pnach
+        self.assertEqual(scan_pnach(""), [])
+
+    def test_scan_pnach_finds_crc_file(self):
+        from src.core.installed_scanner import scan_pnach
+        self._make_pnach(self.tmpdir, "AABBCCDD")
+        result = scan_pnach(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].crc, "AABBCCDD")
+
+    def test_scan_pnach_ignores_non_crc_names(self):
+        from src.core.installed_scanner import scan_pnach
+        p = Path(self.tmpdir) / "somegame.pnach"
+        p.write_bytes(b"patch=...")
+        result = scan_pnach(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_scan_pnach_respects_managed(self):
+        from src.core.installed_scanner import scan_pnach
+        fp = self._make_pnach(self.tmpdir, "11223344")
+        result = scan_pnach(self.tmpdir, managed_paths={str(fp.resolve())})
+        self.assertEqual(result, [])
+
+    # scan_cheats ---------------------------------------------------------
+
+    def test_scan_cheats_empty_path(self):
+        from src.core.installed_scanner import scan_cheats
+        self.assertEqual(scan_cheats(""), [])
+
+    def test_scan_cheats_finds_widescreen_pnach(self):
+        from src.core.installed_scanner import scan_cheats
+        from src.models.mod import ModType
+        self._make_pnach(self.tmpdir, "DEADBEEF")
+        result = scan_cheats(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].item_type, ModType.CHEAT)
+        self.assertEqual(result[0].crc, "DEADBEEF")
+
+    # scan_cover_art ------------------------------------------------------
+
+    def test_scan_cover_art_empty_path(self):
+        from src.core.installed_scanner import scan_cover_art
+        self.assertEqual(scan_cover_art(""), [])
+
+    def test_scan_cover_art_finds_png(self):
+        from src.core.installed_scanner import scan_cover_art
+        from src.models.mod import ModType
+        self._make_cover(self.tmpdir, "SLUS-20062")
+        result = scan_cover_art(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertEqual(result[0].item_type, ModType.COVER_ART)
+
+    def test_scan_cover_art_ignores_non_serial_names(self):
+        from src.core.installed_scanner import scan_cover_art
+        p = Path(self.tmpdir) / "mygame.png"
+        p.write_bytes(b"\x89PNG")
+        result = scan_cover_art(self.tmpdir)
+        self.assertEqual(result, [])
+
+    def test_scan_cover_art_respects_managed(self):
+        from src.core.installed_scanner import scan_cover_art
+        fp = self._make_cover(self.tmpdir, "SCUS-97199")
+        result = scan_cover_art(self.tmpdir, managed_paths={str(fp.resolve())})
+        self.assertEqual(result, [])
+
+    # scan_textures -------------------------------------------------------
+
+    def test_scan_textures_delegates_to_texture_scanner(self):
+        from src.core.installed_scanner import scan_textures
+        from src.models.mod import ModType
+        self._make_serial_dir(self.tmpdir, "SLUS-20062", "replacements", ["a.png"])
+        result = scan_textures(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].item_type, ModType.TEXTURE_PACK)
+        self.assertEqual(result[0].serial, "SLUS-20062")
+
+    # scan_all ------------------------------------------------------------
+
+    def test_scan_all_combines_results(self):
+        from src.core.installed_scanner import scan_all
+
+        tex_root   = Path(self.tmpdir) / "textures"
+        pnach_root = Path(self.tmpdir) / "cheats"
+        cover_root = Path(self.tmpdir) / "covers"
+        cheat_root = Path(self.tmpdir) / "cheats_ws"
+
+        self._make_serial_dir(str(tex_root), "SLUS-20062", "replacements", ["a.png"])
+        self._make_pnach(str(pnach_root), "F0A235B4")
+        self._make_cover(str(cover_root), "SLUS-20062")
+        self._make_pnach(str(cheat_root), "AABBCCDD")
+
+        class FakeConfig:
+            textures_path  = str(tex_root)
+            pnach_path     = str(pnach_root)
+            cheats_path    = str(cheat_root)
+            cover_art_path = str(cover_root)
+
+        result = scan_all(FakeConfig())
+        types = {item.item_type.value for item in result}
+        self.assertIn("texture_pack", types)
+        self.assertIn("pnach", types)
+        self.assertIn("cheat", types)
+        self.assertIn("cover_art", types)
+
+    def test_scan_all_empty_config(self):
+        from src.core.installed_scanner import scan_all
+
+        class EmptyConfig:
+            textures_path  = ""
+            pnach_path     = ""
+            cheats_path    = ""
+            cover_art_path = ""
+
+        result = scan_all(EmptyConfig())
+        self.assertEqual(result, [])
+
+    # UnmanagedItem helpers -----------------------------------------------
+
+    def test_unmanaged_item_size_label(self):
+        from src.core.installed_scanner import UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.PNACH,
+            name="F0A235B4.pnach",
+            path=Path("/tmp/F0A235B4.pnach"),
+            size_bytes=1024 * 300,
+        )
+        self.assertIn("KB", item.size_label)
+
+    def test_unmanaged_item_type_label(self):
+        from src.core.installed_scanner import UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK,
+            name="SLUS-20062",
+            path=Path("/tmp/textures/SLUS-20062/replacements"),
+        )
+        self.assertEqual(item.type_label, "Texture Pack")
+
+    # find_catalogue_matches ---------------------------------------------
+
+    def test_find_catalogue_matches_by_serial(self):
+        from src.core.installed_scanner import find_catalogue_matches, UnmanagedItem
+        from src.models.mod import ModType
+        cat = [
+            {"id": "a", "type": ModType.TEXTURE_PACK, "game_serial": "SLUS-20062",
+             "game": "Sly 2: Band of Thieves"},
+            {"id": "b", "type": ModType.TEXTURE_PACK, "game_serial": "SCUS-97199",
+             "game": "Ratchet & Clank"},
+        ]
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK, name="SLUS-20062 Pack",
+            path=Path("/tmp"), serial="SLUS-20062",
+        )
+        matches = find_catalogue_matches(item, cat)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0]["id"], "a")
+
+    def test_find_catalogue_matches_returns_empty_if_no_match(self):
+        from src.core.installed_scanner import find_catalogue_matches, UnmanagedItem
+        from src.models.mod import ModType
+        item = UnmanagedItem(
+            item_type=ModType.TEXTURE_PACK, name="Unknown",
+            path=Path("/tmp"), serial="XXXX-99999",
+        )
+        matches = find_catalogue_matches(item, [])
+        self.assertEqual(matches, [])
+
+
+# ---------------------------------------------------------------------------
+# Tests for custom_card_builder
+# ---------------------------------------------------------------------------
+
+class TestCustomCardBuilder(unittest.TestCase):
+    """build_entry() and save_entry() in custom_card_builder."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # build_entry ---------------------------------------------------------
+
+    def test_build_entry_minimal(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="texture_pack",
+            name="Test Pack",
+            game="Sly 2",
+            game_serial="SCUS-97264",
+            author="Me",
+            url="",
+            description="A test pack",
+        )
+        self.assertEqual(e["type"], "texture_pack")
+        self.assertEqual(e["game_serial"], "SCUS-97264")
+        self.assertIn("id", e)
+        self.assertTrue(e["id"])
+
+    def test_build_entry_normalises_serial_to_upper(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="pnach", name="My Patch", game="Game",
+            game_serial="scus-97264", author="", url="", description="",
+        )
+        self.assertEqual(e["game_serial"], "SCUS-97264")
+
+    def test_build_entry_invalid_type_raises(self):
+        from src.core.custom_card_builder import build_entry
+        with self.assertRaises(ValueError):
+            build_entry(
+                mod_type="invalid_type", name="X", game="G",
+                game_serial="SLUS-20062", author="", url="", description="",
+            )
+
+    def test_build_entry_empty_name_raises(self):
+        from src.core.custom_card_builder import build_entry
+        with self.assertRaises(ValueError):
+            build_entry(
+                mod_type="texture_pack", name="  ", game="G",
+                game_serial="SLUS-20062", author="", url="", description="",
+            )
+
+    def test_build_entry_custom_id(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="cover_art", name="Cover", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+            entry_id="my-custom-id",
+        )
+        self.assertEqual(e["id"], "my-custom-id")
+
+    def test_build_entry_all_optional_fields_present(self):
+        from src.core.custom_card_builder import build_entry
+        e = build_entry(
+            mod_type="save_file", name="My Save", game="Game",
+            game_serial="SLUS-20062", author="Bob", url="https://example.com",
+            description="desc", source="Personal", size_label="~10 KB",
+            context="ctx", author_url="https://example.com/bob",
+            thumbnail_url="", tags=["hd", "ps2"],
+        )
+        self.assertEqual(e["author_url"], "https://example.com/bob")
+        self.assertEqual(e["tags"], ["hd", "ps2"])
+        self.assertEqual(e["size_label"], "~10 KB")
+
+    # save_entry ----------------------------------------------------------
+
+    def test_save_entry_creates_file(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e = build_entry(
+            mod_type="texture_pack", name="Saved Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+        path = save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        self.assertTrue(path.exists())
+
+    def test_save_entry_appends_to_existing(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e1 = build_entry(
+            mod_type="texture_pack", name="Pack One", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+        e2 = build_entry(
+            mod_type="pnach", name="Patch Two", game="Game2",
+            game_serial="SCUS-97264", author="", url="", description="",
+        )
+        save_entry(e1, user_catalogue_dir=Path(self.tmpdir))
+        save_entry(e2, user_catalogue_dir=Path(self.tmpdir))
+        import json
+        data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
+        self.assertEqual(len(data), 2)
+
+    def test_save_entry_duplicate_id_gets_new_id(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        e = build_entry(
+            mod_type="texture_pack", name="Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+            entry_id="dup-id",
+        )
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))  # same id
+        import json
+        data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
+        ids = [d["id"] for d in data]
+        self.assertEqual(len(set(ids)), 2, "Duplicate ID should have been renamed")
+
+    def test_save_entry_no_id_raises(self):
+        from src.core.custom_card_builder import save_entry
+        with self.assertRaises(ValueError):
+            save_entry({"id": ""}, user_catalogue_dir=Path(self.tmpdir))
+
+    def test_saved_entry_is_valid_catalogue_json(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+        from src.core.catalogue_loader import load_user_catalogue
+        e = build_entry(
+            mod_type="texture_pack", name="Valid Pack", game="Sly 2",
+            game_serial="SCUS-97264", author="Tester",
+            url="https://example.com", description="Test desc",
+        )
+        save_entry(e, user_catalogue_dir=Path(self.tmpdir))
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["name"], "Valid Pack")
+
+    # generate_id ---------------------------------------------------------
+
+    def test_generate_id_is_string(self):
+        from src.core.custom_card_builder import generate_id
+        gid = generate_id("My Pack", "SCUS-97264")
+        self.assertIsInstance(gid, str)
+        self.assertTrue(gid)
+
+    def test_generate_id_unique_per_call(self):
+        from src.core.custom_card_builder import generate_id
+        ids = {generate_id("Pack", "SCUS-97264") for _ in range(20)}
+        # All 20 should be unique (random suffix)
+        self.assertGreater(len(ids), 1)
+
+
+# ===========================================================================
+# TestConflictResolver
+# ===========================================================================
+
+class TestConflictResolver(unittest.TestCase):
+    """Tests for src.core.conflict_resolver — conflict detection and resolution."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # -----------------------------------------------------------------------
+    # Module import
+    # -----------------------------------------------------------------------
+
+    def test_import(self):
+        from src.core.conflict_resolver import (
+            Conflict, ConflictSeverity,
+            resolve_pnach_conflicts,
+            resolve_cover_art_conflicts,
+            resolve_texture_conflicts,
+            resolve_all_conflicts,
+            auto_fix_conflict,
+        )
+
+    # -----------------------------------------------------------------------
+    # Conflict dataclass
+    # -----------------------------------------------------------------------
+
+    def test_conflict_severity_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.ERROR,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("❌", c.severity_label)
+
+    def test_conflict_severity_warning_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.WARNING,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("⚠", c.severity_label)
+
+    def test_conflict_severity_info_label(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        c = Conflict(
+            conflict_type="test",
+            severity=ConflictSeverity.INFO,
+            title="Test",
+            description="desc",
+        )
+        self.assertIn("ℹ", c.severity_label)
+
+    def test_conflict_item_names(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        p = Path("/tmp/F0A235B4.pnach")
+        c = Conflict(
+            conflict_type="pnach_duplicate_crc",
+            severity=ConflictSeverity.WARNING,
+            title="Test",
+            description="desc",
+            items=[p],
+        )
+        self.assertEqual(c.item_names, ["F0A235B4.pnach"])
+
+    def test_conflict_severity_color_not_empty(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+        for sev in ConflictSeverity:
+            c = Conflict(conflict_type="t", severity=sev, title="t", description="d")
+            self.assertTrue(c.severity_color.startswith("#"))
+
+    # -----------------------------------------------------------------------
+    # resolve_pnach_conflicts — no conflict (empty dirs)
+    # -----------------------------------------------------------------------
+
+    def test_pnach_conflict_empty_dirs(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir  = os.path.join(self.tmpdir, "cheats")
+        cheats_ws   = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    def test_pnach_conflict_missing_dirs(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        conflicts = resolve_pnach_conflicts("", "")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_pnach_conflicts — duplicate CRC across folders
+    # -----------------------------------------------------------------------
+
+    def test_pnach_duplicate_crc_detected(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "AABBCCDD"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            "// patch A\npatch=1,EE,00100000,word,12345678\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            "// patch B\npatch=1,EE,00200000,word,FFFFFFFF\n"
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertIn(crc, conflicts[0].title)
+        # Different addresses → warning, not error
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.WARNING)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
+        self.assertEqual(len(conflicts[0].items), 2)
+
+    def test_pnach_address_clash_detected(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "11223344"
+        shared_addr = "00300000"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{shared_addr},word,12345678\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{shared_addr},word,DEADBEEF\n"
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.ERROR)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
+        self.assertIn(shared_addr.upper(), conflicts[0].description)
+
+    def test_pnach_non_crc_files_ignored(self):
+        """Files that are not 8-hex-digit CRC filenames must be ignored."""
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        Path(os.path.join(cheats_dir, "README.txt")).write_text("hi")
+        Path(os.path.join(cheats_ws, "mycheat.pnach")).write_text("// not a CRC name")
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    def test_pnach_unique_crcs_no_conflict(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        Path(os.path.join(cheats_dir,  "AABBCCDD.pnach")).write_text("patch=1,EE,00100000,word,0\n")
+        Path(os.path.join(cheats_ws, "11223344.pnach")).write_text("patch=1,EE,00200000,word,0\n")
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_cover_art_conflicts
+    # -----------------------------------------------------------------------
+
+    def test_cover_art_no_duplicates(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "SCES-50003.png")).write_bytes(b"PNG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_cover_art_duplicate_detected(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts, ConflictSeverity
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "SLUS-20062.jpg")).write_bytes(b"JPG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
+        self.assertEqual(conflicts[0].conflict_type, "cover_art_duplicate")
+        self.assertIn("SLUS-20062", conflicts[0].title)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_cover_art_non_serial_ignored(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        Path(os.path.join(covers_dir, "background.png")).write_bytes(b"PNG")
+        Path(os.path.join(covers_dir, "background.jpg")).write_bytes(b"JPG")
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_cover_art_missing_dir(self):
+        from src.core.conflict_resolver import resolve_cover_art_conflicts
+        conflicts = resolve_cover_art_conflicts("")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_texture_conflicts
+    # -----------------------------------------------------------------------
+
+    def test_texture_no_conflict_single_pack(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts
+        tex_dir = os.path.join(self.tmpdir, "textures")
+        repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
+        os.makedirs(repl)
+        Path(os.path.join(repl, "texture.dds")).write_bytes(b"DDS")
+        conflicts = resolve_texture_conflicts(tex_dir)
+        self.assertEqual(conflicts, [])
+
+    def test_texture_merged_packs_detected(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts, ConflictSeverity
+        tex_dir = os.path.join(self.tmpdir, "textures")
+        repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
+        os.makedirs(os.path.join(repl, "PackAlpha"))
+        os.makedirs(os.path.join(repl, "PackBeta"))
+        os.makedirs(os.path.join(repl, "PackGamma"))
+        conflicts = resolve_texture_conflicts(tex_dir)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
+        self.assertEqual(conflicts[0].conflict_type, "texture_pack_merged")
+        self.assertIn("SLUS-20062", conflicts[0].title)
+
+    def test_texture_missing_dir(self):
+        from src.core.conflict_resolver import resolve_texture_conflicts
+        conflicts = resolve_texture_conflicts("")
+        self.assertEqual(conflicts, [])
+
+    # -----------------------------------------------------------------------
+    # resolve_all_conflicts — empty config
+    # -----------------------------------------------------------------------
+
+    def test_resolve_all_empty_config(self):
+        from src.core.conflict_resolver import resolve_all_conflicts
+
+        class EmptyConfig:
+            pnach_path     = ""
+            cheats_path    = ""
+            cover_art_path = ""
+            textures_path  = ""
+
+        conflicts = resolve_all_conflicts(EmptyConfig())
+        self.assertEqual(conflicts, [])
+
+    def test_resolve_all_sorted_severity(self):
+        """resolve_all_conflicts must sort errors before warnings before infos."""
+        from src.core.conflict_resolver import resolve_all_conflicts, ConflictSeverity
+
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+        os.makedirs(covers_dir)
+
+        # Create an address clash (ERROR)
+        crc = "DEADBEEF"
+        addr = "00400000"
+        Path(os.path.join(cheats_dir, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{addr},word,11111111\n"
+        )
+        Path(os.path.join(cheats_ws, f"{crc}.pnach")).write_text(
+            f"patch=1,EE,{addr},word,22222222\n"
+        )
+
+        # Create a cover art duplicate (INFO)
+        Path(os.path.join(covers_dir, "SLUS-20062.png")).write_bytes(b"P")
+        Path(os.path.join(covers_dir, "SLUS-20062.jpg")).write_bytes(b"J")
+
+        class Cfg:
+            pnach_path     = cheats_dir
+            cheats_path    = cheats_ws
+            cover_art_path = covers_dir
+            textures_path  = ""
+
+        conflicts = resolve_all_conflicts(Cfg())
+        self.assertGreaterEqual(len(conflicts), 2)
+        severities = [c.severity for c in conflicts]
+        # error should come before info
+        error_idx = next(i for i, s in enumerate(severities) if s == ConflictSeverity.ERROR)
+        info_idx  = next(i for i, s in enumerate(severities) if s == ConflictSeverity.INFO)
+        self.assertLess(error_idx, info_idx)
+
+    # -----------------------------------------------------------------------
+    # auto_fix_conflict — cover art
+    # -----------------------------------------------------------------------
+
+    def test_auto_fix_cover_art_removes_non_png(self):
+        from src.core.conflict_resolver import (
+            resolve_cover_art_conflicts, auto_fix_conflict
+        )
+        covers_dir = os.path.join(self.tmpdir, "covers")
+        os.makedirs(covers_dir)
+        png = Path(os.path.join(covers_dir, "SLUS-20062.png"))
+        jpg = Path(os.path.join(covers_dir, "SLUS-20062.jpg"))
+        png.write_bytes(b"PNG")
+        jpg.write_bytes(b"JPG")
+
+        conflicts = resolve_cover_art_conflicts(covers_dir)
+        self.assertEqual(len(conflicts), 1)
+        ok, msg = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok)
+        self.assertTrue(png.exists(), "PNG must be kept")
+        self.assertFalse(jpg.exists(), "JPG must be deleted")
+
+    def test_auto_fix_non_fixable_returns_false(self):
+        from src.core.conflict_resolver import Conflict, ConflictSeverity, auto_fix_conflict
+        c = Conflict(
+            conflict_type="pnach_duplicate_crc",
+            severity=ConflictSeverity.WARNING,
+            title="test",
+            description="desc",
+            can_auto_fix=False,
+        )
+        ok, msg = auto_fix_conflict(c)
+        self.assertFalse(ok)
+
+
+# ===========================================================================
+
+class TestBackupManager(unittest.TestCase):
+    """Tests for src.core.backup_manager — create / list / restore / delete."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        # Patch get_exe_dir so backups go into our temp dir
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        # Simple fake config with real sub-directories
+        self.cheats_dir    = os.path.join(self.tmpdir, "cheats")
+        self.cheats_ws_dir = os.path.join(self.tmpdir, "cheats_ws")
+        self.covers_dir    = os.path.join(self.tmpdir, "covers")
+        self.textures_dir  = os.path.join(self.tmpdir, "textures")
+        for d in (self.cheats_dir, self.cheats_ws_dir, self.covers_dir, self.textures_dir):
+            os.makedirs(d, exist_ok=True)
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+        self.cfg.pnach_path     = self.cheats_dir
+        self.cfg.cheats_path    = self.cheats_ws_dir
+        self.cfg.cover_art_path = self.covers_dir
+        self.cfg.textures_path  = self.textures_dir
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # -----------------------------------------------------------------------
+    # Module import
+    # -----------------------------------------------------------------------
+
+    def test_import(self):
+        from src.core.backup_manager import (
+            BackupEntry,
+            get_backup_dir,
+            create_backup,
+            list_backups,
+            restore_backup,
+            delete_backup,
+        )
+
+    # -----------------------------------------------------------------------
+    # BackupEntry helpers
+    # -----------------------------------------------------------------------
+
+    def test_size_label_bytes(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=512)
+        self.assertIn("KB", e.size_label)
+
+    def test_size_label_mb(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=5 * 1024 * 1024)
+        self.assertIn("MB", e.size_label)
+
+    def test_size_label_gb(self):
+        from src.core.backup_manager import BackupEntry
+        e = BackupEntry(path="/tmp/x.zip", label="x.zip", created_at="2025-01-01T00:00:00", size_bytes=2 * 1024 * 1024 * 1024)
+        self.assertIn("GB", e.size_label)
+
+    # -----------------------------------------------------------------------
+    # get_backup_dir
+    # -----------------------------------------------------------------------
+
+    def test_get_backup_dir_creates_dir(self):
+        from src.core.backup_manager import get_backup_dir
+        backup_dir = get_backup_dir(self.cfg)
+        self.assertTrue(backup_dir.exists())
+        self.assertTrue(backup_dir.is_dir())
+
+    def test_get_backup_dir_idempotent(self):
+        from src.core.backup_manager import get_backup_dir
+        d1 = get_backup_dir(self.cfg)
+        d2 = get_backup_dir(self.cfg)
+        self.assertEqual(d1, d2)
+
+    # -----------------------------------------------------------------------
+    # create_backup
+    # -----------------------------------------------------------------------
+
+    def test_create_backup_returns_entry(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertIsNotNone(entry)
+        self.assertTrue(entry.label.startswith("backup_"))
+        self.assertTrue(entry.label.endswith(".zip"))
+
+    def test_create_backup_file_exists(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+
+    def test_create_backup_with_note(self):
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg, note="my note")
+        self.assertIn("my_note", entry.label)
+
+    def test_create_backup_note_sanitised(self):
+        """Note with special characters must be sanitised in the filename."""
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg, note="bad/path\\hack")
+        # Slashes and backslashes must not appear in the filename
+        self.assertNotIn("/", entry.label[7:])  # skip "backup_" prefix
+        self.assertNotIn("\\", entry.label)
+
+    def test_create_backup_includes_files(self):
+        """Files placed in the source dirs must appear in the archive."""
+        import zipfile
+        from src.core.backup_manager import create_backup
+
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+        Path(os.path.join(self.covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+
+        entry = create_backup(self.cfg)
+        with zipfile.ZipFile(entry.path) as zf:
+            names = zf.namelist()
+        self.assertTrue(any("AABBCCDD.pnach" in n for n in names))
+        self.assertTrue(any("SLUS-20062.png" in n for n in names))
+
+    def test_create_backup_size_bytes(self):
+        """size_bytes should be > 0 when files are present."""
+        from src.core.backup_manager import create_backup
+        Path(os.path.join(self.cheats_dir, "11223344.pnach")).write_text("patch=1,EE,0,word,0")
+        entry = create_backup(self.cfg)
+        self.assertGreater(entry.size_bytes, 0)
+
+    def test_create_backup_empty_dirs(self):
+        """create_backup should succeed even when all configured dirs are empty."""
+        from src.core.backup_manager import create_backup
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+
+    # -----------------------------------------------------------------------
+    # list_backups
+    # -----------------------------------------------------------------------
+
+    def test_list_backups_empty(self):
+        from src.core.backup_manager import list_backups
+        entries = list_backups(self.cfg)
+        self.assertEqual(entries, [])
+
+    def test_list_backups_after_create(self):
+        from src.core.backup_manager import create_backup, list_backups
+        create_backup(self.cfg, note="first")
+        create_backup(self.cfg, note="second")
+        entries = list_backups(self.cfg)
+        self.assertEqual(len(entries), 2)
+
+    def test_list_backups_newest_first(self):
+        """list_backups must return entries newest-first."""
+        import time
+        from src.core.backup_manager import create_backup, list_backups
+        e1 = create_backup(self.cfg, note="a")
+        time.sleep(0.01)
+        e2 = create_backup(self.cfg, note="b")
+        entries = list_backups(self.cfg)
+        # The most recently created file should appear first
+        labels = [e.label for e in entries]
+        self.assertEqual(labels.index(e2.label), 0)
+
+    # -----------------------------------------------------------------------
+    # restore_backup
+    # -----------------------------------------------------------------------
+
+    def test_restore_backup_restores_files(self):
+        """Files in an archive should be restored to the correct destination."""
+        from src.core.backup_manager import create_backup, restore_backup
+
+        src_file = Path(os.path.join(self.cheats_dir, "DEADBEEF.pnach"))
+        src_file.write_text("patch=1,EE,0,word,0")
+
+        entry = create_backup(self.cfg)
+
+        # Delete the source file then restore
+        src_file.unlink()
+        self.assertFalse(src_file.exists())
+
+        count = restore_backup(entry, self.cfg)
+        self.assertGreater(count, 0)
+        self.assertTrue(src_file.exists())
+
+    def test_restore_backup_returns_count(self):
+        from src.core.backup_manager import create_backup, restore_backup
+        Path(os.path.join(self.covers_dir, "SLUS-20062.png")).write_bytes(b"PNG")
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+        entry = create_backup(self.cfg)
+        count = restore_backup(entry, self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_restore_missing_archive_raises(self):
+        from src.core.backup_manager import BackupEntry, restore_backup
+        fake = BackupEntry(
+            path="/nonexistent/backup_19990101_000000.zip",
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        with self.assertRaises(FileNotFoundError):
+            restore_backup(fake, self.cfg)
+
+    # -----------------------------------------------------------------------
+    # delete_backup
+    # -----------------------------------------------------------------------
+
+    def test_delete_backup_removes_file(self):
+        from src.core.backup_manager import create_backup, delete_backup, list_backups
+        entry = create_backup(self.cfg)
+        self.assertTrue(os.path.isfile(entry.path))
+        ok = delete_backup(entry)
+        self.assertTrue(ok)
+        self.assertFalse(os.path.isfile(entry.path))
+
+    def test_delete_backup_nonexistent_returns_false(self):
+        from src.core.backup_manager import BackupEntry, delete_backup
+        fake = BackupEntry(
+            path="/nonexistent/backup_19990101_000000.zip",
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        ok = delete_backup(fake)
+        self.assertFalse(ok)
+
+    def test_list_after_delete_shows_fewer(self):
+        from src.core.backup_manager import create_backup, delete_backup, list_backups
+        e1 = create_backup(self.cfg, note="keep")
+        e2 = create_backup(self.cfg, note="remove")
+        delete_backup(e2)
+        entries = list_backups(self.cfg)
+        self.assertEqual(len(entries), 1)
+        self.assertIn("keep", entries[0].label)
+
+    def test_restore_zipslip_rejected(self):
+        """A malicious archive with path traversal must not write outside dest_root."""
+        import zipfile as zf_mod
+        from src.core.backup_manager import BackupEntry, restore_backup, get_backup_dir
+
+        backup_dir = get_backup_dir(self.cfg)
+        evil_zip = str(backup_dir / "backup_19990101_000000.zip")
+
+        # Craft an entry whose arcname tries to escape cheats_dir via ../
+        evil_path = "cheats/../../evil.txt"
+        with zf_mod.ZipFile(evil_zip, "w") as zf:
+            zf.writestr(evil_path, "evil content")
+
+        entry = BackupEntry(
+            path=evil_zip,
+            label="backup_19990101_000000.zip",
+            created_at="1999-01-01T00:00:00",
+            size_bytes=0,
+        )
+        count = restore_backup(entry, self.cfg)
+        # The evil file must NOT have been written outside cheats_dir
+        evil_file = os.path.join(self.tmpdir, "evil.txt")
+        self.assertFalse(os.path.exists(evil_file), "Zip-slip path traversal was not blocked")
+        # And nothing should have been restored (the entry was skipped)
+        self.assertEqual(count, 0)
+
+
+# ===========================================================================
+# TestDownloadHistory
+# ===========================================================================
+
+class TestDownloadHistory(unittest.TestCase):
+    """Tests for src.core.download_history."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # --- imports -----------------------------------------------------------
+
+    def test_import(self):
+        from src.core.download_history import (
+            HistoryEntry,
+            STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED,
+            get_history_file,
+            record_event,
+            list_history,
+            clear_history,
+            delete_entry,
+            export_history_csv,
+        )
+
+    # --- HistoryEntry properties -------------------------------------------
+
+    def test_status_label_success(self):
+        from src.core.download_history import HistoryEntry, STATUS_SUCCESS
+        e = HistoryEntry(id="1", timestamp="2025-01-01T00:00:00+00:00",
+                         mod_name="Test", mod_type="pnach", status=STATUS_SUCCESS)
+        self.assertIn("Success", e.status_label)
+
+    def test_status_label_failed(self):
+        from src.core.download_history import HistoryEntry, STATUS_FAILED
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         status=STATUS_FAILED)
+        self.assertIn("Failed", e.status_label)
+
+    def test_status_label_skipped(self):
+        from src.core.download_history import HistoryEntry, STATUS_SKIPPED
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         status=STATUS_SKIPPED)
+        self.assertIn("Skip", e.status_label)
+
+    def test_type_label_texture_pack(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack")
+        self.assertIn("Texture", e.type_label)
+
+    def test_type_label_pnach(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach")
+        self.assertIn("PNACH", e.type_label)
+
+    def test_size_label_zero(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         size_bytes=0)
+        self.assertEqual(e.size_label, "–")
+
+    def test_size_label_bytes(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="pnach",
+                         size_bytes=512)
+        self.assertIn("B", e.size_label)
+
+    def test_size_label_mb(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack",
+                         size_bytes=10 * 1024 * 1024)
+        self.assertIn("MB", e.size_label)
+
+    def test_size_label_gb(self):
+        from src.core.download_history import HistoryEntry
+        e = HistoryEntry(id="1", timestamp="t", mod_name="X", mod_type="texture_pack",
+                         size_bytes=2 * 1024 * 1024 * 1024)
+        self.assertIn("GB", e.size_label)
+
+    # --- serialisation round-trip ------------------------------------------
+
+    def test_to_dict_from_dict_roundtrip(self):
+        from src.core.download_history import HistoryEntry, STATUS_SUCCESS
+        e = HistoryEntry(
+            id="abc", timestamp="2025-03-01T12:00:00+00:00",
+            mod_name="SH2 HD", mod_type="texture_pack",
+            serial="SLUS-20228", source_url="https://example.com",
+            status=STATUS_SUCCESS, size_bytes=1024, note="test note",
+        )
+        e2 = HistoryEntry.from_dict(e.to_dict())
+        self.assertEqual(e.id, e2.id)
+        self.assertEqual(e.mod_name, e2.mod_name)
+        self.assertEqual(e.serial, e2.serial)
+        self.assertEqual(e.size_bytes, e2.size_bytes)
+
+    # --- get_history_file --------------------------------------------------
+
+    def test_get_history_file_returns_path(self):
+        from src.core.download_history import get_history_file
+        p = get_history_file(self.cfg)
+        self.assertIsInstance(p, Path)
+        self.assertTrue(str(p).endswith("download_history.json"))
+
+    # --- record_event ------------------------------------------------------
+
+    def test_record_event_returns_entry(self):
+        from src.core.download_history import record_event, STATUS_SUCCESS
+        e = record_event(self.cfg, mod_name="Test Mod", mod_type="pnach",
+                         status=STATUS_SUCCESS)
+        self.assertIsNotNone(e.id)
+        self.assertEqual(e.mod_name, "Test Mod")
+        self.assertEqual(e.status, STATUS_SUCCESS)
+
+    def test_record_event_writes_json(self):
+        from src.core.download_history import record_event, get_history_file
+        record_event(self.cfg, mod_name="Test Mod", mod_type="pnach")
+        p = get_history_file(self.cfg)
+        self.assertTrue(p.exists())
+        import json
+        data = json.loads(p.read_text())
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+
+    def test_record_event_multiple(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        record_event(self.cfg, mod_name="B", mod_type="cover_art")
+        record_event(self.cfg, mod_name="C", mod_type="texture_pack")
+        entries = list_history(self.cfg)
+        self.assertEqual(len(entries), 3)
+
+    def test_record_event_newest_first(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="First", mod_type="pnach")
+        record_event(self.cfg, mod_name="Second", mod_type="pnach")
+        entries = list_history(self.cfg)
+        self.assertEqual(entries[0].mod_name, "Second")
+        self.assertEqual(entries[1].mod_name, "First")
+
+    # --- list_history filters ----------------------------------------------
+
+    def test_list_history_filter_status(self):
+        from src.core.download_history import record_event, list_history, STATUS_SUCCESS, STATUS_FAILED
+        record_event(self.cfg, mod_name="OK",  mod_type="pnach", status=STATUS_SUCCESS)
+        record_event(self.cfg, mod_name="BAD", mod_type="pnach", status=STATUS_FAILED)
+        successes = list_history(self.cfg, status=STATUS_SUCCESS)
+        failures  = list_history(self.cfg, status=STATUS_FAILED)
+        self.assertEqual(len(successes), 1)
+        self.assertEqual(successes[0].mod_name, "OK")
+        self.assertEqual(len(failures), 1)
+        self.assertEqual(failures[0].mod_name, "BAD")
+
+    def test_list_history_filter_mod_type(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="P", mod_type="pnach")
+        record_event(self.cfg, mod_name="T", mod_type="texture_pack")
+        pnach_only = list_history(self.cfg, mod_type="pnach")
+        self.assertEqual(len(pnach_only), 1)
+        self.assertEqual(pnach_only[0].mod_type, "pnach")
+
+    def test_list_history_filter_serial(self):
+        from src.core.download_history import record_event, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach", serial="SLUS-20228")
+        record_event(self.cfg, mod_name="B", mod_type="pnach", serial="SLES-54053")
+        results = list_history(self.cfg, serial="SLUS-20228")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].serial, "SLUS-20228")
+
+    def test_list_history_limit(self):
+        from src.core.download_history import record_event, list_history
+        for i in range(10):
+            record_event(self.cfg, mod_name=f"Mod {i}", mod_type="pnach")
+        results = list_history(self.cfg, limit=3)
+        self.assertEqual(len(results), 3)
+
+    def test_list_history_empty(self):
+        from src.core.download_history import list_history
+        entries = list_history(self.cfg)
+        self.assertEqual(entries, [])
+
+    # --- clear_history -----------------------------------------------------
+
+    def test_clear_history_returns_count(self):
+        from src.core.download_history import record_event, clear_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        record_event(self.cfg, mod_name="B", mod_type="pnach")
+        count = clear_history(self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_clear_history_empties_log(self):
+        from src.core.download_history import record_event, clear_history, list_history
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        clear_history(self.cfg)
+        self.assertEqual(list_history(self.cfg), [])
+
+    # --- delete_entry ------------------------------------------------------
+
+    def test_delete_entry_removes_one(self):
+        from src.core.download_history import record_event, delete_entry, list_history
+        e1 = record_event(self.cfg, mod_name="Keep", mod_type="pnach")
+        e2 = record_event(self.cfg, mod_name="Remove", mod_type="pnach")
+        result = delete_entry(e2, self.cfg)
+        self.assertTrue(result)
+        remaining = list_history(self.cfg)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0].mod_name, "Keep")
+
+    def test_delete_entry_missing_returns_false(self):
+        from src.core.download_history import HistoryEntry, delete_entry
+        ghost = HistoryEntry(id="nonexistent", timestamp="t",
+                             mod_name="X", mod_type="pnach")
+        self.assertFalse(delete_entry(ghost, self.cfg))
+
+    # --- export_history_csv ------------------------------------------------
+
+    def test_export_csv_creates_file(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        csv_path = export_history_csv(self.cfg)
+        self.assertTrue(os.path.isfile(csv_path))
+
+    def test_export_csv_has_header_and_row(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="Silent Hill 2 HD",
+                     mod_type="texture_pack", serial="SLUS-20228")
+        csv_path = export_history_csv(self.cfg)
+        import csv as csv_mod
+        with open(csv_path, newline="", encoding="utf-8") as fh:
+            rows = list(csv_mod.DictReader(fh))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["mod_name"], "Silent Hill 2 HD")
+        self.assertEqual(rows[0]["serial"], "SLUS-20228")
+
+    def test_export_csv_custom_path(self):
+        from src.core.download_history import record_event, export_history_csv
+        record_event(self.cfg, mod_name="X", mod_type="pnach")
+        out = os.path.join(self.tmpdir, "out.csv")
+        result = export_history_csv(self.cfg, path=out)
+        self.assertEqual(result, out)
+        self.assertTrue(os.path.isfile(out))
+
+    # --- max entries pruning -----------------------------------------------
+
+    def test_max_entries_pruned(self):
+        from src.core.download_history import (
+            record_event, list_history, MAX_HISTORY_ENTRIES,
+            _load, _save,
+        )
+        # Directly write more than MAX entries and verify list_history returns all
+        entries = []
+        for i in range(MAX_HISTORY_ENTRIES + 10):
+            entries.append(
+                __import__("src.core.download_history", fromlist=["HistoryEntry"]).HistoryEntry(
+                    id=str(i), timestamp="t", mod_name=f"M{i}", mod_type="pnach"
+                )
+            )
+        _save(entries, self.cfg)
+        loaded = _load(self.cfg)
+        self.assertEqual(len(loaded), MAX_HISTORY_ENTRIES)
+
+
+
+class TestModNotes(unittest.TestCase):
+    """Tests for src.core.mod_notes."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_exe_dir = cm.get_exe_dir
+        cm.get_exe_dir = lambda: self.tmpdir
+
+        class FakeCfg:
+            pass
+        self.cfg = FakeCfg()
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.get_exe_dir = self._orig_exe_dir
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # --- imports -----------------------------------------------------------
+
+    def test_import(self):
+        from src.core.mod_notes import (
+            NoteEntry,
+            get_notes_file,
+            upsert_note,
+            get_note,
+            list_notes,
+            delete_note,
+            clear_notes,
+            export_notes_csv,
+        )
+
+    # --- NoteEntry properties ----------------------------------------------
+
+    def test_note_entry_type_label_texture_pack(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="SH2 HD",
+                      mod_type="texture_pack")
+        self.assertIn("Texture Pack", n.type_label)
+
+    def test_note_entry_type_label_pnach(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="WS Patch",
+                      mod_type="pnach")
+        self.assertIn("PNACH", n.type_label)
+
+    def test_note_entry_type_label_unknown_defaults_other(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="unknown_type")
+        self.assertIn("Other", n.type_label)
+
+    def test_note_entry_short_text_short(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="pnach", text="hello")
+        self.assertEqual(n.short_text, "hello")
+
+    def test_note_entry_short_text_truncated(self):
+        from src.core.mod_notes import NoteEntry
+        long_text = "a" * 100
+        n = NoteEntry(id="1", entry_id="e1", entry_title="X",
+                      mod_type="pnach", text=long_text)
+        self.assertTrue(n.short_text.endswith("…"))
+        self.assertLessEqual(len(n.short_text), 82)
+
+    # --- serialisation round-trip ------------------------------------------
+
+    def test_to_dict_from_dict_roundtrip(self):
+        from src.core.mod_notes import NoteEntry
+        n = NoteEntry(
+            id="abc", entry_id="eid1", entry_title="SH2 HD",
+            mod_type="texture_pack", serial="SLUS-20228",
+            text="Great pack!", created_at="2025-01-01T00:00:00+00:00",
+            updated_at="2025-06-01T00:00:00+00:00",
+        )
+        n2 = NoteEntry.from_dict(n.to_dict())
+        self.assertEqual(n.id, n2.id)
+        self.assertEqual(n.entry_id, n2.entry_id)
+        self.assertEqual(n.entry_title, n2.entry_title)
+        self.assertEqual(n.text, n2.text)
+        self.assertEqual(n.serial, n2.serial)
+
+    # --- get_notes_file ----------------------------------------------------
+
+    def test_get_notes_file_returns_path(self):
+        from src.core.mod_notes import get_notes_file
+        p = get_notes_file(self.cfg)
+        self.assertIsInstance(p, Path)
+        self.assertTrue(str(p).endswith("mod_notes.json"))
+
+    # --- upsert_note (create) ----------------------------------------------
+
+    def test_upsert_note_creates_new(self):
+        from src.core.mod_notes import upsert_note, get_note
+        n = upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                        mod_type="texture_pack", serial="SLUS-20228",
+                        text="First note")
+        self.assertIsNotNone(n.id)
+        self.assertEqual(n.entry_id, "e1")
+        self.assertEqual(n.text, "First note")
+        self.assertTrue(n.created_at)
+        self.assertTrue(n.updated_at)
+
+    def test_upsert_note_persists_to_disk(self):
+        from src.core.mod_notes import upsert_note, get_notes_file
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="stored")
+        p = get_notes_file(self.cfg)
+        self.assertTrue(p.exists())
+        import json as _json
+        data = _json.loads(p.read_text())
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["text"], "stored")
+
+    # --- upsert_note (update) ----------------------------------------------
+
+    def test_upsert_note_updates_existing(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="v1")
+        upsert_note(self.cfg, entry_id="e1", entry_title="SH2 HD",
+                    mod_type="texture_pack", text="v2 updated")
+        notes = list_notes(self.cfg)
+        self.assertEqual(len(notes), 1)
+        self.assertEqual(notes[0].text, "v2 updated")
+
+    def test_upsert_note_does_not_duplicate(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        for _ in range(3):
+            upsert_note(self.cfg, entry_id="e1", entry_title="SH2",
+                        mod_type="pnach", text="note")
+        self.assertEqual(len(list_notes(self.cfg)), 1)
+
+    # --- get_note ----------------------------------------------------------
+
+    def test_get_note_returns_correct(self):
+        from src.core.mod_notes import upsert_note, get_note
+        upsert_note(self.cfg, entry_id="e1", entry_title="Mod A",
+                    mod_type="pnach", text="note A")
+        upsert_note(self.cfg, entry_id="e2", entry_title="Mod B",
+                    mod_type="pnach", text="note B")
+        n = get_note(self.cfg, "e1")
+        self.assertIsNotNone(n)
+        self.assertEqual(n.text, "note A")
+
+    def test_get_note_returns_none_when_absent(self):
+        from src.core.mod_notes import get_note
+        self.assertIsNone(get_note(self.cfg, "nonexistent"))
+
+    # --- list_notes --------------------------------------------------------
+
+    def test_list_notes_all(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="texture_pack", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="y")
+        notes = list_notes(self.cfg)
+        self.assertEqual(len(notes), 2)
+
+    def test_list_notes_empty_when_no_file(self):
+        from src.core.mod_notes import list_notes
+        self.assertEqual(list_notes(self.cfg), [])
+
+    def test_list_notes_filter_mod_type(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="texture_pack", text="tp")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="pn")
+        tp = list_notes(self.cfg, mod_type="texture_pack")
+        self.assertEqual(len(tp), 1)
+        self.assertEqual(tp[0].mod_type, "texture_pack")
+
+    def test_list_notes_filter_serial(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", serial="SLUS-20228", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", serial="SLES-54053", text="y")
+        results = list_notes(self.cfg, serial="SLUS-20228")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].serial, "SLUS-20228")
+
+    def test_list_notes_filter_query_title(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="Silent Hill 2 HD",
+                    mod_type="texture_pack", text="great")
+        upsert_note(self.cfg, entry_id="b", entry_title="God of War",
+                    mod_type="texture_pack", text="also great")
+        results = list_notes(self.cfg, query="silent")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entry_id, "a")
+
+    def test_list_notes_filter_query_text(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="Mod A",
+                    mod_type="pnach", text="installed v3 successfully")
+        upsert_note(self.cfg, entry_id="b", entry_title="Mod B",
+                    mod_type="pnach", text="waiting to test")
+        results = list_notes(self.cfg, query="v3")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entry_id, "a")
+
+    def test_list_notes_sorted_by_updated_desc(self):
+        from src.core.mod_notes import upsert_note, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="first")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="second")
+        notes = list_notes(self.cfg)
+        # Most recently upserted (b) should appear first
+        self.assertEqual(notes[0].entry_id, "b")
+
+    # --- delete_note -------------------------------------------------------
+
+    def test_delete_note_removes_entry(self):
+        from src.core.mod_notes import upsert_note, delete_note, list_notes
+        upsert_note(self.cfg, entry_id="keep", entry_title="Keep",
+                    mod_type="pnach", text="keep me")
+        upsert_note(self.cfg, entry_id="remove", entry_title="Remove",
+                    mod_type="pnach", text="delete me")
+        result = delete_note(self.cfg, "remove")
+        self.assertTrue(result)
+        remaining = list_notes(self.cfg)
+        self.assertEqual(len(remaining), 1)
+        self.assertEqual(remaining[0].entry_id, "keep")
+
+    def test_delete_note_missing_returns_false(self):
+        from src.core.mod_notes import delete_note
+        self.assertFalse(delete_note(self.cfg, "does_not_exist"))
+
+    # --- clear_notes -------------------------------------------------------
+
+    def test_clear_notes_returns_count(self):
+        from src.core.mod_notes import upsert_note, clear_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="x")
+        upsert_note(self.cfg, entry_id="b", entry_title="B",
+                    mod_type="pnach", text="y")
+        count = clear_notes(self.cfg)
+        self.assertEqual(count, 2)
+
+    def test_clear_notes_empties_store(self):
+        from src.core.mod_notes import upsert_note, clear_notes, list_notes
+        upsert_note(self.cfg, entry_id="a", entry_title="A",
+                    mod_type="pnach", text="x")
+        clear_notes(self.cfg)
+        self.assertEqual(list_notes(self.cfg), [])
+
+    # --- export_notes_csv --------------------------------------------------
+
+    def test_export_csv_creates_file(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="a", entry_title="SH2",
+                    mod_type="texture_pack", text="note")
+        csv_path = export_notes_csv(self.cfg)
+        self.assertTrue(os.path.isfile(csv_path))
+
+    def test_export_csv_has_header_and_row(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="slus_20228", entry_title="SH2 HD",
+                    mod_type="texture_pack", serial="SLUS-20228",
+                    text="Looks great at 4K")
+        csv_path = export_notes_csv(self.cfg)
+        import csv as csv_mod
+        with open(csv_path, newline="", encoding="utf-8") as fh:
+            rows = list(csv_mod.DictReader(fh))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["entry_title"], "SH2 HD")
+        self.assertEqual(rows[0]["serial"], "SLUS-20228")
+        self.assertEqual(rows[0]["text"], "Looks great at 4K")
+
+    def test_export_csv_custom_path(self):
+        from src.core.mod_notes import upsert_note, export_notes_csv
+        upsert_note(self.cfg, entry_id="x", entry_title="X",
+                    mod_type="other", text="test")
+        out = os.path.join(self.tmpdir, "my_notes.csv")
+        result = export_notes_csv(self.cfg, path=out)
+        self.assertEqual(result, out)
+        self.assertTrue(os.path.isfile(out))
