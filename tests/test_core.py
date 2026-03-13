@@ -3913,7 +3913,7 @@ class TestGametdbCoverUrl(unittest.TestCase):
         self.assertEqual(url, "")
 
     def test_lowercase_input_normalised(self):
-        url = self.gcu("slus-21829")
+        url = self.gcu("slus-21714")
         self.assertIn("SLUS21714", url)
         self.assertIn("/US/", url)
 
@@ -3986,7 +3986,7 @@ class TestCatalogueGameSerial(unittest.TestCase):
             "cckrizalid_baroque_textures": "SLUS-21714",
             "spyro_anb_6x_extra_detail":   "SLUS-21372",
             "sly2_save_gamefiles":         "SCES-52400",
-            "bully_save_moataz":           "SLUS-21358",
+            "bully_save_moataz":           "SLUS-21269",
             "god_of_war_save_gbatemp":     "SCUS-97399",
         }
         for eid, expected_serial in expected.items():

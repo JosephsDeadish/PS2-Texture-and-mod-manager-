@@ -1099,7 +1099,7 @@
     "nsfw": false,
     "url": "https://www.patreon.com/c/DeadOnTheInside",
     "type": "texture_pack",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "source": "Patreon",
     "game": "Bully",
     "thumbnail_url": "",
@@ -2794,7 +2794,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/download/categories/ps2-texture-packs.33/",
     "game": "Bully",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "thumbnail_url": "",
     "tags": [
       "bully",
@@ -3123,7 +3123,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
     "game": "Shin Megami Tensei: Nocturne",
-    "game_serial": "SLUS-21198",
+    "game_serial": "SLUS-20911",
     "thumbnail_url": "",
     "tags": [
       "shin-megami-tensei",
@@ -4426,7 +4426,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
     "game": "Bully",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "thumbnail_url": "",
     "tags": [
       "bully",
@@ -6083,7 +6083,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/download/categories/ps2-texture-packs.33/",
     "game": "Shin Megami Tensei: Nocturne",
-    "game_serial": "SLUS-21198",
+    "game_serial": "SLUS-20911",
     "thumbnail_url": "",
     "tags": [
       "shin-megami-tensei",
@@ -6811,7 +6811,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/threads/mega-library-of-hd-texture-packs-by-cckrizalid.618690/",
     "game": "La Pucelle: Ragnarok",
-    "game_serial": "SLUS-20552",
+    "game_serial": "SLUS-20847",
     "thumbnail_url": "",
     "tags": [
       "la-pucelle",
@@ -16489,7 +16489,7 @@
     "download_action": "manual_mega",
     "source": "GBAtemp",
     "game": "Bully / Canis Canem Edit",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "type": "texture_pack",
     "upscale_tech": "AI upscale",
     "tags": [

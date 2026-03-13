@@ -627,7 +627,7 @@
     "nsfw": false,
     "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
     "type": "pnach",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "source": "GitHub",
     "game": "Bully / Canis Canem Edit",
     "thumbnail_url": "",
@@ -2951,7 +2951,7 @@
     "nsfw": false,
     "url": "https://www.ps2wide.net/",
     "game": "Bully",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "thumbnail_url": "",
     "tags": [
       "bully",
@@ -3429,7 +3429,7 @@
     "nsfw": false,
     "url": "https://www.ps2wide.net/",
     "game": "Shin Megami Tensei: Nocturne",
-    "game_serial": "SLUS-21198",
+    "game_serial": "SLUS-20911",
     "thumbnail_url": "",
     "tags": [
       "smt",
@@ -4079,7 +4079,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/download/categories/pnach-cheat-codes.14/",
     "game": "Bully",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "thumbnail_url": "",
     "tags": [
       "bully",
@@ -5119,7 +5119,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/download/categories/pnach-cheat-codes.14/",
     "game": "Shin Megami Tensei: Nocturne",
-    "game_serial": "SLUS-21198",
+    "game_serial": "SLUS-20911",
     "thumbnail_url": "",
     "tags": [
       "smt",
@@ -12865,7 +12865,7 @@
     "direct_download_url": "",
     "source": "PS2Wide",
     "game": "Bully",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "type": "pnach",
     "upscale_tech": "",
     "tags": [
@@ -14522,7 +14522,7 @@
     "download_action": "",
     "source": "PS2Wide",
     "game": "Shin Megami Tensei: Nocturne",
-    "game_serial": "SLUS-21198",
+    "game_serial": "SLUS-20911",
     "type": "pnach",
     "upscale_tech": "",
     "tags": [
@@ -17947,7 +17947,7 @@
     "nsfw": false,
     "url": "https://github.com/PCSX2/pcsx2/tree/master/bin/cheats_ws",
     "type": "pnach",
-    "game_serial": "SLUS-21357",
+    "game_serial": "SLUS-21269",
     "source": "GitHub",
     "game": "Bully / Canis Canem Edit",
     "thumbnail_url": "",
