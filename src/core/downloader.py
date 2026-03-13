@@ -50,6 +50,15 @@ def download_file(
     try:
         with requests.get(url, stream=True, timeout=timeout) as resp:
             resp.raise_for_status()
+            # Detect HTML error pages masquerading as successful responses —
+            # e.g. login walls or CDN error pages that return 200 OK with HTML
+            content_type = resp.headers.get("Content-Type", "").lower()
+            if "text/html" in content_type:
+                raise DownloadError(
+                    f"Server returned an HTML page instead of a file.\n"
+                    f"The URL may require a login or the file may no longer be available.\n"
+                    f"URL: {url}"
+                )
             total = int(resp.headers.get("Content-Length", 0))
             received = 0
             with open(dest, "wb") as f:

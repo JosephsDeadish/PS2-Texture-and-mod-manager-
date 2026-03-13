@@ -14,6 +14,7 @@ import threading
 import tempfile
 from pathlib import Path
 from typing import List, Optional
+from urllib.parse import unquote, urlparse
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QPixmap
@@ -101,6 +102,50 @@ _TYPE_LABELS = {
     ModType.SAVE_FILE: "Game Save",
     ModType.CHEAT: "Cheat",
 }
+
+
+def _download_cover_by_url_async(
+    entry: dict,
+    config,
+    parent_widget,
+) -> None:
+    """Download a cover image from entry['url'] to the configured cover art folder.
+
+    Runs the download on a background thread and shows a Qt dialog on completion.
+    Used by both _CatalogueTabContent and BrowsePanel to avoid code duplication.
+    """
+    url = entry.get("url", "")
+    if not url:
+        QMessageBox.warning(parent_widget, "No URL", "No direct image URL found for this entry.")
+        return
+
+    dest_dir = getattr(config, "cover_art_path", None) or str(THUMBNAILS_DIR)
+
+    # Preserve the actual file extension from the URL; fall back to .png
+    parsed_path = Path(unquote(urlparse(url).path))
+    fname = parsed_path.name
+    if not fname or not parsed_path.suffix:
+        serial = entry.get("game_serial", "cover")
+        suffix = parsed_path.suffix or ".png"
+        fname = f"{serial}{suffix}"
+
+    dest = str(Path(dest_dir) / fname)
+
+    def _run():
+        try:
+            download_file(url, dest)
+            QTimer.singleShot(0, lambda: QMessageBox.information(
+                parent_widget, "Cover Downloaded",
+                f"Cover art saved to:\n{dest}"
+            ))
+        except Exception as exc:
+            err = str(exc)
+            QTimer.singleShot(0, lambda: QMessageBox.warning(
+                parent_widget, "Download Failed",
+                f"Could not download cover art:\n{err}"
+            ))
+
+    threading.Thread(target=_run, daemon=True).start()
 
 # ---------------------------------------------------------------------------
 # Catalogue card widget
@@ -383,7 +428,7 @@ class CatalogueCard(QFrame):
 
         layout.addStretch()
 
-        # Button row: always show both Visit Source and Download buttons side by side
+        # Button row — context-aware based on download_action
         action_row = QHBoxLayout()
         action_row.setSpacing(6)
 
@@ -392,26 +437,72 @@ class CatalogueCard(QFrame):
         visit_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
         action_row.addWidget(visit_btn, 1)
 
-        # Download button is always shown — opens the download/install dialog
-        # so users can paste a direct link for any entry in the catalogue.
+        download_action = self.entry.get("download_action", "")
         has_direct = bool(self.entry.get("direct_download_url"))
-        dl_label = "⬇ Install In-App" if has_direct else "⬇ Download from URL"
-        dl_btn = QPushButton(dl_label)
-        dl_btn.setObjectName("primary_btn")
-        dl_btn.setToolTip(
-            "Download and install this mod directly in PS2 Mod Manager.\n"
-            "Paste a direct download link (ZIP, 7z, PNACH, Google Drive…) "
-            "to download and install a mod."
-        )
-        dl_btn.clicked.connect(lambda: self.install_direct.emit(self.entry))
-        action_row.addWidget(dl_btn, 1)
+
+        if download_action == "cover_by_id":
+            # Cover art downloadable by game serial via GameTDB
+            cover_btn = QPushButton("🖼 Get Cover Art")
+            cover_btn.setObjectName("primary_btn")
+            cover_btn.setToolTip("Download PS2 cover art from GameTDB by game serial")
+            cover_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
+            action_row.addWidget(cover_btn, 1)
+
+        elif download_action == "cover_by_url":
+            # Cover art where the entry URL is a direct image link
+            cover_url_btn = QPushButton("⬇ Download Cover")
+            cover_url_btn.setObjectName("primary_btn")
+            cover_url_btn.setToolTip("Download this cover art image directly")
+            cover_url_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
+            action_row.addWidget(cover_url_btn, 1)
+
+        elif download_action == "manual_mega":
+            # MEGA-hosted content — must be downloaded manually
+            if has_direct:
+                mega_btn = QPushButton("📥 MEGA Link")
+                mega_btn.setObjectName("primary_btn")
+                mega_btn.setToolTip(
+                    "This mod is hosted on MEGA.\n"
+                    "Click to open the download dialog with the MEGA link pre-filled.\n"
+                    "You will need the MEGA desktop client or browser to download."
+                )
+                mega_btn.clicked.connect(lambda: self.install_direct.emit(self.entry))
+            else:
+                mega_btn = QPushButton("📥 Get from MEGA")
+                mega_btn.setObjectName("primary_btn")
+                mega_btn.setToolTip(
+                    "This mod is hosted on MEGA.\n"
+                    "Visit the source page to find the MEGA download link.\n"
+                    "You will need the MEGA desktop client or browser to download."
+                )
+                mega_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
+            action_row.addWidget(mega_btn, 1)
+
+        elif download_action in ("manual", "download_save"):
+            # Manual download — user must browse to the source page
+            find_btn = QPushButton("🔍 Find on GBAtemp")
+            find_btn.setObjectName("primary_btn")
+            find_btn.setToolTip(
+                "Opens the GBAtemp page where you can find and download this file.\n"
+                "After downloading, use ➕ Import in the relevant mod panel to install it."
+            )
+            find_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
+            action_row.addWidget(find_btn, 1)
+
+        else:
+            # Generic: direct download available or user can paste a URL
+            dl_label = "⬇ Install In-App" if has_direct else "⬇ Download from URL"
+            dl_btn = QPushButton(dl_label)
+            dl_btn.setObjectName("primary_btn")
+            dl_btn.setToolTip(
+                "Download and install this mod directly in PS2 Mod Manager.\n"
+                "Paste a direct download link (ZIP, 7z, PNACH, Google Drive…) "
+                "to download and install a mod."
+            )
+            dl_btn.clicked.connect(lambda: self.install_direct.emit(self.entry))
+            action_row.addWidget(dl_btn, 1)
 
         layout.addLayout(action_row)
-
-        if self.entry.get("download_action") == "cover_by_id":
-            cover_btn = QPushButton("🖼 Download Cover by ID")
-            cover_btn.clicked.connect(lambda: self.download_cover.emit(self.entry))
-            layout.addWidget(cover_btn)
 
     def _toggle_favorite(self):
         author = self.entry["author"]
@@ -1117,6 +1208,16 @@ class DownloadInstallDialog(QDialog):
             QTimer.singleShot(0, _no_storage)
             return
 
+        if self.db is None:
+            def _no_db():
+                QMessageBox.warning(self, "Database Not Ready",
+                    "The mod database is not loaded yet.\n"
+                    "Please wait for the application to finish starting up and try again.")
+                self._progress.hide()
+                self._dl_btn.setEnabled(True)
+            QTimer.singleShot(0, _no_db)
+            return
+
         # Capture widget text NOW on the main thread before the background thread
         # starts — Qt widget reads must not be made from non-main threads.
         _name_text = self._name_edit.text().strip()
@@ -1127,7 +1228,6 @@ class DownloadInstallDialog(QDialog):
 
         def _run():
             try:
-                from urllib.parse import urlparse, unquote
                 parsed = urlparse(url)
                 fname = Path(unquote(parsed.path)).name or "downloaded_mod"
                 if not Path(fname).suffix:
@@ -1845,10 +1945,19 @@ class _CatalogueTabContent(QWidget):
         QDesktopServices.openUrl(QUrl(url))
 
     def _download_cover(self, entry: dict):
-        # Pre-fill the serial from the catalogue entry if available
-        initial_serial = entry.get("game_serial", "")
-        dlg = CoverDownloadDialog(self.config, self, initial_serial=initial_serial)
-        dlg.exec()
+        download_action = entry.get("download_action", "")
+        if download_action == "cover_by_url":
+            # The entry's url IS the direct image URL — download it right away
+            self._download_cover_by_url(entry)
+        else:
+            # cover_by_id or generic: open the CoverDownloadDialog
+            initial_serial = entry.get("game_serial", "")
+            dlg = CoverDownloadDialog(self.config, self, initial_serial=initial_serial)
+            dlg.exec()
+
+    def _download_cover_by_url(self, entry: dict):
+        """Download a cover image directly from entry['url'] (cover_by_url action)."""
+        _download_cover_by_url_async(entry, self.config, self)
 
 
 # ---------------------------------------------------------------------------
@@ -1913,7 +2022,7 @@ class BrowsePanel(BasePanel):
         tools_row = QHBoxLayout()
         tools_row.setSpacing(6)
 
-        pnach_btn = QPushButton("🔧 Fetch PNACH (GitHub)")
+        pnach_btn = QPushButton("🔧 Fetch PNACH from GitHub")
         pnach_btn.setToolTip(
             "Browse and download official PCSX2 widescreen PNACH patches "
             "directly from the PCSX2 GitHub repository"
@@ -1921,7 +2030,7 @@ class BrowsePanel(BasePanel):
         pnach_btn.clicked.connect(self._open_pnach_github_dialog)
         tools_row.addWidget(pnach_btn)
 
-        gbatemp_btn = QPushButton("🔍 Scan Forum Post")
+        gbatemp_btn = QPushButton("🔍 Scan GBAtemp/PS2-Home Post")
         gbatemp_btn.setToolTip(
             "Paste a GBAtemp thread, GBAtemp Downloads page, or PS2-Home forum topic URL "
             "to auto-discover the author, game serial, and all download links "
@@ -1946,7 +2055,7 @@ class BrowsePanel(BasePanel):
         create_card_btn.clicked.connect(self._open_custom_card_dialog)
         tools_row.addWidget(create_card_btn)
 
-        conflict_btn = QPushButton("⚠ Conflicts")
+        conflict_btn = QPushButton("⚠ Resolve Conflicts")
         conflict_btn.setToolTip(
             "Scan your installed PCSX2 content for conflicts:\n"
             "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
@@ -1957,7 +2066,7 @@ class BrowsePanel(BasePanel):
         conflict_btn.clicked.connect(self._open_conflict_resolver)
         tools_row.addWidget(conflict_btn)
 
-        backup_btn = QPushButton("💾 Backup")
+        backup_btn = QPushButton("💾 Backup / Restore")
         backup_btn.setToolTip(
             "Create, browse and restore ZIP backups of your PCSX2 managed content:\n"
             "• PNACH cheat files\n"
@@ -2309,36 +2418,90 @@ class BrowsePanel(BasePanel):
         dlg.exec()
 
     def _install_catalogue_entry(self, entry: dict):
-        """Open the Download & Install dialog pre-filled from a catalogue entry."""
-        dlg = DownloadInstallDialog(self.config, self._db, self)
-        # Pre-fill URL: use direct_download_url if available, otherwise leave blank
+        """Open the appropriate download dialog pre-filled from a catalogue entry."""
+        download_action = entry.get("download_action", "")
         direct_url = entry.get("direct_download_url", "")
+        source_url = entry.get("url", "")
+
+        # MEGA entries: show MEGA instructions
+        if download_action == "manual_mega":
+            if direct_url and ("mega.nz" in direct_url or "mega.co.nz" in direct_url):
+                # We have the MEGA link — open dialog so user sees it
+                dlg = DownloadInstallDialog(self.config, self._db, self)
+                dlg._url_edit.setText(direct_url)
+                self._prefill_dialog(dlg, entry)
+                dlg._status.setText(
+                    "📥  This file is hosted on MEGA.\n"
+                    "Copy the MEGA link from the URL field above, open MEGA in your browser\n"
+                    "or desktop client, download the file, then use ➕ Import in the\n"
+                    "Texture Packs panel to install it."
+                )
+                dlg.exec()
+            else:
+                # No direct MEGA link — send user to the source page
+                msg = (
+                    "This mod is hosted on MEGA.  The source page lists the download links.\n\n"
+                    f"Source: {source_url}\n\n"
+                    "Download the file from MEGA (using the MEGA app or browser),\n"
+                    "then use ➕ Import in the Texture Packs panel to install it."
+                )
+                QMessageBox.information(self, "MEGA Download Required", msg)
+            return
+
+        # cover_by_id / cover_by_url: these are handled by _download_cover via the card button;
+        # if this method is somehow called for them, open CoverDownloadDialog
+        if download_action in ("cover_by_id", "cover_by_url"):
+            from src.core.config_manager import THUMBNAILS_DIR
+            if download_action == "cover_by_url" and source_url:
+                self._install_cover_by_url(entry)
+            else:
+                initial_serial = entry.get("game_serial", "")
+                dlg = CoverDownloadDialog(self.config, self, initial_serial=initial_serial)
+                dlg.exec()
+            return
+
+        # manual / download_save: user must browse to the source page themselves
+        if download_action in ("manual", "download_save"):
+            msg = (
+                "This content must be downloaded manually from the source page.\n\n"
+                f"Source: {source_url}\n\n"
+                "After downloading, use ➕ Import in the relevant mod panel to install it."
+            )
+            QMessageBox.information(self, "Manual Download Required", msg)
+            return
+
+        # Default: open the DownloadInstallDialog (URL paste / direct download)
+        dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg._url_edit.setText(direct_url)
+        self._prefill_dialog(dlg, entry)
+        if not direct_url:
+            hint = (
+                "ℹ  No automatic download link is available for this entry.\n"
+                "Please visit the source page to get the direct download URL,\n"
+                "then paste it into the URL field above."
+            )
+            if source_url:
+                hint += f"\n\nSource page: {source_url}"
+            dlg._status.setText(hint)
+        dlg.exec()
+
+    def _prefill_dialog(self, dlg, entry: dict):
+        """Prefill a DownloadInstallDialog with metadata from a catalogue entry."""
         dlg._name_edit.setText(entry.get("name", ""))
         dlg._author_edit.setText(entry.get("author", ""))
         dlg._game_edit.setText(entry.get("game", ""))
         dlg._desc_edit.setText(entry.get("description", "")[:200])
-        # source_url = the catalogue browse-page URL (where the user found this mod)
         dlg._source_url_edit.setText(entry.get("url", ""))
-        # Set mod type combo
         mod_type = entry.get("type")
         if mod_type is not None:
             for i in range(dlg._type_combo.count()):
                 if dlg._type_combo.itemData(i) == mod_type:
                     dlg._type_combo.setCurrentIndex(i)
                     break
-        # When there is no direct download URL, hint the user to visit the source
-        if not direct_url:
-            source_page = entry.get("url", "")
-            hint = (
-                "ℹ  No automatic download link is available for this entry.\n"
-                "Please visit the source page to get the direct download URL,\n"
-                "then paste it into the URL field above."
-            )
-            if source_page:
-                hint += f"\n\nSource page: {source_page}"
-            dlg._status.setText(hint)
-        dlg.exec()
+
+    def _install_cover_by_url(self, entry: dict):
+        """Download cover art directly from entry['url'] (cover_by_url entries)."""
+        _download_cover_by_url_async(entry, self.config, self)
 
 
     def _open_pnach_github_dialog(self):
