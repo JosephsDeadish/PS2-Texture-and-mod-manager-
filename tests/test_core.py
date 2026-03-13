@@ -231,8 +231,58 @@ class TestModDatabase(unittest.TestCase):
             json.dump({"bad": bad_entry}, f)
 
         db = self._make_db()
-        # Should have silently discarded the corrupted database
+        # Should have silently discarded only the corrupted entry
         self.assertEqual(db.all(), [])
+
+    def test_load_keeps_good_entries_when_one_is_corrupt(self):
+        """A single corrupt entry must not wipe valid mods from the database."""
+        import json
+        import src.core.config_manager as cm
+
+        good_entry = {
+            "id": "good", "name": "Good Mod", "mod_type": "texture_pack",
+            "path": "/tmp/good", "enabled": True, "version": "1.0",
+            "author": "", "description": "", "game_id": "", "thumbnail_url": "",
+            "thumbnail_path": "", "source_url": "", "priority": 0,
+            "files": [], "tags": [], "size_bytes": 0, "installed": True,
+            "has_update": False, "installed_at": 0.0,
+        }
+        bad_entry = {
+            "id": "bad", "name": "Bad Mod", "mod_type": "INVALID_TYPE",
+            "path": "", "enabled": True, "version": "1.0", "author": "",
+            "description": "", "game_id": "", "thumbnail_url": "",
+            "thumbnail_path": "", "source_url": "", "priority": 0,
+            "files": [], "tags": [], "size_bytes": 0, "installed": True,
+            "has_update": False, "installed_at": 0.0,
+        }
+        with open(cm.MODS_DB_FILE, "w") as f:
+            json.dump({"good": good_entry, "bad": bad_entry}, f)
+
+        db = self._make_db()
+        # Good entry must survive; corrupt entry is silently skipped
+        self.assertIsNotNone(db.get("good"))
+        self.assertEqual(db.get("good").name, "Good Mod")
+        self.assertIsNone(db.get("bad"))
+
+    def test_save_is_atomic(self):
+        """ModDatabase.save() must not corrupt the DB file on failure."""
+        import json
+        import src.core.config_manager as cm
+        from src.core.mod_manager import ModDatabase
+
+        # Pre-populate the DB with one mod
+        db = self._make_db()
+        mod = ModInfo(id="x", name="X", mod_type=ModType.PNACH, path="/p")
+        db.add(mod)
+
+        # The file must be valid JSON after save()
+        with open(cm.MODS_DB_FILE, "r") as f:
+            data = json.load(f)
+        self.assertIn("x", data)
+
+        # No leftover .tmp files in the same directory
+        tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
+        self.assertEqual(tmp_files, [])
 
 
 class TestModManager(unittest.TestCase):
@@ -493,6 +543,59 @@ class TestDownloader(unittest.TestCase):
             self.assertEqual(result, dest)
             with open(dest, "rb") as f:
                 self.assertEqual(f.read(), b"hello")
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_removes_partial_file_on_network_error(self, mock_get):
+        """A failed mid-download must not leave a partial file on disk."""
+        import tempfile
+        import requests as _requests
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+
+        # First chunk succeeds, second raises a network error
+        def _iter_content(chunk_size=None):
+            yield b"partial"
+            raise _requests.ConnectionError("broken pipe")
+
+        mock_resp.iter_content.side_effect = _iter_content
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            # Partial file must have been removed
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_removes_partial_file_on_cancel(self, mock_get):
+        """Cancelling via the progress callback must remove the partial file."""
+        import tempfile
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+        mock_resp.iter_content.return_value = [b"partial"]
+        mock_get.return_value = mock_resp
+
+        def _cancel_callback(received, total):
+            raise DownloadError("Download cancelled")
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest,
+                              progress_callback=_cancel_callback)
+            # Partial file must have been removed
+            self.assertFalse(Path(dest).exists())
 
 
 class TestArchiveExtraction(unittest.TestCase):
@@ -775,6 +878,29 @@ class TestMemoryCardCreate(unittest.TestCase):
         deep_path = str(Path(self.tmpdir) / "sub" / "deep" / "card.ps2")
         result = create_memcard(deep_path)
         self.assertTrue(Path(result).exists())
+
+    def test_raises_on_zero_size(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "bad.ps2"), size_mb=0)
+
+    def test_raises_on_negative_size(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "bad.ps2"), size_mb=-1)
+
+    def test_raises_on_oversized(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "big.ps2"), size_mb=65)
+
+    def test_accepts_boundary_sizes(self):
+        """size_mb=1 and size_mb=64 must both succeed."""
+        from src.core.memory_card import create_memcard
+        p1 = str(Path(self.tmpdir) / "min.ps2")
+        p64 = str(Path(self.tmpdir) / "max.ps2")
+        self.assertTrue(Path(create_memcard(p1, size_mb=1)).exists())
+        self.assertTrue(Path(create_memcard(p64, size_mb=64)).exists())
 
 
 class TestUpdateMetadata(unittest.TestCase):
@@ -7158,6 +7284,40 @@ class TestDownloadHistory(unittest.TestCase):
         _save(entries, self.cfg)
         loaded = _load(self.cfg)
         self.assertEqual(len(loaded), MAX_HISTORY_ENTRIES)
+
+    def test_save_is_atomic_no_tmp_files_left(self):
+        """_save() must not leave .tmp files after a successful write."""
+        from src.core.download_history import record_event, _save, _load
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        # No .tmp files should remain
+        tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
+        self.assertEqual(tmp_files, [])
+
+    def test_save_does_not_corrupt_existing_file_on_write_error(self):
+        """If an error occurs during write, the original file must be unchanged."""
+        import json
+        from src.core.download_history import record_event, _load, get_history_file
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+
+        import unittest.mock as um
+        from src.core.download_history import _save
+        entries = _load(self.cfg)
+        history_path = get_history_file(self.cfg)
+
+        original_json = json.loads(history_path.read_text(encoding="utf-8"))
+
+        def _bad_replace(src, dst):
+            raise OSError("simulated disk full")
+
+        with um.patch("src.core.download_history.os.replace", side_effect=_bad_replace):
+            try:
+                _save(entries, self.cfg)
+            except OSError:
+                pass
+
+        # Original file must still be valid
+        data = json.loads(history_path.read_text(encoding="utf-8"))
+        self.assertEqual(data, original_json)
 
 
 

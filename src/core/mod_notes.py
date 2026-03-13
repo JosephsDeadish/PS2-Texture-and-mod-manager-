@@ -46,6 +46,8 @@ from __future__ import annotations
 import csv
 import datetime
 import json
+import os
+import tempfile
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
@@ -189,10 +191,20 @@ def _load(config=None) -> List[NoteEntry]:
 
 
 def _save(notes: List[NoteEntry], config=None) -> None:
-    """Persist *notes* to disk."""
+    """Persist *notes* to disk atomically."""
     path = get_notes_file(config)
-    with open(path, "w", encoding="utf-8") as fh:
-        json.dump([n.to_dict() for n in notes], fh, indent=2)
+    data = [n.to_dict() for n in notes]
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2)
+        os.replace(tmp_path, str(path))
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 # ---------------------------------------------------------------------------

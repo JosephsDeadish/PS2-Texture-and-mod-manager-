@@ -61,13 +61,19 @@ def download_file(
                 )
             total = int(resp.headers.get("Content-Length", 0))
             received = 0
-            with open(dest, "wb") as f:
-                for chunk in resp.iter_content(chunk_size=65536):
-                    if chunk:
-                        f.write(chunk)
-                        received += len(chunk)
-                        if progress_callback:
-                            progress_callback(received, total)
+            try:
+                with open(dest, "wb") as f:
+                    for chunk in resp.iter_content(chunk_size=65536):
+                        if chunk:
+                            f.write(chunk)
+                            received += len(chunk)
+                            if progress_callback:
+                                progress_callback(received, total)
+            except BaseException:
+                # Remove any partially-written file so callers never see a
+                # truncated download artifact.
+                dest.unlink(missing_ok=True)
+                raise
     except requests.RequestException as exc:
         raise DownloadError(f"Download failed: {exc}") from exc
 

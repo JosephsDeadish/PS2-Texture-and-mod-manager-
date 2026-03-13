@@ -306,10 +306,17 @@ def create_memcard(dest_path: str, size_mb: int = 8) -> str:
     Args:
         dest_path: Full path including filename (e.g. ~/memcards/Slot1.ps2).
         size_mb:   Card size in megabytes.  8 MB is the standard PS2 card size.
+                   Must be between 1 and 64 (inclusive).
 
     Returns:
         The absolute path of the created file.
     """
+    if not isinstance(size_mb, int) or size_mb < 1 or size_mb > 64:
+        raise MemoryCardError(
+            f"Invalid memory card size: {size_mb} MB. "
+            "Valid range is 1–64 MB (standard PS2 card is 8 MB)."
+        )
+
     dest = Path(dest_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
 

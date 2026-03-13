@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shutil
+import tempfile
 import uuid
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -35,6 +36,28 @@ def _folder_has_serial_structure(folder: Path) -> bool:
     except PermissionError:
         return False
 
+
+def _atomic_json_write(path: Path, data) -> None:
+    """Write *data* as JSON to *path* atomically.
+
+    Writes to a sibling temporary file first, then replaces the target using
+    :func:`os.replace` which is atomic on POSIX and best-effort on Windows.
+    If writing fails the temporary file is removed and the exception is
+    re-raised, leaving the original file intact.
+    """
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2)
+        os.replace(tmp_path, str(path))
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
 class ModDatabase:
     """Persistent mod database backed by JSON."""
 
@@ -53,15 +76,23 @@ class ModDatabase:
             try:
                 with open(db_file, "r", encoding="utf-8") as f:
                     raw = json.load(f)
-                self._mods = {k: ModInfo.from_dict(v) for k, v in raw.items()}
-            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+                # Load entries individually so a single corrupt record does not
+                # wipe the entire mod database.
+                mods: Dict[str, ModInfo] = {}
+                for k, v in raw.items():
+                    try:
+                        mods[k] = ModInfo.from_dict(v)
+                    except (KeyError, TypeError, ValueError):
+                        pass  # skip corrupt individual entries
+                self._mods = mods
+            except (json.JSONDecodeError, TypeError):
                 self._mods = {}
 
     def save(self):
         db_file = _cfg.MODS_DB_FILE
         db_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(db_file, "w", encoding="utf-8") as f:
-            json.dump({k: v.to_dict() for k, v in self._mods.items()}, f, indent=2)
+        data = {k: v.to_dict() for k, v in self._mods.items()}
+        _atomic_json_write(db_file, data)
 
     # ------------------------------------------------------------------
     # CRUD
