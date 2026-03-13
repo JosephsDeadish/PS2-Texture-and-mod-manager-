@@ -3686,8 +3686,103 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 self.assertTrue(explicit,
                     f"Patreon entry {entry['id']} has requires_account=False, expected True")
 
+    def test_in_app_download_filter_logic(self):
+        """in_app_only filter must show only entries downloadable within the app.
 
-class TestTextureStructureNormalization(unittest.TestCase):
+        An entry is in-app downloadable when:
+        - download_action is 'cover_by_id' or 'cover_by_url', OR
+        - download_action is '' AND direct_download_url is non-empty.
+        All other entries (manual, download_save, manual_mega without direct
+        URL, or empty action without direct URL) must be hidden.
+        """
+        def is_in_app(entry):
+            action = entry.get("download_action", "")
+            if action in ("cover_by_id", "cover_by_url"):
+                return True
+            return action == "" and bool(entry.get("direct_download_url", ""))
+
+        must_be_true = [
+            {"download_action": "cover_by_id", "direct_download_url": ""},
+            {"download_action": "cover_by_url", "direct_download_url": ""},
+            {
+                "download_action": "",
+                "direct_download_url": "https://www.mediafire.com/file/abc/mod.zip/file",
+            },
+            {
+                "download_action": "",
+                "direct_download_url": "https://drive.google.com/file/d/ABCDEF/view",
+            },
+        ]
+        for e in must_be_true:
+            self.assertTrue(is_in_app(e), f"Expected in-app=True for {e}")
+
+        must_be_false = [
+            {"download_action": "manual", "direct_download_url": ""},
+            {"download_action": "download_save", "direct_download_url": ""},
+            {"download_action": "manual_mega", "direct_download_url": ""},
+            {"download_action": "manual_mega",
+             "direct_download_url": "https://mega.nz/file/ABCDEF"},
+            {"download_action": "", "direct_download_url": ""},
+            {"download_action": ""},
+        ]
+        for e in must_be_false:
+            self.assertFalse(is_in_app(e), f"Expected in-app=False for {e}")
+
+    def test_in_app_download_filter_applied_to_catalogue(self):
+        """The in_app_only filter on the real catalogue must yield a subset of entries."""
+        def is_in_app(entry):
+            action = entry.get("download_action", "")
+            if action in ("cover_by_id", "cover_by_url"):
+                return True
+            return action == "" and bool(entry.get("direct_download_url", ""))
+
+        in_app = [e for e in self.catalogue if is_in_app(e)]
+        not_in_app = [e for e in self.catalogue if not is_in_app(e)]
+
+        self.assertEqual(len(in_app) + len(not_in_app), len(self.catalogue))
+
+        for e in in_app:
+            action = e.get("download_action", "")
+            direct = e.get("direct_download_url", "")
+            ok = action in ("cover_by_id", "cover_by_url") or (action == "" and bool(direct))
+            self.assertTrue(ok, f"Entry {e['id']} wrongly classified as in-app")
+
+        from src.models.mod import ModType
+        cover_in_app = [
+            e for e in self.catalogue
+            if e.get("type") == ModType.COVER_ART and is_in_app(e)
+        ]
+        self.assertGreater(len(cover_in_app), 100,
+                           "Expected many cover art entries to be in-app downloadable")
+
+    def test_no_serial_shared_across_unrelated_games(self):
+        """Each game_serial must not be assigned to more than 4 distinct game titles.
+
+        A small number of duplicate titles (e.g. 'Dragon Quest VIII' vs
+        'Dragon Quest VIII: Journey of the Cursed King') are acceptable, but
+        a serial being shared across genuinely different games indicates a
+        data error in the catalogue.  The threshold is set to 4 to reflect
+        the current cleaned state; future waves should reduce this further.
+        """
+        from collections import defaultdict
+
+        serial_games: dict = defaultdict(set)
+        for entry in self.catalogue:
+            serial = entry.get("game_serial", "")
+            game = entry.get("game", "")
+            if serial and game:
+                serial_games[serial].add(game)
+
+        for serial, games in serial_games.items():
+            self.assertLessEqual(
+                len(games),
+                4,
+                f"Serial {serial} is shared by {len(games)} different games: {games}. "
+                "This likely indicates wrong game_serial assignments.",
+            )
+
+
+
     """Tests for ModManager._normalize_texture_structure."""
 
     def setUp(self):

@@ -95,6 +95,31 @@ def _entry_is_complete(entry: dict) -> bool:
     return bool(entry.get("is_complete", True))
 
 
+def _entry_is_in_app_downloadable(entry: dict) -> bool:
+    """Return True if this entry can be fully downloaded and installed within the app.
+
+    An entry is considered *in-app downloadable* when the application can obtain
+    and install the file without the user opening a web browser or an external tool:
+
+    * ``cover_by_id``  — cover art fetched automatically from GameTDB by serial.
+    * ``cover_by_url`` — cover art fetched directly from a known URL.
+    * empty action **with** a ``direct_download_url`` — the app can download the
+      file directly (MediaFire and Google Drive links are resolved automatically).
+
+    Actions that are **not** in-app:
+    * ``manual`` — user must visit a web page to download the file.
+    * ``download_save`` — user must browse GBAtemp to find the correct save.
+    * ``manual_mega`` — user must use the MEGA desktop client or browser.
+    * empty action **without** a ``direct_download_url`` — no download path.
+    """
+    action = entry.get("download_action", "")
+    if action in ("cover_by_id", "cover_by_url"):
+        return True
+    if action == "" and bool(entry.get("direct_download_url", "")):
+        return True
+    return False
+
+
 # Human-readable labels for each ModType in catalogue cards
 _TYPE_LABELS = {
     ModType.TEXTURE_PACK: "Texture Pack",
@@ -1523,7 +1548,7 @@ class PnachGitHubDialog(QDialog):
                                 author="PCSX2 Team",
                                 source_url=(
                                     "https://github.com/PCSX2/widescreen_patches/blob/"
-                                    f"master/{patch.get('filename', f\"{patch['crc']}.pnach\")}"
+                                    f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
                                 ),
                                 files=[path],
                                 size_bytes=pnach_file_path.stat().st_size if pnach_file_path.exists() else 0,
@@ -1840,7 +1865,8 @@ class _CatalogueTabContent(QWidget):
                       show_nsfw: bool = False,
                       show_paid: bool = False,
                       show_account_required: bool = False,
-                      show_incomplete: bool = True):
+                      show_incomplete: bool = True,
+                      in_app_only: bool = False):
         self._current_query = query
         self._current_source = source
         self._current_author = author
@@ -1849,6 +1875,7 @@ class _CatalogueTabContent(QWidget):
         self._show_paid = show_paid
         self._show_account_required = show_account_required
         self._show_incomplete = show_incomplete
+        self._in_app_only = in_app_only
 
         q = query.lower()
         fav_authors = getattr(self.config, "favorite_authors", [])
@@ -1866,6 +1893,9 @@ class _CatalogueTabContent(QWidget):
                 continue
             # Incomplete/partial filter
             if not _entry_is_complete(e) and not show_incomplete:
+                continue
+            # In-app download filter — hide entries that require a browser or external tool
+            if in_app_only and not _entry_is_in_app_downloadable(e):
                 continue
             if q and not (
                 q in e.get("name", "").lower()
@@ -2202,6 +2232,22 @@ class BrowsePanel(BasePanel):
         self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
         type_filter_row.addWidget(self._incomplete_check)
 
+        # In-app download toggle
+        self._in_app_check = QCheckBox("📥 In-App Downloads Only")
+        self._in_app_check.setChecked(getattr(self.config, "in_app_only", False))
+        self._in_app_check.setStyleSheet("color: #50d090; font-size: 12px;")
+        self._in_app_check.setToolTip(
+            "Show only entries that can be downloaded and installed directly\n"
+            "within PS2 Mod Manager — no browser or external tool required.\n"
+            "\n"
+            "Includes: cover art (GameTDB / direct URL) and mods with a\n"
+            "pre-configured MediaFire or Google Drive download link.\n"
+            "\n"
+            "When unchecked, all entries (including manual downloads) are shown."
+        )
+        self._in_app_check.stateChanged.connect(self._on_in_app_toggled)
+        type_filter_row.addWidget(self._in_app_check)
+
         type_filter_row.addStretch()
 
         # Clear Filters button — resets all filters to defaults
@@ -2303,10 +2349,12 @@ class BrowsePanel(BasePanel):
         show_paid = self._paid_check.isChecked()
         show_account_required = self._acct_check.isChecked()
         show_incomplete = self._incomplete_check.isChecked()
+        in_app_only = self._in_app_check.isChecked()
         for tab in self._tab_contents:
             tab.apply_filters(
                 query, source, author, favs_only, show_nsfw,
                 show_paid, show_account_required, show_incomplete,
+                in_app_only=in_app_only,
             )
 
     def _on_nsfw_toggled(self, state: int):
@@ -2350,6 +2398,16 @@ class BrowsePanel(BasePanel):
             pass
         self._apply_filters()
 
+    def _on_in_app_toggled(self, state: int):
+        """Persist the in-app-only preference and re-apply filters."""
+        self.config.in_app_only = bool(state)
+        try:
+            from src.core.config_manager import save_config
+            save_config(self.config)
+        except Exception:
+            pass
+        self._apply_filters()
+
     def _on_result_count_changed(self, visible: int, total: int):
         """Update the result count label when the active tab's filter changes."""
         if visible == total:
@@ -2373,6 +2431,7 @@ class BrowsePanel(BasePanel):
                 self._paid_check.isChecked(),
                 self._acct_check.isChecked(),
                 self._incomplete_check.isChecked(),
+                in_app_only=self._in_app_check.isChecked(),
             )
 
     def _clear_filters(self):
@@ -2387,6 +2446,7 @@ class BrowsePanel(BasePanel):
             self._paid_check,
             self._acct_check,
             self._incomplete_check,
+            self._in_app_check,
         ):
             widget.blockSignals(True)
 
@@ -2398,6 +2458,7 @@ class BrowsePanel(BasePanel):
         self._paid_check.setChecked(False)
         self._acct_check.setChecked(True)
         self._incomplete_check.setChecked(True)
+        self._in_app_check.setChecked(False)
 
         for widget in (
             self._search,
@@ -2408,6 +2469,7 @@ class BrowsePanel(BasePanel):
             self._paid_check,
             self._acct_check,
             self._incomplete_check,
+            self._in_app_check,
         ):
             widget.blockSignals(False)
 
