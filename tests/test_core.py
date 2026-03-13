@@ -5432,15 +5432,28 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertIn("word",                pa.PATCH_TYPE_LABELS)
 
     def test_most_entries_have_word_patch_type(self):
-        """The vast majority of entries should use 'word' patch_type (32-bit writes)."""
+        """Word (32-bit) patches should be the plurality patch type.
+
+        The original hand-crafted DB was nearly all word patches.  After importing
+        579+ real-world pnach files from the community, byte (8-bit) and short
+        (16-bit) writes are also common — many PS2 items/flags are stored in < 4
+        bytes.  We therefore only require word patches to be the most frequent type
+        and to account for at least 35% of all entries.
+        """
         import json
         from pathlib import Path
         db = json.loads((Path(__file__).parent.parent /
                          "data/pnach_db/known_addresses.json").read_text())
-        word_count = sum(1 for v in db.values() if v.get("patch_type") == "word")
+        from collections import Counter
+        type_counts = Counter(v.get("patch_type") for v in db.values())
+        word_count = type_counts.get("word", 0)
         total = len(db)
-        self.assertGreater(word_count / total, 0.90,
-                           f"Expected >90% word patches; got {word_count}/{total}")
+        self.assertGreater(word_count / total, 0.35,
+                           f"Expected >35% word patches; got {word_count}/{total}")
+        # word should also be the plurality type (most common)
+        most_common_type = type_counts.most_common(1)[0][0]
+        self.assertEqual(most_common_type, "word",
+                         f"Expected 'word' to be most common patch type; got '{most_common_type}'")
 
 
 class TestTextureFilePickerLogic(unittest.TestCase):
