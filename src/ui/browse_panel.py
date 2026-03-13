@@ -2078,7 +2078,7 @@ class BrowsePanel(BasePanel):
         show_nsfw = bool(state)
         self.config.show_nsfw = show_nsfw
         try:
-            from src.core.config import save_config
+            from src.core.config_manager import save_config
             save_config(self.config)
         except Exception:
             pass
@@ -2088,7 +2088,7 @@ class BrowsePanel(BasePanel):
         """Persist the show-paid preference and re-apply filters."""
         self.config.show_paid = bool(state)
         try:
-            from src.core.config import save_config
+            from src.core.config_manager import save_config
             save_config(self.config)
         except Exception:
             pass
@@ -2098,7 +2098,7 @@ class BrowsePanel(BasePanel):
         """Persist the show-account-required preference and re-apply filters."""
         self.config.show_account_required = bool(state)
         try:
-            from src.core.config import save_config
+            from src.core.config_manager import save_config
             save_config(self.config)
         except Exception:
             pass
@@ -2108,7 +2108,7 @@ class BrowsePanel(BasePanel):
         """Persist the show-incomplete preference and re-apply filters."""
         self.config.show_incomplete = bool(state)
         try:
-            from src.core.config import save_config
+            from src.core.config_manager import save_config
             save_config(self.config)
         except Exception:
             pass
