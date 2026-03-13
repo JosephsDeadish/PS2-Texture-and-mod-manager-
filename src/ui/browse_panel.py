@@ -1659,6 +1659,14 @@ class GBATempScraperDialog(QDialog):
 # Tab content widget
 # ---------------------------------------------------------------------------
 
+#: Number of catalogue cards rendered per page.  Rendering the full catalogue
+#: (2,500+ entries) at once blocks the UI thread for several seconds on most
+#: machines and spawns hundreds of simultaneous network threads for cover art.
+#: Limiting the initial render to _PAGE_SIZE cards keeps startup instant while
+#: the user can still load more entries on demand.
+_PAGE_SIZE = 30
+
+
 class _CatalogueTabContent(QWidget):
     favorite_toggled = pyqtSignal(str, bool)
     install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
@@ -1676,6 +1684,11 @@ class _CatalogueTabContent(QWidget):
         self._show_paid = False
         self._show_account_required = True
         self._show_incomplete = True
+
+        # Pagination state – updated by _populate / _append_cards
+        self._all_filtered: list = []   # current filter-result set
+        self._shown_count: int = 0      # how many cards are currently in the grid
+        self._load_more_btn = None      # QPushButton or None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -1747,13 +1760,31 @@ class _CatalogueTabContent(QWidget):
         self._populate(filtered)
 
     def _populate(self, entries: list):
+        # Clear every widget currently in the grid (cards, spacers, load-more btn)
         while self._cards_layout.count():
             item = self._cards_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
+        self._all_filtered = entries
+        self._shown_count = 0
+        self._load_more_btn = None
+
+        self._append_cards(_PAGE_SIZE)
+
+        # Emit filter-match count (total entries that pass the filter, not how
+        # many cards are rendered — the result-count label reflects the filter).
+        self.result_count_changed.emit(len(entries), len(self._all_entries))
+
+    def _append_cards(self, count: int):
+        """Render up to *count* more cards starting from self._shown_count."""
+        entries = self._all_filtered
+        start = self._shown_count
+        end = min(start + count, len(entries))
         cols = 3
-        for i, entry in enumerate(entries):
+
+        for i in range(start, end):
+            entry = entries[i]
             card = CatalogueCard(entry, self.config)
             card.open_url.connect(self._open_url)
             card.download_cover.connect(self._download_cover)
@@ -1761,16 +1792,41 @@ class _CatalogueTabContent(QWidget):
             card.install_direct.connect(self.install_direct.emit)
             self._cards_layout.addWidget(card, i // cols, i % cols)
 
-        remainder = len(entries) % cols
-        if remainder and entries:
-            for j in range(cols - remainder):
-                spacer = QWidget()
-                spacer.setSizePolicy(
-                    QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-                )
-                self._cards_layout.addWidget(spacer, len(entries) // cols, remainder + j)
+        self._shown_count = end
 
-        self.result_count_changed.emit(len(entries), len(self._all_entries))
+        # Remove the previous "Load More" button (if any) before deciding
+        # whether a new one is needed.
+        if self._load_more_btn is not None:
+            self._cards_layout.removeWidget(self._load_more_btn)
+            self._load_more_btn.deleteLater()
+            self._load_more_btn = None
+
+        n_remaining = len(entries) - self._shown_count
+        if n_remaining > 0:
+            # Place "Load More" button spanning all columns in the next row
+            load_row = (self._shown_count + cols - 1) // cols
+            btn = QPushButton(f"⬇  Load more  ({n_remaining} remaining)")
+            btn.setObjectName("primary_btn")
+            btn.clicked.connect(self._load_more)
+            self._load_more_btn = btn
+            self._cards_layout.addWidget(btn, load_row, 0, 1, cols)
+        else:
+            # Last page — fill any incomplete row with invisible spacers so
+            # cards in the last row don't stretch to fill the full width.
+            remainder = self._shown_count % cols
+            if remainder and entries:
+                for j in range(cols - remainder):
+                    spacer = QWidget()
+                    spacer.setSizePolicy(
+                        QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+                    )
+                    self._cards_layout.addWidget(
+                        spacer, self._shown_count // cols, remainder + j
+                    )
+
+    def _load_more(self):
+        """Append the next page of catalogue cards."""
+        self._append_cards(_PAGE_SIZE)
 
     def _open_url(self, url: str):
         from PyQt6.QtGui import QDesktopServices

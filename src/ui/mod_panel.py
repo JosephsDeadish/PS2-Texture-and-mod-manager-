@@ -588,7 +588,7 @@ class ModPanel(BasePanel):
         )
         dlg.exec()
 
-
+    def _check_updates(self):
         """
         Run the update checker for all mods in this panel that have a source URL.
         Results are shown in a summary dialog; mods with available updates get an
