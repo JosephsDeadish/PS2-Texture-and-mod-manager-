@@ -7957,3 +7957,287 @@ class TestSerialDatabase(unittest.TestCase):
                         entry.get("game_serial"), "SCUS-97399",
                         f"{fname}: God of War entry has wrong serial"
                     )
+
+
+# ===========================================================================
+# Wave 38 – serial DB CRCs, expanded cheats catalogue, link checker,
+#            CRC↔serial cross-validation
+# ===========================================================================
+
+class TestSerialDbCrcs(unittest.TestCase):
+    """Serial DB must have CRC arrays populated from the PNACH DB."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_serial_db_expanded_to_over_700_games(self):
+        """After Wave 38 expansion, serial DB should contain > 700 games."""
+        self.assertGreater(self.sdb.game_count(), 700)
+
+    def test_kingdom_hearts_has_crcs(self):
+        info = self.sdb.get_info("Kingdom Hearts")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0,
+                           "Kingdom Hearts entry should have at least one CRC")
+
+    def test_god_of_war_has_crcs(self):
+        info = self.sdb.get_info("God of War")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0,
+                           "God of War entry should have at least one CRC")
+
+    def test_final_fantasy_x_has_crcs(self):
+        info = self.sdb.get_info("Final Fantasy X")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0)
+
+    def test_gta_san_andreas_has_crcs(self):
+        info = self.sdb.get_info("Grand Theft Auto: San Andreas")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0)
+
+    def test_games_with_crcs_count_over_200(self):
+        """At least 200 games in the serial DB must have CRC entries."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
+        )
+        self.assertGreater(count, 200,
+                           f"Expected >200 games with CRCs, got {count}")
+
+    def test_crcs_are_8_hex_uppercase(self):
+        """All CRC values must be 8 uppercase hex characters."""
+        import re
+        pat = re.compile(r'^[0-9A-F]{8}$')
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            for crc in info.crcs:
+                self.assertRegex(crc, pat,
+                                 f"Bad CRC {crc!r} for '{title}'")
+
+
+class TestCrcSerialConsistency(unittest.TestCase):
+    """CRC-serial cross-validation: every CRC's serial should exist in serial_db."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_crc_serial_consistency_issues_under_5(self):
+        """After Wave 38 fixes, < 5 CRC entries should have unknown serials.
+
+        The only allowed leftovers are non-NTSC-U serials (PSP, Korean, etc.)
+        that are correctly absent from the NTSC-U serial DB.
+        """
+        issues = self.sdb.validate_crc_serial_consistency()
+        self.assertLess(
+            len(issues), 5,
+            f"Found {len(issues)} CRC-serial mismatches (expected < 5):\n"
+            + "\n".join(str(i) for i in issues[:10])
+        )
+
+    def test_crc_serial_consistency_returns_list(self):
+        result = self.sdb.validate_crc_serial_consistency()
+        self.assertIsInstance(result, list)
+        for item in result:
+            self.assertIn("crc",    item)
+            self.assertIn("serial", item)
+            self.assertIn("issue",  item)
+
+
+class TestCheatsCatalogue(unittest.TestCase):
+    """Expanded cheats catalogue should have game-specific entries."""
+
+    def setUp(self):
+        import json, os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "catalogue", "cheats.json"
+        )
+        with open(path, encoding="utf-8") as f:
+            self.cheats = json.load(f)
+
+    def test_cheats_catalogue_has_over_100_entries(self):
+        """After Wave 38 expansion, cheats.json should have > 100 entries."""
+        self.assertGreater(len(self.cheats), 100)
+
+    def test_cheats_catalogue_has_game_specific_entries(self):
+        """At least 80 entries should have a non-empty game_serial."""
+        with_serial = [e for e in self.cheats if e.get("game_serial")]
+        self.assertGreater(len(with_serial), 80,
+                           f"Only {len(with_serial)} entries have a game_serial")
+
+    def test_cheats_catalogue_kingdom_hearts_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SLUS-20370", serials,
+                      "Kingdom Hearts (SLUS-20370) should be in cheats catalogue")
+
+    def test_cheats_catalogue_god_of_war_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SCUS-97399", serials,
+                      "God of War (SCUS-97399) should be in cheats catalogue")
+
+    def test_cheats_catalogue_resident_evil_4_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SLUS-21134", serials,
+                      "Resident Evil 4 (SLUS-21134) should be in cheats catalogue")
+
+    def test_cheats_catalogue_all_serials_valid_format(self):
+        """Every game_serial field must match XXXX-NNNNN or be empty."""
+        import re
+        pat = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for entry in self.cheats:
+            serial = entry.get("game_serial", "")
+            if serial:
+                self.assertRegex(serial, pat,
+                                 f"Bad serial {serial!r} in cheats entry {entry.get('id')}")
+
+    def test_cheats_catalogue_game_crcs_are_valid(self):
+        """Any game_crcs list must contain 8-char uppercase hex strings."""
+        import re
+        pat = re.compile(r'^[0-9A-F]{8}$')
+        for entry in self.cheats:
+            for crc in entry.get("game_crcs", []):
+                self.assertRegex(crc, pat,
+                                 f"Bad CRC {crc!r} in entry {entry.get('id')}")
+
+    def test_cheats_catalogue_no_duplicate_ids(self):
+        ids = [e.get("id") for e in self.cheats]
+        self.assertEqual(len(ids), len(set(ids)),
+                         "cheats.json contains duplicate entry IDs")
+
+    def test_cheats_catalogue_hub_entries_present(self):
+        """The two original hub entries should still be present."""
+        ids = {e.get("id") for e in self.cheats}
+        self.assertIn("codejunkies_ps2",      ids)
+        self.assertIn("pcsx2_cheatdb_github", ids)
+
+    def test_cheats_catalogue_direct_download_urls_valid(self):
+        """Non-empty direct_download_url values must be valid http(s) URLs."""
+        import re
+        pat = re.compile(r'^https?://')
+        for entry in self.cheats:
+            url = entry.get("direct_download_url", "")
+            if url:
+                self.assertRegex(url, pat,
+                                 f"Bad direct_download_url in entry {entry.get('id')!r}")
+
+
+class TestLinkChecker(unittest.TestCase):
+    """Tests for src.core.link_checker.LinkChecker."""
+
+    def setUp(self):
+        from src.core.link_checker import LinkChecker
+        self.lc = LinkChecker()
+
+    # -- Unit tests for URL validators --
+
+    def test_valid_https_url_passes(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://github.com/PCSX2/pcsx2"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_malformed_url_flagged(self):
+        from src.core.link_checker import LinkChecker, LinkIssue
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "not_a_url"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed")
+
+    def test_bad_domain_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamesavedfiles.com/some/page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_empty_url_not_flagged(self):
+        """Empty URL fields should not produce issues."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "", "author_url": ""}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_no_url_field_not_flagged(self):
+        """Entries without URL fields should not produce issues."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000"}])
+        self.assertEqual(issues, [])
+
+    def test_multiple_url_fields_checked(self):
+        """Both 'url' and 'author_url' fields are checked independently."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "not-valid", "author_url": "also-not-valid"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 2)
+
+    # -- Integration test: all catalogues pass link checks --
+
+    def test_all_catalogues_pass_link_check(self):
+        """All 5 catalogue files should have 0 link issues after Wave 38."""
+        report = self.lc.check_all_catalogues()
+        self.assertEqual(
+            report["total_issues"], 0,
+            f"Link issues found:\n"
+            + "\n".join(
+                f"  [{f}] {i}"
+                for f, issues in report["issues_by_file"].items()
+                for i in issues
+            )
+        )
+
+    def test_check_all_catalogues_returns_dict(self):
+        report = self.lc.check_all_catalogues()
+        self.assertIn("catalogues_checked",   report)
+        self.assertIn("total_issues",         report)
+        self.assertIn("issues_by_file",       report)
+        self.assertIn("issue_count_by_type",  report)
+        self.assertIn("summary",              report)
+
+    def test_check_all_catalogues_checks_five_files(self):
+        report = self.lc.check_all_catalogues()
+        self.assertEqual(len(report["catalogues_checked"]), 5)
+        self.assertIn("cheats.json", report["catalogues_checked"])
+
+    def test_link_issue_str_representation(self):
+        from src.core.link_checker import LinkIssue
+        issue = LinkIssue(
+            source_file="test.json",
+            entry_index=3,
+            field_name="url",
+            url="bad-url",
+            issue_type="malformed",
+            detail="no scheme",
+        )
+        s = str(issue)
+        self.assertIn("test.json[3]", s)
+        self.assertIn("malformed",     s)
+        self.assertIn("bad-url",       s)
+
+    def test_link_checker_with_custom_dir(self):
+        """LinkChecker should handle a missing directory gracefully."""
+        import tempfile, os
+        from src.core.link_checker import LinkChecker
+        tmp = tempfile.mkdtemp()
+        lc = LinkChecker(cat_dir=tmp)
+        report = lc.check_all_catalogues()
+        # No files → 0 issues, 0 catalogues checked
+        self.assertEqual(report["total_issues"], 0)
+        self.assertEqual(report["catalogues_checked"], [])

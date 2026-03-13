@@ -240,6 +240,73 @@ class SerialDatabase:
             issues.extend(self.validate_catalogue(data, source_file=name))
         return issues
 
+    # ------------------------------------------------------------------
+    # CRC ↔ Serial cross-validation
+    # ------------------------------------------------------------------
+
+    def validate_crc_serial_consistency(
+        self,
+        pnach_db_path: Optional[Path] = None,
+    ) -> List[dict]:
+        """Cross-check every CRC entry in the PNACH DB against the serial DB.
+
+        For each CRC entry that carries a ``game_serial`` value, verify that:
+
+        1. The serial exists as a primary **or** alt serial in the serial DB.
+        2. The serial matches the format ``XXXX-NNNNN``.
+
+        Returns a list of issue dicts with keys:
+
+        - ``crc``         — the 8-hex-digit CRC string
+        - ``game``        — game name from the PNACH DB entry
+        - ``serial``      — the serial found in the PNACH DB entry
+        - ``issue``       — human-readable description of the problem
+        """
+        pnach_path = Path(pnach_db_path) if pnach_db_path else (
+            _REPO_ROOT / "data" / "pnach_db" / "known_addresses.json"
+        )
+        if not pnach_path.is_file():
+            return []
+        try:
+            pnach_db = json.loads(pnach_path.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+
+        issues: List[dict] = []
+        seen: set = set()  # (crc, serial) — avoid duplicate reports per CRC
+
+        for key, val in pnach_db.items():
+            crc    = key.split(":")[0]
+            serial = (val.get("game_serial") or "").strip()
+            game   = (val.get("game") or "").strip()
+            if not serial:
+                continue
+            pair = (crc, serial)
+            if pair in seen:
+                continue
+            seen.add(pair)
+
+            # Format check
+            if not _SERIAL_RE.match(serial):
+                issues.append({
+                    "crc": crc, "game": game, "serial": serial,
+                    "issue": f"serial {serial!r} does not match XXXX-NNNNN format",
+                })
+                continue
+
+            # Existence check — serial must be known in the DB
+            titles = self.titles_for_serial(serial)
+            if not titles:
+                issues.append({
+                    "crc": crc, "game": game, "serial": serial,
+                    "issue": (
+                        f"serial {serial!r} not found in serial DB "
+                        f"(neither primary nor alt for any title)"
+                    ),
+                })
+
+        return issues
+
     def summary_report(self) -> dict:
         """Return a structured validation summary for all four catalogues.
 
