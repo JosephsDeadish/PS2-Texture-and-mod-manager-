@@ -14214,7 +14214,7 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "C2E7F10B:00348B7C": {
+  "C2E7F10B:EE:00348B7C": {
     "game": "Kingdom Hearts",
     "game_crc": "C2E7F10B",
     "game_serial": "SLUS-20773",
@@ -14234,28 +14234,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "C2E7F10B:002A1C4C": {
-    "game": "Kingdom Hearts",
-    "game_crc": "C2E7F10B",
-    "game_serial": "SLUS-20773",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "DBC5E296:001C4B2C": {
+  "DBC5E296:EE:001C4B2C": {
     "game": "Crash Bandicoot: Wrath of Cortex",
     "game_crc": "DBC5E296",
     "game_serial": "SLUS-20518",
@@ -14275,28 +14254,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "DBC5E296:001F3B6C": {
-    "game": "Crash Bandicoot: Wrath of Cortex",
-    "game_crc": "DBC5E296",
-    "game_serial": "SLUS-20518",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "AE4CCFF6:002E1A5C": {
+  "AE4CCFF6:EE:002E1A5C": {
     "game": "Okami",
     "game_crc": "AE4CCFF6",
     "game_serial": "SLUS-21344",
@@ -14316,28 +14274,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "AE4CCFF6:00312A0C": {
-    "game": "Okami",
-    "game_crc": "AE4CCFF6",
-    "game_serial": "SLUS-21344",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "F070ECA8:0024B8FC": {
+  "F070ECA8:EE:0024B8FC": {
     "game": "Bully / Canis Canem Edit",
     "game_crc": "F070ECA8",
     "game_serial": "SLUS-21358",
@@ -14357,28 +14294,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "F070ECA8:002A1C4C": {
-    "game": "Bully / Canis Canem Edit",
-    "game_crc": "F070ECA8",
-    "game_serial": "SLUS-21358",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "D9FC6573:003C2D1C": {
+  "D9FC6573:EE:003C2D1C": {
     "game": "Need for Speed: Most Wanted",
     "game_crc": "D9FC6573",
     "game_serial": "SLUS-20898",
@@ -14398,28 +14314,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "D9FC6573:001F3B6C": {
-    "game": "Need for Speed: Most Wanted",
-    "game_crc": "D9FC6573",
-    "game_serial": "SLUS-20898",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "DB3BCCE8:00348B7C": {
+  "DB3BCCE8:EE:00348B7C": {
     "game": "Spider-Man 2",
     "game_crc": "DB3BCCE8",
     "game_serial": "SLUS-20265",
@@ -14439,28 +14334,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "DB3BCCE8:00312A0C": {
-    "game": "Spider-Man 2",
-    "game_crc": "DB3BCCE8",
-    "game_serial": "SLUS-20265",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "8A3B3F55:001C4B2C": {
+  "8A3B3F55:EE:001C4B2C": {
     "game": "Persona 4",
     "game_crc": "8A3B3F55",
     "game_serial": "SLUS-21782",
@@ -14480,28 +14354,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "8A3B3F55:002A1C4C": {
-    "game": "Persona 4",
-    "game_crc": "8A3B3F55",
-    "game_serial": "SLUS-21782",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "CF4E3AC0:002E1A5C": {
+  "CF4E3AC0:EE:002E1A5C": {
     "game": "Sly 3: Honor Among Thieves",
     "game_crc": "CF4E3AC0",
     "game_serial": "SLUS-20916",
@@ -14521,28 +14374,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "CF4E3AC0:001F3B6C": {
-    "game": "Sly 3: Honor Among Thieves",
-    "game_crc": "CF4E3AC0",
-    "game_serial": "SLUS-20916",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3B698B6E:0024B8FC": {
+  "3B698B6E:EE:0024B8FC": {
     "game": "Crash Twinsanity",
     "game_crc": "3B698B6E",
     "game_serial": "SLUS-20605",
@@ -14562,28 +14394,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "3B698B6E:00312A0C": {
-    "game": "Crash Twinsanity",
-    "game_crc": "3B698B6E",
-    "game_serial": "SLUS-20605",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "749FADA6:003C2D1C": {
+  "749FADA6:EE:003C2D1C": {
     "game": "Final Fantasy XII",
     "game_crc": "749FADA6",
     "game_serial": "SLUS-20963",
@@ -14603,28 +14414,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "749FADA6:002A1C4C": {
-    "game": "Final Fantasy XII",
-    "game_crc": "749FADA6",
-    "game_serial": "SLUS-20963",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "858B2EBB:00348B7C": {
+  "858B2EBB:EE:00348B7C": {
     "game": "SoulCalibur III",
     "game_crc": "858B2EBB",
     "game_serial": "SLUS-21216",
@@ -14644,28 +14434,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "858B2EBB:001F3B6C": {
-    "game": "SoulCalibur III",
-    "game_crc": "858B2EBB",
-    "game_serial": "SLUS-21216",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A5B1B4C1:001C4B2C": {
+  "A5B1B4C1:EE:001C4B2C": {
     "game": "Need for Speed Underground 2",
     "game_crc": "A5B1B4C1",
     "game_serial": "SLUS-20784",
@@ -14685,28 +14454,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A5B1B4C1:00312A0C": {
-    "game": "Need for Speed Underground 2",
-    "game_crc": "A5B1B4C1",
-    "game_serial": "SLUS-20784",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "EA81505D:002E1A5C": {
+  "EA81505D:EE:002E1A5C": {
     "game": "Need for Speed Carbon",
     "game_crc": "EA81505D",
     "game_serial": "SLUS-21420",
@@ -14726,28 +14474,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "EA81505D:002A1C4C": {
-    "game": "Need for Speed Carbon",
-    "game_crc": "EA81505D",
-    "game_serial": "SLUS-21420",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "06A33E38:0024B8FC": {
+  "06A33E38:EE:0024B8FC": {
     "game": "Need for Speed: Hot Pursuit 2",
     "game_crc": "06A33E38",
     "game_serial": "SLUS-20212",
@@ -14767,28 +14494,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "06A33E38:001F3B6C": {
-    "game": "Need for Speed: Hot Pursuit 2",
-    "game_crc": "06A33E38",
-    "game_serial": "SLUS-20212",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "0A2A7DE0:003C2D1C": {
+  "0A2A7DE0:EE:003C2D1C": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -14808,28 +14514,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "0A2A7DE0:00312A0C": {
-    "game": "Crash: Mind over Mutant",
-    "game_crc": "0A2A7DE0",
-    "game_serial": "SLUS-21758",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2AFC166C:00348B7C": {
+  "2AFC166C:EE:00348B7C": {
     "game": "Kingdom Hearts: Chain of Memories (Re:CoM)",
     "game_crc": "2AFC166C",
     "game_serial": "SLUS-21790",
@@ -14849,28 +14534,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "2AFC166C:002A1C4C": {
-    "game": "Kingdom Hearts: Chain of Memories (Re:CoM)",
-    "game_crc": "2AFC166C",
-    "game_serial": "SLUS-21790",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3BD4EE40:001C4B2C": {
+  "3BD4EE40:EE:001C4B2C": {
     "game": "Prince of Persia: The Two Thrones",
     "game_crc": "3BD4EE40",
     "game_serial": "SLUS-21282",
@@ -14890,28 +14554,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "3BD4EE40:001F3B6C": {
-    "game": "Prince of Persia: The Two Thrones",
-    "game_crc": "3BD4EE40",
-    "game_serial": "SLUS-21282",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "14FE13DE:002E1A5C": {
+  "14FE13DE:EE:002E1A5C": {
     "game": "Star Wars Battlefront II",
     "game_crc": "14FE13DE",
     "game_serial": "SLUS-21240",
@@ -14931,28 +14574,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "14FE13DE:00312A0C": {
-    "game": "Star Wars Battlefront II",
-    "game_crc": "14FE13DE",
-    "game_serial": "SLUS-21240",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "EE9E674C:0024B8FC": {
+  "EE9E674C:EE:0024B8FC": {
     "game": "Rogue Galaxy",
     "game_crc": "EE9E674C",
     "game_serial": "SCUS-97737",
@@ -14972,28 +14594,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "EE9E674C:002A1C4C": {
-    "game": "Rogue Galaxy",
-    "game_crc": "EE9E674C",
-    "game_serial": "SCUS-97737",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2E4CE8A8:003C2D1C": {
+  "2E4CE8A8:EE:003C2D1C": {
     "game": "SOCOM II: U.S. Navy SEALs",
     "game_crc": "2E4CE8A8",
     "game_serial": "SCUS-97318",
@@ -15013,28 +14614,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "2E4CE8A8:001F3B6C": {
-    "game": "SOCOM II: U.S. Navy SEALs",
-    "game_crc": "2E4CE8A8",
-    "game_serial": "SCUS-97318",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2B2C9BA6:00348B7C": {
+  "2B2C9BA6:EE:00348B7C": {
     "game": "Digital Devil Saga 2",
     "game_crc": "2B2C9BA6",
     "game_serial": "SLUS-21414",
@@ -15054,28 +14634,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "2B2C9BA6:00312A0C": {
-    "game": "Digital Devil Saga 2",
-    "game_crc": "2B2C9BA6",
-    "game_serial": "SLUS-21414",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "65A59984:001C4B2C": {
+  "65A59984:EE:001C4B2C": {
     "game": "Onimusha 3: Demon Siege",
     "game_crc": "65A59984",
     "game_serial": "SLUS-20966",
@@ -15095,28 +14654,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "65A59984:002A1C4C": {
-    "game": "Onimusha 3: Demon Siege",
-    "game_crc": "65A59984",
-    "game_serial": "SLUS-20966",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "7C980400:002E1A5C": {
+  "7C980400:EE:002E1A5C": {
     "game": "Tales of the Abyss",
     "game_crc": "7C980400",
     "game_serial": "SLUS-21386",
@@ -15136,28 +14674,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "7C980400:001F3B6C": {
-    "game": "Tales of the Abyss",
-    "game_crc": "7C980400",
-    "game_serial": "SLUS-21386",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "161E0B8D:0024B8FC": {
+  "161E0B8D:EE:0024B8FC": {
     "game": "Xenosaga Episode II: Jenseits von Gut und Böse",
     "game_crc": "161E0B8D",
     "game_serial": "SLUS-20901",
@@ -15177,28 +14694,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "161E0B8D:00312A0C": {
-    "game": "Xenosaga Episode II: Jenseits von Gut und Böse",
-    "game_crc": "161E0B8D",
-    "game_serial": "SLUS-20901",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "E58F6960:003C2D1C": {
+  "E58F6960:EE:003C2D1C": {
     "game": "Ar tonelico: Melody of Elemia",
     "game_crc": "E58F6960",
     "game_serial": "SLUS-21487",
@@ -15218,28 +14714,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "E58F6960:002A1C4C": {
-    "game": "Ar tonelico: Melody of Elemia",
-    "game_crc": "E58F6960",
-    "game_serial": "SLUS-21487",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "D7EF8CF8:00348B7C": {
+  "D7EF8CF8:EE:00348B7C": {
     "game": "Shadow Hearts: From the New World",
     "game_crc": "D7EF8CF8",
     "game_serial": "SLUS-21395",
@@ -15259,28 +14734,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "D7EF8CF8:001F3B6C": {
-    "game": "Shadow Hearts: From the New World",
-    "game_crc": "D7EF8CF8",
-    "game_serial": "SLUS-21395",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "03AFC852:001C4B2C": {
+  "03AFC852:EE:001C4B2C": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -15300,28 +14754,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00312A0C": {
-    "game": "Mana Khemia: Alchemists of Al-Revis",
-    "game_crc": "03AFC852",
-    "game_serial": "SLUS-21713",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "1B5D5161:002E1A5C": {
+  "1B5D5161:EE:002E1A5C": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -15341,28 +14774,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:002A1C4C": {
-    "game": "Mana Khemia 2: Fall of Alchemy",
-    "game_crc": "1B5D5161",
-    "game_serial": "SLUS-21846",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A6167B5A:0024B8FC": {
+  "A6167B5A:EE:0024B8FC": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -15382,28 +14794,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A6167B5A:001F3B6C": {
-    "game": "Disgaea: Hour of Darkness",
-    "game_crc": "A6167B5A",
-    "game_serial": "SLUS-20523",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "92A5B6C3:003C2D1C": {
+  "92A5B6C3:EE:003C2D1C": {
     "game": "Crash Twinsanity (alt)",
     "game_crc": "92A5B6C3",
     "game_serial": "SLUS-20997",
@@ -15423,28 +14814,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "92A5B6C3:00312A0C": {
-    "game": "Crash Twinsanity (alt)",
-    "game_crc": "92A5B6C3",
-    "game_serial": "SLUS-20997",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3B0AECE4:00348B7C": {
+  "3B0AECE4:EE:00348B7C": {
     "game": "Spyro: Enter the Dragonfly",
     "game_crc": "3B0AECE4",
     "game_serial": "SLUS-20201",
@@ -15464,28 +14834,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "3B0AECE4:002A1C4C": {
-    "game": "Spyro: Enter the Dragonfly",
-    "game_crc": "3B0AECE4",
-    "game_serial": "SLUS-20201",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "64DF0D3F:001C4B2C": {
+  "64DF0D3F:EE:001C4B2C": {
     "game": "Crash Nitro Kart",
     "game_crc": "64DF0D3F",
     "game_serial": "SLUS-20644",
@@ -15505,28 +14854,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "64DF0D3F:001F3B6C": {
-    "game": "Crash Nitro Kart",
-    "game_crc": "64DF0D3F",
-    "game_serial": "SLUS-20644",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A3E2CD7F:002E1A5C": {
+  "A3E2CD7F:EE:002E1A5C": {
     "game": "Dead or Alive 2: Hardcore",
     "game_crc": "A3E2CD7F",
     "game_serial": "SLUS-20009",
@@ -15546,28 +14874,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A3E2CD7F:00312A0C": {
-    "game": "Dead or Alive 2: Hardcore",
-    "game_crc": "A3E2CD7F",
-    "game_serial": "SLUS-20009",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "1E9DAD32:0024B8FC": {
+  "1E9DAD32:EE:0024B8FC": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",
@@ -15587,28 +14894,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1E9DAD32:002A1C4C": {
-    "game": "Virtua Fighter 4: Evolution",
-    "game_crc": "1E9DAD32",
-    "game_serial": "SLUS-20710",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "B119C6BA:003C2D1C": {
+  "B119C6BA:EE:003C2D1C": {
     "game": "WWE SmackDown vs. RAW 2007",
     "game_crc": "B119C6BA",
     "game_serial": "SLUS-21493",
@@ -15618,27 +14904,6 @@
     "value_map": {
       "3FAB851F": "16:9 (Widescreen)",
       "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "B119C6BA:001F3B6C": {
-    "game": "WWE SmackDown vs. RAW 2007",
-    "game_crc": "B119C6BA",
-    "game_serial": "SLUS-21493",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "notes": "Estimated gravity address",
-    "value_map": {
-      "3F800000": "Normal (1.0×)",
-      "3F000000": "Half gravity (0.5×)",
-      "40000000": "2× gravity"
     },
     "value_type": "float",
     "estimated": true,
@@ -28051,7 +27316,7 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "0A2A7DE0:00A00000": {
+  "0A2A7DE0:EE:00A00000": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -28072,7 +27337,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "0A2A7DE0:00A00100": {
+  "0A2A7DE0:EE:00A00100": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -28093,7 +27358,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "0A2A7DE0:00A00200": {
+  "0A2A7DE0:EE:00A00200": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -28114,7 +27379,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "0A2A7DE0:00A00300": {
+  "0A2A7DE0:EE:00A00300": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -28135,7 +27400,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "0A2A7DE0:00A00400": {
+  "0A2A7DE0:EE:00A00400": {
     "game": "Crash: Mind over Mutant",
     "game_crc": "0A2A7DE0",
     "game_serial": "SLUS-21758",
@@ -28534,7 +27799,7 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "A6167B5A:00B00000": {
+  "A6167B5A:EE:00B00000": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -28555,7 +27820,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A6167B5A:00B00100": {
+  "A6167B5A:EE:00B00100": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -28576,7 +27841,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A6167B5A:00B00200": {
+  "A6167B5A:EE:00B00200": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -28597,7 +27862,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A6167B5A:00B00300": {
+  "A6167B5A:EE:00B00300": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -28618,7 +27883,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "A6167B5A:00B00400": {
+  "A6167B5A:EE:00B00400": {
     "game": "Disgaea: Hour of Darkness",
     "game_crc": "A6167B5A",
     "game_serial": "SLUS-20523",
@@ -28639,7 +27904,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00000": {
+  "03AFC852:EE:00C00000": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28660,7 +27925,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00100": {
+  "03AFC852:EE:00C00100": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28681,7 +27946,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00200": {
+  "03AFC852:EE:00C00200": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28702,7 +27967,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00300": {
+  "03AFC852:EE:00C00300": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28723,7 +27988,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00400": {
+  "03AFC852:EE:00C00400": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28744,7 +28009,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "03AFC852:00C00500": {
+  "03AFC852:EE:00C00500": {
     "game": "Mana Khemia: Alchemists of Al-Revis",
     "game_crc": "03AFC852",
     "game_serial": "SLUS-21713",
@@ -28765,7 +28030,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00000": {
+  "1B5D5161:EE:00C00000": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -28786,7 +28051,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00100": {
+  "1B5D5161:EE:00C00100": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -28807,7 +28072,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00200": {
+  "1B5D5161:EE:00C00200": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -28828,7 +28093,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00300": {
+  "1B5D5161:EE:00C00300": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -28849,7 +28114,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00400": {
+  "1B5D5161:EE:00C00400": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -28870,7 +28135,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1B5D5161:00C00500": {
+  "1B5D5161:EE:00C00500": {
     "game": "Mana Khemia 2: Fall of Alchemy",
     "game_crc": "1B5D5161",
     "game_serial": "SLUS-21846",
@@ -29665,7 +28930,7 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "1E9DAD32:003B0000": {
+  "1E9DAD32:EE:003B0000": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",
@@ -29686,7 +28951,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1E9DAD32:003B0100": {
+  "1E9DAD32:EE:003B0100": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",
@@ -29707,7 +28972,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1E9DAD32:003B0200": {
+  "1E9DAD32:EE:003B0200": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",
@@ -29728,7 +28993,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1E9DAD32:003B0300": {
+  "1E9DAD32:EE:003B0300": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",
@@ -29749,7 +29014,7 @@
     "exclusion_group": "",
     "exclusion_note": ""
   },
-  "1E9DAD32:003B0400": {
+  "1E9DAD32:EE:003B0400": {
     "game": "Virtua Fighter 4: Evolution",
     "game_crc": "1E9DAD32",
     "game_serial": "SLUS-20710",

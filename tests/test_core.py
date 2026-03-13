@@ -4447,10 +4447,77 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 3800 entries (Wave 29 adds 16 new games + graphics for existing games)."""
+        """Known addresses DB should have more than 3770 entries.
+
+        Wave 30 cleanup details:
+          * 97 malformed ``CRC:ADDR`` keys were reformatted to ``CRC:EE:ADDR``
+            (entry count unchanged — format correction only).
+          * 35 generic estimated "Gravity multiplier" entries that shared the
+            same address across 11-12 unrelated games were removed, reducing
+            the total from 3809 to 3774.
+        """
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 3800, "PNACH DB should have more than 3800 entries after Wave 29 game-specific graphics expansion")
+        self.assertGreater(n, 3770, "PNACH DB should have more than 3770 entries after Wave 30 game-specific cleanup")
+
+    def test_pnach_db_key_format_valid(self):
+        """All PNACH DB keys must follow the CRC:MEMTYPE:ADDRESS format (3 colon-separated parts).
+
+        Keys with only 2 parts (CRC:ADDRESS, missing the memory-type segment) are unreachable
+        by describe_address() / entries_for_crc() and indicate incorrectly formatted entries.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        bad = [k for k in data if len(k.split(":")) != 3]
+        self.assertEqual(
+            bad, [],
+            f"{len(bad)} PNACH DB key(s) have wrong format (expected CRC:MEMTYPE:ADDR): {bad[:5]}",
+        )
+
+    def test_pnach_db_all_entries_game_specific(self):
+        """Every PNACH DB entry's key CRC must match the entry's game_crc field.
+
+        PNACH memory addresses are game-specific — codes written for one game's CRC
+        MUST NOT be reused under a different CRC.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        mismatches = []
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue  # covered by test_pnach_db_key_format_valid
+            key_crc = parts[0].upper()
+            val_crc = entry.get("game_crc", "").upper()
+            if key_crc != val_crc:
+                mismatches.append((key, key_crc, val_crc))
+        self.assertEqual(
+            mismatches, [],
+            f"{len(mismatches)} PNACH DB entries have CRC mismatch between key and game_crc: {mismatches[:3]}",
+        )
+
+    def test_pnach_db_max_address_sharing(self):
+        """No raw address should appear in more than 9 distinct game CRCs.
+
+        PNACH memory addresses are game-specific.  An address appearing in too many
+        unrelated games is a strong signal of a generic placeholder rather than a
+        verified game-specific code.  The threshold of 9 captures known coincidental
+        overlaps (common PS2 memory regions) while flagging clearly multi-game entries.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        addr_crcs: dict = {}
+        for key in data:
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            addr_crcs.setdefault(addr, set()).add(crc.upper())
+        over_limit = {addr: crcs for addr, crcs in addr_crcs.items() if len(crcs) > 9}
+        self.assertEqual(
+            over_limit, {},
+            f"Addresses appearing in >9 games (likely generic placeholders): {list(over_limit.keys())[:5]}",
+        )
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
