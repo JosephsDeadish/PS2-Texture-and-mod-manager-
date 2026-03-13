@@ -729,12 +729,14 @@ class CoverDownloadDialog(QDialog):
 
         def _run():
             path = fetch_gametdb_art(game_id, dest_dir, region)
-            if path:
-                self._status.setText(f"✅  Saved to: {path}")
-            else:
-                self._status.setText("❌  Cover not found or download failed.")
-            self._dl_btn.setEnabled(True)
-            self._progress.hide()
+            msg = f"✅  Saved to: {path}" if path else "❌  Cover not found or download failed."
+
+            def _done():
+                self._status.setText(msg)
+                self._dl_btn.setEnabled(True)
+                self._progress.hide()
+
+            QTimer.singleShot(0, _done)
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -763,8 +765,13 @@ class CoverDownloadDialog(QDialog):
             try:
                 games = scan_library(lib_path)
             except Exception as exc:
-                self._bulk_status.setText(f"❌  Scan failed: {exc}")
-                self._bulk_scan_btn.setEnabled(True)
+                err = str(exc)
+
+                def _err():
+                    self._bulk_status.setText(f"❌  Scan failed: {err}")
+                    self._bulk_scan_btn.setEnabled(True)
+
+                QTimer.singleShot(0, _err)
                 return
 
             seen: set = set()
@@ -779,21 +786,24 @@ class CoverDownloadDialog(QDialog):
 
             self._bulk_serials = results
 
-            self._bulk_list.clear()
-            if not results:
-                item = QListWidgetItem("No games with recognisable serials found.")
-                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
-                self._bulk_list.addItem(item)
-                self._bulk_dl_btn.setEnabled(False)
-            else:
-                for serial, title in results:
-                    self._bulk_list.addItem(f"{serial}  —  {title}")
-                self._bulk_dl_btn.setEnabled(True)
+            def _update():
+                self._bulk_list.clear()
+                if not results:
+                    item = QListWidgetItem("No games with recognisable serials found.")
+                    item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                    self._bulk_list.addItem(item)
+                    self._bulk_dl_btn.setEnabled(False)
+                else:
+                    for serial, title in results:
+                        self._bulk_list.addItem(f"{serial}  —  {title}")
+                    self._bulk_dl_btn.setEnabled(True)
 
-            self._bulk_status.setText(
-                f"Found {len(results)} game(s) with recognised serials."
-            )
-            self._bulk_scan_btn.setEnabled(True)
+                self._bulk_status.setText(
+                    f"Found {len(results)} game(s) with recognised serials."
+                )
+                self._bulk_scan_btn.setEnabled(True)
+
+            QTimer.singleShot(0, _update)
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -821,38 +831,57 @@ class CoverDownloadDialog(QDialog):
             skipped = 0
             failed = 0
             for i, (serial, title) in enumerate(self._bulk_serials, 1):
-                self._bulk_status.setText(
-                    f"Downloading {i}/{total}: {serial} — {title}…"
-                )
-                self._bulk_progress.setValue(i)
+                def _set_progress(idx=i, ser=serial, ttl=title):
+                    self._bulk_status.setText(
+                        f"Downloading {idx}/{total}: {ser} — {ttl}…"
+                    )
+                    self._bulk_progress.setValue(idx)
+
+                QTimer.singleShot(0, _set_progress)
 
                 dest_file = _Path(dest_dir) / f"{serial}.jpg"
                 if skip_existing and dest_file.exists():
                     skipped += 1
-                    # Mark the list item as skipped
-                    item = self._bulk_list.item(i - 1)
-                    if item:
-                        item.setText(f"⏭  {serial}  —  {title}  (skipped, exists)")
+
+                    def _skip(idx=i, ser=serial, ttl=title):
+                        item = self._bulk_list.item(idx - 1)
+                        if item:
+                            item.setText(f"⏭  {ser}  —  {ttl}  (skipped, exists)")
+
+                    QTimer.singleShot(0, _skip)
                     continue
 
                 path = fetch_gametdb_art(serial, dest_dir, region)
                 if path:
                     ok += 1
-                    item = self._bulk_list.item(i - 1)
-                    if item:
-                        item.setText(f"✅  {serial}  —  {title}")
+
+                    def _ok(idx=i, ser=serial, ttl=title):
+                        item = self._bulk_list.item(idx - 1)
+                        if item:
+                            item.setText(f"✅  {ser}  —  {ttl}")
+
+                    QTimer.singleShot(0, _ok)
                 else:
                     failed += 1
-                    item = self._bulk_list.item(i - 1)
-                    if item:
-                        item.setText(f"❌  {serial}  —  {title}  (not found)")
 
-            self._bulk_status.setText(
-                f"Done — {ok} downloaded, {skipped} skipped, {failed} not found."
-            )
-            self._bulk_progress.hide()
-            self._bulk_dl_btn.setEnabled(True)
-            self._bulk_scan_btn.setEnabled(True)
+                    def _fail(idx=i, ser=serial, ttl=title):
+                        item = self._bulk_list.item(idx - 1)
+                        if item:
+                            item.setText(f"❌  {ser}  —  {ttl}  (not found)")
+
+                    QTimer.singleShot(0, _fail)
+
+            ok_final, skipped_final, failed_final = ok, skipped, failed
+
+            def _done():
+                self._bulk_status.setText(
+                    f"Done — {ok_final} downloaded, {skipped_final} skipped, {failed_final} not found."
+                )
+                self._bulk_progress.hide()
+                self._bulk_dl_btn.setEnabled(True)
+                self._bulk_scan_btn.setEnabled(True)
+
+            QTimer.singleShot(0, _done)
 
         threading.Thread(target=_run, daemon=True).start()
 

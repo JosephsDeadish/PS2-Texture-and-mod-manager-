@@ -54,7 +54,7 @@ class ModDatabase:
                 with open(db_file, "r", encoding="utf-8") as f:
                     raw = json.load(f)
                 self._mods = {k: ModInfo.from_dict(v) for k, v in raw.items()}
-            except (json.JSONDecodeError, KeyError, TypeError):
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
                 self._mods = {}
 
     def save(self):

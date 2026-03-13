@@ -193,6 +193,26 @@ class TestModDatabase(unittest.TestCase):
         self.assertIsNotNone(got)
         self.assertEqual(got.name, "Persistent")
 
+    def test_load_with_corrupted_mod_type_returns_empty(self):
+        """ModDatabase._load() must not crash when a stored mod_type is invalid."""
+        import json
+        import src.core.config_manager as cm
+
+        bad_entry = {
+            "id": "bad", "name": "Bad", "mod_type": "not_a_real_type",
+            "path": "", "enabled": True, "version": "1.0", "author": "",
+            "description": "", "game_id": "", "thumbnail_url": "",
+            "thumbnail_path": "", "source_url": "", "priority": 0,
+            "files": [], "tags": [], "size_bytes": 0, "installed": True,
+            "has_update": False, "installed_at": 0.0,
+        }
+        with open(cm.MODS_DB_FILE, "w") as f:
+            json.dump({"bad": bad_entry}, f)
+
+        db = self._make_db()
+        # Should have silently discarded the corrupted database
+        self.assertEqual(db.all(), [])
+
 
 class TestModManager(unittest.TestCase):
     """Test ModManager operations."""
@@ -3894,7 +3914,8 @@ class TestCatalogueLoader(unittest.TestCase):
         """Optional fields must be present in every loaded entry."""
         optional = {"context", "author_url", "is_hub", "nsfw", "thumbnail_url",
                     "tags", "download_action", "direct_download_url",
-                    "upscale_tech", "is_free", "requires_account", "is_complete"}
+                    "upscale_tech", "is_free", "requires_account", "is_complete",
+                    "size_label"}
         for e in self.catalogue:
             for f in optional:
                 self.assertIn(f, e,
