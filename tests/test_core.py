@@ -3879,9 +3879,9 @@ class TestGametdbCoverUrl(unittest.TestCase):
         self.gcu = gametdb_cover_url
 
     def test_ntsc_us_slus_gives_us_region(self):
-        url = self.gcu("SLUS-21829")
+        url = self.gcu("SLUS-21714")
         self.assertIn("/US/", url)
-        self.assertIn("SLUS21829", url)
+        self.assertIn("SLUS21714", url)
         self.assertTrue(url.startswith("https://art.gametdb.com/ps2/cover/"))
 
     def test_ntsc_us_scus_gives_us_region(self):
@@ -3914,7 +3914,7 @@ class TestGametdbCoverUrl(unittest.TestCase):
 
     def test_lowercase_input_normalised(self):
         url = self.gcu("slus-21829")
-        self.assertIn("SLUS21829", url)
+        self.assertIn("SLUS21714", url)
         self.assertIn("/US/", url)
 
     def test_url_ends_with_jpg(self):
@@ -3983,7 +3983,7 @@ class TestCatalogueGameSerial(unittest.TestCase):
             "doti_kh2_textures":           "SLUS-21005",
             "doti_ffx_textures":           "SLUS-20312",
             "doti_sh2_textures":           "SLUS-20228",
-            "cckrizalid_baroque_textures": "SLUS-21829",
+            "cckrizalid_baroque_textures": "SLUS-21714",
             "spyro_anb_6x_extra_detail":   "SLUS-21372",
             "sly2_save_gamefiles":         "SCES-52400",
             "bully_save_moataz":           "SLUS-21358",
@@ -4107,7 +4107,7 @@ class TestCCKrizalidEntries(unittest.TestCase):
 
     def test_baroque_serial_is_slus_21829(self):
         e = self.entries["cckrizalid_baroque_textures"]
-        self.assertEqual(e["game_serial"], "SLUS-21829")
+        self.assertEqual(e["game_serial"], "SLUS-21714")
 
     def test_baroque_author_is_cckrizalid(self):
         e = self.entries["cckrizalid_baroque_textures"]
@@ -7789,7 +7789,7 @@ class TestSerialDatabase(unittest.TestCase):
 
     def test_mgs3_snake_eater_serial(self):
         self.assertEqual(
-            self.sdb.get_serial("Metal Gear Solid 3: Snake Eater"), "SLUS-20718"
+            self.sdb.get_serial("Metal Gear Solid 3: Snake Eater"), "SLUS-20915"
         )
 
     def test_okami_serial(self):
@@ -7797,20 +7797,20 @@ class TestSerialDatabase(unittest.TestCase):
         self.assertEqual(self.sdb.get_serial("Okami"), "SLUS-21115")
 
     def test_castlevania_lament_serial(self):
-        # CRC 2B123FE9 + A5B82E82 confirm SLUS-21050
+        # SLUS-20733 confirmed via PCSX2 GameIndex (NTSC-U)
         self.assertEqual(
-            self.sdb.get_serial("Castlevania: Lament of Innocence"), "SLUS-21050"
+            self.sdb.get_serial("Castlevania: Lament of Innocence"), "SLUS-20733"
         )
 
     def test_disgaea_hour_of_darkness_serial(self):
-        # CRC 471A4AF8 + F26A89E4 confirm SLUS-20365
+        # SLUS-20666 confirmed via PCSX2 GameIndex (NTSC-U)
         self.assertEqual(
-            self.sdb.get_serial("Disgaea: Hour of Darkness"), "SLUS-20365"
+            self.sdb.get_serial("Disgaea: Hour of Darkness"), "SLUS-20666"
         )
 
     def test_shadow_hearts_serial(self):
-        # CRC 3E34F9D4 confirms SLUS-20472
-        self.assertEqual(self.sdb.get_serial("Shadow Hearts"), "SLUS-20472")
+        # SLUS-20347 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(self.sdb.get_serial("Shadow Hearts"), "SLUS-20347")
 
     def test_prince_of_persia_sot_serial(self):
         # CRC 6A928BAE + 880EB41E confirm SLUS-20743
@@ -7819,9 +7819,9 @@ class TestSerialDatabase(unittest.TestCase):
         )
 
     def test_silent_hill_4_serial(self):
-        # CRC 0152E0C7 confirms SLUS-20978
+        # SLUS-20873 confirmed via PCSX2 GameIndex (NTSC-U)
         self.assertEqual(
-            self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20978"
+            self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20873"
         )
 
     def test_hack_infection_serial(self):
@@ -7830,12 +7830,13 @@ class TestSerialDatabase(unittest.TestCase):
 
     def test_zoe_2nd_runner_serial(self):
         self.assertEqual(
-            self.sdb.get_serial("Zone of the Enders: The 2nd Runner"), "SLUS-20553"
+            self.sdb.get_serial("Zone of the Enders: The 2nd Runner"), "SLUS-20545"
         )
 
     def test_crash_twinsanity_serial(self):
+        # SLUS-20909 confirmed via PCSX2 GameIndex (NTSC-U)
         self.assertEqual(
-            self.sdb.get_serial("Crash Twinsanity"), "SLUS-20979"
+            self.sdb.get_serial("Crash Twinsanity"), "SLUS-20909"
         )
 
     # ------------------------------------------------------------------
