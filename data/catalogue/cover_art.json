@@ -13363,5 +13363,203 @@
     "download_action": "cover_by_id",
     "direct_download_url": "",
     "upscale_tech": ""
+  },
+  {
+    "id": "cover_kh_slus20372",
+    "name": "Kingdom Hearts \u2014 Cover Art",
+    "description": "Official PS2 cover art for Kingdom Hearts (SLUS-20372).",
+    "context": "Available via GameTDB using serial SLUS-20372.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20372",
+    "type": "cover_art",
+    "game_serial": "SLUS-20372",
+    "source": "GameTDB",
+    "game": "Kingdom Hearts",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20372.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_kh_rechain_slus21717",
+    "name": "Kingdom Hearts Re:Chain of Memories \u2014 Cover Art",
+    "description": "Official PS2 cover art for Kingdom Hearts Re:Chain of Memories (SLUS-21717).",
+    "context": "Available via GameTDB using serial SLUS-21717.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-21717",
+    "type": "cover_art",
+    "game_serial": "SLUS-21717",
+    "source": "GameTDB",
+    "game": "Kingdom Hearts Re:Chain of Memories",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-21717.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_dbz_budokai_slus20394",
+    "name": "Dragon Ball Z: Budokai \u2014 Cover Art",
+    "description": "Official PS2 cover art for Dragon Ball Z: Budokai (SLUS-20394).",
+    "context": "Available via GameTDB using serial SLUS-20394.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20394",
+    "type": "cover_art",
+    "game_serial": "SLUS-20394",
+    "source": "GameTDB",
+    "game": "Dragon Ball Z: Budokai",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20394.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_dbz_budokai2_slus20753",
+    "name": "Dragon Ball Z: Budokai 2 \u2014 Cover Art",
+    "description": "Official PS2 cover art for Dragon Ball Z: Budokai 2 (SLUS-20753).",
+    "context": "Available via GameTDB using serial SLUS-20753.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20753",
+    "type": "cover_art",
+    "game_serial": "SLUS-20753",
+    "source": "GameTDB",
+    "game": "Dragon Ball Z: Budokai 2",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20753.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_dbz_bt2_slus21734",
+    "name": "Dragon Ball Z: Budokai Tenkaichi 2 \u2014 Cover Art",
+    "description": "Official PS2 cover art for Dragon Ball Z: Budokai Tenkaichi 2 (SLUS-21734).",
+    "context": "Available via GameTDB using serial SLUS-21734.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-21734",
+    "type": "cover_art",
+    "game_serial": "SLUS-21734",
+    "source": "GameTDB",
+    "game": "Dragon Ball Z: Budokai Tenkaichi 2",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-21734.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_sh3_slus20751",
+    "name": "Silent Hill 3 \u2014 Cover Art",
+    "description": "Official PS2 cover art for Silent Hill 3 (SLUS-20751).",
+    "context": "Available via GameTDB using serial SLUS-20751.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20751",
+    "type": "cover_art",
+    "game_serial": "SLUS-20751",
+    "source": "GameTDB",
+    "game": "Silent Hill 3",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20751.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_sh4_slus20814",
+    "name": "Silent Hill 4: The Room \u2014 Cover Art",
+    "description": "Official PS2 cover art for Silent Hill 4: The Room (SLUS-20814).",
+    "context": "Available via GameTDB using serial SLUS-20814.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20814",
+    "type": "cover_art",
+    "game_serial": "SLUS-20814",
+    "source": "GameTDB",
+    "game": "Silent Hill 4: The Room",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20814.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_fatal_frame_slus20479",
+    "name": "Fatal Frame \u2014 Cover Art",
+    "description": "Official PS2 cover art for Fatal Frame (SLUS-20479).",
+    "context": "Available via GameTDB using serial SLUS-20479.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20479",
+    "type": "cover_art",
+    "game_serial": "SLUS-20479",
+    "source": "GameTDB",
+    "game": "Fatal Frame",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20479.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "cover_fatal_frame2_slus20766",
+    "name": "Fatal Frame II: Crimson Butterfly \u2014 Cover Art",
+    "description": "Official PS2 cover art for Fatal Frame II: Crimson Butterfly (SLUS-20766).",
+    "context": "Available via GameTDB using serial SLUS-20766.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20766",
+    "type": "cover_art",
+    "game_serial": "SLUS-20766",
+    "source": "GameTDB",
+    "game": "Fatal Frame II: Crimson Butterfly",
+    "thumbnail_url": "https://art.gametdb.com/ps2/cover/US/SLUS-20766.jpg",
+    "tags": [
+      "cover",
+      "official"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
   }
 ]

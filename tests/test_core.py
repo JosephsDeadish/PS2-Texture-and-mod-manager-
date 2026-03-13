@@ -4447,10 +4447,10 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have grown beyond 4780 entries (wave 28 expansion)."""
+        """Known addresses DB should have grown beyond 4980 entries (wave 29 expansion)."""
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 4780, "PNACH DB should have more than 4780 entries after wave-28 expansion")
+        self.assertGreater(n, 4980, "PNACH DB should have more than 4980 entries after wave-29 expansion")
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category
