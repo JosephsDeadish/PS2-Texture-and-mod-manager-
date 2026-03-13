@@ -12,6 +12,7 @@ Features:
 import os
 import threading
 import tempfile
+import uuid
 from pathlib import Path
 from typing import List, Optional
 from urllib.parse import unquote, urlparse
@@ -48,7 +49,7 @@ from src.core.downloader import (
     list_pcsx2_widescreen_patches,
     search_pcsx2_patches_by_crc,
 )
-from src.models.mod import AppConfig, ModType
+from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
 
 
@@ -1175,8 +1176,11 @@ class DownloadInstallDialog(QDialog):
                         self._dl_btn.setEnabled(True)
                     QTimer.singleShot(0, _mf_err)
                     return
+                # Schedule _run_download back on the main thread so that Qt
+                # widget reads (mod type combo, etc.) happen on the correct thread.
+                _resolved = url
                 QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                self._run_download(raw_url, url)
+                QTimer.singleShot(0, lambda: self._run_download(raw_url, _resolved))
 
             threading.Thread(target=_resolve_then_download, daemon=True).start()
             return
@@ -1501,18 +1505,31 @@ class PnachGitHubDialog(QDialog):
                     btn.setText("✅")
                     btn.setStyleSheet("color: #40c040;")
                     self._status.setText(f"✅  Installed: {path}")
-                    # Register the patch in the mod database
+                    # Register the patch in the mod database as a tracked entry.
+                    # We do NOT use install_from_folder here because the file is
+                    # already in pnach_dir (the PCSX2-visible location).  Using
+                    # install_from_folder would create a UUID subdirectory copy
+                    # alongside the real file, causing PCSX2 to load the patch
+                    # twice (in tools that scan subdirectories) or leaving a
+                    # confusing duplicate on disk.  Instead we register a ModInfo
+                    # that points directly at the downloaded file.
                     if self.db is not None:
                         try:
-                            from src.core.mod_manager import ModManager
-                            mgr = ModManager(self.db)
-                            mgr.install_from_folder(
-                                source_path=path,
-                                mod_type=ModType.PNACH,
-                                dest_base=pnach_dir,
+                            pnach_file_path = Path(path)
+                            mod_record = ModInfo(
+                                id=str(uuid.uuid4()),
                                 name=f"Widescreen Patch ({patch['crc']})",
+                                mod_type=ModType.PNACH,
+                                path=path,
                                 author="PCSX2 Team",
+                                source_url=(
+                                    "https://github.com/PCSX2/widescreen_patches/blob/"
+                                    f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
+                                ),
+                                files=[path],
+                                size_bytes=pnach_file_path.stat().st_size if pnach_file_path.exists() else 0,
                             )
+                            self.db.add(mod_record)
                         except Exception as _reg_exc:  # DB registration is best-effort
                             import sys
                             print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)

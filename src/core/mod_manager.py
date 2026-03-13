@@ -180,8 +180,12 @@ class ModManager:
     def remove_mod(self, mod_id: str, delete_files: bool = True):
         """Remove a mod from the database and optionally delete its files."""
         mod = self.db.get(mod_id)
-        if mod and delete_files and Path(mod.path).exists():
-            shutil.rmtree(mod.path, ignore_errors=True)
+        if mod and delete_files:
+            p = Path(mod.path)
+            if p.is_dir():
+                shutil.rmtree(str(p), ignore_errors=True)
+            elif p.is_file():
+                p.unlink(missing_ok=True)
         self.db.remove(mod_id)
 
     # ------------------------------------------------------------------

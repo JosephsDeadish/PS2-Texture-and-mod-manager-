@@ -302,7 +302,28 @@ class TestModManager(unittest.TestCase):
         self.assertIsNone(db.get(mod.id))
         self.assertFalse(Path(mod_path).exists())
 
-    def test_detect_no_conflicts(self):
+    def test_remove_mod_file_path(self):
+        """remove_mod should delete a single file when mod.path is a file (not a dir)."""
+        db, mgr = self._make_manager()
+        pnach_dir = Path(self.tmpdir) / "pnach"
+        pnach_dir.mkdir()
+        pnach_file = pnach_dir / "F0A235B4.pnach"
+        pnach_file.write_text("patch v=0 nop")
+
+        # Register a ModInfo whose path points directly at the file (PNACH-from-GitHub pattern)
+        mod = ModInfo(
+            id="test-pnach-direct",
+            name="Widescreen Patch (F0A235B4)",
+            mod_type=ModType.PNACH,
+            path=str(pnach_file),
+        )
+        db.add(mod)
+        self.assertTrue(pnach_file.exists())
+
+        mgr.remove_mod(mod.id, delete_files=True)
+        self.assertIsNone(db.get(mod.id))
+        self.assertFalse(pnach_file.exists())
+
         db, mgr = self._make_manager()
         db.add(ModInfo(id="x", name="X", mod_type=ModType.TEXTURE_PACK, path="/p",
                        enabled=True, files=["a.png"]))
