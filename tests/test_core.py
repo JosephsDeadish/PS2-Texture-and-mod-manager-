@@ -7973,8 +7973,8 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.sdb = SerialDatabase()
 
     def test_serial_db_expanded_to_over_700_games(self):
-        """After Wave 38 expansion, serial DB should contain > 700 games."""
-        self.assertGreater(self.sdb.game_count(), 700)
+        """After Wave 41 expansion, serial DB should contain > 950 games."""
+        self.assertGreater(self.sdb.game_count(), 950)
 
     def test_kingdom_hearts_has_crcs(self):
         info = self.sdb.get_info("Kingdom Hearts")
@@ -7999,13 +7999,13 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.assertGreater(len(info.crcs), 0)
 
     def test_games_with_crcs_count_over_200(self):
-        """At least 700 games in the serial DB must have CRC entries (Wave 40)."""
+        """At least 900 games in the serial DB must have CRC entries (Wave 41)."""
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 700,
-                           f"Expected >700 games with CRCs, got {count}")
+        self.assertGreater(count, 900,
+                           f"Expected >900 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8016,6 +8016,26 @@ class TestSerialDbCrcs(unittest.TestCase):
             for crc in info.crcs:
                 self.assertRegex(crc, pat,
                                  f"Bad CRC {crc!r} for '{title}'")
+
+    def test_wave41_new_games_present(self):
+        """Wave 41: newly added NTSC-U games from Gabominated should be in DB."""
+        new_games = [
+            ("Area 51",            "SLUS-20595"),
+            ("Black",              "SLUS-21376"),
+            ("Cold Fear",          "SLUS-21047"),
+            ("Drakan - The Ancients' Gates", "SCUS-97128"),
+            ("Killzone",           "SCUS-97402"),
+            ("Mercenaries 2 - World in Flames", "SLUS-21650"),
+            ("Star Wars - The Force Unleashed", "SLUS-21614"),
+            ("Stuntman - Ignition", "SLUS-21626"),
+        ]
+        for title, serial in new_games:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info, f"'{title}' missing from serial DB")
+                self.assertEqual(info.serial, serial)
+                self.assertGreater(len(info.crcs), 0,
+                                   f"'{title}' has no CRC entries")
 
 
 class TestCrcSerialConsistency(unittest.TestCase):
