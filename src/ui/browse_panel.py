@@ -1107,6 +1107,14 @@ class DownloadInstallDialog(QDialog):
             QTimer.singleShot(0, _no_storage)
             return
 
+        # Capture widget text NOW on the main thread before the background thread
+        # starts — Qt widget reads must not be made from non-main threads.
+        _name_text = self._name_edit.text().strip()
+        _author_text = self._author_edit.text().strip()
+        _game_text = self._game_edit.text().strip()
+        _desc_text = self._desc_edit.text().strip()
+        _source_url_text = self._source_url_edit.text().strip()
+
         def _run():
             try:
                 from urllib.parse import urlparse, unquote
@@ -1127,11 +1135,11 @@ class DownloadInstallDialog(QDialog):
                 download_file(url, dest, _progress)
                 from src.core.mod_manager import ModManager
                 mgr = ModManager(self.db)
-                name = self._name_edit.text().strip() or Path(fname).stem
-                author = self._author_edit.text().strip()
-                game = self._game_edit.text().strip()
-                description = self._desc_edit.text().strip()
-                source_url = self._source_url_edit.text().strip() or raw_url
+                name = _name_text or Path(fname).stem
+                author = _author_text
+                game = _game_text
+                description = _desc_text
+                source_url = _source_url_text or raw_url
                 mod = mgr.install_from_folder(
                     source_path=dest, mod_type=mod_type, dest_base=storage,
                     name=name, author=author, game_id=game,
