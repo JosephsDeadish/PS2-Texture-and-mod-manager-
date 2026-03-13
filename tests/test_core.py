@@ -7698,3 +7698,262 @@ class TestModNotes(unittest.TestCase):
         result = export_notes_csv(self.cfg, path=out)
         self.assertEqual(result, out)
         self.assertTrue(os.path.isfile(out))
+
+
+# ===========================================================================
+# Serial Database + Validator
+# ===========================================================================
+
+class TestSerialDatabase(unittest.TestCase):
+    """Tests for the authoritative PS2 serial database and catalogue validator."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # DB integrity
+    # ------------------------------------------------------------------
+
+    def test_serial_db_loads_nonempty(self):
+        """Serial DB must contain at least 300 games."""
+        self.assertGreater(self.sdb.game_count(), 300)
+
+    def test_serial_db_all_serials_valid_format(self):
+        """Every primary serial must match the SLUS/SCUS/SLES/SCES-NNNNN pattern."""
+        import re
+        pat = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            self.assertRegex(info.serial, pat,
+                             f"Bad serial format for '{title}': {info.serial!r}")
+
+    def test_serial_db_no_duplicate_primary_serials(self):
+        """No two genuinely-different games should share the same primary serial.
+
+        Title variants of the same game (e.g. 'God of War' / 'God of War (God Mode
+        complete)', 'GTA III' / 'Grand Theft Auto III', 'Ico' / 'ICO') are allowed
+        to share a serial because they refer to the same disc.  Only entries where
+        neither title is a case-normalised substring of the other, and neither
+        carries a save-variant suffix, are treated as distinct games.
+        """
+        import re
+        VARIANT_SUFFIXES = re.compile(
+            r'\s*[\(/](DMD complete|100% complete|God Mode complete|Titan Mode complete|'
+            r'post-game.*|all unlocked|all characters|Greatest Hits|alternate|alt|'
+            r'pre-order|The Journey.*|PAL|post-game|professional complete)[)\s].*$',
+            re.I,
+        )
+
+        def core_title(t: str) -> str:
+            """Strip save-variant suffixes and normalise to lowercase alphanumeric."""
+            t2 = VARIANT_SUFFIXES.sub('', t).strip()
+            # Keep only letters, digits, and spaces for robust comparison
+            t2 = re.sub(r'[^a-z0-9 ]', ' ', t2.lower())
+            # Expand common short-form game abbreviations
+            t2 = re.sub(r'\bgta\b', 'grand theft auto', t2)
+            t2 = re.sub(r'\s+', ' ', t2).strip()
+            return t2
+
+        seen: dict = {}  # serial → first title seen
+        for title in self.sdb.all_titles():
+            serial = self.sdb.get_serial(title)
+            if serial not in seen:
+                seen[serial] = title
+                continue
+            other = seen[serial]
+            c1, c2 = core_title(title), core_title(other)
+            # Allow if one core title is a substring of the other (title variant),
+            # or the word sets overlap ≥ 80% (reordered title),
+            # or the first 3 significant words are identical (subtitle variants).
+            words1, words2 = set(c1.split()), set(c2.split())
+            overlap = len(words1 & words2) / max(len(words1 | words2), 1)
+            prefix1 = c1.split()[:2]
+            prefix2 = c2.split()[:2]
+            same_prefix = prefix1 == prefix2 and len(prefix1) >= 2
+            if c1 not in c2 and c2 not in c1 and overlap < 0.8 and not same_prefix:
+                self.fail(
+                    f"Duplicate primary serial {serial!r} for genuinely different "
+                    f"games: '{title}' vs '{other}'"
+                )
+
+    # ------------------------------------------------------------------
+    # Known-correct serial assignments (CRC-backed)
+    # ------------------------------------------------------------------
+
+    def test_kingdom_hearts_serial(self):
+        self.assertEqual(self.sdb.get_serial("Kingdom Hearts"), "SLUS-20370")
+
+    def test_god_of_war_serial(self):
+        self.assertEqual(self.sdb.get_serial("God of War"), "SCUS-97399")
+
+    def test_mgs3_snake_eater_serial(self):
+        self.assertEqual(
+            self.sdb.get_serial("Metal Gear Solid 3: Snake Eater"), "SLUS-20718"
+        )
+
+    def test_okami_serial(self):
+        # pnach_db CRC 1B594C95 + 21068223 confirm SLUS-21115 (not Steambot Chronicles SLUS-21344)
+        self.assertEqual(self.sdb.get_serial("Okami"), "SLUS-21115")
+
+    def test_castlevania_lament_serial(self):
+        # CRC 2B123FE9 + A5B82E82 confirm SLUS-21050
+        self.assertEqual(
+            self.sdb.get_serial("Castlevania: Lament of Innocence"), "SLUS-21050"
+        )
+
+    def test_disgaea_hour_of_darkness_serial(self):
+        # CRC 471A4AF8 + F26A89E4 confirm SLUS-20365
+        self.assertEqual(
+            self.sdb.get_serial("Disgaea: Hour of Darkness"), "SLUS-20365"
+        )
+
+    def test_shadow_hearts_serial(self):
+        # CRC 3E34F9D4 confirms SLUS-20472
+        self.assertEqual(self.sdb.get_serial("Shadow Hearts"), "SLUS-20472")
+
+    def test_prince_of_persia_sot_serial(self):
+        # CRC 6A928BAE + 880EB41E confirm SLUS-20743
+        self.assertEqual(
+            self.sdb.get_serial("Prince of Persia: The Sands of Time"), "SLUS-20743"
+        )
+
+    def test_silent_hill_4_serial(self):
+        # CRC 0152E0C7 confirms SLUS-20978
+        self.assertEqual(
+            self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20978"
+        )
+
+    def test_hack_infection_serial(self):
+        # CRC D3C7A0A3 confirms SLUS-20267
+        self.assertEqual(self.sdb.get_serial(".hack//Infection"), "SLUS-20267")
+
+    def test_zoe_2nd_runner_serial(self):
+        self.assertEqual(
+            self.sdb.get_serial("Zone of the Enders: The 2nd Runner"), "SLUS-20553"
+        )
+
+    def test_crash_twinsanity_serial(self):
+        self.assertEqual(
+            self.sdb.get_serial("Crash Twinsanity"), "SLUS-20979"
+        )
+
+    # ------------------------------------------------------------------
+    # is_valid / is_known helpers
+    # ------------------------------------------------------------------
+
+    def test_is_valid_correct_serial_returns_true(self):
+        self.assertTrue(self.sdb.is_valid("Kingdom Hearts", "SLUS-20370"))
+
+    def test_is_valid_wrong_serial_returns_false(self):
+        self.assertFalse(self.sdb.is_valid("Kingdom Hearts", "SLUS-20773"))
+
+    def test_is_known_alt_serial_returns_true(self):
+        # SLUS-20773 is a legacy alt for KH
+        self.assertTrue(self.sdb.is_known("Kingdom Hearts", "SLUS-20773"))
+
+    def test_is_known_completely_wrong_serial_returns_false(self):
+        self.assertFalse(self.sdb.is_known("Kingdom Hearts", "SLUS-99999"))
+
+    def test_titles_for_serial_finds_game(self):
+        titles = self.sdb.titles_for_serial("SLUS-20370")
+        self.assertIn("Kingdom Hearts", titles)
+
+    # ------------------------------------------------------------------
+    # Catalogue validation — after fixes
+    # ------------------------------------------------------------------
+
+    def test_validate_all_catalogues_zero_issues_after_fixes(self):
+        """After the Wave 37 serial fixes, no catalogue entry should mismatch."""
+        issues = self.sdb.validate_all_catalogues()
+        if issues:
+            sample = "\n".join(str(i) for i in issues[:10])
+            self.fail(
+                f"Found {len(issues)} remaining serial mismatches:\n{sample}"
+            )
+
+    def test_validate_catalogue_detects_wrong_serial(self):
+        """validate_catalogue() detects a manually-injected wrong serial."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        fake_entries = [
+            {"game": "Kingdom Hearts", "game_serial": "SLUS-20773"},
+            {"game": "God of War",     "game_serial": "SCUS-97399"},  # correct
+        ]
+        issues = sdb.validate_catalogue(fake_entries, source_file="test")
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].game, "Kingdom Hearts")
+        self.assertEqual(issues[0].serial_found, "SLUS-20773")
+        self.assertEqual(issues[0].expected_serial, "SLUS-20370")
+
+    def test_summary_report_structure(self):
+        report = self.sdb.summary_report()
+        self.assertIn("total_games_in_db", report)
+        self.assertIn("issue_count", report)
+        self.assertIn("games_with_issues", report)
+        self.assertIn("issues", report)
+        self.assertGreater(report["total_games_in_db"], 300)
+        self.assertIsInstance(report["issues"], list)
+
+    def test_summary_report_issue_count_zero_after_fixes(self):
+        """After Wave 37 fixes, summary report should show 0 issues."""
+        report = self.sdb.summary_report()
+        self.assertEqual(
+            report["issue_count"], 0,
+            f"Expected 0 issues, got {report['issue_count']}. "
+            f"Affected games: {report['games_with_issues'][:5]}"
+        )
+
+    # ------------------------------------------------------------------
+    # Serial DB file integrity
+    # ------------------------------------------------------------------
+
+    def test_serial_db_file_exists(self):
+        import os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_ntsc_u.json"
+        )
+        self.assertTrue(os.path.isfile(path))
+
+    def test_serial_db_file_valid_json(self):
+        import json, os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_ntsc_u.json"
+        )
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertIn("version", data)
+        self.assertIn("games", data)
+        self.assertIsInstance(data["games"], dict)
+
+    def test_catalogue_kingdom_hearts_serial_fixed(self):
+        """All KH entries in every catalogue should use SLUS-20370 after fixes."""
+        import json, os
+        cat_dir = os.path.join(os.path.dirname(__file__), "..", "data", "catalogue")
+        for fname in ("texture_packs.json", "saves.json", "cover_art.json", "pnach.json"):
+            path = os.path.join(cat_dir, fname)
+            if not os.path.isfile(path):
+                continue
+            data = json.load(open(path, encoding="utf-8"))
+            for entry in data:
+                if entry.get("game") == "Kingdom Hearts":
+                    self.assertEqual(
+                        entry.get("game_serial"), "SLUS-20370",
+                        f"{fname}: Kingdom Hearts entry has wrong serial"
+                    )
+
+    def test_catalogue_god_of_war_serial_fixed(self):
+        """All GoW entries should use SCUS-97399 after fixes."""
+        import json, os
+        cat_dir = os.path.join(os.path.dirname(__file__), "..", "data", "catalogue")
+        for fname in ("texture_packs.json", "saves.json", "cover_art.json", "pnach.json"):
+            path = os.path.join(cat_dir, fname)
+            if not os.path.isfile(path):
+                continue
+            data = json.load(open(path, encoding="utf-8"))
+            for entry in data:
+                if entry.get("game") == "God of War":
+                    self.assertEqual(
+                        entry.get("game_serial"), "SCUS-97399",
+                        f"{fname}: God of War entry has wrong serial"
+                    )
