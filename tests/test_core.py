@@ -4447,18 +4447,29 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_pnach_db_expanded(self):
-        """Known addresses DB should have more than 3770 entries.
+        """Known addresses DB should have more than 3710 entries.
 
-        Wave 30 cleanup details:
-          * 97 malformed ``CRC:ADDR`` keys were reformatted to ``CRC:EE:ADDR``
-            (entry count unchanged — format correction only).
-          * 35 generic estimated "Gravity multiplier" entries that shared the
-            same address across 11-12 unrelated games were removed, reducing
-            the total from 3809 to 3774.
+        Wave 31 cleanup details:
+          * 43 unrelated-game widescreen entries removed (addresses 00348B7C,
+            001C4B2C, 002E1A5C, 0024B8FC, 003C2D1C, 002A0000, 00280000) — each
+            address had the identical 16:9 value_map applied to 4–7 completely
+            different games (different publishers / engines), indicating a
+            copy-pasted generic placeholder.
+          * 6 Sims-series widescreen entries removed (address 0040E340) —
+            even same-franchise titles may differ in memory layout, and 6
+            titles sharing one unverified address fails the game-specific
+            requirement.
+          * 9 physics-multiplier entries removed (address 003E0008) — a
+            gravity / run-speed / jump-height cheat was applied to 9 unrelated
+            games (Ratchet & Clank, Kingdom Hearts II, God of War, Shadow of the
+            Colossus, Jak and Daxter, Spyro, Crash Bandicoot, Spider-Man 2,
+            Prince of Persia) with no shared engine or memory layout.
+          Subtotal by category: 43 + 6 widescreen = 49; 9 physics = 9.
+          Total removed: 58 entries (3774 → 3716).
         """
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 3770, "PNACH DB should have more than 3770 entries after Wave 30 game-specific cleanup")
+        self.assertGreater(n, 3710, "PNACH DB should have more than 3710 entries after Wave 31 game-specific cleanup")
 
     def test_pnach_db_key_format_valid(self):
         """All PNACH DB keys must follow the CRC:MEMTYPE:ADDRESS format (3 colon-separated parts).
@@ -4517,6 +4528,39 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertEqual(
             over_limit, {},
             f"Addresses appearing in >9 games (likely generic placeholders): {list(over_limit.keys())[:5]}",
+        )
+
+    def test_pnach_db_no_generic_widescreen_entries(self):
+        """Widescreen patches must not share the same address + value_map across 4+ unrelated games.
+
+        A standard PS2 widescreen value (3FAB851F = 16:9, or 3FAAAAAB) stored
+        at the *same* EE address for 4 or more completely different game CRCs
+        is a clear sign of a copy-pasted generic placeholder rather than a
+        verified game-specific cheat code.  Each game stores its aspect-ratio
+        register at a unique address determined by its own memory layout.
+        """
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        data = json.loads(db_path.read_text())
+        ws_values = {"3FAB851F", "3FAAAAAB"}
+        addr_crcs: dict = {}
+        for key, entry in data.items():
+            parts = key.split(":")
+            if len(parts) != 3:
+                continue
+            crc, _memtype, addr = parts
+            desc = entry.get("description", "")
+            vm = entry.get("value_map", {})
+            is_ws = (
+                ("widescreen" in desc.lower() or "aspect ratio" in desc.lower())
+                and bool(ws_values & set(vm.keys()))
+            )
+            if is_ws:
+                addr_crcs.setdefault(addr, set()).add(crc.upper())
+        generic_ws = {addr: crcs for addr, crcs in addr_crcs.items() if len(crcs) >= 4}
+        self.assertEqual(
+            generic_ws, {},
+            f"Widescreen address(es) appear in ≥4 unrelated game CRCs — likely generic: "
+            f"{list(generic_ws.keys())[:5]}",
         )
 
     def test_infer_category_handles_all_sizes(self):

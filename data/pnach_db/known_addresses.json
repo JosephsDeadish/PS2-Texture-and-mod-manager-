@@ -2730,23 +2730,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "CB8F7C34:EE:0040E340": {
-    "game": "The Sims 2: Castaway (SLUS-21668)",
-    "game_crc": "CB8F7C34",
-    "game_serial": "SLUS-21668",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen",
-      "3F800000": "4:3 standard (default)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "value_type": "float",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "CB8F7C34:EE:0080A400": {
     "game": "The Sims 2: Castaway (SLUS-21668)",
     "game_crc": "CB8F7C34",
@@ -3301,23 +3284,6 @@
     "patch_type": "word",
     "code_method": "continuous_write"
   },
-  "3F9E2D59:EE:0040E340": {
-    "game": "The Sims 2 (SLUS-21102)",
-    "game_crc": "3F9E2D59",
-    "game_serial": "SLUS-21102",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen",
-      "3F800000": "4:3 standard (default)"
-    },
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "value_type": "float",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "3F9E2D59:EE:0080A400": {
     "game": "The Sims 2 (SLUS-21102)",
     "game_crc": "3F9E2D59",
@@ -3828,27 +3794,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "AF9B5C62:EE:003E0008": {
-    "game": "Ratchet & Clank (SCUS-97131)",
-    "game_crc": "AF9B5C62",
-    "game_serial": "SCUS-97131",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal gravity (default)",
-      "3F000000": "½× gravity (floaty)",
-      "3E800000": "¼× gravity (moon-like)",
-      "40000000": "2× gravity (heavy)",
-      "40800000": "4× gravity (crushing)",
-      "3D4CCCCD": "0.05× gravity (near-zero)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "8CC67FC1:EE:0060A000": {
     "game": "Ratchet & Clank: Going Commando (SCUS-97199)",
     "game_crc": "8CC67FC1",
@@ -4026,27 +3971,6 @@
     "input_compat": "not_applicable",
     "value_type": "int",
     "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "F266B00B:EE:003E0008": {
-    "game": "Kingdom Hearts II (SLUS-21005)",
-    "game_crc": "F266B00B",
-    "game_serial": "SLUS-21005",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal gravity (default)",
-      "3F000000": "½× gravity (floaty)",
-      "3E800000": "¼× gravity (moon-like)",
-      "40000000": "2× gravity (heavy)",
-      "40800000": "4× gravity (crushing)",
-      "3D4CCCCD": "0.05× gravity (near-zero)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
     "patch_type": "word",
     "code_method": "static_write"
   },
@@ -4281,28 +4205,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "B7FD7B53:EE:003E0008": {
-    "game": "Shadow of the Colossus (SCUS-97472)",
-    "game_crc": "B7FD7B53",
-    "game_serial": "SCUS-97472",
-    "description": "Jump height multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal (default)",
-      "40000000": "2× normal",
-      "40800000": "4× normal",
-      "40C00000": "6× normal",
-      "41400000": "12× normal",
-      "3F000000": "½× (lower)",
-      "3E800000": "¼× (very low)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "B7FD7B53:EE:003E000C": {
     "game": "Shadow of the Colossus (SCUS-97472)",
     "game_crc": "B7FD7B53",
@@ -4410,27 +4312,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "FB0E6A61:EE:003E0008": {
-    "game": "God of War (SCUS-97399)",
-    "game_crc": "FB0E6A61",
-    "game_serial": "SCUS-97399",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal gravity (default)",
-      "3F000000": "½× gravity (floaty)",
-      "3E800000": "¼× gravity (moon-like)",
-      "40000000": "2× gravity (heavy)",
-      "40800000": "4× gravity (crushing)",
-      "3D4CCCCD": "0.05× gravity (near-zero)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "44A61C8F:EE:007B0000": {
     "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
     "game_crc": "44A61C8F",
@@ -4466,27 +4347,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "44A61C8F:EE:003E0008": {
-    "game": "Jak and Daxter: The Precursor Legacy (SCUS-97124)",
-    "game_crc": "44A61C8F",
-    "game_serial": "SCUS-97124",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal gravity (default)",
-      "3F000000": "½× gravity (floaty)",
-      "3E800000": "¼× gravity (moon-like)",
-      "40000000": "2× gravity (heavy)",
-      "40800000": "4× gravity (crushing)",
-      "3D4CCCCD": "0.05× gravity (near-zero)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "5D054E5A:EE:006C0004": {
     "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
     "game_crc": "5D054E5A",
@@ -4519,28 +4379,6 @@
     "estimated": true,
     "input_compat": "not_applicable",
     "value_type": "int",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "5D054E5A:EE:003E0008": {
-    "game": "Spyro: Enter the Dragonfly (SLUS-20062)",
-    "game_crc": "5D054E5A",
-    "game_serial": "SLUS-20062",
-    "description": "Run speed multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal (default)",
-      "40000000": "2× normal",
-      "40400000": "3× normal",
-      "40800000": "4× normal",
-      "40C00000": "6× normal",
-      "3F000000": "½× (slower)",
-      "3E800000": "¼× (very slow)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
     "verification_status": "community_verified",
     "patch_type": "word",
     "code_method": "static_write"
@@ -4602,27 +4440,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "A91F4EAE:EE:003E0008": {
-    "game": "Crash Bandicoot: The Wrath of Cortex (SLUS-20238)",
-    "game_crc": "A91F4EAE",
-    "game_serial": "SLUS-20238",
-    "description": "Gravity multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal gravity (default)",
-      "3F000000": "½× gravity (floaty)",
-      "3E800000": "¼× gravity (moon-like)",
-      "40000000": "2× gravity (heavy)",
-      "40800000": "4× gravity (crushing)",
-      "3D4CCCCD": "0.05× gravity (near-zero)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "2E01B00C:EE:006C0004": {
     "game": "Spider-Man 2 (SLUS-20776)",
     "game_crc": "2E01B00C",
@@ -4635,28 +4452,6 @@
       "00000064": "100 hero pts"
     },
     "value_type": "int",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "community_verified",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "2E01B00C:EE:003E0008": {
-    "game": "Spider-Man 2 (SLUS-20776)",
-    "game_crc": "2E01B00C",
-    "game_serial": "SLUS-20776",
-    "description": "Run speed multiplier (on foot)",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal (default)",
-      "40000000": "2× normal",
-      "40400000": "3× normal",
-      "40800000": "4× normal",
-      "40C00000": "6× normal",
-      "3F000000": "½× (slower)",
-      "3E800000": "¼× (very slow)"
-    },
-    "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "community_verified",
@@ -4698,28 +4493,6 @@
     "estimated": true,
     "input_compat": "not_applicable",
     "value_type": "int",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "880EB41E:EE:003E0008": {
-    "game": "Prince of Persia: The Sands of Time (SLUS-20743)",
-    "game_crc": "880EB41E",
-    "game_serial": "SLUS-20743",
-    "description": "Wall run duration multiplier",
-    "category": "physics",
-    "value_map": {
-      "3F800000": "1× normal (default)",
-      "40000000": "2× normal",
-      "40400000": "3× normal",
-      "40800000": "4× normal",
-      "40C00000": "6× normal",
-      "3F000000": "½× (slower)",
-      "3E800000": "¼× (very slow)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
@@ -12244,24 +12017,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "8B84D0BE:EE:002A0000": {
-    "game": "Wild Arms 3 (SCUS-97203)",
-    "game_crc": "8B84D0BE",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SCUS-97203",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "8B84D0BE:EE:0038C000": {
     "game": "Wild Arms 3 (SCUS-97203)",
     "game_crc": "8B84D0BE",
@@ -12479,24 +12234,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "D3C7A0A3:EE:002A0000": {
-    "game": ".hack//Infection (SLUS-20267)",
-    "game_crc": "D3C7A0A3",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20267",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "D3C7A0A3:EE:0038C000": {
     "game": ".hack//Infection (SLUS-20267)",
     "game_crc": "D3C7A0A3",
@@ -12581,24 +12318,6 @@
     },
     "game_serial": "SLUS-20179",
     "value_type": "int",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "9FC7F3C8:EE:00280000": {
-    "game": "Baldur's Gate: Dark Alliance (SLUS-20772)",
-    "game_crc": "9FC7F3C8",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20772",
-    "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "estimated",
@@ -12924,24 +12643,6 @@
     },
     "game_serial": "SLUS-21193",
     "value_type": "int",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "6E3E2B4E:EE:002A0000": {
-    "game": "SoulCalibur II (SLUS-20591)",
-    "game_crc": "6E3E2B4E",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20591",
-    "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "estimated",
@@ -13365,24 +13066,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "4CC7B859:EE:00280000": {
-    "game": "Burnout 2: Point of Impact (SLUS-20489)",
-    "game_crc": "4CC7B859",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20489",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "4CC7B859:EE:0032C000": {
     "game": "Burnout 2: Point of Impact (SLUS-20489)",
     "game_crc": "4CC7B859",
@@ -13725,24 +13408,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "43AB7214:EE:00280000": {
-    "game": "Burnout 3: Takedown (SLUS-20625)",
-    "game_crc": "43AB7214",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20625",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "43AB7214:EE:0034C000": {
     "game": "Burnout 3: Takedown (SLUS-20625)",
     "game_crc": "43AB7214",
@@ -13852,24 +13517,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "E4E15CA3:EE:002A0000": {
-    "game": "Ty the Tasmanian Tiger (SLUS-20556)",
-    "game_crc": "E4E15CA3",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20556",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "E4E15CA3:EE:003A8000": {
     "game": "Ty the Tasmanian Tiger (SLUS-20556)",
     "game_crc": "E4E15CA3",
@@ -13971,24 +13618,6 @@
       "40000000": "double (2×)"
     },
     "game_serial": "SLUS-20314",
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "1D5C5AD6:EE:00280000": {
-    "game": "Shadow of Rome (SLUS-20902)",
-    "game_crc": "1D5C5AD6",
-    "description": "Widescreen aspect ratio — 16:9",
-    "category": "graphics",
-    "notes": "16:9 widescreen patch.",
-    "value_map": {
-      "3FAAAAAB": "16:9 widescreen",
-      "3F800000": "4:3 normal"
-    },
-    "game_serial": "SLUS-20902",
     "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
@@ -14213,706 +13842,6 @@
     "verification_status": "estimated",
     "patch_type": "word",
     "code_method": "static_write"
-  },
-  "C2E7F10B:EE:00348B7C": {
-    "game": "Kingdom Hearts",
-    "game_crc": "C2E7F10B",
-    "game_serial": "SLUS-20773",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "DBC5E296:EE:001C4B2C": {
-    "game": "Crash Bandicoot: Wrath of Cortex",
-    "game_crc": "DBC5E296",
-    "game_serial": "SLUS-20518",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "AE4CCFF6:EE:002E1A5C": {
-    "game": "Okami",
-    "game_crc": "AE4CCFF6",
-    "game_serial": "SLUS-21344",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "F070ECA8:EE:0024B8FC": {
-    "game": "Bully / Canis Canem Edit",
-    "game_crc": "F070ECA8",
-    "game_serial": "SLUS-21358",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "D9FC6573:EE:003C2D1C": {
-    "game": "Need for Speed: Most Wanted",
-    "game_crc": "D9FC6573",
-    "game_serial": "SLUS-20898",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "DB3BCCE8:EE:00348B7C": {
-    "game": "Spider-Man 2",
-    "game_crc": "DB3BCCE8",
-    "game_serial": "SLUS-20265",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "8A3B3F55:EE:001C4B2C": {
-    "game": "Persona 4",
-    "game_crc": "8A3B3F55",
-    "game_serial": "SLUS-21782",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "CF4E3AC0:EE:002E1A5C": {
-    "game": "Sly 3: Honor Among Thieves",
-    "game_crc": "CF4E3AC0",
-    "game_serial": "SLUS-20916",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3B698B6E:EE:0024B8FC": {
-    "game": "Crash Twinsanity",
-    "game_crc": "3B698B6E",
-    "game_serial": "SLUS-20605",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "749FADA6:EE:003C2D1C": {
-    "game": "Final Fantasy XII",
-    "game_crc": "749FADA6",
-    "game_serial": "SLUS-20963",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "858B2EBB:EE:00348B7C": {
-    "game": "SoulCalibur III",
-    "game_crc": "858B2EBB",
-    "game_serial": "SLUS-21216",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A5B1B4C1:EE:001C4B2C": {
-    "game": "Need for Speed Underground 2",
-    "game_crc": "A5B1B4C1",
-    "game_serial": "SLUS-20784",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "EA81505D:EE:002E1A5C": {
-    "game": "Need for Speed Carbon",
-    "game_crc": "EA81505D",
-    "game_serial": "SLUS-21420",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "06A33E38:EE:0024B8FC": {
-    "game": "Need for Speed: Hot Pursuit 2",
-    "game_crc": "06A33E38",
-    "game_serial": "SLUS-20212",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "0A2A7DE0:EE:003C2D1C": {
-    "game": "Crash: Mind over Mutant",
-    "game_crc": "0A2A7DE0",
-    "game_serial": "SLUS-21758",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2AFC166C:EE:00348B7C": {
-    "game": "Kingdom Hearts: Chain of Memories (Re:CoM)",
-    "game_crc": "2AFC166C",
-    "game_serial": "SLUS-21790",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3BD4EE40:EE:001C4B2C": {
-    "game": "Prince of Persia: The Two Thrones",
-    "game_crc": "3BD4EE40",
-    "game_serial": "SLUS-21282",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "14FE13DE:EE:002E1A5C": {
-    "game": "Star Wars Battlefront II",
-    "game_crc": "14FE13DE",
-    "game_serial": "SLUS-21240",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "EE9E674C:EE:0024B8FC": {
-    "game": "Rogue Galaxy",
-    "game_crc": "EE9E674C",
-    "game_serial": "SCUS-97737",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2E4CE8A8:EE:003C2D1C": {
-    "game": "SOCOM II: U.S. Navy SEALs",
-    "game_crc": "2E4CE8A8",
-    "game_serial": "SCUS-97318",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "2B2C9BA6:EE:00348B7C": {
-    "game": "Digital Devil Saga 2",
-    "game_crc": "2B2C9BA6",
-    "game_serial": "SLUS-21414",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "65A59984:EE:001C4B2C": {
-    "game": "Onimusha 3: Demon Siege",
-    "game_crc": "65A59984",
-    "game_serial": "SLUS-20966",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "7C980400:EE:002E1A5C": {
-    "game": "Tales of the Abyss",
-    "game_crc": "7C980400",
-    "game_serial": "SLUS-21386",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "161E0B8D:EE:0024B8FC": {
-    "game": "Xenosaga Episode II: Jenseits von Gut und Böse",
-    "game_crc": "161E0B8D",
-    "game_serial": "SLUS-20901",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "E58F6960:EE:003C2D1C": {
-    "game": "Ar tonelico: Melody of Elemia",
-    "game_crc": "E58F6960",
-    "game_serial": "SLUS-21487",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "D7EF8CF8:EE:00348B7C": {
-    "game": "Shadow Hearts: From the New World",
-    "game_crc": "D7EF8CF8",
-    "game_serial": "SLUS-21395",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "03AFC852:EE:001C4B2C": {
-    "game": "Mana Khemia: Alchemists of Al-Revis",
-    "game_crc": "03AFC852",
-    "game_serial": "SLUS-21713",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "1B5D5161:EE:002E1A5C": {
-    "game": "Mana Khemia 2: Fall of Alchemy",
-    "game_crc": "1B5D5161",
-    "game_serial": "SLUS-21846",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A6167B5A:EE:0024B8FC": {
-    "game": "Disgaea: Hour of Darkness",
-    "game_crc": "A6167B5A",
-    "game_serial": "SLUS-20523",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "92A5B6C3:EE:003C2D1C": {
-    "game": "Crash Twinsanity (alt)",
-    "game_crc": "92A5B6C3",
-    "game_serial": "SLUS-20997",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "3B0AECE4:EE:00348B7C": {
-    "game": "Spyro: Enter the Dragonfly",
-    "game_crc": "3B0AECE4",
-    "game_serial": "SLUS-20201",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "64DF0D3F:EE:001C4B2C": {
-    "game": "Crash Nitro Kart",
-    "game_crc": "64DF0D3F",
-    "game_serial": "SLUS-20644",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "A3E2CD7F:EE:002E1A5C": {
-    "game": "Dead or Alive 2: Hardcore",
-    "game_crc": "A3E2CD7F",
-    "game_serial": "SLUS-20009",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "1E9DAD32:EE:0024B8FC": {
-    "game": "Virtua Fighter 4: Evolution",
-    "game_crc": "1E9DAD32",
-    "game_serial": "SLUS-20710",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
-  },
-  "B119C6BA:EE:003C2D1C": {
-    "game": "WWE SmackDown vs. RAW 2007",
-    "game_crc": "B119C6BA",
-    "game_serial": "SLUS-21493",
-    "description": "Widescreen (16:9) aspect ratio patch",
-    "category": "graphics",
-    "notes": "Estimated address for widescreen support",
-    "value_map": {
-      "3FAB851F": "16:9 (Widescreen)",
-      "3F800000": "4:3 (Normal)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write",
-    "exclusion_group": "",
-    "exclusion_note": ""
   },
   "77DEA027:EE:003B2400": {
     "game": "Tony Hawk's Pro Skater 3 (SLUS-20090)",
@@ -33555,24 +32484,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "1371A2F5:EE:0040E340": {
-    "game": "The Sims Bustin' Out (SLUS-20597)",
-    "game_crc": "1371A2F5",
-    "game_serial": "SLUS-20597",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "notes": "Stores 16:9 aspect ratio float (1.7778) at widescreen address. Write 3FAB851F for 16:9.",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen (1.7778)",
-      "3F800000": "4:3 standard (1.0)"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "1371A2F5:EE:0080A400": {
     "game": "The Sims Bustin' Out (SLUS-20597)",
     "game_crc": "1371A2F5",
@@ -33885,24 +32796,6 @@
     "patch_type": "word",
     "code_method": "static_write"
   },
-  "D96D9D1A:EE:0040E340": {
-    "game": "The Urbz: Sims in the City (SLUS-20959)",
-    "game_crc": "D96D9D1A",
-    "game_serial": "SLUS-20959",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "notes": "Write 3FAB851F for 16:9 widescreen.",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen",
-      "3F800000": "4:3 standard"
-    },
-    "value_type": "float",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
   "D96D9D1A:EE:0080A400": {
     "game": "The Urbz: Sims in the City (SLUS-20959)",
     "game_crc": "D96D9D1A",
@@ -34170,24 +33063,6 @@
       "00000000": "strangers (0)"
     },
     "value_type": "int",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "A8512F13:EE:0040E340": {
-    "game": "The Sims 2: Pets (SLUS-21452)",
-    "game_crc": "A8512F13",
-    "game_serial": "SLUS-21452",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "notes": "Write 3FAB851F for 16:9 widescreen.",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen",
-      "3F800000": "4:3 standard"
-    },
-    "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "estimated",
@@ -34476,24 +33351,6 @@
       "0000000A": "10 (max)"
     },
     "value_type": "int",
-    "estimated": true,
-    "input_compat": "not_applicable",
-    "verification_status": "estimated",
-    "patch_type": "word",
-    "code_method": "static_write"
-  },
-  "EA5C3E8B:EE:0040E340": {
-    "game": "The Sims (SLUS-20034)",
-    "game_crc": "EA5C3E8B",
-    "game_serial": "SLUS-20034",
-    "description": "Widescreen aspect ratio correction",
-    "category": "graphics",
-    "notes": "Write 3FAB851F for 16:9 widescreen.",
-    "value_map": {
-      "3FAB851F": "16:9 widescreen",
-      "3F800000": "4:3 standard"
-    },
-    "value_type": "float",
     "estimated": true,
     "input_compat": "not_applicable",
     "verification_status": "estimated",
