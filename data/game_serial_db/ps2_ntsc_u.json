@@ -726,7 +726,8 @@
       "serial": "SLUS-20874",
       "alt_serials": [],
       "crcs": [
-        "9C3ED1B5"
+        "9C3ED1B5",
+        "E36751DA"
       ]
     },
     "Dragon Quest VIII": {
@@ -6925,6 +6926,6620 @@
       "crcs": [
         "EAEDE6E8"
       ]
+    },
+    "The Godfather": {
+      "serial": "SLUS-21385",
+      "alt_serials": [
+        "SLUS-21406"
+      ],
+      "crcs": [
+        "D850707E"
+      ]
+    },
+    "NFL GameDay 2001": {
+      "serial": "SCUS-97106",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA GameBreaker 2001": {
+      "serial": "SCUS-97107",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Final Four 2001": {
+      "serial": "SCUS-97109",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL FaceOff 2001": {
+      "serial": "SCUS-97110",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2001": {
+      "serial": "SCUS-97114",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gran Turismo 3: A-Spec (SCUS-97115)": {
+      "serial": "SCUS-97115",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury": {
+      "serial": "SCUS-97122",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Okage: Shadow King": {
+      "serial": "SCUS-97129",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Final Four 2002": {
+      "serial": "SCUS-97136",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Stitch: Experiment 626": {
+      "serial": "SCUS-97145",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Treasure Planet": {
+      "serial": "SCUS-97146",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cool Boarders 2001 (SCUS-97147)": {
+      "serial": "SCUS-97147",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dark Cloud (SCUS-97152)": {
+      "serial": "SCUS-97152",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Vans Warped Tour '01": {
+      "serial": "SCUS-97153",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Frequency (SCUS-97157)": {
+      "serial": "SCUS-97157",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ico (SCUS-97159)": {
+      "serial": "SCUS-97159",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Extermination (SCUS-97160)": {
+      "serial": "SCUS-97160",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kinetica (SCUS-97161)": {
+      "serial": "SCUS-97161",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Twisted Metal: Black (SCUS-97164)": {
+      "serial": "SCUS-97164",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PlayStation Underground: Holiday 2001": {
+      "serial": "SCUS-97166",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Drakan: The Ancients' Gates": {
+      "serial": "SCUS-97169",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak and Daxter: The Precursor Legacy (SCUS-97170)": {
+      "serial": "SCUS-97170",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak and Daxter: The Precursor Legacy (SCUS-97171)": {
+      "serial": "SCUS-97171",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2002": {
+      "serial": "SCUS-97172",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jet X2O": {
+      "serial": "SCUS-97173",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL GameDay 2002": {
+      "serial": "SCUS-97178",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Twisted Metal: Black Online": {
+      "serial": "SCUS-97179",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2002 (SCUS-97192)": {
+      "serial": "SCUS-97192",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL GameDay 2003": {
+      "serial": "SCUS-97194",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Twisted Metal: Black Online (SCUS-97196)": {
+      "serial": "SCUS-97196",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Mark of Kri (SCUS-97201)": {
+      "serial": "SCUS-97201",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Final Four 2003": {
+      "serial": "SCUS-97204",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM: U.S. Navy SEALs (SCUS-97205)": {
+      "serial": "SCUS-97205",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Shots Golf 3 + PaRappa the Rapper 2": {
+      "serial": "SCUS-97208",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank (SCUS-97209)": {
+      "serial": "SCUS-97209",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly Cooper and the Thievius Raccoonus (SCUS-97210)": {
+      "serial": "SCUS-97210",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA GameBreaker 2003": {
+      "serial": "SCUS-97214",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2003": {
+      "serial": "SCUS-97217",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gran Turismo 3: Nissan 350Z Edition": {
+      "serial": "SCUS-97219",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL FaceOff 2003": {
+      "serial": "SCUS-97220",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Mark of Kri (SCUS-97222)": {
+      "serial": "SCUS-97222",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL GameDay 2003 (SCUS-97223)": {
+      "serial": "SCUS-97223",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Wild Arms 3 (SCUS-97224)": {
+      "serial": "SCUS-97224",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Primal (SCUS-97225)": {
+      "serial": "SCUS-97225",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA GameBreaker 2003 (SCUS-97226)": {
+      "serial": "SCUS-97226",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dark Cloud 2 (SCUS-97229)": {
+      "serial": "SCUS-97229",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM: U.S. Navy SEALs (SCUS-97230)": {
+      "serial": "SCUS-97230",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Getaway": {
+      "serial": "SCUS-97232",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2003": {
+      "serial": "SCUS-97233",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Winter 2002": {
+      "serial": "SCUS-97234",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Winter 2002 (SCUS-97235)": {
+      "serial": "SCUS-97235",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2003 (SCUS-97236)": {
+      "serial": "SCUS-97236",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jet X2O (SCUS-97239)": {
+      "serial": "SCUS-97239",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank (SCUS-97240)": {
+      "serial": "SCUS-97240",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2003 (SCUS-97253)": {
+      "serial": "SCUS-97253",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2004": {
+      "serial": "SCUS-97256",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2004 (SCUS-97257)": {
+      "serial": "SCUS-97257",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Amplitude": {
+      "serial": "SCUS-97258",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL FaceOff 2003 (SCUS-97259)": {
+      "serial": "SCUS-97259",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "War of the Monsters (SCUS-97260)": {
+      "serial": "SCUS-97260",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Amplitude (SCUS-97262)": {
+      "serial": "SCUS-97262",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "My Street (SCUS-97263)": {
+      "serial": "SCUS-97263",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PlayOnline Viewer and Tetra Master": {
+      "serial": "SCUS-97269",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PlayOnline Viewer and Tetra Master (SCUS-97272)": {
+      "serial": "SCUS-97272",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak II (SCUS-97273)": {
+      "serial": "SCUS-97273",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak II (SCUS-97274)": {
+      "serial": "SCUS-97274",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA GameBreaker 2004": {
+      "serial": "SCUS-97277",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Final Four 2004": {
+      "serial": "SCUS-97278",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Summer 2003": {
+      "serial": "SCUS-97280",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Summer 2003 (SCUS-97281)": {
+      "serial": "SCUS-97281",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arc the Lad: Twilight of the Spirits (SCUS-97282)": {
+      "serial": "SCUS-97282",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Winter 2003": {
+      "serial": "SCUS-97312",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jampack: Winter 2003 (SCUS-97313)": {
+      "serial": "SCUS-97313",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA GameBreaker 2004 (SCUS-97315)": {
+      "serial": "SCUS-97315",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL GameDay 2004": {
+      "serial": "SCUS-97317",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2004": {
+      "serial": "SCUS-97318",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Play": {
+      "serial": "SCUS-97319",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kiosk June-July-August 2003": {
+      "serial": "SCUS-97321",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Going Commando (SCUS-97322)": {
+      "serial": "SCUS-97322",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Going Commando (SCUS-97323)": {
+      "serial": "SCUS-97323",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kiosk 2-11 Winter 2003": {
+      "serial": "SCUS-97324",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2004 (SCUS-97325)": {
+      "serial": "SCUS-97325",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2005": {
+      "serial": "SCUS-97326",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2005 (SCUS-97327)": {
+      "serial": "SCUS-97327",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Downhill Domination (SCUS-97329)": {
+      "serial": "SCUS-97329",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Groove": {
+      "serial": "SCUS-97345",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2006": {
+      "serial": "SCUS-97347",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 06": {
+      "serial": "SCUS-97348",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Syphon Filter: Dark Mirror": {
+      "serial": "SCUS-97362",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2005": {
+      "serial": "SCUS-97365",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM II: U.S. Navy SEALs (SCUS-97366)": {
+      "serial": "SCUS-97366",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM II: U.S. Navy SEALs (SCUS-97368)": {
+      "serial": "SCUS-97368",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 2 (SCUS-97369)": {
+      "serial": "SCUS-97369",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Final Four 2004 (SCUS-97370)": {
+      "serial": "SCUS-97370",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jet Li: Rise to Honor": {
+      "serial": "SCUS-97372",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Going Commando + Jak II": {
+      "serial": "SCUS-97374",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Syphon Filter: The Omega Strain": {
+      "serial": "SCUS-97377",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Going Commando + Jak II (SCUS-97381)": {
+      "serial": "SCUS-97381",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA ShootOut 2004 (SCUS-97382)": {
+      "serial": "SCUS-97382",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kiosk 2-12 Spring 2004": {
+      "serial": "SCUS-97383",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 06 (SCUS-97392)": {
+      "serial": "SCUS-97392",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Welcome to the World of Online Gaming for Your PlayStation 2": {
+      "serial": "SCUS-97394",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2005 (SCUS-97396)": {
+      "serial": "SCUS-97396",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Syphon Filter: The Omega Strain (SCUS-97397)": {
+      "serial": "SCUS-97397",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Siren (SCUS-97398)": {
+      "serial": "SCUS-97398",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Groove (SCUS-97400)": {
+      "serial": "SCUS-97400",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Athens 2004 (SCUS-97403)": {
+      "serial": "SCUS-97403",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 3": {
+      "serial": "SCUS-97405",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PS2 Kiosk Q2-Q3 2004: Summer 2004": {
+      "serial": "SCUS-97407",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Getaway: Black Monday": {
+      "serial": "SCUS-97408",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gretzky NHL 2005": {
+      "serial": "SCUS-97409",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Up Your Arsenal (SCUS-97411)": {
+      "serial": "SCUS-97411",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak 3 (SCUS-97412)": {
+      "serial": "SCUS-97412",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Up Your Arsenal (SCUS-97413)": {
+      "serial": "SCUS-97413",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Antigrav": {
+      "serial": "SCUS-97414",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly 2: Band of Thieves (SCUS-97415)": {
+      "serial": "SCUS-97415",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PS2 Kiosk Q3-Q4 2005": {
+      "serial": "SCUS-97424",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Shots Golf Fore! (SCUS-97427)": {
+      "serial": "SCUS-97427",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Shots Golf Fore! (SCUS-97430)": {
+      "serial": "SCUS-97430",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Killzone (SCUS-97431)": {
+      "serial": "SCUS-97431",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Killzone (SCUS-97432)": {
+      "serial": "SCUS-97432",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 3 (SCUS-97437)": {
+      "serial": "SCUS-97437",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Antigrav (SCUS-97438)": {
+      "serial": "SCUS-97438",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Getaway: Black Monday (SCUS-97441)": {
+      "serial": "SCUS-97441",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly 2: Band of Thieves (SCUS-97457)": {
+      "serial": "SCUS-97457",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 2006 (SCUS-97460)": {
+      "serial": "SCUS-97460",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rise of the Kasai": {
+      "serial": "SCUS-97462",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gretzky NHL 06": {
+      "serial": "SCUS-97466",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "God of War: The Hydra Battle": {
+      "serial": "SCUS-97467",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Play 2": {
+      "serial": "SCUS-97468",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Neopets: The Darkest Faerie": {
+      "serial": "SCUS-97469",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Tour Soccer 2006 (SCUS-97473)": {
+      "serial": "SCUS-97473",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM 3: U.S. Navy SEALs (SCUS-97475)": {
+      "serial": "SCUS-97475",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Kinetic": {
+      "serial": "SCUS-97478",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 4": {
+      "serial": "SCUS-97479",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "God of War II: The Colossus Battle": {
+      "serial": "SCUS-97482",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gran Turismo 4: Mazda MX-5 Edition": {
+      "serial": "SCUS-97483",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly 3: Honor Among Thieves (SCUS-97484)": {
+      "serial": "SCUS-97484",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet: Deadlocked (SCUS-97485)": {
+      "serial": "SCUS-97485",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak X: Combat Racing (SCUS-97486)": {
+      "serial": "SCUS-97486",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet: Deadlocked (SCUS-97487)": {
+      "serial": "SCUS-97487",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak X: Combat Racing (SCUS-97488)": {
+      "serial": "SCUS-97488",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM 3: U.S. Navy SEALs (SCUS-97489)": {
+      "serial": "SCUS-97489",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Play 2 (SCUS-97495)": {
+      "serial": "SCUS-97495",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Kinetic (SCUS-97497)": {
+      "serial": "SCUS-97497",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 06: The Show": {
+      "serial": "SCUS-97500",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tourist Trophy": {
+      "serial": "SCUS-97502",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 06: The Show (SCUS-97503)": {
+      "serial": "SCUS-97503",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Genji: Dawn of the Samurai": {
+      "serial": "SCUS-97504",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shadow of the Colossus (SCUS-97505)": {
+      "serial": "SCUS-97505",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gretzky NHL 06 (SCUS-97506)": {
+      "serial": "SCUS-97506",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy": {
+      "serial": "SCUS-97507",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gran Turismo 3: A-Spec (SCUS-97512)": {
+      "serial": "SCUS-97512",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Going Commando (Greatest Hits)": {
+      "serial": "SCUS-97513",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 3: Greatest Hits (SCUS-97514)": {
+      "serial": "SCUS-97514",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak 3 (Greatest Hits)": {
+      "serial": "SCUS-97516",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy: Operation Spy": {
+      "serial": "SCUS-97523",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly 3: Honor Among Thieves (SCUS-97527)": {
+      "serial": "SCUS-97527",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Splashdown: Rides Gone Wild / ATV Offroad Fury 2 / Need for Speed Hot Pursuit 2": {
+      "serial": "SCUS-97530",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 07 featuring the Life Vol. 2": {
+      "serial": "SCUS-97544",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ape Escape 3 (SCUS-97548)": {
+      "serial": "SCUS-97548",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 4 (SCUS-97553)": {
+      "serial": "SCUS-97553",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 07 featuring the Life Vol. 2 (SCUS-97554)": {
+      "serial": "SCUS-97554",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak and Daxter Complete Trilogy": {
+      "serial": "SCUS-97555",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 07: The Show": {
+      "serial": "SCUS-97556",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kiosk Q2-Q3 2006": {
+      "serial": "SCUS-97557",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak and Daxter: The Lost Frontier": {
+      "serial": "SCUS-97558",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM: U.S. Navy SEALs: Combined Assault": {
+      "serial": "SCUS-97560",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gran Turismo 4 (SCUS-97563)": {
+      "serial": "SCUS-97563",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 07: The Show (SCUS-97568)": {
+      "serial": "SCUS-97568",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Rocks!": {
+      "serial": "SCUS-97571",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rogue Galaxy (SCUS-97572)": {
+      "serial": "SCUS-97572",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jak X: Combat Racing (SCUS-97574)": {
+      "serial": "SCUS-97574",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sly 3: Honor Among Thieves: Greatest Hits": {
+      "serial": "SCUS-97576",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shadow of the Colossus: Greatest Hits": {
+      "serial": "SCUS-97578",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 4 (SCUS-97579)": {
+      "serial": "SCUS-97579",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Pop (SCUS-97580)": {
+      "serial": "SCUS-97580",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 08: The Show": {
+      "serial": "SCUS-97583",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Syphon Filter: Logan's Shadow": {
+      "serial": "SCUS-97584",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 08 featuring the Life Vol. 3": {
+      "serial": "SCUS-97589",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Rocks!(Game Only)": {
+      "serial": "SCUS-97590",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Pop (SCUS-97591)": {
+      "serial": "SCUS-97591",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! The Mega Quiz": {
+      "serial": "SCUS-97592",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! The Hollywood Quiz": {
+      "serial": "SCUS-97594",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! Junior: Jungle Party": {
+      "serial": "SCUS-97596",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! Junior: RoboJam": {
+      "serial": "SCUS-97597",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EyeToy (SCUS-97600)": {
+      "serial": "SCUS-97600",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! The Mega Quiz (SCUS-97601)": {
+      "serial": "SCUS-97601",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! Junior: Jungle Party (SCUS-97602)": {
+      "serial": "SCUS-97602",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Shots Tennis": {
+      "serial": "SCUS-97610",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Amped": {
+      "serial": "SCUS-97611",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Amped (SCUS-97612)": {
+      "serial": "SCUS-97612",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ratchet & Clank: Size Matters": {
+      "serial": "SCUS-97615",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar '80s [with Microphones]": {
+      "serial": "SCUS-97616",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Shots Tennis (SCUS-97619)": {
+      "serial": "SCUS-97619",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Syphon Filter: Dark Mirror (SCUS-97620)": {
+      "serial": "SCUS-97620",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Twisted Metal: Head-On: Extra Twisted Edition": {
+      "serial": "SCUS-97621",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar '80s": {
+      "serial": "SCUS-97622",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Secret Agent Clank": {
+      "serial": "SCUS-97623",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 09: The Inside": {
+      "serial": "SCUS-97625",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar '90s": {
+      "serial": "SCUS-97626",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! The Hollywood Quiz (SCUS-97633)": {
+      "serial": "SCUS-97633",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buzz! Junior: RoboJam (SCUS-97634)": {
+      "serial": "SCUS-97634",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar '90s (SCUS-97636)": {
+      "serial": "SCUS-97636",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Legends": {
+      "serial": "SCUS-97640",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar ABBA": {
+      "serial": "SCUS-97642",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Queen": {
+      "serial": "SCUS-97643",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 09: The Show": {
+      "serial": "SCUS-97644",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Pop Vol. 2": {
+      "serial": "SCUS-97649",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Country": {
+      "serial": "SCUS-97650",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Country (SCUS-97651)": {
+      "serial": "SCUS-97651",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 10: The Show": {
+      "serial": "SCUS-97653",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB 11: The Show": {
+      "serial": "SCUS-97657",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SingStar Latino": {
+      "serial": "SCUS-97660",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SOCOM: U.S. Navy SEALs (SCUS-97859)": {
+      "serial": "SCUS-97859",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Amplitude: P.O.D.": {
+      "serial": "SCUS-97869",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Army Men: Air Attack 2": {
+      "serial": "SLUS-20004",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Destruction League: Thunder Tanks": {
+      "serial": "SLUS-20005",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Warriors of Might and Magic": {
+      "serial": "SLUS-20006",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "All-Star Baseball 2002": {
+      "serial": "SLUS-20008",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Orphen: Scion of Sorcery": {
+      "serial": "SLUS-20011",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kengo: Master of Bushido": {
+      "serial": "SLUS-20021",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Operative: No One Lives Forever": {
+      "serial": "SLUS-20028",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Top Gear DareDevil": {
+      "serial": "SLUS-20029",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Real Pool": {
+      "serial": "SLUS-20032",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Top Gear Dare Devil": {
+      "serial": "SLUS-20039",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gradius III and IV": {
+      "serial": "SLUS-20040",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Super Bombad Racing": {
+      "serial": "SLUS-20043",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Starfighter": {
+      "serial": "SLUS-20044",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Legend of Alon D'ar": {
+      "serial": "SLUS-20045",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gauntlet: Dark Legacy": {
+      "serial": "SLUS-20047",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Legion: The Legend of Excalibur": {
+      "serial": "SLUS-20048",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB SlugFest 2003": {
+      "serial": "SLUS-20049",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Hoopz": {
+      "serial": "SLUS-20050",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL Blitz 2002": {
+      "serial": "SLUS-20051",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ready 2 Rumble Boxing: Round 2": {
+      "serial": "SLUS-20054",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MotoGP": {
+      "serial": "SLUS-20058",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Midnight Club: Street Racing": {
+      "serial": "SLUS-20063",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Q-Ball: Billiards Master": {
+      "serial": "SLUS-20070",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Summoner": {
+      "serial": "SLUS-20074",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Walt Disney's The Jungle Book: Rhythm n' Groove": {
+      "serial": "SLUS-20075",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Tarzan: Untamed": {
+      "serial": "SLUS-20076",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 2": {
+      "serial": "SLUS-20079",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Soldier of Fortune: Gold Edition": {
+      "serial": "SLUS-20084",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Silpheed: The Lost Planet": {
+      "serial": "SLUS-20085",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Commandos 2: Men of Courage": {
+      "serial": "SLUS-20086",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Army Men: Green Rogue": {
+      "serial": "SLUS-20087",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fur Fighters: Viggo's Revenge": {
+      "serial": "SLUS-20088",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN Winter X Games Snowboarding": {
+      "serial": "SLUS-20089",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TimeSplitters": {
+      "serial": "SLUS-20090",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "4x4 Evo": {
+      "serial": "SLUS-20091",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Surfing H3O": {
+      "serial": "SLUS-20092",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 2001": {
+      "serial": "SLUS-20093",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA 2001": {
+      "serial": "SLUS-20097",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Theme Park Roller Coaster": {
+      "serial": "SLUS-20099",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "F1 Championship Season 2000": {
+      "serial": "SLUS-20103",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MDK2: Armageddon": {
+      "serial": "SLUS-20105",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Wild Wild Racing": {
+      "serial": "SLUS-20108",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Deus Ex: The Conspiracy": {
+      "serial": "SLUS-20111",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Trek: Shattered Universe": {
+      "serial": "SLUS-20112",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Simpsons Skateboarding": {
+      "serial": "SLUS-20114",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN MLS ExtraTime": {
+      "serial": "SLUS-20128",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dark Angel: Vampire Apocalypse": {
+      "serial": "SLUS-20131",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Army Men: Sarge's Heroes 2": {
+      "serial": "SLUS-20132",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "High Heat Major League Baseball 2002": {
+      "serial": "SLUS-20133",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NBA 2Night (SLUS-20143)": {
+      "serial": "SLUS-20143",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL QB Club 2002": {
+      "serial": "SLUS-20154",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Heroes of Might and Magic: Quest for the DragonBone Staff": {
+      "serial": "SLUS-20158",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dave Mirra Freestyle BMX 2": {
+      "serial": "SLUS-20159",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WinBack: Covert Operations": {
+      "serial": "SLUS-20160",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Aqua Aqua": {
+      "serial": "SLUS-20162",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN National Hockey Night": {
+      "serial": "SLUS-20166",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Quake III: Revolution": {
+      "serial": "SLUS-20167",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Triple Play Baseball": {
+      "serial": "SLUS-20168",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Adventures of Cookie & Cream": {
+      "serial": "SLUS-20170",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Vehicular Combat League Presents: Motor Mayhem": {
+      "serial": "SLUS-20171",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam: Journey to Jaburo": {
+      "serial": "SLUS-20175",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Giants: Citizen Kabuto": {
+      "serial": "SLUS-20178",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Escape from Monkey Island": {
+      "serial": "SLUS-20181",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Jam: Maximum Destruction": {
+      "serial": "SLUS-20186",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Rancher 3": {
+      "serial": "SLUS-20190",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Soccer America: International Cup": {
+      "serial": "SLUS-20196",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pac-Man Fever": {
+      "serial": "SLUS-20197",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FireBlade": {
+      "serial": "SLUS-20198",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Casper: Spirit Dimensions": {
+      "serial": "SLUS-20205",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "18 Wheeler: American Pro Trucker": {
+      "serial": "SLUS-20210",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Top Gun: Combat Zones": {
+      "serial": "SLUS-20211",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Test Drive": {
+      "serial": "SLUS-20213",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Time Crisis II": {
+      "serial": "SLUS-20219",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MTV Music Generator 2": {
+      "serial": "SLUS-20222",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pac-Man World 2": {
+      "serial": "SLUS-20224",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gadget Racers": {
+      "serial": "SLUS-20225",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Thunderstrike: Operation Phoenix": {
+      "serial": "SLUS-20232",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam: Zeonic Front": {
+      "serial": "SLUS-20233",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Taz: Wanted": {
+      "serial": "SLUS-20236",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN X Games Skateboarding": {
+      "serial": "SLUS-20237",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Conflict Zone: Modern War Strategy": {
+      "serial": "SLUS-20240",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 2002": {
+      "serial": "SLUS-20241",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Silent Scope 2: Dark Silhouette": {
+      "serial": "SLUS-20243",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Robotech: Battlecry": {
+      "serial": "SLUS-20244",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Armored Core 2: Another Age": {
+      "serial": "SLUS-20249",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gallop Racer 2001": {
+      "serial": "SLUS-20255",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Frogger: The Great Quest": {
+      "serial": "SLUS-20257",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Wizardry: Tale of the Forsaken Land": {
+      "serial": "SLUS-20259",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NBA 2Night 2002": {
+      "serial": "SLUS-20261",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rugby": {
+      "serial": "SLUS-20262",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 2002": {
+      "serial": "SLUS-20263",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "F1 2001": {
+      "serial": "SLUS-20264",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "007: Agent Under Fire": {
+      "serial": "SLUS-20265",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Racer Revenge": {
+      "serial": "SLUS-20268",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Museum": {
+      "serial": "SLUS-20273",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "City Crisis": {
+      "serial": "SLUS-20274",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kessen II": {
+      "serial": "SLUS-20275",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yanya Caballista: City Skater": {
+      "serial": "SLUS-20278",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X-Men: Next Dimension": {
+      "serial": "SLUS-20279",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2002": {
+      "serial": "SLUS-20281",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Victorious Boxers: Ippo's Road to Glory": {
+      "serial": "SLUS-20282",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World of Outlaws: Sprint Cars 2002": {
+      "serial": "SLUS-20283",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MotoGP 2": {
+      "serial": "SLUS-20285",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Smash Court Tennis: Pro Tournament": {
+      "serial": "SLUS-20286",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "GoDai: Elemental Force": {
+      "serial": "SLUS-20288",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Big Mutha Truckers (SLUS-20291)": {
+      "serial": "SLUS-20291",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tsugunai: Atonement": {
+      "serial": "SLUS-20292",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Jedi Starfighter": {
+      "serial": "SLUS-20293",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kao the Kangaroo: Round 2": {
+      "serial": "SLUS-20296",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "High Heat Major League Baseball 2003": {
+      "serial": "SLUS-20298",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Street Hoops": {
+      "serial": "SLUS-20299",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "XGIII: Extreme G Racing": {
+      "serial": "SLUS-20302",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 2002": {
+      "serial": "SLUS-20303",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Simpsons: Road Rage": {
+      "serial": "SLUS-20305",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NFL PrimeTime 2002": {
+      "serial": "SLUS-20308",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gravity Games Bike: Street. Vert. Dirt.": {
+      "serial": "SLUS-20310",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "All-Star Baseball 2003 featuring Derek Jeter": {
+      "serial": "SLUS-20311",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWF SmackDown! Just Bring It": {
+      "serial": "SLUS-20316",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "King's Field: The Ancient City": {
+      "serial": "SLUS-20318",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN International Winter Sports 2002": {
+      "serial": "SLUS-20320",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Winter X Games Snowboarding 2002": {
+      "serial": "SLUS-20321",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL 2K2": {
+      "serial": "SLUS-20322",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K2": {
+      "serial": "SLUS-20330",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2002": {
+      "serial": "SLUS-20332",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Turok: Evolution": {
+      "serial": "SLUS-20333",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kelly Slater's Pro Surfer": {
+      "serial": "SLUS-20334",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X2: Wolverine's Revenge": {
+      "serial": "SLUS-20337",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sega Bass Fishing Duel": {
+      "serial": "SLUS-20339",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Top Angler: Real Bass Fishing": {
+      "serial": "SLUS-20342",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mike Tyson Heavyweight Boxing": {
+      "serial": "SLUS-20345",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "RedCard 20-03": {
+      "serial": "SLUS-20354",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tom and Jerry in War of the Whiskers": {
+      "serial": "SLUS-20355",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WTA Tour Tennis": {
+      "serial": "SLUS-20357",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tiger Woods PGA Tour 2002": {
+      "serial": "SLUS-20364",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Triple Play 2002": {
+      "serial": "SLUS-20366",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mad Maestro!": {
+      "serial": "SLUS-20376",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Salt Lake 2002": {
+      "serial": "SLUS-20378",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam: Federation vs. Zeon": {
+      "serial": "SLUS-20382",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SkyGunner": {
+      "serial": "SLUS-20384",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lethal Skies: Elite Pilot: Team SW": {
+      "serial": "SLUS-20386",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Endgame": {
+      "serial": "SLUS-20389",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Risk: Global Domination": {
+      "serial": "SLUS-20390",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Antz Extreme Racing": {
+      "serial": "SLUS-20392",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ecco the Dolphin: Defender of the Future": {
+      "serial": "SLUS-20394",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Global Touring Challenge: Africa": {
+      "serial": "SLUS-20395",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mission: Impossible: Operation Surma": {
+      "serial": "SLUS-20400",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Evil Dead: A Fistful of Boomstick": {
+      "serial": "SLUS-20403",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "2002 FIFA World Cup": {
+      "serial": "SLUS-20404",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pride FC: Fighting Championships": {
+      "serial": "SLUS-20406",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Way of the Samurai": {
+      "serial": "SLUS-20407",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pitfall: The Lost Expedition": {
+      "serial": "SLUS-20408",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Wheels: Velocity X: Maximum Justice": {
+      "serial": "SLUS-20412",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "BMX XXX": {
+      "serial": "SLUS-20415",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Wakeboarding Unleashed featuring Shaun Murray": {
+      "serial": "SLUS-20418",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Bounty Hunter": {
+      "serial": "SLUS-20420",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hulk": {
+      "serial": "SLUS-20422",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Scorpion King: Rise of the Akkadian": {
+      "serial": "SLUS-20424",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon SpongeBob SquarePants: Revenge of the Flying Dutchman": {
+      "serial": "SLUS-20425",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fisherman's Bass Club": {
+      "serial": "SLUS-20428",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Wreckless: The Yakuza Missions": {
+      "serial": "SLUS-20431",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SWAT: Global Strike Team": {
+      "serial": "SLUS-20433",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Myst III: Exile": {
+      "serial": "SLUS-20434",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DDRMAX: Dance Dance Revolution": {
+      "serial": "SLUS-20437",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL Hitz 2003": {
+      "serial": "SLUS-20438",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kya: Dark Lineage": {
+      "serial": "SLUS-20440",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Rugrats: Royal Ransom": {
+      "serial": "SLUS-20443",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Robot Alchemic Drive": {
+      "serial": "SLUS-20445",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Agassi Tennis Generation": {
+      "serial": "SLUS-20446",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Egg Mania: Eggstreme Madness": {
+      "serial": "SLUS-20452",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA College Football 2K3": {
+      "serial": "SLUS-20453",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Enter the Matrix": {
+      "serial": "SLUS-20454",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL 2K3": {
+      "serial": "SLUS-20457",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dropship: United Peace Force": {
+      "serial": "SLUS-20463",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fugitive Hunter: War on Terror": {
+      "serial": "SLUS-20464",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gravenville: Ghost Master Chronicles": {
+      "serial": "SLUS-20466",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lara Croft Tomb Raider: The Angel of Darkness": {
+      "serial": "SLUS-20467",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Tactics": {
+      "serial": "SLUS-20468",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures": {
+      "serial": "SLUS-20470",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Micro Machines": {
+      "serial": "SLUS-20472",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Rocket Power: Beach Bandits": {
+      "serial": "SLUS-20473",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL Blitz 2003": {
+      "serial": "SLUS-20474",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K3": {
+      "serial": "SLUS-20476",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2K3": {
+      "serial": "SLUS-20477",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's PK: Out of the Shadows": {
+      "serial": "SLUS-20478",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dino Stalker": {
+      "serial": "SLUS-20485",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "V-Rally 3": {
+      "serial": "SLUS-20496",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Auto Modellista (SLUS-20498)": {
+      "serial": "SLUS-20498",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mace Griffin: Bounty Hunter": {
+      "serial": "SLUS-20505",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Black & Bruised": {
+      "serial": "SLUS-20506",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Indiana Jones and the Emperor's Tomb": {
+      "serial": "SLUS-20508",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: The Clone Wars": {
+      "serial": "SLUS-20510",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hunter: The Reckoning: Wayward": {
+      "serial": "SLUS-20511",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Starting Five": {
+      "serial": "SLUS-20513",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yu-Gi-Oh! The Duelists of the Roses": {
+      "serial": "SLUS-20515",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Haven: Call of the King": {
+      "serial": "SLUS-20517",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Route 66": {
+      "serial": "SLUS-20522",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "eJay Clubworld: The Music Making Experience": {
+      "serial": "SLUS-20525",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Butt-Ugly Martians: Zoom or Doom!": {
+      "serial": "SLUS-20527",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Zapper: One Wicked Cricket": {
+      "serial": "SLUS-20528",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 2003": {
+      "serial": "SLUS-20529",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 2003": {
+      "serial": "SLUS-20530",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Big Game Hunter": {
+      "serial": "SLUS-20534",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 2003": {
+      "serial": "SLUS-20536",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Jimmy Neutron: Boy Genius": {
+      "serial": "SLUS-20537",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA College Basketball 2K3": {
+      "serial": "SLUS-20538",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fallout: Brotherhood of Steel": {
+      "serial": "SLUS-20539",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Document of Metal Gear Solid 2": {
+      "serial": "SLUS-20543",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sub Rebellion": {
+      "serial": "SLUS-20548",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Conflict: Desert Storm": {
+      "serial": "SLUS-20549",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "True Crime: Streets of LA": {
+      "serial": "SLUS-20550",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fisherman's Challenge": {
+      "serial": "SLUS-20553",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Reel Fishing III": {
+      "serial": "SLUS-20555",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Galerians: Ash": {
+      "serial": "SLUS-20560",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Buffy the Vampire Slayer: Chaos Bleeds": {
+      "serial": "SLUS-20566",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "P.T.O. IV: Pacific Theater of Operations": {
+      "serial": "SLUS-20567",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hard Hitter Tennis": {
+      "serial": "SLUS-20568",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "All-Star Baseball 2004 featuring Derek Jeter": {
+      "serial": "SLUS-20569",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV: Quad Power Racing 2": {
+      "serial": "SLUS-20570",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2003": {
+      "serial": "SLUS-20574",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 2003": {
+      "serial": "SLUS-20580",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SRS: Street Racing Syndicate": {
+      "serial": "SLUS-20582",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Powerpuff Girls: Relish Rampage": {
+      "serial": "SLUS-20585",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "HSX: HyperSonic.Xtreme": {
+      "serial": "SLUS-20592",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Magic Pengel: The Quest for Color": {
+      "serial": "SLUS-20593",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "UFC: Ultimate Fighting Championship: Sudden Impact": {
+      "serial": "SLUS-20596",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Warhammer 40,000: Fire Warrior": {
+      "serial": "SLUS-20597",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Whiteout": {
+      "serial": "SLUS-20599",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SX Superstar": {
+      "serial": "SLUS-20600",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "High Heat Major League Baseball 2004": {
+      "serial": "SLUS-20602",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mary-Kate and Ashley: Sweet 16: Licensed to Drive": {
+      "serial": "SLUS-20603",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MTV Celebrity Deathmatch": {
+      "serial": "SLUS-20604",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MAGIX Music Maker: Rocks Your Console": {
+      "serial": "SLUS-20609",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Aero Elite: Combat Academy": {
+      "serial": "SLUS-20614",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 3: Xtreme Legends": {
+      "serial": "SLUS-20617",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB SlugFest 2004": {
+      "serial": "SLUS-20618",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Starsky & Hutch": {
+      "serial": "SLUS-20619",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Seven Samurai 20XX": {
+      "serial": "SLUS-20621",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Soccer Winning Eleven 6: International": {
+      "serial": "SLUS-20623",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MotoGP 3": {
+      "serial": "SLUS-20625",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Deer Hunter": {
+      "serial": "SLUS-20626",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar Finding Nemo": {
+      "serial": "SLUS-20628",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL Blitz Pro": {
+      "serial": "SLUS-20631",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jim Henson's Muppets Party Cruise": {
+      "serial": "SLUS-20635",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Wrestling: Don't Try This at Home": {
+      "serial": "SLUS-20638",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Jam": {
+      "serial": "SLUS-20648",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MVP Baseball 2003": {
+      "serial": "SLUS-20650",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X-Men Legends": {
+      "serial": "SLUS-20656",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Presents Piglet's Big Game": {
+      "serial": "SLUS-20659",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Fairly OddParents: Breakin' da Rules": {
+      "serial": "SLUS-20661",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gallop Racer 2003: A New Breed": {
+      "serial": "SLUS-20662",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naval Ops: Warship Gunner": {
+      "serial": "SLUS-20663",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Barbie Horse Adventures: Wild Horse Rescue": {
+      "serial": "SLUS-20664",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Deer Hunt: 2004 Season": {
+      "serial": "SLUS-20665",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cyber Troopers: Virtual-On Marz": {
+      "serial": "SLUS-20674",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lowrider": {
+      "serial": "SLUS-20676",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's The Haunted Mansion": {
+      "serial": "SLUS-20681",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lupin the 3rd: Treasure of the Sorcerer King": {
+      "serial": "SLUS-20683",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Splashdown: Rides Gone Wild": {
+      "serial": "SLUS-20686",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL Hitz Pro": {
+      "serial": "SLUS-20691",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Jimmy Neutron: Boy Genius: Jet Fusion": {
+      "serial": "SLUS-20696",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SD Gundam Force: Showdown!": {
+      "serial": "SLUS-20698",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Basketball": {
+      "serial": "SLUS-20704",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Spawn: Armageddon": {
+      "serial": "SLUS-20707",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Batman: Rise of Sin Tzu": {
+      "serial": "SLUS-20709",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Onimusha: Blade Warriors": {
+      "serial": "SLUS-20710",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DDRMAX2: Dance Dance Revolution": {
+      "serial": "SLUS-20711",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Combat Elite: WWII Paratroopers": {
+      "serial": "SLUS-20715",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 2004": {
+      "serial": "SLUS-20719",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "R:Racing Evolution": {
+      "serial": "SLUS-20721",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Robin Hood: Defender of the Crown": {
+      "serial": "SLUS-20723",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Call of Duty: Finest Hour": {
+      "serial": "SLUS-20725",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NBA Basketball": {
+      "serial": "SLUS-20726",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NHL Hockey": {
+      "serial": "SLUS-20728",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN College Hoops": {
+      "serial": "SLUS-20729",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Frogger's Adventures: The Rescue": {
+      "serial": "SLUS-20734",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lethal Skies II": {
+      "serial": "SLUS-20735",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Dangerous Hunts": {
+      "serial": "SLUS-20736",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Wheels: World Race": {
+      "serial": "SLUS-20737",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam: Encounters in Space": {
+      "serial": "SLUS-20740",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Chulip": {
+      "serial": "SLUS-20742",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures: Frontiers": {
+      "serial": "SLUS-20744",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rogue Ops": {
+      "serial": "SLUS-20746",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rugby 2004": {
+      "serial": "SLUS-20749",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 2004": {
+      "serial": "SLUS-20752",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Medal of Honor: Rising Sun": {
+      "serial": "SLUS-20753",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 2004": {
+      "serial": "SLUS-20755",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2004": {
+      "serial": "SLUS-20756",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Growlanser: Generations": {
+      "serial": "SLUS-20759",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Championship Pool 2004": {
+      "serial": "SLUS-20760",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harry Potter: Quidditch World Cup": {
+      "serial": "SLUS-20769",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2004": {
+      "serial": "SLUS-20771",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Karaoke Revolution": {
+      "serial": "SLUS-20781",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Digital Hitz Factory": {
+      "serial": "SLUS-20785",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Arms: Glitch in the System": {
+      "serial": "SLUS-20786",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jeopardy!": {
+      "serial": "SLUS-20789",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Trivial Pursuit: Unhinged": {
+      "serial": "SLUS-20791",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Goblin Commander: Unleash the Horde": {
+      "serial": "SLUS-20792",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN Major League Baseball": {
+      "serial": "SLUS-20794",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster 4x4: Masters of Metal": {
+      "serial": "SLUS-20796",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dr. Seuss' The Cat in the Hat": {
+      "serial": "SLUS-20797",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Terminator 3: Rise of the Machines": {
+      "serial": "SLUS-20799",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Taiko Drum Master": {
+      "serial": "SLUS-20800",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Midway Arcade Treasures": {
+      "serial": "SLUS-20801",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Bard's Tale": {
+      "serial": "SLUS-20803",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yu Yu Hakusho: Dark Tournament": {
+      "serial": "SLUS-20805",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Space Channel 5: Special Edition (Disc 1)": {
+      "serial": "SLUS-20806",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Godzilla: Save the Earth": {
+      "serial": "SLUS-20809",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 4: Xtreme Legends": {
+      "serial": "SLUS-20812",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Max Payne 2: The Fall of Max Payne": {
+      "serial": "SLUS-20814",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "American Idol": {
+      "serial": "SLUS-20816",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tom Clancy's Ghost Recon: Jungle Storm": {
+      "serial": "SLUS-20820",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam: Gundam vs. Zeta Gundam": {
+      "serial": "SLUS-20821",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Galactic Wrestling featuring Ultimate Muscle: The Kinnikuman Legacy": {
+      "serial": "SLUS-20822",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Robotech: Invasion": {
+      "serial": "SLUS-20823",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NASCAR Thunder 2004": {
+      "serial": "SLUS-20824",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Intellivision Lives!": {
+      "serial": "SLUS-20830",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters 2000": {
+      "serial": "SLUS-20834",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ribbit King": {
+      "serial": "SLUS-20837",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "All-Star Baseball 2005 featuring Derek Jeter": {
+      "serial": "SLUS-20838",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters 2001": {
+      "serial": "SLUS-20839",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dead to Rights II": {
+      "serial": "SLUS-20843",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Strike Force Bowling": {
+      "serial": "SLUS-20846",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Life Line": {
+      "serial": "SLUS-20848",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Carmen Sandiego: The Secret of the Stolen Drums": {
+      "serial": "SLUS-20849",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Looney Tunes: Back in Action": {
+      "serial": "SLUS-20853",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Future Tactics: The Uprising": {
+      "serial": "SLUS-20859",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tim Burton's The Nightmare Before Christmas: Oogie's Revenge": {
+      "serial": "SLUS-20860",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MTV Music Generator 3: This Is the Remix": {
+      "serial": "SLUS-20861",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Soccer Winning Eleven 7: International": {
+      "serial": "SLUS-20863",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Baseball": {
+      "serial": "SLUS-20865",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Asterix & Obelix: Kick Buttix": {
+      "serial": "SLUS-20866",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MVP Baseball 2004": {
+      "serial": "SLUS-20868",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naval Ops: Commander": {
+      "serial": "SLUS-20871",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Football 2006": {
+      "serial": "SLUS-20876",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Red Star": {
+      "serial": "SLUS-20885",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sitting Ducks": {
+      "serial": "SLUS-20886",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Jimmy Neutron: Boy Genius: Attack of the Twonkies": {
+      "serial": "SLUS-20887",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB SlugFest: Loaded": {
+      "serial": "SLUS-20889",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rocky Legends": {
+      "serial": "SLUS-20890",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bujingai: The Forsaken City": {
+      "serial": "SLUS-20895",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Jack: The Shadow of Aku": {
+      "serial": "SLUS-20899",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mega Man X: Command Mission": {
+      "serial": "SLUS-20903",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon SpongeBob SquarePants: The Movie": {
+      "serial": "SLUS-20904",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar The Incredibles": {
+      "serial": "SLUS-20905",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guilty Gear Isuka": {
+      "serial": "SLUS-20908",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Test Drive: Eve of Destruction": {
+      "serial": "SLUS-20910",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Suzuki TT Superbikes: Real Road Racing": {
+      "serial": "SLUS-20912",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Inuyasha: The Secret of the Cursed Mask": {
+      "serial": "SLUS-20913",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution Extreme": {
+      "serial": "SLUS-20916",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NFL 2K5": {
+      "serial": "SLUS-20919",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NBA 2K5": {
+      "serial": "SLUS-20920",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN NHL 2K5": {
+      "serial": "SLUS-20921",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN College Hoops 2K5": {
+      "serial": "SLUS-20922",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "KOF: Maximum Impact": {
+      "serial": "SLUS-20923",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Duel Masters": {
+      "serial": "SLUS-20924",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Time Crisis: Crisis Zone": {
+      "serial": "SLUS-20927",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Battle Assault 3 featuring Gundam Seed": {
+      "serial": "SLUS-20929",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Choro Q": {
+      "serial": "SLUS-20930",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Smash Court Tennis: Pro Tournament 2": {
+      "serial": "SLUS-20933",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 4: Empires": {
+      "serial": "SLUS-20938",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yu-Gi-Oh! Capsule Monster Coliseum": {
+      "serial": "SLUS-20940",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WinBack 2: Project Poseidon": {
+      "serial": "SLUS-20947",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Tak 2: The Staff of Dreams": {
+      "serial": "SLUS-20952",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shonen Jump's Shaman King: Power of Spirit": {
+      "serial": "SLUS-20953",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Wheels: Stunt Track Challenge": {
+      "serial": "SLUS-20954",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tom Clancy's Splinter Cell: Pandora Tomorrow": {
+      "serial": "SLUS-20958",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Dukes of Hazzard: Return of the General Lee": {
+      "serial": "SLUS-20959",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Enthusia: Professional Racing": {
+      "serial": "SLUS-20967",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Karaoke Revolution Volume 2": {
+      "serial": "SLUS-20968",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "S.L.A.I.: Steel Lancer Arena International": {
+      "serial": "SLUS-20969",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shonen Jump's One Piece: Grand Battle": {
+      "serial": "SLUS-20975",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Power Drome": {
+      "serial": "SLUS-20978",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bad Boys: Miami Takedown": {
+      "serial": "SLUS-20982",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Musashi: Samurai Legend": {
+      "serial": "SLUS-20983",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Playboy: The Mansion": {
+      "serial": "SLUS-20988",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 2005": {
+      "serial": "SLUS-20991",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fullmetal Alchemist and the Broken Angel": {
+      "serial": "SLUS-20994",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters 2002: Challenge to Ultimate Battle": {
+      "serial": "SLUS-20995",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters 2003": {
+      "serial": "SLUS-20996",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Midway Arcade Treasures 2": {
+      "serial": "SLUS-20997",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sega Superstars": {
+      "serial": "SLUS-20999",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2005": {
+      "serial": "SLUS-21001",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NASCAR 2005: Chase for the Cup": {
+      "serial": "SLUS-21003",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Def Jam: Fight for NY": {
+      "serial": "SLUS-21004",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sega Classics Collection": {
+      "serial": "SLUS-21009",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nanobreaker": {
+      "serial": "SLUS-21010",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rapala Pro Fishing": {
+      "serial": "SLUS-21012",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Showdown: Legends of Wrestling": {
+      "serial": "SLUS-21017",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Big Game Hunter 2005 Adventures (SLUS-21021)": {
+      "serial": "SLUS-21021",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 2005 (SLUS-21025)": {
+      "serial": "SLUS-21025",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Lord of the Rings: The Third Age": {
+      "serial": "SLUS-21027",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gallop Racer 2004": {
+      "serial": "SLUS-21031",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marc Ecko's Getting Up: Contents Under Pressure": {
+      "serial": "SLUS-21032",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MAGIX Music Maker": {
+      "serial": "SLUS-21034",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K5": {
+      "serial": "SLUS-21035",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Get on da Mic": {
+      "serial": "SLUS-21036",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pinball Hall of Fame: The Gottlieb Collection": {
+      "serial": "SLUS-21038",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TOCA Race Driver 2": {
+      "serial": "SLUS-21039",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Shield: The Game": {
+      "serial": "SLUS-21040",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Wrestling 2: There Goes the Neighborhood": {
+      "serial": "SLUS-21043",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Outlaw Volleyball Remixed": {
+      "serial": "SLUS-21049",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Pixar: Monsters, Inc.: Scare Island [Disney / Pixar Classics]": {
+      "serial": "SLUS-21052",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Stitch: Experiment 626 (SLUS-21053)": {
+      "serial": "SLUS-21053",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Treasure Planet (Classics)": {
+      "serial": "SLUS-21054",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 2005": {
+      "serial": "SLUS-21058",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jaws Unleashed": {
+      "serial": "SLUS-21062",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "GoldenEye: Rogue Agent": {
+      "serial": "SLUS-21064",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Vietcong: Purple Haze": {
+      "serial": "SLUS-21068",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "American Chopper": {
+      "serial": "SLUS-21069",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XI: Online: Chains of Promathia": {
+      "serial": "SLUS-21070",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Nightmare of Druaga: Fushigino Dungeon": {
+      "serial": "SLUS-21071",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Finny the Fish & the Seven Waters": {
+      "serial": "SLUS-21072",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nicktoons Movin'": {
+      "serial": "SLUS-21073",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Atari Anthology": {
+      "serial": "SLUS-21076",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Warriors: Xtreme Legends": {
+      "serial": "SLUS-21080",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "LEGO Star Wars: The Video Game": {
+      "serial": "SLUS-21083",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Winnie the Pooh's Rumbly Tumbly Adventure": {
+      "serial": "SLUS-21084",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Big Mutha Truckers 2": {
+      "serial": "SLUS-21086",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Karaoke Revolution Volume 3": {
+      "serial": "SLUS-21089",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Scooby-Doo! Unmasked": {
+      "serial": "SLUS-21091",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Midway Arcade Treasures 3": {
+      "serial": "SLUS-21094",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ape Escape: Pumped & Primed": {
+      "serial": "SLUS-21096",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MX World Tour featuring Jamie Little": {
+      "serial": "SLUS-21097",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Frogger: Ancient Shadow": {
+      "serial": "SLUS-21098",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2005": {
+      "serial": "SLUS-21100",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mortal Kombat: Deception: Premium Pack": {
+      "serial": "SLUS-21101",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hard Rock Casino": {
+      "serial": "SLUS-21102",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Commandos: Strike Force": {
+      "serial": "SLUS-21103",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "True Crime: New York City": {
+      "serial": "SLUS-21106",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Drive to Survive": {
+      "serial": "SLUS-21109",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHRA Championship Drag Racing": {
+      "serial": "SLUS-21114",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Soccer Winning Eleven 8: International": {
+      "serial": "SLUS-21117",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kessen III": {
+      "serial": "SLUS-21119",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Taito Legends": {
+      "serial": "SLUS-21122",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dragon Ball Z: Budokai 3: Limited Edition": {
+      "serial": "SLUS-21123",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Delta Force: Black Hawk Down": {
+      "serial": "SLUS-21124",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Airborne Troops: Countdown to D-Day": {
+      "serial": "SLUS-21125",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Blitz: The League": {
+      "serial": "SLUS-21128",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SnoCross 2 featuring Blair Morgan": {
+      "serial": "SLUS-21130",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pump It Up: Exceed": {
+      "serial": "SLUS-21131",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Stella Deus: The Gate of Eternity": {
+      "serial": "SLUS-21132",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MVP Baseball 2005": {
+      "serial": "SLUS-21135",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tom Clancy's Splinter Cell: Chaos Theory": {
+      "serial": "SLUS-21137",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X-Men Legends II: Rise of Apocalypse": {
+      "serial": "SLUS-21138",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mobile Suit Gundam Seed: Never Ending Tomorrow": {
+      "serial": "SLUS-21140",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yourself!Fitness": {
+      "serial": "SLUS-21149",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Beat Down: Fists of Vengeance": {
+      "serial": "SLUS-21150",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Killer7": {
+      "serial": "SLUS-21154",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Codename: Kids Next Door: Operation: V.I.D.E.O.G.A.M.E.": {
+      "serial": "SLUS-21155",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Flipnic: Ultimate Pinball": {
+      "serial": "SLUS-21157",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MotoGP 4": {
+      "serial": "SLUS-21159",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tekken 5 (SLUS-21160)": {
+      "serial": "SLUS-21160",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Night Round 2": {
+      "serial": "SLUS-21161",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ford Mustang: The Legend Lives": {
+      "serial": "SLUS-21162",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Museum -50th Anniversary Greatest Hits": {
+      "serial": "SLUS-21164",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fullmetal Alchemist 2: Curse of the Crimson Elixir": {
+      "serial": "SLUS-21166",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nick Jr. Dora the Explorer: Journey to the Purple Planet": {
+      "serial": "SLUS-21173",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution Extreme 2": {
+      "serial": "SLUS-21174",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Bible Game": {
+      "serial": "SLUS-21175",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Championship Poker 2 featuring Howard Lederer": {
+      "serial": "SLUS-21176",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "In the Groove": {
+      "serial": "SLUS-21177",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DICE: DNA Integrated Cybernetic Enterprises": {
+      "serial": "SLUS-21181",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TOCA Race Driver 3: The Ultimate Racing Simulator": {
+      "serial": "SLUS-21182",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Ballers: Phenom": {
+      "serial": "SLUS-21186",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Outdoor Adventures": {
+      "serial": "SLUS-21192",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Inuyasha: Feudal Combat": {
+      "serial": "SLUS-21193",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Breeders' Cup: World Thoroughbred Championships": {
+      "serial": "SLUS-21195",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks Shrek: SuperSlam": {
+      "serial": "SLUS-21197",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Victorious Boxers 2: Fighting Spirit": {
+      "serial": "SLUS-21204",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Spartan: Total Warrior": {
+      "serial": "SLUS-21212",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 06": {
+      "serial": "SLUS-21213",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 06": {
+      "serial": "SLUS-21214",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar The Incredibles: Rise of the Underminer": {
+      "serial": "SLUS-21217",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Tak: The Great Juju Challenge": {
+      "serial": "SLUS-21218",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pac-Man World 3": {
+      "serial": "SLUS-21219",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Soccer Winning Eleven 9": {
+      "serial": "SLUS-21220",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bratz: Rock Angelz": {
+      "serial": "SLUS-21225",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "College Hoops 2K6": {
+      "serial": "SLUS-21232",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K6": {
+      "serial": "SLUS-21233",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K6": {
+      "serial": "SLUS-21235",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "AND 1 Streetball": {
+      "serial": "SLUS-21237",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fight: Streetwise": {
+      "serial": "SLUS-21238",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Beatmania": {
+      "serial": "SLUS-21239",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Legend of Kay": {
+      "serial": "SLUS-21248",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Full Spectrum Warrior: Ten Hammers": {
+      "serial": "SLUS-21250",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon SpongeBob SquarePants: Lights, Camera, Pants!": {
+      "serial": "SLUS-21252",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Zatch Bell! Mamodo Battles": {
+      "serial": "SLUS-21254",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Most Wanted (SLUS-21257)": {
+      "serial": "SLUS-21257",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Stacked with Daniel Negreanu": {
+      "serial": "SLUS-21259",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NASCAR 06: Total Team Control": {
+      "serial": "SLUS-21266",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MS Saga: A New Dawn": {
+      "serial": "SLUS-21270",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "OutRun 2006: Coast 2 Coast": {
+      "serial": "SLUS-21274",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Barnyard": {
+      "serial": "SLUS-21277",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 06": {
+      "serial": "SLUS-21279",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 06": {
+      "serial": "SLUS-21280",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marvel Nemesis: Rise of the Imperfects": {
+      "serial": "SLUS-21281",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "007: From Russia with Love": {
+      "serial": "SLUS-21282",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Total Overdose: A Gunslinger's Tale in Mexico": {
+      "serial": "SLUS-21283",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nicktoons Unite!": {
+      "serial": "SLUS-21284",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ultimate Spider-Man (SLUS-21285)": {
+      "serial": "SLUS-21285",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "American Chopper 2: Full Throttle": {
+      "serial": "SLUS-21288",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SeaWorld Adventure Parks: Shamu's Deep Sea Adventures": {
+      "serial": "SLUS-21289",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ford Bold Moves Street Racing": {
+      "serial": "SLUS-21290",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marc Ecko's Getting Up: Content Under Pressure [Limited Edition]": {
+      "serial": "SLUS-21294",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tony Hawk's American Wasteland (SLUS-21295)": {
+      "serial": "SLUS-21295",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Factory": {
+      "serial": "SLUS-21296",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 06": {
+      "serial": "SLUS-21298",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 5: Xtreme Legends": {
+      "serial": "SLUS-21299",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Over the Hedge": {
+      "serial": "SLUS-21300",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rebel Raiders: Operation Nighthawk": {
+      "serial": "SLUS-21303",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arthur and the Invisibles: The Game": {
+      "serial": "SLUS-21305",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ghost Rider": {
+      "serial": "SLUS-21306",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Let's Ride! Silver Buckle Stables": {
+      "serial": "SLUS-21309",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Brothers in Arms: Earned in Blood": {
+      "serial": "SLUS-21310",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Peter Jackson's King Kong: The Official Game of the Movie": {
+      "serial": "SLUS-21311",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Friends: The One with All the Trivia": {
+      "serial": "SLUS-21313",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ruff Trigger: The Vanocore Conspiracy": {
+      "serial": "SLUS-21314",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "50 Cent: Bulletproof": {
+      "serial": "SLUS-21315",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Capcom Classics Collection Vol. 1": {
+      "serial": "SLUS-21316",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Street Fighter Alpha Anthology": {
+      "serial": "SLUS-21317",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Call of Duty 2: Big Red One (SLUS-21318)": {
+      "serial": "SLUS-21318",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Flow: Urban Dance Uprising": {
+      "serial": "SLUS-21319",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Alfa Romeo Racing Italiano": {
+      "serial": "SLUS-21321",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rampage: Total Destruction": {
+      "serial": "SLUS-21323",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K5: World Series Edition": {
+      "serial": "SLUS-21324",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "CMT Presents: Karaoke Revolution: Country": {
+      "serial": "SLUS-21329",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Rancher Evo": {
+      "serial": "SLUS-21330",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Real World Golf": {
+      "serial": "SLUS-21332",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Hustle: Detroit Streets": {
+      "serial": "SLUS-21335",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arena Football": {
+      "serial": "SLUS-21337",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Puzzle Challenge: Crosswords and More!": {
+      "serial": "SLUS-21339",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Championship Cards": {
+      "serial": "SLUS-21340",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Champloo: Sidetracked": {
+      "serial": "SLUS-21343",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Taito Legends 2": {
+      "serial": "SLUS-21349",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Dangerous Hunts 2": {
+      "serial": "SLUS-21350",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Most Wanted: Black Edition": {
+      "serial": "SLUS-21351",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dai Senryaku VII: Modern Military Tactics Exceed": {
+      "serial": "SLUS-21352",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Eureka Seven Vol. 1: The New Wave": {
+      "serial": "SLUS-21353",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Gear Solid 3: Subsistence (Disc 1) (Subsistence)": {
+      "serial": "SLUS-21359",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Zatch Bell! Mamodo Fury": {
+      "serial": "SLUS-21363",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shonen Jump's One Piece: Pirates' Carnival": {
+      "serial": "SLUS-21364",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters 2006": {
+      "serial": "SLUS-21365",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ultimate Board Game Collection": {
+      "serial": "SLUS-21366",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MVP 06 NCAA Baseball": {
+      "serial": "SLUS-21367",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rugby 06": {
+      "serial": "SLUS-21368",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marvel: Ultimate Alliance": {
+      "serial": "SLUS-21374",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution SuperNova": {
+      "serial": "SLUS-21377",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's African Safari": {
+      "serial": "SLUS-21379",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bode Miller Alpine Skiing": {
+      "serial": "SLUS-21381",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Franklin the Turtle: A Birthday Surprise": {
+      "serial": "SLUS-21382",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Night Round 3": {
+      "serial": "SLUS-21383",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Alaskan Adventures": {
+      "serial": "SLUS-21384",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Sopranos: Road to Respect": {
+      "serial": "SLUS-21388",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Urban Chaos: Riot Response": {
+      "serial": "SLUS-21390",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tokyo Xtreme Racer: Drift 2": {
+      "serial": "SLUS-21394",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Trek: Encounters": {
+      "serial": "SLUS-21396",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 5: Empires": {
+      "serial": "SLUS-21398",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Driver: Parallel Lines (SLUS-21399)": {
+      "serial": "SLUS-21399",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lucinda Green's Equestrian Challenge": {
+      "serial": "SLUS-21401",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Sports: Baseball 2007": {
+      "serial": "SLUS-21403",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XI: Online: Treasures of Aht Urhgan": {
+      "serial": "SLUS-21404",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Xiaolin Showdown": {
+      "serial": "SLUS-21405",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL Head Coach": {
+      "serial": "SLUS-21407",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA World Cup Germany 2006": {
+      "serial": "SLUS-21408",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "LEGO Star Wars II: The Original Trilogy": {
+      "serial": "SLUS-21409",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Championship Poker featuring Howard Lederer: All In": {
+      "serial": "SLUS-21412",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Delta Force: Black Hawk Down: Team Sabre": {
+      "serial": "SLUS-21414",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Professional Drift: D1 Grand Prix Series": {
+      "serial": "SLUS-21416",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sprint Cars: Road to Knoxville": {
+      "serial": "SLUS-21418",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney's Chicken Little: Ace in Action": {
+      "serial": "SLUS-21420",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K7": {
+      "serial": "SLUS-21424",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "IGPX: Immortal Grand Prix": {
+      "serial": "SLUS-21430",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NRA Gun Club": {
+      "serial": "SLUS-21432",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 07": {
+      "serial": "SLUS-21433",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shonen Jump's One Piece: Grand Adventure": {
+      "serial": "SLUS-21435",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Grim Adventures of Billy & Mandy": {
+      "serial": "SLUS-21451",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Walt Disney Pictures Presents Meet the Robinsons": {
+      "serial": "SLUS-21453",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks Shrek the Third": {
+      "serial": "SLUS-21454",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tony Hawk's Downhill Jam": {
+      "serial": "SLUS-21456",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Championship Paintball": {
+      "serial": "SLUS-21457",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 07": {
+      "serial": "SLUS-21459",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 07": {
+      "serial": "SLUS-21460",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "College Hoops 2K7": {
+      "serial": "SLUS-21463",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Winning Eleven: Pro Evolution Soccer 2007": {
+      "serial": "SLUS-21464",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Raiden III": {
+      "serial": "SLUS-21465",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Plan": {
+      "serial": "SLUS-21466",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nicktoons: Battle for Volcano Island": {
+      "serial": "SLUS-21469",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bratz: Forever Diamondz": {
+      "serial": "SLUS-21470",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tokobot Plus: Mysteries of the Karakuri": {
+      "serial": "SLUS-21471",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Capcom Classics Collection Vol. 2": {
+      "serial": "SLUS-21473",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The History Channel: Civil War: A Nation Divided": {
+      "serial": "SLUS-21474",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XII (SLUS-21475)": {
+      "serial": "SLUS-21475",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 07": {
+      "serial": "SLUS-21477",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pirates: Legend of the Black Buccaneer": {
+      "serial": "SLUS-21478",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack G.U. Vol. 1: Rebirth: Terminal Disc": {
+      "serial": "SLUS-21480",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 07": {
+      "serial": "SLUS-21481",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Sports: Basketball 2007": {
+      "serial": "SLUS-21485",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Art of Fighting Anthology": {
+      "serial": "SLUS-21487",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Series of Poker: Tournament of Champions: 2007 Edition": {
+      "serial": "SLUS-21491",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Scarface: The World Is Yours": {
+      "serial": "SLUS-21492",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Carbon: Collector's Edition": {
+      "serial": "SLUS-21494",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Carol Vorderman's Sudoku": {
+      "serial": "SLUS-21495",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ProStroke Golf: World Tour 2007": {
+      "serial": "SLUS-21496",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Strawberry Shortcake: The Sweet Dreams Game": {
+      "serial": "SLUS-21497",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naruto: Uzumaki Chronicles": {
+      "serial": "SLUS-21498",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Suzuki Super-Bikes II: Riding Challenge": {
+      "serial": "SLUS-21500",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Raw Danger": {
+      "serial": "SLUS-21501",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fatal Fury: Battle Archives Volume 1": {
+      "serial": "SLUS-21537",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Eureka Seven Vol. 2: The New Vision": {
+      "serial": "SLUS-21538",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Greg Hastings' Tournament Paintball Max'd": {
+      "serial": "SLUS-21539",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Karaoke Revolution Presents: American Idol": {
+      "serial": "SLUS-21540",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar Ratatouille": {
+      "serial": "SLUS-21541",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sega Genesis Collection": {
+      "serial": "SLUS-21542",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mortal Kombat: Armageddon (SLUS-21543)": {
+      "serial": "SLUS-21543",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fantastic Four: Rise of the Silver Surfer": {
+      "serial": "SLUS-21544",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Pirates of the Caribbean: At World's End": {
+      "serial": "SLUS-21545",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHRA Drag Racing: Countdown to the Championship": {
+      "serial": "SLUS-21547",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mercury Meltdown Remix": {
+      "serial": "SLUS-21548",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Sopranos: Road to Respect (SLUS-21549)": {
+      "serial": "SLUS-21549",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Slug Anthology": {
+      "serial": "SLUS-21550",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Artlist Collection: The Dog Island": {
+      "serial": "SLUS-21551",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Lumines Plus": {
+      "serial": "SLUS-21553",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters Collection: The Orochi Saga": {
+      "serial": "SLUS-21554",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Konami Kids Playground: Dinosaurs: Shapes & Colors": {
+      "serial": "SLUS-21556",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Konami Kids Playground: Frogger: Hop, Skip & Jumpin' Fun": {
+      "serial": "SLUS-21557",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Konami Kids Playground: Toy Pals Fun with Numbers": {
+      "serial": "SLUS-21558",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Konami Kids Playground: Alphabet Circus": {
+      "serial": "SLUS-21559",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Family Guy: Video Game!": {
+      "serial": "SLUS-21560",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K7": {
+      "serial": "SLUS-21561",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Brunswick Pro Bowling": {
+      "serial": "SLUS-21566",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shining Force EXA": {
+      "serial": "SLUS-21567",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arena Football: Road To Glory": {
+      "serial": "SLUS-21568",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harley-Davidson Motorcycles: Race to the Rally": {
+      "serial": "SLUS-21573",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naruto: Ultimate Ninja 2": {
+      "serial": "SLUS-21575",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Biker Mice from Mars": {
+      "serial": "SLUS-21578",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Barbie in the 12 Dancing Princesses": {
+      "serial": "SLUS-21579",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MTV Pimp My Ride": {
+      "serial": "SLUS-21580",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "UEFA Champions League 2006-2007": {
+      "serial": "SLUS-21581",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MVP 07 NCAA Baseball": {
+      "serial": "SLUS-21582",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Romance of the Three Kingdoms XI": {
+      "serial": "SLUS-21584",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Warriors 2: Empires": {
+      "serial": "SLUS-21585",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero Encore: Rocks the 80s": {
+      "serial": "SLUS-21586",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Made Man: Confessions of the Family Blood": {
+      "serial": "SLUS-21587",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Avatar: The Last Airbender: The Burning Earth": {
+      "serial": "SLUS-21588",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pinball Hall of Fame: The Williams Collection": {
+      "serial": "SLUS-21589",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ski-Doo Snow X Racing": {
+      "serial": "SLUS-21591",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Adventures of Darwin": {
+      "serial": "SLUS-21592",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Juiced 2: Hot Import Nights": {
+      "serial": "SLUS-21593",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naruto: Uzumaki Chronicles 2": {
+      "serial": "SLUS-21594",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TMNT": {
+      "serial": "SLUS-21595",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Digimon World: Data Squad": {
+      "serial": "SLUS-21598",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney High School Musical: Sing It!": {
+      "serial": "SLUS-21599",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sprint Cars 2: Showdown at Eldora": {
+      "serial": "SLUS-21601",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nicktoons: Attack of the Toybots": {
+      "serial": "SLUS-21605",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metropolismania 2": {
+      "serial": "SLUS-21606",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Legend of Spyro: The Eternal Night": {
+      "serial": "SLUS-21607",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution SuperNova 2": {
+      "serial": "SLUS-21608",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution: Disney Channel Edition": {
+      "serial": "SLUS-21609",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Thrillville: Off the Rails": {
+      "serial": "SLUS-21611",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Legend of the Dragon": {
+      "serial": "SLUS-21612",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tony Hawk's Proving Ground": {
+      "serial": "SLUS-21616",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Spider-Man 3 (SLUS-21617)": {
+      "serial": "SLUS-21617",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Plan (SLUS-21618)": {
+      "serial": "SLUS-21618",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harry Potter and the Order of the Phoenix": {
+      "serial": "SLUS-21619",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 08": {
+      "serial": "SLUS-21620",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Trophy Bucks": {
+      "serial": "SLUS-21624",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Big Game Hunter 2008": {
+      "serial": "SLUS-21625",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Jackass: The Game": {
+      "serial": "SLUS-21627",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hot Wheels: Beat That!": {
+      "serial": "SLUS-21628",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Shodown Anthology": {
+      "serial": "SLUS-21629",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Trek: Conquest": {
+      "serial": "SLUS-21630",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Phantasy Star Universe: Ambition of the Illuminus": {
+      "serial": "SLUS-21631",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2K8": {
+      "serial": "SLUS-21632",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Aqua Teen Hunger Force: Zombie Ninja Pro-Am": {
+      "serial": "SLUS-21633",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crazy Frog Arcade Racer": {
+      "serial": "SLUS-21634",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Jam": {
+      "serial": "SLUS-21635",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Looney Tunes: Acme Arsenal": {
+      "serial": "SLUS-21636",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 08": {
+      "serial": "SLUS-21638",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NASCAR 08": {
+      "serial": "SLUS-21639",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rugby 08": {
+      "serial": "SLUS-21640",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Innocent Life: A Futuristic Harvest Moon: Special Edition": {
+      "serial": "SLUS-21641",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sonic Riders: Zero Gravity": {
+      "serial": "SLUS-21642",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bratz: The Movie": {
+      "serial": "SLUS-21643",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE SmackDown vs. Raw 2008": {
+      "serial": "SLUS-21645",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tiger Woods PGA Tour 08": {
+      "serial": "SLUS-21646",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 08": {
+      "serial": "SLUS-21647",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 08": {
+      "serial": "SLUS-21648",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 08": {
+      "serial": "SLUS-21649",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Heavenly Guardian": {
+      "serial": "SLUS-21653",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "CSI: Crime Scene Investigation: 3 Dimensions of Murder": {
+      "serial": "SLUS-21655",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Princess: Enchanted Journey": {
+      "serial": "SLUS-21660",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ben 10: Protector of Earth": {
+      "serial": "SLUS-21661",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Warriors Orochi": {
+      "serial": "SLUS-21662",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cocoto Fishing Master": {
+      "serial": "SLUS-21663",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Simpsons Game": {
+      "serial": "SLUS-21665",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mountain Bike Adrenaline": {
+      "serial": "SLUS-21666",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K8": {
+      "serial": "SLUS-21669",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Football '08": {
+      "serial": "SLUS-21670",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB Power Pros": {
+      "serial": "SLUS-21671",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "College Hoops 2K8": {
+      "serial": "SLUS-21673",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Petz: Dogz 2": {
+      "serial": "SLUS-21674",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Petz: Catz 2": {
+      "serial": "SLUS-21675",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dancing with the Stars": {
+      "serial": "SLUS-21676",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Power Rangers: Super Legends: 15th Anniversary": {
+      "serial": "SLUS-21679",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harvey Birdman: Attorney at Law": {
+      "serial": "SLUS-21680",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Boogie": {
+      "serial": "SLUS-21681",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band": {
+      "serial": "SLUS-21682",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yu-Gi-Oh! GX: The Beginning of Destiny": {
+      "serial": "SLUS-21683",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Barbie as the Island Princess": {
+      "serial": "SLUS-21684",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2008: Pro Evolution Soccer": {
+      "serial": "SLUS-21685",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Series of Poker 2008: Battle for the Bracelets": {
+      "serial": "SLUS-21686",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Petz: Horsez 2": {
+      "serial": "SLUS-21689",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Alone in the Dark": {
+      "serial": "SLUS-21690",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Swashbucklers: Blue vs. Grey": {
+      "serial": "SLUS-21691",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Puzzle Quest: Challenge of the Warlords": {
+      "serial": "SLUS-21692",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "7 Wonders of the Ancient World": {
+      "serial": "SLUS-21693",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XI: Online: Wings of the Goddess Expansion Pack": {
+      "serial": "SLUS-21694",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ford Racing: Off Road": {
+      "serial": "SLUS-21696",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Iridium Runners": {
+      "serial": "SLUS-21697",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 08": {
+      "serial": "SLUS-21698",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fire Pro Wrestling Returns": {
+      "serial": "SLUS-21702",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Luxor: Pharaoh's Challenge": {
+      "serial": "SLUS-21703",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XI: Online: Vana'diel Collection 2008": {
+      "serial": "SLUS-21704",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 08 en Español": {
+      "serial": "SLUS-21705",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Alvin and the Chipmunks": {
+      "serial": "SLUS-21706",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NeoGeo Battle Coliseum": {
+      "serial": "SLUS-21708",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PopCap Hits! Vol. 1": {
+      "serial": "SLUS-21710",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "RTL Biathlon 2008": {
+      "serial": "SLUS-21711",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The History Channel: Battle for the Pacific": {
+      "serial": "SLUS-21712",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Winter Sports 2008: The Ultimate Challenge": {
+      "serial": "SLUS-21713",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Monster Bass": {
+      "serial": "SLUS-21715",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nick Jr. Go Diego Go! Safari Rescue": {
+      "serial": "SLUS-21718",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Karaoke Revolution Presents: American Idol Encore": {
+      "serial": "SLUS-21719",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arcana Heart": {
+      "serial": "SLUS-21720",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nobunaga's Ambition: Rise to Power": {
+      "serial": "SLUS-21721",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Chaos Wars": {
+      "serial": "SLUS-21722",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fatal Fury: Battle Archives Volume 2": {
+      "serial": "SLUS-21723",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SNK Arcade Classics Vol. 1": {
+      "serial": "SLUS-21724",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "World Heroes Anthology": {
+      "serial": "SLUS-21725",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Warriors 2: Xtreme Legends": {
+      "serial": "SLUS-21726",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K8": {
+      "serial": "SLUS-21729",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon El Tigre: The Adventures of Manny Rivera": {
+      "serial": "SLUS-21732",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sega Superstars Tennis": {
+      "serial": "SLUS-21733",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Falling Stars": {
+      "serial": "SLUS-21734",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Riding Star": {
+      "serial": "SLUS-21737",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sea Monsters: A Prehistoric Adventure": {
+      "serial": "SLUS-21741",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Women's Volleyball Championship": {
+      "serial": "SLUS-21742",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Code Lyoko: Quest for Infinity": {
+      "serial": "SLUS-21743",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NASCAR 09": {
+      "serial": "SLUS-21744",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K9": {
+      "serial": "SLUS-21745",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MLB Power Pros 2008": {
+      "serial": "SLUS-21748",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Hannah Montana: Spotlight World Tour": {
+      "serial": "SLUS-21750",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Baseball '09": {
+      "serial": "SLUS-21751",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 09": {
+      "serial": "SLUS-21752",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monopoly": {
+      "serial": "SLUS-21753",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "CID the Dummy": {
+      "serial": "SLUS-21754",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Are You Smarter than a 5th Grader? Make the Grade": {
+      "serial": "SLUS-21755",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band: Track Pack Volume 1": {
+      "serial": "SLUS-21758",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "LEGO Indiana Jones: The Original Adventures": {
+      "serial": "SLUS-21759",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "B-Boy": {
+      "serial": "SLUS-21761",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2K9": {
+      "serial": "SLUS-21763",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cake Mania: Baker's Challenge": {
+      "serial": "SLUS-21764",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Incredible Hulk": {
+      "serial": "SLUS-21765",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pipe Mania": {
+      "serial": "SLUS-21766",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution X": {
+      "serial": "SLUS-21767",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PopCap Hits! Vol. 2": {
+      "serial": "SLUS-21768",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 09": {
+      "serial": "SLUS-21770",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 09": {
+      "serial": "SLUS-21771",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tiger Woods PGA Tour 09": {
+      "serial": "SLUS-21772",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PDC World Championship Darts": {
+      "serial": "SLUS-21773",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors 6": {
+      "serial": "SLUS-21774",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 09": {
+      "serial": "SLUS-21776",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 09": {
+      "serial": "SLUS-21777",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dokapon Kingdom": {
+      "serial": "SLUS-21778",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ferrari Challenge: Trofeo Pirelli": {
+      "serial": "SLUS-21780",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Space Chimps": {
+      "serial": "SLUS-21783",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "LEGO Batman: The Videogame": {
+      "serial": "SLUS-21785",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Summer Athletics: The Ultimate Challenge": {
+      "serial": "SLUS-21786",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TNA Impact! Total Nonstop Action Wrestling": {
+      "serial": "SLUS-21787",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Legendary Adventures": {
+      "serial": "SLUS-21789",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks Shrek's Carnival Craze: Party Games": {
+      "serial": "SLUS-21790",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bratz: Girlz Really Rock": {
+      "serial": "SLUS-21791",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mercenaries 2: L'Enfer Des Favelas": {
+      "serial": "SLUS-21792",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Go Diego Go! Great Dinosaur Rescue": {
+      "serial": "SLUS-21794",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Totally Spies! Totally Party": {
+      "serial": "SLUS-21795",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Dora the Explorer: Dora Saves the Snow Princess": {
+      "serial": "SLUS-21796",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Tak and the Guardians of Gross": {
+      "serial": "SLUS-21797",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shepherd's Crossing": {
+      "serial": "SLUS-21798",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band 2": {
+      "serial": "SLUS-21800",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Undercover": {
+      "serial": "SLUS-21801",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon The Naked Brothers Band: The Video Game": {
+      "serial": "SLUS-21802",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Warriors Orochi 2": {
+      "serial": "SLUS-21803",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Avatar: The Last Airbender: Into the Inferno": {
+      "serial": "SLUS-21804",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hasbro Family Game Night": {
+      "serial": "SLUS-21805",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Barbie Horse Adventures: Riding Camp": {
+      "serial": "SLUS-21806",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Jam: Urban Assault": {
+      "serial": "SLUS-21807",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harry Potter and the Half-Blood Prince": {
+      "serial": "SLUS-21808",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Football '09": {
+      "serial": "SLUS-21809",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE SmackDown vs. Raw 2009": {
+      "serial": "SLUS-21810",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Speed Racer": {
+      "serial": "SLUS-21812",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "007: Quantum of Solace": {
+      "serial": "SLUS-21813",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Think Fast": {
+      "serial": "SLUS-21814",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ben 10: Alien Force": {
+      "serial": "SLUS-21815",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The King of Fighters '98: Ultimate Match": {
+      "serial": "SLUS-21816",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon SpongeBob SquarePants featuring Nicktoons: Globs of Doom": {
+      "serial": "SLUS-21818",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney High School Musical 3: Senior Year Dance!": {
+      "serial": "SLUS-21819",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Legend of Spyro: Dawn of the Dragon": {
+      "serial": "SLUS-21820",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2009: Pro Evolution Soccer": {
+      "serial": "SLUS-21821",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Spider-Man: Web of Shadows: Amazing Allies Edition": {
+      "serial": "SLUS-21822",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pro Bull Riding: Out of the Chute": {
+      "serial": "SLUS-21825",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Sing It": {
+      "serial": "SLUS-21826",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PopStar Guitar": {
+      "serial": "SLUS-21827",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band: Track Pack Volume 2": {
+      "serial": "SLUS-21830",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Goosebumps HorrorLand": {
+      "serial": "SLUS-21834",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "History Civil War: Secret Missions": {
+      "serial": "SLUS-21835",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Lab": {
+      "serial": "SLUS-21838",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks Madagascar: Escape 2 Africa": {
+      "serial": "SLUS-21840",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Dangerous Hunts 2009": {
+      "serial": "SLUS-21841",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero: Metallica": {
+      "serial": "SLUS-21843",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Walt Disney Pictures Bolt": {
+      "serial": "SLUS-21844",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guilty Gear XX Accent Core Plus": {
+      "serial": "SLUS-21847",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "AC/DC Live: Rock Band Track Pack": {
+      "serial": "SLUS-21848",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Winter Sports 2: The Next Challenge": {
+      "serial": "SLUS-21849",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Basketball 09": {
+      "serial": "SLUS-21851",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Tale of Despereaux": {
+      "serial": "SLUS-21852",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shaun White Snowboarding": {
+      "serial": "SLUS-21853",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NPPL Championship Paintball 2009": {
+      "serial": "SLUS-21855",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tomb Raider: Underworld": {
+      "serial": "SLUS-21858",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Sing It: High School Musical 3: Senior Year": {
+      "serial": "SLUS-21861",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naruto Shippuden: Ultimate Ninja 4": {
+      "serial": "SLUS-21862",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Suzuki TT Superbikes: Real Road Racing Championship": {
+      "serial": "SLUS-21863",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar Up": {
+      "serial": "SLUS-21864",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero 5": {
+      "serial": "SLUS-21865",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero: Smash Hits": {
+      "serial": "SLUS-21866",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero: Van Halen": {
+      "serial": "SLUS-21867",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nobunaga's Ambition: Iron Triangle": {
+      "serial": "SLUS-21868",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Trivial Pursuit": {
+      "serial": "SLUS-21869",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks Monsters vs. Aliens": {
+      "serial": "SLUS-21870",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K9": {
+      "serial": "SLUS-21871",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MTV Pimp My Ride: Street Racing": {
+      "serial": "SLUS-21872",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dynasty Warriors: Gundam 2": {
+      "serial": "SLUS-21873",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band Track Pack: Classic Rock": {
+      "serial": "SLUS-21876",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tiger Woods PGA Tour 10": {
+      "serial": "SLUS-21877",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marvel: Ultimate Alliance 2": {
+      "serial": "SLUS-21879",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X-Men Origins: Wolverine": {
+      "serial": "SLUS-21880",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ghostbusters: The Video Game": {
+      "serial": "SLUS-21882",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Baseball '10": {
+      "serial": "SLUS-21884",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band: Country Track Pack": {
+      "serial": "SLUS-21888",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock Band: Metal Track Pack": {
+      "serial": "SLUS-21889",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney G-Force": {
+      "serial": "SLUS-21891",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 10": {
+      "serial": "SLUS-21892",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 10": {
+      "serial": "SLUS-21893",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Astro Boy: The Video Game": {
+      "serial": "SLUS-21895",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Secret Saturdays: Beasts of the 5th Sun": {
+      "serial": "SLUS-21896",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Devil Summoner 2: Raidou Kuzunoha vs. King Abaddon": {
+      "serial": "SLUS-21897",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Band Hero": {
+      "serial": "SLUS-21898",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Silent Hill: Shattered Memories": {
+      "serial": "SLUS-21899",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Scooby-Doo! First Frights": {
+      "serial": "SLUS-21900",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE SmackDown vs. Raw 2010": {
+      "serial": "SLUS-21901",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Bakugan: Battle Brawlers": {
+      "serial": "SLUS-21902",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 10": {
+      "serial": "SLUS-21905",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's Outdoor Adventures 2010": {
+      "serial": "SLUS-21906",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K10": {
+      "serial": "SLUS-21908",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DJ Hero": {
+      "serial": "SLUS-21909",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marvel Super Hero Squad": {
+      "serial": "SLUS-21910",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: The Clone Wars: Republic Heroes": {
+      "serial": "SLUS-21913",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 2K10": {
+      "serial": "SLUS-21914",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Dance Revolution X2": {
+      "serial": "SLUS-21917",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2010: Pro Evolution Soccer": {
+      "serial": "SLUS-21918",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Backyard Football '10": {
+      "serial": "SLUS-21919",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney Sing It: Pop Hits": {
+      "serial": "SLUS-21920",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ben 10: Alien Force: Vilgax Attacks": {
+      "serial": "SLUS-21921",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero: Van Halen (SLUS-21924)": {
+      "serial": "SLUS-21924",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Nickelodeon Ni Hao, Kai-Lan: Super Game Day": {
+      "serial": "SLUS-21926",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sakura Wars: So Long, My Love (Disc 1) (English Voice Over)": {
+      "serial": "SLUS-21927",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Scooby-Doo! and the Spooky Swamp": {
+      "serial": "SLUS-21928",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K10": {
+      "serial": "SLUS-21929",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney/Pixar Toy Story 3": {
+      "serial": "SLUS-21931",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA Football 11": {
+      "serial": "SLUS-21932",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rapala Pro Bass Fishing": {
+      "serial": "SLUS-21934",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Cabela's North American Adventures": {
+      "serial": "SLUS-21935",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K11": {
+      "serial": "SLUS-21936",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 11": {
+      "serial": "SLUS-21937",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ben 10: Ultimate Alien: Cosmic Destruction": {
+      "serial": "SLUS-21938",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE SmackDown vs. Raw 2011": {
+      "serial": "SLUS-21939",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE All Stars": {
+      "serial": "SLUS-21940",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 11": {
+      "serial": "SLUS-21941",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2011: Pro Evolution Soccer": {
+      "serial": "SLUS-21942",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K11": {
+      "serial": "SLUS-21945",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 12": {
+      "serial": "SLUS-21946",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 12": {
+      "serial": "SLUS-21947",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2012: Pro Evolution Soccer": {
+      "serial": "SLUS-21948",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Netflix Streaming Disc": {
+      "serial": "SLUS-21949",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA 2K12": {
+      "serial": "SLUS-21950",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Major League Baseball 2K12": {
+      "serial": "SLUS-21951",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "PES 2013: Pro Evolution Soccer": {
+      "serial": "SLUS-21955",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Suikoden Tactics (SLUS-22145)": {
+      "serial": "SLUS-22145",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Madden NFL 08 (SLUS-26138)": {
+      "serial": "SLUS-26138",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Grand Theft Auto: Vice City (SLUS-27003)": {
+      "serial": "SLUS-27003",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Devil May Cry: 5th Anniversary Collection (dark cover)": {
+      "serial": "SLUS-27004",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Collector's Series": {
+      "serial": "SLUS-27005",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Grand Theft Auto: The Trilogy": {
+      "serial": "SLUS-27006",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crash Bandicoot: Action Pack": {
+      "serial": "SLUS-27008",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Harry Potter Collection": {
+      "serial": "SLUS-27009",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hitman Trilogy": {
+      "serial": "SLUS-27010",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Resident Evil: The Essentials (Capcom Entertainment Inc.)": {
+      "serial": "SLUS-27011",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Burnout Anthology": {
+      "serial": "SLUS-27013",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Gear Solid: The Essential Collection": {
+      "serial": "SLUS-27015",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Naruto: Ultimate Collection": {
+      "serial": "SLUS-27019",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Onimusha Essentials": {
+      "serial": "SLUS-27021",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero 3-Disc Set": {
+      "serial": "SLUS-27025",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rock University Presents: The Naked Brothers Band: The Video Game: Microphone Pack": {
+      "serial": "SLUS-27026",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disney High School Musical 3: Senior Year Dance! (Dance Pad inside!)": {
+      "serial": "SLUS-27030",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Grand Theft Auto Double Pack: Liberty City Stories / Vice City Stories": {
+      "serial": "SLUS-27035",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sakura Wars: So Long, My Love: Premium Box": {
+      "serial": "SLUS-27037",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA 14": {
+      "serial": "SLUS-27093",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Red Faction (SLUS-28002)": {
+      "serial": "SLUS-28002",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Klonoa 2: Lunatea's Veil (SLUS-28004)": {
+      "serial": "SLUS-28004",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Burnout (SLUS-28006)": {
+      "serial": "SLUS-28006",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "All-Star Baseball 2003 featuring Derek Jeter (SLUS-28007)": {
+      "serial": "SLUS-28007",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SkyGunner (SLUS-28008)": {
+      "serial": "SLUS-28008",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "UFC: Throwdown": {
+      "serial": "SLUS-28009",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Jedi Starfighter (SLUS-28010)": {
+      "serial": "SLUS-28010",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tekken 4 (SLUS-28012)": {
+      "serial": "SLUS-28012",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dual Hearts (SLUS-28013)": {
+      "serial": "SLUS-28013",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mat Hoffman's Pro BMX 2 (SLUS-28014)": {
+      "serial": "SLUS-28014",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gungrave (SLUS-28015)": {
+      "serial": "SLUS-28015",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shinobi (SLUS-28016)": {
+      "serial": "SLUS-28016",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Haven: Call of the King (SLUS-28019)": {
+      "serial": "SLUS-28019",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures (SLUS-28020)": {
+      "serial": "SLUS-28020",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures (SLUS-28021)": {
+      "serial": "SLUS-28021",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 1: Infection": {
+      "serial": "SLUS-28023",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disaster Report (SLUS-28025)": {
+      "serial": "SLUS-28025",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures (SLUS-28026)": {
+      "serial": "SLUS-28026",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Black & Bruised (SLUS-28027)": {
+      "serial": "SLUS-28027",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "High Heat Major League Baseball 2004 (SLUS-28029)": {
+      "serial": "SLUS-28029",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Auto Modellista (SLUS-28031)": {
+      "serial": "SLUS-28031",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 2: Mutation": {
+      "serial": "SLUS-28032",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Disgaea: Hour of Darkness (SLUS-28034)": {
+      "serial": "SLUS-28034",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Kya: Dark Lineage (SLUS-28037)": {
+      "serial": "SLUS-28037",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rogue Ops (SLUS-28039)": {
+      "serial": "SLUS-28039",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Transformers": {
+      "serial": "SLUS-28040",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Test Drive: Eve of Destruction (SLUS-28043)": {
+      "serial": "SLUS-28043",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Choro Q (SLUS-28044)": {
+      "serial": "SLUS-28044",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Nocturne (SLUS-28045)": {
+      "serial": "SLUS-28045",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guilty Gear Isuka (SLUS-28046)": {
+      "serial": "SLUS-28046",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Digital Devil Saga (SLUS-28049)": {
+      "serial": "SLUS-28049",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Stella Deus: The Gate of Eternity (SLUS-28050)": {
+      "serial": "SLUS-28050",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Samurai Western (SLUS-28051)": {
+      "serial": "SLUS-28051",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-28052)": {
+      "serial": "SLUS-28052",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Magna Carta: Tears of Blood (SLUS-28053)": {
+      "serial": "SLUS-28053",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Combat Elite: WWII Paratroopers (SLUS-28054)": {
+      "serial": "SLUS-28054",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "State of Emergency 2 (SLUS-28056)": {
+      "serial": "SLUS-28056",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Saga (SLUS-28059)": {
+      "serial": "SLUS-28059",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Steambot Chronicles (SLUS-28061)": {
+      "serial": "SLUS-28061",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dance Factory (SLUS-28062)": {
+      "serial": "SLUS-28062",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Rule of Rose (SLUS-28063)": {
+      "serial": "SLUS-28063",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army": {
+      "serial": "SLUS-28064",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Odin Sphere (SLUS-28065)": {
+      "serial": "SLUS-28065",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Persona 3": {
+      "serial": "SLUS-28067",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Persona 3 FES": {
+      "serial": "SLUS-28068",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shin Megami Tensei: Persona 4": {
+      "serial": "SLUS-28069",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN Winter X Games Snowboarding (SLUS-29001)": {
+      "serial": "SLUS-29001",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Gear Solid 2: Sons of Liberty: Trial Edition": {
+      "serial": "SLUS-29003",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Unison: Rebels of Rhythm & Dance / DOA2: Hardcore": {
+      "serial": "SLUS-29004",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Red Faction (SLUS-29005)": {
+      "serial": "SLUS-29005",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MX 2002 featuring Ricky Carmichael": {
+      "serial": "SLUS-29006",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Arctic Thunder (SLUS-29007)": {
+      "serial": "SLUS-29007",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ESPN X Games Skateboarding (SLUS-29008)": {
+      "serial": "SLUS-29008",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Devil May Cry (SLUS-29009)": {
+      "serial": "SLUS-29009",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crash Bandicoot: The Wrath of Cortex (SLUS-29010)": {
+      "serial": "SLUS-29010",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWF SmackDown! Just Bring It (SLUS-29011)": {
+      "serial": "SLUS-29011",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Top Gun: Combat Zones (SLUS-29012)": {
+      "serial": "SLUS-29012",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Victorious Boxers: Ippo's Road to Glory (SLUS-29013)": {
+      "serial": "SLUS-29013",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Half-Life (SLUS-29014)": {
+      "serial": "SLUS-29014",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dark Summit (SLUS-29015)": {
+      "serial": "SLUS-29015",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "X-Games Winter SnoCross + ESPN International Winter Sports 2002 + Winter X Games Snowboarding 2002": {
+      "serial": "SLUS-29016",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "AirBlade": {
+      "serial": "SLUS-29017",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "High Heat Major League Baseball 2003 (SLUS-29019)": {
+      "serial": "SLUS-29019",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SkyGunner (SLUS-29020)": {
+      "serial": "SLUS-29020",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Aggressive Inline (SLUS-29021)": {
+      "serial": "SLUS-29021",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "UFC: Throwdown (SLUS-29022)": {
+      "serial": "SLUS-29022",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Robot Alchemic Drive (SLUS-29025)": {
+      "serial": "SLUS-29025",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MX SuperFly": {
+      "serial": "SLUS-29026",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Red Faction II (SLUS-29027)": {
+      "serial": "SLUS-29027",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Summoner 2 (SLUS-29029)": {
+      "serial": "SLUS-29029",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FireBlade (SLUS-29030)": {
+      "serial": "SLUS-29030",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Egg Mania: Eggstreme Madness (SLUS-29032)": {
+      "serial": "SLUS-29032",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dual Hearts (SLUS-29033)": {
+      "serial": "SLUS-29033",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tekken 4 (SLUS-29034)": {
+      "serial": "SLUS-29034",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Scorpion King: Rise of the Akkadian (SLUS-29036)": {
+      "serial": "SLUS-29036",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DDRMAX: Dance Dance Revolution (SLUS-29037)": {
+      "serial": "SLUS-29037",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Haven: Call of the King (SLUS-29038)": {
+      "serial": "SLUS-29038",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dr. Muto (SLUS-29040)": {
+      "serial": "SLUS-29040",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 1: Infection (SLUS-29042)": {
+      "serial": "SLUS-29042",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Pride FC: Fighting Championships (SLUS-29044)": {
+      "serial": "SLUS-29044",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Black & Bruised (SLUS-29045)": {
+      "serial": "SLUS-29045",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Def Jam: Vendetta": {
+      "serial": "SLUS-29047",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tom Clancy's Splinter Cell (SLUS-29048)": {
+      "serial": "SLUS-29048",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Warhammer 40,000: Fire Warrior (SLUS-29049)": {
+      "serial": "SLUS-29049",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures (SLUS-29050)": {
+      "serial": "SLUS-29050",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Street Vol. 2 (SLUS-29053)": {
+      "serial": "SLUS-29053",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Splashdown: Rides Gone Wild (SLUS-29054)": {
+      "serial": "SLUS-29054",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 2: Mutation (SLUS-29055)": {
+      "serial": "SLUS-29055",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Alter Echo (SLUS-29056)": {
+      "serial": "SLUS-29056",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sphinx and the Shadow of Set": {
+      "serial": "SLUS-29057",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Soulcalibur II": {
+      "serial": "SLUS-29058",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hunter: The Reckoning: Wayward (SLUS-29059)": {
+      "serial": "SLUS-29059",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Gladius (SLUS-29060)": {
+      "serial": "SLUS-29060",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Freaky Flyers (SLUS-29061)": {
+      "serial": "SLUS-29061",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "EverQuest: Online Adventures: Frontiers (SLUS-29063)": {
+      "serial": "SLUS-29063",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 3: Outbreak": {
+      "serial": "SLUS-29065",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Tak and the Power of Juju": {
+      "serial": "SLUS-29067",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crash Nitro Kart (SLUS-29068)": {
+      "serial": "SLUS-29068",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Prince of Persia: The Sands of Time (SLUS-29069)": {
+      "serial": "SLUS-29069",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "XIII (SLUS-29070)": {
+      "serial": "SLUS-29070",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Transmission v1.03": {
+      "serial": "SLUS-29071",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Underground (SLUS-29073)": {
+      "serial": "SLUS-29073",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DDRMAX2: Dance Dance Revolution (SLUS-29074)": {
+      "serial": "SLUS-29074",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "I-Ninja (SLUS-29077)": {
+      "serial": "SLUS-29077",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2004 (SLUS-29079)": {
+      "serial": "SLUS-29079",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Whiplash (SLUS-29080)": {
+      "serial": "SLUS-29080",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Metal Arms: Glitch in the System (SLUS-29081)": {
+      "serial": "SLUS-29081",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Beyond Good & Evil (SLUS-29082)": {
+      "serial": "SLUS-29082",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Maximo vs Army of Zin": {
+      "serial": "SLUS-29083",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack Part 4: Quarantine": {
+      "serial": "SLUS-29084",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Champions of Norrath: Realms of Everquest": {
+      "serial": "SLUS-29085",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Champions of Norrath (SLUS-29088)": {
+      "serial": "SLUS-29088",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Resident Evil: Outbreak (SLUS-29089)": {
+      "serial": "SLUS-29089",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MX Unleashed (SLUS-29091)": {
+      "serial": "SLUS-29091",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NFL Street (SLUS-29093)": {
+      "serial": "SLUS-29093",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "007: Everything or Nothing": {
+      "serial": "SLUS-29095",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Night 2004 (SLUS-29096)": {
+      "serial": "SLUS-29096",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ribbit King (SLUS-29100)": {
+      "serial": "SLUS-29100",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crash Twinsanity / Spyro: A Hero's Tail": {
+      "serial": "SLUS-29101",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Galactic Wrestling featuring Ultimate Muscle: The Kinnikuman Legacy (SLUS-29104)": {
+      "serial": "SLUS-29104",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Transformers (SLUS-29107)": {
+      "serial": "SLUS-29107",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Def Jam: Fight for NY (SLUS-29108)": {
+      "serial": "SLUS-29108",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Monster Hunter (SLUS-29110)": {
+      "serial": "SLUS-29110",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Asterix & Obelix: Kick Buttix (SLUS-29111)": {
+      "serial": "SLUS-29111",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Burnout 3: Takedown (SLUS-29113)": {
+      "serial": "SLUS-29113",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "WWE SmackDown! vs. Raw": {
+      "serial": "SLUS-29116",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Battlefield 2: Modern Combat": {
+      "serial": "SLUS-29117",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Underground 2 (SLUS-29118)": {
+      "serial": "SLUS-29118",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Ghost in the Shell: Stand Alone Complex": {
+      "serial": "SLUS-29123",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Club (SLUS-29124)": {
+      "serial": "SLUS-29124",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Champions: Return to Arms (SLUS-29126)": {
+      "serial": "SLUS-29126",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 2005 (SLUS-29127)": {
+      "serial": "SLUS-29127",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "25 to Life": {
+      "serial": "SLUS-29129",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Crash 'n' Burn": {
+      "serial": "SLUS-29130",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Project: Snowblind": {
+      "serial": "SLUS-29131",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "S.L.A.I.: Steel Lancer Arena International (SLUS-29132)": {
+      "serial": "SLUS-29132",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Transmission v2": {
+      "serial": "SLUS-29133",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Transmission Vol. 2": {
+      "serial": "SLUS-29134",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 2005 (SLUS-29135)": {
+      "serial": "SLUS-29135",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Mercenaries": {
+      "serial": "SLUS-29137",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Punisher": {
+      "serial": "SLUS-29138",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shadow of Rome (SLUS-29139)": {
+      "serial": "SLUS-29139",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "MX vs. ATV Unleashed": {
+      "serial": "SLUS-29140",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Street V3": {
+      "serial": "SLUS-29141",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Night Round 2 (SLUS-29145)": {
+      "serial": "SLUS-29145",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Juiced (SLUS-29147)": {
+      "serial": "SLUS-29147",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Incredible Hulk: Ultimate Destruction": {
+      "serial": "SLUS-29148",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Flipnic: Ultimate Pinball (SLUS-29149)": {
+      "serial": "SLUS-29149",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Destroy All Humans! (SLUS-29150)": {
+      "serial": "SLUS-29150",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Enthusia: Professional Racing (SLUS-29151)": {
+      "serial": "SLUS-29151",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Battlefield 2: Modern Combat (SLUS-29152)": {
+      "serial": "SLUS-29152",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Burnout Revenge (SLUS-29153)": {
+      "serial": "SLUS-29153",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NHL 06": {
+      "serial": "SLUS-29154",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Most Wanted (SLUS-29155)": {
+      "serial": "SLUS-29155",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Marvel Nemesis: Rise of the Imperfects (SLUS-29156)": {
+      "serial": "SLUS-29156",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dragon Quest VIII: Journey of the Cursed King (SLUS-29157)": {
+      "serial": "SLUS-29157",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Shonen Jump's One Piece: Grand Battle (SLUS-29159)": {
+      "serial": "SLUS-29159",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA 06": {
+      "serial": "SLUS-29160",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "SSX on Tour": {
+      "serial": "SLUS-29161",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NBA Live 06 (SLUS-29162)": {
+      "serial": "SLUS-29162",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "NCAA March Madness 06 (SLUS-29163)": {
+      "serial": "SLUS-29163",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Star Wars: Battlefront II (SLUS-29164)": {
+      "serial": "SLUS-29164",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "007: From Russia with Love (SLUS-29168)": {
+      "serial": "SLUS-29168",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Resident Evil 4 (SLUS-29169)": {
+      "serial": "SLUS-29169",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Total Overdose: A Gunslinger's Tale in Mexico (SLUS-29170)": {
+      "serial": "SLUS-29170",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Final Fantasy XII (SLUS-29171)": {
+      "serial": "SLUS-29171",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Battlefield 2: Modern Combat (SLUS-29172)": {
+      "serial": "SLUS-29172",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "The Sims 2 (SLUS-29173)": {
+      "serial": "SLUS-29173",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Transmission v3.1": {
+      "serial": "SLUS-29174",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Namco Transmission v3.2": {
+      "serial": "SLUS-29175",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "TOCA Race Driver 3": {
+      "serial": "SLUS-29178",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Sonic Riders (SLUS-29179)": {
+      "serial": "SLUS-29179",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Black (SLUS-29180)": {
+      "serial": "SLUS-29180",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Fight Night Round 3 (SLUS-29183)": {
+      "serial": "SLUS-29183",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Driver: Parallel Lines (SLUS-29185)": {
+      "serial": "SLUS-29185",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Steambot Chronicles (SLUS-29188)": {
+      "serial": "SLUS-29188",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA World Cup Germany 2006 (SLUS-29189)": {
+      "serial": "SLUS-29189",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Hitman: Blood Money / Urban Chaos: Riot Response": {
+      "serial": "SLUS-29191",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Test Drive Unlimited (SLUS-29192)": {
+      "serial": "SLUS-29192",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Need for Speed: Carbon (SLUS-29193)": {
+      "serial": "SLUS-29193",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 07 (SLUS-29194)": {
+      "serial": "SLUS-29194",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Yakuza (SLUS-29195)": {
+      "serial": "SLUS-29195",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Destroy All Humans! 2 (SLUS-29196)": {
+      "serial": "SLUS-29196",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "DreamWorks & Aardman Flushed Away": {
+      "serial": "SLUS-29197",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Guitar Hero II (SLUS-29198)": {
+      "serial": "SLUS-29198",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Dot Hack G.U. Vol. 1: Rebirth": {
+      "serial": "SLUS-29199",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "Konami Kids Playground": {
+      "serial": "SLUS-29200",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "FIFA Soccer 08 (SLUS-29201)": {
+      "serial": "SLUS-29201",
+      "alt_serials": [],
+      "crcs": []
+    },
+    "ATV Offroad Fury 2 (SCUS-97238)": {
+      "serial": "SCUS-97238",
+      "alt_serials": [],
+      "crcs": []
     }
   }
 }

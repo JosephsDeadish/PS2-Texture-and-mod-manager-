@@ -8038,6 +8038,67 @@ class TestSerialDbCrcs(unittest.TestCase):
                                    f"'{title}' has no CRC entries")
 
 
+class TestWave42SerialDb(unittest.TestCase):
+    """Wave 42: serial DB expanded with PS2.data.json / PS2.titles.json data."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_wave42_game_count_over_2200(self):
+        """After Wave 42, serial DB should contain > 2200 games."""
+        self.assertGreater(
+            self.sdb.game_count(), 2200,
+            f"Expected >2200 games, got {self.sdb.game_count()}"
+        )
+
+    def test_wave42_games_with_crcs_over_900(self):
+        """Wave 42: at least 900 games still have CRC entries."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
+        )
+        self.assertGreater(count, 900,
+                           f"Expected >900 games with CRCs, got {count}")
+
+    def test_wave42_dbz_sagas_crc_fixed(self):
+        """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
+        info = self.sdb.get_info("Dragon Ball Z: Sagas")
+        self.assertIsNotNone(info)
+        self.assertIn("E36751DA", info.crcs,
+                      "DBZ Sagas missing CRC E36751DA")
+
+    def test_wave42_godfather_added(self):
+        """The Godfather (SLUS-21385) must be present with CRC D850707E."""
+        info = self.sdb.get_info("The Godfather")
+        self.assertIsNotNone(info, "The Godfather missing from serial DB")
+        self.assertEqual(info.serial, "SLUS-21385")
+        self.assertIn("D850707E", info.crcs)
+
+    def test_wave42_ps2data_games_present(self):
+        """Wave 42: spot-check games added from PS2.data.json are in DB."""
+        new_games = [
+            ("Summoner",                         "SLUS-20074"),
+            ("Midnight Club: Street Racing",     "SLUS-20063"),
+            ("Dynasty Warriors 2",               "SLUS-20079"),
+            ("ATV Offroad Fury",                 "SCUS-97122"),
+            ("Dark Cloud",                       "SCUS-97111"),
+            ("Gauntlet: Dark Legacy",            "SLUS-20047"),
+            ("Star Wars: Starfighter",           "SLUS-20044"),
+            ("Okage: Shadow King",               "SCUS-97129"),
+            ("ATV Off-Road Fury",                "SCUS-97104"),
+            ("Frequency",                        "SCUS-97125"),
+        ]
+        for title, serial in new_games:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info, f"'{title}' missing from serial DB")
+                self.assertEqual(
+                    info.serial, serial,
+                    f"'{title}' expected serial {serial!r}, got {info.serial!r}"
+                )
+
+
 class TestCrcSerialConsistency(unittest.TestCase):
     """CRC-serial cross-validation: every CRC's serial should exist in serial_db."""
 
