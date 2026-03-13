@@ -4518,7 +4518,7 @@ class TestPnachAnalyzer(unittest.TestCase):
         """
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
-        self.assertGreater(n, 3700, "PNACH DB should have more than 3700 entries after Wave 32 game-specific cleanup")
+        self.assertGreater(n, 40000, "PNACH DB should have more than 40,000 entries after Wave 32 community-cheat expansion")
 
     def test_pnach_db_key_format_valid(self):
         """All PNACH DB keys must follow the CRC:MEMTYPE:ADDRESS format (3 colon-separated parts).
@@ -4671,6 +4671,49 @@ class TestPnachAnalyzer(unittest.TestCase):
             f"games — clear indicator of copy-pasted generic placeholders rather than verified codes. "
             f"First offender: {violations[0] if violations else ''}",
         )
+
+    def test_pnach_db_index_entries_for_crc(self):
+        """entries_for_crc uses the CRC index and returns the correct entries."""
+        from src.core.pnach_analyzer import entries_for_crc, reload_db
+        reload_db()
+        # Front Mission 4 has a large number of entries
+        entries = entries_for_crc("EB3AC800")
+        self.assertGreater(len(entries), 0)
+        for e in entries:
+            self.assertEqual(e.get("game_crc", "").upper(), "EB3AC800")
+            self.assertIn("key", e)
+
+    def test_pnach_db_index_entries_for_serial(self):
+        """entries_for_serial uses the serial index and returns the correct entries."""
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        entries = entries_for_serial("SLUS-20888")
+        self.assertGreater(len(entries), 0)
+        for e in entries:
+            serial = e.get("game_serial", "").upper()
+            self.assertEqual(serial, "SLUS-20888")
+
+    def test_pnach_db_index_list_serials_nonempty(self):
+        """list_all_serials_in_db returns a non-empty sorted list via the serial index."""
+        from src.core.pnach_analyzer import list_all_serials_in_db, reload_db
+        reload_db()
+        serials = list_all_serials_in_db()
+        self.assertGreater(len(serials), 100)
+        # Each element is a (serial, title) tuple
+        for serial, title in serials[:5]:
+            self.assertIsInstance(serial, str)
+            self.assertIsInstance(title, str)
+        # List should be sorted by title
+        titles = [t for _, t in serials]
+        self.assertEqual(titles, sorted(titles))
+
+    def test_pnach_db_reload_rebuilds_index(self):
+        """reload_db() rebuilds indexes so entries_for_crc still works after reload."""
+        from src.core.pnach_analyzer import entries_for_crc, reload_db
+        n = reload_db()
+        self.assertGreater(n, 40000)
+        entries = entries_for_crc("EB3AC800")
+        self.assertGreater(len(entries), 0)
 
     def test_infer_category_handles_all_sizes(self):
         from src.core.pnach_analyzer import infer_category

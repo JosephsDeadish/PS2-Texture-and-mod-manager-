@@ -46,7 +46,45 @@ def _load_db() -> Dict[str, dict]:
     return {}
 
 
-_DB: Dict[str, dict] = _load_db()
+# DB and the two look-up indexes (built at load time and on reload).
+_DB: Dict[str, dict] = {}
+# CRC (upper) → list of DB keys for that game.
+_IDX_CRC: Dict[str, List[str]] = {}
+# Serial (upper) → list of DB keys for that serial.
+_IDX_SERIAL: Dict[str, List[str]] = {}
+
+# Regex used to extract a PS2 serial from an embedded "Game Title (SLUS-NNNNN)" string.
+_SERIAL_RE = re.compile(
+    r'\(([A-Z]{4}-\d{5})\)',
+    re.IGNORECASE,
+)
+
+
+def _build_indexes(db: Dict[str, dict]) -> None:
+    """Build the CRC and serial look-up indexes from *db* in O(n)."""
+    global _IDX_CRC, _IDX_SERIAL
+    idx_crc: Dict[str, List[str]] = {}
+    idx_serial: Dict[str, List[str]] = {}
+    for key, entry in db.items():
+        crc = entry.get("game_crc", "").upper()
+        if crc:
+            idx_crc.setdefault(crc, []).append(key)
+        serial = entry.get("game_serial", "").upper()
+        if serial:
+            idx_serial.setdefault(serial, []).append(key)
+        elif (m := _SERIAL_RE.search(entry.get("game", ""))):
+            idx_serial.setdefault(m.group(1).upper(), []).append(key)
+    _IDX_CRC = idx_crc
+    _IDX_SERIAL = idx_serial
+
+
+def _init_db() -> None:
+    global _DB
+    _DB = _load_db()
+    _build_indexes(_DB)
+
+
+_init_db()
 
 
 def _db_key(game_crc: str, processor: str, address: str) -> str:
@@ -288,24 +326,15 @@ def entries_for_serial(serial: str) -> List[dict]:
 
     Each returned dict is an enriched copy of the DB entry with an additional
     ``key`` field containing the raw DB key (``CRC:PROC:ADDR``).
+
+    Backed by a pre-built index so the look-up is O(1) regardless of DB size.
     """
     serial_upper = serial.strip().upper()
     results: List[dict] = []
-    seen_keys: set = set()
-    for key, entry in _DB.items():
-        if key in seen_keys:
-            continue
-        # Preferred: explicit game_serial field
-        stored_serial = entry.get("game_serial", "")
-        if stored_serial and stored_serial.upper() == serial_upper:
+    for key in _IDX_SERIAL.get(serial_upper, []):
+        entry = _DB.get(key)
+        if entry is not None:
             results.append({"key": key, **entry})
-            seen_keys.add(key)
-            continue
-        # Fallback: serial embedded in the game name string
-        game = entry.get("game", "")
-        if serial_upper in game.upper():
-            results.append({"key": key, **entry})
-            seen_keys.add(key)
     return results
 
 
@@ -313,11 +342,14 @@ def entries_for_crc(game_crc: str) -> List[dict]:
     """Return all DB entries for a game identified by its CRC.
 
     Each returned dict includes the raw DB ``key`` plus all stored fields.
+
+    Backed by a pre-built index so the look-up is O(1) regardless of DB size.
     """
     crc_upper = game_crc.strip().upper()
     results: List[dict] = []
-    for key, entry in _DB.items():
-        if entry.get("game_crc", "").upper() == crc_upper:
+    for key in _IDX_CRC.get(crc_upper, []):
+        entry = _DB.get(key)
+        if entry is not None:
             results.append({"key": key, **entry})
     return results
 
@@ -383,21 +415,18 @@ def list_all_serials_in_db() -> List[Tuple[str, str]]:
     """Return a sorted list of ``(serial, game_title)`` pairs found in the DB.
 
     Used by the Code Builder game picker to populate its dropdown.
+
+    Backed by the pre-built serial index so this is O(unique-serials) instead
+    of O(all-entries).
     """
     seen: Dict[str, str] = {}
-    for entry in _DB.values():
-        serial = entry.get("game_serial", "")
+    for serial_upper, keys in _IDX_SERIAL.items():
+        if not keys:
+            continue
+        entry = _DB.get(keys[0], {})
         game = entry.get("game", "")
-        if not serial:
-            # Try to extract serial from embedded game string like "Title (SLUS-21028)"
-            import re as _re
-            m = _re.search(r'\((S[LC]US-\d{5}|SCES-\d{5}|SLES-\d{5}|SLPS-\d{5})\)', game)
-            if m:
-                serial = m.group(1)
-        if serial and serial not in seen:
-            # Strip the "(SERIAL)" suffix from the game title if present
-            title = game.split(" (")[0] if " (" in game else game
-            seen[serial] = title
+        title = game.split(" (")[0] if " (" in game else game
+        seen[serial_upper] = title
     return sorted(seen.items(), key=lambda x: x[1])
 
 
@@ -406,9 +435,13 @@ def list_all_serials_in_db() -> List[Tuple[str, str]]:
 # ---------------------------------------------------------------------------
 
 def reload_db() -> int:
-    """Reload the address database from disk.  Returns entry count."""
+    """Reload the address database from disk and rebuild look-up indexes.
+
+    Returns entry count.
+    """
     global _DB
     _DB = _load_db()
+    _build_indexes(_DB)
     return len(_DB)
 
 
@@ -481,8 +514,9 @@ def check_freecam_compatibility(game_crc: str) -> List[dict]:
     """
     crc = game_crc.upper()
     out: List[dict] = []
-    for key, entry in _DB.items():
-        if entry.get("game_crc", "").upper() != crc:
+    for key in _IDX_CRC.get(crc, []):
+        entry = _DB.get(key)
+        if entry is None:
             continue
         desc = entry.get("description", "").lower()
         if "freecam" not in desc:
@@ -559,8 +593,8 @@ def get_game_verification_summary(game_crc: str) -> dict:
     ``notes``                — human-readable summary string
     """
     crc = game_crc.strip().upper()
-    matching = [(key, entry) for key, entry in _DB.items()
-                if entry.get("game_crc", "").upper() == crc]
+    keys = _IDX_CRC.get(crc, [])
+    matching = [(key, _DB[key]) for key in keys if key in _DB]
 
     if not matching:
         return {
