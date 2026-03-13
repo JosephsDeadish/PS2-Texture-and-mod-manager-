@@ -32,11 +32,17 @@
     },
     ".hack//G.U. Vol.2: Reminisce": {
       "serial": "SLUS-21488",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "91A69524"
+      ]
     },
     ".hack//G.U. Vol.3: Redemption": {
       "serial": "SLUS-21489",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "D7D7A24B"
+      ]
     },
     ".hack//Infection": {
       "serial": "SLUS-20267",
@@ -48,11 +54,17 @@
     },
     ".hack//Mutation": {
       "serial": "SLUS-20562",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "7B48304C"
+      ]
     },
     ".hack//Outbreak": {
       "serial": "SLUS-20563",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "BF23E069"
+      ]
     },
     ".hack//Quarantine": {
       "serial": "SLUS-20564",
@@ -147,7 +159,10 @@
     },
     "Arc the Lad: End of Darkness": {
       "serial": "SLUS-21165",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E5BFDC18"
+      ]
     },
     "Arc the Lad: Twilight of the Spirits": {
       "serial": "SCUS-97231",
@@ -180,7 +195,10 @@
     },
     "Armored Core: Last Raven": {
       "serial": "SLUS-21338",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1EB1C9E4"
+      ]
     },
     "Armored Core: Nexus": {
       "serial": "SLUS-20986",
@@ -199,7 +217,10 @@
     },
     "Armored Core: Silent Line": {
       "serial": "SLUS-20644",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "B89C74F7"
+      ]
     },
     "Atelier Iris 2: The Azoth of Destiny": {
       "serial": "SLUS-21327",
@@ -247,7 +268,10 @@
     },
     "Baroque": {
       "serial": "SLUS-21714",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "B74F3108"
+      ]
     },
     "Beyond Good & Evil": {
       "serial": "SLUS-20763",
@@ -260,6 +284,9 @@
       "serial": "SLUS-21376",
       "alt_serials": [
         "SLES-53886"
+      ],
+      "crcs": [
+        "F0A235B4"
       ]
     },
     "Blood Omen 2: Legacy of Kain": {
@@ -396,12 +423,18 @@
     },
     "Champions: Return to Arms": {
       "serial": "SLUS-20973",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "4F44BCDE"
+      ]
     },
     "Clock Tower 3": {
       "serial": "SLUS-20633",
       "alt_serials": [
         "SLES-51619"
+      ],
+      "crcs": [
+        "5B3DB264"
       ]
     },
     "Contra: Shattered Soldier": {
@@ -426,7 +459,10 @@
     },
     "Crash Bandicoot: Wrath of Cortex": {
       "serial": "SLUS-20238",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "D764DFC1"
+      ]
     },
     "Crash Nitro Kart": {
       "serial": "SLUS-20649",
@@ -530,7 +566,10 @@
     },
     "Destroy All Humans! 2": {
       "serial": "SLUS-21439",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "D72B4CD3"
+      ]
     },
     "Devil May Cry": {
       "serial": "SLUS-20216",
@@ -567,7 +606,11 @@
     },
     "Devil May Cry 2 (alt serial)": {
       "serial": "SLUS-20627",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1B14C0AC",
+        "A71E7805"
+      ]
     },
     "Devil May Cry 3": {
       "serial": "SLUS-20964",
@@ -603,11 +646,17 @@
     },
     "Devil Summoner 2: Raidou Kuzunoha vs. King Abaddon": {
       "serial": "SLUS-21845",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "27B6C6B1"
+      ]
     },
     "Devil Summoner: Raidou Kuzunoha vs. The Soulless Army": {
       "serial": "SLUS-21431",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "25EF6B94"
+      ]
     },
     "Digital Devil Saga": {
       "serial": "SLUS-20974",
@@ -702,7 +751,10 @@
     },
     "Dragon Ball Z: Infinite World": {
       "serial": "SLUS-21842",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "A0C1D89E"
+      ]
     },
     "Dragon Ball Z: Sagas": {
       "serial": "SLUS-20874",
@@ -713,11 +765,19 @@
     },
     "Dragon Quest VIII": {
       "serial": "SLUS-21207",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "F53B6210",
+        "DA0F1E34"
+      ]
     },
     "Dragon Quest VIII (post-game save)": {
       "serial": "SLUS-21207",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "F53B6210",
+        "DA0F1E34"
+      ]
     },
     "Dragon Quest VIII: Journey of the Cursed King": {
       "serial": "SLUS-21207",
@@ -739,7 +799,10 @@
     },
     "Drakengard": {
       "serial": "SLUS-20732",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "9F943FDD"
+      ]
     },
     "Drakengard 2": {
       "serial": "SLUS-21373",
@@ -772,11 +835,17 @@
     },
     "Eragon": {
       "serial": "SLUS-21322",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E9E0A33C"
+      ]
     },
     "Eternal Poison": {
       "serial": "SLUS-21779",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "16093F5E"
+      ]
     },
     "Fahrenheit / Indigo Prophecy": {
       "serial": "SLUS-21196",
@@ -894,7 +963,10 @@
     },
     "Front Mission 4": {
       "serial": "SLUS-20888",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "5F5DEAE6"
+      ]
     },
     "Front Mission 5: Scars of the War": {
       "serial": "SLPM-66205",
@@ -980,7 +1052,11 @@
     },
     "Gradius V": {
       "serial": "SLUS-20712",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "FBBA1C3B",
+        "58B9B9DC"
+      ]
     },
     "Gran Turismo 3: A-Spec": {
       "serial": "SCUS-97102",
@@ -1079,11 +1155,17 @@
       "serial": "SLUS-21334",
       "alt_serials": [
         "SLPM-65976"
+      ],
+      "crcs": [
+        "07DADC7E"
       ]
     },
     "Grandia III (alt serial)": {
       "serial": "SLUS-21334",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "07DADC7E"
+      ]
     },
     "Grandia Xtreme": {
       "serial": "SLUS-20417",
@@ -1091,7 +1173,10 @@
     },
     "GrimGrimoire": {
       "serial": "SLUS-21604",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "2B6FD6B7"
+      ]
     },
     "Growlanser Generations": {
       "serial": "SLUS-20758",
@@ -1102,7 +1187,10 @@
     },
     "Growlanser: Heritage of War": {
       "serial": "SLUS-21571",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "47BDB9D4"
+      ]
     },
     "Guilty Gear X": {
       "serial": "SLUS-20287",
@@ -1113,11 +1201,17 @@
     },
     "Guilty Gear X2: #Reload": {
       "serial": "SLUS-20436",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "9BC6CE0E"
+      ]
     },
     "Guilty Gear X2: The Midnight Carnival": {
       "serial": "SLUS-20436",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "9BC6CE0E"
+      ]
     },
     "Guilty Gear XX Accent Core": {
       "serial": "SLUS-21652",
@@ -1181,11 +1275,17 @@
     },
     "Hitman 2: Silent Assassin": {
       "serial": "SLUS-20374",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "9E0B6994"
+      ]
     },
     "Hitman: Blood Money": {
       "serial": "SLUS-21108",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1A2C85E7"
+      ]
     },
     "Hitman: Contracts": {
       "serial": "SLUS-20882",
@@ -1233,7 +1333,10 @@
     },
     "Indigo Prophecy": {
       "serial": "SLUS-21196",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "7EEF0BF5"
+      ]
     },
     "Jak 3": {
       "serial": "SCUS-97330",
@@ -1344,7 +1447,12 @@
     },
     "Kingdom Hearts: Chain of Memories (Re:CoM)": {
       "serial": "SLUS-21799",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "8E9C0D58",
+        "94A82AAA",
+        "FCD6E9FA"
+      ]
     },
     "Kingdom Hearts: Re:Chain of Memories": {
       "serial": "SLUS-21799",
@@ -1388,7 +1496,10 @@
     },
     "Legacy of Kain: Defiance": {
       "serial": "SLUS-20773",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "FAF8A84A"
+      ]
     },
     "Legacy of Kain: Soul Reaver 2": {
       "serial": "SLUS-20165",
@@ -1422,7 +1533,10 @@
     },
     "Magna Carta: Tears of Blood": {
       "serial": "SLUS-21221",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "C2272B2B"
+      ]
     },
     "Makai Kingdom: Chronicles of the Sacred Tome": {
       "serial": "SLUS-21170",
@@ -1457,7 +1571,10 @@
     },
     "Manhunt 2": {
       "serial": "SLUS-21613",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "7C0D1E42"
+      ]
     },
     "Marvel vs. Capcom 2": {
       "serial": "SLUS-20486",
@@ -1478,7 +1595,10 @@
     },
     "Maximo: Ghosts to Glory": {
       "serial": "SLUS-20017",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E04B5B2A"
+      ]
     },
     "Medal of Honor: European Assault": {
       "serial": "SLUS-21199",
@@ -1497,11 +1617,17 @@
     },
     "Mega Man X Collection": {
       "serial": "SLUS-21370",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "D3E1EE08"
+      ]
     },
     "Mega Man X7": {
       "serial": "SLUS-20487",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "6F536DEA"
+      ]
     },
     "Mega Man X8": {
       "serial": "SLUS-20960",
@@ -1541,7 +1667,12 @@
     },
     "Metal Gear Solid 3": {
       "serial": "SLUS-20915",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "015FC3F6",
+        "7C55F671",
+        "A76CBAA4"
+      ]
     },
     "Metal Gear Solid 3: Snake Eater": {
       "serial": "SLUS-20915",
@@ -1628,7 +1759,11 @@
     },
     "Mortal Kombat: Deception": {
       "serial": "SLUS-20881",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "79E17EE2",
+        "C7C09A27"
+      ]
     },
     "NBA Street Vol. 2": {
       "serial": "SLUS-20651",
@@ -1664,15 +1799,24 @@
     },
     "Naruto: Ultimate Ninja 5": {
       "serial": "SLUS-21358",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "C8276ADE"
+      ]
     },
     "Need for Speed Carbon": {
       "serial": "SLUS-21493",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "78F0DF7B"
+      ]
     },
     "Need for Speed Underground": {
       "serial": "SLUS-20811",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "F2ADBD41"
+      ]
     },
     "Need for Speed Underground 2": {
       "serial": "SLUS-21065",
@@ -1852,7 +1996,11 @@
     },
     "Prince of Persia: Warrior Within": {
       "serial": "SLUS-21022",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E94B4EA3",
+        "4FC3FFF2"
+      ]
     },
     "Psi-Ops: The Mindgate Conspiracy": {
       "serial": "SLUS-20688",
@@ -1985,7 +2133,10 @@
     },
     "Resident Evil Outbreak": {
       "serial": "SLUS-20765",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "4EEE8A2A"
+      ]
     },
     "Resident Evil Outbreak File #2": {
       "serial": "SLUS-20984",
@@ -2006,7 +2157,10 @@
     },
     "Resident Evil: Dead Aim": {
       "serial": "SLUS-20669",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "7DFC5C6B"
+      ]
     },
     "Resident Evil: Outbreak": {
       "serial": "SLUS-20765",
@@ -2024,7 +2178,11 @@
     },
     "Ridge Racer V": {
       "serial": "SLUS-20002",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1F2C2BCE",
+        "5D498EE4"
+      ]
     },
     "Ring of Red": {
       "serial": "SLUS-20145",
@@ -2051,7 +2209,10 @@
     },
     "Rygar: The Legendary Adventure": {
       "serial": "SLUS-20471",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E5F79AC1"
+      ]
     },
     "SOCOM 3: U.S. Navy SEALs": {
       "serial": "SCUS-97474",
@@ -2074,11 +2235,17 @@
     },
     "SSX 3": {
       "serial": "SLUS-20772",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1491EFCC"
+      ]
     },
     "SSX On Tour": {
       "serial": "SLUS-21278",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1BD2B2FE"
+      ]
     },
     "SSX Tricky": {
       "serial": "SLUS-20326",
@@ -2124,7 +2291,10 @@
     },
     "Shadow Hearts: From the New World": {
       "serial": "SLUS-21326",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "5CD3055C"
+      ]
     },
     "Shadow of Rome": {
       "serial": "SLUS-20902",
@@ -2145,11 +2315,18 @@
     },
     "Shadow the Hedgehog": {
       "serial": "SLUS-21261",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "A7B86483"
+      ]
     },
     "Shin Megami Tensei: Digital Devil Saga": {
       "serial": "SLUS-20974",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "4C7BBDC5",
+        "7B4F6E5A"
+      ]
     },
     "Shin Megami Tensei: Digital Devil Saga 2": {
       "serial": "SLUS-21152",
@@ -2286,7 +2463,10 @@
     },
     "Soul Nomad and the World Eaters": {
       "serial": "SLUS-21603",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "DFC7A0A8"
+      ]
     },
     "SoulCalibur II": {
       "serial": "SLUS-20643",
@@ -2374,23 +2554,38 @@
     },
     "Star Wars Battlefront": {
       "serial": "SLUS-20898",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "F9E4F5C1"
+      ]
     },
     "Star Wars Battlefront II": {
       "serial": "SLUS-21240",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "0F900EAA"
+      ]
     },
     "Star Wars Battlefront II (all unlocked)": {
       "serial": "SLUS-21240",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "0F900EAA"
+      ]
     },
     "Star Wars: Battlefront": {
       "serial": "SLUS-20898",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "F9E4F5C1"
+      ]
     },
     "Star Wars: Battlefront II": {
       "serial": "SLUS-21240",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "0F900EAA"
+      ]
     },
     "Steambot Chronicles": {
       "serial": "SLUS-21344",
@@ -2507,11 +2702,18 @@
     },
     "Tekken: Tag Tournament": {
       "serial": "SLUS-20001",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "1FCFDC7B",
+        "64C7E58B"
+      ]
     },
     "Tenchu: Fatal Shadows": {
       "serial": "SLUS-21129",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "CCD8A19C"
+      ]
     },
     "Tenchu: Wrath of Heaven": {
       "serial": "SLUS-20397",
@@ -2750,7 +2952,10 @@
     },
     "WWE SmackDown! Here Comes the Pain": {
       "serial": "SLUS-20787",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "77ADDA5D"
+      ]
     },
     "WWE SmackDown! Shut Your Mouth": {
       "serial": "SLUS-20483",
@@ -2769,7 +2974,10 @@
     },
     "WWE SmackDown! vs. RAW 2006": {
       "serial": "SLUS-21286",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "DCC36E4C"
+      ]
     },
     "War of the Monsters": {
       "serial": "SCUS-97197",
@@ -2794,7 +3002,11 @@
     },
     "Wild ARMs 3": {
       "serial": "SCUS-97203",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "A53C9EC5",
+        "B5B09F5D"
+      ]
     },
     "Wild ARMs 4": {
       "serial": "SLUS-21292",
@@ -2806,7 +3018,10 @@
     },
     "Wild ARMs 5": {
       "serial": "SLUS-21615",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "ADFCC5A1"
+      ]
     },
     "Wild Arms 3": {
       "serial": "SCUS-97203",
@@ -2827,7 +3042,10 @@
     },
     "Wild Arms 5": {
       "serial": "SLUS-21615",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "ADFCC5A1"
+      ]
     },
     "Wild Arms: Alter Code F": {
       "serial": "SLUS-20937",
@@ -5440,11 +5658,17 @@
     },
     "Airforce Delta Strike": {
       "serial": "SLUS-20703",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "B55F4D5D"
+      ]
     },
     "Aggressive Inline": {
       "serial": "SLUS-20327",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "BAFF7A27"
+      ]
     },
     "Knockout Kings 2002": {
       "serial": "SLUS-20369",
@@ -5468,15 +5692,24 @@
     },
     "Wheel of Fortune": {
       "serial": "SLUS-20790",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "E32DCF24"
+      ]
     },
     "Worms 3D": {
       "serial": "SLUS-20894",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "2B3CF29C"
+      ]
     },
     "Sonic Mega Collection Plus": {
       "serial": "SLUS-20917",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "4DC37ADA"
+      ]
     },
     "Heroes of the Pacific": {
       "serial": "SLUS-20943",
@@ -5484,7 +5717,10 @@
     },
     "State of Emergency 2": {
       "serial": "SLUS-20966",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "DA4C1E8E"
+      ]
     },
     "Outlaw Tennis": {
       "serial": "SLUS-21190",
@@ -5492,7 +5728,10 @@
     },
     "Aeon Flux": {
       "serial": "SLUS-21205",
-      "alt_serials": []
+      "alt_serials": [],
+      "crcs": [
+        "FA37A58A"
+      ]
     },
     "MLB Slugfest 2006": {
       "serial": "SLUS-21342",

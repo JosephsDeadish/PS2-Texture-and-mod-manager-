@@ -13501,5 +13501,77 @@
     ],
     "download_action": "cover_by_id",
     "upscale_tech": ""
+  },
+  {
+    "id": "gametdb_grimgrimoire_slus21604",
+    "name": "GrimGrimoire — Cover Art",
+    "description": "PS2 cover art for GrimGrimoire (SLUS-21604). Available on GameTDB.com using the game serial as the lookup key.",
+    "context": "Use GameTDB to download cover art for this game. The serial SLUS-21604 can be used to look up the cover.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-21604",
+    "type": "cover_art",
+    "game_serial": "SLUS-21604",
+    "source": "GameTDB",
+    "game": "GrimGrimoire",
+    "thumbnail_url": "https://www.gametdb.com/favicon.ico",
+    "tags": [
+      "grimgrimoire",
+      "strategy",
+      "rpg",
+      "cover"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "gametdb_eternal_ring_slus20015",
+    "name": "Eternal Ring — Cover Art",
+    "description": "PS2 cover art for Eternal Ring (SLUS-20015). Available on GameTDB.com using the game serial as the lookup key.",
+    "context": "Use GameTDB to download cover art for this game. The serial SLUS-20015 can be used to look up the cover.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20015",
+    "type": "cover_art",
+    "game_serial": "SLUS-20015",
+    "source": "GameTDB",
+    "game": "Eternal Ring",
+    "thumbnail_url": "https://www.gametdb.com/favicon.ico",
+    "tags": [
+      "eternal-ring",
+      "rpg",
+      "from-software",
+      "cover"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
+  },
+  {
+    "id": "gametdb_evergrace_slus20016",
+    "name": "Evergrace — Cover Art",
+    "description": "PS2 cover art for Evergrace (SLUS-20016). Available on GameTDB.com using the game serial as the lookup key.",
+    "context": "Use GameTDB to download cover art for this game. The serial SLUS-20016 can be used to look up the cover.",
+    "author": "GameTDB",
+    "author_url": "https://www.gametdb.com",
+    "is_hub": false,
+    "nsfw": false,
+    "url": "https://www.gametdb.com/PS2/SLUS-20016",
+    "type": "cover_art",
+    "game_serial": "SLUS-20016",
+    "source": "GameTDB",
+    "game": "Evergrace",
+    "thumbnail_url": "https://www.gametdb.com/favicon.ico",
+    "tags": [
+      "evergrace",
+      "rpg",
+      "from-software",
+      "cover"
+    ],
+    "download_action": "cover_by_id",
+    "upscale_tech": ""
   }
 ]

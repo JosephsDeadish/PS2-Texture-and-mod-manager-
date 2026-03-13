@@ -7999,13 +7999,13 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.assertGreater(len(info.crcs), 0)
 
     def test_games_with_crcs_count_over_200(self):
-        """At least 200 games in the serial DB must have CRC entries."""
+        """At least 700 games in the serial DB must have CRC entries (Wave 40)."""
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 200,
-                           f"Expected >200 games with CRCs, got {count}")
+        self.assertGreater(count, 700,
+                           f"Expected >700 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8059,13 +8059,13 @@ class TestCheatsCatalogue(unittest.TestCase):
             self.cheats = json.load(f)
 
     def test_cheats_catalogue_has_over_100_entries(self):
-        """After Wave 38 expansion, cheats.json should have > 100 entries."""
-        self.assertGreater(len(self.cheats), 100)
+        """After Wave 40 expansion, cheats.json should have > 600 entries."""
+        self.assertGreater(len(self.cheats), 600)
 
     def test_cheats_catalogue_has_game_specific_entries(self):
-        """At least 80 entries should have a non-empty game_serial."""
+        """At least 600 entries should have a non-empty game_serial."""
         with_serial = [e for e in self.cheats if e.get("game_serial")]
-        self.assertGreater(len(with_serial), 80,
+        self.assertGreater(len(with_serial), 600,
                            f"Only {len(with_serial)} entries have a game_serial")
 
     def test_cheats_catalogue_kingdom_hearts_present(self):
