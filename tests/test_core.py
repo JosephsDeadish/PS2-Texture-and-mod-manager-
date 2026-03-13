@@ -8323,3 +8323,88 @@ class TestLinkChecker(unittest.TestCase):
         # No files → 0 issues, 0 catalogues checked
         self.assertEqual(report["total_issues"], 0)
         self.assertEqual(report["catalogues_checked"], [])
+
+
+class TestWave43MetadataEnrichment(unittest.TestCase):
+    """Wave 43: serial DB enriched with release_date, developer, publisher, genre."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_wave43_games_with_release_date_over_1700(self):
+        """Wave 43: at least 1700 games should have a release_date."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).release_date
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with release_date, got {count}")
+
+    def test_wave43_games_with_developer_over_1700(self):
+        """Wave 43: at least 1700 games should have a developer."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).developer
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with developer, got {count}")
+
+    def test_wave43_games_with_genre_over_1700(self):
+        """Wave 43: at least 1700 games should have a genre."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).genre
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with genre, got {count}")
+
+    def test_wave43_kingdom_hearts_metadata(self):
+        """Kingdom Hearts should have correct release_date, developer, publisher."""
+        info = self.sdb.get_info("Kingdom Hearts")
+        self.assertIsNotNone(info, "Kingdom Hearts missing from serial DB")
+        self.assertIsNotNone(info.release_date, "Kingdom Hearts missing release_date")
+        self.assertIsNotNone(info.developer, "Kingdom Hearts missing developer")
+        self.assertIsNotNone(info.publisher, "Kingdom Hearts missing publisher")
+
+    def test_wave43_god_of_war_metadata(self):
+        """God of War should have developer and genre populated."""
+        info = self.sdb.get_info("God of War")
+        self.assertIsNotNone(info, "God of War missing from serial DB")
+        self.assertIsNotNone(info.developer, "God of War missing developer")
+        self.assertIsNotNone(info.genre, "God of War missing genre")
+
+    def test_wave43_metadata_fields_are_strings(self):
+        """All populated metadata fields should be non-empty strings (not lists)."""
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            if info is None:
+                continue
+            with self.subTest(title=title):
+                for field_name in ("release_date", "developer", "publisher", "genre"):
+                    val = getattr(info, field_name)
+                    if val is not None:
+                        self.assertIsInstance(
+                            val, str,
+                            f"'{title}'.{field_name} should be str, got {type(val)}"
+                        )
+                        self.assertGreater(
+                            len(val), 0,
+                            f"'{title}'.{field_name} should be non-empty"
+                        )
+
+    def test_wave43_gameinfo_metadata_fields_exist(self):
+        """GameInfo dataclass must expose release_date, developer, publisher, genre."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(
+            title="Test",
+            serial="SLUS-00000",
+            release_date="2001-01-01",
+            developer="Test Dev",
+            publisher="Test Pub",
+            genre="Action",
+        )
+        self.assertEqual(gi.release_date, "2001-01-01")
+        self.assertEqual(gi.developer, "Test Dev")
+        self.assertEqual(gi.publisher, "Test Pub")
+        self.assertEqual(gi.genre, "Action")

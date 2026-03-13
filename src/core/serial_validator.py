@@ -53,6 +53,14 @@ class GameInfo:
     serial: str
     alt_serials: List[str] = field(default_factory=list)
     crcs: List[str] = field(default_factory=list)
+    # Optional metadata sourced from PS2.data.json (NTSC-U region entries).
+    # release_date: ISO-8601 date string (e.g. "2001-07-09" or "2001").
+    # developer / publisher: studio name (comma-joined when multiple).
+    # genre: genre label (comma-joined when multiple).
+    release_date: Optional[str] = None
+    developer: Optional[str] = None
+    publisher: Optional[str] = None
+    genre: Optional[str] = None
 
     def all_serials(self) -> Set[str]:
         """Return the primary serial plus all known alt serials."""
@@ -117,6 +125,10 @@ class SerialDatabase:
                 serial=info.get("serial", ""),
                 alt_serials=info.get("alt_serials", []),
                 crcs=info.get("crcs", []),
+                release_date=info.get("release_date") or None,
+                developer=info.get("developer") or None,
+                publisher=info.get("publisher") or None,
+                genre=info.get("genre") or None,
             )
             self._games[title] = gi
             for s in gi.all_serials():
