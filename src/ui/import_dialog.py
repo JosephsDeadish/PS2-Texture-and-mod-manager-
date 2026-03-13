@@ -539,20 +539,28 @@ class EditModDialog(QDialog):
         self._dialog_closed = False
 
         import threading
+        import weakref
+        from PyQt6.QtCore import QTimer
         from src.core.downloader import fetch_gametdb_art
         import src.core.config_manager as _cfg
 
+        self_ref = weakref.ref(self)
+
         def _run():
             path = fetch_gametdb_art(game_id, str(_cfg.THUMBNAILS_DIR))
-            # Only update UI if the dialog is still open
-            if not getattr(self, "_dialog_closed", True):
+
+            def _update():
+                dlg = self_ref()
+                if dlg is None or getattr(dlg, "_dialog_closed", True):
+                    return
                 if path:
-                    self._thumb_status_lbl.setText(f"✅ Saved: {path}")
-                    # Store for later use
-                    self._fetched_thumbnail = path
+                    dlg._thumb_status_lbl.setText(f"✅ Saved: {path}")
+                    dlg._fetched_thumbnail = path
                 else:
-                    self._thumb_status_lbl.setText("❌ Not found on GameTDB")
-                self._fetch_thumb_btn.setEnabled(True)
+                    dlg._thumb_status_lbl.setText("❌ Not found on GameTDB")
+                dlg._fetch_thumb_btn.setEnabled(True)
+
+            QTimer.singleShot(0, _update)
 
         self._fetched_thumbnail = ""
         threading.Thread(target=_run, daemon=True).start()

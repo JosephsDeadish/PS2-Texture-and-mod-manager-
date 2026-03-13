@@ -92,6 +92,7 @@ _OPTIONAL_DEFAULTS: Dict[str, object] = {
     "is_free":            True,
     "requires_account":   False,
     "is_complete":        True,
+    "size_label":         "",
 }
 
 

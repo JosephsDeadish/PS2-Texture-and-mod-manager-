@@ -38,6 +38,8 @@ a = Analysis(
         ('assets',     'assets'),
         # Bundle the src package
         ('src',        'src'),
+        # Bundle the data directory (catalogue JSON files, PNACH DB)
+        ('data',       'data'),
     ],
     hiddenimports=[
         # PyQt6 modules that may not be auto-detected
