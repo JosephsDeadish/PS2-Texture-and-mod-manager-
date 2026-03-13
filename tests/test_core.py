@@ -4166,8 +4166,8 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Basic load ──────────────────────────────────────────────────────────
 
     def test_loads_more_than_150_entries(self):
-        self.assertGreater(len(self.catalogue), 850,
-                           "catalogue should have >850 entries after scaling")
+        self.assertGreater(len(self.catalogue), 3000,
+                           "catalogue should have >3000 entries after Wave 40 bulk expansion")
 
     def test_no_duplicate_ids(self):
         ids = [e["id"] for e in self.catalogue]
@@ -4238,7 +4238,7 @@ class TestCatalogueLoader(unittest.TestCase):
     def test_has_pnach_entries(self):
         from src.models.mod import ModType
         pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
-        self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
+        self.assertGreater(len(pn), 1000, "Expected >1000 PNACH entries after Wave 40 bulk expansion")
 
     def test_has_save_file_entries(self):
         from src.models.mod import ModType
