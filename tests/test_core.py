@@ -2030,10 +2030,10 @@ class TestAppConfigFieldChanges(unittest.TestCase):
     # -- New browse-filter preference fields ---------------------------------
 
     def test_browse_filter_defaults(self):
-        """show_paid defaults to False; show_account_required and show_incomplete to True."""
+        """show_paid and show_account_required default to False; show_incomplete to True."""
         cfg = AppConfig()
         self.assertFalse(cfg.show_paid)
-        self.assertTrue(cfg.show_account_required)
+        self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
 
     def test_browse_filter_fields_in_to_dict(self):
@@ -2059,7 +2059,7 @@ class TestAppConfigFieldChanges(unittest.TestCase):
                "first_run": False, "favorite_authors": [], "show_nsfw": False}
         cfg = AppConfig.from_dict(old)
         self.assertFalse(cfg.show_paid)
-        self.assertTrue(cfg.show_account_required)
+        self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
 
 

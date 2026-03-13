@@ -92,6 +92,16 @@ def _entry_is_complete(entry: dict) -> bool:
     Defaults to True — only explicitly False for incomplete or partial-coverage packs."""
     return bool(entry.get("is_complete", True))
 
+
+# Human-readable labels for each ModType in catalogue cards
+_TYPE_LABELS = {
+    ModType.TEXTURE_PACK: "Texture Pack",
+    ModType.PNACH: "PNACH Patch",
+    ModType.COVER_ART: "Cover Art",
+    ModType.SAVE_FILE: "Game Save",
+    ModType.CHEAT: "Cheat",
+}
+
 # ---------------------------------------------------------------------------
 # Catalogue card widget
 # ---------------------------------------------------------------------------
@@ -177,7 +187,8 @@ class CatalogueCard(QFrame):
         # Header row: type badge + source badge + status badges
         header = QHBoxLayout()
 
-        type_lbl = QLabel(self.entry["type"].value.replace("_", " ").title())
+        _entry_type_label = _TYPE_LABELS.get(self.entry["type"], self.entry["type"].value.replace("_", " ").title())
+        type_lbl = QLabel(_entry_type_label)
         type_lbl.setStyleSheet(
             "background:#0f3460; color:#80b0ff; border-radius:9px;"
             "padding: 2px 8px; font-size:11px;"
@@ -914,8 +925,7 @@ class DownloadInstallDialog(QDialog):
             "Supported: HTTPS links to ZIP, 7z, RAR, PNACH, PNG, Google Drive, "
             "<span style='color:#60b0e0;'>MediaFire</span> (auto-resolved).<br>"
             "<span style='color:#a0c070;'>RAR files</span> are extracted automatically "
-            "if the <code>rarfile</code> package and <code>unrar</code> tool are installed "
-            "(run: <code>pip install rarfile</code>).<br>"
+            "(requires the <code>unrar</code> command-line tool on your system PATH).<br>"
             "MEGA links must be downloaded manually.<br>"
             "<span style='color:#a08040;'>🔒 Patreon attachments:</span> "
             "log in to Patreon, open the post, download <b>all parts</b> to the same "
@@ -1682,7 +1692,7 @@ class _CatalogueTabContent(QWidget):
         self._show_favs_only = False
         self._show_nsfw = False
         self._show_paid = False
-        self._show_account_required = True
+        self._show_account_required = False
         self._show_incomplete = True
 
         # Pagination state – updated by _populate / _append_cards
@@ -1701,10 +1711,11 @@ class _CatalogueTabContent(QWidget):
         self._cards_layout.setSpacing(14)
         self._scroll.setWidget(self._cards_container)
         layout.addWidget(self._scroll, 1)
-        # Populate with NSFW and paid content hidden by default
+        # Populate with NSFW, paid, and account-required content hidden by default
         initial = [
             e for e in entries
             if not e.get("nsfw", False) and _entry_is_free(e)
+            and not _entry_requires_account(e)
         ]
         self._populate(initial)
 
@@ -1712,7 +1723,7 @@ class _CatalogueTabContent(QWidget):
                       author: str = "", favs_only: bool = False,
                       show_nsfw: bool = False,
                       show_paid: bool = False,
-                      show_account_required: bool = True,
+                      show_account_required: bool = False,
                       show_incomplete: bool = True):
         self._current_query = query
         self._current_source = source
@@ -1863,7 +1874,7 @@ class BrowsePanel(BasePanel):
     def _build(self):
         content = self._content_layout
 
-        # ── Search + download toolbar ────────────────────────────────────
+        # ── Row 1: Search bar + primary actions ─────────────────────────
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
 
@@ -1882,23 +1893,6 @@ class BrowsePanel(BasePanel):
         dl_btn.clicked.connect(self._open_download_dialog)
         toolbar.addWidget(dl_btn)
 
-        pnach_btn = QPushButton("🔧 Fetch PNACH from GitHub")
-        pnach_btn.setToolTip(
-            "Browse and download official PCSX2 widescreen PNACH patches "
-            "directly from the PCSX2 GitHub repository"
-        )
-        pnach_btn.clicked.connect(self._open_pnach_github_dialog)
-        toolbar.addWidget(pnach_btn)
-
-        gbatemp_btn = QPushButton("🔍 Scan GBAtemp/PS2-Home Post")
-        gbatemp_btn.setToolTip(
-            "Paste a GBAtemp thread, GBAtemp Downloads page, or PS2-Home forum topic URL "
-            "to auto-discover the author, game serial, and all download links "
-            "for one-click in-app installation"
-        )
-        gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
-        toolbar.addWidget(gbatemp_btn)
-
         cover_art_btn = QPushButton("🖼 Cover Art")
         cover_art_btn.setToolTip(
             "Download PS2 cover art from GameTDB.\n"
@@ -1908,13 +1902,41 @@ class BrowsePanel(BasePanel):
         cover_art_btn.clicked.connect(self._open_cover_art_dialog)
         toolbar.addWidget(cover_art_btn)
 
+        reload_btn = QPushButton("🔄 Reload")
+        reload_btn.setToolTip("Clear all filters and reload the catalogue")
+        reload_btn.clicked.connect(self._reload_catalogue)
+        toolbar.addWidget(reload_btn)
+
+        content.addLayout(toolbar)
+
+        # ── Row 2: Utility tools (secondary actions) ────────────────────
+        tools_row = QHBoxLayout()
+        tools_row.setSpacing(6)
+
+        pnach_btn = QPushButton("🔧 Fetch PNACH (GitHub)")
+        pnach_btn.setToolTip(
+            "Browse and download official PCSX2 widescreen PNACH patches "
+            "directly from the PCSX2 GitHub repository"
+        )
+        pnach_btn.clicked.connect(self._open_pnach_github_dialog)
+        tools_row.addWidget(pnach_btn)
+
+        gbatemp_btn = QPushButton("🔍 Scan Forum Post")
+        gbatemp_btn.setToolTip(
+            "Paste a GBAtemp thread, GBAtemp Downloads page, or PS2-Home forum topic URL "
+            "to auto-discover the author, game serial, and all download links "
+            "for one-click in-app installation"
+        )
+        gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
+        tools_row.addWidget(gbatemp_btn)
+
         scan_btn = QPushButton("🔍 Scan PCSX2 Folder")
         scan_btn.setToolTip(
             "Scan your PCSX2 directory for texture packs, PNACH files, and cover art\n"
             "that were installed outside of PS2 Mod Manager so you can manage them here"
         )
         scan_btn.clicked.connect(self._open_installed_scanner)
-        toolbar.addWidget(scan_btn)
+        tools_row.addWidget(scan_btn)
 
         create_card_btn = QPushButton("✏ New Custom Card")
         create_card_btn.setToolTip(
@@ -1922,9 +1944,9 @@ class BrowsePanel(BasePanel):
             "Cards are saved to your personal user_catalogue/ folder."
         )
         create_card_btn.clicked.connect(self._open_custom_card_dialog)
-        toolbar.addWidget(create_card_btn)
+        tools_row.addWidget(create_card_btn)
 
-        conflict_btn = QPushButton("⚠ Resolve Conflicts")
+        conflict_btn = QPushButton("⚠ Conflicts")
         conflict_btn.setToolTip(
             "Scan your installed PCSX2 content for conflicts:\n"
             "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
@@ -1933,9 +1955,9 @@ class BrowsePanel(BasePanel):
             "• Merged texture packs that may override each other"
         )
         conflict_btn.clicked.connect(self._open_conflict_resolver)
-        toolbar.addWidget(conflict_btn)
+        tools_row.addWidget(conflict_btn)
 
-        backup_btn = QPushButton("💾 Backup / Restore")
+        backup_btn = QPushButton("💾 Backup")
         backup_btn.setToolTip(
             "Create, browse and restore ZIP backups of your PCSX2 managed content:\n"
             "• PNACH cheat files\n"
@@ -1943,7 +1965,7 @@ class BrowsePanel(BasePanel):
             "• Texture packs"
         )
         backup_btn.clicked.connect(self._open_backup_manager)
-        toolbar.addWidget(backup_btn)
+        tools_row.addWidget(backup_btn)
 
         history_btn = QPushButton("📋 History")
         history_btn.setToolTip(
@@ -1953,7 +1975,7 @@ class BrowsePanel(BasePanel):
             "• Export the log as a CSV file"
         )
         history_btn.clicked.connect(self._open_download_history)
-        toolbar.addWidget(history_btn)
+        tools_row.addWidget(history_btn)
 
         notes_btn = QPushButton("📝 Notes")
         notes_btn.setToolTip(
@@ -1963,14 +1985,10 @@ class BrowsePanel(BasePanel):
             "• Export all notes to a CSV file"
         )
         notes_btn.clicked.connect(self._open_mod_notes)
-        toolbar.addWidget(notes_btn)
+        tools_row.addWidget(notes_btn)
 
-        reload_btn = QPushButton("🔄 Reload")
-        reload_btn.setToolTip("Clear all filters and reload the catalogue")
-        reload_btn.clicked.connect(self._reload_catalogue)
-        toolbar.addWidget(reload_btn)
-
-        content.addLayout(toolbar)
+        tools_row.addStretch()
+        content.addLayout(tools_row)
 
         # ── Filter row ───────────────────────────────────────────────────
         filter_row = QHBoxLayout()
@@ -2036,7 +2054,7 @@ class BrowsePanel(BasePanel):
 
         # Account-required toggle
         self._acct_check = QCheckBox("🔐 Show Account-Required")
-        self._acct_check.setChecked(getattr(self.config, "show_account_required", True))
+        self._acct_check.setChecked(getattr(self.config, "show_account_required", False))
         self._acct_check.setStyleSheet("color: #60a8e0; font-size: 12px;")
         self._acct_check.setToolTip(
             "Some sources (GBAtemp, LoversLab, Patreon, PCSX2 Forums, Discord) \n"
@@ -2293,8 +2311,9 @@ class BrowsePanel(BasePanel):
     def _install_catalogue_entry(self, entry: dict):
         """Open the Download & Install dialog pre-filled from a catalogue entry."""
         dlg = DownloadInstallDialog(self.config, self._db, self)
-        # Pre-fill from catalogue metadata
-        dlg._url_edit.setText(entry.get("direct_download_url", ""))
+        # Pre-fill URL: use direct_download_url if available, otherwise leave blank
+        direct_url = entry.get("direct_download_url", "")
+        dlg._url_edit.setText(direct_url)
         dlg._name_edit.setText(entry.get("name", ""))
         dlg._author_edit.setText(entry.get("author", ""))
         dlg._game_edit.setText(entry.get("game", ""))
@@ -2308,7 +2327,19 @@ class BrowsePanel(BasePanel):
                 if dlg._type_combo.itemData(i) == mod_type:
                     dlg._type_combo.setCurrentIndex(i)
                     break
+        # When there is no direct download URL, hint the user to visit the source
+        if not direct_url:
+            source_page = entry.get("url", "")
+            hint = (
+                "ℹ  No automatic download link is available for this entry.\n"
+                "Please visit the source page to get the direct download URL,\n"
+                "then paste it into the URL field above."
+            )
+            if source_page:
+                hint += f"\n\nSource page: {source_page}"
+            dlg._status.setText(hint)
         dlg.exec()
+
 
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)

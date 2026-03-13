@@ -113,7 +113,7 @@ class AppConfig:
     favorite_authors: list = field(default_factory=list)
     show_nsfw: bool = False
     show_paid: bool = False
-    show_account_required: bool = True
+    show_account_required: bool = False
     show_incomplete: bool = True
 
     def to_dict(self) -> dict:
