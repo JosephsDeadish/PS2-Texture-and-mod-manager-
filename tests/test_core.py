@@ -7850,8 +7850,8 @@ class TestSerialDatabase(unittest.TestCase):
         self.assertFalse(self.sdb.is_valid("Kingdom Hearts", "SLUS-20773"))
 
     def test_is_known_alt_serial_returns_true(self):
-        # SLUS-20773 is a legacy alt for KH
-        self.assertTrue(self.sdb.is_known("Kingdom Hearts", "SLUS-20773"))
+        # SLPS-25112 is the Japanese regional alt for Armored Core 3
+        self.assertTrue(self.sdb.is_known("Armored Core 3", "SLPS-25112"))
 
     def test_is_known_completely_wrong_serial_returns_false(self):
         self.assertFalse(self.sdb.is_known("Kingdom Hearts", "SLUS-99999"))
