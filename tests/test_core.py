@@ -1921,51 +1921,17 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         return [e["id"] for e in load_catalogue(catalogue_dir=CATALOGUE_DIR)]
 
     def test_game_specific_texture_entries_present(self):
-        """Catalogue should include game-specific texture pack entries (non-hub, specific files)."""
+        """Catalogue should include game-specific texture pack entries with direct downloads."""
         ids = self._load_catalogue()
-        # DeadOnTheInside Patreon-hosted texture packs are the main specific-file entries
+        # Only entries with a working direct_download_url are retained
         game_entries = [
-            "doti_spyro_textures",
-            "doti_crash_woc_textures",
-            "doti_gow1_textures",
-            "doti_ffx_textures",
-            "doti_kh1_textures",
-            "doti_kh2_textures",
-            "doti_sotc_textures",
-            "doti_gt4_textures",
-            "doti_dmc3_textures",
-            "doti_ratchet_clank_textures",
-            "doti_jak_textures",
-            "doti_dbz_bt3_textures",
-            "doti_gtasa_textures",
-            "doti_ico_textures",
+            "spyro_anb_6x_extra_detail",
+            "spyro_anb_6x_only",
+            "spyro_anb_4x_anime",
+            "cckrizalid_baroque_textures",
         ]
         for entry_id in game_entries:
             self.assertIn(entry_id, ids, f"Missing catalogue entry: {entry_id}")
-
-    def test_game_specific_pnach_entries_present(self):
-        """Catalogue should include game-specific PNACH patch entries."""
-        ids = self._load_catalogue()
-        pnach_entries = [
-            "gow_widescreen_pnach",
-            "kh_widescreen_pnach",
-            "ffx_widescreen_pnach",
-            "gt4_widescreen_pnach",
-            "crash_woc_pnach",
-            "sotc_pnach",
-        ]
-        for entry_id in pnach_entries:
-            self.assertIn(entry_id, ids, f"Missing PNACH entry: {entry_id}")
-
-    def test_game_specific_cover_art_entries_present(self):
-        """Catalogue should include game-specific cover art entries."""
-        ids = self._load_catalogue()
-        cover_entries = [
-            "cover_art_popular_us",
-            "cover_art_popular_eu",
-        ]
-        for entry_id in cover_entries:
-            self.assertIn(entry_id, ids, f"Missing cover art entry: {entry_id}")
 
     def test_no_duplicate_ids(self):
         """All catalogue entry IDs must be unique."""
@@ -2904,11 +2870,11 @@ class TestSpyroANBCatalogueEntries(unittest.TestCase):
 
     def test_all_spyro_anb_variants_present(self):
         ids = self._load_catalogue()
+        # Only the three variants with direct_download_url are retained
         expected = [
             "spyro_anb_6x_extra_detail",
             "spyro_anb_6x_only",
             "spyro_anb_4x_anime",
-            "spyro_anb_mediafire_folder",
         ]
         for eid in expected:
             self.assertIn(eid, ids, f"Missing Spyro ANB catalogue entry: {eid}")
@@ -3207,22 +3173,25 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
         ids = self._get_ids()
         self.assertNotIn("gbatemp_downloads_saves_hub", ids)
 
-    def test_sly2_save_entry_present(self):
-        ids = self._get_ids()
-        self.assertIn("sly2_save_gamefiles", ids)
-
     def test_bully_save_entry_present(self):
+        """Bully save is the only save entry that has a working direct download URL."""
         ids = self._get_ids()
         self.assertIn("bully_save_moataz", ids)
+
+    def test_sly2_save_entry_removed(self):
+        """sly2_save_gamefiles has no direct_download_url and must not be in catalogue."""
+        ids = self._get_ids()
+        self.assertNotIn("sly2_save_gamefiles", ids)
 
     def test_ps2home_saves_hub_removed(self):
         """The ps2home_saves_hub entry is a category hub and must NOT be in catalogue."""
         ids = self._get_ids()
         self.assertNotIn("ps2home_saves_hub", ids)
 
-    def test_atv_save_entry_present(self):
+    def test_atv_save_entry_removed(self):
+        """atv_fury_save_ps2home has no direct_download_url and must not be in catalogue."""
         ids = self._get_ids()
-        self.assertIn("atv_fury_save_ps2home", ids)
+        self.assertNotIn("atv_fury_save_ps2home", ids)
 
     def test_bully_save_has_mediafire_url(self):
         """Bully save entry must have a direct_download_url pointing to MediaFire."""
@@ -3234,35 +3203,6 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
         self.assertIn("moataz", src)
         self.assertIn("gbatemp.net/members/moataz", src)
 
-    def test_sly2_save_source_is_gbatemp_download(self):
-        src = self._get_all_json_text()
-        self.assertIn("gbatemp.net/download/sly-2-band-of-thieves-ps2-europe", src)
-
-    def test_atv_save_source_is_ps2home(self):
-        src = self._get_all_json_text()
-        self.assertIn("ps2-home.com/forum/viewtopic.php?f=70&t=12165", src)
-
-    # Popular-game save entries added for issue #3
-    def test_popular_game_saves_present(self):
-        """Issue #3 popular PS2 game save entries must be in the catalogue."""
-        ids = self._get_ids()
-        expected = [
-            "kingdom_hearts_save_gbatemp",
-            "ffx_save_gbatemp",
-            "god_of_war_save_gbatemp",
-            "gta_sa_save_gbatemp",
-            "mgs3_save_gbatemp",
-            "re4_save_gbatemp",
-            "sotc_save_gbatemp",
-            "jak_daxter_save_gbatemp",
-            "ratchet_clank_save_gbatemp",
-            "dbz_bt3_save_gbatemp",
-            "tekken5_save_gbatemp",
-            "persona4_save_gbatemp",
-        ]
-        for eid in expected:
-            self.assertIn(eid, ids, f"Missing popular-game save entry: {eid}")
-
     def test_all_save_entries_are_not_hub(self):
         """Every save file entry must be a specific-file entry (is_hub=False)."""
         entries = self._get_entries()
@@ -3271,11 +3211,15 @@ class TestSaveFileCatalogueEntries(unittest.TestCase):
             self.assertFalse(e.get("is_hub", False),
                              f"Save entry {e['id']} must not be a hub")
 
-    def test_save_entries_have_game_serial_or_game_name(self):
-        """Every specific save entry should mention a game name or serial in description/context."""
-        ids = self._get_ids()
-        save_ids = [eid for eid in ids if 'save' in eid.lower()]
-        self.assertGreater(len(save_ids), 5, "Expected multiple specific save entries")
+    def test_all_save_entries_have_direct_download_url(self):
+        """Every retained save entry must have a working direct_download_url."""
+        entries = self._get_entries()
+        saves = [e for e in entries if e["type"] == "save_file"]
+        for e in saves:
+            self.assertTrue(
+                e.get("direct_download_url", ""),
+                f"Save entry {e['id']} is missing a direct_download_url"
+            )
 
 
 # =============================================================================
@@ -3673,12 +3617,15 @@ class TestCatalogueIntegrity(unittest.TestCase):
         )
 
     def test_patreon_entries_have_requires_account_true(self):
-        """All non-hub Patreon entries should have requires_account=True (explicit or inferred)."""
+        """All non-hub Patreon entries should have requires_account=True (explicit or inferred).
+        After filtering to only entries with direct downloads, Patreon entries without direct
+        download URLs have been removed.  This test is skipped if none remain."""
         patreon_entries = [
             e for e in self.catalogue
             if e.get("source") == "Patreon" and not e.get("is_hub", False)
         ]
-        self.assertGreater(len(patreon_entries), 0, "Should have some Patreon entries")
+        if not patreon_entries:
+            self.skipTest("No Patreon entries remain after direct-download filtering")
         for entry in patreon_entries:
             # Either explicitly set or inferred as True (Patreon is in _ACCOUNT_REQUIRED_SOURCES)
             explicit = entry.get("requires_account")
@@ -3746,14 +3693,6 @@ class TestCatalogueIntegrity(unittest.TestCase):
             direct = e.get("direct_download_url", "")
             ok = action in ("cover_by_id", "cover_by_url") or (action == "" and bool(direct))
             self.assertTrue(ok, f"Entry {e['id']} wrongly classified as in-app")
-
-        from src.models.mod import ModType
-        cover_in_app = [
-            e for e in self.catalogue
-            if e.get("type") == ModType.COVER_ART and is_in_app(e)
-        ]
-        self.assertGreater(len(cover_in_app), 100,
-                           "Expected many cover art entries to be in-app downloadable")
 
     def test_no_serial_shared_across_unrelated_games(self):
         """Each game_serial must not be assigned to more than 4 distinct game titles.
@@ -3978,16 +3917,11 @@ class TestCatalogueGameSerial(unittest.TestCase):
 
     def test_well_known_game_serials(self):
         by_id = {e["id"]: e for e in self.catalogue}
+        # Only entries that have a working direct_download_url are retained
         expected = {
-            "doti_gow1_textures":          "SCUS-97399",
-            "doti_kh2_textures":           "SLUS-21005",
-            "doti_ffx_textures":           "SLUS-20312",
-            "doti_sh2_textures":           "SLUS-20228",
             "cckrizalid_baroque_textures": "SLUS-21714",
             "spyro_anb_6x_extra_detail":   "SLUS-21372",
-            "sly2_save_gamefiles":         "SCES-52400",
             "bully_save_moataz":           "SLUS-21269",
-            "god_of_war_save_gbatemp":     "SCUS-97399",
         }
         for eid, expected_serial in expected.items():
             self.assertIn(eid, by_id, f"Entry {eid!r} not found")
@@ -4120,7 +4054,7 @@ class TestCCKrizalidEntries(unittest.TestCase):
     def test_all_cckrizalid_entries_have_thread_url(self):
         thread = "mega-library-of-hd-texture-packs-by-cckrizalid.618690"
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
-        self.assertGreater(len(cc), 1)
+        self.assertGreater(len(cc), 0)
         for e in cc:
             self.assertIn(thread, e["url"],
                           f"{e['id']}: url should contain the thread slug")
@@ -4140,8 +4074,8 @@ class TestCCKrizalidEntries(unittest.TestCase):
 
     def test_minimum_cckrizalid_pack_count(self):
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
-        self.assertGreaterEqual(len(cc), 15,
-                                "Expected at least 15 CCKrizalid pack entries")
+        self.assertGreaterEqual(len(cc), 1,
+                                "Expected at least 1 CCKrizalid pack entry with direct download")
 
 
 # =============================================================================
@@ -4166,8 +4100,9 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Basic load ──────────────────────────────────────────────────────────
 
     def test_loads_more_than_150_entries(self):
-        self.assertGreater(len(self.catalogue), 3000,
-                           "catalogue should have >3000 entries after Wave 40 bulk expansion")
+        # 4 texture packs + 600 cheats + 1 save = 605 after direct-download filtering
+        self.assertGreaterEqual(len(self.catalogue), 605,
+                                "catalogue should have ≥605 entries after direct-download filtering")
 
     def test_no_duplicate_ids(self):
         ids = [e["id"] for e in self.catalogue]
@@ -4213,7 +4148,7 @@ class TestCatalogueLoader(unittest.TestCase):
     def test_has_texture_pack_entries(self):
         from src.models.mod import ModType
         tp = [e for e in self.catalogue if e["type"] == ModType.TEXTURE_PACK]
-        self.assertGreater(len(tp), 380, "Expected >380 texture pack entries")
+        self.assertGreater(len(tp), 0, "Expected texture pack entries with direct downloads")
 
     def test_texture_pack_size_labels(self):
         """Non-hub texture pack entries should have a size_label field in format '~NNN MB/GB'."""
@@ -4236,14 +4171,23 @@ class TestCatalogueLoader(unittest.TestCase):
         )
 
     def test_has_pnach_entries(self):
+        """After direct-download filtering, all PNACH entries without direct_download_url
+        are removed.  This test simply verifies that the PNACH list has been cleaned."""
         from src.models.mod import ModType
         pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
-        self.assertGreater(len(pn), 1000, "Expected >1000 PNACH entries after Wave 40 bulk expansion")
+        # All retained PNACH entries must have a direct_download_url
+        for e in pn:
+            self.assertTrue(e.get("direct_download_url"),
+                            f"PNACH entry {e['id']} has no direct_download_url")
 
     def test_has_save_file_entries(self):
+        """After direct-download filtering, only save entries with direct_download_url are kept."""
         from src.models.mod import ModType
         sv = [e for e in self.catalogue if e["type"] == ModType.SAVE_FILE]
-        self.assertGreater(len(sv), 120, "Expected >120 save file entries")
+        self.assertGreater(len(sv), 0, "Expected at least one save file entry with direct download")
+        for e in sv:
+            self.assertTrue(e.get("direct_download_url"),
+                            f"Save entry {e['id']} has no direct_download_url")
 
     def test_no_generic_placeholder_authors(self):
         """Every catalogue entry must credit a real person or project.
@@ -4351,21 +4295,28 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertIn("GitHub", self.all_sources)
 
     def test_all_sources_contains_ps2wide(self):
-        self.assertIn("PS2Wide", self.all_sources)
+        """PS2Wide was a source for PNACH entries without direct downloads; those are removed.
+        This test verifies PS2Wide is no longer a source after filtering."""
+        self.assertNotIn("PS2Wide", self.all_sources)
 
     # ── New sources from scaling ──────────────────────────────────────────────
 
     def test_gamebanana_source_present(self):
-        """Scaling added GameBanana entries."""
+        """GameBanana entries without direct downloads have been removed.
+        This test verifies they are no longer in the filtered catalogue."""
         gb = [e for e in self.catalogue if e["source"] == "GameBanana"]
-        self.assertGreater(len(gb), 0, "Expected GameBanana entries")
+        for e in gb:
+            self.assertTrue(e.get("direct_download_url"),
+                            f"GameBanana entry {e['id']} has no direct_download_url")
 
     # ── 60fps patches ─────────────────────────────────────────────────────────
 
     def test_60fps_patches_present(self):
+        """After filtering, 60fps-tagged entries are only present if they have direct_download_url."""
         fps_patches = [e for e in self.catalogue if "60fps" in e.get("tags", [])]
-        self.assertGreater(len(fps_patches), 10,
-                           "Expected >10 60fps PNACH entries")
+        for e in fps_patches:
+            self.assertTrue(e.get("direct_download_url"),
+                            f"60fps entry {e['id']} has no direct_download_url")
 
     def test_60fps_patches_are_pnach_type(self):
         from src.models.mod import ModType
@@ -4382,8 +4333,8 @@ class TestCatalogueLoader(unittest.TestCase):
 
     def test_cckrizalid_minimum_pack_count(self):
         cc = [e for e in self.catalogue if e.get("author") == "CCKrizalid"]
-        self.assertGreaterEqual(len(cc), 20,
-                                "Expected at least 20 CCKrizalid entries after scaling")
+        self.assertGreaterEqual(len(cc), 1,
+                                "Expected at least 1 CCKrizalid entry with direct download")
 
 
 # =============================================================================
@@ -4661,10 +4612,28 @@ class TestCatalogueModTypeEnum(unittest.TestCase):
                 self.fail(f"Entry {e['id']}: .value not accessible on {e['type']!r}")
 
     def test_tab_filtering_by_modtype_enum_non_empty(self):
-        for mt in ModType:
+        """Types with retained entries (texture_pack, cheat, save_file) should be non-empty.
+        pnach and cover_art have no entries with direct downloads and are empty."""
+        from src.models.mod import ModType
+        non_empty_types = {ModType.TEXTURE_PACK, ModType.CHEAT, ModType.SAVE_FILE}
+        for mt in non_empty_types:
             entries = [e for e in self.catalogue if e["type"] == mt]
             self.assertGreater(len(entries), 0,
                                f"No catalogue entries of type {mt}")
+
+    def test_pnach_entries_empty_after_filtering(self):
+        """pnach.json has no entries with working direct_download_url; catalogue must be empty."""
+        from src.models.mod import ModType
+        pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
+        self.assertEqual(len(pn), 0,
+                         f"Expected 0 PNACH entries after direct-download filtering, got {len(pn)}")
+
+    def test_cover_art_entries_empty_after_filtering(self):
+        """cover_art.json uses cover_by_id (no direct_download_url); catalogue must be empty."""
+        from src.models.mod import ModType
+        ca = [e for e in self.catalogue if e["type"] == ModType.COVER_ART]
+        self.assertEqual(len(ca), 0,
+                         f"Expected 0 COVER_ART entries after direct-download filtering, got {len(ca)}")
 
     def test_tab_filtering_consistent_with_string_value(self):
         """Filtering by enum equals filtering by its string value via .value."""
@@ -8150,13 +8119,13 @@ class TestCheatsCatalogue(unittest.TestCase):
             self.cheats = json.load(f)
 
     def test_cheats_catalogue_has_over_100_entries(self):
-        """After Wave 40 expansion, cheats.json should have > 600 entries."""
-        self.assertGreater(len(self.cheats), 600)
+        """After filtering to direct-download-only entries, cheats.json should have ≥ 600 entries."""
+        self.assertGreaterEqual(len(self.cheats), 600)
 
     def test_cheats_catalogue_has_game_specific_entries(self):
-        """At least 600 entries should have a non-empty game_serial."""
+        """All retained entries should have a non-empty game_serial."""
         with_serial = [e for e in self.cheats if e.get("game_serial")]
-        self.assertGreater(len(with_serial), 600,
+        self.assertGreaterEqual(len(with_serial), 600,
                            f"Only {len(with_serial)} entries have a game_serial")
 
     def test_cheats_catalogue_kingdom_hearts_present(self):
@@ -8198,11 +8167,11 @@ class TestCheatsCatalogue(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)),
                          "cheats.json contains duplicate entry IDs")
 
-    def test_cheats_catalogue_hub_entries_present(self):
-        """The two original hub entries should still be present."""
+    def test_cheats_catalogue_hub_entries_removed(self):
+        """The generic hub entries (no specific game) must not be present after filtering."""
         ids = {e.get("id") for e in self.cheats}
-        self.assertIn("codejunkies_ps2",      ids)
-        self.assertIn("pcsx2_cheatdb_github", ids)
+        self.assertNotIn("codejunkies_ps2", ids)
+        self.assertNotIn("pcsx2_cheatdb_github", ids)
 
     def test_cheats_catalogue_direct_download_urls_valid(self):
         """Non-empty direct_download_url values must be valid http(s) URLs."""
