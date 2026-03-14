@@ -8093,17 +8093,18 @@ class TestCrcSerialConsistency(unittest.TestCase):
         from src.core.serial_validator import SerialDatabase
         self.sdb = SerialDatabase()
 
-    def test_crc_serial_consistency_issues_under_5(self):
-        """After Wave 38 fixes, < 5 CRC entries should have unknown serials.
+    def test_crc_serial_consistency_issues_under_15(self):
+        """After Wave 71 fixes, < 15 CRC entries should have unknown serials.
 
-        The only allowed leftovers are non-NTSC-U serials (PSP, Korean, etc.)
+        Allowed leftovers are non-NTSC-U serials (PAL/SLES, PSP, Korean, etc.)
         that are correctly absent from the NTSC-U serial DB.
+        Wave 71 added 10 PAL (SLES) serials, raising the expected ceiling to 15.
         """
         issues = self.sdb.validate_crc_serial_consistency()
         self.assertLess(
-            len(issues), 5,
-            f"Found {len(issues)} CRC-serial mismatches (expected < 5):\n"
-            + "\n".join(str(i) for i in issues[:10])
+            len(issues), 15,
+            f"Found {len(issues)} CRC-serial mismatches (expected < 15):\n"
+            + "\n".join(str(i) for i in issues[:15])
         )
 
     def test_crc_serial_consistency_returns_list(self):
@@ -14277,3 +14278,135 @@ class TestWave70EmptySerialFix(unittest.TestCase):
     def test_117d1977_persona4(self):
         """117D1977 (Persona 4): 1 entry, serial SLUS-21782."""
         self._assert_crc_serial("117D1977", "SLUS-21782")
+
+
+class TestWave71EmptySerialFix(unittest.TestCase):
+    """Wave 71: Fill 296 empty game_serial entries across 12 CRCs.
+
+    Fixes
+    -----
+    Group A — serial extracted from game name (SERIAL_CRC pattern or brackets):
+    * 37E36C6D → SLES-54221  (168 entries)
+    * 9F6F78DB → SLES-54974  (Guitar Hero III: Legends of Rock PAL, 39 entries)
+    * C2911A79 → SLES-54466  (Test Drive Unlimited PAL, 25 entries)
+    * 58BED00E → SLES-54493  (17 entries)
+    * 3BEBCCAC → SLES-52976  (11 entries)
+    * 151DF9C9 → SLES-54200  (7 entries)
+    * B2408080 → SLES-53194  (7 entries)
+    * EA8DC584 → SLES-55003  (6 entries)
+    * CBC401C5 → SLES-51654  (1 entry)
+    * 2FCBAB60 → SLES-55350  (1 entry)
+    Group B — known NTSC-U serials:
+    * A8DB29DF → SLUS-20781  (Delta Force: Black Hawk Down - Team Sabre, 11 entries)
+    * 3A32FD60 → SLUS-20233  (NFL Blitz 2002, 3 entries)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.pnach_db.items() if k.startswith(f"{crc}:")}
+
+    def _assert_crc_serial(self, crc, serial):
+        entries = self._crc_entries(crc)
+        empty = [k for k, v in entries.items() if not v.get("game_serial", "")]
+        self.assertEqual(empty, [],
+                         f"CRC {crc} still has empty game_serial entries: {empty}")
+        wrong = [(k, v.get("game_serial")) for k, v in entries.items()
+                 if v.get("game_serial") != serial]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc} entries with wrong serial (expected {serial}): {wrong}")
+
+    # ------------------------------------------------------------------
+    # Group A — serial from game name
+    # ------------------------------------------------------------------
+
+    def test_37e36c6d_sles54221_serial(self):
+        """37E36C6D: all 168 entries must have game_serial SLES-54221."""
+        self._assert_crc_serial("37E36C6D", "SLES-54221")
+        self.assertEqual(len(self._crc_entries("37E36C6D")), 168)
+
+    def test_9f6f78db_guitar_hero3_pal_serial(self):
+        """9F6F78DB (Guitar Hero III PAL): all 39 entries must have serial SLES-54974."""
+        self._assert_crc_serial("9F6F78DB", "SLES-54974")
+        self.assertEqual(len(self._crc_entries("9F6F78DB")), 39)
+
+    def test_9f6f78db_guitar_hero3_game_name(self):
+        """9F6F78DB must use normalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("9F6F78DB").items()
+                 if v.get("game") != "Guitar Hero III: Legends of Rock (SLES-54974)"]
+        self.assertEqual(wrong, [])
+
+    def test_c2911a79_tdu_serial(self):
+        """C2911A79 (Test Drive Unlimited PAL): all 25 entries must have serial SLES-54466."""
+        self._assert_crc_serial("C2911A79", "SLES-54466")
+        self.assertEqual(len(self._crc_entries("C2911A79")), 25)
+
+    def test_c2911a79_tdu_game_name(self):
+        """C2911A79 must use normalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("C2911A79").items()
+                 if v.get("game") != "Test Drive Unlimited (SLES-54466)"]
+        self.assertEqual(wrong, [])
+
+    def test_58bed00e_sles54493_serial(self):
+        """58BED00E: all 17 entries must have game_serial SLES-54493."""
+        self._assert_crc_serial("58BED00E", "SLES-54493")
+        self.assertEqual(len(self._crc_entries("58BED00E")), 17)
+
+    def test_3bebccac_sles52976_serial(self):
+        """3BEBCCAC: all 11 entries must have game_serial SLES-52976."""
+        self._assert_crc_serial("3BEBCCAC", "SLES-52976")
+        self.assertEqual(len(self._crc_entries("3BEBCCAC")), 11)
+
+    def test_151df9c9_sles54200_serial(self):
+        """151DF9C9: all 7 entries must have game_serial SLES-54200."""
+        self._assert_crc_serial("151DF9C9", "SLES-54200")
+        self.assertEqual(len(self._crc_entries("151DF9C9")), 7)
+
+    def test_b2408080_sles53194_serial(self):
+        """B2408080: all 7 entries must have game_serial SLES-53194."""
+        self._assert_crc_serial("B2408080", "SLES-53194")
+        self.assertEqual(len(self._crc_entries("B2408080")), 7)
+
+    def test_ea8dc584_sles55003_serial(self):
+        """EA8DC584: all 6 entries must have game_serial SLES-55003."""
+        self._assert_crc_serial("EA8DC584", "SLES-55003")
+        self.assertEqual(len(self._crc_entries("EA8DC584")), 6)
+
+    def test_cbc401c5_sles51654_serial(self):
+        """CBC401C5: single entry must have game_serial SLES-51654."""
+        self._assert_crc_serial("CBC401C5", "SLES-51654")
+
+    def test_2fcbab60_sles55350_serial(self):
+        """2FCBAB60: single entry must have game_serial SLES-55350."""
+        self._assert_crc_serial("2FCBAB60", "SLES-55350")
+
+    # ------------------------------------------------------------------
+    # Group B — NTSC-U games
+    # ------------------------------------------------------------------
+
+    def test_a8db29df_delta_force_serial(self):
+        """A8DB29DF (Delta Force BHD Team Sabre): 11 entries, serial SLUS-20781."""
+        self._assert_crc_serial("A8DB29DF", "SLUS-20781")
+        self.assertEqual(len(self._crc_entries("A8DB29DF")), 11)
+
+    def test_a8db29df_delta_force_game_name(self):
+        """A8DB29DF must use normalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("A8DB29DF").items()
+                 if v.get("game") != "Delta Force: Black Hawk Down - Team Sabre (SLUS-20781)"]
+        self.assertEqual(wrong, [])
+
+    def test_3a32fd60_nfl_blitz_serial(self):
+        """3A32FD60 (NFL Blitz 2002): 3 entries, serial SLUS-20233."""
+        self._assert_crc_serial("3A32FD60", "SLUS-20233")
+        self.assertEqual(len(self._crc_entries("3A32FD60")), 3)
+
+    def test_3a32fd60_nfl_blitz_game_name(self):
+        """3A32FD60 must use normalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("3A32FD60").items()
+                 if v.get("game") != "NFL Blitz 2002 (SLUS-20233)"]
+        self.assertEqual(wrong, [])
