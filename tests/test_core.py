@@ -12394,3 +12394,251 @@ class TestWave61PnachEntries(unittest.TestCase):
         ]
         for crc, addr in ws_checks:
             self._assert_ws_entry(crc, addr)
+
+
+# =============================================================================
+# Wave 62: GBATemp texture-pack catalogue expansion
+# =============================================================================
+
+class TestWave62GBATempTexturePacks(unittest.TestCase):
+    """Wave 62: 39 new texture-pack catalogue entries sourced from the curated
+    GBATemp PS2 texture packs list. Covers 16 entries with direct download URLs
+    and 23 thread-only / hub entries.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+
+    # ------------------------------------------------------------------
+    # Catalogue size
+    # ------------------------------------------------------------------
+    def test_total_texture_pack_count(self):
+        """After Wave 62 there should be at least 43 texture-pack entries."""
+        self.assertGreaterEqual(len(self.packs), 43,
+                                f"Expected ≥43 packs, got {len(self.packs)}")
+
+    def test_no_duplicate_ids(self):
+        ids = [p["id"] for p in self.packs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate texture-pack IDs found")
+
+    # ------------------------------------------------------------------
+    # CCKrizalid entries
+    # ------------------------------------------------------------------
+    def test_ghost_rider_entry_present(self):
+        self.assertIn("ghost_rider_hd_cckrizalid", self.by_id)
+
+    def test_chaos_legion_entry_present(self):
+        self.assertIn("chaos_legion_hd_cckrizalid", self.by_id)
+
+    def test_dmc3_nonse_entry_present(self):
+        self.assertIn("dmc3_nonse_hd_cckrizalid", self.by_id)
+
+    def test_cckrizalid_hub_present(self):
+        self.assertIn("cckrizalid_mega_library", self.by_id)
+        self.assertTrue(self.by_id["cckrizalid_mega_library"]["is_hub"])
+
+    def test_cckrizalid_entries_have_gdrive_urls(self):
+        for eid in ("ghost_rider_hd_cckrizalid", "chaos_legion_hd_cckrizalid",
+                    "dmc3_nonse_hd_cckrizalid"):
+            url = self.by_id[eid]["direct_download_url"]
+            self.assertIn("drive.google.com", url,
+                          f"{eid}: expected Google Drive URL, got {url!r}")
+
+    # ------------------------------------------------------------------
+    # ewgeha remastered project entries
+    # ------------------------------------------------------------------
+    def test_god_of_war_remastered_present(self):
+        self.assertIn("god_of_war_remastered_ewgeha", self.by_id)
+        p = self.by_id["god_of_war_remastered_ewgeha"]
+        self.assertEqual(p["game_serial"], "SCUS-97399")
+        self.assertIn("yandex", p["direct_download_url"])
+
+    def test_god_of_war_2_remastered_present(self):
+        self.assertIn("god_of_war_2_remastered_ewgeha", self.by_id)
+        self.assertEqual(self.by_id["god_of_war_2_remastered_ewgeha"]["game_serial"], "SCUS-97481")
+
+    def test_pop_ww_remastered_present(self):
+        self.assertIn("pop_ww_remastered_ewgeha", self.by_id)
+        p = self.by_id["pop_ww_remastered_ewgeha"]
+        self.assertEqual(p["game_serial"], "SLUS-21022")
+        self.assertIn("yandex", p["direct_download_url"])
+
+    def test_pop_tt_remastered_present(self):
+        self.assertIn("pop_tt_remastered_ewgeha", self.by_id)
+        self.assertIn("yandex", self.by_id["pop_tt_remastered_ewgeha"]["direct_download_url"])
+
+    def test_pop_sot_remastered_present(self):
+        self.assertIn("pop_sot_remastered_ewgeha", self.by_id)
+        self.assertEqual(self.by_id["pop_sot_remastered_ewgeha"]["game_serial"], "SLUS-20743")
+
+    def test_re_dead_aim_remastered_present(self):
+        self.assertIn("re_dead_aim_remastered_ewgeha", self.by_id)
+        p = self.by_id["re_dead_aim_remastered_ewgeha"]
+        self.assertEqual(p["game_serial"], "SLUS-20669")
+        self.assertIn("yandex", p["direct_download_url"])
+
+    def test_re_cvx_remastered_present(self):
+        self.assertIn("re_cvx_remastered_4k_ewgeha", self.by_id)
+        self.assertIn("yandex", self.by_id["re_cvx_remastered_4k_ewgeha"]["direct_download_url"])
+
+    def test_silent_hill_4_entry_present(self):
+        self.assertIn("silent_hill_4_remastered_ewgeha", self.by_id)
+        self.assertEqual(self.by_id["silent_hill_4_remastered_ewgeha"]["game_serial"], "SLUS-20873")
+
+    def test_ewgeha_entries_author_field(self):
+        ewgeha_ids = (
+            "god_of_war_remastered_ewgeha", "god_of_war_2_remastered_ewgeha",
+            "pop_ww_remastered_ewgeha", "pop_tt_remastered_ewgeha",
+            "pop_sot_remastered_ewgeha", "re_dead_aim_remastered_ewgeha",
+            "re_cvx_remastered_4k_ewgeha", "silent_hill_4_remastered_ewgeha",
+        )
+        for eid in ewgeha_ids:
+            self.assertEqual(self.by_id[eid]["author"], "ewgeha",
+                             f"{eid} author mismatch")
+
+    # ------------------------------------------------------------------
+    # Panda_Venom entries
+    # ------------------------------------------------------------------
+    def test_tales_abyss_entry_present(self):
+        self.assertIn("tales_abyss_hd_pandavenom", self.by_id)
+        self.assertEqual(self.by_id["tales_abyss_hd_pandavenom"]["game_serial"], "SLUS-21386")
+
+    def test_burnout3_entry_present(self):
+        self.assertIn("burnout3_hd_pandavenom", self.by_id)
+        p = self.by_id["burnout3_hd_pandavenom"]
+        self.assertEqual(p["game_serial"], "SLUS-21050")
+        self.assertIn("mediafire.com", p["direct_download_url"])
+
+    def test_suikoden_trilogy_present(self):
+        for eid in ("suikoden_v_hd_pandavenom", "suikoden_iv_hd_pandavenom",
+                    "suikoden_iii_hd_pandavenom"):
+            self.assertIn(eid, self.by_id, f"Missing entry: {eid}")
+
+    def test_persona_entries_present(self):
+        for eid in ("persona_4_hd_pandavenom", "persona_3_fes_hd_pandavenom"):
+            self.assertIn(eid, self.by_id, f"Missing entry: {eid}")
+
+    def test_ratchet_clank_trilogy_present(self):
+        for eid in ("ratchet_clank_1_hd_pandavenom", "ratchet_clank_gc_hd_pandavenom",
+                    "ratchet_clank_upa_hd"):
+            self.assertIn(eid, self.by_id, f"Missing entry: {eid}")
+
+    def test_ratchet_clank_serials(self):
+        self.assertEqual(self.by_id["ratchet_clank_1_hd_pandavenom"]["game_serial"], "SCUS-97199")
+        self.assertEqual(self.by_id["ratchet_clank_gc_hd_pandavenom"]["game_serial"], "SCUS-97268")
+        self.assertEqual(self.by_id["ratchet_clank_upa_hd"]["game_serial"], "SCUS-97353")
+
+    def test_xenosaga_entry_present(self):
+        self.assertIn("xenosaga_trilogy_hd_pandavenom", self.by_id)
+
+    # ------------------------------------------------------------------
+    # Other notable entries
+    # ------------------------------------------------------------------
+    def test_haunting_ground_entry_present(self):
+        self.assertIn("haunting_ground_hd_juancho", self.by_id)
+        p = self.by_id["haunting_ground_hd_juancho"]
+        self.assertEqual(p["game_serial"], "SLUS-21075")
+        self.assertIn("drive.google.com", p["direct_download_url"])
+
+    def test_armored_core_lr_entry_present(self):
+        self.assertIn("armored_core_lr_hd_ninebreaker", self.by_id)
+        self.assertEqual(self.by_id["armored_core_lr_hd_ninebreaker"]["game_serial"], "SLUS-21338")
+
+    def test_spyro_etd_entry_present(self):
+        self.assertIn("spyro_etd_4k_ahmedD77", self.by_id)
+        p = self.by_id["spyro_etd_4k_ahmedD77"]
+        self.assertEqual(p["game_serial"], "SLUS-20315")
+        self.assertIn("mediafire.com", p["direct_download_url"])
+
+    def test_hack_imoq_entry_present(self):
+        self.assertIn("hack_imoq_2k_mrdiggle", self.by_id)
+        p = self.by_id["hack_imoq_2k_mrdiggle"]
+        self.assertEqual(p["game_serial"], "SLUS-20461")
+        self.assertIn("drive.google.com", p["direct_download_url"])
+
+    def test_shadow_hearts_ftnw_entry_present(self):
+        self.assertIn("shadow_hearts_ftnw_hd_pandavenom", self.by_id)
+        self.assertEqual(self.by_id["shadow_hearts_ftnw_hd_pandavenom"]["game_serial"], "SLUS-21326")
+
+    def test_bully_entry_present(self):
+        self.assertIn("bully_hd_vinfer", self.by_id)
+        self.assertEqual(self.by_id["bully_hd_vinfer"]["game_serial"], "SLUS-21269")
+
+    def test_mercenaries_entry_present(self):
+        self.assertIn("mercenaries_pod_hd_psxrestore", self.by_id)
+        self.assertEqual(self.by_id["mercenaries_pod_hd_psxrestore"]["game_serial"], "SLUS-20932")
+
+    # ------------------------------------------------------------------
+    # Schema validation for all new entries
+    # ------------------------------------------------------------------
+    def test_all_entries_have_required_fields(self):
+        """Every texture-pack entry must have the required catalogue fields."""
+        required = {"id", "name", "description", "type", "source", "url",
+                    "game_serial", "is_hub", "is_free", "is_complete", "author"}
+        wave62_ids = {
+            "ghost_rider_hd_cckrizalid", "chaos_legion_hd_cckrizalid",
+            "dmc3_nonse_hd_cckrizalid", "tales_abyss_hd_pandavenom",
+            "tales_legendia_hd_pandavenom", "haunting_ground_hd_juancho",
+            "armored_core_lr_hd_ninebreaker", "god_of_war_remastered_ewgeha",
+            "god_of_war_2_remastered_ewgeha", "pop_ww_remastered_ewgeha",
+            "pop_tt_remastered_ewgeha", "pop_sot_remastered_ewgeha",
+            "re_dead_aim_remastered_ewgeha", "re_cvx_remastered_4k_ewgeha",
+            "silent_hill_4_remastered_ewgeha", "spyro_etd_4k_ahmedD77",
+            "hack_imoq_2k_mrdiggle", "burnout3_hd_pandavenom",
+            "shadow_hearts_ftnw_hd_pandavenom", "suikoden_v_hd_pandavenom",
+            "suikoden_iv_hd_pandavenom", "suikoden_iii_hd_pandavenom",
+            "persona_4_hd_pandavenom", "persona_3_fes_hd_pandavenom",
+            "dds1_hd_pandavenom", "grimgrimoire_hd_pandavenom",
+            "wild_arms_5_hd_pandavenom", "burnout_dominator_hd_pandavenom",
+            "ssx_tricky_hd_sombershroud", "ratchet_clank_1_hd_pandavenom",
+            "ratchet_clank_gc_hd_pandavenom", "ratchet_clank_upa_hd",
+            "castlevania_cod_hd_pandavenom", "star_ocean_te_hd_pandavenom",
+            "call_of_duty_3_hd_pandavenom", "mercenaries_pod_hd_psxrestore",
+            "bully_hd_vinfer", "xenosaga_trilogy_hd_pandavenom",
+            "cckrizalid_mega_library",
+        }
+        for eid in wave62_ids:
+            self.assertIn(eid, self.by_id, f"Missing Wave 62 entry: {eid}")
+            entry = self.by_id[eid]
+            missing = required - set(entry.keys())
+            self.assertFalse(missing,
+                             f"Entry {eid} missing fields: {missing}")
+
+    def test_all_entries_source_is_gbatemp(self):
+        """All Wave 62 entries must have source=GBAtemp."""
+        wave62_ids = {
+            "ghost_rider_hd_cckrizalid", "chaos_legion_hd_cckrizalid",
+            "god_of_war_remastered_ewgeha", "burnout3_hd_pandavenom",
+            "suikoden_v_hd_pandavenom", "persona_4_hd_pandavenom",
+        }
+        for eid in wave62_ids:
+            self.assertEqual(self.by_id[eid]["source"], "GBAtemp",
+                             f"{eid}: source must be GBAtemp")
+
+    def test_all_entries_type_is_texture_pack(self):
+        """All new entries must have type='texture_pack'."""
+        wave62_ids = {
+            "ghost_rider_hd_cckrizalid", "god_of_war_remastered_ewgeha",
+            "burnout3_hd_pandavenom", "suikoden_v_hd_pandavenom",
+        }
+        for eid in wave62_ids:
+            self.assertEqual(self.by_id[eid]["type"], "texture_pack",
+                             f"{eid}: type must be texture_pack")
+
+    def test_gbatemp_thread_urls_are_valid_format(self):
+        """All GBAtemp thread URLs must follow the gbatemp.net/threads/ pattern."""
+        wave62_ids = (
+            "ghost_rider_hd_cckrizalid", "chaos_legion_hd_cckrizalid",
+            "dmc3_nonse_hd_cckrizalid", "god_of_war_remastered_ewgeha",
+            "burnout3_hd_pandavenom", "suikoden_v_hd_pandavenom",
+            "persona_4_hd_pandavenom", "ratchet_clank_1_hd_pandavenom",
+        )
+        for eid in wave62_ids:
+            url = self.by_id[eid]["url"]
+            self.assertIn("gbatemp.net/threads/", url,
+                          f"{eid}: url must be a gbatemp thread URL")
