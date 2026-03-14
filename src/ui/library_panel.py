@@ -479,8 +479,28 @@ class LibraryPanel(BasePanel):
 
         refresh_btn = QPushButton("↺ Scan Library")
         refresh_btn.setObjectName("primary_btn")
+        refresh_btn.setToolTip("Re-scan your game library folder and refresh the list")
         refresh_btn.clicked.connect(self.refresh)
         toolbar.addWidget(refresh_btn)
+
+        import_btn = QPushButton("📂 Import Installed Content")
+        import_btn.setToolTip(
+            "Scan your PCSX2 folder for texture packs, PNACH files, and cover art\n"
+            "that were installed outside of PS2 Mod Manager so you can manage them here"
+        )
+        import_btn.clicked.connect(self._open_installed_scanner)
+        toolbar.addWidget(import_btn)
+
+        conflict_btn = QPushButton("⚠ Resolve Conflicts")
+        conflict_btn.setToolTip(
+            "Scan your installed PCSX2 content for conflicts:\n"
+            "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
+            "• PNACH patches writing to the same memory address\n"
+            "• Multiple cover-art images for the same serial\n"
+            "• Merged texture packs that may override each other"
+        )
+        conflict_btn.clicked.connect(self._open_conflict_resolver)
+        toolbar.addWidget(conflict_btn)
 
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
@@ -627,3 +647,17 @@ class LibraryPanel(BasePanel):
     def refresh(self):
         self._populate()
         self.emit_status("Library refreshed")
+
+    def _open_installed_scanner(self):
+        """Open the Installed Content Scanner dialog (import from PCSX2 folder)."""
+        from src.ui.widgets import InstalledScannerDialog
+        dlg = InstalledScannerDialog(self.config, self)
+        dlg.exec()
+        # Refresh the library after scanning in case new mods were imported
+        self._populate()
+
+    def _open_conflict_resolver(self):
+        """Open the Conflict Resolver dialog."""
+        from src.ui.widgets import ConflictResolverDialog
+        dlg = ConflictResolverDialog(self.config, self)
+        dlg.exec()
