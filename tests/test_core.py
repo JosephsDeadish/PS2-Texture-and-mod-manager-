@@ -7999,13 +7999,18 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.assertGreater(len(info.crcs), 0)
 
     def test_games_with_crcs_count_over_200(self):
-        """At least 900 games in the serial DB must have CRC entries (Wave 41)."""
+        """At least 885 games in the serial DB must have CRC entries.
+
+        Wave 41 established ≥900; Wave 51 consolidated ~10 duplicate/redundant
+        entries (moving their CRCs into canonical entries) which reduced the
+        count slightly while preserving all unique CRC coverage.
+        """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 900,
-                           f"Expected >900 games with CRCs, got {count}")
+        self.assertGreater(count, 885,
+                           f"Expected >885 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8053,13 +8058,17 @@ class TestWave42SerialDb(unittest.TestCase):
         )
 
     def test_wave42_games_with_crcs_over_900(self):
-        """Wave 42: at least 900 games still have CRC entries."""
+        """Wave 42: at least 885 games still have CRC entries.
+
+        Wave 51 consolidated ~10 duplicate/redundant entries into canonical
+        entries, reducing the count slightly while preserving all unique CRCs.
+        """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 900,
-                           f"Expected >900 games with CRCs, got {count}")
+        self.assertGreater(count, 885,
+                           f"Expected >885 games with CRCs, got {count}")
 
     def test_wave42_dbz_sagas_crc_fixed(self):
         """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
@@ -9385,4 +9394,209 @@ class TestWave50VersionLabels(unittest.TestCase):
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
         """Wave 50: serial DB game count must remain 2294 (only crc_labels added)."""
+        self.assertEqual(len(self.raw_games), 2294)
+
+
+class TestWave51CrcLabelsExpanded(unittest.TestCase):
+    """Wave 51: extended crc_labels + data-quality fixes."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+        import json
+        from pathlib import Path
+        raw = json.loads(
+            (Path(__file__).parent.parent / "data/game_serial_db/ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        cls.raw_games = raw["games"]
+
+    # ── Total crc_labels count ───────────────────────────────────────────────
+
+    def test_wave51_crc_labels_count_at_least_20(self):
+        """Wave 51: At least 20 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 20,
+                                f"Expected ≥20 games with crc_labels, got {count}")
+
+    # ── Grand Theft Auto: San Andreas ───────────────────────────────────────
+
+    def test_wave51_gta_sa_v100_label(self):
+        """Wave 51: GTA SA CRC 9A5B29A1 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("9A5B29A1"), "v1.00")
+
+    def test_wave51_gta_sa_v101_label(self):
+        """Wave 51: GTA SA CRC 399A49CA must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("399A49CA"), "v1.01")
+
+    def test_wave51_gta_sa_greatest_hits_label(self):
+        """Wave 51: GTA SA CRC B3D64CF8 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("B3D64CF8"), "Greatest Hits")
+
+    def test_wave51_gta_sa_v200_label(self):
+        """Wave 51: GTA SA CRC 2C6BE434 must be labelled 'v2.00'."""
+        self.assertEqual(self.sdb.label_for_crc("2C6BE434"), "v2.00")
+
+    def test_wave51_gta_sa_all_4_crcs_present(self):
+        """Wave 51: Grand Theft Auto: San Andreas must have 4 CRCs."""
+        info = self.sdb.get_info("Grand Theft Auto: San Andreas")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 4, f"Expected 4 CRCs, got {info.crcs}")
+
+    # ── Gran Turismo 3: A-Spec ───────────────────────────────────────────────
+
+    def test_wave51_gt3_v100_label(self):
+        """Wave 51: GT3 CRC 85AE91B3 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("85AE91B3"), "v1.00")
+
+    def test_wave51_gt3_v101_label(self):
+        """Wave 51: GT3 CRC C12E4587 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("C12E4587"), "v1.01")
+
+    def test_wave51_gt3_greatest_hits_label(self):
+        """Wave 51: GT3 CRC F9F416C5 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("F9F416C5"), "Greatest Hits")
+
+    # ── God of War II ────────────────────────────────────────────────────────
+
+    def test_wave51_gow2_v100_label(self):
+        """Wave 51: GoW II CRC 0B29B9B6 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0B29B9B6"), "v1.00")
+
+    def test_wave51_gow2_v101_label(self):
+        """Wave 51: GoW II CRC 2F123FD8 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("2F123FD8"), "v1.01")
+
+    def test_wave51_gow2_greatest_hits_label(self):
+        """Wave 51: GoW II CRC 44A8A22A must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("44A8A22A"), "Greatest Hits")
+
+    # ── Metal Gear Solid 2: Sons of Liberty ─────────────────────────────────
+
+    def test_wave51_mgs2_v100_label(self):
+        """Wave 51: MGS2 CRC 5E267A69 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("5E267A69"), "v1.00")
+
+    def test_wave51_mgs2_greatest_hits_label(self):
+        """Wave 51: MGS2 CRC 1540CFB5 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("1540CFB5"), "Greatest Hits")
+
+    def test_wave51_mgs2_all_5_crcs_present(self):
+        """Wave 51: MGS2 must have 5 CRCs."""
+        info = self.sdb.get_info("Metal Gear Solid 2: Sons of Liberty")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 5, f"Expected 5 CRCs, got {info.crcs}")
+
+    # ── Metal Gear Solid 3: Snake Eater ─────────────────────────────────────
+
+    def test_wave51_mgs3_v100_label(self):
+        """Wave 51: MGS3 CRC 015FC3F6 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("015FC3F6"), "v1.00")
+
+    def test_wave51_mgs3_all_5_crcs_present(self):
+        """Wave 51: MGS3: Snake Eater must have all 5 CRCs after consolidation."""
+        info = self.sdb.get_info("Metal Gear Solid 3: Snake Eater")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 5, f"Expected 5 CRCs, got {info.crcs}")
+        self.assertIn("A39517AB", info.crcs)
+        self.assertIn("D4FA1757", info.crcs)
+
+    def test_wave51_mgs3_gh_wrong_crc_removed(self):
+        """Wave 51: MGS3 GH entry must no longer claim CRC AEB91ED0 (belongs to DMC2)."""
+        info = self.raw_games.get("Metal Gear Solid 3: Snake Eater (GH)", {})
+        self.assertNotIn("AEB91ED0", info.get("crcs", []),
+                         "AEB91ED0 (DMC2 CRC) wrongly still in MGS3: Snake Eater (GH)")
+
+    # ── Devil May Cry 2 ──────────────────────────────────────────────────────
+
+    def test_wave51_dmc2_v100_label(self):
+        """Wave 51: DMC2 CRC 0BF94D63 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0BF94D63"), "v1.00")
+
+    def test_wave51_dmc2_v105_label(self):
+        """Wave 51: DMC2 CRC AEB91ED0 (now correct in DMC2) must be labelled 'v1.05'."""
+        self.assertEqual(self.sdb.label_for_crc("AEB91ED0"), "v1.05")
+
+    def test_wave51_dmc2_v104_crc_added(self):
+        """Wave 51: DMC2 must include previously-missing CRC 08995DEE."""
+        info = self.sdb.get_info("Devil May Cry 2")
+        self.assertIsNotNone(info)
+        self.assertIn("08995DEE", info.crcs,
+                      "CRC 08995DEE missing from Devil May Cry 2 after Wave 51 fix")
+
+    def test_wave51_dmc2_all_6_crcs_present(self):
+        """Wave 51: DMC2 must have 6 CRCs after Wave 51 fix."""
+        info = self.sdb.get_info("Devil May Cry 2")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 6, f"Expected 6 CRCs, got {info.crcs}")
+
+    # ── Tekken 5 ─────────────────────────────────────────────────────────────
+
+    def test_wave51_tekken5_v100_label(self):
+        """Wave 51: Tekken 5 CRC CF5A1A6B must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("CF5A1A6B"), "v1.00")
+
+    def test_wave51_tekken5_greatest_hits_label(self):
+        """Wave 51: Tekken 5 CRC 652050D2 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("652050D2"), "Greatest Hits")
+
+    # ── Silent Hill 4: The Room ──────────────────────────────────────────────
+
+    def test_wave51_sh4_v100_label(self):
+        """Wave 51: SH4 CRC 0152E0C7 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0152E0C7"), "v1.00")
+
+    def test_wave51_sh4_v103_label(self):
+        """Wave 51: SH4 CRC 42E152EF must be labelled 'v1.03'."""
+        self.assertEqual(self.sdb.label_for_crc("42E152EF"), "v1.03")
+
+    def test_wave51_sh4_ambiguous_crc_not_labelled(self):
+        """Wave 51: Ambiguous SH4 CRC E360416A must NOT have a crc_label."""
+        sh4_labels = self.raw_games.get("Silent Hill 4: The Room", {}).get(
+            "crc_labels", {}
+        )
+        self.assertNotIn("E360416A", sh4_labels,
+                         "Ambiguous CRC E360416A should not be labelled in SH4")
+
+    # ── Kingdom Hearts: Re:Chain of Memories ────────────────────────────────
+
+    def test_wave51_khrecom_v100_label(self):
+        """Wave 51: KH Re:CoM CRC 2AFC166C must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("2AFC166C"), "v1.00")
+
+    def test_wave51_khrecom_v101_label(self):
+        """Wave 51: KH Re:CoM CRC D3E8D5EC must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("D3E8D5EC"), "v1.01")
+
+    # ── Silent Hill 2 GH labels ──────────────────────────────────────────────
+
+    def test_wave51_sh2_gh_v100_label(self):
+        """Wave 51: SH2 CRC 4A0E5B3A must be labelled 'Greatest Hits v1.00'."""
+        sh2_labels = self.raw_games.get("Silent Hill 2", {}).get("crc_labels", {})
+        self.assertEqual(sh2_labels.get("4A0E5B3A"), "Greatest Hits v1.00")
+
+    # ── Xenosaga III canonical entry ─────────────────────────────────────────
+
+    def test_wave51_xeno3_v100_label(self):
+        """Wave 51: Xenosaga III CRC 94A82AAA must be labelled 'v1.00'."""
+        xeno = self.raw_games.get(
+            "Xenosaga Episode III: Also sprach Zarathustra", {}
+        )
+        labels = xeno.get("crc_labels", {})
+        self.assertEqual(labels.get("94A82AAA"), "v1.00")
+
+    def test_wave51_xeno3_ambiguous_crc_not_labelled(self):
+        """Wave 51: Ambiguous Xenosaga III CRC FCD6E9FA must NOT have a crc_label."""
+        xeno = self.raw_games.get(
+            "Xenosaga Episode III: Also sprach Zarathustra", {}
+        )
+        labels = xeno.get("crc_labels", {})
+        self.assertNotIn("FCD6E9FA", labels,
+                         "Ambiguous CRC FCD6E9FA should not be labelled in Xenosaga III")
+
+    # ── Serial DB game count unchanged ───────────────────────────────────────
+
+    def test_wave51_serial_db_game_count_unchanged(self):
+        """Wave 51: serial DB game count must remain 2294."""
         self.assertEqual(len(self.raw_games), 2294)

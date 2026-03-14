@@ -867,9 +867,7 @@
     "Devil May Cry (DMD complete)": {
       "serial": "SLUS-20216",
       "alt_serials": [],
-      "crcs": [
-        "9E0C4BC3"
-      ],
+      "crcs": [],
       "release_date": "2001-10-16",
       "developer": "Capcom Co., Ltd",
       "publisher": "Capcom",
@@ -879,15 +877,25 @@
       "serial": "SLUS-20484",
       "alt_serials": [],
       "crcs": [
+        "08995DEE",
         "0BF94D63",
         "371C1949",
         "5CC91F1D",
+        "AEB91ED0",
         "D5B16B2D"
       ],
       "release_date": "2003-01-29",
       "developer": "Capcom",
       "publisher": "Capcom",
-      "genre": "Action, Platformer, Beat'em Up, Survival Horror."
+      "genre": "Action, Platformer, Beat'em Up, Survival Horror.",
+      "crc_labels": {
+        "0BF94D63": "v1.00",
+        "371C1949": "v1.01",
+        "5CC91F1D": "v1.02",
+        "D5B16B2D": "v1.03",
+        "08995DEE": "v1.04",
+        "AEB91ED0": "v1.05"
+      }
     },
     "Devil May Cry 2 (alt serial)": {
       "serial": "SLUS-20627",
@@ -915,9 +923,7 @@
     "Devil May Cry 3 (DMD complete)": {
       "serial": "SLUS-20964",
       "alt_serials": [],
-      "crcs": [
-        "4C416932"
-      ],
+      "crcs": [],
       "release_date": "2005-03-01",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -1424,9 +1430,7 @@
     "GTA San Andreas": {
       "serial": "SLUS-20946",
       "alt_serials": [],
-      "crcs": [
-        "9A5B29A1"
-      ],
+      "crcs": [],
       "release_date": "2004-10-26",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
@@ -1491,11 +1495,7 @@
     "God of War (God Mode complete)": {
       "serial": "SCUS-97399",
       "alt_serials": [],
-      "crcs": [
-        "8192CEA8",
-        "D6385328",
-        "FB0E6A61"
-      ],
+      "crcs": [],
       "release_date": "2005-03-22",
       "developer": "SCE Studio Santa Monica",
       "publisher": "Sony",
@@ -1512,15 +1512,17 @@
       "release_date": "2007-03-13",
       "developer": "Sony",
       "publisher": "Sony",
-      "genre": "Action, Adventure, Beat'em Up."
+      "genre": "Action, Adventure, Beat'em Up.",
+      "crc_labels": {
+        "0B29B9B6": "v1.00",
+        "2F123FD8": "v1.01",
+        "44A8A22A": "Greatest Hits"
+      }
     },
     "God of War II (Titan Mode complete)": {
       "serial": "SCUS-97481",
       "alt_serials": [],
-      "crcs": [
-        "2F123FD8",
-        "44A8A22A"
-      ],
+      "crcs": [],
       "release_date": "2007-03-13",
       "developer": "Sony",
       "publisher": "Sony",
@@ -1549,7 +1551,12 @@
       "release_date": "2001-07-09",
       "developer": "Polyphony Digital",
       "publisher": "Sony",
-      "genre": "Driving, Racing."
+      "genre": "Driving, Racing.",
+      "crc_labels": {
+        "85AE91B3": "v1.00",
+        "C12E4587": "v1.01",
+        "F9F416C5": "Greatest Hits"
+      }
     },
     "Gran Turismo 3: A-spec": {
       "serial": "SCUS-97102",
@@ -1617,6 +1624,7 @@
       "serial": "SLUS-20946",
       "alt_serials": [],
       "crcs": [
+        "2C6BE434",
         "399A49CA",
         "9A5B29A1",
         "B3D64CF8"
@@ -1624,16 +1632,18 @@
       "release_date": "2004-10-26",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
-      "genre": "Action"
+      "genre": "Action",
+      "crc_labels": {
+        "9A5B29A1": "v1.00",
+        "399A49CA": "v1.01",
+        "B3D64CF8": "Greatest Hits",
+        "2C6BE434": "v2.00"
+      }
     },
     "Grand Theft Auto: San Andreas (v2)": {
       "serial": "SLUS-20946",
       "alt_serials": [],
-      "crcs": [
-        "2C6BE434",
-        "399A49CA",
-        "B3D64CF8"
-      ],
+      "crcs": [],
       "release_date": "2004-10-26",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
@@ -2112,10 +2122,7 @@
     "Kingdom Hearts Re:Chain of Memories": {
       "serial": "SLUS-21799",
       "alt_serials": [],
-      "crcs": [
-        "D3E8D5EC",
-        "F2537F87"
-      ],
+      "crcs": [],
       "release_date": "2008-12-02",
       "developer": "Jupiter Corporation",
       "publisher": "Square Enix",
@@ -2124,11 +2131,7 @@
     "Kingdom Hearts: Chain of Memories (Re:CoM)": {
       "serial": "SLUS-21799",
       "alt_serials": [],
-      "crcs": [
-        "2AFC166C",
-        "D3E8D5EC",
-        "F2537F87"
-      ],
+      "crcs": [],
       "release_date": "2008-12-02",
       "developer": "Jupiter Corporation",
       "publisher": "Square Enix",
@@ -2145,7 +2148,12 @@
       "release_date": "2008-12-02",
       "developer": "Jupiter Corporation",
       "publisher": "Square Enix",
-      "genre": "Action, RPG."
+      "genre": "Action, RPG.",
+      "crc_labels": {
+        "2AFC166C": "v1.00",
+        "D3E8D5EC": "v1.01",
+        "F2537F87": "v1.02"
+      }
     },
     "Klonoa 2: Lunatea's Veil": {
       "serial": "SLUS-20151",
@@ -2410,15 +2418,19 @@
       "release_date": "2001-12-11",
       "developer": "Konami",
       "publisher": "Konami",
-      "genre": "Action, Adventure"
+      "genre": "Action, Adventure",
+      "crc_labels": {
+        "5E267A69": "v1.00",
+        "BFBBB524": "v1.01",
+        "F8371A97": "v1.02",
+        "21181211": "v1.03",
+        "1540CFB5": "Greatest Hits"
+      }
     },
     "Metal Gear Solid 2: Sons of Liberty (alt)": {
       "serial": "SLUS-20144",
       "alt_serials": [],
-      "crcs": [
-        "1540CFB5",
-        "21181211"
-      ],
+      "crcs": [],
       "release_date": "2001-12-11",
       "developer": "Konami",
       "publisher": "Konami",
@@ -2438,11 +2450,7 @@
     "Metal Gear Solid 3": {
       "serial": "SLUS-20915",
       "alt_serials": [],
-      "crcs": [
-        "015FC3F6",
-        "7C55F671",
-        "A76CBAA4"
-      ],
+      "crcs": [],
       "release_date": "2004-11-17",
       "developer": "Konami",
       "publisher": "Konami",
@@ -2452,20 +2460,28 @@
       "serial": "SLUS-20915",
       "alt_serials": [],
       "crcs": [
+        "015FC3F6",
+        "7C55F671",
         "A39517AB",
+        "A76CBAA4",
         "D4FA1757"
       ],
       "release_date": "2004-11-17",
       "developer": "Konami",
       "publisher": "Konami",
-      "genre": "Action, Adventure."
+      "genre": "Action, Adventure.",
+      "crc_labels": {
+        "015FC3F6": "v1.00",
+        "7C55F671": "v1.01",
+        "A76CBAA4": "v1.02",
+        "A39517AB": "v1.03",
+        "D4FA1757": "v1.04"
+      }
     },
     "Metal Gear Solid 3: Snake Eater (GH)": {
       "serial": "SLUS-20915",
       "alt_serials": [],
-      "crcs": [
-        "AEB91ED0"
-      ],
+      "crcs": [],
       "release_date": "2004-11-17",
       "developer": "Konami",
       "publisher": "Konami",
@@ -3402,7 +3418,12 @@
       "release_date": "2001-09-24",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
       "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror."
+      "genre": "Action, Adventure, Survival Horror.",
+      "crc_labels": {
+        "4A0E5B3A": "Greatest Hits v1.00",
+        "7BBFE394": "Greatest Hits v1.01",
+        "CC2AE534": "Greatest Hits v1.02"
+      }
     },
     "Silent Hill 2 (Greatest Hits)": {
       "serial": "SLUS-20228",
@@ -3472,7 +3493,13 @@
       "release_date": "2004-09-07",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
       "publisher": "Konami",
-      "genre": "Survival Horror, Action, Shooter."
+      "genre": "Survival Horror, Action, Shooter.",
+      "crc_labels": {
+        "0152E0C7": "v1.00",
+        "0D1EA753": "v1.01",
+        "3919136D": "v1.02",
+        "42E152EF": "v1.03"
+      }
     },
     "Silent Hill: Origins": {
       "serial": "SLUS-21731",
@@ -3883,7 +3910,14 @@
       "release_date": "2005-02-24",
       "developer": "Namco",
       "publisher": "Namco",
-      "genre": "Fighting"
+      "genre": "Fighting",
+      "crc_labels": {
+        "CF5A1A6B": "v1.00",
+        "CF36A3C2": "v1.01",
+        "7AC53678": "v1.02",
+        "B4414C0D": "v1.03",
+        "652050D2": "Greatest Hits"
+      }
     },
     "Tekken Tag Tournament": {
       "serial": "SLUS-20001",
@@ -4453,11 +4487,7 @@
     "Xenosaga Episode III": {
       "serial": "SLUS-21389",
       "alt_serials": [],
-      "crcs": [
-        "94A82AAA",
-        "A4E6B8D2",
-        "FCD6E9FA"
-      ],
+      "crcs": [],
       "release_date": "2006-08-29",
       "developer": "Monolith Soft",
       "publisher": "Namco Bandai Games",
@@ -4466,10 +4496,7 @@
     "Xenosaga Episode III: Also Sprach Zarathustra": {
       "serial": "SLUS-21389",
       "alt_serials": [],
-      "crcs": [
-        "94A82AAA",
-        "FCD6E9FA"
-      ],
+      "crcs": [],
       "release_date": "2006-08-29",
       "developer": "Monolith Soft",
       "publisher": "Namco Bandai Games",
@@ -4489,7 +4516,12 @@
       "release_date": "2006-08-29",
       "developer": "Monolith Soft",
       "publisher": "Namco Bandai Games",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "94A82AAA": "v1.00",
+        "A4E6B8D2": "v1.01",
+        "B7ECDECD": "v1.02"
+      }
     },
     "Yakuza": {
       "serial": "SLUS-21348",
@@ -4632,9 +4664,7 @@
     "Gran Turismo 3 A-Spec": {
       "serial": "SCUS-97102",
       "alt_serials": [],
-      "crcs": [
-        "85AE91B3"
-      ],
+      "crcs": [],
       "release_date": "2001-07-09",
       "developer": "Polyphony Digital",
       "publisher": "Sony",
