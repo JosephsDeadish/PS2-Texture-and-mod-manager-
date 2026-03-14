@@ -1382,7 +1382,11 @@
     },
     "Forbidden Siren 2": {
       "serial": "SCPS-15106",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2006-02-09",
+      "developer": "SCE Japan Studio",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Survival Horror"
     },
     "Forbidden Siren 2 (PAL)": {
       "serial": "SLES-53851",
@@ -1401,7 +1405,11 @@
     },
     "Front Mission 5: Scars of the War": {
       "serial": "SLPM-66205",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2005-12-29",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Strategy"
     },
     "GTA III": {
       "serial": "SLUS-20062",
@@ -1564,7 +1572,11 @@
     },
     "Gran Turismo 4 Prologue": {
       "serial": "SCES-52438",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2004-05-26",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Racing"
     },
     "Grand Theft Auto III": {
       "serial": "SLUS-20062",
@@ -2796,7 +2808,11 @@
       ],
       "crcs": [
         "FCD89DC3"
-      ]
+      ],
+      "release_date": "2003-03-25",
+      "developer": "SCE Cambridge Studio",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure"
     },
     "Prince of Persia: The Sands of Time": {
       "serial": "SLUS-20743",
@@ -3740,11 +3756,15 @@
     },
     "Tales of Destiny (PS2 remake)": {
       "serial": "SLPS-25715",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2006-11-30",
+      "genre": "RPG"
     },
     "Tales of Destiny 2": {
       "serial": "SLPS-25172",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2002-11-28",
+      "genre": "RPG"
     },
     "Tales of Legendia": {
       "serial": "SLUS-21201",
@@ -3759,7 +3779,11 @@
     },
     "Tales of Rebirth": {
       "serial": "SLPS-25450",
-      "alt_serials": []
+      "alt_serials": [],
+      "release_date": "2004-12-16",
+      "developer": "Namco Bandai",
+      "publisher": "Namco Bandai",
+      "genre": "Action, RPG"
     },
     "Tales of the Abyss": {
       "serial": "SLUS-21386",
@@ -4774,7 +4798,11 @@
       "alt_serials": [],
       "crcs": [
         "68DAC75E"
-      ]
+      ],
+      "release_date": "2001",
+      "developer": "Konami Computer Entertainment Osaka",
+      "publisher": "Konami of Europe",
+      "genre": "Sports"
     },
     "Super Bust-A-Move": {
       "serial": "SLUS-20115",
@@ -4845,7 +4873,11 @@
       "alt_serials": [],
       "crcs": [
         "51D8A6A9"
-      ]
+      ],
+      "release_date": "2001-11-16",
+      "developer": "Rage Software",
+      "publisher": "Rage Software",
+      "genre": "Driving, Racing"
     },
     "Vexx": {
       "serial": "SLUS-20383",
@@ -5275,7 +5307,11 @@
       "alt_serials": [],
       "crcs": [
         "EBDB6E4B"
-      ]
+      ],
+      "release_date": "2004-11-05",
+      "developer": "Heavy Iron Studios",
+      "publisher": "THQ",
+      "genre": "Action, Adventure, Platformer"
     },
     "FIFA Street": {
       "serial": "SLUS-21147",
@@ -11258,7 +11294,11 @@
       "alt_serials": [
         "SLUS-97414"
       ],
-      "crcs": []
+      "crcs": [],
+      "release_date": "2004-11-09",
+      "developer": "Harmonix",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing"
     },
     "Sly 2: Band of Thieves (SCUS-97415)": {
       "serial": "SCUS-97415",
@@ -15639,7 +15679,11 @@
       "alt_serials": [
         "SCUS-21117"
       ],
-      "crcs": []
+      "crcs": [],
+      "release_date": "2005-02-01",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami TYO Ltd.",
+      "genre": "Sports"
     },
     "Kessen III": {
       "serial": "SLUS-21119",
@@ -20612,6 +20656,15 @@
       "developer": "Marvelous Entertainment Inc.",
       "publisher": "Natsume",
       "genre": "Simulation / RPG / Fishing"
+    },
+    "FIFA 13": {
+      "serial": "SLUS-21954",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2012-09-25",
+      "developer": "EA Canada",
+      "publisher": "Electronic Arts",
+      "genre": "Soccer"
     }
   }
 }

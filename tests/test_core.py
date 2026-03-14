@@ -8626,3 +8626,112 @@ class TestWave45AltSerials(unittest.TestCase):
         self._assert_alt_serial(
             "Sakura Wars: So Long, My Love (Disc 1) (English Voice Over)", "SLUS-21930"
         )
+
+
+class TestWave46MetadataEnrichment(unittest.TestCase):
+    """Wave 46: metadata enrichment for 12 games via alt-serial cross-reference with PS2.data.json,
+    plus FIFA 13 (SLUS-21954) added as a new entry from PS2.titles.json."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.data = json.loads(db_path.read_text())["games"]
+
+    def _assert_metadata(self, title, field, expected=None):
+        game = self.data.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        value = game.get(field)
+        self.assertIsNotNone(value, f"Expected '{field}' to be set for '{title}'")
+        if expected is not None:
+            self.assertEqual(value, expected, f"Expected '{title}' {field}={expected!r}, got {value!r}")
+
+    # --- FIFA 13 new entry ---
+
+    def test_fifa13_in_db(self):
+        """Wave 46: FIFA 13 (SLUS-21954) added from PS2.titles.json."""
+        self.assertIn("FIFA 13", self.data)
+
+    def test_fifa13_serial(self):
+        """Wave 46: FIFA 13 should have serial SLUS-21954."""
+        self._assert_metadata("FIFA 13", "serial", "SLUS-21954")
+
+    # --- Metadata enrichment for 12 games ---
+
+    def test_primal_has_release_date(self):
+        """Wave 46: Primal should have release_date from PS2.data.json."""
+        self._assert_metadata("Primal", "release_date", "2003-03-25")
+
+    def test_primal_has_developer(self):
+        """Wave 46: Primal should have developer from PS2.data.json."""
+        self._assert_metadata("Primal", "developer", "SCE Cambridge Studio")
+
+    def test_eyetoy_antigrav_has_release_date(self):
+        """Wave 46: EyeToy: Antigrav should have release_date from PS2.data.json."""
+        self._assert_metadata("EyeToy: Antigrav", "release_date", "2004-11-09")
+
+    def test_eyetoy_antigrav_has_developer(self):
+        """Wave 46: EyeToy: Antigrav should have developer from PS2.data.json."""
+        self._assert_metadata("EyeToy: Antigrav", "developer", "Harmonix")
+
+    def test_we8_international_has_release_date(self):
+        """Wave 46: World Soccer WE8 International should have release_date."""
+        self._assert_metadata(
+            "World Soccer Winning Eleven 8: International", "release_date", "2005-02-01"
+        )
+
+    def test_we8_international_has_developer(self):
+        """Wave 46: World Soccer WE8 International should have developer."""
+        self._assert_metadata(
+            "World Soccer Winning Eleven 8: International",
+            "developer",
+            "Konami Computer Entertainment Japan",
+        )
+
+    def test_gran_turismo_4_prologue_has_metadata(self):
+        """Wave 46: Gran Turismo 4 Prologue should have developer Polyphony Digital."""
+        self._assert_metadata("Gran Turismo 4 Prologue", "developer", "Polyphony Digital")
+
+    def test_incredibles_has_release_date(self):
+        """Wave 46: Incredibles, The should have release_date from PS2.data.json."""
+        self._assert_metadata("Incredibles, The", "release_date", "2004-11-05")
+
+    def test_incredibles_has_developer(self):
+        """Wave 46: Incredibles, The should have developer Heavy Iron Studios."""
+        self._assert_metadata("Incredibles, The", "developer", "Heavy Iron Studios")
+
+    def test_tales_of_destiny_ps2_has_release_date(self):
+        """Wave 46: Tales of Destiny (PS2 remake) should have release_date."""
+        self._assert_metadata("Tales of Destiny (PS2 remake)", "release_date", "2006-11-30")
+
+    def test_tales_of_destiny_ps2_has_genre(self):
+        """Wave 46: Tales of Destiny (PS2 remake) should have genre RPG."""
+        self._assert_metadata("Tales of Destiny (PS2 remake)", "genre", "RPG")
+
+    def test_tales_of_destiny_2_has_release_date(self):
+        """Wave 46: Tales of Destiny 2 should have release_date."""
+        self._assert_metadata("Tales of Destiny 2", "release_date", "2002-11-28")
+
+    def test_tales_of_rebirth_has_developer(self):
+        """Wave 46: Tales of Rebirth should have developer Namco Bandai."""
+        self._assert_metadata("Tales of Rebirth", "developer", "Namco Bandai")
+
+    def test_forbidden_siren_2_has_developer(self):
+        """Wave 46: Forbidden Siren 2 should have developer SCE Japan Studio."""
+        self._assert_metadata("Forbidden Siren 2", "developer", "SCE Japan Studio")
+
+    def test_front_mission_5_has_developer(self):
+        """Wave 46: Front Mission 5: Scars of the War should have developer Square Enix."""
+        self._assert_metadata("Front Mission 5: Scars of the War", "developer", "Square Enix")
+
+    def test_gtc_africa_has_developer(self):
+        """Wave 46: GTC Africa should have developer Rage Software."""
+        self._assert_metadata("GTC Africa", "developer", "Rage Software")
+
+    def test_espn_nba_2night_has_release_date(self):
+        """Wave 46: ESPN NBA 2Night should have release_date."""
+        self._assert_metadata("ESPN NBA 2Night", "release_date", "2001")
+
+    def test_serial_db_wave46_game_count(self):
+        """Wave 46: serial DB should have at least 2288 games (FIFA 13 added)."""
+        self.assertGreaterEqual(len(self.data), 2288)
