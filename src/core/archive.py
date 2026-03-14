@@ -255,7 +255,18 @@ def extract_archive(source_path: str, dest_dir: str) -> List[str]:
 def _safe_name(member_path: str) -> bool:
     """Return True if *member_path* is safe to extract (no absolute paths or
     path traversal sequences).
+
+    Checks are performed on the raw string as well as on the parsed ``Path``
+    object so that backslash-based traversal sequences (e.g. ``..\\evil.txt``)
+    are rejected on POSIX systems where ``pathlib`` treats ``\\`` as a literal
+    character rather than a path separator.
     """
+    # Reject any path that contains a backslash-encoded traversal sequence.
+    # On Linux, Path('..\\foo').parts == ('..\\foo',), which does NOT expose
+    # the '..' component, so we must check the raw string first.
+    if "\\" in member_path:
+        # Normalise backslashes to forward slashes and re-check
+        member_path = member_path.replace("\\", "/")
     p = Path(member_path)
     if p.is_absolute():
         return False

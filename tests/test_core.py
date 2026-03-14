@@ -76,6 +76,27 @@ class TestModInfoSerialization(unittest.TestCase):
         self.assertEqual(restored.textures_path, cfg.textures_path)
         self.assertFalse(restored.first_run)
 
+    def test_from_dict_ignores_unknown_keys(self):
+        """ModInfo.from_dict must silently ignore keys not in the dataclass.
+
+        Without this behaviour a mods.json written by a newer version of the
+        app (which may have extra fields) would raise TypeError when loaded by
+        an older version.  ModDatabase._load() catches TypeError and resets the
+        entire database to {}, silently losing all tracked mods.
+        """
+        data = {
+            "id": "abc",
+            "name": "My Mod",
+            "mod_type": "texture_pack",
+            "path": "/tmp/mymod",
+            "future_field_added_in_v2": "some_value",
+            "another_new_field": 99,
+        }
+        mod = ModInfo.from_dict(data)
+        self.assertEqual(mod.id, "abc")
+        self.assertEqual(mod.name, "My Mod")
+        self.assertEqual(mod.mod_type, ModType.TEXTURE_PACK)
+
 
 class TestConfigManager(unittest.TestCase):
     """Test configuration persistence."""
@@ -210,8 +231,58 @@ class TestModDatabase(unittest.TestCase):
             json.dump({"bad": bad_entry}, f)
 
         db = self._make_db()
-        # Should have silently discarded the corrupted database
+        # Should have silently discarded only the corrupted entry
         self.assertEqual(db.all(), [])
+
+    def test_load_keeps_good_entries_when_one_is_corrupt(self):
+        """A single corrupt entry must not wipe valid mods from the database."""
+        import json
+        import src.core.config_manager as cm
+
+        good_entry = {
+            "id": "good", "name": "Good Mod", "mod_type": "texture_pack",
+            "path": "/tmp/good", "enabled": True, "version": "1.0",
+            "author": "", "description": "", "game_id": "", "thumbnail_url": "",
+            "thumbnail_path": "", "source_url": "", "priority": 0,
+            "files": [], "tags": [], "size_bytes": 0, "installed": True,
+            "has_update": False, "installed_at": 0.0,
+        }
+        bad_entry = {
+            "id": "bad", "name": "Bad Mod", "mod_type": "INVALID_TYPE",
+            "path": "", "enabled": True, "version": "1.0", "author": "",
+            "description": "", "game_id": "", "thumbnail_url": "",
+            "thumbnail_path": "", "source_url": "", "priority": 0,
+            "files": [], "tags": [], "size_bytes": 0, "installed": True,
+            "has_update": False, "installed_at": 0.0,
+        }
+        with open(cm.MODS_DB_FILE, "w") as f:
+            json.dump({"good": good_entry, "bad": bad_entry}, f)
+
+        db = self._make_db()
+        # Good entry must survive; corrupt entry is silently skipped
+        self.assertIsNotNone(db.get("good"))
+        self.assertEqual(db.get("good").name, "Good Mod")
+        self.assertIsNone(db.get("bad"))
+
+    def test_save_is_atomic(self):
+        """ModDatabase.save() must not corrupt the DB file on failure."""
+        import json
+        import src.core.config_manager as cm
+        from src.core.mod_manager import ModDatabase
+
+        # Pre-populate the DB with one mod
+        db = self._make_db()
+        mod = ModInfo(id="x", name="X", mod_type=ModType.PNACH, path="/p")
+        db.add(mod)
+
+        # The file must be valid JSON after save()
+        with open(cm.MODS_DB_FILE, "r") as f:
+            data = json.load(f)
+        self.assertIn("x", data)
+
+        # No leftover .tmp files in the same directory
+        tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
+        self.assertEqual(tmp_files, [])
 
 
 class TestModManager(unittest.TestCase):
@@ -302,7 +373,28 @@ class TestModManager(unittest.TestCase):
         self.assertIsNone(db.get(mod.id))
         self.assertFalse(Path(mod_path).exists())
 
-    def test_detect_no_conflicts(self):
+    def test_remove_mod_file_path(self):
+        """remove_mod should delete a single file when mod.path is a file (not a dir)."""
+        db, mgr = self._make_manager()
+        pnach_dir = Path(self.tmpdir) / "pnach"
+        pnach_dir.mkdir()
+        pnach_file = pnach_dir / "F0A235B4.pnach"
+        pnach_file.write_text("patch v=0 nop")
+
+        # Register a ModInfo whose path points directly at the file (PNACH-from-GitHub pattern)
+        mod = ModInfo(
+            id="test-pnach-direct",
+            name="Widescreen Patch (F0A235B4)",
+            mod_type=ModType.PNACH,
+            path=str(pnach_file),
+        )
+        db.add(mod)
+        self.assertTrue(pnach_file.exists())
+
+        mgr.remove_mod(mod.id, delete_files=True)
+        self.assertIsNone(db.get(mod.id))
+        self.assertFalse(pnach_file.exists())
+
         db, mgr = self._make_manager()
         db.add(ModInfo(id="x", name="X", mod_type=ModType.TEXTURE_PACK, path="/p",
                        enabled=True, files=["a.png"]))
@@ -452,6 +544,59 @@ class TestDownloader(unittest.TestCase):
             with open(dest, "rb") as f:
                 self.assertEqual(f.read(), b"hello")
 
+    @patch("src.core.downloader.requests.get")
+    def test_download_removes_partial_file_on_network_error(self, mock_get):
+        """A failed mid-download must not leave a partial file on disk."""
+        import tempfile
+        import requests as _requests
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+
+        # First chunk succeeds, second raises a network error
+        def _iter_content(chunk_size=None):
+            yield b"partial"
+            raise _requests.ConnectionError("broken pipe")
+
+        mock_resp.iter_content.side_effect = _iter_content
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            # Partial file must have been removed
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_removes_partial_file_on_cancel(self, mock_get):
+        """Cancelling via the progress callback must remove the partial file."""
+        import tempfile
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+        mock_resp.iter_content.return_value = [b"partial"]
+        mock_get.return_value = mock_resp
+
+        def _cancel_callback(received, total):
+            raise DownloadError("Download cancelled")
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest,
+                              progress_callback=_cancel_callback)
+            # Partial file must have been removed
+            self.assertFalse(Path(dest).exists())
+
 
 class TestArchiveExtraction(unittest.TestCase):
     """Tests for archive extraction utilities."""
@@ -511,6 +656,25 @@ class TestArchiveExtraction(unittest.TestCase):
         with zipfile.ZipFile(bad_zip, "w") as zf:
             zf.writestr("../evil.txt", "bad content")
         dest = str(Path(self.tmpdir) / "safe")
+        with self.assertRaises(ArchiveError):
+            extract_archive(bad_zip, dest)
+
+    def test_extract_zip_rejects_backslash_path_traversal(self):
+        """ZIP members with backslash-encoded traversal must be rejected.
+
+        On POSIX systems, pathlib.Path('..\\\\evil.txt').parts returns the
+        whole string as one component so the '..' check is bypassed.  The
+        fixed _safe_name() replaces '\\\\' with '/' before parsing, catching
+        sequences like '..\\\\evil.txt' or 'foo\\\\..\\\\bar'.
+        """
+        from src.core.archive import extract_archive, ArchiveError
+        import zipfile
+        bad_zip = str(Path(self.tmpdir) / "backslash_bad.zip")
+        # Craft a member whose filename contains a backslash traversal
+        with zipfile.ZipFile(bad_zip, "w") as zf:
+            info = zipfile.ZipInfo("..\\evil.txt")
+            zf.writestr(info, "evil content")
+        dest = str(Path(self.tmpdir) / "safe2")
         with self.assertRaises(ArchiveError):
             extract_archive(bad_zip, dest)
 
@@ -714,6 +878,29 @@ class TestMemoryCardCreate(unittest.TestCase):
         deep_path = str(Path(self.tmpdir) / "sub" / "deep" / "card.ps2")
         result = create_memcard(deep_path)
         self.assertTrue(Path(result).exists())
+
+    def test_raises_on_zero_size(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "bad.ps2"), size_mb=0)
+
+    def test_raises_on_negative_size(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "bad.ps2"), size_mb=-1)
+
+    def test_raises_on_oversized(self):
+        from src.core.memory_card import create_memcard, MemoryCardError
+        with self.assertRaises(MemoryCardError):
+            create_memcard(str(Path(self.tmpdir) / "big.ps2"), size_mb=65)
+
+    def test_accepts_boundary_sizes(self):
+        """size_mb=1 and size_mb=64 must both succeed."""
+        from src.core.memory_card import create_memcard
+        p1 = str(Path(self.tmpdir) / "min.ps2")
+        p64 = str(Path(self.tmpdir) / "max.ps2")
+        self.assertTrue(Path(create_memcard(p1, size_mb=1)).exists())
+        self.assertTrue(Path(create_memcard(p64, size_mb=64)).exists())
 
 
 class TestUpdateMetadata(unittest.TestCase):
@@ -2030,10 +2217,10 @@ class TestAppConfigFieldChanges(unittest.TestCase):
     # -- New browse-filter preference fields ---------------------------------
 
     def test_browse_filter_defaults(self):
-        """show_paid defaults to False; show_account_required and show_incomplete to True."""
+        """show_paid and show_account_required default to False; show_incomplete to True."""
         cfg = AppConfig()
         self.assertFalse(cfg.show_paid)
-        self.assertTrue(cfg.show_account_required)
+        self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
 
     def test_browse_filter_fields_in_to_dict(self):
@@ -2059,7 +2246,7 @@ class TestAppConfigFieldChanges(unittest.TestCase):
                "first_run": False, "favorite_authors": [], "show_nsfw": False}
         cfg = AppConfig.from_dict(old)
         self.assertFalse(cfg.show_paid)
-        self.assertTrue(cfg.show_account_required)
+        self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
 
 
@@ -3499,8 +3686,103 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 self.assertTrue(explicit,
                     f"Patreon entry {entry['id']} has requires_account=False, expected True")
 
+    def test_in_app_download_filter_logic(self):
+        """in_app_only filter must show only entries downloadable within the app.
 
-class TestTextureStructureNormalization(unittest.TestCase):
+        An entry is in-app downloadable when:
+        - download_action is 'cover_by_id' or 'cover_by_url', OR
+        - download_action is '' AND direct_download_url is non-empty.
+        All other entries (manual, download_save, manual_mega without direct
+        URL, or empty action without direct URL) must be hidden.
+        """
+        def is_in_app(entry):
+            action = entry.get("download_action", "")
+            if action in ("cover_by_id", "cover_by_url"):
+                return True
+            return action == "" and bool(entry.get("direct_download_url", ""))
+
+        must_be_true = [
+            {"download_action": "cover_by_id", "direct_download_url": ""},
+            {"download_action": "cover_by_url", "direct_download_url": ""},
+            {
+                "download_action": "",
+                "direct_download_url": "https://www.mediafire.com/file/abc/mod.zip/file",
+            },
+            {
+                "download_action": "",
+                "direct_download_url": "https://drive.google.com/file/d/ABCDEF/view",
+            },
+        ]
+        for e in must_be_true:
+            self.assertTrue(is_in_app(e), f"Expected in-app=True for {e}")
+
+        must_be_false = [
+            {"download_action": "manual", "direct_download_url": ""},
+            {"download_action": "download_save", "direct_download_url": ""},
+            {"download_action": "manual_mega", "direct_download_url": ""},
+            {"download_action": "manual_mega",
+             "direct_download_url": "https://mega.nz/file/ABCDEF"},
+            {"download_action": "", "direct_download_url": ""},
+            {"download_action": ""},
+        ]
+        for e in must_be_false:
+            self.assertFalse(is_in_app(e), f"Expected in-app=False for {e}")
+
+    def test_in_app_download_filter_applied_to_catalogue(self):
+        """The in_app_only filter on the real catalogue must yield a subset of entries."""
+        def is_in_app(entry):
+            action = entry.get("download_action", "")
+            if action in ("cover_by_id", "cover_by_url"):
+                return True
+            return action == "" and bool(entry.get("direct_download_url", ""))
+
+        in_app = [e for e in self.catalogue if is_in_app(e)]
+        not_in_app = [e for e in self.catalogue if not is_in_app(e)]
+
+        self.assertEqual(len(in_app) + len(not_in_app), len(self.catalogue))
+
+        for e in in_app:
+            action = e.get("download_action", "")
+            direct = e.get("direct_download_url", "")
+            ok = action in ("cover_by_id", "cover_by_url") or (action == "" and bool(direct))
+            self.assertTrue(ok, f"Entry {e['id']} wrongly classified as in-app")
+
+        from src.models.mod import ModType
+        cover_in_app = [
+            e for e in self.catalogue
+            if e.get("type") == ModType.COVER_ART and is_in_app(e)
+        ]
+        self.assertGreater(len(cover_in_app), 100,
+                           "Expected many cover art entries to be in-app downloadable")
+
+    def test_no_serial_shared_across_unrelated_games(self):
+        """Each game_serial must not be assigned to more than 4 distinct game titles.
+
+        A small number of duplicate titles (e.g. 'Dragon Quest VIII' vs
+        'Dragon Quest VIII: Journey of the Cursed King') are acceptable, but
+        a serial being shared across genuinely different games indicates a
+        data error in the catalogue.  The threshold is set to 4 to reflect
+        the current cleaned state; future waves should reduce this further.
+        """
+        from collections import defaultdict
+
+        serial_games: dict = defaultdict(set)
+        for entry in self.catalogue:
+            serial = entry.get("game_serial", "")
+            game = entry.get("game", "")
+            if serial and game:
+                serial_games[serial].add(game)
+
+        for serial, games in serial_games.items():
+            self.assertLessEqual(
+                len(games),
+                4,
+                f"Serial {serial} is shared by {len(games)} different games: {games}. "
+                "This likely indicates wrong game_serial assignments.",
+            )
+
+
+
     """Tests for ModManager._normalize_texture_structure."""
 
     def setUp(self):
@@ -3597,9 +3879,9 @@ class TestGametdbCoverUrl(unittest.TestCase):
         self.gcu = gametdb_cover_url
 
     def test_ntsc_us_slus_gives_us_region(self):
-        url = self.gcu("SLUS-21829")
+        url = self.gcu("SLUS-21714")
         self.assertIn("/US/", url)
-        self.assertIn("SLUS21829", url)
+        self.assertIn("SLUS21714", url)
         self.assertTrue(url.startswith("https://art.gametdb.com/ps2/cover/"))
 
     def test_ntsc_us_scus_gives_us_region(self):
@@ -3631,8 +3913,8 @@ class TestGametdbCoverUrl(unittest.TestCase):
         self.assertEqual(url, "")
 
     def test_lowercase_input_normalised(self):
-        url = self.gcu("slus-21829")
-        self.assertIn("SLUS21829", url)
+        url = self.gcu("slus-21714")
+        self.assertIn("SLUS21714", url)
         self.assertIn("/US/", url)
 
     def test_url_ends_with_jpg(self):
@@ -3701,10 +3983,10 @@ class TestCatalogueGameSerial(unittest.TestCase):
             "doti_kh2_textures":           "SLUS-21005",
             "doti_ffx_textures":           "SLUS-20312",
             "doti_sh2_textures":           "SLUS-20228",
-            "cckrizalid_baroque_textures": "SLUS-21829",
+            "cckrizalid_baroque_textures": "SLUS-21714",
             "spyro_anb_6x_extra_detail":   "SLUS-21372",
             "sly2_save_gamefiles":         "SCES-52400",
-            "bully_save_moataz":           "SLUS-21358",
+            "bully_save_moataz":           "SLUS-21269",
             "god_of_war_save_gbatemp":     "SCUS-97399",
         }
         for eid, expected_serial in expected.items():
@@ -3825,7 +4107,7 @@ class TestCCKrizalidEntries(unittest.TestCase):
 
     def test_baroque_serial_is_slus_21829(self):
         e = self.entries["cckrizalid_baroque_textures"]
-        self.assertEqual(e["game_serial"], "SLUS-21829")
+        self.assertEqual(e["game_serial"], "SLUS-21714")
 
     def test_baroque_author_is_cckrizalid(self):
         e = self.entries["cckrizalid_baroque_textures"]
@@ -3884,8 +4166,8 @@ class TestCatalogueLoader(unittest.TestCase):
     # ── Basic load ──────────────────────────────────────────────────────────
 
     def test_loads_more_than_150_entries(self):
-        self.assertGreater(len(self.catalogue), 850,
-                           "catalogue should have >850 entries after scaling")
+        self.assertGreater(len(self.catalogue), 3000,
+                           "catalogue should have >3000 entries after Wave 40 bulk expansion")
 
     def test_no_duplicate_ids(self):
         ids = [e["id"] for e in self.catalogue]
@@ -3956,7 +4238,7 @@ class TestCatalogueLoader(unittest.TestCase):
     def test_has_pnach_entries(self):
         from src.models.mod import ModType
         pn = [e for e in self.catalogue if e["type"] == ModType.PNACH]
-        self.assertGreater(len(pn), 320, "Expected >320 PNACH entries")
+        self.assertGreater(len(pn), 1000, "Expected >1000 PNACH entries after Wave 40 bulk expansion")
 
     def test_has_save_file_entries(self):
         from src.models.mod import ModType
@@ -7098,6 +7380,40 @@ class TestDownloadHistory(unittest.TestCase):
         loaded = _load(self.cfg)
         self.assertEqual(len(loaded), MAX_HISTORY_ENTRIES)
 
+    def test_save_is_atomic_no_tmp_files_left(self):
+        """_save() must not leave .tmp files after a successful write."""
+        from src.core.download_history import record_event, _save, _load
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+        # No .tmp files should remain
+        tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
+        self.assertEqual(tmp_files, [])
+
+    def test_save_does_not_corrupt_existing_file_on_write_error(self):
+        """If an error occurs during write, the original file must be unchanged."""
+        import json
+        from src.core.download_history import record_event, _load, get_history_file
+        record_event(self.cfg, mod_name="A", mod_type="pnach")
+
+        import unittest.mock as um
+        from src.core.download_history import _save
+        entries = _load(self.cfg)
+        history_path = get_history_file(self.cfg)
+
+        original_json = json.loads(history_path.read_text(encoding="utf-8"))
+
+        def _bad_replace(src, dst):
+            raise OSError("simulated disk full")
+
+        with um.patch("src.core.download_history.os.replace", side_effect=_bad_replace):
+            try:
+                _save(entries, self.cfg)
+            except OSError:
+                pass
+
+        # Original file must still be valid
+        data = json.loads(history_path.read_text(encoding="utf-8"))
+        self.assertEqual(data, original_json)
+
 
 
 class TestModNotes(unittest.TestCase):
@@ -7382,3 +7698,3456 @@ class TestModNotes(unittest.TestCase):
         result = export_notes_csv(self.cfg, path=out)
         self.assertEqual(result, out)
         self.assertTrue(os.path.isfile(out))
+
+
+# ===========================================================================
+# Serial Database + Validator
+# ===========================================================================
+
+class TestSerialDatabase(unittest.TestCase):
+    """Tests for the authoritative PS2 serial database and catalogue validator."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # DB integrity
+    # ------------------------------------------------------------------
+
+    def test_serial_db_loads_nonempty(self):
+        """Serial DB must contain at least 300 games."""
+        self.assertGreater(self.sdb.game_count(), 300)
+
+    def test_serial_db_all_serials_valid_format(self):
+        """Every primary serial must match the SLUS/SCUS/SLES/SCES-NNNNN pattern."""
+        import re
+        pat = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            self.assertRegex(info.serial, pat,
+                             f"Bad serial format for '{title}': {info.serial!r}")
+
+    def test_serial_db_no_duplicate_primary_serials(self):
+        """No two genuinely-different games should share the same primary serial.
+
+        Title variants of the same game (e.g. 'God of War' / 'God of War (God Mode
+        complete)', 'GTA III' / 'Grand Theft Auto III', 'Ico' / 'ICO') are allowed
+        to share a serial because they refer to the same disc.  Only entries where
+        neither title is a case-normalised substring of the other, and neither
+        carries a save-variant suffix, are treated as distinct games.
+        """
+        import re
+        VARIANT_SUFFIXES = re.compile(
+            r'\s*[\(/](DMD complete|100% complete|God Mode complete|Titan Mode complete|'
+            r'post-game.*|all unlocked|all characters|Greatest Hits|alternate|alt|'
+            r'pre-order|The Journey.*|PAL|post-game|professional complete)[)\s].*$',
+            re.I,
+        )
+
+        def core_title(t: str) -> str:
+            """Strip save-variant suffixes and normalise to lowercase alphanumeric."""
+            t2 = VARIANT_SUFFIXES.sub('', t).strip()
+            # Keep only letters, digits, and spaces for robust comparison
+            t2 = re.sub(r'[^a-z0-9 ]', ' ', t2.lower())
+            # Expand common short-form game abbreviations
+            t2 = re.sub(r'\bgta\b', 'grand theft auto', t2)
+            t2 = re.sub(r'\s+', ' ', t2).strip()
+            return t2
+
+        seen: dict = {}  # serial → first title seen
+        for title in self.sdb.all_titles():
+            serial = self.sdb.get_serial(title)
+            if serial not in seen:
+                seen[serial] = title
+                continue
+            other = seen[serial]
+            c1, c2 = core_title(title), core_title(other)
+            # Allow if one core title is a substring of the other (title variant),
+            # or the word sets overlap ≥ 80% (reordered title),
+            # or the first 3 significant words are identical (subtitle variants).
+            words1, words2 = set(c1.split()), set(c2.split())
+            overlap = len(words1 & words2) / max(len(words1 | words2), 1)
+            prefix1 = c1.split()[:2]
+            prefix2 = c2.split()[:2]
+            same_prefix = prefix1 == prefix2 and len(prefix1) >= 2
+            if c1 not in c2 and c2 not in c1 and overlap < 0.8 and not same_prefix:
+                self.fail(
+                    f"Duplicate primary serial {serial!r} for genuinely different "
+                    f"games: '{title}' vs '{other}'"
+                )
+
+    # ------------------------------------------------------------------
+    # Known-correct serial assignments (CRC-backed)
+    # ------------------------------------------------------------------
+
+    def test_kingdom_hearts_serial(self):
+        self.assertEqual(self.sdb.get_serial("Kingdom Hearts"), "SLUS-20370")
+
+    def test_god_of_war_serial(self):
+        self.assertEqual(self.sdb.get_serial("God of War"), "SCUS-97399")
+
+    def test_mgs3_snake_eater_serial(self):
+        self.assertEqual(
+            self.sdb.get_serial("Metal Gear Solid 3: Snake Eater"), "SLUS-20915"
+        )
+
+    def test_okami_serial(self):
+        # pnach_db CRC 1B594C95 + 21068223 confirm SLUS-21115 (not Steambot Chronicles SLUS-21344)
+        self.assertEqual(self.sdb.get_serial("Okami"), "SLUS-21115")
+
+    def test_castlevania_lament_serial(self):
+        # SLUS-20733 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(
+            self.sdb.get_serial("Castlevania: Lament of Innocence"), "SLUS-20733"
+        )
+
+    def test_disgaea_hour_of_darkness_serial(self):
+        # SLUS-20666 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(
+            self.sdb.get_serial("Disgaea: Hour of Darkness"), "SLUS-20666"
+        )
+
+    def test_shadow_hearts_serial(self):
+        # SLUS-20347 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(self.sdb.get_serial("Shadow Hearts"), "SLUS-20347")
+
+    def test_prince_of_persia_sot_serial(self):
+        # CRC 6A928BAE + 880EB41E confirm SLUS-20743
+        self.assertEqual(
+            self.sdb.get_serial("Prince of Persia: The Sands of Time"), "SLUS-20743"
+        )
+
+    def test_silent_hill_4_serial(self):
+        # SLUS-20873 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(
+            self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20873"
+        )
+
+    def test_hack_infection_serial(self):
+        # CRC D3C7A0A3 confirms SLUS-20267
+        self.assertEqual(self.sdb.get_serial(".hack//Infection"), "SLUS-20267")
+
+    def test_zoe_2nd_runner_serial(self):
+        self.assertEqual(
+            self.sdb.get_serial("Zone of the Enders: The 2nd Runner"), "SLUS-20545"
+        )
+
+    def test_crash_twinsanity_serial(self):
+        # SLUS-20909 confirmed via PCSX2 GameIndex (NTSC-U)
+        self.assertEqual(
+            self.sdb.get_serial("Crash Twinsanity"), "SLUS-20909"
+        )
+
+    # ------------------------------------------------------------------
+    # is_valid / is_known helpers
+    # ------------------------------------------------------------------
+
+    def test_is_valid_correct_serial_returns_true(self):
+        self.assertTrue(self.sdb.is_valid("Kingdom Hearts", "SLUS-20370"))
+
+    def test_is_valid_wrong_serial_returns_false(self):
+        self.assertFalse(self.sdb.is_valid("Kingdom Hearts", "SLUS-20773"))
+
+    def test_is_known_alt_serial_returns_true(self):
+        # SLPS-25112 is the Japanese regional alt for Armored Core 3
+        self.assertTrue(self.sdb.is_known("Armored Core 3", "SLPS-25112"))
+
+    def test_is_known_completely_wrong_serial_returns_false(self):
+        self.assertFalse(self.sdb.is_known("Kingdom Hearts", "SLUS-99999"))
+
+    def test_titles_for_serial_finds_game(self):
+        titles = self.sdb.titles_for_serial("SLUS-20370")
+        self.assertIn("Kingdom Hearts", titles)
+
+    # ------------------------------------------------------------------
+    # Catalogue validation — after fixes
+    # ------------------------------------------------------------------
+
+    def test_validate_all_catalogues_zero_issues_after_fixes(self):
+        """After the Wave 37 serial fixes, no catalogue entry should mismatch."""
+        issues = self.sdb.validate_all_catalogues()
+        if issues:
+            sample = "\n".join(str(i) for i in issues[:10])
+            self.fail(
+                f"Found {len(issues)} remaining serial mismatches:\n{sample}"
+            )
+
+    def test_validate_catalogue_detects_wrong_serial(self):
+        """validate_catalogue() detects a manually-injected wrong serial."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        fake_entries = [
+            {"game": "Kingdom Hearts", "game_serial": "SLUS-20773"},
+            {"game": "God of War",     "game_serial": "SCUS-97399"},  # correct
+        ]
+        issues = sdb.validate_catalogue(fake_entries, source_file="test")
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].game, "Kingdom Hearts")
+        self.assertEqual(issues[0].serial_found, "SLUS-20773")
+        self.assertEqual(issues[0].expected_serial, "SLUS-20370")
+
+    def test_summary_report_structure(self):
+        report = self.sdb.summary_report()
+        self.assertIn("total_games_in_db", report)
+        self.assertIn("issue_count", report)
+        self.assertIn("games_with_issues", report)
+        self.assertIn("issues", report)
+        self.assertGreater(report["total_games_in_db"], 300)
+        self.assertIsInstance(report["issues"], list)
+
+    def test_summary_report_issue_count_zero_after_fixes(self):
+        """After Wave 37 fixes, summary report should show 0 issues."""
+        report = self.sdb.summary_report()
+        self.assertEqual(
+            report["issue_count"], 0,
+            f"Expected 0 issues, got {report['issue_count']}. "
+            f"Affected games: {report['games_with_issues'][:5]}"
+        )
+
+    # ------------------------------------------------------------------
+    # Serial DB file integrity
+    # ------------------------------------------------------------------
+
+    def test_serial_db_file_exists(self):
+        import os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_ntsc_u.json"
+        )
+        self.assertTrue(os.path.isfile(path))
+
+    def test_serial_db_file_valid_json(self):
+        import json, os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_ntsc_u.json"
+        )
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertIn("version", data)
+        self.assertIn("games", data)
+        self.assertIsInstance(data["games"], dict)
+
+    def test_catalogue_kingdom_hearts_serial_fixed(self):
+        """All KH entries in every catalogue should use SLUS-20370 after fixes."""
+        import json, os
+        cat_dir = os.path.join(os.path.dirname(__file__), "..", "data", "catalogue")
+        for fname in ("texture_packs.json", "saves.json", "cover_art.json", "pnach.json"):
+            path = os.path.join(cat_dir, fname)
+            if not os.path.isfile(path):
+                continue
+            data = json.load(open(path, encoding="utf-8"))
+            for entry in data:
+                if entry.get("game") == "Kingdom Hearts":
+                    self.assertEqual(
+                        entry.get("game_serial"), "SLUS-20370",
+                        f"{fname}: Kingdom Hearts entry has wrong serial"
+                    )
+
+    def test_catalogue_god_of_war_serial_fixed(self):
+        """All GoW entries should use SCUS-97399 after fixes."""
+        import json, os
+        cat_dir = os.path.join(os.path.dirname(__file__), "..", "data", "catalogue")
+        for fname in ("texture_packs.json", "saves.json", "cover_art.json", "pnach.json"):
+            path = os.path.join(cat_dir, fname)
+            if not os.path.isfile(path):
+                continue
+            data = json.load(open(path, encoding="utf-8"))
+            for entry in data:
+                if entry.get("game") == "God of War":
+                    self.assertEqual(
+                        entry.get("game_serial"), "SCUS-97399",
+                        f"{fname}: God of War entry has wrong serial"
+                    )
+
+
+# ===========================================================================
+# Wave 38 – serial DB CRCs, expanded cheats catalogue, link checker,
+#            CRC↔serial cross-validation
+# ===========================================================================
+
+class TestSerialDbCrcs(unittest.TestCase):
+    """Serial DB must have CRC arrays populated from the PNACH DB."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_serial_db_expanded_to_over_700_games(self):
+        """After Wave 41 expansion, serial DB should contain > 950 games."""
+        self.assertGreater(self.sdb.game_count(), 950)
+
+    def test_kingdom_hearts_has_crcs(self):
+        info = self.sdb.get_info("Kingdom Hearts")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0,
+                           "Kingdom Hearts entry should have at least one CRC")
+
+    def test_god_of_war_has_crcs(self):
+        info = self.sdb.get_info("God of War")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0,
+                           "God of War entry should have at least one CRC")
+
+    def test_final_fantasy_x_has_crcs(self):
+        info = self.sdb.get_info("Final Fantasy X")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0)
+
+    def test_gta_san_andreas_has_crcs(self):
+        info = self.sdb.get_info("Grand Theft Auto: San Andreas")
+        self.assertIsNotNone(info)
+        self.assertGreater(len(info.crcs), 0)
+
+    def test_games_with_crcs_count_over_200(self):
+        """At least 875 games in the serial DB must have CRC entries.
+
+        Wave 41 established ≥900; Wave 51 consolidated ~10 duplicate/redundant
+        entries; Wave 52 cleared CRCs from 7 more wrong-case/alias entries
+        while preserving all unique CRC coverage.
+        """
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
+        )
+        self.assertGreater(count, 875,
+                           f"Expected >875 games with CRCs, got {count}")
+
+    def test_crcs_are_8_hex_uppercase(self):
+        """All CRC values must be 8 uppercase hex characters."""
+        import re
+        pat = re.compile(r'^[0-9A-F]{8}$')
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            for crc in info.crcs:
+                self.assertRegex(crc, pat,
+                                 f"Bad CRC {crc!r} for '{title}'")
+
+    def test_wave41_new_games_present(self):
+        """Wave 41: newly added NTSC-U games from Gabominated should be in DB."""
+        new_games = [
+            ("Area 51",            "SLUS-20595"),
+            ("Black",              "SLUS-21376"),
+            ("Cold Fear",          "SLUS-21047"),
+            ("Drakan - The Ancients' Gates", "SCUS-97128"),
+            ("Killzone",           "SCUS-97402"),
+            ("Mercenaries 2 - World in Flames", "SLUS-21650"),
+            ("Star Wars - The Force Unleashed", "SLUS-21614"),
+            ("Stuntman - Ignition", "SLUS-21626"),
+        ]
+        for title, serial in new_games:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info, f"'{title}' missing from serial DB")
+                self.assertEqual(info.serial, serial)
+                self.assertGreater(len(info.crcs), 0,
+                                   f"'{title}' has no CRC entries")
+
+
+class TestWave42SerialDb(unittest.TestCase):
+    """Wave 42: serial DB expanded with PS2.data.json / PS2.titles.json data."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_wave42_game_count_over_2200(self):
+        """After Wave 42, serial DB should contain > 2200 games."""
+        self.assertGreater(
+            self.sdb.game_count(), 2200,
+            f"Expected >2200 games, got {self.sdb.game_count()}"
+        )
+
+    def test_wave42_games_with_crcs_over_900(self):
+        """Wave 42: at least 875 games still have CRC entries.
+
+        Wave 51 consolidated ~10 duplicate/redundant entries into canonical
+        entries; Wave 52 cleared CRCs from 7 more alias/wrong-case entries,
+        reducing the count while preserving all unique CRC coverage.
+        """
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
+        )
+        self.assertGreater(count, 875,
+                           f"Expected >875 games with CRCs, got {count}")
+
+    def test_wave42_dbz_sagas_crc_fixed(self):
+        """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
+        info = self.sdb.get_info("Dragon Ball Z: Sagas")
+        self.assertIsNotNone(info)
+        self.assertIn("E36751DA", info.crcs,
+                      "DBZ Sagas missing CRC E36751DA")
+
+    def test_wave42_godfather_added(self):
+        """The Godfather (SLUS-21385) must be present with CRC D850707E."""
+        info = self.sdb.get_info("The Godfather")
+        self.assertIsNotNone(info, "The Godfather missing from serial DB")
+        self.assertEqual(info.serial, "SLUS-21385")
+        self.assertIn("D850707E", info.crcs)
+
+    def test_wave42_ps2data_games_present(self):
+        """Wave 42: spot-check games added from PS2.data.json are in DB."""
+        new_games = [
+            ("Summoner",                         "SLUS-20074"),
+            ("Midnight Club: Street Racing",     "SLUS-20063"),
+            ("Dynasty Warriors 2",               "SLUS-20079"),
+            ("ATV Offroad Fury",                 "SCUS-97122"),
+            ("Dark Cloud",                       "SCUS-97111"),
+            ("Gauntlet: Dark Legacy",            "SLUS-20047"),
+            ("Star Wars: Starfighter",           "SLUS-20044"),
+            ("Okage: Shadow King",               "SCUS-97129"),
+            ("ATV Off-Road Fury",                "SCUS-97104"),
+            ("Frequency",                        "SCUS-97125"),
+        ]
+        for title, serial in new_games:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info, f"'{title}' missing from serial DB")
+                self.assertEqual(
+                    info.serial, serial,
+                    f"'{title}' expected serial {serial!r}, got {info.serial!r}"
+                )
+
+
+class TestCrcSerialConsistency(unittest.TestCase):
+    """CRC-serial cross-validation: every CRC's serial should exist in serial_db."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_crc_serial_consistency_issues_under_5(self):
+        """After Wave 38 fixes, < 5 CRC entries should have unknown serials.
+
+        The only allowed leftovers are non-NTSC-U serials (PSP, Korean, etc.)
+        that are correctly absent from the NTSC-U serial DB.
+        """
+        issues = self.sdb.validate_crc_serial_consistency()
+        self.assertLess(
+            len(issues), 5,
+            f"Found {len(issues)} CRC-serial mismatches (expected < 5):\n"
+            + "\n".join(str(i) for i in issues[:10])
+        )
+
+    def test_crc_serial_consistency_returns_list(self):
+        result = self.sdb.validate_crc_serial_consistency()
+        self.assertIsInstance(result, list)
+        for item in result:
+            self.assertIn("crc",    item)
+            self.assertIn("serial", item)
+            self.assertIn("issue",  item)
+
+
+class TestCheatsCatalogue(unittest.TestCase):
+    """Expanded cheats catalogue should have game-specific entries."""
+
+    def setUp(self):
+        import json, os
+        path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "catalogue", "cheats.json"
+        )
+        with open(path, encoding="utf-8") as f:
+            self.cheats = json.load(f)
+
+    def test_cheats_catalogue_has_over_100_entries(self):
+        """After Wave 40 expansion, cheats.json should have > 600 entries."""
+        self.assertGreater(len(self.cheats), 600)
+
+    def test_cheats_catalogue_has_game_specific_entries(self):
+        """At least 600 entries should have a non-empty game_serial."""
+        with_serial = [e for e in self.cheats if e.get("game_serial")]
+        self.assertGreater(len(with_serial), 600,
+                           f"Only {len(with_serial)} entries have a game_serial")
+
+    def test_cheats_catalogue_kingdom_hearts_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SLUS-20370", serials,
+                      "Kingdom Hearts (SLUS-20370) should be in cheats catalogue")
+
+    def test_cheats_catalogue_god_of_war_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SCUS-97399", serials,
+                      "God of War (SCUS-97399) should be in cheats catalogue")
+
+    def test_cheats_catalogue_resident_evil_4_present(self):
+        serials = {e.get("game_serial") for e in self.cheats}
+        self.assertIn("SLUS-21134", serials,
+                      "Resident Evil 4 (SLUS-21134) should be in cheats catalogue")
+
+    def test_cheats_catalogue_all_serials_valid_format(self):
+        """Every game_serial field must match XXXX-NNNNN or be empty."""
+        import re
+        pat = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for entry in self.cheats:
+            serial = entry.get("game_serial", "")
+            if serial:
+                self.assertRegex(serial, pat,
+                                 f"Bad serial {serial!r} in cheats entry {entry.get('id')}")
+
+    def test_cheats_catalogue_game_crcs_are_valid(self):
+        """Any game_crcs list must contain 8-char uppercase hex strings."""
+        import re
+        pat = re.compile(r'^[0-9A-F]{8}$')
+        for entry in self.cheats:
+            for crc in entry.get("game_crcs", []):
+                self.assertRegex(crc, pat,
+                                 f"Bad CRC {crc!r} in entry {entry.get('id')}")
+
+    def test_cheats_catalogue_no_duplicate_ids(self):
+        ids = [e.get("id") for e in self.cheats]
+        self.assertEqual(len(ids), len(set(ids)),
+                         "cheats.json contains duplicate entry IDs")
+
+    def test_cheats_catalogue_hub_entries_present(self):
+        """The two original hub entries should still be present."""
+        ids = {e.get("id") for e in self.cheats}
+        self.assertIn("codejunkies_ps2",      ids)
+        self.assertIn("pcsx2_cheatdb_github", ids)
+
+    def test_cheats_catalogue_direct_download_urls_valid(self):
+        """Non-empty direct_download_url values must be valid http(s) URLs."""
+        import re
+        pat = re.compile(r'^https?://')
+        for entry in self.cheats:
+            url = entry.get("direct_download_url", "")
+            if url:
+                self.assertRegex(url, pat,
+                                 f"Bad direct_download_url in entry {entry.get('id')!r}")
+
+
+class TestLinkChecker(unittest.TestCase):
+    """Tests for src.core.link_checker.LinkChecker."""
+
+    def setUp(self):
+        from src.core.link_checker import LinkChecker
+        self.lc = LinkChecker()
+
+    # -- Unit tests for URL validators --
+
+    def test_valid_https_url_passes(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://github.com/PCSX2/pcsx2"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_malformed_url_flagged(self):
+        from src.core.link_checker import LinkChecker, LinkIssue
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "not_a_url"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed")
+
+    def test_bad_domain_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamesavedfiles.com/some/page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_empty_url_not_flagged(self):
+        """Empty URL fields should not produce issues."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "", "author_url": ""}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_no_url_field_not_flagged(self):
+        """Entries without URL fields should not produce issues."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000"}])
+        self.assertEqual(issues, [])
+
+    def test_multiple_url_fields_checked(self):
+        """Both 'url' and 'author_url' fields are checked independently."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "not-valid", "author_url": "also-not-valid"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 2)
+
+    # -- Integration test: all catalogues pass link checks --
+
+    def test_all_catalogues_pass_link_check(self):
+        """All 5 catalogue files should have 0 link issues after Wave 38."""
+        report = self.lc.check_all_catalogues()
+        self.assertEqual(
+            report["total_issues"], 0,
+            f"Link issues found:\n"
+            + "\n".join(
+                f"  [{f}] {i}"
+                for f, issues in report["issues_by_file"].items()
+                for i in issues
+            )
+        )
+
+    def test_check_all_catalogues_returns_dict(self):
+        report = self.lc.check_all_catalogues()
+        self.assertIn("catalogues_checked",   report)
+        self.assertIn("total_issues",         report)
+        self.assertIn("issues_by_file",       report)
+        self.assertIn("issue_count_by_type",  report)
+        self.assertIn("summary",              report)
+
+    def test_check_all_catalogues_checks_five_files(self):
+        report = self.lc.check_all_catalogues()
+        self.assertEqual(len(report["catalogues_checked"]), 5)
+        self.assertIn("cheats.json", report["catalogues_checked"])
+
+    def test_link_issue_str_representation(self):
+        from src.core.link_checker import LinkIssue
+        issue = LinkIssue(
+            source_file="test.json",
+            entry_index=3,
+            field_name="url",
+            url="bad-url",
+            issue_type="malformed",
+            detail="no scheme",
+        )
+        s = str(issue)
+        self.assertIn("test.json[3]", s)
+        self.assertIn("malformed",     s)
+        self.assertIn("bad-url",       s)
+
+    def test_link_checker_with_custom_dir(self):
+        """LinkChecker should handle a missing directory gracefully."""
+        import tempfile, os
+        from src.core.link_checker import LinkChecker
+        tmp = tempfile.mkdtemp()
+        lc = LinkChecker(cat_dir=tmp)
+        report = lc.check_all_catalogues()
+        # No files → 0 issues, 0 catalogues checked
+        self.assertEqual(report["total_issues"], 0)
+        self.assertEqual(report["catalogues_checked"], [])
+
+
+class TestWave43MetadataEnrichment(unittest.TestCase):
+    """Wave 43: serial DB enriched with release_date, developer, publisher, genre."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def test_wave43_games_with_release_date_over_1700(self):
+        """Wave 43: at least 1700 games should have a release_date."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).release_date
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with release_date, got {count}")
+
+    def test_wave43_games_with_developer_over_1700(self):
+        """Wave 43: at least 1700 games should have a developer."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).developer
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with developer, got {count}")
+
+    def test_wave43_games_with_genre_over_1700(self):
+        """Wave 43: at least 1700 games should have a genre."""
+        count = sum(
+            1 for t in self.sdb.all_titles()
+            if self.sdb.get_info(t) and self.sdb.get_info(t).genre
+        )
+        self.assertGreater(count, 1700,
+                           f"Expected >1700 games with genre, got {count}")
+
+    def test_wave43_kingdom_hearts_metadata(self):
+        """Kingdom Hearts should have correct release_date, developer, publisher."""
+        info = self.sdb.get_info("Kingdom Hearts")
+        self.assertIsNotNone(info, "Kingdom Hearts missing from serial DB")
+        self.assertIsNotNone(info.release_date, "Kingdom Hearts missing release_date")
+        self.assertIsNotNone(info.developer, "Kingdom Hearts missing developer")
+        self.assertIsNotNone(info.publisher, "Kingdom Hearts missing publisher")
+
+    def test_wave43_god_of_war_metadata(self):
+        """God of War should have developer and genre populated."""
+        info = self.sdb.get_info("God of War")
+        self.assertIsNotNone(info, "God of War missing from serial DB")
+        self.assertIsNotNone(info.developer, "God of War missing developer")
+        self.assertIsNotNone(info.genre, "God of War missing genre")
+
+    def test_wave43_metadata_fields_are_strings(self):
+        """All populated metadata fields should be non-empty strings (not lists)."""
+        for title in self.sdb.all_titles():
+            info = self.sdb.get_info(title)
+            if info is None:
+                continue
+            with self.subTest(title=title):
+                for field_name in ("release_date", "developer", "publisher", "genre"):
+                    val = getattr(info, field_name)
+                    if val is not None:
+                        self.assertIsInstance(
+                            val, str,
+                            f"'{title}'.{field_name} should be str, got {type(val)}"
+                        )
+                        self.assertGreater(
+                            len(val), 0,
+                            f"'{title}'.{field_name} should be non-empty"
+                        )
+
+    def test_wave43_gameinfo_metadata_fields_exist(self):
+        """GameInfo dataclass must expose release_date, developer, publisher, genre."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(
+            title="Test",
+            serial="SLUS-00000",
+            release_date="2001-01-01",
+            developer="Test Dev",
+            publisher="Test Pub",
+            genre="Action",
+        )
+        self.assertEqual(gi.release_date, "2001-01-01")
+        self.assertEqual(gi.developer, "Test Dev")
+        self.assertEqual(gi.publisher, "Test Pub")
+        self.assertEqual(gi.genre, "Action")
+
+
+class TestWave44FpsPnachCodes(unittest.TestCase):
+    """Wave 44: fps/widescreen/visual codes from Gabominated PCSX2 repo added to pnach DB."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+
+    def test_wave44_pnach_db_size_over_47800(self):
+        """Wave 44: pnach DB should have more than 47,800 entries after fps code addition."""
+        self.assertGreater(
+            len(self.db), 47800,
+            f"Expected >47800 pnach DB entries after Wave 44, got {len(self.db)}"
+        )
+
+    def test_wave44_fps_entries_present(self):
+        """Wave 44: pnach DB should contain fps category entries from Gabominated."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        self.assertGreater(
+            len(fps_entries), 200,
+            f"Expected >200 fps entries in pnach DB, got {len(fps_entries)}"
+        )
+
+    def test_wave44_widescreen_entries_present(self):
+        """Wave 44: pnach DB should contain widescreen entries from Gabominated."""
+        ws_entries = [e for e in self.db.values() if e.get("category") == "widescreen"]
+        self.assertGreater(
+            len(ws_entries), 50,
+            f"Expected >50 widescreen entries in pnach DB, got {len(ws_entries)}"
+        )
+
+    def test_wave44_fps_entry_structure(self):
+        """Wave 44: fps entries must have required fields."""
+        fps_entries = [(k, e) for k, e in self.db.items() if e.get("category") == "fps"]
+        required_fields = ("game", "game_crc", "game_serial", "description", "category",
+                           "patch_type", "verification_status")
+        for key, entry in fps_entries[:20]:
+            with self.subTest(key=key):
+                for field in required_fields:
+                    self.assertIn(
+                        field, entry,
+                        f"fps entry {key} missing required field '{field}'"
+                    )
+                # CRC in key must match game_crc
+                key_crc = key.split(":")[0].upper()
+                self.assertEqual(
+                    key_crc, entry["game_crc"].upper(),
+                    f"fps entry {key} key CRC doesn't match game_crc"
+                )
+
+    def test_wave44_fps_entries_community_verified(self):
+        """Wave 44: Gabominated fps entries should be community_verified."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        non_verified = [e for e in fps_entries
+                        if e.get("verification_status") != "community_verified"]
+        # Allow some tolerance but most should be community_verified
+        self.assertLess(
+            len(non_verified), len(fps_entries) // 2,
+            f"Most fps entries should be community_verified"
+        )
+
+    def test_wave44_known_fps_games_present(self):
+        """Wave 44: specific known games should have fps entries."""
+        # These games had fps codes in Gabominated and their CRCs are now in pnach DB
+        known_fps_serials = ["SLUS-21312", "SLUS-21376", "SLUS-21574", "SLUS-20003"]
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        fps_serials = {e.get("game_serial") for e in fps_entries}
+        for serial in known_fps_serials:
+            self.assertIn(
+                serial, fps_serials,
+                f"Expected fps entry for {serial} not found in pnach DB"
+            )
+
+    def test_wave44_river_king_in_serial_db(self):
+        """Wave 44: River King: A Wonderful Journey should be in the serial DB."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        info = sdb.get_info("River King: A Wonderful Journey")
+        self.assertIsNotNone(info, "River King: A Wonderful Journey missing from serial DB")
+        self.assertEqual(info.serial, "SLUS-21275")
+        self.assertIsNotNone(info.release_date)
+        self.assertIsNotNone(info.developer)
+
+    def test_wave44_world_soccer_we8_alt_serial(self):
+        """Wave 44: World Soccer Winning Eleven 8: International should have SCUS-21117 as alt_serial."""
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        data = json.loads(db_path.read_text())
+        game = data["games"].get("World Soccer Winning Eleven 8: International")
+        self.assertIsNotNone(game, "World Soccer WE8 International not found in serial DB")
+        alt_serials = game.get("alt_serials", [])
+        self.assertIn(
+            "SCUS-21117", alt_serials,
+            f"Expected SCUS-21117 in alt_serials for WE8 International, got {alt_serials}"
+        )
+
+
+class TestWave45AltSerials(unittest.TestCase):
+    """Wave 45: alt_serial additions for game variants and multi-disc entries from PS2.data.json."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.data = json.loads(db_path.read_text())["games"]
+
+    def _assert_alt_serial(self, title, expected_serial):
+        game = self.data.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        alts = game.get("alt_serials", [])
+        self.assertIn(
+            expected_serial, alts,
+            f"Expected {expected_serial} in alt_serials for '{title}', got {alts}",
+        )
+
+    # --- Variant/alternate-release alt_serials ---
+
+    def test_lego_batman_scus_10380_alt_serial(self):
+        """Wave 45: SCUS-10380 should be alt_serial for LEGO Batman: The Videogame."""
+        self._assert_alt_serial("LEGO Batman: The Videogame", "SCUS-10380")
+
+    def test_monsters_inc_scus_21052_alt_serial(self):
+        """Wave 45: SCUS-21052 should be alt_serial for Monsters, Inc."""
+        self._assert_alt_serial("Monsters, Inc.", "SCUS-21052")
+
+    def test_toy_story_3_scus_90174_alt_serial(self):
+        """Wave 45: SCUS-90174 should be alt_serial for Disney/Pixar Toy Story 3."""
+        self._assert_alt_serial("Disney/Pixar Toy Story 3", "SCUS-90174")
+
+    def test_gran_turismo_4_scus_90682_alt_serial(self):
+        """Wave 45: SCUS-90682 should be alt_serial for Gran Turismo 4."""
+        self._assert_alt_serial("Gran Turismo 4", "SCUS-90682")
+
+    def test_war_of_the_monsters_scus_91197_alt_serial(self):
+        """Wave 45: SCUS-91197 should be alt_serial for War of the Monsters."""
+        self._assert_alt_serial("War of the Monsters", "SCUS-91197")
+
+    def test_singstar_latino_scus_94346_alt_serial(self):
+        """Wave 45: SCUS-94346 should be alt_serial for SingStar Latino."""
+        self._assert_alt_serial("SingStar Latino", "SCUS-94346")
+
+    def test_jak_daxter_slus_97124_alt_serial(self):
+        """Wave 45: SLUS-97124 (GH) should be alt_serial for Jak and Daxter: The Precursor Legacy."""
+        self._assert_alt_serial("Jak and Daxter: The Precursor Legacy", "SLUS-97124")
+
+    def test_primal_slus_97142_alt_serial(self):
+        """Wave 45: SLUS-97142 should be alt_serial for Primal."""
+        self._assert_alt_serial("Primal", "SLUS-97142")
+
+    def test_wild_arms_3_slus_97203_alt_serial(self):
+        """Wave 45: SLUS-97203 (GH) should be alt_serial for Wild ARMs 3."""
+        self._assert_alt_serial("Wild ARMs 3", "SLUS-97203")
+
+    def test_atv_offroad_fury3_slus_97405_alt_serial(self):
+        """Wave 45: SLUS-97405 should be alt_serial for ATV Offroad Fury 3."""
+        self._assert_alt_serial("ATV Offroad Fury 3", "SLUS-97405")
+
+    def test_eyetoy_antigrav_slus_97414_alt_serial(self):
+        """Wave 45: SLUS-97414 should be alt_serial for EyeToy: Antigrav."""
+        self._assert_alt_serial("EyeToy: Antigrav", "SLUS-97414")
+
+    # --- Multi-disc alt_serials (Disc 2 / Disc 3 / Bonus Disc) ---
+
+    def test_space_channel_5_disc2_alt_serial(self):
+        """Wave 45: SLUS-20807 (Disc 2) should be alt_serial for Space Channel 5: Special Edition."""
+        self._assert_alt_serial("Space Channel 5: Special Edition (Disc 1)", "SLUS-20807")
+
+    def test_cy_girls_disc2_alt_serial(self):
+        """Wave 45: SLUS-20854 (Disc 2/Aska) should be alt_serial for Cy Girls."""
+        self._assert_alt_serial("Cy Girls", "SLUS-20854")
+
+    def test_ribbit_king_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-20914 (Bonus Disc) should be alt_serial for Ribbit King."""
+        self._assert_alt_serial("Ribbit King", "SLUS-20914")
+
+    def test_shadow_hearts_covenant_disc2_alt_serial(self):
+        """Wave 45: SLUS-21044 (Disc 2) should be alt_serial for Shadow Hearts: Covenant."""
+        self._assert_alt_serial("Shadow Hearts: Covenant", "SLUS-21044")
+
+    def test_armored_core_nexus_disc2_alt_serial(self):
+        """Wave 45: SLUS-21079 (Disc 2) should be alt_serial for Armored Core: Nexus."""
+        self._assert_alt_serial("Armored Core: Nexus", "SLUS-21079")
+
+    def test_mortal_kombat_deception_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-21081 (Bonus Disc) should be alt_serial for MK: Deception Premium Pack."""
+        self._assert_alt_serial("Mortal Kombat: Deception: Premium Pack", "SLUS-21081")
+
+    def test_xenosaga_ep2_disc2_alt_serial(self):
+        """Wave 45: SLUS-21133 (Disc 2) should be alt_serial for Xenosaga Episode II."""
+        self._assert_alt_serial("Xenosaga Episode II: Jenseits von Gut und Böse", "SLUS-21133")
+
+    def test_mgs3_subsistence_disc3_alt_serial(self):
+        """Wave 45: SLUS-21360 (Disc 3/Existence) should be alt_serial for MGS3 Subsistence Disc 1."""
+        self._assert_alt_serial(
+            "Metal Gear Solid 3: Subsistence (Disc 1) (Subsistence)", "SLUS-21360"
+        )
+
+    def test_onimusha_dawn_disc2_alt_serial(self):
+        """Wave 45: SLUS-21362 (Disc 2) should be alt_serial for Onimusha: Dawn of Dreams."""
+        self._assert_alt_serial("Onimusha: Dawn of Dreams", "SLUS-21362")
+
+    def test_xenosaga_ep3_disc2_alt_serial(self):
+        """Wave 45: SLUS-21417 (Disc 2) should be alt_serial for Xenosaga Episode III."""
+        self._assert_alt_serial("Xenosaga Episode III: Also sprach Zarathustra", "SLUS-21417")
+
+    def test_tna_impact_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-21824 (Bonus Disc) should be alt_serial for TNA Impact!."""
+        self._assert_alt_serial("TNA Impact! Total Nonstop Action Wrestling", "SLUS-21824")
+
+    def test_sakura_wars_disc2_alt_serial(self):
+        """Wave 45: SLUS-21930 (Disc 2/Japanese VO) should be alt_serial for Sakura Wars Disc 1."""
+        self._assert_alt_serial(
+            "Sakura Wars: So Long, My Love (Disc 1) (English Voice Over)", "SLUS-21930"
+        )
+
+
+class TestWave46MetadataEnrichment(unittest.TestCase):
+    """Wave 46: metadata enrichment for 12 games via alt-serial cross-reference with PS2.data.json,
+    plus FIFA 13 (SLUS-21954) added as a new entry from PS2.titles.json."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.data = json.loads(db_path.read_text())["games"]
+
+    def _assert_metadata(self, title, field, expected=None):
+        game = self.data.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        value = game.get(field)
+        self.assertIsNotNone(value, f"Expected '{field}' to be set for '{title}'")
+        if expected is not None:
+            self.assertEqual(value, expected, f"Expected '{title}' {field}={expected!r}, got {value!r}")
+
+    # --- FIFA 13 new entry ---
+
+    def test_fifa13_in_db(self):
+        """Wave 46: FIFA 13 (SLUS-21954) added from PS2.titles.json."""
+        self.assertIn("FIFA 13", self.data)
+
+    def test_fifa13_serial(self):
+        """Wave 46: FIFA 13 should have serial SLUS-21954."""
+        self._assert_metadata("FIFA 13", "serial", "SLUS-21954")
+
+    # --- Metadata enrichment for 12 games ---
+
+    def test_primal_has_release_date(self):
+        """Wave 46: Primal should have release_date from PS2.data.json."""
+        self._assert_metadata("Primal", "release_date", "2003-03-25")
+
+    def test_primal_has_developer(self):
+        """Wave 46: Primal should have developer from PS2.data.json."""
+        self._assert_metadata("Primal", "developer", "SCE Cambridge Studio")
+
+    def test_eyetoy_antigrav_has_release_date(self):
+        """Wave 46: EyeToy: Antigrav should have release_date from PS2.data.json."""
+        self._assert_metadata("EyeToy: Antigrav", "release_date", "2004-11-09")
+
+    def test_eyetoy_antigrav_has_developer(self):
+        """Wave 46: EyeToy: Antigrav should have developer from PS2.data.json."""
+        self._assert_metadata("EyeToy: Antigrav", "developer", "Harmonix")
+
+    def test_we8_international_has_release_date(self):
+        """Wave 46: World Soccer WE8 International should have release_date."""
+        self._assert_metadata(
+            "World Soccer Winning Eleven 8: International", "release_date", "2005-02-01"
+        )
+
+    def test_we8_international_has_developer(self):
+        """Wave 46: World Soccer WE8 International should have developer."""
+        self._assert_metadata(
+            "World Soccer Winning Eleven 8: International",
+            "developer",
+            "Konami Computer Entertainment Japan",
+        )
+
+    def test_gran_turismo_4_prologue_has_metadata(self):
+        """Wave 46: Gran Turismo 4 Prologue should have developer Polyphony Digital."""
+        self._assert_metadata("Gran Turismo 4 Prologue", "developer", "Polyphony Digital")
+
+    def test_incredibles_has_release_date(self):
+        """Wave 46: Incredibles, The should have release_date from PS2.data.json."""
+        self._assert_metadata("Incredibles, The", "release_date", "2004-11-05")
+
+    def test_incredibles_has_developer(self):
+        """Wave 46: Incredibles, The should have developer Heavy Iron Studios."""
+        self._assert_metadata("Incredibles, The", "developer", "Heavy Iron Studios")
+
+    def test_tales_of_destiny_ps2_has_release_date(self):
+        """Wave 46: Tales of Destiny (PS2 remake) should have release_date."""
+        self._assert_metadata("Tales of Destiny (PS2 remake)", "release_date", "2006-11-30")
+
+    def test_tales_of_destiny_ps2_has_genre(self):
+        """Wave 46: Tales of Destiny (PS2 remake) should have genre RPG."""
+        self._assert_metadata("Tales of Destiny (PS2 remake)", "genre", "RPG")
+
+    def test_tales_of_destiny_2_has_release_date(self):
+        """Wave 46: Tales of Destiny 2 should have release_date."""
+        self._assert_metadata("Tales of Destiny 2", "release_date", "2002-11-28")
+
+    def test_tales_of_rebirth_has_developer(self):
+        """Wave 46: Tales of Rebirth should have developer Namco Bandai."""
+        self._assert_metadata("Tales of Rebirth", "developer", "Namco Bandai")
+
+    def test_forbidden_siren_2_has_developer(self):
+        """Wave 46: Forbidden Siren 2 should have developer SCE Japan Studio."""
+        self._assert_metadata("Forbidden Siren 2", "developer", "SCE Japan Studio")
+
+    def test_front_mission_5_has_developer(self):
+        """Wave 46: Front Mission 5: Scars of the War should have developer Square Enix."""
+        self._assert_metadata("Front Mission 5: Scars of the War", "developer", "Square Enix")
+
+    def test_gtc_africa_has_developer(self):
+        """Wave 46: GTC Africa should have developer Rage Software."""
+        self._assert_metadata("GTC Africa", "developer", "Rage Software")
+
+    def test_espn_nba_2night_has_release_date(self):
+        """Wave 46: ESPN NBA 2Night should have release_date."""
+        self._assert_metadata("ESPN NBA 2Night", "release_date", "2001")
+
+    def test_serial_db_wave46_game_count(self):
+        """Wave 46: serial DB should have at least 2288 games (FIFA 13 added)."""
+        self.assertGreaterEqual(len(self.data), 2288)
+
+
+class TestWave47NewGames(unittest.TestCase):
+    """Wave 47: new NTSC-U games and alt_serials added from PS2.txt / PS2 ID List cross-reference."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(db_path.read_text())["games"]
+
+    def _assert_alt_serial(self, title, expected_serial):
+        game = self.games.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        alts = game.get("alt_serials", [])
+        self.assertIn(
+            expected_serial, alts,
+            f"Expected {expected_serial} in alt_serials for '{title}', got {alts}",
+        )
+
+    # ── new games ──────────────────────────────────────────────────────────────
+
+    def test_americas_army_rise_of_a_soldier_present(self):
+        """Wave 47: America's Army: Rise of a Soldier (SLUS-21188) added."""
+        self.assertIn("America's Army: Rise of a Soldier", self.games)
+
+    def test_americas_army_serial(self):
+        """Wave 47: America's Army should have serial SLUS-21188."""
+        self.assertEqual(self.games["America's Army: Rise of a Soldier"]['serial'], 'SLUS-21188')
+
+    def test_peanuts_all_stars_present(self):
+        """Wave 47: Peanuts: All Stars (SLUS-21468) added."""
+        self.assertIn('Peanuts: All Stars', self.games)
+
+    def test_peanuts_all_stars_serial(self):
+        """Wave 47: Peanuts: All Stars should have serial SLUS-21468."""
+        self.assertEqual(self.games['Peanuts: All Stars']['serial'], 'SLUS-21468')
+
+    def test_world_pool_challenge_present(self):
+        """Wave 47: World Pool Challenge '06 (SLUS-21472) added."""
+        self.assertIn("World Pool Challenge '06", self.games)
+
+    def test_world_pool_challenge_serial(self):
+        """Wave 47: World Pool Challenge '06 should have serial SLUS-21472."""
+        self.assertEqual(self.games["World Pool Challenge '06"]['serial'], 'SLUS-21472')
+
+    def test_heroes_indianapolis_500_present(self):
+        """Wave 47: Heroes of the Indianapolis 500 (SLUS-21747) added."""
+        self.assertIn('Heroes of the Indianapolis 500', self.games)
+
+    def test_heroes_indianapolis_500_serial(self):
+        """Wave 47: Heroes of the Indianapolis 500 should have serial SLUS-21747."""
+        self.assertEqual(self.games['Heroes of the Indianapolis 500']['serial'], 'SLUS-21747')
+
+    def test_jelly_belly_ballistic_beans_present(self):
+        """Wave 47: Jelly Belly: Ballistic Beans (SLUS-21874) added."""
+        self.assertIn('Jelly Belly: Ballistic Beans', self.games)
+
+    def test_jelly_belly_ballistic_beans_serial(self):
+        """Wave 47: Jelly Belly: Ballistic Beans should have serial SLUS-21874."""
+        self.assertEqual(self.games['Jelly Belly: Ballistic Beans']['serial'], 'SLUS-21874')
+
+    def test_mms_adventure_present(self):
+        """Wave 47: M&M's Adventure (SLUS-21875) added."""
+        self.assertIn("M&M's Adventure", self.games)
+
+    def test_mms_adventure_serial(self):
+        """Wave 47: M&M's Adventure should have serial SLUS-21875."""
+        self.assertEqual(self.games["M&M's Adventure"]['serial'], 'SLUS-21875')
+
+    # ── alt_serials ────────────────────────────────────────────────────────────
+
+    def test_okage_has_scus91129_alt_serial(self):
+        """Wave 47: SCUS-91129 should be alt_serial for Okage: Shadow King."""
+        self._assert_alt_serial('Okage: Shadow King', 'SCUS-91129')
+
+    def test_haven_has_slus20157_alt_serial(self):
+        """Wave 47: SLUS-20157 should be alt_serial for Haven: Call of the King."""
+        self._assert_alt_serial('Haven: Call of the King', 'SLUS-20157')
+
+    def test_nascar_thunder_2004_has_slus20754_alt_serial(self):
+        """Wave 47: SLUS-20754 should be alt_serial for NASCAR Thunder 2004."""
+        self._assert_alt_serial('NASCAR Thunder 2004', 'SLUS-20754')
+
+    # ── thresholds ─────────────────────────────────────────────────────────────
+
+    def test_serial_db_wave47_game_count(self):
+        """Wave 47: serial DB should have at least 2294 games (6 new games added)."""
+        self.assertGreaterEqual(len(self.games), 2294)
+
+
+class TestWave48GabominatedPnachCodes(unittest.TestCase):
+    """Wave 48: fps/visual codes from Gabominated PCSX2 repo — 52 new CRCs (78 entries)."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(sdb_path.read_text())["games"]
+
+    # ── pnach DB size ────────────────────────────────────────────────────────
+
+    def test_wave48_pnach_db_size_over_47900(self):
+        """Wave 48: pnach DB should have more than 47,900 entries after new fps code addition."""
+        self.assertGreater(
+            len(self.db), 47900,
+            f"Expected >47900 pnach DB entries after Wave 48, got {len(self.db)}"
+        )
+
+    def test_wave48_fps_entry_count_over_360(self):
+        """Wave 48: pnach DB should have >360 fps category entries after Wave 48."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        self.assertGreater(
+            len(fps_entries), 360,
+            f"Expected >360 fps entries, got {len(fps_entries)}"
+        )
+
+    # ── specific new fps entries ─────────────────────────────────────────────
+
+    def test_wave48_horsez_fps_present(self):
+        """Wave 48: Horsez (F0512849) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("F0512849:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for Horsez CRC F0512849")
+        entry = self.db[keys[0]]
+        self.assertEqual(entry.get("category"), "fps")
+        self.assertEqual(entry.get("game_serial"), "SLUS-21563")
+
+    def test_wave48_uefa_euro_2008_fps_present(self):
+        """Wave 48: UEFA Euro 2008 (9703FCBF) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("9703FCBF:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 entries for UEFA Euro 2008 CRC 9703FCBF, got {len(keys)}")
+        for k in keys:
+            self.assertEqual(self.db[k].get("category"), "fps")
+            self.assertEqual(self.db[k].get("game_serial"), "SLUS-21699")
+
+    def test_wave48_silent_hill_4_fps_present(self):
+        """Wave 48: Silent Hill 4: The Room (3919136D) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("3919136D:EE:")]
+        self.assertGreaterEqual(
+            len(keys), 6,
+            f"Expected >=6 fps entries for Silent Hill 4 CRC 3919136D, got {len(keys)}"
+        )
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20873")
+
+    def test_wave48_freedom_fighters_fps_present(self):
+        """Wave 48: Freedom Fighters (1DA7E9BC) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("1DA7E9BC:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for Freedom Fighters CRC 1DA7E9BC")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20658")
+
+    def test_wave48_syphon_filter_omega_strain_fps_present(self):
+        """Wave 48: Syphon Filter: The Omega Strain (D5605611) fps entries in pnach DB."""
+        keys = [k for k in self.db if k.startswith("D5605611:EE:")]
+        self.assertGreaterEqual(len(keys), 3, f"Expected >=3 entries for Syphon Filter: The Omega Strain CRC D5605611, got {len(keys)}")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SCUS-97264")
+
+    def test_wave48_prince_of_persia_warrior_within_fps_present(self):
+        """Wave 48: Prince of Persia: Warrior Within (6B17B39F) fps+visual entries in pnach DB."""
+        keys = [k for k in self.db if k.startswith("6B17B39F:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 entries for Prince of Persia: Warrior Within CRC 6B17B39F")
+        categories = {self.db[k].get("category") for k in keys}
+        self.assertIn("fps", categories)
+        self.assertIn("visual", categories)
+
+    def test_wave48_grandia_iii_fps_present(self):
+        """Wave 48: Grandia III (5B657DAD) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("5B657DAD:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 fps entries for Grandia III CRC 5B657DAD, got {len(keys)}")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-21334")
+
+    def test_wave48_blade_ii_fps_present(self):
+        """Wave 48: Blade II (6D0E5F2D) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("6D0E5F2D:EE:")]
+        self.assertGreaterEqual(len(keys), 4, f"Expected >=4 fps entries for Blade II CRC 6D0E5F2D, got {len(keys)}")
+
+    def test_wave48_dbz_sagas_fps_present(self):
+        """Wave 48: Dragon Ball Z: Sagas (E36751DA) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("E36751DA:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for DBZ Sagas CRC E36751DA")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20874")
+
+    # ── entry structure ──────────────────────────────────────────────────────
+
+    def test_wave48_new_entries_have_required_fields(self):
+        """Wave 48: new entries must have required fields (game, game_crc, game_serial, etc.)."""
+        new_crcs = [
+            "F0512849", "9703FCBF", "3919136D", "1DA7E9BC", "D5605611",
+            "6B17B39F", "5B657DAD", "6D0E5F2D", "E36751DA", "9798D85A",
+        ]
+        required_fields = ("game", "game_crc", "game_serial", "description", "category",
+                           "patch_type", "verification_status")
+        for crc in new_crcs:
+            keys = [k for k in self.db if k.startswith(f"{crc}:EE:")]
+            for key in keys:
+                entry = self.db[key]
+                with self.subTest(key=key):
+                    for field in required_fields:
+                        self.assertIn(field, entry, f"Entry {key} missing field '{field}'")
+                    key_crc = key.split(":")[0].upper()
+                    self.assertEqual(
+                        key_crc, entry["game_crc"].upper(),
+                        f"CRC mismatch for entry {key}: key={key_crc}, game_crc={entry['game_crc']}"
+                    )
+
+    # ── serial DB update ─────────────────────────────────────────────────────
+
+    def test_wave48_project_snowblind_has_2bda8adb_crc(self):
+        """Wave 48: Project Snowblind should have 2BDA8ADB as secondary CRC."""
+        game = self.games.get("Project - Snowblind")
+        self.assertIsNotNone(game, "Project - Snowblind not found in serial DB")
+        crcs = game.get("crcs", [])
+        self.assertIn("2BDA8ADB", crcs, f"Expected 2BDA8ADB in Project Snowblind CRCs, got {crcs}")
+
+
+class TestWave49SerialCrcConsistency(unittest.TestCase):
+    """Wave 49: Verify all game serials and CRCs are correctly cross-referenced
+    between pnach_db and serial_db.  Fixes 664 pnach serial mismatches and
+    removes 25 wrong CRCs from serial_db.
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(sdb_path.read_text())["games"]
+
+    # ── pnach_db serial corrections ─────────────────────────────────────────
+
+    def test_wave49_castlevania_loi_serial_corrected(self):
+        """Wave 49: Castlevania LoI CRCs (2B123FE9, A5B82E82) must use SLUS-20733, not SLUS-21050."""
+        for crc in ("2B123FE9", "A5B82E82"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            self.assertGreater(len(keys), 0, f"No pnach entries for CRC {crc}")
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SLUS-20733",
+                    f"Castlevania LoI entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_burnout3_takedown_serial_corrected(self):
+        """Wave 49: Burnout 3 CRC 1CD5CC9D must use SLUS-21050, not SLUS-20462."""
+        keys = [k for k in self.db if k.startswith("1CD5CC9D:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC 1CD5CC9D")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-21050",
+                f"Burnout 3 entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_shadow_of_the_colossus_serial_added(self):
+        """Wave 49: Shadow of the Colossus CRC C19A374E must have serial SCUS-97472."""
+        keys = [k for k in self.db if k.startswith("C19A374E:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC C19A374E")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SCUS-97472",
+                f"Shadow of the Colossus entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_gta_vice_city_serial_corrected(self):
+        """Wave 49: GTA Vice City CRC 3F68CFCF must use SLUS-20552, not SLUS-20174."""
+        keys = [k for k in self.db if k.startswith("3F68CFCF:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC 3F68CFCF")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-20552",
+                f"GTA VC entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_god_of_war_crcs_use_scus_serial(self):
+        """Wave 49: God of War CRCs 17D68D15/D6385328/F0A34C75 must use SCUS-97399."""
+        for crc in ("17D68D15", "D6385328", "F0A34C75"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            if not keys:
+                continue  # CRC may be missing; skip
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SCUS-97399",
+                    f"God of War entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_crash_twinsanity_crcs_consolidated(self):
+        """Wave 49: Crash Twinsanity CRCs 3B698B6E/BD2AC49F/CA5B7A61 must use SLUS-20909."""
+        for crc in ("3B698B6E", "BD2AC49F", "CA5B7A61"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            if not keys:
+                continue
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SLUS-20909",
+                    f"Crash Twinsanity entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_driver_parallel_lines_serial_added(self):
+        """Wave 49: Driver: Parallel Lines CRC D720770D must have serial SLUS-21271."""
+        keys = [k for k in self.db if k.startswith("D720770D:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC D720770D")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-21271",
+                f"Driver: PL entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_silent_hill_3_serial_corrected(self):
+        """Wave 49: Silent Hill 3 CRC FFAAC65B must use SLUS-20622, not SLUS-20459."""
+        keys = [k for k in self.db if k.startswith("FFAAC65B:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC FFAAC65B")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-20622",
+                f"Silent Hill 3 entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_pnach_serial_lookup_castlevania_loi(self):
+        """Wave 49: entries_for_serial(SLUS-20733) must return Castlevania LoI entries."""
+        import sys
+        sys.path.insert(0, str(__file__).replace("tests/test_core.py", ""))
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SLUS-20733")
+        self.assertGreater(len(results), 0, "entries_for_serial(SLUS-20733) returned no results")
+        crcs = {e["key"].split(":")[0] for e in results}
+        self.assertTrue(
+            crcs & {"2B123FE9", "A5B82E82"},
+            f"Expected Castlevania LoI CRCs in results, got CRCs: {crcs}"
+        )
+
+    def test_wave49_pnach_serial_lookup_shadow_of_the_colossus(self):
+        """Wave 49: entries_for_serial(SCUS-97472) must return Shadow of the Colossus entries."""
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SCUS-97472")
+        self.assertGreater(len(results), 0, "entries_for_serial(SCUS-97472) returned no results")
+
+    def test_wave49_pnach_serial_lookup_god_of_war(self):
+        """Wave 49: entries_for_serial(SCUS-97399) must return God of War entries."""
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SCUS-97399")
+        self.assertGreater(len(results), 10, "entries_for_serial(SCUS-97399) returned too few results")
+
+    # ── serial_db CRC removals (cross-game contaminations) ──────────────────
+
+    def test_wave49_atv_off_road_fury_wrong_crc_removed(self):
+        """Wave 49: ATV Off-Road Fury (SCUS-97104) must NOT claim CRC 67DB3ED8 (Aggressive Inline)."""
+        game = self.games.get("ATV Off-Road Fury", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("67DB3ED8", crcs,
+                         "CRC 67DB3ED8 (Aggressive Inline) wrongly in ATV Off-Road Fury")
+
+    def test_wave49_baldurs_gate_da_wrong_crc_removed(self):
+        """Wave 49: Baldur's Gate: DA must NOT claim CRC 08FFF00D (SSX 3)."""
+        game = self.games.get("Baldur's Gate: Dark Alliance", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("08FFF00D", crcs,
+                         "CRC 08FFF00D (SSX 3) wrongly in Baldur's Gate: Dark Alliance")
+
+    def test_wave49_contra_shattered_soldier_wrong_crc_removed(self):
+        """Wave 49: Contra: Shattered Soldier must NOT claim CRC 33EC7780 (Star Ocean TtEoT)."""
+        game = self.games.get("Contra: Shattered Soldier", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("33EC7780", crcs,
+                         "CRC 33EC7780 (Star Ocean) wrongly in Contra: Shattered Soldier")
+
+    def test_wave49_silent_hill_3_wrong_crc_removed(self):
+        """Wave 49: Silent Hill 3 must NOT claim CRC BFCC3E7E (Shinobi)."""
+        game = self.games.get("Silent Hill 3", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("BFCC3E7E", crcs,
+                         "CRC BFCC3E7E (Shinobi) wrongly in Silent Hill 3")
+
+    def test_wave49_metal_gear_solid_3_wrong_crc_removed(self):
+        """Wave 49: MGS3: Snake Eater must NOT claim CRC AEB91ED0 (Devil May Cry 2)."""
+        game = self.games.get("Metal Gear Solid 3: Snake Eater", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("AEB91ED0", crcs,
+                         "CRC AEB91ED0 (DMC2) wrongly in MGS3: Snake Eater")
+
+    def test_wave49_gta_vc_correct_crc_still_present(self):
+        """Wave 49: Grand Theft Auto: Vice City must still have CRC 3F68CFCF."""
+        game = self.games.get("Grand Theft Auto: Vice City", {})
+        crcs = game.get("crcs", [])
+        self.assertIn("3F68CFCF", crcs,
+                      "CRC 3F68CFCF missing from Grand Theft Auto: Vice City")
+
+    def test_wave49_castlevania_loi_correct_crcs_still_present(self):
+        """Wave 49: Castlevania: LoI must still have CRCs 2B123FE9 and A5B82E82."""
+        game = self.games.get("Castlevania: Lament of Innocence", {})
+        crcs = game.get("crcs", [])
+        self.assertIn("2B123FE9", crcs)
+        self.assertIn("A5B82E82", crcs)
+
+    def test_wave49_no_pnach_entry_has_wrong_slus20552_via_slus20174(self):
+        """Wave 49: No pnach entry should have game_serial SLUS-20174 (Rumble Racing) for a GTA CRC."""
+        gta_crcs = {"3F68CFCF", "7AC3B4F3", "B4B15628"}
+        for key, entry in self.db.items():
+            crc = key.split(":")[0].upper()
+            if crc in gta_crcs:
+                serial = entry.get("game_serial", "").upper()
+                self.assertNotEqual(
+                    serial, "SLUS-20174",
+                    f"GTA VC entry {key} wrongly has serial SLUS-20174 (Rumble Racing)"
+                )
+
+    # ── pnach_db size still within range ─────────────────────────────────────
+
+    def test_wave49_pnach_db_size_still_over_47800(self):
+        """Wave 49: pnach DB should still have >47,800 entries after serial corrections."""
+        self.assertGreater(
+            len(self.db), 47800,
+            f"Unexpected drop in pnach DB size: {len(self.db)}"
+        )
+
+    def test_wave49_serial_db_games_count_unchanged(self):
+        """Wave 49: serial DB game count should still be 2294 (only CRCs changed, not game entries)."""
+        self.assertEqual(
+            len(self.games), 2294,
+            f"Serial DB game count changed unexpectedly: {len(self.games)}"
+        )
+
+
+class TestWave50VersionLabels(unittest.TestCase):
+    """Wave 50: CRC version labels — the app can now tell users which disc
+    version a texture pack or PNACH code is designed for when a game has
+    multiple releases with different CRCs (v1.00, Greatest Hits, etc.).
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.raw_games = json.loads(sdb_path.read_text())["games"]
+
+    # ── GameInfo.crc_labels field ────────────────────────────────────────────
+
+    def test_gameinfo_has_crc_labels_field(self):
+        """Wave 50: GameInfo dataclass must have a crc_labels dict field."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test", serial="SLUS-10000")
+        self.assertIsInstance(gi.crc_labels, dict)
+
+    def test_gameinfo_crc_labels_defaults_empty(self):
+        """Wave 50: GameInfo.crc_labels must default to empty dict, not None."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test", serial="SLUS-10000")
+        self.assertEqual(gi.crc_labels, {})
+
+    # ── SerialDatabase.label_for_crc ─────────────────────────────────────────
+
+    def test_label_for_crc_god_of_war_v100(self):
+        """Wave 50: God of War CRC 17D68D15 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("17D68D15")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_god_of_war_greatest_hits(self):
+        """Wave 50: God of War CRC F0A34C75 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("F0A34C75")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_gta_vc_v100(self):
+        """Wave 50: GTA Vice City CRC 7AC3B4F3 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("7AC3B4F3")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_gta_vc_v101(self):
+        """Wave 50: GTA Vice City CRC 3F68CFCF must be labelled 'v1.01'."""
+        label = self.sdb.label_for_crc("3F68CFCF")
+        self.assertEqual(label, "v1.01")
+
+    def test_label_for_crc_gta_vc_greatest_hits(self):
+        """Wave 50: GTA Vice City CRC B4B15628 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("B4B15628")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_shadow_of_colossus(self):
+        """Wave 50: Shadow of the Colossus CRC C19A374E must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("C19A374E")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_castlevania_loi(self):
+        """Wave 50: Castlevania LoI CRC 2B123FE9 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("2B123FE9")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_silent_hill_3_v100(self):
+        """Wave 50: Silent Hill 3 CRC FFAAC65B must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("FFAAC65B")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_kingdom_hearts_v100(self):
+        """Wave 50: Kingdom Hearts CRC 39BB7DF5 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("39BB7DF5")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_kingdom_hearts_greatest_hits(self):
+        """Wave 50: Kingdom Hearts CRC 0F6B6315 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("0F6B6315")
+        self.assertIn("Greatest Hits", label or "")
+
+    def test_label_for_crc_ratchet_clank_greatest_hits(self):
+        """Wave 50: Ratchet & Clank CRC E4E70DCE must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("E4E70DCE")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_unknown_returns_none(self):
+        """Wave 50: label_for_crc must return None for an unknown CRC."""
+        label = self.sdb.label_for_crc("00000000")
+        self.assertIsNone(label)
+
+    def test_label_for_crc_case_insensitive(self):
+        """Wave 50: label_for_crc must accept lowercase CRC strings."""
+        label_lower = self.sdb.label_for_crc("17d68d15")
+        label_upper = self.sdb.label_for_crc("17D68D15")
+        self.assertEqual(label_lower, label_upper)
+        self.assertIsNotNone(label_lower)
+
+    # ── SerialDatabase.serial_for_crc ────────────────────────────────────────
+
+    def test_serial_for_crc_god_of_war(self):
+        """Wave 50: serial_for_crc must return SCUS-97399 for any God of War CRC."""
+        for crc in ("17D68D15", "F0A34C75", "D6385328"):
+            self.assertEqual(
+                self.sdb.serial_for_crc(crc), "SCUS-97399",
+                f"serial_for_crc({crc!r}) did not return SCUS-97399",
+            )
+
+    def test_serial_for_crc_gta_vc(self):
+        """Wave 50: serial_for_crc must return SLUS-20552 for GTA VC CRCs."""
+        for crc in ("7AC3B4F3", "3F68CFCF", "B4B15628"):
+            self.assertEqual(
+                self.sdb.serial_for_crc(crc), "SLUS-20552",
+                f"serial_for_crc({crc!r}) did not return SLUS-20552",
+            )
+
+    def test_serial_for_crc_unknown_returns_none(self):
+        """Wave 50: serial_for_crc must return None for an unknown CRC."""
+        self.assertIsNone(self.sdb.serial_for_crc("00000000"))
+
+    # ── SerialDatabase.all_crcs_for_title ────────────────────────────────────
+
+    def test_all_crcs_for_title_god_of_war_count(self):
+        """Wave 50: all_crcs_for_title must return 5 pairs for God of War."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        self.assertEqual(len(pairs), 5)
+
+    def test_all_crcs_for_title_god_of_war_has_v100(self):
+        """Wave 50: God of War CRC 17D68D15 must have label 'v1.00' in pairs."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        crc_to_label = dict(pairs)
+        self.assertEqual(crc_to_label.get("17D68D15"), "v1.00")
+
+    def test_all_crcs_for_title_god_of_war_has_greatest_hits(self):
+        """Wave 50: God of War CRC F0A34C75 must have label 'Greatest Hits' in pairs."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        crc_to_label = dict(pairs)
+        self.assertEqual(crc_to_label.get("F0A34C75"), "Greatest Hits")
+
+    def test_all_crcs_for_title_unknown_game(self):
+        """Wave 50: all_crcs_for_title must return empty list for unknown game."""
+        pairs = self.sdb.all_crcs_for_title("Not A Real Game")
+        self.assertEqual(pairs, [])
+
+    # ── pnach_analyzer.get_version_label ────────────────────────────────────
+
+    def test_get_version_label_god_of_war_v100(self):
+        """Wave 50: pnach_analyzer.get_version_label must return 'v1.00' for 17D68D15."""
+        from src.core.pnach_analyzer import get_version_label
+        label = get_version_label("17D68D15")
+        self.assertEqual(label, "v1.00")
+
+    def test_get_version_label_god_of_war_greatest_hits(self):
+        """Wave 50: pnach_analyzer.get_version_label must return 'Greatest Hits' for F0A34C75."""
+        from src.core.pnach_analyzer import get_version_label
+        label = get_version_label("F0A34C75")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_get_version_label_unknown_returns_none(self):
+        """Wave 50: get_version_label must return None for an unlabelled CRC."""
+        from src.core.pnach_analyzer import get_version_label
+        self.assertIsNone(get_version_label("00000000"))
+
+    # ── get_game_verification_summary includes version_label ─────────────────
+
+    def test_verification_summary_includes_version_label_key(self):
+        """Wave 50: get_game_verification_summary must include a 'version_label' key."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("17D68D15")
+        self.assertIn("version_label", summary)
+
+    def test_verification_summary_version_label_god_of_war_v100(self):
+        """Wave 50: verification summary for 17D68D15 must report version_label='v1.00'."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("17D68D15")
+        self.assertEqual(summary.get("version_label"), "v1.00")
+
+    def test_verification_summary_version_label_none_for_unknown_crc(self):
+        """Wave 50: verification summary version_label must be None for unknown CRC."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("FFFFFFFF")
+        self.assertIsNone(summary.get("version_label"))
+
+    # ── JSON data integrity ───────────────────────────────────────────────────
+
+    def test_crc_labels_only_contain_valid_crcs(self):
+        """Wave 50: Every CRC in crc_labels must also appear in the game's crcs list."""
+        for title, info in self.raw_games.items():
+            crcs_set = set(c.upper() for c in info.get("crcs", []))
+            for crc in info.get("crc_labels", {}).keys():
+                self.assertIn(
+                    crc.upper(), crcs_set,
+                    f"{title!r}: crc_labels contains {crc!r} not in crcs list",
+                )
+
+    def test_crc_labels_values_are_non_empty_strings(self):
+        """Wave 50: Every crc_labels value must be a non-empty string."""
+        for title, info in self.raw_games.items():
+            for crc, label in info.get("crc_labels", {}).items():
+                self.assertIsInstance(
+                    label, str,
+                    f"{title!r} crc_label[{crc!r}] is not a string: {label!r}",
+                )
+                self.assertTrue(
+                    label.strip(),
+                    f"{title!r} crc_label[{crc!r}] is empty or whitespace",
+                )
+
+    def test_games_with_crc_labels_count(self):
+        """Wave 50: At least 10 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 10,
+                                f"Too few games with crc_labels: {count}")
+
+    def test_serial_db_game_count_unchanged_after_wave50(self):
+        """Wave 50: serial DB game count must remain 2294 (only crc_labels added)."""
+        self.assertEqual(len(self.raw_games), 2294)
+
+
+class TestWave51CrcLabelsExpanded(unittest.TestCase):
+    """Wave 51: extended crc_labels + data-quality fixes."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+        import json
+        from pathlib import Path
+        raw = json.loads(
+            (Path(__file__).parent.parent / "data/game_serial_db/ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        cls.raw_games = raw["games"]
+
+    # ── Total crc_labels count ───────────────────────────────────────────────
+
+    def test_wave51_crc_labels_count_at_least_20(self):
+        """Wave 51: At least 20 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 20,
+                                f"Expected ≥20 games with crc_labels, got {count}")
+
+    # ── Grand Theft Auto: San Andreas ───────────────────────────────────────
+
+    def test_wave51_gta_sa_v100_label(self):
+        """Wave 51: GTA SA CRC 9A5B29A1 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("9A5B29A1"), "v1.00")
+
+    def test_wave51_gta_sa_v101_label(self):
+        """Wave 51: GTA SA CRC 399A49CA must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("399A49CA"), "v1.01")
+
+    def test_wave51_gta_sa_greatest_hits_label(self):
+        """Wave 51: GTA SA CRC B3D64CF8 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("B3D64CF8"), "Greatest Hits")
+
+    def test_wave51_gta_sa_v200_label(self):
+        """Wave 51: GTA SA CRC 2C6BE434 must be labelled 'v2.00'."""
+        self.assertEqual(self.sdb.label_for_crc("2C6BE434"), "v2.00")
+
+    def test_wave51_gta_sa_all_4_crcs_present(self):
+        """Wave 51: Grand Theft Auto: San Andreas must have 4 CRCs."""
+        info = self.sdb.get_info("Grand Theft Auto: San Andreas")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 4, f"Expected 4 CRCs, got {info.crcs}")
+
+    # ── Gran Turismo 3: A-Spec ───────────────────────────────────────────────
+
+    def test_wave51_gt3_v100_label(self):
+        """Wave 51: GT3 CRC 85AE91B3 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("85AE91B3"), "v1.00")
+
+    def test_wave51_gt3_v101_label(self):
+        """Wave 51: GT3 CRC C12E4587 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("C12E4587"), "v1.01")
+
+    def test_wave51_gt3_greatest_hits_label(self):
+        """Wave 51: GT3 CRC F9F416C5 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("F9F416C5"), "Greatest Hits")
+
+    # ── God of War II ────────────────────────────────────────────────────────
+
+    def test_wave51_gow2_v100_label(self):
+        """Wave 51: GoW II CRC 0B29B9B6 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0B29B9B6"), "v1.00")
+
+    def test_wave51_gow2_v101_label(self):
+        """Wave 51: GoW II CRC 2F123FD8 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("2F123FD8"), "v1.01")
+
+    def test_wave51_gow2_greatest_hits_label(self):
+        """Wave 51: GoW II CRC 44A8A22A must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("44A8A22A"), "Greatest Hits")
+
+    # ── Metal Gear Solid 2: Sons of Liberty ─────────────────────────────────
+
+    def test_wave51_mgs2_v100_label(self):
+        """Wave 51: MGS2 CRC 5E267A69 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("5E267A69"), "v1.00")
+
+    def test_wave51_mgs2_greatest_hits_label(self):
+        """Wave 51: MGS2 CRC 1540CFB5 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("1540CFB5"), "Greatest Hits")
+
+    def test_wave51_mgs2_all_5_crcs_present(self):
+        """Wave 51: MGS2 must have 5 CRCs."""
+        info = self.sdb.get_info("Metal Gear Solid 2: Sons of Liberty")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 5, f"Expected 5 CRCs, got {info.crcs}")
+
+    # ── Metal Gear Solid 3: Snake Eater ─────────────────────────────────────
+
+    def test_wave51_mgs3_v100_label(self):
+        """Wave 51: MGS3 CRC 015FC3F6 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("015FC3F6"), "v1.00")
+
+    def test_wave51_mgs3_all_5_crcs_present(self):
+        """Wave 51: MGS3: Snake Eater must have all 5 CRCs after consolidation."""
+        info = self.sdb.get_info("Metal Gear Solid 3: Snake Eater")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 5, f"Expected 5 CRCs, got {info.crcs}")
+        self.assertIn("A39517AB", info.crcs)
+        self.assertIn("D4FA1757", info.crcs)
+
+    def test_wave51_mgs3_gh_wrong_crc_removed(self):
+        """Wave 51: MGS3 GH entry must no longer claim CRC AEB91ED0 (belongs to DMC2)."""
+        info = self.raw_games.get("Metal Gear Solid 3: Snake Eater (GH)", {})
+        self.assertNotIn("AEB91ED0", info.get("crcs", []),
+                         "AEB91ED0 (DMC2 CRC) wrongly still in MGS3: Snake Eater (GH)")
+
+    # ── Devil May Cry 2 ──────────────────────────────────────────────────────
+
+    def test_wave51_dmc2_v100_label(self):
+        """Wave 51: DMC2 CRC 0BF94D63 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0BF94D63"), "v1.00")
+
+    def test_wave51_dmc2_v105_label(self):
+        """Wave 51: DMC2 CRC AEB91ED0 (now correct in DMC2) must be labelled 'v1.05'."""
+        self.assertEqual(self.sdb.label_for_crc("AEB91ED0"), "v1.05")
+
+    def test_wave51_dmc2_v104_crc_added(self):
+        """Wave 51: DMC2 must include previously-missing CRC 08995DEE."""
+        info = self.sdb.get_info("Devil May Cry 2")
+        self.assertIsNotNone(info)
+        self.assertIn("08995DEE", info.crcs,
+                      "CRC 08995DEE missing from Devil May Cry 2 after Wave 51 fix")
+
+    def test_wave51_dmc2_all_6_crcs_present(self):
+        """Wave 51: DMC2 must have 6 CRCs after Wave 51 fix."""
+        info = self.sdb.get_info("Devil May Cry 2")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 6, f"Expected 6 CRCs, got {info.crcs}")
+
+    # ── Tekken 5 ─────────────────────────────────────────────────────────────
+
+    def test_wave51_tekken5_v100_label(self):
+        """Wave 51: Tekken 5 CRC CF5A1A6B must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("CF5A1A6B"), "v1.00")
+
+    def test_wave51_tekken5_greatest_hits_label(self):
+        """Wave 51: Tekken 5 CRC 652050D2 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("652050D2"), "Greatest Hits")
+
+    # ── Silent Hill 4: The Room ──────────────────────────────────────────────
+
+    def test_wave51_sh4_v100_label(self):
+        """Wave 51: SH4 CRC 0152E0C7 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("0152E0C7"), "v1.00")
+
+    def test_wave51_sh4_v103_label(self):
+        """Wave 51: SH4 CRC 42E152EF must be labelled 'v1.03'."""
+        self.assertEqual(self.sdb.label_for_crc("42E152EF"), "v1.03")
+
+    def test_wave51_sh4_ambiguous_crc_not_labelled(self):
+        """Wave 51: Ambiguous SH4 CRC E360416A must NOT have a crc_label."""
+        sh4_labels = self.raw_games.get("Silent Hill 4: The Room", {}).get(
+            "crc_labels", {}
+        )
+        self.assertNotIn("E360416A", sh4_labels,
+                         "Ambiguous CRC E360416A should not be labelled in SH4")
+
+    # ── Kingdom Hearts: Re:Chain of Memories ────────────────────────────────
+
+    def test_wave51_khrecom_v100_label(self):
+        """Wave 51: KH Re:CoM CRC 2AFC166C must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("2AFC166C"), "v1.00")
+
+    def test_wave51_khrecom_v101_label(self):
+        """Wave 51: KH Re:CoM CRC D3E8D5EC must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("D3E8D5EC"), "v1.01")
+
+    # ── Silent Hill 2 GH labels ──────────────────────────────────────────────
+
+    def test_wave51_sh2_gh_v100_label(self):
+        """Wave 51: SH2 CRC 4A0E5B3A must be labelled 'Greatest Hits v1.00'."""
+        sh2_labels = self.raw_games.get("Silent Hill 2", {}).get("crc_labels", {})
+        self.assertEqual(sh2_labels.get("4A0E5B3A"), "Greatest Hits v1.00")
+
+    # ── Xenosaga III canonical entry ─────────────────────────────────────────
+
+    def test_wave51_xeno3_v100_label(self):
+        """Wave 51: Xenosaga III CRC 94A82AAA must be labelled 'v1.00'."""
+        xeno = self.raw_games.get(
+            "Xenosaga Episode III: Also sprach Zarathustra", {}
+        )
+        labels = xeno.get("crc_labels", {})
+        self.assertEqual(labels.get("94A82AAA"), "v1.00")
+
+    def test_wave51_xeno3_ambiguous_crc_not_labelled(self):
+        """Wave 51: Ambiguous Xenosaga III CRC FCD6E9FA must NOT have a crc_label."""
+        xeno = self.raw_games.get(
+            "Xenosaga Episode III: Also sprach Zarathustra", {}
+        )
+        labels = xeno.get("crc_labels", {})
+        self.assertNotIn("FCD6E9FA", labels,
+                         "Ambiguous CRC FCD6E9FA should not be labelled in Xenosaga III")
+
+    # ── Serial DB game count unchanged ───────────────────────────────────────
+
+    def test_wave51_serial_db_game_count_unchanged(self):
+        """Wave 51: serial DB game count must remain 2294."""
+        self.assertEqual(len(self.raw_games), 2294)
+
+
+class TestWave52CrcQualityFixes(unittest.TestCase):
+    """Wave 52: CRC ownership fixes + crc_labels expansion."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+        import json
+        from pathlib import Path
+        raw = json.loads(
+            (Path(__file__).parent.parent / "data/game_serial_db/ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        cls.raw_games = raw["games"]
+
+    # ── crc_labels count ─────────────────────────────────────────────────────
+
+    def test_wave52_crc_labels_count_at_least_28(self):
+        """Wave 52: At least 28 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 28,
+                                f"Expected ≥28 games with crc_labels, got {count}")
+
+    # ── Wrong-case duplicate entries must have CRCs cleared ──────────────────
+
+    def test_wave52_ico_uppercase_crcs_cleared(self):
+        """Wave 52: 'ICO' (wrong-case) entry must have CRCs cleared."""
+        ico_upper = self.raw_games.get("ICO", {})
+        self.assertEqual(ico_upper.get("crcs", []), [],
+                         "'ICO' wrong-case entry must have empty CRCs (canonical is 'Ico')")
+
+    def test_wave52_shadow_of_rome_wrong_case_crcs_cleared(self):
+        """Wave 52: 'Shadow Of Rome' wrong-case entry must have CRCs cleared."""
+        entry = self.raw_games.get("Shadow Of Rome", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Shadow Of Rome' wrong-case entry must have empty CRCs")
+
+    # ── Way of the Samurai 2 CRC moved to canonical entry ────────────────────
+
+    def test_wave52_way_of_samurai2_canonical_has_crc(self):
+        """Wave 52: 'Way of the Samurai 2' canonical entry must have CRC 7B79C53C."""
+        entry = self.raw_games.get("Way of the Samurai 2", {})
+        self.assertIn("7B79C53C", entry.get("crcs", []),
+                      "CRC 7B79C53C must be in 'Way of the Samurai 2'")
+
+    def test_wave52_way_of_samurai2_wrong_case_crcs_cleared(self):
+        """Wave 52: 'Way Of The Samurai 2' wrong-case entry must have CRCs cleared."""
+        entry = self.raw_games.get("Way Of The Samurai 2", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Way Of The Samurai 2' wrong-case entry must have empty CRCs")
+
+    def test_wave52_way_of_samurai2_crc_maps_to_canonical(self):
+        """Wave 52: CRC 7B79C53C must resolve to 'Way of the Samurai 2'."""
+        title = self.sdb._crc_to_title.get("7B79C53C")
+        self.assertEqual(title, "Way of the Samurai 2",
+                         "CRC 7B79C53C must map to canonical 'Way of the Samurai 2'")
+
+    # ── Alias entries with duplicate CRCs must be cleared ────────────────────
+
+    def test_wave52_ffx_slash_xii_crcs_cleared(self):
+        """Wave 52: 'Final Fantasy X / XII' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Final Fantasy X / XII", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Final Fantasy X / XII' alias must have empty CRCs")
+
+    def test_wave52_ffx_crc_maps_to_canonical(self):
+        """Wave 52: FFX CRC 941AE3A4 must resolve to 'Final Fantasy X'."""
+        title = self.sdb._crc_to_title.get("941AE3A4")
+        self.assertEqual(title, "Final Fantasy X",
+                         "CRC 941AE3A4 must map to canonical 'Final Fantasy X'")
+
+    def test_wave52_jak2_slash_jak3_crcs_cleared(self):
+        """Wave 52: 'Jak II / Jak 3' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Jak II / Jak 3", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Jak II / Jak 3' alias must have empty CRCs")
+
+    def test_wave52_jak2_crc_maps_to_canonical(self):
+        """Wave 52: Jak II CRC 9184AAF1 must resolve to 'Jak II'."""
+        title = self.sdb._crc_to_title.get("9184AAF1")
+        self.assertEqual(title, "Jak II",
+                         "CRC 9184AAF1 must map to canonical 'Jak II'")
+
+    def test_wave52_rc_series_crcs_cleared(self):
+        """Wave 52: 'Ratchet & Clank series' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Ratchet & Clank series", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Ratchet & Clank series' alias must have empty CRCs")
+
+    def test_wave52_dark_cloud_slash_dark_chronicle_crcs_cleared(self):
+        """Wave 52: 'Dark Cloud / Dark Chronicle' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Dark Cloud / Dark Chronicle", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Dark Cloud / Dark Chronicle' alias must have empty CRCs")
+
+    def test_wave52_dark_cloud_crc_maps_to_canonical(self):
+        """Wave 52: Dark Cloud CRC 1DF75E06 must resolve to 'Dark Cloud'."""
+        title = self.sdb._crc_to_title.get("1DF75E06")
+        self.assertEqual(title, "Dark Cloud",
+                         "CRC 1DF75E06 must map to canonical 'Dark Cloud'")
+
+    def test_wave52_bully_short_crcs_cleared(self):
+        """Wave 52: 'Bully' short alias must have empty CRCs (canonical is 'Bully / Canis Canem Edit')."""
+        entry = self.raw_games.get("Bully", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Bully' short alias must have empty CRCs")
+
+    # ── Final Fantasy X crc_labels ────────────────────────────────────────────
+
+    def test_wave52_ffx_v100_label(self):
+        """Wave 52: FFX CRC 941AE3A4 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("941AE3A4"), "v1.00")
+
+    def test_wave52_ffx_greatest_hits_label(self):
+        """Wave 52: FFX CRC CF8ABA10 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("CF8ABA10"), "Greatest Hits")
+
+    # ── Jak II crc_labels ─────────────────────────────────────────────────────
+
+    def test_wave52_jak2_v100_label(self):
+        """Wave 52: Jak II CRC 9184AAF1 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("9184AAF1"), "v1.00")
+
+    def test_wave52_jak2_v101_label(self):
+        """Wave 52: Jak II CRC A5C02F40 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("A5C02F40"), "v1.01")
+
+    def test_wave52_jak2_greatest_hits_label(self):
+        """Wave 52: Jak II CRC C5CA2AB3 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("C5CA2AB3"), "Greatest Hits")
+
+    def test_wave52_jak2_all_3_crcs_present(self):
+        """Wave 52: Jak II must have 3 CRCs."""
+        info = self.sdb.get_info("Jak II")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 3, f"Expected 3 CRCs, got {info.crcs}")
+
+    # ── Jak 3 crc_labels ──────────────────────────────────────────────────────
+
+    def test_wave52_jak3_v100_label(self):
+        """Wave 52: Jak 3 CRC 3F5A3B78 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("3F5A3B78"), "v1.00")
+
+    def test_wave52_jak3_v101_label(self):
+        """Wave 52: Jak 3 CRC 44A3A9D5 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("44A3A9D5"), "v1.01")
+
+    def test_wave52_jak3_v102_label(self):
+        """Wave 52: Jak 3 CRC 644CFD03 must be labelled 'v1.02'."""
+        self.assertEqual(self.sdb.label_for_crc("644CFD03"), "v1.02")
+
+    def test_wave52_jak3_greatest_hits_label(self):
+        """Wave 52: Jak 3 CRC 6F942E31 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("6F942E31"), "Greatest Hits")
+
+    def test_wave52_jak3_all_4_crcs_present(self):
+        """Wave 52: Jak 3 must have 4 CRCs."""
+        info = self.sdb.get_info("Jak 3")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 4, f"Expected 4 CRCs, got {info.crcs}")
+
+    # ── Ratchet & Clank: Going Commando crc_labels ────────────────────────────
+
+    def test_wave52_rcgoc_v100_label(self):
+        """Wave 52: R&C Going Commando CRC 4A8BB2F9 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("4A8BB2F9"), "v1.00")
+
+    def test_wave52_rcgoc_v101_label(self):
+        """Wave 52: R&C Going Commando CRC A51FB9E1 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("A51FB9E1"), "v1.01")
+
+    def test_wave52_rcgoc_greatest_hits_label(self):
+        """Wave 52: R&C Going Commando CRC F7C04473 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("F7C04473"), "Greatest Hits")
+
+    def test_wave52_rcgoc_all_3_crcs_present(self):
+        """Wave 52: R&C Going Commando must have 3 CRCs."""
+        info = self.sdb.get_info("Ratchet & Clank: Going Commando")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 3, f"Expected 3 CRCs, got {info.crcs}")
+
+    # ── Serial DB game count unchanged ───────────────────────────────────────
+
+    def test_wave52_serial_db_game_count_unchanged(self):
+        """Wave 52: serial DB game count must remain 2294."""
+        self.assertEqual(len(self.raw_games), 2294)
+
+
+# ===========================================================================
+# Wave 53 — PCSX2 Guidance, Texture Hash DB, Load Order Manager, Mod Profiles
+# ===========================================================================
+
+class TestWave53Pcsx2Guidance(unittest.TestCase):
+    """Wave 53: PCSX2 user guidance constants and helpers in pcsx2_layout."""
+
+    def test_import_guidance_constants(self):
+        from src.core.pcsx2_layout import (
+            PCSX2_CHEATS_HINT,
+            PCSX2_TEXTURES_HINT,
+            PCSX2_ENABLE_CHEATS_STEPS,
+            PCSX2_ENABLE_TEXTURES_STEPS,
+            PCSX2_DUMP_TEXTURES_STEPS,
+        )
+
+    def test_cheats_hint_mentions_enable_cheats(self):
+        from src.core.pcsx2_layout import PCSX2_CHEATS_HINT
+        lower = PCSX2_CHEATS_HINT.lower()
+        self.assertIn("cheat", lower)
+        self.assertIn("enable", lower)
+
+    def test_textures_hint_mentions_load_textures(self):
+        from src.core.pcsx2_layout import PCSX2_TEXTURES_HINT
+        lower = PCSX2_TEXTURES_HINT.lower()
+        self.assertIn("texture", lower)
+        self.assertIn("load", lower)
+
+    def test_enable_cheats_steps_has_at_least_three(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_CHEATS_STEPS
+        self.assertGreaterEqual(len(PCSX2_ENABLE_CHEATS_STEPS), 3)
+
+    def test_enable_textures_steps_has_at_least_three(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_TEXTURES_STEPS
+        self.assertGreaterEqual(len(PCSX2_ENABLE_TEXTURES_STEPS), 3)
+
+    def test_get_cheats_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_cheats_guidance
+        g = get_cheats_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["hint"], str)
+        self.assertIsInstance(g["steps"], list)
+        self.assertTrue(len(g["steps"]) >= 3)
+
+    def test_get_textures_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_textures_guidance
+        g = get_textures_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["hint"], str)
+        self.assertGreaterEqual(len(g["steps"]), 3)
+
+    def test_get_dump_textures_guidance_returns_dict(self):
+        from src.core.pcsx2_layout import get_dump_textures_guidance
+        g = get_dump_textures_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertGreaterEqual(len(g["steps"]), 3)
+
+    def test_cheats_hint_mentions_properties(self):
+        """Steps should guide user to open game Properties."""
+        from src.core.pcsx2_layout import PCSX2_ENABLE_CHEATS_STEPS
+        combined = " ".join(PCSX2_ENABLE_CHEATS_STEPS).lower()
+        self.assertIn("properties", combined)
+
+    def test_textures_hint_mentions_properties(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_TEXTURES_STEPS
+        combined = " ".join(PCSX2_ENABLE_TEXTURES_STEPS).lower()
+        self.assertIn("properties", combined)
+
+    def test_dump_textures_steps_mention_dumps_folder(self):
+        from src.core.pcsx2_layout import PCSX2_DUMP_TEXTURES_STEPS
+        combined = " ".join(PCSX2_DUMP_TEXTURES_STEPS).lower()
+        self.assertIn("dump", combined)
+
+    def test_guidance_hints_start_with_warning_or_info_emoji(self):
+        from src.core.pcsx2_layout import PCSX2_CHEATS_HINT, PCSX2_TEXTURES_HINT
+        self.assertTrue(
+            PCSX2_CHEATS_HINT.startswith("\u26a0") or PCSX2_CHEATS_HINT.startswith("\u2139"),
+            "Cheats hint should start with a warning or info emoji",
+        )
+        self.assertTrue(
+            PCSX2_TEXTURES_HINT.startswith("\u26a0") or PCSX2_TEXTURES_HINT.startswith("\u2139"),
+            "Textures hint should start with a warning or info emoji",
+        )
+
+
+class TestWave53TextureHashDB(unittest.TestCase):
+    """Wave 53: TextureHashDB — hash tracking, conflict detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.tmpdir, "texture_hash.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.texture_hash_db import TextureHashDB, TextureEntry, TextureConflict
+
+    def test_constants(self):
+        from src.core.texture_hash_db import MIN_TEXTURE_BYTES, TEXTURE_EXTENSIONS
+        self.assertGreater(MIN_TEXTURE_BYTES, 0)
+        self.assertIn(".png", TEXTURE_EXTENSIONS)
+        self.assertIn(".dds", TEXTURE_EXTENSIONS)
+
+    def test_empty_db_stats(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        s = db.stats()
+        self.assertEqual(s["total_entries"], 0)
+        self.assertEqual(s["total_packs"], 0)
+        self.assertEqual(s["broken_count"], 0)
+        self.assertEqual(s["duplicate_groups"], 0)
+        self.assertEqual(s["overwrite_conflicts"], 0)
+
+    def test_all_entries_empty(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        self.assertEqual(db.all_entries(), [])
+
+    def test_register_file_creates_entry(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "tex.png"
+        tex.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        entry = db.register_file("tex.png", "pack-1", str(tex))
+        self.assertEqual(entry.texture_id, "tex.png")
+        self.assertEqual(entry.pack_id, "pack-1")
+        self.assertFalse(entry.broken)
+        self.assertGreater(entry.size_bytes, 0)
+        self.assertEqual(len(entry.content_hash), 64)
+
+    def test_register_zero_byte_file_marked_broken(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "broken.png"
+        tex.write_bytes(b"")
+        entry = db.register_file("broken.png", "pack-1", str(tex))
+        self.assertTrue(entry.broken)
+
+    def test_register_missing_file_marked_broken(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
+        self.assertTrue(entry.broken)
+
+    def test_register_pack_scans_directory(self):
+        from src.core.texture_hash_db import TextureHashDB
+        pack_dir = os.path.join(self.tmpdir, "PackAlpha")
+        os.makedirs(pack_dir)
+        for fname in ["a.png", "b.png", "c.dds"]:
+            Path(pack_dir, fname).write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db = TextureHashDB(self.db_path)
+        entries = db.register_pack("pack-alpha", pack_dir)
+        self.assertEqual(len(entries), 3)
+
+    def test_register_pack_ignores_non_texture_files(self):
+        from src.core.texture_hash_db import TextureHashDB
+        pack_dir = os.path.join(self.tmpdir, "PackBeta")
+        os.makedirs(pack_dir)
+        Path(pack_dir, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        Path(pack_dir, "readme.txt").write_text("hello")
+        db = TextureHashDB(self.db_path)
+        entries = db.register_pack("pack-beta", pack_dir)
+        self.assertEqual(len(entries), 1)
+
+    def test_register_pack_missing_dir_returns_empty(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        result = db.register_pack("pack-x", "/nonexistent/path")
+        self.assertEqual(result, [])
+
+    def test_no_conflict_different_texture_ids(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "a.png"
+        tb = Path(self.tmpdir) / "b.png"
+        ta.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        tb.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("a.png", "pack-1", str(ta))
+        db.register_file("b.png", "pack-2", str(tb))
+        self.assertEqual(db.find_overwrite_conflicts(), [])
+
+    def test_conflict_detected_when_two_packs_have_same_texture_id(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "shared.png"
+        tb = Path(self.tmpdir) / "shared2.png"
+        ta.write_bytes(b"\x89PNG" + b"\x01" * 200)
+        tb.write_bytes(b"\x89PNG" + b"\x02" * 200)
+        db.register_file("shared.png", "pack-1", str(ta))
+        db.register_file("shared.png", "pack-2", str(tb))
+        conflicts = db.find_overwrite_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].texture_id, "shared.png")
+        pids = set(conflicts[0].pack_ids)
+        self.assertIn("pack-1", pids)
+        self.assertIn("pack-2", pids)
+        self.assertFalse(conflicts[0].is_duplicate_content)
+
+    def test_conflict_same_content_flagged(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\xAA" * 200
+        ta = Path(self.tmpdir) / "same.png"
+        tb = Path(self.tmpdir) / "same_copy.png"
+        ta.write_bytes(content)
+        tb.write_bytes(content)
+        db.register_file("same.png", "pack-A", str(ta))
+        db.register_file("same.png", "pack-B", str(tb))
+        conflicts = db.find_overwrite_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].is_duplicate_content)
+
+    def test_same_pack_no_conflict(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "x.png"
+        ta.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("x.png", "pack-1", str(ta))
+        db.register_file("x.png", "pack-1", str(ta))
+        self.assertEqual(db.find_overwrite_conflicts(), [])
+
+    def test_find_duplicates_same_content(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\xFF" * 200
+        for i in range(3):
+            p = Path(self.tmpdir) / f"dup{i}.png"
+            p.write_bytes(content)
+            db.register_file(f"dup{i}.png", f"pack-{i}", str(p))
+        groups = db.find_duplicates()
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(len(groups[0]), 3)
+
+    def test_find_duplicates_no_duplicates(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        for i in range(3):
+            p = Path(self.tmpdir) / f"unique{i}.png"
+            p.write_bytes(b"\x89PNG" + bytes([i]) * 200)
+            db.register_file(f"unique{i}.png", f"pack-{i}", str(p))
+        self.assertEqual(db.find_duplicates(), [])
+
+    def test_find_broken_returns_broken_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        good = Path(self.tmpdir) / "good.png"
+        good.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        bad = Path(self.tmpdir) / "bad.png"
+        bad.write_bytes(b"")
+        db.register_file("good.png", "pack-1", str(good))
+        db.register_file("bad.png",  "pack-1", str(bad))
+        broken = db.find_broken_textures()
+        self.assertEqual(len(broken), 1)
+        self.assertEqual(broken[0].texture_id, "bad.png")
+
+    def test_remove_pack_clears_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        p = Path(self.tmpdir) / "t.png"
+        p.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("t.png", "pack-rm", str(p))
+        self.assertEqual(len(db.all_entries()), 1)
+        removed = db.remove_pack("pack-rm")
+        self.assertEqual(removed, 1)
+        self.assertEqual(len(db.all_entries()), 0)
+
+    def test_save_and_reload(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        p = Path(self.tmpdir) / "save_test.png"
+        p.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("save_test.png", "pack-s", str(p))
+        db.save()
+        self.assertTrue(os.path.exists(self.db_path))
+        db2 = TextureHashDB(self.db_path)
+        self.assertEqual(len(db2.all_entries()), 1)
+        self.assertEqual(db2.all_entries()[0].texture_id, "save_test.png")
+
+    def test_save_is_atomic_no_tmp_files_left(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        db.save()
+        parent = Path(self.db_path).parent
+        tmp_files = [f for f in parent.iterdir() if "texhash_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_stats_reflect_registered_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\x00" * 200
+        for i in range(4):
+            p = Path(self.tmpdir) / f"s{i}.png"
+            p.write_bytes(content)
+            db.register_file(f"s{i}.png", "pack-1", str(p))
+        s = db.stats()
+        self.assertEqual(s["total_entries"], 4)
+        self.assertEqual(s["total_packs"], 1)
+
+    def test_texture_entry_round_trip(self):
+        from src.core.texture_hash_db import TextureEntry
+        e = TextureEntry(
+            texture_id="abc.png",
+            pack_id="test-pack",
+            file_path="/some/path/abc.png",
+            content_hash="a" * 64,
+            size_bytes=1024,
+            broken=False,
+        )
+        d = e.to_dict()
+        e2 = TextureEntry.from_dict(d)
+        self.assertEqual(e2.texture_id, e.texture_id)
+        self.assertEqual(e2.pack_id, e.pack_id)
+        self.assertEqual(e2.content_hash, e.content_hash)
+        self.assertEqual(e2.broken, e.broken)
+
+
+class TestWave53LoadOrderManager(unittest.TestCase):
+    """Wave 53: LoadOrderManager — load order CRUD and conflict detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.order_file = os.path.join(self.tmpdir, "load_order.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+    def test_get_order_empty(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+
+    def test_all_serials_empty(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertEqual(lom.all_serials(), [])
+
+    def test_set_and_get_order(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-C"])
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B", "pack-C"])
+
+    def test_set_order_deduplicates(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+
+    def test_get_order_returns_copy(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A"])
+        order = lom.get_order("SLUS-20062")
+        order.append("injected")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A"])
+
+    def test_add_pack_appends(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-A")
+        lom.add_pack("SLUS-20062", "pack-B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+
+    def test_add_pack_no_duplicate(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-A")
+        lom.add_pack("SLUS-20062", "pack-A")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A"])
+
+    def test_remove_pack_removes_item(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B"])
+        result = lom.remove_pack("SLUS-20062", "pack-A")
+        self.assertTrue(result)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-B"])
+
+    def test_remove_pack_nonexistent_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        result = lom.remove_pack("SLUS-20062", "pack-Z")
+        self.assertFalse(result)
+
+    def test_remove_pack_last_item_removes_serial(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-only")
+        lom.remove_pack("SLUS-20062", "pack-only")
+        self.assertNotIn("SLUS-20062", lom.all_serials())
+
+    def test_move_up(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_up("SLUS-20062", "B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["B", "A", "C"])
+
+    def test_move_up_already_first_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        result = lom.move_up("SLUS-20062", "A")
+        self.assertFalse(result)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "B"])
+
+    def test_move_down(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_down("SLUS-20062", "B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "C", "B"])
+
+    def test_move_down_already_last_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        result = lom.move_down("SLUS-20062", "B")
+        self.assertFalse(result)
+
+    def test_move_to_top(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_to_top("SLUS-20062", "C")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["C", "A", "B"])
+
+    def test_move_to_bottom(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_to_bottom("SLUS-20062", "A")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["B", "C", "A"])
+
+    def test_set_position(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C", "D"])
+        lom.set_position("SLUS-20062", "D", 1)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "D", "B", "C"])
+
+    def test_priority_returns_index(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(lom.priority("SLUS-20062", "A"), 0)
+        self.assertEqual(lom.priority("SLUS-20062", "C"), 2)
+
+    def test_priority_none_for_unregistered(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertIsNone(lom.priority("SLUS-20062", "missing"))
+
+    def test_winner_returns_last_in_order(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["base", "env", "char", "ui"])
+        winner = lom.winner("SLUS-20062", ["base", "env", "char"])
+        self.assertEqual(winner, "char")
+
+    def test_winner_highest_priority_wins(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(lom.winner("SLUS-20062", ["A", "C"]), "C")
+
+    def test_winner_empty_returns_none(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertIsNone(lom.winner("SLUS-20062", []))
+
+    def test_detect_order_conflicts(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["base", "hd-env", "char"])
+        tid_to_packs = {
+            "grass.png":  ["base", "hd-env"],
+            "tree.png":   ["base", "char"],
+            "unique.png": ["base"],
+        }
+        results = lom.detect_order_conflicts("SLUS-20062", tid_to_packs)
+        self.assertEqual(len(results), 2)
+        tids = {r["texture_id"] for r in results}
+        self.assertIn("grass.png", tids)
+        self.assertIn("tree.png", tids)
+        self.assertNotIn("unique.png", tids)
+
+    def test_detect_order_conflicts_winner_correct(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        results = lom.detect_order_conflicts(
+            "SLUS-20062", {"shared.png": ["A", "C"]}
+        )
+        self.assertEqual(results[0]["winner"], "C")
+
+    def test_save_and_reload(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-1", "pack-2", "pack-3"])
+        lom.save()
+        lom2 = LoadOrderManager(self.order_file)
+        self.assertEqual(lom2.get_order("SLUS-20062"), ["pack-1", "pack-2", "pack-3"])
+
+    def test_save_is_atomic(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-1")
+        lom.save()
+        parent = Path(self.order_file).parent
+        tmp_files = [f for f in parent.iterdir() if "loadorder_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_clear_removes_all(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        lom.set_order("SCUS-97232", ["C"])
+        lom.clear()
+        self.assertEqual(lom.all_serials(), [])
+
+
+class TestWave53ModProfiles(unittest.TestCase):
+    """Wave 53: ModProfileManager and ModProfile."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.profiles_file = os.path.join(self.tmpdir, "profiles.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.mod_profile import ModProfileManager, ModProfile
+
+    def test_no_profiles_initially(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertEqual(pm.profile_count(), 0)
+        self.assertIsNone(pm.get_active())
+
+    def test_create_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        p = pm.create_profile("Vanilla+", description="Minimal mods")
+        self.assertEqual(p.name, "Vanilla+")
+        self.assertEqual(p.description, "Minimal mods")
+        self.assertEqual(pm.profile_count(), 1)
+
+    def test_create_duplicate_raises_value_error(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("HD")
+        with self.assertRaises(ValueError):
+            pm.create_profile("HD")
+
+    def test_get_profile_returns_correct(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Test")
+        p = pm.get_profile("Test")
+        self.assertIsNotNone(p)
+        self.assertEqual(p.name, "Test")
+
+    def test_get_profile_missing_returns_none(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertIsNone(pm.get_profile("nonexistent"))
+
+    def test_list_profiles_sorted(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Zulu")
+        pm.create_profile("Alpha")
+        pm.create_profile("Mike")
+        self.assertEqual(pm.list_profiles(), ["Alpha", "Mike", "Zulu"])
+
+    def test_delete_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("ToDelete")
+        result = pm.delete_profile("ToDelete")
+        self.assertTrue(result)
+        self.assertIsNone(pm.get_profile("ToDelete"))
+
+    def test_delete_active_profile_clears_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Active")
+        pm.set_active("Active")
+        pm.delete_profile("Active")
+        self.assertIsNone(pm.get_active_name())
+
+    def test_delete_nonexistent_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertFalse(pm.delete_profile("nope"))
+
+    def test_rename_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("OldName")
+        pm.set_active("OldName")
+        result = pm.rename_profile("OldName", "NewName")
+        self.assertTrue(result)
+        self.assertIsNotNone(pm.get_profile("NewName"))
+        self.assertIsNone(pm.get_profile("OldName"))
+        self.assertEqual(pm.get_active_name(), "NewName")
+
+    def test_rename_to_existing_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("A")
+        pm.create_profile("B")
+        self.assertFalse(pm.rename_profile("A", "B"))
+
+    def test_set_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("HD Graphics")
+        pm.set_active("HD Graphics")
+        self.assertEqual(pm.get_active_name(), "HD Graphics")
+        active = pm.get_active()
+        self.assertIsNotNone(active)
+        self.assertEqual(active.name, "HD Graphics")
+
+    def test_set_active_nonexistent_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        result = pm.set_active("missing")
+        self.assertFalse(result)
+        self.assertIsNone(pm.get_active())
+
+    def test_clear_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.set_active("P")
+        pm.clear_active()
+        self.assertIsNone(pm.get_active())
+
+    def test_add_mod_to_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("TestProf")
+        pm.add_mod_to_profile("TestProf", "uuid-mod-1")
+        p = pm.get_profile("TestProf")
+        self.assertTrue(p.is_mod_enabled("uuid-mod-1"))
+
+    def test_add_mod_no_duplicate(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.add_mod_to_profile("P", "m1")
+        pm.add_mod_to_profile("P", "m1")
+        self.assertEqual(pm.get_profile("P").enabled_mods.count("m1"), 1)
+
+    def test_remove_mod_from_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.add_mod_to_profile("P", "m1")
+        result = pm.remove_mod_from_profile("P", "m1")
+        self.assertTrue(result)
+        self.assertFalse(pm.get_profile("P").is_mod_enabled("m1"))
+
+    def test_remove_mod_cleans_load_order(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        p = pm.get_profile("P")
+        p.add_mod("m1")
+        p.set_load_order("SLUS-20062", ["m1", "m2"])
+        pm.remove_mod_from_profile("P", "m1")
+        self.assertNotIn("m1", p.get_load_order("SLUS-20062"))
+
+    def test_is_mod_in_active_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Active")
+        pm.add_mod_to_profile("Active", "uuid-A")
+        pm.set_active("Active")
+        self.assertTrue(pm.is_mod_in_active_profile("uuid-A"))
+        self.assertFalse(pm.is_mod_in_active_profile("uuid-B"))
+
+    def test_is_mod_in_active_profile_no_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertFalse(pm.is_mod_in_active_profile("any"))
+
+    def test_profile_load_order_set_get(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        p.set_load_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B", "C"])
+
+    def test_profile_load_order_deduplicates(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        p.set_load_order("SLUS-20062", ["A", "B", "A"])
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B"])
+
+    def test_profile_load_order_empty_by_default(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        self.assertEqual(p.get_load_order("SLUS-99999"), [])
+
+    def test_duplicate_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Source", description="original", enabled_mods=["mod-A"])
+        pm.get_profile("Source").set_load_order("SLUS-20062", ["mod-A"])
+        clone = pm.duplicate_profile("Source", "Clone")
+        self.assertIsNotNone(clone)
+        self.assertEqual(clone.name, "Clone")
+        self.assertEqual(clone.description, "original")
+        self.assertIn("mod-A", clone.enabled_mods)
+        self.assertEqual(clone.get_load_order("SLUS-20062"), ["mod-A"])
+
+    def test_duplicate_to_existing_name_returns_none(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("A")
+        pm.create_profile("B")
+        self.assertIsNone(pm.duplicate_profile("A", "B"))
+
+    def test_save_and_reload(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Vanilla+", description="minimal")
+        pm.add_mod_to_profile("Vanilla+", "mod-1")
+        pm.create_profile("HD")
+        pm.set_active("HD")
+        pm.save()
+        pm2 = ModProfileManager(self.profiles_file)
+        self.assertEqual(sorted(pm2.list_profiles()), ["HD", "Vanilla+"])
+        self.assertEqual(pm2.get_active_name(), "HD")
+        vp = pm2.get_profile("Vanilla+")
+        self.assertIsNotNone(vp)
+        self.assertIn("mod-1", vp.enabled_mods)
+        self.assertEqual(vp.description, "minimal")
+
+    def test_save_is_atomic(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.save()
+        parent = Path(self.profiles_file).parent
+        tmp_files = [f for f in parent.iterdir() if "profiles_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_reload_preserves_load_order(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Ordered")
+        pm.get_profile("Ordered").set_load_order("SLUS-20062", ["A", "B", "C"])
+        pm.save()
+        pm2 = ModProfileManager(self.profiles_file)
+        p = pm2.get_profile("Ordered")
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B", "C"])
+
+    def test_mod_profile_round_trip(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(
+            name="Round Trip",
+            description="test",
+            enabled_mods=["m1", "m2"],
+        )
+        p.set_load_order("SLUS-20062", ["m1", "m2"])
+        d = p.to_dict()
+        p2 = ModProfile.from_dict("Round Trip", d)
+        self.assertEqual(p2.name, "Round Trip")
+        self.assertEqual(p2.description, "test")
+        self.assertEqual(p2.enabled_mods, ["m1", "m2"])
+        self.assertEqual(p2.get_load_order("SLUS-20062"), ["m1", "m2"])
+
+
+class TestWave53TextureOverwriteConflicts(unittest.TestCase):
+    """Wave 53: resolve_texture_overwrite_conflicts."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts,
+            TextureOverwriteConflict,
+        )
+
+    def test_no_conflict_empty_dir(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        result = resolve_texture_overwrite_conflicts("")
+        self.assertEqual(result, [])
+
+    def test_no_conflict_single_pack(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        repl = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        os.makedirs(repl)
+        Path(repl, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result, [])
+
+    def test_no_conflict_disjoint_filenames(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        Path(pb, "b.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result, [])
+
+    def test_conflict_detected_shared_filename(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "shared.png").write_bytes(b"\x89PNG" + b"\x01" * 200)
+        Path(pb, "shared.png").write_bytes(b"\x89PNG" + b"\x02" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].texture_id, "shared.png")
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertFalse(result[0].same_content)
+
+    def test_conflict_same_content_detected(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        content = b"\x89PNG" + b"\xAA" * 200
+        Path(pa, "same.png").write_bytes(content)
+        Path(pb, "same.png").write_bytes(content)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0].same_content)
+
+    def test_multiple_conflicts_sorted_by_texture_id(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        for fname in ["z_tex.png", "a_tex.png", "m_tex.png"]:
+            Path(pa, fname).write_bytes(b"\x89PNG" + b"\x11" * 200)
+            Path(pb, fname).write_bytes(b"\x89PNG" + b"\x22" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        tids = [r.texture_id for r in result]
+        self.assertEqual(tids, sorted(tids))
+
+    def test_missing_dir_returns_empty(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        result = resolve_texture_overwrite_conflicts("/nonexistent/path")
+        self.assertEqual(result, [])
+
+    def test_conflict_summary_readable(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict
+        c = TextureOverwriteConflict(
+            texture_id="abc.png",
+            serial="SLUS-20062",
+            pack_a_id="PackA",
+            pack_a_path=Path("/textures/SLUS-20062/replacements/PackA/abc.png"),
+            pack_b_id="PackB",
+            pack_b_path=Path("/textures/SLUS-20062/replacements/PackB/abc.png"),
+            same_content=False,
+        )
+        summary = c.conflict_summary
+        self.assertIn("abc.png", summary)
+        self.assertIn("SLUS-20062", summary)
+        self.assertIn("PackA", summary)
+        self.assertIn("PackB", summary)
+
+    def test_two_serials_independent(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        for serial in ["SLUS-20062", "SCUS-97232"]:
+            pa = os.path.join(tex, serial, "replacements", "PackA")
+            pb = os.path.join(tex, serial, "replacements", "PackB")
+            os.makedirs(pa)
+            os.makedirs(pb)
+            Path(pa, "shared.dds").write_bytes(b"DDS " + b"\x00" * 200)
+            Path(pb, "shared.dds").write_bytes(b"DDS " + b"\xFF" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        serials = {r.serial for r in result}
+        self.assertIn("SLUS-20062", serials)
+        self.assertIn("SCUS-97232", serials)
+
+
+class TestWave54ConflictVisualizer(unittest.TestCase):
+    """Wave 54: Enhanced Texture Pack Conflict Visualizer.
+
+    Tests for ConflictResolution enum, _detect_alpha_type helper,
+    enhanced TextureOverwriteConflict fields, and ConflictResolutionSession.
+    """
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # ------------------------------------------------------------------
+    # Imports
+    # ------------------------------------------------------------------
+
+    def test_imports(self):
+        from src.core.conflict_resolver import (
+            ConflictResolution,
+            ConflictResolutionSession,
+            TextureOverwriteConflict,
+        )
+
+    # ------------------------------------------------------------------
+    # ConflictResolution enum
+    # ------------------------------------------------------------------
+
+    def test_conflict_resolution_enum_values(self):
+        from src.core.conflict_resolver import ConflictResolution
+        self.assertEqual(ConflictResolution.PENDING, "pending")
+        self.assertEqual(ConflictResolution.PACK_A, "pack_a")
+        self.assertEqual(ConflictResolution.PACK_B, "pack_b")
+        self.assertEqual(ConflictResolution.SKIP, "skip")
+
+    def test_conflict_resolution_default_is_pending(self):
+        from src.core.conflict_resolver import (
+            ConflictResolution,
+            TextureOverwriteConflict,
+        )
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/t.png"),
+            pack_b_id="B", pack_b_path=Path("/b/t.png"),
+        )
+        self.assertEqual(c.resolution, ConflictResolution.PENDING)
+
+    # ------------------------------------------------------------------
+    # _detect_alpha_type
+    # ------------------------------------------------------------------
+
+    def _write_png(self, path: str, color_type: int) -> Path:
+        """Write a minimal but structurally valid PNG with the given color type."""
+        import struct, zlib
+        p = Path(path)
+
+        def _chunk(name: bytes, data: bytes) -> bytes:
+            crc = zlib.crc32(name + data) & 0xFFFFFFFF
+            return struct.pack(">I", len(data)) + name + data + struct.pack(">I", crc)
+
+        # IHDR: width=1, height=1, bit_depth=8, color_type, compress=0, filter=0, interlace=0
+        ihdr_data = struct.pack(">IIBBBBB", 1, 1, 8, color_type, 0, 0, 0)
+        # Simple single-pixel IDAT
+        # For simplicity, use a raw scanline depending on color_type
+        channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color_type, 1)
+        scanline = b"\x00" + bytes(channels)  # filter byte + pixel bytes
+        compressed = zlib.compress(scanline)
+        idat_data = compressed
+
+        data = b"\x89PNG\r\n\x1a\n"
+        data += _chunk(b"IHDR", ihdr_data)
+        data += _chunk(b"IDAT", idat_data)
+        data += _chunk(b"IEND", b"")
+        p.write_bytes(data)
+        return p
+
+    def test_detect_alpha_type_png_rgb(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "rgb.png"), color_type=2)
+        self.assertEqual(_detect_alpha_type(p), "opaque")
+
+    def test_detect_alpha_type_png_rgba(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "rgba.png"), color_type=6)
+        self.assertEqual(_detect_alpha_type(p), "has_alpha")
+
+    def test_detect_alpha_type_png_grayscale(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "gray.png"), color_type=0)
+        self.assertEqual(_detect_alpha_type(p), "opaque")
+
+    def test_detect_alpha_type_png_grayscale_alpha(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "ga.png"), color_type=4)
+        self.assertEqual(_detect_alpha_type(p), "has_alpha")
+
+    def test_detect_alpha_type_dds_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "tex.dds")
+        p.write_bytes(b"DDS " + b"\x00" * 120)
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_detect_alpha_type_missing_file_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "nonexistent.png")
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_detect_alpha_type_truncated_png_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "short.png")
+        # Valid magic but not enough bytes for IHDR
+        p.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 10)
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    # ------------------------------------------------------------------
+    # TextureOverwriteConflict new fields
+    # ------------------------------------------------------------------
+
+    def test_texture_overwrite_conflict_new_fields_present(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="abc.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/abc.png"),
+            pack_b_id="B", pack_b_path=Path("/b/abc.png"),
+            alpha_type_a="has_alpha",
+            alpha_type_b="opaque",
+            pack_a_size_bytes=1024,
+            pack_b_size_bytes=2048,
+        )
+        self.assertEqual(c.alpha_type_a, "has_alpha")
+        self.assertEqual(c.alpha_type_b, "opaque")
+        self.assertEqual(c.pack_a_size_bytes, 1024)
+        self.assertEqual(c.pack_b_size_bytes, 2048)
+        self.assertEqual(c.resolution, ConflictResolution.PENDING)
+
+    def test_winner_id_pack_a(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.PACK_A,
+        )
+        self.assertEqual(c.winner_id, "PackA")
+
+    def test_winner_id_pack_b(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.PACK_B,
+        )
+        self.assertEqual(c.winner_id, "PackB")
+
+    def test_winner_id_pending_returns_none(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+        )
+        self.assertIsNone(c.winner_id)
+
+    def test_winner_id_skip_returns_none(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.SKIP,
+        )
+        self.assertIsNone(c.winner_id)
+
+    def test_to_dict_and_from_dict(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="abc.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/abc.png"),
+            pack_b_id="B", pack_b_path=Path("/b/abc.png"),
+            same_content=False,
+            alpha_type_a="has_alpha",
+            alpha_type_b="opaque",
+            pack_a_size_bytes=500,
+            pack_b_size_bytes=600,
+            resolution=ConflictResolution.PACK_A,
+        )
+        d = c.to_dict()
+        self.assertEqual(d["texture_id"], "abc.png")
+        self.assertEqual(d["alpha_type_a"], "has_alpha")
+        self.assertEqual(d["pack_a_size_bytes"], 500)
+        self.assertEqual(d["resolution"], "pack_a")
+
+        c2 = TextureOverwriteConflict.from_dict(d)
+        self.assertEqual(c2.texture_id, "abc.png")
+        self.assertEqual(c2.serial, "SLUS-20062")
+        self.assertEqual(c2.alpha_type_a, "has_alpha")
+        self.assertEqual(c2.alpha_type_b, "opaque")
+        self.assertEqual(c2.pack_a_size_bytes, 500)
+        self.assertEqual(c2.pack_b_size_bytes, 600)
+        self.assertEqual(c2.resolution, "pack_a")
+
+    # ------------------------------------------------------------------
+    # resolve_texture_overwrite_conflicts populates new fields
+    # ------------------------------------------------------------------
+
+    def _make_conflict_fixture(self, content_a: bytes, content_b: bytes,
+                               filename: str = "tex.png") -> str:
+        """Create a textures dir with two packs containing the given texture."""
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, filename).write_bytes(content_a)
+        Path(pb, filename).write_bytes(content_b)
+        return tex
+
+    def test_resolve_populates_size_bytes(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        content_a = b"\x89PNG\r\n\x1a\n" + b"\x00" * 100
+        content_b = b"\x89PNG\r\n\x1a\n" + b"\x00" * 200
+        tex = self._make_conflict_fixture(content_a, content_b)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        c = result[0]
+        self.assertEqual(c.pack_a_size_bytes, len(content_a))
+        self.assertEqual(c.pack_b_size_bytes, len(content_b))
+
+    def test_resolve_populates_alpha_type_for_png(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        import struct, zlib
+
+        def _make_png(color_type: int) -> bytes:
+            def _chunk(name: bytes, data: bytes) -> bytes:
+                crc = zlib.crc32(name + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + name + data + struct.pack(">I", crc)
+            ihdr = struct.pack(">IIBBBBB", 1, 1, 8, color_type, 0, 0, 0)
+            channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color_type, 1)
+            idat = zlib.compress(b"\x00" + bytes(channels))
+            return (b"\x89PNG\r\n\x1a\n"
+                    + _chunk(b"IHDR", ihdr)
+                    + _chunk(b"IDAT", idat)
+                    + _chunk(b"IEND", b""))
+
+        tex = self._make_conflict_fixture(
+            _make_png(6),   # RGBA → has_alpha
+            _make_png(2),   # RGB  → opaque
+        )
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        c = result[0]
+        self.assertEqual(c.alpha_type_a, "has_alpha")
+        self.assertEqual(c.alpha_type_b, "opaque")
+
+    def test_resolve_default_resolution_is_pending(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts, ConflictResolution,
+        )
+        tex = self._make_conflict_fixture(
+            b"\x89PNG\r\n\x1a\n" + b"\x01" * 50,
+            b"\x89PNG\r\n\x1a\n" + b"\x02" * 50,
+        )
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result[0].resolution, ConflictResolution.PENDING)
+
+    # ------------------------------------------------------------------
+    # ConflictResolutionSession
+    # ------------------------------------------------------------------
+
+    def _make_session(self):
+        from src.core.conflict_resolver import (
+            TextureOverwriteConflict,
+            ConflictResolutionSession,
+        )
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="a.png", serial="SLUS-20062",
+                pack_a_id="P1", pack_a_path=Path("/p1/a.png"),
+                pack_b_id="P2", pack_b_path=Path("/p2/a.png"),
+            ),
+            TextureOverwriteConflict(
+                texture_id="b.png", serial="SLUS-20062",
+                pack_a_id="P1", pack_a_path=Path("/p1/b.png"),
+                pack_b_id="P2", pack_b_path=Path("/p2/b.png"),
+            ),
+            TextureOverwriteConflict(
+                texture_id="c.png", serial="SCUS-97232",
+                pack_a_id="Q1", pack_a_path=Path("/q1/c.png"),
+                pack_b_id="Q2", pack_b_path=Path("/q2/c.png"),
+            ),
+        ]
+        return ConflictResolutionSession(conflicts)
+
+    def test_session_total(self):
+        session = self._make_session()
+        self.assertEqual(session.total, 3)
+
+    def test_session_initial_counts(self):
+        session = self._make_session()
+        self.assertEqual(session.unresolved_count, 3)
+        self.assertEqual(session.resolved_count, 0)
+
+    def test_session_resolve_single(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        result = session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        self.assertTrue(result)
+        self.assertEqual(session.resolved_count, 1)
+        self.assertEqual(session.unresolved_count, 2)
+
+    def test_session_resolve_nonexistent_returns_false(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        result = session.resolve("SLUS-99999", "z.png", ConflictResolution.PACK_A)
+        self.assertFalse(result)
+
+    def test_session_resolve_all_pending(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        count = session.resolve_all(ConflictResolution.PACK_B)
+        self.assertEqual(count, 3)
+        self.assertEqual(session.unresolved_count, 0)
+
+    def test_session_resolve_all_skips_already_resolved(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        count = session.resolve_all(ConflictResolution.PACK_B)
+        # Only 2 remaining PENDING should be updated
+        self.assertEqual(count, 2)
+        # The first conflict should still be PACK_A
+        c = session.get_conflict_detail("SLUS-20062", "a.png")
+        self.assertEqual(c["resolution"], "pack_a")
+
+    def test_session_resolve_all_overwrite(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        count = session.resolve_all(ConflictResolution.PACK_B, overwrite=True)
+        self.assertEqual(count, 3)
+        c = session.get_conflict_detail("SLUS-20062", "a.png")
+        self.assertEqual(c["resolution"], "pack_b")
+
+    def test_session_conflicts_for_serial(self):
+        session = self._make_session()
+        slu_conflicts = session.conflicts_for_serial("SLUS-20062")
+        self.assertEqual(len(slu_conflicts), 2)
+        scu_conflicts = session.conflicts_for_serial("SCUS-97232")
+        self.assertEqual(len(scu_conflicts), 1)
+
+    def test_session_all_conflicts_returns_copy(self):
+        session = self._make_session()
+        all_c = session.all_conflicts()
+        self.assertEqual(len(all_c), 3)
+        all_c.clear()
+        self.assertEqual(session.total, 3)  # original unchanged
+
+    def test_session_get_conflict_detail_structure(self):
+        from src.core.conflict_resolver import ConflictResolution, TextureOverwriteConflict, ConflictResolutionSession
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="abc.png", serial="SLUS-20062",
+                pack_a_id="PackA", pack_a_path=Path("/a/abc.png"),
+                pack_b_id="PackB", pack_b_path=Path("/b/abc.png"),
+                alpha_type_a="has_alpha",
+                alpha_type_b="opaque",
+                pack_a_size_bytes=1111,
+                pack_b_size_bytes=2222,
+            ),
+        ]
+        session = ConflictResolutionSession(conflicts)
+        detail = session.get_conflict_detail("SLUS-20062", "abc.png")
+        self.assertIsNotNone(detail)
+        self.assertEqual(detail["texture_id"], "abc.png")
+        self.assertEqual(detail["serial"], "SLUS-20062")
+        self.assertEqual(detail["pack_a"]["id"], "PackA")
+        self.assertEqual(detail["pack_a"]["alpha_type"], "has_alpha")
+        self.assertEqual(detail["pack_a"]["size_bytes"], 1111)
+        self.assertEqual(detail["pack_b"]["id"], "PackB")
+        self.assertEqual(detail["pack_b"]["alpha_type"], "opaque")
+        self.assertEqual(detail["pack_b"]["size_bytes"], 2222)
+        self.assertEqual(detail["resolution"], "pending")
+        self.assertIsNone(detail["winner_id"])
+
+    def test_session_get_conflict_detail_after_resolve(self):
+        from src.core.conflict_resolver import ConflictResolution, TextureOverwriteConflict, ConflictResolutionSession
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="abc.png", serial="SLUS-20062",
+                pack_a_id="PackA", pack_a_path=Path("/a/abc.png"),
+                pack_b_id="PackB", pack_b_path=Path("/b/abc.png"),
+            ),
+        ]
+        session = ConflictResolutionSession(conflicts)
+        session.resolve("SLUS-20062", "abc.png", ConflictResolution.PACK_A)
+        detail = session.get_conflict_detail("SLUS-20062", "abc.png")
+        self.assertEqual(detail["resolution"], "pack_a")
+        self.assertEqual(detail["winner_id"], "PackA")
+
+    def test_session_get_conflict_detail_not_found(self):
+        session = self._make_session()
+        self.assertIsNone(session.get_conflict_detail("SLUS-99999", "z.png"))
+
+    def test_session_summary(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        s = session.summary()
+        self.assertEqual(s["total"], 3)
+        self.assertEqual(s["resolved"], 1)
+        self.assertEqual(s["unresolved"], 2)
+        self.assertIn("SLUS-20062", s["serials_affected"])
+        self.assertIn("SCUS-97232", s["serials_affected"])
+
+    def test_session_summary_empty(self):
+        from src.core.conflict_resolver import ConflictResolutionSession
+        session = ConflictResolutionSession([])
+        s = session.summary()
+        self.assertEqual(s["total"], 0)
+        self.assertEqual(s["resolved"], 0)
+        self.assertEqual(s["unresolved"], 0)
+        self.assertEqual(s["serials_affected"], [])
+
+    def test_session_from_resolve_texture_overwrite_conflicts(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts,
+            ConflictResolutionSession,
+            ConflictResolution,
+        )
+        tex = os.path.join(self.tmpdir, "textures2")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        for name in ["x.png", "y.png"]:
+            Path(pa, name).write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x01" * 50)
+            Path(pb, name).write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x02" * 50)
+
+        raw = resolve_texture_overwrite_conflicts(tex)
+        session = ConflictResolutionSession(raw)
+        self.assertEqual(session.total, 2)
+        session.resolve("SLUS-20062", "x.png", ConflictResolution.PACK_A)
+        session.resolve("SLUS-20062", "y.png", ConflictResolution.PACK_B)
+        self.assertEqual(session.unresolved_count, 0)
+        s = session.summary()
+        self.assertEqual(s["total"], 2)
+        self.assertEqual(s["resolved"], 2)

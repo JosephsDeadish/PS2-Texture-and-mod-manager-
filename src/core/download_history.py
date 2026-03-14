@@ -45,6 +45,8 @@ from __future__ import annotations
 import csv
 import datetime
 import json
+import os
+import tempfile
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -230,11 +232,21 @@ def _load(config=None) -> List[HistoryEntry]:
 
 
 def _save(entries: List[HistoryEntry], config=None) -> None:
-    """Persist *entries* to disk, pruning to :data:`MAX_HISTORY_ENTRIES`."""
+    """Persist *entries* to disk atomically, pruning to :data:`MAX_HISTORY_ENTRIES`."""
     path = get_history_file(config)
     to_write = entries[:MAX_HISTORY_ENTRIES]
-    with open(path, "w", encoding="utf-8") as fh:
-        json.dump([e.to_dict() for e in to_write], fh, indent=2)
+    data = [e.to_dict() for e in to_write]
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(data, fh, indent=2)
+        os.replace(tmp_path, str(path))
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 # ---------------------------------------------------------------------------

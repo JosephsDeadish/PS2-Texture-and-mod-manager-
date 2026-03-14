@@ -90,6 +90,100 @@ PCSX2_HIERARCHY: Dict[str, str] = {
 TEXTURE_GAME_SUBFOLDERS: tuple[str, ...] = ("replacements", "dumps")
 
 # ---------------------------------------------------------------------------
+# PCSX2 user guidance — enabling cheats and texture loading
+# ---------------------------------------------------------------------------
+
+#: Step-by-step instructions for enabling PNACH cheats/patches in PCSX2 Qt (v1.7+).
+PCSX2_ENABLE_CHEATS_STEPS: tuple[str, ...] = (
+    "Right-click the game in the PCSX2 game list and choose 'Properties'.",
+    "Select the 'Patches' tab (or 'Cheats' tab in older builds).",
+    "Tick 'Enable Cheats' at the top of the tab.",
+    "Click 'OK' to save, then launch the game — patches will be applied on boot.",
+)
+
+#: Plain-English summary shown near cheat/PNACH features.
+PCSX2_CHEATS_HINT: str = (
+    "⚠️  PCSX2 does not apply PNACH codes by default.  "
+    "To activate installed patches or cheats, right-click the game in PCSX2, "
+    "open 'Properties', go to the 'Patches' tab, and tick 'Enable Cheats'.  "
+    "Restart the game after making this change."
+)
+
+#: Step-by-step instructions for enabling texture replacement in PCSX2 Qt (v1.7+).
+PCSX2_ENABLE_TEXTURES_STEPS: tuple[str, ...] = (
+    "Right-click the game in the PCSX2 game list and choose 'Properties'.",
+    "Select the 'Graphics' tab.",
+    "Under 'Texture Replacement', tick 'Load Textures'.",
+    "Optionally tick 'Precache Textures' to reduce in-game stutter.",
+    "Click 'OK' to save, then launch the game — replacement textures will load.",
+)
+
+#: Plain-English summary shown near texture-pack features.
+PCSX2_TEXTURES_HINT: str = (
+    "⚠️  PCSX2 does not load replacement textures by default.  "
+    "To activate an installed texture pack, right-click the game in PCSX2, "
+    "open 'Properties', go to the 'Graphics' tab, and tick 'Load Textures'.  "
+    "Restart the game after making this change."
+)
+
+#: Step-by-step instructions for dumping textures in PCSX2 Qt (v1.7+).
+PCSX2_DUMP_TEXTURES_STEPS: tuple[str, ...] = (
+    "Right-click the game in the PCSX2 game list and choose 'Properties'.",
+    "Select the 'Graphics' tab.",
+    "Under 'Texture Replacement', tick 'Dump Textures'.",
+    "Launch the game and navigate to areas whose textures you want to dump.",
+    "Exit PCSX2 — dumped textures will be in textures/<SERIAL>/dumps/.",
+    "Disable 'Dump Textures' again when finished to avoid large dumps.",
+)
+
+
+def get_cheats_guidance() -> dict:
+    """Return structured guidance for enabling PNACH cheats in PCSX2.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": PCSX2_CHEATS_HINT,
+        "steps": list(PCSX2_ENABLE_CHEATS_STEPS),
+    }
+
+
+def get_textures_guidance() -> dict:
+    """Return structured guidance for enabling texture loading in PCSX2.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": PCSX2_TEXTURES_HINT,
+        "steps": list(PCSX2_ENABLE_TEXTURES_STEPS),
+    }
+
+
+def get_dump_textures_guidance() -> dict:
+    """Return structured guidance for dumping textures from PCSX2.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": (
+            "ℹ️  To create a new texture pack, first dump textures from PCSX2.  "
+            "Enable 'Dump Textures' in game properties, play the game, then "
+            "edit the dumped files and place them in the replacements folder."
+        ),
+        "steps": list(PCSX2_DUMP_TEXTURES_STEPS),
+    }
+
+
+# ---------------------------------------------------------------------------
 # ModType → PCSX2 folder mapping
 # ---------------------------------------------------------------------------
 
