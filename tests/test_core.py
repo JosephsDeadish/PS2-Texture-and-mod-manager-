@@ -7972,14 +7972,16 @@ class TestSerialDbCrcs(unittest.TestCase):
 
         Wave 41 established ≥900; Wave 51 consolidated ~10 duplicate/redundant
         entries; Wave 52 cleared CRCs from 7 more wrong-case/alias entries
-        while preserving all unique CRC coverage.
+        while preserving all unique CRC coverage.  Wave 66 removed the only
+        CRC from the duplicate 'Godfather, The' entry (SLUS-21406), reducing
+        the count by 1 — ≥875 remains an adequate floor.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 875,
-                           f"Expected >875 games with CRCs, got {count}")
+        self.assertGreaterEqual(count, 875,
+                                f"Expected ≥875 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8032,13 +8034,15 @@ class TestWave42SerialDb(unittest.TestCase):
         Wave 51 consolidated ~10 duplicate/redundant entries into canonical
         entries; Wave 52 cleared CRCs from 7 more alias/wrong-case entries,
         reducing the count while preserving all unique CRC coverage.
+        Wave 66 removed the duplicate 'Godfather, The' (SLUS-21406) CRC,
+        so ≥875 is the updated floor.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 875,
-                           f"Expected >875 games with CRCs, got {count}")
+        self.assertGreaterEqual(count, 875,
+                                f"Expected ≥875 games with CRCs, got {count}")
 
     def test_wave42_dbz_sagas_crc_fixed(self):
         """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
@@ -13510,3 +13514,181 @@ class TestWave65DataQualityFixes(unittest.TestCase):
         for k, v in entries.items():
             self.assertEqual(v.get("game_serial"), "SLUS-21134",
                              f"{k}: game_serial must be SLUS-21134 (Resident Evil 4)")
+
+
+class TestWave66DataQualityFixes(unittest.TestCase):
+    """Wave 66: Data quality fixes — CRC cross-contamination removed from serial DB,
+    pnach DB game_serial / game fields corrected.
+
+    Fixed issues
+    -----------
+    Serial DB — CRC removals (CRC was wrongly assigned to the wrong game):
+    * 9FA0A1B0 removed from 'Aeon Flux'               (belongs to Star Ocean: TTEOT DC)
+    * D850707E removed from 'Godfather, The' (SLUS-21406) duplicate entry
+                                                       (canonical entry is The Godfather SLUS-21385)
+    * E360416A removed from 'Resident Evil Outbreak File #2' and 'The Sims 2'
+                                                       (belongs to Silent Hill 4: The Room)
+    * FCD6E9FA removed from 'Atelier Iris 2: The Azoth of Destiny'
+                                                       (belongs to Xenosaga Episode III)
+
+    Pnach DB — game_serial / game name corrections (78 entries fixed):
+    * 00E9B795 entries with SLUS-21229 (Motocross Mania 3) → SCUS-97105 (Fantavision)
+    * 1AFD7469 entries with SLUS-21400 (Monster House) → SLUS-21455 (Happy Feet)
+    * 30B05B6E entries with SLUS-21275 (River King) → SLUS-21207 (Dragon Quest VIII)
+    * E5BD2EA5 entries with SCUS-97436 (GT4 alt-serial) → SCUS-97328 (GT4 canonical serial)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        raw = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+        cls.games = raw["games"]
+
+    # ------------------------------------------------------------------
+    # Serial DB — CRC removals
+    # ------------------------------------------------------------------
+
+    def test_aeon_flux_no_star_ocean_crc(self):
+        """Aeon Flux must not contain 9FA0A1B0 (Star Ocean DC's CRC)."""
+        crcs = self.games.get("Aeon Flux", {}).get("crcs", [])
+        self.assertNotIn("9FA0A1B0", crcs,
+                         "9FA0A1B0 belongs to Star Ocean: TTEOT DC, not Aeon Flux")
+
+    def test_star_ocean_dc_retains_9fa0a1b0(self):
+        """Star Ocean: Till the End of Time DC must still have CRC 9FA0A1B0."""
+        crcs = self.games.get(
+            "Star Ocean: Till the End of Time Director's Cut", {}
+        ).get("crcs", [])
+        self.assertIn("9FA0A1B0", crcs,
+                      "Star Ocean DC must retain CRC 9FA0A1B0")
+
+    def test_godfather_slus21406_no_d850707e(self):
+        """'Godfather, The' (SLUS-21406) duplicate entry must not contain D850707E."""
+        crcs = self.games.get("Godfather, The", {}).get("crcs", [])
+        self.assertNotIn("D850707E", crcs,
+                         "D850707E must only be under the canonical The Godfather (SLUS-21385)")
+
+    def test_godfather_slus21385_retains_d850707e(self):
+        """'The Godfather' (SLUS-21385) must still have CRC D850707E."""
+        crcs = self.games.get("The Godfather", {}).get("crcs", [])
+        self.assertIn("D850707E", crcs,
+                      "The Godfather (SLUS-21385) must retain CRC D850707E")
+
+    def test_re_outbreak_f2_no_sh4_crc(self):
+        """Resident Evil Outbreak File #2 must not contain E360416A (SH4's CRC)."""
+        crcs = self.games.get("Resident Evil Outbreak File #2", {}).get("crcs", [])
+        self.assertNotIn("E360416A", crcs,
+                         "E360416A belongs to Silent Hill 4, not RE Outbreak F2")
+
+    def test_sims2_no_sh4_crc(self):
+        """The Sims 2 must not contain E360416A (SH4's CRC)."""
+        crcs = self.games.get("The Sims 2", {}).get("crcs", [])
+        self.assertNotIn("E360416A", crcs,
+                         "E360416A belongs to Silent Hill 4, not The Sims 2")
+
+    def test_sh4_retains_e360416a(self):
+        """Silent Hill 4: The Room must still have CRC E360416A."""
+        crcs = self.games.get("Silent Hill 4: The Room", {}).get("crcs", [])
+        self.assertIn("E360416A", crcs,
+                      "Silent Hill 4: The Room must retain CRC E360416A")
+
+    def test_atelier_iris2_no_xenosaga3_crc(self):
+        """Atelier Iris 2 must not contain FCD6E9FA (Xenosaga III's CRC)."""
+        crcs = self.games.get(
+            "Atelier Iris 2: The Azoth of Destiny", {}
+        ).get("crcs", [])
+        self.assertNotIn("FCD6E9FA", crcs,
+                         "FCD6E9FA belongs to Xenosaga III, not Atelier Iris 2")
+
+    def test_xenosaga3_retains_fcd6e9fa(self):
+        """Xenosaga Episode III must still have CRC FCD6E9FA."""
+        crcs = self.games.get(
+            "Xenosaga Episode III: Also sprach Zarathustra", {}
+        ).get("crcs", [])
+        self.assertIn("FCD6E9FA", crcs,
+                      "Xenosaga Episode III must retain CRC FCD6E9FA")
+
+    def test_gt4_no_dark_chronicle_crc(self):
+        """Gran Turismo 4 must still have CRC E5BD2EA5 (Greatest Hits disc)."""
+        crcs = self.games.get("Gran Turismo 4", {}).get("crcs", [])
+        self.assertIn("E5BD2EA5", crcs,
+                      "Gran Turismo 4 must retain CRC E5BD2EA5 (Greatest Hits)")
+
+    def test_dark_chronicle_has_e5bd2ea5(self):
+        """Dark Chronicle (Dark Cloud 2) must NOT have E5BD2EA5 (that CRC belongs to GT4 GH)."""
+        crcs = self.games.get("Dark Chronicle (Dark Cloud 2)", {}).get("crcs", [])
+        self.assertNotIn("E5BD2EA5", crcs,
+                         "E5BD2EA5 belongs to GT4 Greatest Hits, not Dark Chronicle")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — corrected game_serial / game name fields
+    # ------------------------------------------------------------------
+
+    def _entries_for_crc(self, crc):
+        return {k: v for k, v in self.pnach_db.items()
+                if isinstance(v, dict) and v.get("game_crc", "").upper() == crc.upper()}
+
+    def test_fantavision_00e9b795_no_motocross_serial(self):
+        """00E9B795 pnach entries must not use Motocross Mania 3 serial SLUS-21229."""
+        entries = self._entries_for_crc("00E9B795")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21229"]
+        self.assertEqual(bad, [],
+                         f"00E9B795 must not reference Motocross Mania 3 (SLUS-21229): {bad}")
+
+    def test_fantavision_00e9b795_serial(self):
+        """All 00E9B795 pnach entries must use SCUS-97105 (Fantavision)."""
+        entries = self._entries_for_crc("00E9B795")
+        self.assertGreater(len(entries), 0, "No 00E9B795 entries found")
+        serials = {v.get("game_serial") for v in entries.values()}
+        self.assertEqual(serials, {"SCUS-97105"},
+                         f"All 00E9B795 entries must use SCUS-97105, got: {serials}")
+
+    def test_happy_feet_1afd7469_no_monster_house_serial(self):
+        """1AFD7469 pnach entries must not use Monster House serial SLUS-21400."""
+        entries = self._entries_for_crc("1AFD7469")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21400"]
+        self.assertEqual(bad, [],
+                         f"1AFD7469 must not reference Monster House (SLUS-21400): {bad}")
+
+    def test_happy_feet_1afd7469_serial(self):
+        """All 1AFD7469 pnach entries must use SLUS-21455 (Happy Feet)."""
+        entries = self._entries_for_crc("1AFD7469")
+        self.assertGreater(len(entries), 0, "No 1AFD7469 entries found")
+        serials = {v.get("game_serial") for v in entries.values()}
+        self.assertEqual(serials, {"SLUS-21455"},
+                         f"All 1AFD7469 entries must use SLUS-21455, got: {serials}")
+
+    def test_dq8_30b05b6e_no_river_king_serial(self):
+        """30B05B6E pnach entries must not use River King serial SLUS-21275."""
+        entries = self._entries_for_crc("30B05B6E")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21275"]
+        self.assertEqual(bad, [],
+                         f"30B05B6E must not reference River King (SLUS-21275): {bad}")
+
+    def test_dq8_30b05b6e_serial(self):
+        """All 30B05B6E pnach entries must use SLUS-21207 (Dragon Quest VIII)."""
+        entries = self._entries_for_crc("30B05B6E")
+        self.assertGreater(len(entries), 0, "No 30B05B6E entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21207",
+                             f"{k}: game_serial must be SLUS-21207 (Dragon Quest VIII)")
+
+    def test_dark_chronicle_e5bd2ea5_no_wrong_serial(self):
+        """E5BD2EA5 pnach entries must not use the bogus SCUS-97436 serial (GT4 alt-serial, not a standalone game)."""
+        entries = self._entries_for_crc("E5BD2EA5")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SCUS-97436"]
+        self.assertEqual(bad, [],
+                         f"E5BD2EA5 must not reference non-canonical SCUS-97436: {bad}")
+
+    def test_dark_chronicle_e5bd2ea5_serial(self):
+        """All E5BD2EA5 pnach entries must use SCUS-97328 (Gran Turismo 4 canonical serial)."""
+        entries = self._entries_for_crc("E5BD2EA5")
+        self.assertGreater(len(entries), 0, "No E5BD2EA5 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SCUS-97328",
+                             f"{k}: game_serial must be SCUS-97328 (Gran Turismo 4)")

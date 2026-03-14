@@ -341,8 +341,7 @@
       "serial": "SLUS-21327",
       "alt_serials": [],
       "crcs": [
-        "8E9C0D58",
-        "FCD6E9FA"
+        "8E9C0D58"
       ],
       "release_date": "2006-04-25",
       "developer": "Gust",
@@ -1611,8 +1610,8 @@
         "77E61C8A",
         "77FEA582",
         "8D057621",
-        "E5BD2EA5",
-        "44A61C8F"
+        "44A61C8F",
+        "E5BD2EA5"
       ],
       "release_date": "2006-03-01",
       "developer": "Polyphony Digital",
@@ -3168,8 +3167,7 @@
       "serial": "SLUS-20984",
       "alt_serials": [],
       "crcs": [
-        "C0437D3A",
-        "E360416A"
+        "C0437D3A"
       ],
       "release_date": "2005-04-26",
       "developer": "Capcom",
@@ -4097,8 +4095,7 @@
       "alt_serials": [],
       "crcs": [
         "3F9E2D59",
-        "B67577F3",
-        "E360416A"
+        "B67577F3"
       ],
       "release_date": "2005-10-25",
       "developer": "Maxis",
@@ -8683,7 +8680,6 @@
       "serial": "SLUS-21205",
       "alt_serials": [],
       "crcs": [
-        "9FA0A1B0",
         "FA37A58A"
       ],
       "release_date": "2005-11-15",
@@ -10057,9 +10053,7 @@
     "Godfather, The": {
       "serial": "SLUS-21406",
       "alt_serials": [],
-      "crcs": [
-        "D850707E"
-      ],
+      "crcs": [],
       "release_date": "2006-03-21",
       "developer": "EA Redwood Shores",
       "publisher": "Electronic Arts",
