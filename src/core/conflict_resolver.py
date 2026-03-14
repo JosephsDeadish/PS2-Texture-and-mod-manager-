@@ -33,6 +33,7 @@ Public API::
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -396,6 +397,179 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
                     can_auto_fix=False,
                 ))
 
+    return conflicts
+
+
+# ---------------------------------------------------------------------------
+# Texture overwrite conflict detection (cross-pack filename clash)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class TextureOverwriteConflict:
+    """Detailed information about two packs providing the same texture file.
+
+    This captures everything needed for the Texture Pack Conflict Visualiser:
+
+    * The PCSX2 texture filename (``texture_id``) both packs compete for.
+    * Which packs are involved and the path to each pack's copy.
+    * The game serial this conflict belongs to.
+
+    Attributes
+    ----------
+    texture_id:
+        The PCSX2 replacement filename both packs provide
+        (e.g. ``abc12345-3b0f5ac99a2574db-00006653.png``).
+    serial:
+        PS2 disc serial (e.g. ``SLUS-20062``).
+    pack_a_id:
+        Identifier / folder name of the first pack.
+    pack_a_path:
+        Path to the texture file inside pack A's replacements folder.
+    pack_b_id:
+        Identifier / folder name of the second pack.
+    pack_b_path:
+        Path to the texture file inside pack B's replacements folder.
+    same_content:
+        ``True`` when both files have identical content (detected via
+        byte-for-byte comparison of the first 8 KiB).
+    """
+
+    texture_id: str
+    serial: str
+    pack_a_id: str
+    pack_a_path: Path
+    pack_b_id: str
+    pack_b_path: Path
+    same_content: bool = False
+
+    @property
+    def conflict_summary(self) -> str:
+        """One-line human-readable summary."""
+        kind = "identical content" if self.same_content else "different content"
+        return (
+            f"{self.serial}: texture '{self.texture_id}' claimed by "
+            f"'{self.pack_a_id}' and '{self.pack_b_id}' ({kind})"
+        )
+
+
+def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192) -> bool:
+    """Return True if the first *check_bytes* of both files are identical."""
+    try:
+        with open(path_a, "rb") as fa, open(path_b, "rb") as fb:
+            return fa.read(check_bytes) == fb.read(check_bytes)
+    except OSError:
+        return False
+
+
+#: Image extensions scanned for overwrite conflict detection.
+_TEXTURE_EXTS: frozenset[str] = frozenset({
+    ".png", ".dds", ".bmp", ".tga", ".jpg", ".jpeg",
+})
+
+
+def _scan_replacements_dir(
+    replacements: Path,
+) -> Dict[str, Path]:
+    """Return a dict of {filename → Path} for all texture files under *replacements*."""
+    result: Dict[str, Path] = {}
+    try:
+        for dirpath, _dirs, files in os.walk(replacements):
+            for fname in files:
+                if Path(fname).suffix.lower() in _TEXTURE_EXTS:
+                    # Key on the basename — this is what PCSX2 matches against.
+                    result.setdefault(fname, Path(dirpath) / fname)
+    except PermissionError:
+        pass
+    return result
+
+
+def resolve_texture_overwrite_conflicts(
+    textures_path: str,
+) -> List[TextureOverwriteConflict]:
+    """Detect texture filename conflicts between packs installed for the same serial.
+
+    For each game serial that has **multiple** sub-directories inside its
+    ``replacements/`` folder (each sub-directory treated as a separate
+    pack), this function finds texture files whose basename appears in
+    more than one pack.
+
+    Because PCSX2 matches replacement textures by filename, two packs
+    providing a file with the same name will conflict — only one can be
+    active.
+
+    Parameters
+    ----------
+    textures_path:
+        Path to PCSX2's ``textures/`` directory.
+
+    Returns
+    -------
+    list[TextureOverwriteConflict]
+        One entry per (serial, texture_id, pack_A, pack_B) combination
+        that conflicts.  Sorted by serial then texture_id.
+    """
+    conflicts: List[TextureOverwriteConflict] = []
+    tex_dir = Path(textures_path) if textures_path else None
+    if not tex_dir or not tex_dir.is_dir():
+        return conflicts
+
+    try:
+        serial_dirs = sorted(
+            d for d in tex_dir.iterdir()
+            if d.is_dir() and _is_ps2_serial(d.name)
+        )
+    except PermissionError:
+        return conflicts
+
+    for serial_dir in serial_dirs:
+        serial = serial_dir.name.upper()
+        replacements = serial_dir / "replacements"
+        if not replacements.is_dir():
+            continue
+
+        # Each sub-directory is treated as a separate pack.
+        try:
+            pack_dirs = sorted(
+                d for d in replacements.iterdir() if d.is_dir()
+            )
+        except PermissionError:
+            continue
+
+        if len(pack_dirs) < 2:
+            continue
+
+        # Build {filename → Path} map per pack
+        pack_maps: List[Tuple[str, Dict[str, Path]]] = []
+        for pack_dir in pack_dirs:
+            fmap = _scan_replacements_dir(pack_dir)
+            if fmap:
+                pack_maps.append((pack_dir.name, fmap))
+
+        if len(pack_maps) < 2:
+            continue
+
+        # Find filenames present in more than one pack
+        # Only compare pairs to produce individual conflict records
+        for i in range(len(pack_maps)):
+            pack_a_id, map_a = pack_maps[i]
+            for j in range(i + 1, len(pack_maps)):
+                pack_b_id, map_b = pack_maps[j]
+                shared = set(map_a) & set(map_b)
+                for tid in sorted(shared):
+                    path_a = map_a[tid]
+                    path_b = map_b[tid]
+                    same = _files_have_same_content(path_a, path_b)
+                    conflicts.append(TextureOverwriteConflict(
+                        texture_id=tid,
+                        serial=serial,
+                        pack_a_id=pack_a_id,
+                        pack_a_path=path_a,
+                        pack_b_id=pack_b_id,
+                        pack_b_path=path_b,
+                        same_content=same,
+                    ))
+
+    conflicts.sort(key=lambda c: (c.serial, c.texture_id, c.pack_a_id))
     return conflicts
 
 

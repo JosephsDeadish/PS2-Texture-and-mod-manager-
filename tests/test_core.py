@@ -9789,3 +9789,914 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count must remain 2294."""
         self.assertEqual(len(self.raw_games), 2294)
+
+
+# ===========================================================================
+# Wave 53 — PCSX2 Guidance, Texture Hash DB, Load Order Manager, Mod Profiles
+# ===========================================================================
+
+class TestWave53Pcsx2Guidance(unittest.TestCase):
+    """Wave 53: PCSX2 user guidance constants and helpers in pcsx2_layout."""
+
+    def test_import_guidance_constants(self):
+        from src.core.pcsx2_layout import (
+            PCSX2_CHEATS_HINT,
+            PCSX2_TEXTURES_HINT,
+            PCSX2_ENABLE_CHEATS_STEPS,
+            PCSX2_ENABLE_TEXTURES_STEPS,
+            PCSX2_DUMP_TEXTURES_STEPS,
+        )
+
+    def test_cheats_hint_mentions_enable_cheats(self):
+        from src.core.pcsx2_layout import PCSX2_CHEATS_HINT
+        lower = PCSX2_CHEATS_HINT.lower()
+        self.assertIn("cheat", lower)
+        self.assertIn("enable", lower)
+
+    def test_textures_hint_mentions_load_textures(self):
+        from src.core.pcsx2_layout import PCSX2_TEXTURES_HINT
+        lower = PCSX2_TEXTURES_HINT.lower()
+        self.assertIn("texture", lower)
+        self.assertIn("load", lower)
+
+    def test_enable_cheats_steps_has_at_least_three(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_CHEATS_STEPS
+        self.assertGreaterEqual(len(PCSX2_ENABLE_CHEATS_STEPS), 3)
+
+    def test_enable_textures_steps_has_at_least_three(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_TEXTURES_STEPS
+        self.assertGreaterEqual(len(PCSX2_ENABLE_TEXTURES_STEPS), 3)
+
+    def test_get_cheats_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_cheats_guidance
+        g = get_cheats_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["hint"], str)
+        self.assertIsInstance(g["steps"], list)
+        self.assertTrue(len(g["steps"]) >= 3)
+
+    def test_get_textures_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_textures_guidance
+        g = get_textures_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["hint"], str)
+        self.assertGreaterEqual(len(g["steps"]), 3)
+
+    def test_get_dump_textures_guidance_returns_dict(self):
+        from src.core.pcsx2_layout import get_dump_textures_guidance
+        g = get_dump_textures_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertGreaterEqual(len(g["steps"]), 3)
+
+    def test_cheats_hint_mentions_properties(self):
+        """Steps should guide user to open game Properties."""
+        from src.core.pcsx2_layout import PCSX2_ENABLE_CHEATS_STEPS
+        combined = " ".join(PCSX2_ENABLE_CHEATS_STEPS).lower()
+        self.assertIn("properties", combined)
+
+    def test_textures_hint_mentions_properties(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_TEXTURES_STEPS
+        combined = " ".join(PCSX2_ENABLE_TEXTURES_STEPS).lower()
+        self.assertIn("properties", combined)
+
+    def test_dump_textures_steps_mention_dumps_folder(self):
+        from src.core.pcsx2_layout import PCSX2_DUMP_TEXTURES_STEPS
+        combined = " ".join(PCSX2_DUMP_TEXTURES_STEPS).lower()
+        self.assertIn("dump", combined)
+
+    def test_guidance_hints_start_with_warning_or_info_emoji(self):
+        from src.core.pcsx2_layout import PCSX2_CHEATS_HINT, PCSX2_TEXTURES_HINT
+        self.assertTrue(
+            PCSX2_CHEATS_HINT.startswith("\u26a0") or PCSX2_CHEATS_HINT.startswith("\u2139"),
+            "Cheats hint should start with a warning or info emoji",
+        )
+        self.assertTrue(
+            PCSX2_TEXTURES_HINT.startswith("\u26a0") or PCSX2_TEXTURES_HINT.startswith("\u2139"),
+            "Textures hint should start with a warning or info emoji",
+        )
+
+
+class TestWave53TextureHashDB(unittest.TestCase):
+    """Wave 53: TextureHashDB — hash tracking, conflict detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.tmpdir, "texture_hash.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.texture_hash_db import TextureHashDB, TextureEntry, TextureConflict
+
+    def test_constants(self):
+        from src.core.texture_hash_db import MIN_TEXTURE_BYTES, TEXTURE_EXTENSIONS
+        self.assertGreater(MIN_TEXTURE_BYTES, 0)
+        self.assertIn(".png", TEXTURE_EXTENSIONS)
+        self.assertIn(".dds", TEXTURE_EXTENSIONS)
+
+    def test_empty_db_stats(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        s = db.stats()
+        self.assertEqual(s["total_entries"], 0)
+        self.assertEqual(s["total_packs"], 0)
+        self.assertEqual(s["broken_count"], 0)
+        self.assertEqual(s["duplicate_groups"], 0)
+        self.assertEqual(s["overwrite_conflicts"], 0)
+
+    def test_all_entries_empty(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        self.assertEqual(db.all_entries(), [])
+
+    def test_register_file_creates_entry(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "tex.png"
+        tex.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        entry = db.register_file("tex.png", "pack-1", str(tex))
+        self.assertEqual(entry.texture_id, "tex.png")
+        self.assertEqual(entry.pack_id, "pack-1")
+        self.assertFalse(entry.broken)
+        self.assertGreater(entry.size_bytes, 0)
+        self.assertEqual(len(entry.content_hash), 64)
+
+    def test_register_zero_byte_file_marked_broken(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "broken.png"
+        tex.write_bytes(b"")
+        entry = db.register_file("broken.png", "pack-1", str(tex))
+        self.assertTrue(entry.broken)
+
+    def test_register_missing_file_marked_broken(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
+        self.assertTrue(entry.broken)
+
+    def test_register_pack_scans_directory(self):
+        from src.core.texture_hash_db import TextureHashDB
+        pack_dir = os.path.join(self.tmpdir, "PackAlpha")
+        os.makedirs(pack_dir)
+        for fname in ["a.png", "b.png", "c.dds"]:
+            Path(pack_dir, fname).write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db = TextureHashDB(self.db_path)
+        entries = db.register_pack("pack-alpha", pack_dir)
+        self.assertEqual(len(entries), 3)
+
+    def test_register_pack_ignores_non_texture_files(self):
+        from src.core.texture_hash_db import TextureHashDB
+        pack_dir = os.path.join(self.tmpdir, "PackBeta")
+        os.makedirs(pack_dir)
+        Path(pack_dir, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        Path(pack_dir, "readme.txt").write_text("hello")
+        db = TextureHashDB(self.db_path)
+        entries = db.register_pack("pack-beta", pack_dir)
+        self.assertEqual(len(entries), 1)
+
+    def test_register_pack_missing_dir_returns_empty(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        result = db.register_pack("pack-x", "/nonexistent/path")
+        self.assertEqual(result, [])
+
+    def test_no_conflict_different_texture_ids(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "a.png"
+        tb = Path(self.tmpdir) / "b.png"
+        ta.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        tb.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("a.png", "pack-1", str(ta))
+        db.register_file("b.png", "pack-2", str(tb))
+        self.assertEqual(db.find_overwrite_conflicts(), [])
+
+    def test_conflict_detected_when_two_packs_have_same_texture_id(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "shared.png"
+        tb = Path(self.tmpdir) / "shared2.png"
+        ta.write_bytes(b"\x89PNG" + b"\x01" * 200)
+        tb.write_bytes(b"\x89PNG" + b"\x02" * 200)
+        db.register_file("shared.png", "pack-1", str(ta))
+        db.register_file("shared.png", "pack-2", str(tb))
+        conflicts = db.find_overwrite_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].texture_id, "shared.png")
+        pids = set(conflicts[0].pack_ids)
+        self.assertIn("pack-1", pids)
+        self.assertIn("pack-2", pids)
+        self.assertFalse(conflicts[0].is_duplicate_content)
+
+    def test_conflict_same_content_flagged(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\xAA" * 200
+        ta = Path(self.tmpdir) / "same.png"
+        tb = Path(self.tmpdir) / "same_copy.png"
+        ta.write_bytes(content)
+        tb.write_bytes(content)
+        db.register_file("same.png", "pack-A", str(ta))
+        db.register_file("same.png", "pack-B", str(tb))
+        conflicts = db.find_overwrite_conflicts()
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].is_duplicate_content)
+
+    def test_same_pack_no_conflict(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        ta = Path(self.tmpdir) / "x.png"
+        ta.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("x.png", "pack-1", str(ta))
+        db.register_file("x.png", "pack-1", str(ta))
+        self.assertEqual(db.find_overwrite_conflicts(), [])
+
+    def test_find_duplicates_same_content(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\xFF" * 200
+        for i in range(3):
+            p = Path(self.tmpdir) / f"dup{i}.png"
+            p.write_bytes(content)
+            db.register_file(f"dup{i}.png", f"pack-{i}", str(p))
+        groups = db.find_duplicates()
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(len(groups[0]), 3)
+
+    def test_find_duplicates_no_duplicates(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        for i in range(3):
+            p = Path(self.tmpdir) / f"unique{i}.png"
+            p.write_bytes(b"\x89PNG" + bytes([i]) * 200)
+            db.register_file(f"unique{i}.png", f"pack-{i}", str(p))
+        self.assertEqual(db.find_duplicates(), [])
+
+    def test_find_broken_returns_broken_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        good = Path(self.tmpdir) / "good.png"
+        good.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        bad = Path(self.tmpdir) / "bad.png"
+        bad.write_bytes(b"")
+        db.register_file("good.png", "pack-1", str(good))
+        db.register_file("bad.png",  "pack-1", str(bad))
+        broken = db.find_broken_textures()
+        self.assertEqual(len(broken), 1)
+        self.assertEqual(broken[0].texture_id, "bad.png")
+
+    def test_remove_pack_clears_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        p = Path(self.tmpdir) / "t.png"
+        p.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("t.png", "pack-rm", str(p))
+        self.assertEqual(len(db.all_entries()), 1)
+        removed = db.remove_pack("pack-rm")
+        self.assertEqual(removed, 1)
+        self.assertEqual(len(db.all_entries()), 0)
+
+    def test_save_and_reload(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        p = Path(self.tmpdir) / "save_test.png"
+        p.write_bytes(b"\x89PNG" + b"\x00" * 200)
+        db.register_file("save_test.png", "pack-s", str(p))
+        db.save()
+        self.assertTrue(os.path.exists(self.db_path))
+        db2 = TextureHashDB(self.db_path)
+        self.assertEqual(len(db2.all_entries()), 1)
+        self.assertEqual(db2.all_entries()[0].texture_id, "save_test.png")
+
+    def test_save_is_atomic_no_tmp_files_left(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        db.save()
+        parent = Path(self.db_path).parent
+        tmp_files = [f for f in parent.iterdir() if "texhash_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_stats_reflect_registered_entries(self):
+        from src.core.texture_hash_db import TextureHashDB
+        db = TextureHashDB(self.db_path)
+        content = b"\x89PNG" + b"\x00" * 200
+        for i in range(4):
+            p = Path(self.tmpdir) / f"s{i}.png"
+            p.write_bytes(content)
+            db.register_file(f"s{i}.png", "pack-1", str(p))
+        s = db.stats()
+        self.assertEqual(s["total_entries"], 4)
+        self.assertEqual(s["total_packs"], 1)
+
+    def test_texture_entry_round_trip(self):
+        from src.core.texture_hash_db import TextureEntry
+        e = TextureEntry(
+            texture_id="abc.png",
+            pack_id="test-pack",
+            file_path="/some/path/abc.png",
+            content_hash="a" * 64,
+            size_bytes=1024,
+            broken=False,
+        )
+        d = e.to_dict()
+        e2 = TextureEntry.from_dict(d)
+        self.assertEqual(e2.texture_id, e.texture_id)
+        self.assertEqual(e2.pack_id, e.pack_id)
+        self.assertEqual(e2.content_hash, e.content_hash)
+        self.assertEqual(e2.broken, e.broken)
+
+
+class TestWave53LoadOrderManager(unittest.TestCase):
+    """Wave 53: LoadOrderManager — load order CRUD and conflict detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.order_file = os.path.join(self.tmpdir, "load_order.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+    def test_get_order_empty(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+
+    def test_all_serials_empty(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertEqual(lom.all_serials(), [])
+
+    def test_set_and_get_order(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-C"])
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B", "pack-C"])
+
+    def test_set_order_deduplicates(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+
+    def test_get_order_returns_copy(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A"])
+        order = lom.get_order("SLUS-20062")
+        order.append("injected")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A"])
+
+    def test_add_pack_appends(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-A")
+        lom.add_pack("SLUS-20062", "pack-B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+
+    def test_add_pack_no_duplicate(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-A")
+        lom.add_pack("SLUS-20062", "pack-A")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A"])
+
+    def test_remove_pack_removes_item(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-A", "pack-B"])
+        result = lom.remove_pack("SLUS-20062", "pack-A")
+        self.assertTrue(result)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-B"])
+
+    def test_remove_pack_nonexistent_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        result = lom.remove_pack("SLUS-20062", "pack-Z")
+        self.assertFalse(result)
+
+    def test_remove_pack_last_item_removes_serial(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-only")
+        lom.remove_pack("SLUS-20062", "pack-only")
+        self.assertNotIn("SLUS-20062", lom.all_serials())
+
+    def test_move_up(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_up("SLUS-20062", "B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["B", "A", "C"])
+
+    def test_move_up_already_first_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        result = lom.move_up("SLUS-20062", "A")
+        self.assertFalse(result)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "B"])
+
+    def test_move_down(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_down("SLUS-20062", "B")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "C", "B"])
+
+    def test_move_down_already_last_returns_false(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        result = lom.move_down("SLUS-20062", "B")
+        self.assertFalse(result)
+
+    def test_move_to_top(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_to_top("SLUS-20062", "C")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["C", "A", "B"])
+
+    def test_move_to_bottom(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        lom.move_to_bottom("SLUS-20062", "A")
+        self.assertEqual(lom.get_order("SLUS-20062"), ["B", "C", "A"])
+
+    def test_set_position(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C", "D"])
+        lom.set_position("SLUS-20062", "D", 1)
+        self.assertEqual(lom.get_order("SLUS-20062"), ["A", "D", "B", "C"])
+
+    def test_priority_returns_index(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(lom.priority("SLUS-20062", "A"), 0)
+        self.assertEqual(lom.priority("SLUS-20062", "C"), 2)
+
+    def test_priority_none_for_unregistered(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertIsNone(lom.priority("SLUS-20062", "missing"))
+
+    def test_winner_returns_last_in_order(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["base", "env", "char", "ui"])
+        winner = lom.winner("SLUS-20062", ["base", "env", "char"])
+        self.assertEqual(winner, "char")
+
+    def test_winner_highest_priority_wins(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(lom.winner("SLUS-20062", ["A", "C"]), "C")
+
+    def test_winner_empty_returns_none(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        self.assertIsNone(lom.winner("SLUS-20062", []))
+
+    def test_detect_order_conflicts(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["base", "hd-env", "char"])
+        tid_to_packs = {
+            "grass.png":  ["base", "hd-env"],
+            "tree.png":   ["base", "char"],
+            "unique.png": ["base"],
+        }
+        results = lom.detect_order_conflicts("SLUS-20062", tid_to_packs)
+        self.assertEqual(len(results), 2)
+        tids = {r["texture_id"] for r in results}
+        self.assertIn("grass.png", tids)
+        self.assertIn("tree.png", tids)
+        self.assertNotIn("unique.png", tids)
+
+    def test_detect_order_conflicts_winner_correct(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B", "C"])
+        results = lom.detect_order_conflicts(
+            "SLUS-20062", {"shared.png": ["A", "C"]}
+        )
+        self.assertEqual(results[0]["winner"], "C")
+
+    def test_save_and_reload(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["pack-1", "pack-2", "pack-3"])
+        lom.save()
+        lom2 = LoadOrderManager(self.order_file)
+        self.assertEqual(lom2.get_order("SLUS-20062"), ["pack-1", "pack-2", "pack-3"])
+
+    def test_save_is_atomic(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-1")
+        lom.save()
+        parent = Path(self.order_file).parent
+        tmp_files = [f for f in parent.iterdir() if "loadorder_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_clear_removes_all(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.set_order("SLUS-20062", ["A", "B"])
+        lom.set_order("SCUS-97232", ["C"])
+        lom.clear()
+        self.assertEqual(lom.all_serials(), [])
+
+
+class TestWave53ModProfiles(unittest.TestCase):
+    """Wave 53: ModProfileManager and ModProfile."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.profiles_file = os.path.join(self.tmpdir, "profiles.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.mod_profile import ModProfileManager, ModProfile
+
+    def test_no_profiles_initially(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertEqual(pm.profile_count(), 0)
+        self.assertIsNone(pm.get_active())
+
+    def test_create_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        p = pm.create_profile("Vanilla+", description="Minimal mods")
+        self.assertEqual(p.name, "Vanilla+")
+        self.assertEqual(p.description, "Minimal mods")
+        self.assertEqual(pm.profile_count(), 1)
+
+    def test_create_duplicate_raises_value_error(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("HD")
+        with self.assertRaises(ValueError):
+            pm.create_profile("HD")
+
+    def test_get_profile_returns_correct(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Test")
+        p = pm.get_profile("Test")
+        self.assertIsNotNone(p)
+        self.assertEqual(p.name, "Test")
+
+    def test_get_profile_missing_returns_none(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertIsNone(pm.get_profile("nonexistent"))
+
+    def test_list_profiles_sorted(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Zulu")
+        pm.create_profile("Alpha")
+        pm.create_profile("Mike")
+        self.assertEqual(pm.list_profiles(), ["Alpha", "Mike", "Zulu"])
+
+    def test_delete_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("ToDelete")
+        result = pm.delete_profile("ToDelete")
+        self.assertTrue(result)
+        self.assertIsNone(pm.get_profile("ToDelete"))
+
+    def test_delete_active_profile_clears_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Active")
+        pm.set_active("Active")
+        pm.delete_profile("Active")
+        self.assertIsNone(pm.get_active_name())
+
+    def test_delete_nonexistent_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertFalse(pm.delete_profile("nope"))
+
+    def test_rename_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("OldName")
+        pm.set_active("OldName")
+        result = pm.rename_profile("OldName", "NewName")
+        self.assertTrue(result)
+        self.assertIsNotNone(pm.get_profile("NewName"))
+        self.assertIsNone(pm.get_profile("OldName"))
+        self.assertEqual(pm.get_active_name(), "NewName")
+
+    def test_rename_to_existing_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("A")
+        pm.create_profile("B")
+        self.assertFalse(pm.rename_profile("A", "B"))
+
+    def test_set_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("HD Graphics")
+        pm.set_active("HD Graphics")
+        self.assertEqual(pm.get_active_name(), "HD Graphics")
+        active = pm.get_active()
+        self.assertIsNotNone(active)
+        self.assertEqual(active.name, "HD Graphics")
+
+    def test_set_active_nonexistent_returns_false(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        result = pm.set_active("missing")
+        self.assertFalse(result)
+        self.assertIsNone(pm.get_active())
+
+    def test_clear_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.set_active("P")
+        pm.clear_active()
+        self.assertIsNone(pm.get_active())
+
+    def test_add_mod_to_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("TestProf")
+        pm.add_mod_to_profile("TestProf", "uuid-mod-1")
+        p = pm.get_profile("TestProf")
+        self.assertTrue(p.is_mod_enabled("uuid-mod-1"))
+
+    def test_add_mod_no_duplicate(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.add_mod_to_profile("P", "m1")
+        pm.add_mod_to_profile("P", "m1")
+        self.assertEqual(pm.get_profile("P").enabled_mods.count("m1"), 1)
+
+    def test_remove_mod_from_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.add_mod_to_profile("P", "m1")
+        result = pm.remove_mod_from_profile("P", "m1")
+        self.assertTrue(result)
+        self.assertFalse(pm.get_profile("P").is_mod_enabled("m1"))
+
+    def test_remove_mod_cleans_load_order(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        p = pm.get_profile("P")
+        p.add_mod("m1")
+        p.set_load_order("SLUS-20062", ["m1", "m2"])
+        pm.remove_mod_from_profile("P", "m1")
+        self.assertNotIn("m1", p.get_load_order("SLUS-20062"))
+
+    def test_is_mod_in_active_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Active")
+        pm.add_mod_to_profile("Active", "uuid-A")
+        pm.set_active("Active")
+        self.assertTrue(pm.is_mod_in_active_profile("uuid-A"))
+        self.assertFalse(pm.is_mod_in_active_profile("uuid-B"))
+
+    def test_is_mod_in_active_profile_no_active(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        self.assertFalse(pm.is_mod_in_active_profile("any"))
+
+    def test_profile_load_order_set_get(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        p.set_load_order("SLUS-20062", ["A", "B", "C"])
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B", "C"])
+
+    def test_profile_load_order_deduplicates(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        p.set_load_order("SLUS-20062", ["A", "B", "A"])
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B"])
+
+    def test_profile_load_order_empty_by_default(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(name="Test")
+        self.assertEqual(p.get_load_order("SLUS-99999"), [])
+
+    def test_duplicate_profile(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Source", description="original", enabled_mods=["mod-A"])
+        pm.get_profile("Source").set_load_order("SLUS-20062", ["mod-A"])
+        clone = pm.duplicate_profile("Source", "Clone")
+        self.assertIsNotNone(clone)
+        self.assertEqual(clone.name, "Clone")
+        self.assertEqual(clone.description, "original")
+        self.assertIn("mod-A", clone.enabled_mods)
+        self.assertEqual(clone.get_load_order("SLUS-20062"), ["mod-A"])
+
+    def test_duplicate_to_existing_name_returns_none(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("A")
+        pm.create_profile("B")
+        self.assertIsNone(pm.duplicate_profile("A", "B"))
+
+    def test_save_and_reload(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Vanilla+", description="minimal")
+        pm.add_mod_to_profile("Vanilla+", "mod-1")
+        pm.create_profile("HD")
+        pm.set_active("HD")
+        pm.save()
+        pm2 = ModProfileManager(self.profiles_file)
+        self.assertEqual(sorted(pm2.list_profiles()), ["HD", "Vanilla+"])
+        self.assertEqual(pm2.get_active_name(), "HD")
+        vp = pm2.get_profile("Vanilla+")
+        self.assertIsNotNone(vp)
+        self.assertIn("mod-1", vp.enabled_mods)
+        self.assertEqual(vp.description, "minimal")
+
+    def test_save_is_atomic(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+        pm.save()
+        parent = Path(self.profiles_file).parent
+        tmp_files = [f for f in parent.iterdir() if "profiles_tmp" in f.name]
+        self.assertEqual(tmp_files, [])
+
+    def test_reload_preserves_load_order(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("Ordered")
+        pm.get_profile("Ordered").set_load_order("SLUS-20062", ["A", "B", "C"])
+        pm.save()
+        pm2 = ModProfileManager(self.profiles_file)
+        p = pm2.get_profile("Ordered")
+        self.assertEqual(p.get_load_order("SLUS-20062"), ["A", "B", "C"])
+
+    def test_mod_profile_round_trip(self):
+        from src.core.mod_profile import ModProfile
+        p = ModProfile(
+            name="Round Trip",
+            description="test",
+            enabled_mods=["m1", "m2"],
+        )
+        p.set_load_order("SLUS-20062", ["m1", "m2"])
+        d = p.to_dict()
+        p2 = ModProfile.from_dict("Round Trip", d)
+        self.assertEqual(p2.name, "Round Trip")
+        self.assertEqual(p2.description, "test")
+        self.assertEqual(p2.enabled_mods, ["m1", "m2"])
+        self.assertEqual(p2.get_load_order("SLUS-20062"), ["m1", "m2"])
+
+
+class TestWave53TextureOverwriteConflicts(unittest.TestCase):
+    """Wave 53: resolve_texture_overwrite_conflicts."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_import(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts,
+            TextureOverwriteConflict,
+        )
+
+    def test_no_conflict_empty_dir(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        result = resolve_texture_overwrite_conflicts("")
+        self.assertEqual(result, [])
+
+    def test_no_conflict_single_pack(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        repl = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        os.makedirs(repl)
+        Path(repl, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result, [])
+
+    def test_no_conflict_disjoint_filenames(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "a.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        Path(pb, "b.png").write_bytes(b"\x89PNG" + b"\x00" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result, [])
+
+    def test_conflict_detected_shared_filename(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "shared.png").write_bytes(b"\x89PNG" + b"\x01" * 200)
+        Path(pb, "shared.png").write_bytes(b"\x89PNG" + b"\x02" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].texture_id, "shared.png")
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertFalse(result[0].same_content)
+
+    def test_conflict_same_content_detected(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        content = b"\x89PNG" + b"\xAA" * 200
+        Path(pa, "same.png").write_bytes(content)
+        Path(pb, "same.png").write_bytes(content)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertTrue(result[0].same_content)
+
+    def test_multiple_conflicts_sorted_by_texture_id(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        for fname in ["z_tex.png", "a_tex.png", "m_tex.png"]:
+            Path(pa, fname).write_bytes(b"\x89PNG" + b"\x11" * 200)
+            Path(pb, fname).write_bytes(b"\x89PNG" + b"\x22" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        tids = [r.texture_id for r in result]
+        self.assertEqual(tids, sorted(tids))
+
+    def test_missing_dir_returns_empty(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        result = resolve_texture_overwrite_conflicts("/nonexistent/path")
+        self.assertEqual(result, [])
+
+    def test_conflict_summary_readable(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict
+        c = TextureOverwriteConflict(
+            texture_id="abc.png",
+            serial="SLUS-20062",
+            pack_a_id="PackA",
+            pack_a_path=Path("/textures/SLUS-20062/replacements/PackA/abc.png"),
+            pack_b_id="PackB",
+            pack_b_path=Path("/textures/SLUS-20062/replacements/PackB/abc.png"),
+            same_content=False,
+        )
+        summary = c.conflict_summary
+        self.assertIn("abc.png", summary)
+        self.assertIn("SLUS-20062", summary)
+        self.assertIn("PackA", summary)
+        self.assertIn("PackB", summary)
+
+    def test_two_serials_independent(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        tex = os.path.join(self.tmpdir, "textures")
+        for serial in ["SLUS-20062", "SCUS-97232"]:
+            pa = os.path.join(tex, serial, "replacements", "PackA")
+            pb = os.path.join(tex, serial, "replacements", "PackB")
+            os.makedirs(pa)
+            os.makedirs(pb)
+            Path(pa, "shared.dds").write_bytes(b"DDS " + b"\x00" * 200)
+            Path(pb, "shared.dds").write_bytes(b"DDS " + b"\xFF" * 200)
+        result = resolve_texture_overwrite_conflicts(tex)
+        serials = {r.serial for r in result}
+        self.assertIn("SLUS-20062", serials)
+        self.assertIn("SCUS-97232", serials)
