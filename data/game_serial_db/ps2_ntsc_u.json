@@ -10641,7 +10641,9 @@
     },
     "Okage: Shadow King": {
       "serial": "SCUS-97129",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-91129"
+      ],
       "crcs": [],
       "release_date": "2001-10-03",
       "developer": "Zener Works",
@@ -13603,7 +13605,9 @@
     },
     "Haven: Call of the King": {
       "serial": "SLUS-20517",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20157"
+      ],
       "crcs": [],
       "release_date": "2002-11-17",
       "developer": "Traveller's Tales",
@@ -14653,7 +14657,9 @@
     },
     "NASCAR Thunder 2004": {
       "serial": "SLUS-20824",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20754"
+      ],
       "crcs": [],
       "release_date": "2003-09-16",
       "developer": "EA",
@@ -20665,6 +20671,30 @@
       "developer": "EA Canada",
       "publisher": "Electronic Arts",
       "genre": "Soccer"
+    },
+    "America's Army: Rise of a Soldier": {
+      "serial": "SLUS-21188",
+      "crcs": []
+    },
+    "Peanuts: All Stars": {
+      "serial": "SLUS-21468",
+      "crcs": []
+    },
+    "World Pool Challenge '06": {
+      "serial": "SLUS-21472",
+      "crcs": []
+    },
+    "Heroes of the Indianapolis 500": {
+      "serial": "SLUS-21747",
+      "crcs": []
+    },
+    "Jelly Belly: Ballistic Beans": {
+      "serial": "SLUS-21874",
+      "crcs": []
+    },
+    "M&M's Adventure": {
+      "serial": "SLUS-21875",
+      "crcs": []
     }
   }
 }

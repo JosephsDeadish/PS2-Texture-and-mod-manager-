@@ -8735,3 +8735,92 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2288 games (FIFA 13 added)."""
         self.assertGreaterEqual(len(self.data), 2288)
+
+
+class TestWave47NewGames(unittest.TestCase):
+    """Wave 47: new NTSC-U games and alt_serials added from PS2.txt / PS2 ID List cross-reference."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(db_path.read_text())["games"]
+
+    def _assert_alt_serial(self, title, expected_serial):
+        game = self.games.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        alts = game.get("alt_serials", [])
+        self.assertIn(
+            expected_serial, alts,
+            f"Expected {expected_serial} in alt_serials for '{title}', got {alts}",
+        )
+
+    # ── new games ──────────────────────────────────────────────────────────────
+
+    def test_americas_army_rise_of_a_soldier_present(self):
+        """Wave 47: America's Army: Rise of a Soldier (SLUS-21188) added."""
+        self.assertIn("America's Army: Rise of a Soldier", self.games)
+
+    def test_americas_army_serial(self):
+        """Wave 47: America's Army should have serial SLUS-21188."""
+        self.assertEqual(self.games["America's Army: Rise of a Soldier"]['serial'], 'SLUS-21188')
+
+    def test_peanuts_all_stars_present(self):
+        """Wave 47: Peanuts: All Stars (SLUS-21468) added."""
+        self.assertIn('Peanuts: All Stars', self.games)
+
+    def test_peanuts_all_stars_serial(self):
+        """Wave 47: Peanuts: All Stars should have serial SLUS-21468."""
+        self.assertEqual(self.games['Peanuts: All Stars']['serial'], 'SLUS-21468')
+
+    def test_world_pool_challenge_present(self):
+        """Wave 47: World Pool Challenge '06 (SLUS-21472) added."""
+        self.assertIn("World Pool Challenge '06", self.games)
+
+    def test_world_pool_challenge_serial(self):
+        """Wave 47: World Pool Challenge '06 should have serial SLUS-21472."""
+        self.assertEqual(self.games["World Pool Challenge '06"]['serial'], 'SLUS-21472')
+
+    def test_heroes_indianapolis_500_present(self):
+        """Wave 47: Heroes of the Indianapolis 500 (SLUS-21747) added."""
+        self.assertIn('Heroes of the Indianapolis 500', self.games)
+
+    def test_heroes_indianapolis_500_serial(self):
+        """Wave 47: Heroes of the Indianapolis 500 should have serial SLUS-21747."""
+        self.assertEqual(self.games['Heroes of the Indianapolis 500']['serial'], 'SLUS-21747')
+
+    def test_jelly_belly_ballistic_beans_present(self):
+        """Wave 47: Jelly Belly: Ballistic Beans (SLUS-21874) added."""
+        self.assertIn('Jelly Belly: Ballistic Beans', self.games)
+
+    def test_jelly_belly_ballistic_beans_serial(self):
+        """Wave 47: Jelly Belly: Ballistic Beans should have serial SLUS-21874."""
+        self.assertEqual(self.games['Jelly Belly: Ballistic Beans']['serial'], 'SLUS-21874')
+
+    def test_mms_adventure_present(self):
+        """Wave 47: M&M's Adventure (SLUS-21875) added."""
+        self.assertIn("M&M's Adventure", self.games)
+
+    def test_mms_adventure_serial(self):
+        """Wave 47: M&M's Adventure should have serial SLUS-21875."""
+        self.assertEqual(self.games["M&M's Adventure"]['serial'], 'SLUS-21875')
+
+    # ── alt_serials ────────────────────────────────────────────────────────────
+
+    def test_okage_has_scus91129_alt_serial(self):
+        """Wave 47: SCUS-91129 should be alt_serial for Okage: Shadow King."""
+        self._assert_alt_serial('Okage: Shadow King', 'SCUS-91129')
+
+    def test_haven_has_slus20157_alt_serial(self):
+        """Wave 47: SLUS-20157 should be alt_serial for Haven: Call of the King."""
+        self._assert_alt_serial('Haven: Call of the King', 'SLUS-20157')
+
+    def test_nascar_thunder_2004_has_slus20754_alt_serial(self):
+        """Wave 47: SLUS-20754 should be alt_serial for NASCAR Thunder 2004."""
+        self._assert_alt_serial('NASCAR Thunder 2004', 'SLUS-20754')
+
+    # ── thresholds ─────────────────────────────────────────────────────────────
+
+    def test_serial_db_wave47_game_count(self):
+        """Wave 47: serial DB should have at least 2294 games (6 new games added)."""
+        self.assertGreaterEqual(len(self.games), 2294)
