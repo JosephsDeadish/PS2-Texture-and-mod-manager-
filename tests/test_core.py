@@ -10700,3 +10700,454 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         serials = {r.serial for r in result}
         self.assertIn("SLUS-20062", serials)
         self.assertIn("SCUS-97232", serials)
+
+
+class TestWave54ConflictVisualizer(unittest.TestCase):
+    """Wave 54: Enhanced Texture Pack Conflict Visualizer.
+
+    Tests for ConflictResolution enum, _detect_alpha_type helper,
+    enhanced TextureOverwriteConflict fields, and ConflictResolutionSession.
+    """
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    # ------------------------------------------------------------------
+    # Imports
+    # ------------------------------------------------------------------
+
+    def test_imports(self):
+        from src.core.conflict_resolver import (
+            ConflictResolution,
+            ConflictResolutionSession,
+            TextureOverwriteConflict,
+        )
+
+    # ------------------------------------------------------------------
+    # ConflictResolution enum
+    # ------------------------------------------------------------------
+
+    def test_conflict_resolution_enum_values(self):
+        from src.core.conflict_resolver import ConflictResolution
+        self.assertEqual(ConflictResolution.PENDING, "pending")
+        self.assertEqual(ConflictResolution.PACK_A, "pack_a")
+        self.assertEqual(ConflictResolution.PACK_B, "pack_b")
+        self.assertEqual(ConflictResolution.SKIP, "skip")
+
+    def test_conflict_resolution_default_is_pending(self):
+        from src.core.conflict_resolver import (
+            ConflictResolution,
+            TextureOverwriteConflict,
+        )
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/t.png"),
+            pack_b_id="B", pack_b_path=Path("/b/t.png"),
+        )
+        self.assertEqual(c.resolution, ConflictResolution.PENDING)
+
+    # ------------------------------------------------------------------
+    # _detect_alpha_type
+    # ------------------------------------------------------------------
+
+    def _write_png(self, path: str, color_type: int) -> Path:
+        """Write a minimal but structurally valid PNG with the given color type."""
+        import struct, zlib
+        p = Path(path)
+
+        def _chunk(name: bytes, data: bytes) -> bytes:
+            crc = zlib.crc32(name + data) & 0xFFFFFFFF
+            return struct.pack(">I", len(data)) + name + data + struct.pack(">I", crc)
+
+        # IHDR: width=1, height=1, bit_depth=8, color_type, compress=0, filter=0, interlace=0
+        ihdr_data = struct.pack(">IIBBBBB", 1, 1, 8, color_type, 0, 0, 0)
+        # Simple single-pixel IDAT
+        # For simplicity, use a raw scanline depending on color_type
+        channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color_type, 1)
+        scanline = b"\x00" + bytes(channels)  # filter byte + pixel bytes
+        compressed = zlib.compress(scanline)
+        idat_data = compressed
+
+        data = b"\x89PNG\r\n\x1a\n"
+        data += _chunk(b"IHDR", ihdr_data)
+        data += _chunk(b"IDAT", idat_data)
+        data += _chunk(b"IEND", b"")
+        p.write_bytes(data)
+        return p
+
+    def test_detect_alpha_type_png_rgb(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "rgb.png"), color_type=2)
+        self.assertEqual(_detect_alpha_type(p), "opaque")
+
+    def test_detect_alpha_type_png_rgba(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "rgba.png"), color_type=6)
+        self.assertEqual(_detect_alpha_type(p), "has_alpha")
+
+    def test_detect_alpha_type_png_grayscale(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "gray.png"), color_type=0)
+        self.assertEqual(_detect_alpha_type(p), "opaque")
+
+    def test_detect_alpha_type_png_grayscale_alpha(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = self._write_png(os.path.join(self.tmpdir, "ga.png"), color_type=4)
+        self.assertEqual(_detect_alpha_type(p), "has_alpha")
+
+    def test_detect_alpha_type_dds_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "tex.dds")
+        p.write_bytes(b"DDS " + b"\x00" * 120)
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_detect_alpha_type_missing_file_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "nonexistent.png")
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_detect_alpha_type_truncated_png_returns_unknown(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+        p = Path(self.tmpdir, "short.png")
+        # Valid magic but not enough bytes for IHDR
+        p.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 10)
+        self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    # ------------------------------------------------------------------
+    # TextureOverwriteConflict new fields
+    # ------------------------------------------------------------------
+
+    def test_texture_overwrite_conflict_new_fields_present(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="abc.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/abc.png"),
+            pack_b_id="B", pack_b_path=Path("/b/abc.png"),
+            alpha_type_a="has_alpha",
+            alpha_type_b="opaque",
+            pack_a_size_bytes=1024,
+            pack_b_size_bytes=2048,
+        )
+        self.assertEqual(c.alpha_type_a, "has_alpha")
+        self.assertEqual(c.alpha_type_b, "opaque")
+        self.assertEqual(c.pack_a_size_bytes, 1024)
+        self.assertEqual(c.pack_b_size_bytes, 2048)
+        self.assertEqual(c.resolution, ConflictResolution.PENDING)
+
+    def test_winner_id_pack_a(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.PACK_A,
+        )
+        self.assertEqual(c.winner_id, "PackA")
+
+    def test_winner_id_pack_b(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.PACK_B,
+        )
+        self.assertEqual(c.winner_id, "PackB")
+
+    def test_winner_id_pending_returns_none(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+        )
+        self.assertIsNone(c.winner_id)
+
+    def test_winner_id_skip_returns_none(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="t.png", serial="SLUS-20062",
+            pack_a_id="PackA", pack_a_path=Path("/a/t.png"),
+            pack_b_id="PackB", pack_b_path=Path("/b/t.png"),
+            resolution=ConflictResolution.SKIP,
+        )
+        self.assertIsNone(c.winner_id)
+
+    def test_to_dict_and_from_dict(self):
+        from src.core.conflict_resolver import TextureOverwriteConflict, ConflictResolution
+        c = TextureOverwriteConflict(
+            texture_id="abc.png", serial="SLUS-20062",
+            pack_a_id="A", pack_a_path=Path("/a/abc.png"),
+            pack_b_id="B", pack_b_path=Path("/b/abc.png"),
+            same_content=False,
+            alpha_type_a="has_alpha",
+            alpha_type_b="opaque",
+            pack_a_size_bytes=500,
+            pack_b_size_bytes=600,
+            resolution=ConflictResolution.PACK_A,
+        )
+        d = c.to_dict()
+        self.assertEqual(d["texture_id"], "abc.png")
+        self.assertEqual(d["alpha_type_a"], "has_alpha")
+        self.assertEqual(d["pack_a_size_bytes"], 500)
+        self.assertEqual(d["resolution"], "pack_a")
+
+        c2 = TextureOverwriteConflict.from_dict(d)
+        self.assertEqual(c2.texture_id, "abc.png")
+        self.assertEqual(c2.serial, "SLUS-20062")
+        self.assertEqual(c2.alpha_type_a, "has_alpha")
+        self.assertEqual(c2.alpha_type_b, "opaque")
+        self.assertEqual(c2.pack_a_size_bytes, 500)
+        self.assertEqual(c2.pack_b_size_bytes, 600)
+        self.assertEqual(c2.resolution, "pack_a")
+
+    # ------------------------------------------------------------------
+    # resolve_texture_overwrite_conflicts populates new fields
+    # ------------------------------------------------------------------
+
+    def _make_conflict_fixture(self, content_a: bytes, content_b: bytes,
+                               filename: str = "tex.png") -> str:
+        """Create a textures dir with two packs containing the given texture."""
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, filename).write_bytes(content_a)
+        Path(pb, filename).write_bytes(content_b)
+        return tex
+
+    def test_resolve_populates_size_bytes(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        content_a = b"\x89PNG\r\n\x1a\n" + b"\x00" * 100
+        content_b = b"\x89PNG\r\n\x1a\n" + b"\x00" * 200
+        tex = self._make_conflict_fixture(content_a, content_b)
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        c = result[0]
+        self.assertEqual(c.pack_a_size_bytes, len(content_a))
+        self.assertEqual(c.pack_b_size_bytes, len(content_b))
+
+    def test_resolve_populates_alpha_type_for_png(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+        import struct, zlib
+
+        def _make_png(color_type: int) -> bytes:
+            def _chunk(name: bytes, data: bytes) -> bytes:
+                crc = zlib.crc32(name + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + name + data + struct.pack(">I", crc)
+            ihdr = struct.pack(">IIBBBBB", 1, 1, 8, color_type, 0, 0, 0)
+            channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color_type, 1)
+            idat = zlib.compress(b"\x00" + bytes(channels))
+            return (b"\x89PNG\r\n\x1a\n"
+                    + _chunk(b"IHDR", ihdr)
+                    + _chunk(b"IDAT", idat)
+                    + _chunk(b"IEND", b""))
+
+        tex = self._make_conflict_fixture(
+            _make_png(6),   # RGBA → has_alpha
+            _make_png(2),   # RGB  → opaque
+        )
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        c = result[0]
+        self.assertEqual(c.alpha_type_a, "has_alpha")
+        self.assertEqual(c.alpha_type_b, "opaque")
+
+    def test_resolve_default_resolution_is_pending(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts, ConflictResolution,
+        )
+        tex = self._make_conflict_fixture(
+            b"\x89PNG\r\n\x1a\n" + b"\x01" * 50,
+            b"\x89PNG\r\n\x1a\n" + b"\x02" * 50,
+        )
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(result[0].resolution, ConflictResolution.PENDING)
+
+    # ------------------------------------------------------------------
+    # ConflictResolutionSession
+    # ------------------------------------------------------------------
+
+    def _make_session(self):
+        from src.core.conflict_resolver import (
+            TextureOverwriteConflict,
+            ConflictResolutionSession,
+        )
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="a.png", serial="SLUS-20062",
+                pack_a_id="P1", pack_a_path=Path("/p1/a.png"),
+                pack_b_id="P2", pack_b_path=Path("/p2/a.png"),
+            ),
+            TextureOverwriteConflict(
+                texture_id="b.png", serial="SLUS-20062",
+                pack_a_id="P1", pack_a_path=Path("/p1/b.png"),
+                pack_b_id="P2", pack_b_path=Path("/p2/b.png"),
+            ),
+            TextureOverwriteConflict(
+                texture_id="c.png", serial="SCUS-97232",
+                pack_a_id="Q1", pack_a_path=Path("/q1/c.png"),
+                pack_b_id="Q2", pack_b_path=Path("/q2/c.png"),
+            ),
+        ]
+        return ConflictResolutionSession(conflicts)
+
+    def test_session_total(self):
+        session = self._make_session()
+        self.assertEqual(session.total, 3)
+
+    def test_session_initial_counts(self):
+        session = self._make_session()
+        self.assertEqual(session.unresolved_count, 3)
+        self.assertEqual(session.resolved_count, 0)
+
+    def test_session_resolve_single(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        result = session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        self.assertTrue(result)
+        self.assertEqual(session.resolved_count, 1)
+        self.assertEqual(session.unresolved_count, 2)
+
+    def test_session_resolve_nonexistent_returns_false(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        result = session.resolve("SLUS-99999", "z.png", ConflictResolution.PACK_A)
+        self.assertFalse(result)
+
+    def test_session_resolve_all_pending(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        count = session.resolve_all(ConflictResolution.PACK_B)
+        self.assertEqual(count, 3)
+        self.assertEqual(session.unresolved_count, 0)
+
+    def test_session_resolve_all_skips_already_resolved(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        count = session.resolve_all(ConflictResolution.PACK_B)
+        # Only 2 remaining PENDING should be updated
+        self.assertEqual(count, 2)
+        # The first conflict should still be PACK_A
+        c = session.get_conflict_detail("SLUS-20062", "a.png")
+        self.assertEqual(c["resolution"], "pack_a")
+
+    def test_session_resolve_all_overwrite(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        count = session.resolve_all(ConflictResolution.PACK_B, overwrite=True)
+        self.assertEqual(count, 3)
+        c = session.get_conflict_detail("SLUS-20062", "a.png")
+        self.assertEqual(c["resolution"], "pack_b")
+
+    def test_session_conflicts_for_serial(self):
+        session = self._make_session()
+        slu_conflicts = session.conflicts_for_serial("SLUS-20062")
+        self.assertEqual(len(slu_conflicts), 2)
+        scu_conflicts = session.conflicts_for_serial("SCUS-97232")
+        self.assertEqual(len(scu_conflicts), 1)
+
+    def test_session_all_conflicts_returns_copy(self):
+        session = self._make_session()
+        all_c = session.all_conflicts()
+        self.assertEqual(len(all_c), 3)
+        all_c.clear()
+        self.assertEqual(session.total, 3)  # original unchanged
+
+    def test_session_get_conflict_detail_structure(self):
+        from src.core.conflict_resolver import ConflictResolution, TextureOverwriteConflict, ConflictResolutionSession
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="abc.png", serial="SLUS-20062",
+                pack_a_id="PackA", pack_a_path=Path("/a/abc.png"),
+                pack_b_id="PackB", pack_b_path=Path("/b/abc.png"),
+                alpha_type_a="has_alpha",
+                alpha_type_b="opaque",
+                pack_a_size_bytes=1111,
+                pack_b_size_bytes=2222,
+            ),
+        ]
+        session = ConflictResolutionSession(conflicts)
+        detail = session.get_conflict_detail("SLUS-20062", "abc.png")
+        self.assertIsNotNone(detail)
+        self.assertEqual(detail["texture_id"], "abc.png")
+        self.assertEqual(detail["serial"], "SLUS-20062")
+        self.assertEqual(detail["pack_a"]["id"], "PackA")
+        self.assertEqual(detail["pack_a"]["alpha_type"], "has_alpha")
+        self.assertEqual(detail["pack_a"]["size_bytes"], 1111)
+        self.assertEqual(detail["pack_b"]["id"], "PackB")
+        self.assertEqual(detail["pack_b"]["alpha_type"], "opaque")
+        self.assertEqual(detail["pack_b"]["size_bytes"], 2222)
+        self.assertEqual(detail["resolution"], "pending")
+        self.assertIsNone(detail["winner_id"])
+
+    def test_session_get_conflict_detail_after_resolve(self):
+        from src.core.conflict_resolver import ConflictResolution, TextureOverwriteConflict, ConflictResolutionSession
+        conflicts = [
+            TextureOverwriteConflict(
+                texture_id="abc.png", serial="SLUS-20062",
+                pack_a_id="PackA", pack_a_path=Path("/a/abc.png"),
+                pack_b_id="PackB", pack_b_path=Path("/b/abc.png"),
+            ),
+        ]
+        session = ConflictResolutionSession(conflicts)
+        session.resolve("SLUS-20062", "abc.png", ConflictResolution.PACK_A)
+        detail = session.get_conflict_detail("SLUS-20062", "abc.png")
+        self.assertEqual(detail["resolution"], "pack_a")
+        self.assertEqual(detail["winner_id"], "PackA")
+
+    def test_session_get_conflict_detail_not_found(self):
+        session = self._make_session()
+        self.assertIsNone(session.get_conflict_detail("SLUS-99999", "z.png"))
+
+    def test_session_summary(self):
+        from src.core.conflict_resolver import ConflictResolution
+        session = self._make_session()
+        session.resolve("SLUS-20062", "a.png", ConflictResolution.PACK_A)
+        s = session.summary()
+        self.assertEqual(s["total"], 3)
+        self.assertEqual(s["resolved"], 1)
+        self.assertEqual(s["unresolved"], 2)
+        self.assertIn("SLUS-20062", s["serials_affected"])
+        self.assertIn("SCUS-97232", s["serials_affected"])
+
+    def test_session_summary_empty(self):
+        from src.core.conflict_resolver import ConflictResolutionSession
+        session = ConflictResolutionSession([])
+        s = session.summary()
+        self.assertEqual(s["total"], 0)
+        self.assertEqual(s["resolved"], 0)
+        self.assertEqual(s["unresolved"], 0)
+        self.assertEqual(s["serials_affected"], [])
+
+    def test_session_from_resolve_texture_overwrite_conflicts(self):
+        from src.core.conflict_resolver import (
+            resolve_texture_overwrite_conflicts,
+            ConflictResolutionSession,
+            ConflictResolution,
+        )
+        tex = os.path.join(self.tmpdir, "textures2")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        for name in ["x.png", "y.png"]:
+            Path(pa, name).write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x01" * 50)
+            Path(pb, name).write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x02" * 50)
+
+        raw = resolve_texture_overwrite_conflicts(tex)
+        session = ConflictResolutionSession(raw)
+        self.assertEqual(session.total, 2)
+        session.resolve("SLUS-20062", "x.png", ConflictResolution.PACK_A)
+        session.resolve("SLUS-20062", "y.png", ConflictResolution.PACK_B)
+        self.assertEqual(session.unresolved_count, 0)
+        s = session.summary()
+        self.assertEqual(s["total"], 2)
+        self.assertEqual(s["resolved"], 2)

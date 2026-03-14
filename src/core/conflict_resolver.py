@@ -45,6 +45,30 @@ from typing import Dict, List, Optional, Set, Tuple
 # Severity enum
 # ---------------------------------------------------------------------------
 
+class ConflictResolution(str, Enum):
+    """User's resolution choice for a :class:`TextureOverwriteConflict`.
+
+    Attributes
+    ----------
+    PENDING:
+        No decision has been made yet (default).
+    PACK_A:
+        Use the texture provided by Pack A; Pack B's version is ignored.
+    PACK_B:
+        Use the texture provided by Pack B; Pack A's version is ignored.
+    SKIP:
+        Leave the conflict without applying any resolution.
+    """
+
+    PENDING = "pending"
+    PACK_A  = "pack_a"
+    PACK_B  = "pack_b"
+    SKIP    = "skip"
+
+    def __str__(self) -> str:  # noqa: D105
+        return self.value
+
+
 class ConflictSeverity(str, Enum):
     """Severity level for a detected conflict."""
     ERROR   = "error"    # will definitely cause problems at runtime
@@ -413,6 +437,8 @@ class TextureOverwriteConflict:
     * The PCSX2 texture filename (``texture_id``) both packs compete for.
     * Which packs are involved and the path to each pack's copy.
     * The game serial this conflict belongs to.
+    * Alpha-channel type and file-size metadata for both versions.
+    * The user's resolution choice (default :attr:`ConflictResolution.PENDING`).
 
     Attributes
     ----------
@@ -432,6 +458,19 @@ class TextureOverwriteConflict:
     same_content:
         ``True`` when both files have identical content (detected via
         byte-for-byte comparison of the first 8 KiB).
+    alpha_type_a:
+        Alpha-channel descriptor for pack A's texture:
+        ``"has_alpha"``, ``"opaque"``, or ``"unknown"``.
+    alpha_type_b:
+        Alpha-channel descriptor for pack B's texture.
+    pack_a_size_bytes:
+        File size of pack A's texture in bytes (0 when unreadable).
+    pack_b_size_bytes:
+        File size of pack B's texture in bytes (0 when unreadable).
+    resolution:
+        The user's choice for resolving this conflict
+        (:class:`ConflictResolution`).  Defaults to
+        :attr:`ConflictResolution.PENDING`.
     """
 
     texture_id: str
@@ -441,6 +480,25 @@ class TextureOverwriteConflict:
     pack_b_id: str
     pack_b_path: Path
     same_content: bool = False
+    alpha_type_a: str = "unknown"
+    alpha_type_b: str = "unknown"
+    pack_a_size_bytes: int = 0
+    pack_b_size_bytes: int = 0
+    resolution: str = ConflictResolution.PENDING
+
+    @property
+    def winner_id(self) -> Optional[str]:
+        """Return the winning pack ID, or ``None`` when unresolved.
+
+        Returns pack A's ID when :attr:`resolution` is
+        :attr:`ConflictResolution.PACK_A`, pack B's ID when it is
+        :attr:`ConflictResolution.PACK_B`, and ``None`` otherwise.
+        """
+        if self.resolution == ConflictResolution.PACK_A:
+            return self.pack_a_id
+        if self.resolution == ConflictResolution.PACK_B:
+            return self.pack_b_id
+        return None
 
     @property
     def conflict_summary(self) -> str:
@@ -451,6 +509,41 @@ class TextureOverwriteConflict:
             f"'{self.pack_a_id}' and '{self.pack_b_id}' ({kind})"
         )
 
+    def to_dict(self) -> dict:
+        """Serialise to a JSON-compatible dictionary."""
+        return {
+            "texture_id": self.texture_id,
+            "serial": self.serial,
+            "pack_a_id": self.pack_a_id,
+            "pack_a_path": str(self.pack_a_path),
+            "pack_b_id": self.pack_b_id,
+            "pack_b_path": str(self.pack_b_path),
+            "same_content": self.same_content,
+            "alpha_type_a": self.alpha_type_a,
+            "alpha_type_b": self.alpha_type_b,
+            "pack_a_size_bytes": self.pack_a_size_bytes,
+            "pack_b_size_bytes": self.pack_b_size_bytes,
+            "resolution": str(self.resolution),
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "TextureOverwriteConflict":
+        """Deserialise from a dictionary produced by :meth:`to_dict`."""
+        return cls(
+            texture_id=data["texture_id"],
+            serial=data["serial"],
+            pack_a_id=data["pack_a_id"],
+            pack_a_path=Path(data["pack_a_path"]),
+            pack_b_id=data["pack_b_id"],
+            pack_b_path=Path(data["pack_b_path"]),
+            same_content=bool(data.get("same_content", False)),
+            alpha_type_a=data.get("alpha_type_a", "unknown"),
+            alpha_type_b=data.get("alpha_type_b", "unknown"),
+            pack_a_size_bytes=int(data.get("pack_a_size_bytes", 0)),
+            pack_b_size_bytes=int(data.get("pack_b_size_bytes", 0)),
+            resolution=data.get("resolution", ConflictResolution.PENDING),
+        )
+
 
 def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192) -> bool:
     """Return True if the first *check_bytes* of both files are identical."""
@@ -459,6 +552,58 @@ def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192
             return fa.read(check_bytes) == fb.read(check_bytes)
     except OSError:
         return False
+
+
+#: PNG file signature (first 8 bytes).
+_PNG_MAGIC: bytes = b"\x89PNG\r\n\x1a\n"
+
+#: PNG color-type byte values that include an alpha channel.
+_PNG_ALPHA_COLOR_TYPES: frozenset[int] = frozenset({4, 6})
+
+#: PNG color-type byte values that are fully opaque.
+_PNG_OPAQUE_COLOR_TYPES: frozenset[int] = frozenset({0, 2, 3})
+
+
+def _detect_alpha_type(path: Path) -> str:
+    """Return the alpha-channel type string for a texture file.
+
+    Supports PNG (IHDR color-type inspection).  All other formats return
+    ``"unknown"``.
+
+    Returns
+    -------
+    str
+        One of ``"has_alpha"``, ``"opaque"``, or ``"unknown"``.
+    """
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return "unknown"
+
+    if path.suffix.lower() == ".png":
+        # PNG layout: 8-byte magic, then IHDR chunk:
+        #   4 bytes length, 4 bytes "IHDR", 4 bytes width, 4 bytes height,
+        #   1 byte bit-depth, 1 byte color-type  → offset 25
+        if len(data) < 26 or data[:8] != _PNG_MAGIC:
+            return "unknown"
+        color_type = data[25]
+        if color_type in _PNG_ALPHA_COLOR_TYPES:
+            return "has_alpha"
+        if color_type in _PNG_OPAQUE_COLOR_TYPES:
+            return "opaque"
+        return "unknown"
+
+    # DDS, TGA, BMP, etc. — alpha detection would require format-specific
+    # parsing; return unknown to keep things simple.
+    return "unknown"
+
+
+def _file_size_bytes(path: Path) -> int:
+    """Return the size of *path* in bytes, or 0 on error."""
+    try:
+        return path.stat().st_size
+    except OSError:
+        return 0
 
 
 #: Image extensions scanned for overwrite conflict detection.
@@ -567,10 +712,199 @@ def resolve_texture_overwrite_conflicts(
                         pack_b_id=pack_b_id,
                         pack_b_path=path_b,
                         same_content=same,
+                        alpha_type_a=_detect_alpha_type(path_a),
+                        alpha_type_b=_detect_alpha_type(path_b),
+                        pack_a_size_bytes=_file_size_bytes(path_a),
+                        pack_b_size_bytes=_file_size_bytes(path_b),
                     ))
 
     conflicts.sort(key=lambda c: (c.serial, c.texture_id, c.pack_a_id))
     return conflicts
+
+
+# ---------------------------------------------------------------------------
+# Conflict resolution session
+# ---------------------------------------------------------------------------
+
+class ConflictResolutionSession:
+    """Track and apply user resolution choices for texture overwrite conflicts.
+
+    Wraps a list of :class:`TextureOverwriteConflict` objects and allows the
+    user (or an automated policy) to mark each one as resolved in favour of
+    Pack A, Pack B, or skipped.
+
+    Example::
+
+        from src.core.conflict_resolver import (
+            ConflictResolutionSession,
+            ConflictResolution,
+            resolve_texture_overwrite_conflicts,
+        )
+
+        raw = resolve_texture_overwrite_conflicts(textures_path)
+        session = ConflictResolutionSession(raw)
+        session.resolve("SLUS-20062", "abc.png", ConflictResolution.PACK_A)
+        print(session.summary())
+    """
+
+    def __init__(self, conflicts: List[TextureOverwriteConflict]) -> None:
+        self._conflicts: List[TextureOverwriteConflict] = list(conflicts)
+
+    # ------------------------------------------------------------------
+    # Resolving individual conflicts
+    # ------------------------------------------------------------------
+
+    def resolve(
+        self,
+        serial: str,
+        texture_id: str,
+        resolution: ConflictResolution,
+    ) -> bool:
+        """Set the *resolution* for every conflict matching *serial* + *texture_id*.
+
+        Returns ``True`` if at least one conflict was found and updated.
+        """
+        found = False
+        for c in self._conflicts:
+            if c.serial == serial and c.texture_id == texture_id:
+                c.resolution = resolution
+                found = True
+        return found
+
+    def resolve_all(
+        self,
+        resolution: ConflictResolution,
+        *,
+        overwrite: bool = False,
+    ) -> int:
+        """Apply *resolution* to all unresolved (PENDING) conflicts.
+
+        Parameters
+        ----------
+        resolution:
+            The :class:`ConflictResolution` to set.
+        overwrite:
+            When ``True``, overwrite existing non-PENDING resolutions too.
+
+        Returns
+        -------
+        int
+            Number of conflicts updated.
+        """
+        count = 0
+        for c in self._conflicts:
+            if overwrite or c.resolution == ConflictResolution.PENDING:
+                c.resolution = resolution
+                count += 1
+        return count
+
+    # ------------------------------------------------------------------
+    # Counts and listing
+    # ------------------------------------------------------------------
+
+    @property
+    def total(self) -> int:
+        """Total number of conflicts in this session."""
+        return len(self._conflicts)
+
+    @property
+    def resolved_count(self) -> int:
+        """Number of conflicts that have a non-PENDING resolution."""
+        return sum(
+            1 for c in self._conflicts
+            if c.resolution != ConflictResolution.PENDING
+        )
+
+    @property
+    def unresolved_count(self) -> int:
+        """Number of conflicts still marked PENDING."""
+        return sum(
+            1 for c in self._conflicts
+            if c.resolution == ConflictResolution.PENDING
+        )
+
+    def conflicts_for_serial(self, serial: str) -> List[TextureOverwriteConflict]:
+        """Return all conflicts for a specific game serial."""
+        return [c for c in self._conflicts if c.serial == serial]
+
+    def all_conflicts(self) -> List[TextureOverwriteConflict]:
+        """Return all conflicts in this session (copy of the internal list)."""
+        return list(self._conflicts)
+
+    # ------------------------------------------------------------------
+    # Structured detail for UI display
+    # ------------------------------------------------------------------
+
+    def get_conflict_detail(self, serial: str, texture_id: str) -> Optional[dict]:
+        """Return a structured detail dictionary for the conflict visualiser.
+
+        The returned dict is suitable for direct use in a UI panel:
+
+        .. code-block:: python
+
+            {
+                "texture_id": "abc.png",
+                "serial": "SLUS-20062",
+                "pack_a": {
+                    "id": "PackA",
+                    "path": "/textures/SLUS-20062/replacements/PackA/abc.png",
+                    "size_bytes": 12345,
+                    "alpha_type": "has_alpha",
+                },
+                "pack_b": {
+                    "id": "PackB",
+                    "path": "/textures/SLUS-20062/replacements/PackB/abc.png",
+                    "size_bytes": 11999,
+                    "alpha_type": "opaque",
+                },
+                "same_content": False,
+                "resolution": "pending",
+                "winner_id": None,
+            }
+
+        Returns ``None`` if no matching conflict is found.
+        """
+        for c in self._conflicts:
+            if c.serial == serial and c.texture_id == texture_id:
+                return {
+                    "texture_id": c.texture_id,
+                    "serial": c.serial,
+                    "pack_a": {
+                        "id": c.pack_a_id,
+                        "path": str(c.pack_a_path),
+                        "size_bytes": c.pack_a_size_bytes,
+                        "alpha_type": c.alpha_type_a,
+                    },
+                    "pack_b": {
+                        "id": c.pack_b_id,
+                        "path": str(c.pack_b_path),
+                        "size_bytes": c.pack_b_size_bytes,
+                        "alpha_type": c.alpha_type_b,
+                    },
+                    "same_content": c.same_content,
+                    "resolution": str(c.resolution),
+                    "winner_id": c.winner_id,
+                }
+        return None
+
+    def summary(self) -> dict:
+        """Return a high-level summary dictionary of the session.
+
+        .. code-block:: python
+
+            {
+                "total": 5,
+                "resolved": 3,
+                "unresolved": 2,
+                "serials_affected": ["SLUS-20062", "SCUS-97232"],
+            }
+        """
+        return {
+            "total": self.total,
+            "resolved": self.resolved_count,
+            "unresolved": self.unresolved_count,
+            "serials_affected": sorted({c.serial for c in self._conflicts}),
+        }
 
 
 def resolve_all_conflicts(config) -> List[Conflict]:
