@@ -13861,3 +13861,105 @@ class TestWave67DataQualityFixes(unittest.TestCase):
                 mismatches.append(f"{key}: key CRC={key_crc}, game_crc={game_crc}")
         self.assertEqual(mismatches, [],
                          f"Key/game_crc mismatches found: {mismatches[:5]}")
+
+
+class TestWave68NewPnachEntries(unittest.TestCase):
+    """Wave 68: 3 new pnach DB entries from verified sources.
+
+    New entries
+    -----------
+    Sims 2 Castaway (6DF2F39E):
+    * E0010000 — E0-type condition code for Gabominated 60fps patch group
+      (paired with existing 10596E04 entry; Sims 2: Castaway SLUS-21664)
+
+    Shin Megami Tensei: Nocturne (AEF2012F):
+    * 002FC0E4 — Remove motion blur (word write; PCSX2 Wiki community excerpt)
+
+    Valkyrie Profile 2: Silmeria (2B81C7F3):
+    * 002DBE1C — Disable blur post-processing effect (word write; PCSX2 Wiki)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _entry(self, key: str) -> dict:
+        self.assertIn(key, self.pnach_db, f"Expected pnach entry not found: {key}")
+        return self.pnach_db[key]
+
+    # ------------------------------------------------------------------
+    # Sims 2: Castaway — 60fps condition code
+    # ------------------------------------------------------------------
+
+    def test_sims2_castaway_60fps_condition_present(self):
+        """6DF2F39E must have E0010000 condition entry for Gabominated 60fps patch."""
+        e = self._entry("6DF2F39E:EE:E0010000")
+        self.assertEqual(e.get("game_crc"), "6DF2F39E")
+        self.assertEqual(e.get("game_serial"), "SLUS-21664")
+
+    def test_sims2_castaway_60fps_condition_type(self):
+        """6DF2F39E:E0010000 must be extended patch_type with fps category."""
+        e = self._entry("6DF2F39E:EE:E0010000")
+        self.assertEqual(e.get("patch_type"), "extended",
+                         "E0-type condition must use extended patch_type")
+        self.assertEqual(e.get("category"), "fps")
+
+    def test_sims2_castaway_60fps_condition_value(self):
+        """6DF2F39E:E0010000 value_map must reference 01A32FC2."""
+        e = self._entry("6DF2F39E:EE:E0010000")
+        self.assertIn("01A32FC2", e.get("value_map", {}),
+                      "Condition value 01A32FC2 must be in value_map")
+
+    def test_sims2_castaway_has_both_60fps_entries(self):
+        """6DF2F39E must have both the condition (E0010000) and main (10596E04) entries."""
+        self.assertIn("6DF2F39E:EE:E0010000", self.pnach_db,
+                      "Sims 2: Castaway must have condition entry E0010000")
+        self.assertIn("6DF2F39E:EE:10596E04", self.pnach_db,
+                      "Sims 2: Castaway must have existing 60fps entry 10596E04")
+
+    # ------------------------------------------------------------------
+    # SMT: Nocturne — remove motion blur
+    # ------------------------------------------------------------------
+
+    def test_smt_nocturne_motion_blur_present(self):
+        """AEF2012F must have 002FC0E4 remove-motion-blur entry."""
+        e = self._entry("AEF2012F:EE:002FC0E4")
+        self.assertEqual(e.get("game_crc"), "AEF2012F")
+        self.assertEqual(e.get("game_serial"), "SLUS-20911")
+
+    def test_smt_nocturne_motion_blur_type(self):
+        """AEF2012F:002FC0E4 must be word patch_type with graphics category."""
+        e = self._entry("AEF2012F:EE:002FC0E4")
+        self.assertEqual(e.get("patch_type"), "word")
+        self.assertEqual(e.get("category"), "graphics")
+
+    def test_smt_nocturne_motion_blur_value(self):
+        """AEF2012F:002FC0E4 value_map must contain 00000000 (blur off)."""
+        e = self._entry("AEF2012F:EE:002FC0E4")
+        self.assertIn("00000000", e.get("value_map", {}),
+                      "00000000 (motion blur off) must be in value_map")
+
+    # ------------------------------------------------------------------
+    # Valkyrie Profile 2: Silmeria — disable blur
+    # ------------------------------------------------------------------
+
+    def test_vp2_disable_blur_present(self):
+        """2B81C7F3 must have 002DBE1C disable-blur entry."""
+        e = self._entry("2B81C7F3:EE:002DBE1C")
+        self.assertEqual(e.get("game_crc"), "2B81C7F3")
+        self.assertEqual(e.get("game_serial"), "SLUS-21452")
+
+    def test_vp2_disable_blur_type(self):
+        """2B81C7F3:002DBE1C must be word patch_type with graphics category."""
+        e = self._entry("2B81C7F3:EE:002DBE1C")
+        self.assertEqual(e.get("patch_type"), "word")
+        self.assertEqual(e.get("category"), "graphics")
+
+    def test_vp2_disable_blur_value(self):
+        """2B81C7F3:002DBE1C value_map must contain 64030000 (blur disabled)."""
+        e = self._entry("2B81C7F3:EE:002DBE1C")
+        self.assertIn("64030000", e.get("value_map", {}),
+                      "64030000 (blur disabled) must be in value_map")
