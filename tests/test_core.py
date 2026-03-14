@@ -12642,3 +12642,399 @@ class TestWave62GBATempTexturePacks(unittest.TestCase):
             url = self.by_id[eid]["url"]
             self.assertIn("gbatemp.net/threads/", url,
                           f"{eid}: url must be a gbatemp thread URL")
+
+
+# =============================================================================
+# Wave 63: New texture-pack catalogue entries + pnach DB expansion
+# =============================================================================
+
+class TestWave63TexturePacks(unittest.TestCase):
+    """Wave 63: 39 new texture-pack catalogue entries from v13.1 reference."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        data = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.catalogue = data
+        cls.by_id = {e["id"]: e for e in data}
+
+    # ------------------------------------------------------------------
+    # Overall count
+    # ------------------------------------------------------------------
+    def test_catalogue_has_at_least_82_entries(self):
+        """Wave 63: catalogue must have ≥82 entries after new additions."""
+        self.assertGreaterEqual(
+            len(self.catalogue), 82,
+            f"Expected ≥82 catalogue entries after Wave 63, got {len(self.catalogue)}"
+        )
+
+    # ------------------------------------------------------------------
+    # New individual entries present
+    # ------------------------------------------------------------------
+    def test_wave63_game_entries_present(self):
+        """Wave 63: game-specific texture pack entries must be in catalogue."""
+        required = {
+            "devil_may_cry_1_hd",
+            "downhill_domination_4k_zombie1673",
+            "downhill_domination_hd_johnazeitona",
+            "shadow_hearts_hd",
+            "ps2_bios_hd_sombershroud",
+            "ps2_bios_hd_remaster_pandavenom",
+            "power_rangers_sl_yamijpg",
+            "lego_batman_hd_v1",
+            "007_qos_hd_texmaster",
+            "futurama_upscaled_dahu",
+            "pop_sot_pal_remaster_hd",
+            "king_kong_remaster_hd",
+            "indiana_jones_sok_2k",
+            "state_of_emergency_hd",
+            "second_sight_hd",
+            "spyro_eternal_night_6x",
+            "fatal_frame_1_hd_janley",
+            "fatal_frame_2_hd_wip",
+            "fatal_frame_3_hd_wip",
+            "fatal_frame_3_teodormax",
+            "fatal_frame_3_ntsc_undub",
+            "tom_jerry_wow_hd_retrogenerica",
+            "indiana_jones_et_hd",
+            "god_of_war_2_20year_hd",
+            "nfs_hot_pursuit_2_hd",
+            "tekken_4_hd_sombershroud",
+            "pitfall_lost_expedition_hd",
+            "battlefield2mc_hd_robin9608",
+            "ratchet_clank_1_hd_texmaster",
+            "ratchet_clank_3_hd_texmaster",
+            "project_altered_beast_hd",
+            "pop_trilogy_hd_xxtherockoxx",
+        }
+        for eid in required:
+            self.assertIn(eid, self.by_id,
+                          f"Missing Wave 63 game entry: {eid}")
+
+    def test_wave63_hub_entries_present(self):
+        """Wave 63: hub / directory entries must be in catalogue."""
+        hubs = {
+            "pandavenom_packs_list",
+            "retrogenerica_packs_list",
+            "bl4ckh4nd_ps2_packs",
+            "curse_arms_hd_remaster_pack",
+            "gbatemp_texture_hub",
+            "gbatemp_texture_complete_list",
+            "teodormax_packs_list",
+        }
+        for eid in hubs:
+            self.assertIn(eid, self.by_id,
+                          f"Missing Wave 63 hub entry: {eid}")
+
+    # ------------------------------------------------------------------
+    # Per-entry field checks
+    # ------------------------------------------------------------------
+    def test_wave63_entries_have_required_fields(self):
+        """All Wave 63 entries must have the required fields."""
+        required = {"id", "name", "description", "url", "type", "source",
+                    "is_free", "is_hub"}
+        wave63_ids = {
+            "devil_may_cry_1_hd", "downhill_domination_4k_zombie1673",
+            "shadow_hearts_hd", "ps2_bios_hd_sombershroud",
+            "fatal_frame_1_hd_janley", "ratchet_clank_1_hd_texmaster",
+            "pandavenom_packs_list", "gbatemp_texture_hub",
+        }
+        for eid in wave63_ids:
+            entry = self.by_id[eid]
+            missing = required - set(entry.keys())
+            self.assertFalse(missing,
+                             f"Entry {eid} missing fields: {missing}")
+
+    def test_wave63_game_entries_source_gbatemp(self):
+        """All Wave 63 game entries must have source=GBAtemp."""
+        wave63_ids = {
+            "devil_may_cry_1_hd", "shadow_hearts_hd",
+            "state_of_emergency_hd", "fatal_frame_1_hd_janley",
+            "ratchet_clank_1_hd_texmaster",
+        }
+        for eid in wave63_ids:
+            self.assertEqual(self.by_id[eid]["source"], "GBAtemp",
+                             f"{eid}: source must be GBAtemp")
+
+    def test_wave63_entries_gbatemp_thread_urls(self):
+        """All Wave 63 entries must have valid gbatemp.net/threads/ URLs."""
+        wave63_ids = {
+            "devil_may_cry_1_hd", "downhill_domination_4k_zombie1673",
+            "shadow_hearts_hd", "ps2_bios_hd_sombershroud",
+            "state_of_emergency_hd", "fatal_frame_1_hd_janley",
+            "ratchet_clank_1_hd_texmaster", "pandavenom_packs_list",
+        }
+        for eid in wave63_ids:
+            url = self.by_id[eid]["url"]
+            self.assertIn("gbatemp.net/threads/", url,
+                          f"{eid}: url must be a gbatemp thread URL")
+
+    def test_wave63_hub_entries_are_marked_is_hub(self):
+        """Hub entries must have is_hub=True."""
+        hubs = {
+            "pandavenom_packs_list", "retrogenerica_packs_list",
+            "bl4ckh4nd_ps2_packs", "gbatemp_texture_hub",
+            "gbatemp_texture_complete_list",
+        }
+        for eid in hubs:
+            self.assertTrue(self.by_id[eid]["is_hub"],
+                            f"{eid}: is_hub must be True")
+
+    def test_wave63_wip_entries_marked_incomplete(self):
+        """WIP entries must have is_complete=False."""
+        wips = {"fatal_frame_2_hd_wip", "fatal_frame_3_hd_wip",
+                "battlefield2mc_hd_robin9608"}
+        for eid in wips:
+            self.assertFalse(self.by_id[eid]["is_complete"],
+                             f"{eid}: is_complete must be False")
+
+    def test_wave63_game_serial_format(self):
+        """Wave 63 entries with serials must follow SL/SC/SE format."""
+        import re
+        serial_pattern = re.compile(r'^(SLUS|SCUS|SLES|SCES|SLPS|SCPS)-\d{5}$')
+        serial_entries = {
+            "devil_may_cry_1_hd": "SLUS-20216",
+            "downhill_domination_4k_zombie1673": "SCUS-97177",
+            "shadow_hearts_hd": "SLUS-20347",
+            "state_of_emergency_hd": "SLUS-20214",
+            "spyro_eternal_night_6x": "SLUS-21607",
+            "tekken_4_hd_sombershroud": "SLUS-20328",
+        }
+        for eid, expected_serial in serial_entries.items():
+            actual = self.by_id[eid].get("game_serial", "")
+            self.assertEqual(actual, expected_serial,
+                             f"{eid}: expected serial {expected_serial}, got {actual}")
+            self.assertRegex(actual, serial_pattern,
+                             f"{eid}: serial {actual} does not match expected format")
+
+    def test_no_duplicate_catalogue_ids(self):
+        """Catalogue must have no duplicate IDs after Wave 63."""
+        ids = [e["id"] for e in self.catalogue]
+        self.assertEqual(len(ids), len(set(ids)),
+                         "Duplicate IDs found in catalogue")
+
+
+class TestWave63PnachEntries(unittest.TestCase):
+    """Wave 63: 175 new pnach DB entries from xs1l3n7x community PNACH files."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _entries_for(self, crc):
+        return {k: v for k, v in self.db.items() if k.startswith(crc)}
+
+    def _assert_entry(self, crc, addr, field=None, expected=None):
+        key = f"{crc}:EE:{addr.upper()}"
+        self.assertIn(key, self.db, f"Missing entry: {key}")
+        if field is not None:
+            self.assertEqual(self.db[key].get(field), expected,
+                             f"{key}: {field} must be {expected!r}")
+
+    # ------------------------------------------------------------------
+    # Overall count
+    # ------------------------------------------------------------------
+    def test_db_has_at_least_48100_entries(self):
+        """Wave 63: pnach DB must have ≥48100 entries after new additions."""
+        self.assertGreaterEqual(
+            len(self.db), 48100,
+            f"Expected ≥48100 pnach entries after Wave 63, got {len(self.db)}"
+        )
+
+    # ------------------------------------------------------------------
+    # God of War (D6385328)
+    # ------------------------------------------------------------------
+    def test_gow_infinite_health(self):
+        self._assert_entry("D6385328", "20795978", "category", "cheat")
+
+    def test_gow_infinite_magic(self):
+        self._assert_entry("D6385328", "20302D1C", "category", "cheat")
+
+    def test_gow_enable_all_magic(self):
+        self._assert_entry("D6385328", "10302D42", "patch_type", "extended")
+
+    def test_gow_max_level(self):
+        self._assert_entry("D6385328", "20302D28", "category", "cheat")
+
+    def test_gow_quick_level_up_blades_of_chaos(self):
+        self._assert_entry("D6385328", "2076D7D8")
+
+    def test_gow_quick_level_up_blades_of_artemis(self):
+        self._assert_entry("D6385328", "2076D7EC")
+
+    def test_gow_total_new_entries_at_least_17(self):
+        entries = self._entries_for("D6385328:")
+        self.assertGreaterEqual(len(entries), 17,
+                                f"GoW D6385328: expected ≥17 entries, got {len(entries)}")
+
+    # ------------------------------------------------------------------
+    # Kingdom Hearts (AE3EAA05)
+    # ------------------------------------------------------------------
+    def test_kh_sora_max_level(self):
+        self._assert_entry("AE3EAA05", "FEBFDA0A", "category", "cheat")
+
+    def test_kh_sora_max_hp(self):
+        self._assert_entry("AE3EAA05", "FEBFDA14")
+
+    def test_kh_all_trinities(self):
+        self._assert_entry("AE3EAA05", "FEBFC623")
+
+    def test_kh_have_ultima_weapon(self):
+        self._assert_entry("AE3EAA05", "FEBFDD0D")
+
+    def test_kh_rescue_dalmations(self):
+        self._assert_entry("AE3EAA05", "FEBFC30B")
+
+    def test_kh_total_entries_at_least_18(self):
+        entries = self._entries_for("AE3EAA05:")
+        self.assertGreaterEqual(len(entries), 18,
+                                f"KH AE3EAA05: expected ≥18 entries, got {len(entries)}")
+
+    # ------------------------------------------------------------------
+    # Final Fantasy X-2 (48FE0C71)
+    # ------------------------------------------------------------------
+    def test_ffx2_has_entries(self):
+        entries = self._entries_for("48FE0C71:")
+        self.assertGreaterEqual(len(entries), 11,
+                                f"FFX-2 48FE0C71: expected ≥11 entries, got {len(entries)}")
+
+    def test_ffx2_infinite_hp_hook(self):
+        self._assert_entry("48FE0C71", "2A6F226E", "category", "cheat")
+
+    def test_ffx2_infinite_hp_cave_entry(self):
+        self._assert_entry("48FE0C71", "2AACC91F")
+
+    # ------------------------------------------------------------------
+    # Final Fantasy XII (0779FBDB)
+    # ------------------------------------------------------------------
+    def test_ffxii_quick_level_up(self):
+        self._assert_entry("0779FBDB", "202EC6E4", "category", "cheat")
+
+    def test_ffxii_quick_license_points(self):
+        self._assert_entry("0779FBDB", "202EC72C")
+
+    def test_ffxii_max_gil_condition(self):
+        self._assert_entry("0779FBDB", "D056BB5C")
+
+    def test_ffxii_max_gil_write(self):
+        self._assert_entry("0779FBDB", "20547F08")
+
+    # ------------------------------------------------------------------
+    # Haunting Ground (901AAC09)
+    # ------------------------------------------------------------------
+    def test_haunting_ground_infinite_item_usage(self):
+        self._assert_entry("901AAC09", "2025FDF0", "category", "cheat")
+        self._assert_entry("901AAC09", "2025FDF0", "description",
+                           "Infinite Item Usage — Items never deplete.")
+
+    # ------------------------------------------------------------------
+    # Resident Evil 4 (6BA2F6B9)
+    # ------------------------------------------------------------------
+    def test_re4_max_health_leon(self):
+        self._assert_entry("6BA2F6B9", "1042DCF8", "category", "cheat")
+
+    def test_re4_infinite_health_leon(self):
+        self._assert_entry("6BA2F6B9", "1042DCF6")
+
+    def test_re4_widescreen_fov(self):
+        key = "6BA2F6B9:EE:20326FF8"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "widescreen")
+
+    def test_re4_movement_speed_is_float(self):
+        self._assert_entry("6BA2F6B9", "20425E98", "value_type", "float")
+
+    # ------------------------------------------------------------------
+    # Persona 4 (DEDC3B71)
+    # ------------------------------------------------------------------
+    def test_p4_infinite_yen(self):
+        self._assert_entry("DEDC3B71", "2079B68C", "category", "cheat")
+
+    def test_p4_exp_code_cave_pt1(self):
+        self._assert_entry("DEDC3B71", "200A0000")
+
+    def test_p4_max_hp_sp_me(self):
+        self._assert_entry("DEDC3B71", "405DD874", "category", "cheat")
+
+    # ------------------------------------------------------------------
+    # Shadow of the Colossus (C19A374E) — community cheat entries
+    # ------------------------------------------------------------------
+    def test_sotc_conditional_check(self):
+        self._assert_entry("C19A374E", "E002E264")
+
+    def test_sotc_item_flags(self):
+        self._assert_entry("C19A374E", "712DA3DA", "category", "cheat")
+
+    # ------------------------------------------------------------------
+    # Grand Theft Auto III (5E115FB6)
+    # ------------------------------------------------------------------
+    def test_gta3_infinite_armor(self):
+        self._assert_entry("5E115FB6", "10B65316", "category", "cheat")
+
+    def test_gta3_infinite_health(self):
+        self._assert_entry("5E115FB6", "10B65312")
+
+    def test_gta3_max_money(self):
+        self._assert_entry("5E115FB6", "20510428")
+
+    # ------------------------------------------------------------------
+    # Grand Theft Auto: Liberty City Stories (7EA439F5)
+    # ------------------------------------------------------------------
+    def test_gtalcs_infinite_health_cave(self):
+        self._assert_entry("7EA439F5", "200C0220", "category", "cheat")
+
+    def test_gtalcs_infinite_armor_cave(self):
+        self._assert_entry("7EA439F5", "200C0230")
+
+    def test_gtalcs_max_money(self):
+        self._assert_entry("7EA439F5", "20408EFC")
+
+    def test_gtalcs_freeze_daily_time(self):
+        self._assert_entry("7EA439F5", "201F88C0")
+
+    # ------------------------------------------------------------------
+    # Devil May Cry 3 (7ADCB24A)
+    # ------------------------------------------------------------------
+    def test_dmc3_infinite_health_cave(self):
+        self._assert_entry("7ADCB24A", "200FFF00", "category", "cheat")
+
+    def test_dmc3_red_orb_value(self):
+        self._assert_entry("7ADCB24A", "202EB758")
+
+    def test_dmc3_all_weapons_customize(self):
+        self._assert_entry("7ADCB24A", "10733BA6")
+
+    def test_dmc3_all_bonus_material(self):
+        self._assert_entry("7ADCB24A", "21CB2A20")
+
+    # ------------------------------------------------------------------
+    # Gran Turismo 4 (44A61C8F)
+    # ------------------------------------------------------------------
+    def test_gt4_always_1_lap_cave(self):
+        self._assert_entry("44A61C8F", "200FFF88", "category", "cheat")
+
+    def test_gt4_always_1_lap_hook(self):
+        self._assert_entry("44A61C8F", "2039B838")
+
+    # ------------------------------------------------------------------
+    # Structural invariants
+    # ------------------------------------------------------------------
+    def test_wave63_all_entries_have_required_fields(self):
+        """All Wave 63 pnach entries must have the 5 required fields."""
+        required = {"category", "description", "game", "game_crc", "game_serial"}
+        wave63_crcs = {
+            "D6385328", "47B9B2FD", "6BA2F6B9", "DEDC3B71",
+            "C19A374E", "901AAC09", "AE3EAA05", "0779FBDB",
+            "48FE0C71", "2A4B60EB", "5E115FB6", "7EA439F5",
+            "7ADCB24A", "44A61C8F",
+        }
+        for k, v in self.db.items():
+            if k.split(":")[0] in wave63_crcs:
+                missing = required - set(v.keys())
+                self.assertFalse(missing,
+                                 f"Entry {k} missing fields: {missing}")
