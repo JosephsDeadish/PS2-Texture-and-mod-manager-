@@ -32,7 +32,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
@@ -61,6 +61,10 @@ class GameInfo:
     developer: Optional[str] = None
     publisher: Optional[str] = None
     genre: Optional[str] = None
+    # Maps each CRC to a human-readable version label such as "v1.00",
+    # "Greatest Hits", "Disc 2", etc.  Only populated for games where
+    # specific version information is known; absent keys mean unknown.
+    crc_labels: Dict[str, str] = field(default_factory=dict)
 
     def all_serials(self) -> Set[str]:
         """Return the primary serial plus all known alt serials."""
@@ -102,6 +106,7 @@ class SerialDatabase:
         self._path = Path(db_path) if db_path else _DB_FILE
         self._games: Dict[str, GameInfo] = {}
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
+        self._crc_to_title: Dict[str, str] = {}            # CRC (upper) → game title
         self._load()
 
     # ------------------------------------------------------------------
@@ -119,6 +124,7 @@ class SerialDatabase:
         games = raw.get("games", {})
         self._games = {}
         self._serial_to_titles = {}
+        self._crc_to_title = {}
         for title, info in games.items():
             gi = GameInfo(
                 title=title,
@@ -129,10 +135,13 @@ class SerialDatabase:
                 developer=info.get("developer") or None,
                 publisher=info.get("publisher") or None,
                 genre=info.get("genre") or None,
+                crc_labels=info.get("crc_labels") or {},
             )
             self._games[title] = gi
             for s in gi.all_serials():
                 self._serial_to_titles.setdefault(s, []).append(title)
+            for crc in gi.crcs:
+                self._crc_to_title[crc.upper()] = title
 
     def reload(self) -> None:
         """Reload the database from disk (picks up on-disk changes)."""
@@ -181,6 +190,60 @@ class SerialDatabase:
     def game_count(self) -> int:
         """Return the total number of games in the database."""
         return len(self._games)
+
+    def serial_for_crc(self, crc: str) -> Optional[str]:
+        """Return the primary serial for the game that owns *crc*, or ``None``.
+
+        The lookup is CRC-indexed for O(1) performance.
+        """
+        title = self._crc_to_title.get(crc.upper().strip())
+        if title is None:
+            return None
+        gi = self._games.get(title)
+        return gi.serial if gi else None
+
+    def label_for_crc(self, crc: str) -> Optional[str]:
+        """Return the human-readable version label for *crc*, or ``None``.
+
+        Version labels are stored in the ``crc_labels`` dict inside each game
+        entry (e.g. ``"v1.00"``, ``"Greatest Hits"``, ``"Disc 2"``).  When no
+        label has been recorded for a CRC the method returns ``None`` so that
+        callers can decide how to display "unknown version" themselves.
+
+        Examples::
+
+            db.label_for_crc("17D68D15")   # "v1.00" (God of War original)
+            db.label_for_crc("F0A34C75")   # "Greatest Hits" (God of War GH)
+            db.label_for_crc("99999999")   # None (not in DB)
+        """
+        crc_upper = crc.upper().strip()
+        title = self._crc_to_title.get(crc_upper)
+        if title is None:
+            return None
+        gi = self._games.get(title)
+        if gi is None:
+            return None
+        return gi.crc_labels.get(crc_upper) or None
+
+    def all_crcs_for_title(self, title: str) -> List[Tuple[str, Optional[str]]]:
+        """Return all ``(CRC, version_label)`` pairs for *title*.
+
+        The version label is ``None`` when no label has been recorded for that
+        CRC.  The pairs are ordered the same way as the ``crcs`` list in the
+        database.
+
+        Example::
+
+            db.all_crcs_for_title("God of War")
+            # [("17D68D15", "v1.00"), ("F0A34C75", "Greatest Hits"), ...]
+        """
+        gi = self._games.get(title)
+        if gi is None:
+            return []
+        return [
+            (crc, gi.crc_labels.get(crc.upper()) or None)
+            for crc in gi.crcs
+        ]
 
     # ------------------------------------------------------------------
     # Validation

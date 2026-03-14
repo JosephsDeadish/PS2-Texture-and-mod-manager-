@@ -9166,3 +9166,223 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
             len(self.games), 2294,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
+
+
+class TestWave50VersionLabels(unittest.TestCase):
+    """Wave 50: CRC version labels — the app can now tell users which disc
+    version a texture pack or PNACH code is designed for when a game has
+    multiple releases with different CRCs (v1.00, Greatest Hits, etc.).
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.raw_games = json.loads(sdb_path.read_text())["games"]
+
+    # ── GameInfo.crc_labels field ────────────────────────────────────────────
+
+    def test_gameinfo_has_crc_labels_field(self):
+        """Wave 50: GameInfo dataclass must have a crc_labels dict field."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test", serial="SLUS-10000")
+        self.assertIsInstance(gi.crc_labels, dict)
+
+    def test_gameinfo_crc_labels_defaults_empty(self):
+        """Wave 50: GameInfo.crc_labels must default to empty dict, not None."""
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test", serial="SLUS-10000")
+        self.assertEqual(gi.crc_labels, {})
+
+    # ── SerialDatabase.label_for_crc ─────────────────────────────────────────
+
+    def test_label_for_crc_god_of_war_v100(self):
+        """Wave 50: God of War CRC 17D68D15 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("17D68D15")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_god_of_war_greatest_hits(self):
+        """Wave 50: God of War CRC F0A34C75 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("F0A34C75")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_gta_vc_v100(self):
+        """Wave 50: GTA Vice City CRC 7AC3B4F3 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("7AC3B4F3")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_gta_vc_v101(self):
+        """Wave 50: GTA Vice City CRC 3F68CFCF must be labelled 'v1.01'."""
+        label = self.sdb.label_for_crc("3F68CFCF")
+        self.assertEqual(label, "v1.01")
+
+    def test_label_for_crc_gta_vc_greatest_hits(self):
+        """Wave 50: GTA Vice City CRC B4B15628 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("B4B15628")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_shadow_of_colossus(self):
+        """Wave 50: Shadow of the Colossus CRC C19A374E must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("C19A374E")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_castlevania_loi(self):
+        """Wave 50: Castlevania LoI CRC 2B123FE9 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("2B123FE9")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_silent_hill_3_v100(self):
+        """Wave 50: Silent Hill 3 CRC FFAAC65B must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("FFAAC65B")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_kingdom_hearts_v100(self):
+        """Wave 50: Kingdom Hearts CRC 39BB7DF5 must be labelled 'v1.00'."""
+        label = self.sdb.label_for_crc("39BB7DF5")
+        self.assertEqual(label, "v1.00")
+
+    def test_label_for_crc_kingdom_hearts_greatest_hits(self):
+        """Wave 50: Kingdom Hearts CRC 0F6B6315 must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("0F6B6315")
+        self.assertIn("Greatest Hits", label or "")
+
+    def test_label_for_crc_ratchet_clank_greatest_hits(self):
+        """Wave 50: Ratchet & Clank CRC E4E70DCE must be labelled 'Greatest Hits'."""
+        label = self.sdb.label_for_crc("E4E70DCE")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_label_for_crc_unknown_returns_none(self):
+        """Wave 50: label_for_crc must return None for an unknown CRC."""
+        label = self.sdb.label_for_crc("00000000")
+        self.assertIsNone(label)
+
+    def test_label_for_crc_case_insensitive(self):
+        """Wave 50: label_for_crc must accept lowercase CRC strings."""
+        label_lower = self.sdb.label_for_crc("17d68d15")
+        label_upper = self.sdb.label_for_crc("17D68D15")
+        self.assertEqual(label_lower, label_upper)
+        self.assertIsNotNone(label_lower)
+
+    # ── SerialDatabase.serial_for_crc ────────────────────────────────────────
+
+    def test_serial_for_crc_god_of_war(self):
+        """Wave 50: serial_for_crc must return SCUS-97399 for any God of War CRC."""
+        for crc in ("17D68D15", "F0A34C75", "D6385328"):
+            self.assertEqual(
+                self.sdb.serial_for_crc(crc), "SCUS-97399",
+                f"serial_for_crc({crc!r}) did not return SCUS-97399",
+            )
+
+    def test_serial_for_crc_gta_vc(self):
+        """Wave 50: serial_for_crc must return SLUS-20552 for GTA VC CRCs."""
+        for crc in ("7AC3B4F3", "3F68CFCF", "B4B15628"):
+            self.assertEqual(
+                self.sdb.serial_for_crc(crc), "SLUS-20552",
+                f"serial_for_crc({crc!r}) did not return SLUS-20552",
+            )
+
+    def test_serial_for_crc_unknown_returns_none(self):
+        """Wave 50: serial_for_crc must return None for an unknown CRC."""
+        self.assertIsNone(self.sdb.serial_for_crc("00000000"))
+
+    # ── SerialDatabase.all_crcs_for_title ────────────────────────────────────
+
+    def test_all_crcs_for_title_god_of_war_count(self):
+        """Wave 50: all_crcs_for_title must return 5 pairs for God of War."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        self.assertEqual(len(pairs), 5)
+
+    def test_all_crcs_for_title_god_of_war_has_v100(self):
+        """Wave 50: God of War CRC 17D68D15 must have label 'v1.00' in pairs."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        crc_to_label = dict(pairs)
+        self.assertEqual(crc_to_label.get("17D68D15"), "v1.00")
+
+    def test_all_crcs_for_title_god_of_war_has_greatest_hits(self):
+        """Wave 50: God of War CRC F0A34C75 must have label 'Greatest Hits' in pairs."""
+        pairs = self.sdb.all_crcs_for_title("God of War")
+        crc_to_label = dict(pairs)
+        self.assertEqual(crc_to_label.get("F0A34C75"), "Greatest Hits")
+
+    def test_all_crcs_for_title_unknown_game(self):
+        """Wave 50: all_crcs_for_title must return empty list for unknown game."""
+        pairs = self.sdb.all_crcs_for_title("Not A Real Game")
+        self.assertEqual(pairs, [])
+
+    # ── pnach_analyzer.get_version_label ────────────────────────────────────
+
+    def test_get_version_label_god_of_war_v100(self):
+        """Wave 50: pnach_analyzer.get_version_label must return 'v1.00' for 17D68D15."""
+        from src.core.pnach_analyzer import get_version_label
+        label = get_version_label("17D68D15")
+        self.assertEqual(label, "v1.00")
+
+    def test_get_version_label_god_of_war_greatest_hits(self):
+        """Wave 50: pnach_analyzer.get_version_label must return 'Greatest Hits' for F0A34C75."""
+        from src.core.pnach_analyzer import get_version_label
+        label = get_version_label("F0A34C75")
+        self.assertEqual(label, "Greatest Hits")
+
+    def test_get_version_label_unknown_returns_none(self):
+        """Wave 50: get_version_label must return None for an unlabelled CRC."""
+        from src.core.pnach_analyzer import get_version_label
+        self.assertIsNone(get_version_label("00000000"))
+
+    # ── get_game_verification_summary includes version_label ─────────────────
+
+    def test_verification_summary_includes_version_label_key(self):
+        """Wave 50: get_game_verification_summary must include a 'version_label' key."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("17D68D15")
+        self.assertIn("version_label", summary)
+
+    def test_verification_summary_version_label_god_of_war_v100(self):
+        """Wave 50: verification summary for 17D68D15 must report version_label='v1.00'."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("17D68D15")
+        self.assertEqual(summary.get("version_label"), "v1.00")
+
+    def test_verification_summary_version_label_none_for_unknown_crc(self):
+        """Wave 50: verification summary version_label must be None for unknown CRC."""
+        from src.core.pnach_analyzer import get_game_verification_summary
+        summary = get_game_verification_summary("FFFFFFFF")
+        self.assertIsNone(summary.get("version_label"))
+
+    # ── JSON data integrity ───────────────────────────────────────────────────
+
+    def test_crc_labels_only_contain_valid_crcs(self):
+        """Wave 50: Every CRC in crc_labels must also appear in the game's crcs list."""
+        for title, info in self.raw_games.items():
+            crcs_set = set(c.upper() for c in info.get("crcs", []))
+            for crc in info.get("crc_labels", {}).keys():
+                self.assertIn(
+                    crc.upper(), crcs_set,
+                    f"{title!r}: crc_labels contains {crc!r} not in crcs list",
+                )
+
+    def test_crc_labels_values_are_non_empty_strings(self):
+        """Wave 50: Every crc_labels value must be a non-empty string."""
+        for title, info in self.raw_games.items():
+            for crc, label in info.get("crc_labels", {}).items():
+                self.assertIsInstance(
+                    label, str,
+                    f"{title!r} crc_label[{crc!r}] is not a string: {label!r}",
+                )
+                self.assertTrue(
+                    label.strip(),
+                    f"{title!r} crc_label[{crc!r}] is empty or whitespace",
+                )
+
+    def test_games_with_crc_labels_count(self):
+        """Wave 50: At least 10 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 10,
+                                f"Too few games with crc_labels: {count}")
+
+    def test_serial_db_game_count_unchanged_after_wave50(self):
+        """Wave 50: serial DB game count must remain 2294 (only crc_labels added)."""
+        self.assertEqual(len(self.raw_games), 2294)

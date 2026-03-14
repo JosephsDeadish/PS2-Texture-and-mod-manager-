@@ -494,7 +494,12 @@
       "release_date": "2004-09-07",
       "developer": "EA",
       "publisher": "Criterion Studios",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "3E1DE0F5": "v1.00",
+        "1CD5CC9D": "v1.01",
+        "43AB7214": "Greatest Hits"
+      }
     },
     "Burnout 3: Takedown (alt serial)": {
       "serial": "SLUS-21050",
@@ -587,7 +592,11 @@
       "release_date": "2003-10-21",
       "developer": "KCET",
       "publisher": "Konami",
-      "genre": "Action, Beat'em Up, Platformer."
+      "genre": "Action, Beat'em Up, Platformer.",
+      "crc_labels": {
+        "2B123FE9": "v1.00",
+        "A5B82E82": "v1.01"
+      }
     },
     "Champions of Norrath": {
       "serial": "SLUS-20565",
@@ -848,7 +857,12 @@
       "release_date": "2001-10-16",
       "developer": "Capcom Co., Ltd",
       "publisher": "Capcom",
-      "genre": "Action, Shooter, Survival Horror"
+      "genre": "Action, Shooter, Survival Horror",
+      "crc_labels": {
+        "9E0C4BC3": "v1.00",
+        "C2C5FE5F": "v1.01",
+        "F4A7473E": "Greatest Hits"
+      }
     },
     "Devil May Cry (DMD complete)": {
       "serial": "SLUS-20216",
@@ -1465,7 +1479,14 @@
       "release_date": "2005-03-22",
       "developer": "SCE Studio Santa Monica",
       "publisher": "Sony",
-      "genre": "Action, Platform, Beat'em Up."
+      "genre": "Action, Platform, Beat'em Up.",
+      "crc_labels": {
+        "17D68D15": "v1.00",
+        "8192CEA8": "v1.01",
+        "D6385328": "v1.02",
+        "F0A34C75": "Greatest Hits",
+        "FB0E6A61": "v1.03"
+      }
     },
     "God of War (God Mode complete)": {
       "serial": "SCUS-97399",
@@ -1553,7 +1574,13 @@
       "release_date": "2006-03-01",
       "developer": "Polyphony Digital",
       "publisher": "Sony Computer Entertainment America",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "77E61C8A": "v1.00",
+        "77FEA582": "v1.01",
+        "8D057621": "v1.02",
+        "E5BD2EA5": "Greatest Hits"
+      }
     },
     "Gran Turismo 4 Prologue": {
       "serial": "SCES-52438",
@@ -1623,7 +1650,12 @@
       "release_date": "2002-10-29",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
-      "genre": "Action, Driving, Shooter"
+      "genre": "Action, Driving, Shooter",
+      "crc_labels": {
+        "7AC3B4F3": "v1.00",
+        "3F68CFCF": "v1.01",
+        "B4B15628": "Greatest Hits"
+      }
     },
     "Grand Theft Auto: Vice City Stories": {
       "serial": "SLUS-21590",
@@ -1899,7 +1931,13 @@
       "release_date": "2001-09-24",
       "developer": "Sony Computer Entertaiment",
       "publisher": "Sony Computer Entertaiment",
-      "genre": "Action, Adventure, Platform"
+      "genre": "Action, Adventure, Platform",
+      "crc_labels": {
+        "2DFAA78D": "v1.00",
+        "4D4B0C8F": "v1.01",
+        "52F2E55D": "v1.02",
+        "8CDCB89D": "Greatest Hits"
+      }
     },
     "Indigo Prophecy": {
       "serial": "SLUS-21196",
@@ -1975,7 +2013,13 @@
       "release_date": "2001-12-04",
       "developer": "Naughty Dog",
       "publisher": "Sony",
-      "genre": "Action, Adventure, Platform."
+      "genre": "Action, Adventure, Platform.",
+      "crc_labels": {
+        "2B2570A0": "v1.00",
+        "44A61C8F": "v1.01",
+        "4D33E38A": "v1.02",
+        "FFF16BAB": "Greatest Hits"
+      }
     },
     "Katamari Damacy": {
       "serial": "SLUS-21008",
@@ -2027,7 +2071,14 @@
       "release_date": "2002-09-16",
       "developer": "Square Enix",
       "publisher": "Square Co. Ltd",
-      "genre": "Action, RPG"
+      "genre": "Action, RPG",
+      "crc_labels": {
+        "39BB7DF5": "v1.00",
+        "B7C17543": "v1.01",
+        "C2E7F10B": "v1.02",
+        "0F6B6315": "Greatest Hits",
+        "B3A9F9D5": "Greatest Hits v1.01"
+      }
     },
     "Kingdom Hearts (Greatest Hits)": {
       "serial": "SLUS-20370",
@@ -2039,7 +2090,11 @@
       "release_date": "2002-09-16",
       "developer": "Square Enix",
       "publisher": "Square Co. Ltd",
-      "genre": "Action, RPG"
+      "genre": "Action, RPG",
+      "crc_labels": {
+        "0F6B6315": "Greatest Hits v1.00",
+        "B3A9F9D5": "Greatest Hits v1.01"
+      }
     },
     "Kingdom Hearts II": {
       "serial": "SLUS-21005",
@@ -2878,7 +2933,13 @@
       "release_date": "2002-11-04",
       "developer": "Insomniac Games",
       "publisher": "Sony",
-      "genre": "Action, PLatformer, Shooter."
+      "genre": "Action, PLatformer, Shooter.",
+      "crc_labels": {
+        "3E1CC296": "v1.00",
+        "8CC67FC1": "v1.01",
+        "AF9B5C62": "v1.02",
+        "E4E70DCE": "Greatest Hits"
+      }
     },
     "Ratchet & Clank series": {
       "serial": "SCUS-97199",
@@ -3266,7 +3327,12 @@
       "release_date": "2005-10-18",
       "developer": "Sony",
       "publisher": "Sony",
-      "genre": "Action, Beat'em Up"
+      "genre": "Action, Beat'em Up",
+      "crc_labels": {
+        "C19A374E": "v1.00",
+        "B7FD7B53": "v1.01",
+        "2C50B4DB": "Greatest Hits"
+      }
     },
     "Shadow the Hedgehog": {
       "serial": "SLUS-21261",
@@ -3350,7 +3416,13 @@
       "release_date": "2001-09-24",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
       "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror."
+      "genre": "Action, Adventure, Survival Horror.",
+      "crc_labels": {
+        "4A0E5B3A": "Greatest Hits v1.00",
+        "7BBFE394": "Greatest Hits v1.01",
+        "CC2AE534": "Greatest Hits v1.02",
+        "FE06A030": "Greatest Hits v1.03"
+      }
     },
     "Silent Hill 3": {
       "serial": "SLUS-20622",
@@ -3366,7 +3438,13 @@
       "release_date": "2003-08-08",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
       "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror."
+      "genre": "Action, Adventure, Survival Horror.",
+      "crc_labels": {
+        "FFAAC65B": "v1.00",
+        "3B1C5E13": "v1.01",
+        "482D4237": "v1.02",
+        "C0B84965": "v1.03"
+      }
     },
     "Silent Hill 3 (GH)": {
       "serial": "SLUS-20622",

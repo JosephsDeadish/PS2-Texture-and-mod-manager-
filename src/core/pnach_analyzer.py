@@ -437,11 +437,15 @@ def list_all_serials_in_db() -> List[Tuple[str, str]]:
 def reload_db() -> int:
     """Reload the address database from disk and rebuild look-up indexes.
 
+    Also resets the cached SerialDatabase so that version labels are
+    refreshed from disk on the next :func:`get_version_label` call.
+
     Returns entry count.
     """
-    global _DB
+    global _DB, _SERIAL_DB
     _DB = _load_db()
     _build_indexes(_DB)
+    _SERIAL_DB = None  # force re-load on next get_version_label() call
     return len(_DB)
 
 
@@ -699,7 +703,49 @@ def get_game_verification_summary(game_crc: str) -> dict:
         "has_continuous_writes":has_cw,
         "has_multi_address":    has_ma,
         "notes":                "\n".join(notes_parts),
+        "version_label":        get_version_label(crc),
     }
+
+
+# ---------------------------------------------------------------------------
+# Version label helper (bridges to the serial DB)
+# ---------------------------------------------------------------------------
+
+# Module-level cache for the SerialDatabase used by get_version_label.
+# Populated lazily on first call to avoid circular-import issues at module
+# load time (pnach_analyzer ↔ serial_validator both import from src.core).
+_SERIAL_DB: Optional[object] = None
+
+
+def get_version_label(game_crc: str) -> Optional[str]:
+    """Return a human-readable version label for *game_crc*, or ``None``.
+
+    The label is looked up from the ``crc_labels`` dict stored in the serial
+    database (``data/game_serial_db/ps2_ntsc_u.json``).  Typical values are
+    ``"v1.00"``, ``"v1.01"``, ``"Greatest Hits"``, ``"Disc 2"``, etc.
+
+    When no label has been recorded for the CRC (either because the game is
+    single-version or because labels have not yet been populated) the function
+    returns ``None``.  Callers should fall back to displaying something like
+    ``"unknown version"`` in that case.
+
+    The underlying :class:`~src.core.serial_validator.SerialDatabase` instance
+    is cached at module level so the JSON file is only parsed once per process.
+
+    Example::
+
+        get_version_label("17D68D15")   # "v1.00"  (God of War original)
+        get_version_label("F0A34C75")   # "Greatest Hits"
+        get_version_label("2EB5B9A9")   # None (only one CRC for Spider-Man 2)
+    """
+    global _SERIAL_DB
+    try:
+        if _SERIAL_DB is None:
+            from src.core.serial_validator import SerialDatabase as _SDB
+            _SERIAL_DB = _SDB()
+        return _SERIAL_DB.label_for_crc(game_crc)  # type: ignore[union-attr]
+    except Exception:
+        return None
 
 
 # ---------------------------------------------------------------------------
