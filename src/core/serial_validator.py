@@ -35,9 +35,10 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 
-_REPO_ROOT = Path(__file__).parent.parent.parent
-_DB_FILE   = _REPO_ROOT / "data" / "game_serial_db" / "ps2_ntsc_u.json"
-_CAT_DIR   = _REPO_ROOT / "data" / "catalogue"
+_REPO_ROOT   = Path(__file__).parent.parent.parent
+_DB_FILE     = _REPO_ROOT / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+_PAL_DB_FILE = _REPO_ROOT / "data" / "game_serial_db" / "ps2_pal.json"
+_CAT_DIR     = _REPO_ROOT / "data" / "catalogue"
 
 _SERIAL_RE = re.compile(r'^[A-Z]{4}-\d{5}$')
 
@@ -102,8 +103,13 @@ class SerialDatabase:
         Override the default path to ``ps2_ntsc_u.json`` (useful in tests).
     """
 
-    def __init__(self, db_path: Optional[Path] = None) -> None:
-        self._path = Path(db_path) if db_path else _DB_FILE
+    def __init__(
+        self,
+        db_path: Optional[Path] = None,
+        pal_db_path: Optional[Path] = None,
+    ) -> None:
+        self._path     = Path(db_path)     if db_path     else _DB_FILE
+        self._pal_path = Path(pal_db_path) if pal_db_path else _PAL_DB_FILE
         self._games: Dict[str, GameInfo] = {}
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
         self._crc_to_title: Dict[str, str] = {}            # CRC (upper) → game title
@@ -114,34 +120,41 @@ class SerialDatabase:
     # ------------------------------------------------------------------
 
     def _load(self) -> None:
-        """Load the database from disk."""
-        if not self._path.is_file():
-            return
-        try:
-            raw = json.loads(self._path.read_text(encoding="utf-8"))
-        except Exception:
-            return
-        games = raw.get("games", {})
+        """Load the NTSC-U and PAL databases from disk.
+
+        Both ``ps2_ntsc_u.json`` and ``ps2_pal.json`` are loaded in order.
+        NTSC-U titles carry a plain name (e.g. ``"God of War"``) while PAL
+        titles carry a ``(PAL)`` suffix (e.g. ``"God of War (PAL)"``) so
+        there are no duplicate keys in ``self._games``.  Serial-to-title and
+        CRC-to-title indices merge transparently across both files.
+        """
         self._games = {}
         self._serial_to_titles = {}
         self._crc_to_title = {}
-        for title, info in games.items():
-            gi = GameInfo(
-                title=title,
-                serial=info.get("serial", ""),
-                alt_serials=info.get("alt_serials", []),
-                crcs=info.get("crcs", []),
-                release_date=info.get("release_date") or None,
-                developer=info.get("developer") or None,
-                publisher=info.get("publisher") or None,
-                genre=info.get("genre") or None,
-                crc_labels=info.get("crc_labels") or {},
-            )
-            self._games[title] = gi
-            for s in gi.all_serials():
-                self._serial_to_titles.setdefault(s, []).append(title)
-            for crc in gi.crcs:
-                self._crc_to_title[crc.upper()] = title
+        for path in (self._path, self._pal_path):
+            if not path.is_file():
+                continue
+            try:
+                raw = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            for title, info in raw.get("games", {}).items():
+                gi = GameInfo(
+                    title=title,
+                    serial=info.get("serial", ""),
+                    alt_serials=info.get("alt_serials", []),
+                    crcs=info.get("crcs", []),
+                    release_date=info.get("release_date") or None,
+                    developer=info.get("developer") or None,
+                    publisher=info.get("publisher") or None,
+                    genre=info.get("genre") or None,
+                    crc_labels=info.get("crc_labels") or {},
+                )
+                self._games[title] = gi
+                for s in gi.all_serials():
+                    self._serial_to_titles.setdefault(s, []).append(title)
+                for crc in gi.crcs:
+                    self._crc_to_title[crc.upper()] = title
 
     def reload(self) -> None:
         """Reload the database from disk (picks up on-disk changes)."""
@@ -327,7 +340,8 @@ class SerialDatabase:
 
         For each CRC entry that carries a ``game_serial`` value, verify that:
 
-        1. The serial exists as a primary **or** alt serial in the serial DB.
+        1. The serial exists as a primary **or** alt serial in the serial DB
+           (both NTSC-U and PAL databases are checked).
         2. The serial matches the format ``XXXX-NNNNN``.
 
         Returns a list of issue dicts with keys:

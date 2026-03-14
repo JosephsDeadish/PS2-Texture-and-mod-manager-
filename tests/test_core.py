@@ -8094,11 +8094,11 @@ class TestCrcSerialConsistency(unittest.TestCase):
         self.sdb = SerialDatabase()
 
     def test_crc_serial_consistency_issues_under_15(self):
-        """After Wave 71 fixes, < 15 CRC entries should have unknown serials.
+        """After Wave 72, all PAL serials are in ps2_pal.json — 0 CRC-serial issues expected.
 
-        Allowed leftovers are non-NTSC-U serials (PAL/SLES, PSP, Korean, etc.)
-        that are correctly absent from the NTSC-U serial DB.
-        Wave 71 added 10 PAL (SLES) serials, raising the expected ceiling to 15.
+        Wave 72 added ps2_pal.json (98 PAL games).  SerialDatabase now loads
+        both ps2_ntsc_u.json and ps2_pal.json, so every SLES/SCES serial in
+        the pnach_db is resolved.  The ceiling is kept at < 15 for safety.
         """
         issues = self.sdb.validate_crc_serial_consistency()
         self.assertLess(
@@ -14410,3 +14410,203 @@ class TestWave71EmptySerialFix(unittest.TestCase):
         wrong = [(k, v.get("game")) for k, v in self._crc_entries("3A32FD60").items()
                  if v.get("game") != "NFL Blitz 2002 (SLUS-20233)"]
         self.assertEqual(wrong, [])
+
+
+class TestWave72PalSerialDb(unittest.TestCase):
+    """Wave 72: PAL/European SLES serial database (ps2_pal.json)."""
+
+    def setUp(self):
+        import os, json
+        self.pal_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_pal.json"
+        )
+        with open(self.pal_path, encoding="utf-8") as f:
+            self.pal_db = json.load(f)
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # File structure
+    # ------------------------------------------------------------------
+
+    def test_pal_db_file_exists(self):
+        """ps2_pal.json must exist in data/game_serial_db/."""
+        import os
+        self.assertTrue(os.path.isfile(self.pal_path))
+
+    def test_pal_db_valid_json(self):
+        """ps2_pal.json must be valid JSON with version and games keys."""
+        self.assertIn("version", self.pal_db)
+        self.assertIn("games", self.pal_db)
+
+    def test_pal_db_has_at_least_90_games(self):
+        """PAL DB must contain at least 90 game entries."""
+        self.assertGreaterEqual(len(self.pal_db["games"]), 90)
+
+    def test_pal_db_all_serials_valid_format(self):
+        """Every PAL DB primary serial must match XXXX-NNNNN format."""
+        import re
+        pat = re.compile(r'^[A-Z]{4}-\d{5}$')
+        for title, info in self.pal_db["games"].items():
+            serial = info.get("serial", "")
+            self.assertRegex(serial, pat,
+                             f"Bad serial for '{title}': {serial!r}")
+
+    def test_pal_db_all_serials_are_pal_region(self):
+        """Every primary serial in the PAL DB must begin with SLES or SCES."""
+        pal_prefixes = ("SLES", "SCES", "SLEH", "SCEH")
+        for title, info in self.pal_db["games"].items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(pal_prefixes),
+                f"Non-PAL serial {serial!r} in PAL DB for '{title}'"
+            )
+
+    def test_pal_db_all_crcs_valid_format(self):
+        """Every CRC in the PAL DB must be an 8-character uppercase hex string."""
+        import re
+        pat = re.compile(r'^[0-9A-F]{8}$')
+        for title, info in self.pal_db["games"].items():
+            for crc in info.get("crcs", []):
+                self.assertRegex(crc, pat,
+                                 f"Bad CRC {crc!r} for '{title}'")
+
+    # ------------------------------------------------------------------
+    # Key PAL serial presence
+    # ------------------------------------------------------------------
+
+    def _get_serial(self, title: str) -> str:
+        return self.pal_db["games"].get(title, {}).get("serial", "")
+
+    def _get_crcs(self, title: str) -> list:
+        return self.pal_db["games"].get(title, {}).get("crcs", [])
+
+    def test_resident_evil_4_pal(self):
+        """Resident Evil 4 (PAL) must map to SLES-53702."""
+        self.assertEqual(self._get_serial("Resident Evil 4 (PAL)"), "SLES-53702")
+
+    def test_resident_evil_4_pal_crc(self):
+        """Resident Evil 4 (PAL) must carry CRC 6BA2F6B9."""
+        self.assertIn("6BA2F6B9", self._get_crcs("Resident Evil 4 (PAL)"))
+
+    def test_guitar_hero_3_pal(self):
+        """Guitar Hero III: Legends of Rock (PAL) must map to SLES-54974."""
+        self.assertEqual(self._get_serial("Guitar Hero III: Legends of Rock (PAL)"), "SLES-54974")
+
+    def test_guitar_hero_3_pal_crc(self):
+        """Guitar Hero III (PAL) must carry CRC 9F6F78DB."""
+        self.assertIn("9F6F78DB", self._get_crcs("Guitar Hero III: Legends of Rock (PAL)"))
+
+    def test_test_drive_unlimited_pal(self):
+        """Test Drive Unlimited (PAL) must map to SLES-54466."""
+        self.assertEqual(self._get_serial("Test Drive Unlimited (PAL)"), "SLES-54466")
+
+    def test_test_drive_unlimited_pal_crc(self):
+        """Test Drive Unlimited (PAL) must carry CRC C2911A79."""
+        self.assertIn("C2911A79", self._get_crcs("Test Drive Unlimited (PAL)"))
+
+    def test_clock_tower_3_pal(self):
+        """Clock Tower 3 (PAL) must map to SLES-51619 (not Devil May Cry 2)."""
+        self.assertEqual(self._get_serial("Clock Tower 3 (PAL)"), "SLES-51619")
+
+    def test_clock_tower_3_pal_crc(self):
+        """Clock Tower 3 (PAL) must carry CRC D9FC6310."""
+        self.assertIn("D9FC6310", self._get_crcs("Clock Tower 3 (PAL)"))
+
+    def test_kingdom_hearts_2_pal(self):
+        """Kingdom Hearts II (PAL) must map to SLES-54114."""
+        self.assertEqual(self._get_serial("Kingdom Hearts II (PAL)"), "SLES-54114")
+
+    def test_kingdom_hearts_2_pal_crc(self):
+        """Kingdom Hearts II (PAL) must carry CRC C398F477."""
+        self.assertIn("C398F477", self._get_crcs("Kingdom Hearts II (PAL)"))
+
+    def test_god_of_war_pal(self):
+        """God of War (PAL) must map to SCES-53133."""
+        self.assertEqual(self._get_serial("God of War (PAL)"), "SCES-53133")
+
+    def test_killzone_pal(self):
+        """Killzone (PAL) must map to SCES-52004."""
+        self.assertEqual(self._get_serial("Killzone (PAL)"), "SCES-52004")
+
+    def test_killzone_pal_crc(self):
+        """Killzone (PAL) must carry CRC 6624A78C."""
+        self.assertIn("6624A78C", self._get_crcs("Killzone (PAL)"))
+
+    def test_all_8_unknown_pal_titles_present(self):
+        """All 8 previously-unknown PAL serials must be present in PAL DB."""
+        unknown_serials = {
+            "SLES-51654", "SLES-52976", "SLES-53194", "SLES-54200",
+            "SLES-54221", "SLES-54493", "SLES-55003", "SLES-55350",
+        }
+        all_serials = {
+            info.get("serial", "")
+            for info in self.pal_db["games"].values()
+        }
+        missing = unknown_serials - all_serials
+        self.assertEqual(missing, set(),
+                         f"Missing previously-unknown PAL serials: {missing}")
+
+    # ------------------------------------------------------------------
+    # SerialDatabase integration
+    # ------------------------------------------------------------------
+
+    def test_sdb_resolves_pal_serial_resident_evil_4(self):
+        """SerialDatabase.titles_for_serial must find SLES-53702 (RE4 PAL)."""
+        titles = self.sdb.titles_for_serial("SLES-53702")
+        self.assertTrue(len(titles) > 0, "SLES-53702 not found in SerialDatabase")
+
+    def test_sdb_resolves_pal_serial_guitar_hero_3(self):
+        """SerialDatabase.titles_for_serial must find SLES-54974 (GH3 PAL)."""
+        titles = self.sdb.titles_for_serial("SLES-54974")
+        self.assertTrue(len(titles) > 0, "SLES-54974 not found in SerialDatabase")
+
+    def test_sdb_resolves_all_unknown_pal_serials(self):
+        """All 8 previously-unknown PAL serials must now be found in SerialDatabase."""
+        unknown_serials = [
+            "SLES-51654", "SLES-52976", "SLES-53194", "SLES-54200",
+            "SLES-54221", "SLES-54493", "SLES-55003", "SLES-55350",
+        ]
+        for serial in unknown_serials:
+            titles = self.sdb.titles_for_serial(serial)
+            self.assertTrue(
+                len(titles) > 0,
+                f"{serial} not resolved in SerialDatabase after PAL DB merge"
+            )
+
+    def test_crc_serial_consistency_zero_issues_after_pal_db(self):
+        """After loading the PAL DB, CRC-serial consistency issues must be 0."""
+        issues = self.sdb.validate_crc_serial_consistency()
+        self.assertEqual(
+            len(issues), 0,
+            f"Expected 0 CRC-serial issues after PAL DB, got {len(issues)}:\n"
+            + "\n".join(str(i) for i in issues)
+        )
+
+    # ------------------------------------------------------------------
+    # game_registry integration
+    # ------------------------------------------------------------------
+
+    def test_game_registry_lookup_pal_serials(self):
+        """game_registry.lookup_game_title must return titles for key PAL serials."""
+        from src.core.game_registry import lookup_game_title
+        tests = {
+            "SLES-53702": "Resident Evil 4 (PAL)",
+            "SLES-54974": "Guitar Hero III: Legends of Rock (PAL)",
+            "SLES-54466": "Test Drive Unlimited (PAL)",
+            "SLES-51619": "Clock Tower 3 (PAL)",
+            "SCES-53133": "God of War (PAL)",
+        }
+        for serial, expected_title in tests.items():
+            result = lookup_game_title(serial)
+            self.assertEqual(result, expected_title,
+                             f"lookup_game_title({serial!r}): expected {expected_title!r}, got {result!r}")
+
+    def test_game_registry_sles_51619_is_clock_tower_3(self):
+        """SLES-51619 must be Clock Tower 3, not Devil May Cry 2."""
+        from src.core.game_registry import lookup_game_title
+        title = lookup_game_title("SLES-51619")
+        self.assertNotIn("Devil May Cry", title,
+                         "SLES-51619 must not be Devil May Cry 2 (that is SLES-51265)")
+        self.assertIn("Clock Tower", title,
+                      "SLES-51619 must be Clock Tower 3")

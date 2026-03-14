@@ -432,7 +432,7 @@ _KNOWN_SERIALS: dict[str, str] = {
     "SCES-53005": "Shadow of the Colossus (PAL)",
     "SCES-50760": "Ico (PAL)",
     "SLES-50873": "Devil May Cry (PAL)",
-    "SLES-51619": "Devil May Cry 2 (PAL)",
+    "SLES-51619": "Clock Tower 3 (PAL)",
     "SLES-52806": "Devil May Cry 3: Dante's Awakening (PAL)",
     "SLES-53670": "Devil May Cry 3: Special Edition (PAL)",
     "SLES-52171": "Prince of Persia: The Sands of Time (PAL)",
@@ -762,6 +762,32 @@ _KNOWN_SERIALS: dict[str, str] = {
     "SCUS-97328": "Gran Turismo 4",
 }
 # fmt: on
+
+# ---------------------------------------------------------------------------
+# Enrich _KNOWN_SERIALS with the PAL/European JSON database
+# ---------------------------------------------------------------------------
+def _load_pal_serials() -> dict[str, str]:
+    """Load PAL serial → title mappings from ps2_pal.json."""
+    import json as _json
+    _pal_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
+    if not _pal_db.is_file():
+        return {}
+    try:
+        raw = _json.loads(_pal_db.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, str] = {}
+    for title, info in raw.get("games", {}).items():
+        serial = info.get("serial", "")
+        if serial:
+            result[serial] = title
+        for alt in info.get("alt_serials", []):
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
+
+_KNOWN_SERIALS.update(_load_pal_serials())
 
 
 def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> str:
