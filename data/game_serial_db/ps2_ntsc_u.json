@@ -112,9 +112,7 @@
     "ATV Off-Road Fury": {
       "serial": "SCUS-97104",
       "alt_serials": [],
-      "crcs": [
-        "67DB3ED8"
-      ],
+      "crcs": [],
       "release_date": "2001-02-05",
       "developer": "Rainbow Studios",
       "publisher": "Sony Computer Entertainment America",
@@ -296,9 +294,7 @@
       "alt_serials": [
         "SLUS-21079"
       ],
-      "crcs": [
-        "A94BB42B"
-      ],
+      "crcs": [],
       "release_date": "2004-09-28",
       "developer": "FromSoftware",
       "publisher": "Agetec",
@@ -367,7 +363,6 @@
       "serial": "SLUS-20035",
       "alt_serials": [],
       "crcs": [
-        "08FFF00D",
         "8A41256F",
         "9FC7F3C8"
       ],
@@ -381,7 +376,6 @@
       "alt_serials": [],
       "crcs": [
         "2C23B3EA",
-        "519E816B",
         "E9720D3E"
       ],
       "release_date": "2004-01-20",
@@ -645,7 +639,6 @@
       "serial": "SLUS-20306",
       "alt_serials": [],
       "crcs": [
-        "33EC7780",
         "5C6EF847"
       ],
       "release_date": "2002-10-23",
@@ -708,10 +701,8 @@
       ],
       "crcs": [
         "3B698B6E",
-        "7A5C6B1E",
         "BD2AC49F",
-        "CA5B7A61",
-        "E2984005"
+        "CA5B7A61"
       ],
       "release_date": "2004-09-26",
       "developer": "Traveller's Tales",
@@ -1059,7 +1050,6 @@
       "serial": "SLUS-21441",
       "alt_serials": [],
       "crcs": [
-        "14FE13DE",
         "31879F22",
         "3B019B31",
         "F13B4AC2"
@@ -1310,9 +1300,7 @@
       "alt_serials": [
         "SLES-51815"
       ],
-      "crcs": [
-        "E2F01792"
-      ],
+      "crcs": [],
       "release_date": "2003-11-18",
       "developer": "Square Enix",
       "publisher": "Square Enix",
@@ -1433,9 +1421,7 @@
     "GTA Vice City": {
       "serial": "SLUS-20552",
       "alt_serials": [],
-      "crcs": [
-        "3F68CFCF"
-      ],
+      "crcs": [],
       "release_date": "2002-10-29",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
@@ -1499,7 +1485,6 @@
       "alt_serials": [],
       "crcs": [
         "0B29B9B6",
-        "1E75FE3A",
         "2F123FD8",
         "44A8A22A"
       ],
@@ -1757,9 +1742,7 @@
     "Guilty Gear XX Accent Core": {
       "serial": "SLUS-21652",
       "alt_serials": [],
-      "crcs": [
-        "7E7D7B87"
-      ],
+      "crcs": [],
       "release_date": "2007-09-11",
       "developer": "Arc System Works",
       "publisher": "Aksys Games",
@@ -2415,7 +2398,6 @@
       "alt_serials": [],
       "crcs": [
         "A39517AB",
-        "AEB91ED0",
         "D4FA1757"
       ],
       "release_date": "2004-11-17",
@@ -2720,9 +2702,7 @@
     "Onimusha 3: Demon Siege": {
       "serial": "SLUS-20694",
       "alt_serials": [],
-      "crcs": [
-        "6A6BB52F"
-      ],
+      "crcs": [],
       "release_date": "2004-04-27",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -2734,7 +2714,6 @@
         "SLUS-21362"
       ],
       "crcs": [
-        "2CFFFC1E",
         "FE44479E"
       ],
       "release_date": "2006-03-07",
@@ -2745,9 +2724,7 @@
     "Onimusha: Warlords": {
       "serial": "SLUS-20018",
       "alt_serials": [],
-      "crcs": [
-        "C1625F14"
-      ],
+      "crcs": [],
       "release_date": "2001-03-13",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -2858,7 +2835,6 @@
       "serial": "SLUS-20688",
       "alt_serials": [],
       "crcs": [
-        "97E76C44",
         "9C71B59E"
       ],
       "release_date": "2004-06-14",
@@ -3384,7 +3360,6 @@
       "crcs": [
         "3B1C5E13",
         "482D4237",
-        "BFCC3E7E",
         "C0B84965",
         "FFAAC65B"
       ],
@@ -3584,9 +3559,7 @@
     "Spyro: A Hero's Tail": {
       "serial": "SLUS-20884",
       "alt_serials": [],
-      "crcs": [
-        "FA7E3081"
-      ],
+      "crcs": [],
       "release_date": "2004-11-02",
       "developer": "Eurocom Developments Ltd",
       "publisher": "Vivendi Universal Games",
@@ -3700,9 +3673,7 @@
     "Street Fighter Anniversary Collection": {
       "serial": "SLUS-20949",
       "alt_serials": [],
-      "crcs": [
-        "F54CC240"
-      ],
+      "crcs": [],
       "release_date": "2004-08-31",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -4072,7 +4043,6 @@
         "SLES-51848"
       ],
       "crcs": [
-        "2EB5B9A9",
         "8A9CE7E6",
         "B222B7A4",
         "ED21DDE0"
@@ -4108,7 +4078,6 @@
       "serial": "SLUS-20571",
       "alt_serials": [],
       "crcs": [
-        "4ADB5E4E",
         "E4E15CA3"
       ],
       "release_date": "2002-09-10",
@@ -4131,7 +4100,6 @@
       "serial": "SLUS-20870",
       "alt_serials": [],
       "crcs": [
-        "47B9B2FD",
         "B5CC9F00",
         "FDD12792"
       ],
@@ -4254,9 +4222,7 @@
     "Way of the Samurai 2": {
       "serial": "SLUS-20893",
       "alt_serials": [],
-      "crcs": [
-        "9B1635C5"
-      ],
+      "crcs": [],
       "release_date": "2004-05-21",
       "developer": "Acquire",
       "publisher": "Capcom",
@@ -4393,7 +4359,7 @@
       "publisher": "Namco Hometek",
       "genre": "RPG"
     },
-    "Xenosaga Episode II: Jenseits von Gut und B\u00f6se": {
+    "Xenosaga Episode II: Jenseits von Gut und Böse": {
       "serial": "SLUS-20892",
       "alt_serials": [
         "SLUS-21133"
@@ -4412,7 +4378,6 @@
       "crcs": [
         "94A82AAA",
         "A4E6B8D2",
-        "B7ECDECD",
         "FCD6E9FA"
       ],
       "release_date": "2006-08-29",
@@ -18144,7 +18109,7 @@
       "crcs": [],
       "genre": "MMORPG"
     },
-    "Madden NFL 08 en Espa\u00f1ol": {
+    "Madden NFL 08 en Español": {
       "serial": "SLUS-21705",
       "alt_serials": [],
       "crcs": [],
@@ -18841,7 +18806,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-10-21",
-      "developer": "\u00c9tranges Libellules",
+      "developer": "Étranges Libellules",
       "publisher": "Sierra Entertainment",
       "genre": "Action-Adventure"
     },

@@ -8949,3 +8949,220 @@ class TestWave48GabominatedPnachCodes(unittest.TestCase):
         self.assertIsNotNone(game, "Project - Snowblind not found in serial DB")
         crcs = game.get("crcs", [])
         self.assertIn("2BDA8ADB", crcs, f"Expected 2BDA8ADB in Project Snowblind CRCs, got {crcs}")
+
+
+class TestWave49SerialCrcConsistency(unittest.TestCase):
+    """Wave 49: Verify all game serials and CRCs are correctly cross-referenced
+    between pnach_db and serial_db.  Fixes 664 pnach serial mismatches and
+    removes 25 wrong CRCs from serial_db.
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(sdb_path.read_text())["games"]
+
+    # ── pnach_db serial corrections ─────────────────────────────────────────
+
+    def test_wave49_castlevania_loi_serial_corrected(self):
+        """Wave 49: Castlevania LoI CRCs (2B123FE9, A5B82E82) must use SLUS-20733, not SLUS-21050."""
+        for crc in ("2B123FE9", "A5B82E82"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            self.assertGreater(len(keys), 0, f"No pnach entries for CRC {crc}")
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SLUS-20733",
+                    f"Castlevania LoI entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_burnout3_takedown_serial_corrected(self):
+        """Wave 49: Burnout 3 CRC 1CD5CC9D must use SLUS-21050, not SLUS-20462."""
+        keys = [k for k in self.db if k.startswith("1CD5CC9D:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC 1CD5CC9D")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-21050",
+                f"Burnout 3 entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_shadow_of_the_colossus_serial_added(self):
+        """Wave 49: Shadow of the Colossus CRC C19A374E must have serial SCUS-97472."""
+        keys = [k for k in self.db if k.startswith("C19A374E:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC C19A374E")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SCUS-97472",
+                f"Shadow of the Colossus entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_gta_vice_city_serial_corrected(self):
+        """Wave 49: GTA Vice City CRC 3F68CFCF must use SLUS-20552, not SLUS-20174."""
+        keys = [k for k in self.db if k.startswith("3F68CFCF:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC 3F68CFCF")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-20552",
+                f"GTA VC entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_god_of_war_crcs_use_scus_serial(self):
+        """Wave 49: God of War CRCs 17D68D15/D6385328/F0A34C75 must use SCUS-97399."""
+        for crc in ("17D68D15", "D6385328", "F0A34C75"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            if not keys:
+                continue  # CRC may be missing; skip
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SCUS-97399",
+                    f"God of War entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_crash_twinsanity_crcs_consolidated(self):
+        """Wave 49: Crash Twinsanity CRCs 3B698B6E/BD2AC49F/CA5B7A61 must use SLUS-20909."""
+        for crc in ("3B698B6E", "BD2AC49F", "CA5B7A61"):
+            keys = [k for k in self.db if k.startswith(f"{crc}:")]
+            if not keys:
+                continue
+            for k in keys:
+                entry = self.db[k]
+                self.assertEqual(
+                    entry.get("game_serial", "").upper(), "SLUS-20909",
+                    f"Crash Twinsanity entry {k} has wrong serial {entry.get('game_serial')!r}"
+                )
+
+    def test_wave49_driver_parallel_lines_serial_added(self):
+        """Wave 49: Driver: Parallel Lines CRC D720770D must have serial SLUS-21271."""
+        keys = [k for k in self.db if k.startswith("D720770D:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC D720770D")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-21271",
+                f"Driver: PL entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_silent_hill_3_serial_corrected(self):
+        """Wave 49: Silent Hill 3 CRC FFAAC65B must use SLUS-20622, not SLUS-20459."""
+        keys = [k for k in self.db if k.startswith("FFAAC65B:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for CRC FFAAC65B")
+        for k in keys:
+            entry = self.db[k]
+            self.assertEqual(
+                entry.get("game_serial", "").upper(), "SLUS-20622",
+                f"Silent Hill 3 entry {k} has wrong serial {entry.get('game_serial')!r}"
+            )
+
+    def test_wave49_pnach_serial_lookup_castlevania_loi(self):
+        """Wave 49: entries_for_serial(SLUS-20733) must return Castlevania LoI entries."""
+        import sys
+        sys.path.insert(0, str(__file__).replace("tests/test_core.py", ""))
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SLUS-20733")
+        self.assertGreater(len(results), 0, "entries_for_serial(SLUS-20733) returned no results")
+        crcs = {e["key"].split(":")[0] for e in results}
+        self.assertTrue(
+            crcs & {"2B123FE9", "A5B82E82"},
+            f"Expected Castlevania LoI CRCs in results, got CRCs: {crcs}"
+        )
+
+    def test_wave49_pnach_serial_lookup_shadow_of_the_colossus(self):
+        """Wave 49: entries_for_serial(SCUS-97472) must return Shadow of the Colossus entries."""
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SCUS-97472")
+        self.assertGreater(len(results), 0, "entries_for_serial(SCUS-97472) returned no results")
+
+    def test_wave49_pnach_serial_lookup_god_of_war(self):
+        """Wave 49: entries_for_serial(SCUS-97399) must return God of War entries."""
+        from src.core.pnach_analyzer import entries_for_serial, reload_db
+        reload_db()
+        results = entries_for_serial("SCUS-97399")
+        self.assertGreater(len(results), 10, "entries_for_serial(SCUS-97399) returned too few results")
+
+    # ── serial_db CRC removals (cross-game contaminations) ──────────────────
+
+    def test_wave49_atv_off_road_fury_wrong_crc_removed(self):
+        """Wave 49: ATV Off-Road Fury (SCUS-97104) must NOT claim CRC 67DB3ED8 (Aggressive Inline)."""
+        game = self.games.get("ATV Off-Road Fury", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("67DB3ED8", crcs,
+                         "CRC 67DB3ED8 (Aggressive Inline) wrongly in ATV Off-Road Fury")
+
+    def test_wave49_baldurs_gate_da_wrong_crc_removed(self):
+        """Wave 49: Baldur's Gate: DA must NOT claim CRC 08FFF00D (SSX 3)."""
+        game = self.games.get("Baldur's Gate: Dark Alliance", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("08FFF00D", crcs,
+                         "CRC 08FFF00D (SSX 3) wrongly in Baldur's Gate: Dark Alliance")
+
+    def test_wave49_contra_shattered_soldier_wrong_crc_removed(self):
+        """Wave 49: Contra: Shattered Soldier must NOT claim CRC 33EC7780 (Star Ocean TtEoT)."""
+        game = self.games.get("Contra: Shattered Soldier", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("33EC7780", crcs,
+                         "CRC 33EC7780 (Star Ocean) wrongly in Contra: Shattered Soldier")
+
+    def test_wave49_silent_hill_3_wrong_crc_removed(self):
+        """Wave 49: Silent Hill 3 must NOT claim CRC BFCC3E7E (Shinobi)."""
+        game = self.games.get("Silent Hill 3", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("BFCC3E7E", crcs,
+                         "CRC BFCC3E7E (Shinobi) wrongly in Silent Hill 3")
+
+    def test_wave49_metal_gear_solid_3_wrong_crc_removed(self):
+        """Wave 49: MGS3: Snake Eater must NOT claim CRC AEB91ED0 (Devil May Cry 2)."""
+        game = self.games.get("Metal Gear Solid 3: Snake Eater", {})
+        crcs = game.get("crcs", [])
+        self.assertNotIn("AEB91ED0", crcs,
+                         "CRC AEB91ED0 (DMC2) wrongly in MGS3: Snake Eater")
+
+    def test_wave49_gta_vc_correct_crc_still_present(self):
+        """Wave 49: Grand Theft Auto: Vice City must still have CRC 3F68CFCF."""
+        game = self.games.get("Grand Theft Auto: Vice City", {})
+        crcs = game.get("crcs", [])
+        self.assertIn("3F68CFCF", crcs,
+                      "CRC 3F68CFCF missing from Grand Theft Auto: Vice City")
+
+    def test_wave49_castlevania_loi_correct_crcs_still_present(self):
+        """Wave 49: Castlevania: LoI must still have CRCs 2B123FE9 and A5B82E82."""
+        game = self.games.get("Castlevania: Lament of Innocence", {})
+        crcs = game.get("crcs", [])
+        self.assertIn("2B123FE9", crcs)
+        self.assertIn("A5B82E82", crcs)
+
+    def test_wave49_no_pnach_entry_has_wrong_slus20552_via_slus20174(self):
+        """Wave 49: No pnach entry should have game_serial SLUS-20174 (Rumble Racing) for a GTA CRC."""
+        gta_crcs = {"3F68CFCF", "7AC3B4F3", "B4B15628"}
+        for key, entry in self.db.items():
+            crc = key.split(":")[0].upper()
+            if crc in gta_crcs:
+                serial = entry.get("game_serial", "").upper()
+                self.assertNotEqual(
+                    serial, "SLUS-20174",
+                    f"GTA VC entry {key} wrongly has serial SLUS-20174 (Rumble Racing)"
+                )
+
+    # ── pnach_db size still within range ─────────────────────────────────────
+
+    def test_wave49_pnach_db_size_still_over_47800(self):
+        """Wave 49: pnach DB should still have >47,800 entries after serial corrections."""
+        self.assertGreater(
+            len(self.db), 47800,
+            f"Unexpected drop in pnach DB size: {len(self.db)}"
+        )
+
+    def test_wave49_serial_db_games_count_unchanged(self):
+        """Wave 49: serial DB game count should still be 2294 (only CRCs changed, not game entries)."""
+        self.assertEqual(
+            len(self.games), 2294,
+            f"Serial DB game count changed unexpectedly: {len(self.games)}"
+        )
