@@ -4354,7 +4354,7 @@
       "publisher": "Namco Hometek",
       "genre": "RPG"
     },
-    "Xenosaga Episode II: Jenseits von Gut und Böse": {
+    "Xenosaga Episode II: Jenseits von Gut und B\u00f6se": {
       "serial": "SLUS-20892",
       "alt_serials": [],
       "crcs": [
@@ -15601,7 +15601,9 @@
     },
     "World Soccer Winning Eleven 8: International": {
       "serial": "SLUS-21117",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-21117"
+      ],
       "crcs": []
     },
     "Kessen III": {
@@ -18054,7 +18056,7 @@
       "crcs": [],
       "genre": "MMORPG"
     },
-    "Madden NFL 08 en Español": {
+    "Madden NFL 08 en Espa\u00f1ol": {
       "serial": "SLUS-21705",
       "alt_serials": [],
       "crcs": [],
@@ -18747,7 +18749,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-10-21",
-      "developer": "Étranges Libellules",
+      "developer": "\u00c9tranges Libellules",
       "publisher": "Sierra Entertainment",
       "genre": "Action-Adventure"
     },
@@ -20556,6 +20558,15 @@
       "serial": "SCUS-97238",
       "alt_serials": [],
       "crcs": []
+    },
+    "River King: A Wonderful Journey": {
+      "serial": "SLUS-21275",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2006-03-28",
+      "developer": "Marvelous Entertainment Inc.",
+      "publisher": "Natsume",
+      "genre": "Simulation / RPG / Fishing"
     }
   }
 }

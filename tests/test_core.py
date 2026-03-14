@@ -8408,3 +8408,102 @@ class TestWave43MetadataEnrichment(unittest.TestCase):
         self.assertEqual(gi.developer, "Test Dev")
         self.assertEqual(gi.publisher, "Test Pub")
         self.assertEqual(gi.genre, "Action")
+
+
+class TestWave44FpsPnachCodes(unittest.TestCase):
+    """Wave 44: fps/widescreen/visual codes from Gabominated PCSX2 repo added to pnach DB."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+
+    def test_wave44_pnach_db_size_over_47800(self):
+        """Wave 44: pnach DB should have more than 47,800 entries after fps code addition."""
+        self.assertGreater(
+            len(self.db), 47800,
+            f"Expected >47800 pnach DB entries after Wave 44, got {len(self.db)}"
+        )
+
+    def test_wave44_fps_entries_present(self):
+        """Wave 44: pnach DB should contain fps category entries from Gabominated."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        self.assertGreater(
+            len(fps_entries), 200,
+            f"Expected >200 fps entries in pnach DB, got {len(fps_entries)}"
+        )
+
+    def test_wave44_widescreen_entries_present(self):
+        """Wave 44: pnach DB should contain widescreen entries from Gabominated."""
+        ws_entries = [e for e in self.db.values() if e.get("category") == "widescreen"]
+        self.assertGreater(
+            len(ws_entries), 50,
+            f"Expected >50 widescreen entries in pnach DB, got {len(ws_entries)}"
+        )
+
+    def test_wave44_fps_entry_structure(self):
+        """Wave 44: fps entries must have required fields."""
+        fps_entries = [(k, e) for k, e in self.db.items() if e.get("category") == "fps"]
+        required_fields = ("game", "game_crc", "game_serial", "description", "category",
+                           "patch_type", "verification_status")
+        for key, entry in fps_entries[:20]:
+            with self.subTest(key=key):
+                for field in required_fields:
+                    self.assertIn(
+                        field, entry,
+                        f"fps entry {key} missing required field '{field}'"
+                    )
+                # CRC in key must match game_crc
+                key_crc = key.split(":")[0].upper()
+                self.assertEqual(
+                    key_crc, entry["game_crc"].upper(),
+                    f"fps entry {key} key CRC doesn't match game_crc"
+                )
+
+    def test_wave44_fps_entries_community_verified(self):
+        """Wave 44: Gabominated fps entries should be community_verified."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        non_verified = [e for e in fps_entries
+                        if e.get("verification_status") != "community_verified"]
+        # Allow some tolerance but most should be community_verified
+        self.assertLess(
+            len(non_verified), len(fps_entries) // 2,
+            f"Most fps entries should be community_verified"
+        )
+
+    def test_wave44_known_fps_games_present(self):
+        """Wave 44: specific known games should have fps entries."""
+        # These games had fps codes in Gabominated and their CRCs are now in pnach DB
+        known_fps_serials = ["SLUS-21312", "SLUS-21376", "SLUS-21574", "SLUS-20003"]
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        fps_serials = {e.get("game_serial") for e in fps_entries}
+        for serial in known_fps_serials:
+            self.assertIn(
+                serial, fps_serials,
+                f"Expected fps entry for {serial} not found in pnach DB"
+            )
+
+    def test_wave44_river_king_in_serial_db(self):
+        """Wave 44: River King: A Wonderful Journey should be in the serial DB."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        info = sdb.get_info("River King: A Wonderful Journey")
+        self.assertIsNotNone(info, "River King: A Wonderful Journey missing from serial DB")
+        self.assertEqual(info.serial, "SLUS-21275")
+        self.assertIsNotNone(info.release_date)
+        self.assertIsNotNone(info.developer)
+
+    def test_wave44_world_soccer_we8_alt_serial(self):
+        """Wave 44: World Soccer Winning Eleven 8: International should have SCUS-21117 as alt_serial."""
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        data = json.loads(db_path.read_text())
+        game = data["games"].get("World Soccer Winning Eleven 8: International")
+        self.assertIsNotNone(game, "World Soccer WE8 International not found in serial DB")
+        alt_serials = game.get("alt_serials", [])
+        self.assertIn(
+            "SCUS-21117", alt_serials,
+            f"Expected SCUS-21117 in alt_serials for WE8 International, got {alt_serials}"
+        )
