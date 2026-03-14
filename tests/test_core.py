@@ -13963,3 +13963,102 @@ class TestWave68NewPnachEntries(unittest.TestCase):
         e = self._entry("2B81C7F3:EE:002DBE1C")
         self.assertIn("64030000", e.get("value_map", {}),
                       "64030000 (blur disabled) must be in value_map")
+
+
+class TestWave69DataFixes(unittest.TestCase):
+    """Wave 69: Fix 31 RE4 (6BA2F6B9) empty game_serial entries + add KH1 D-type 60fps code.
+
+    Fixes
+    -----
+    Resident Evil 4 PAL-M (6BA2F6B9):
+    * 31 entries previously missing game_serial now set to SLES-53702
+      (confirmed by pnach reference: "Resident Evil 4 PAL-M SLES-53702 6BA2F6B9")
+    * game field normalised to "Resident Evil 4 (SLES-53702)" for consistency
+
+    New entries
+    -----------
+    Kingdom Hearts (AE3EAA05):
+    * D02BFD98 — D-type condition code for 60fps patch variants
+      (community excerpt / Reddit source; checks game mode byte at 2BFD98)
+      Paired with existing 002B624C 60fps toggle entry.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _entry(self, key: str) -> dict:
+        self.assertIn(key, self.pnach_db, f"Expected pnach entry not found: {key}")
+        return self.pnach_db[key]
+
+    # ------------------------------------------------------------------
+    # RE4 PAL-M 6BA2F6B9 — serial fix: all entries must have SLES-53702
+    # ------------------------------------------------------------------
+
+    def test_re4_no_empty_game_serial(self):
+        """All 6BA2F6B9 entries must have game_serial SLES-53702 (none empty)."""
+        empty = [k for k in self.pnach_db if k.startswith("6BA2F6B9:")
+                 and not self.pnach_db[k].get("game_serial", "")]
+        self.assertEqual(empty, [],
+                         f"Found 6BA2F6B9 entries with empty game_serial: {empty}")
+
+    def test_re4_all_entries_use_sles53702(self):
+        """Every 6BA2F6B9 entry must have game_serial == SLES-53702."""
+        wrong = [(k, self.pnach_db[k].get("game_serial", ""))
+                 for k in self.pnach_db if k.startswith("6BA2F6B9:")
+                 and self.pnach_db[k].get("game_serial", "") != "SLES-53702"]
+        self.assertEqual(wrong, [],
+                         f"6BA2F6B9 entries with wrong serial: {wrong}")
+
+    def test_re4_total_entry_count(self):
+        """6BA2F6B9 must have exactly 88 entries (57 original + 31 fixed)."""
+        count = sum(1 for k in self.pnach_db if k.startswith("6BA2F6B9:"))
+        self.assertEqual(count, 88,
+                         f"Expected 88 RE4 (6BA2F6B9) entries, got {count}")
+
+    def test_re4_game_name_normalised(self):
+        """All 6BA2F6B9 entries must use normalised game name."""
+        expected_game = "Resident Evil 4 (SLES-53702)"
+        wrong = [(k, self.pnach_db[k].get("game", ""))
+                 for k in self.pnach_db if k.startswith("6BA2F6B9:")
+                 and self.pnach_db[k].get("game", "") != expected_game]
+        self.assertEqual(wrong, [],
+                         f"6BA2F6B9 entries with wrong game name: {wrong}")
+
+    # ------------------------------------------------------------------
+    # Kingdom Hearts AE3EAA05 — D-type 60fps condition code
+    # ------------------------------------------------------------------
+
+    def test_kh1_60fps_condition_present(self):
+        """AE3EAA05 must have D02BFD98 D-type 60fps condition entry."""
+        e = self._entry("AE3EAA05:EE:D02BFD98")
+        self.assertEqual(e.get("game_crc"), "AE3EAA05")
+        self.assertEqual(e.get("game_serial"), "SLUS-20370")
+
+    def test_kh1_60fps_condition_category(self):
+        """AE3EAA05:D02BFD98 must have fps category."""
+        e = self._entry("AE3EAA05:EE:D02BFD98")
+        self.assertEqual(e.get("category"), "fps")
+
+    def test_kh1_60fps_condition_patch_type(self):
+        """AE3EAA05:D02BFD98 must use extended patch_type."""
+        e = self._entry("AE3EAA05:EE:D02BFD98")
+        self.assertEqual(e.get("patch_type"), "extended")
+
+    def test_kh1_60fps_condition_value_map_normal(self):
+        """AE3EAA05:D02BFD98 value_map must include 00000000 (normal mode)."""
+        e = self._entry("AE3EAA05:EE:D02BFD98")
+        self.assertIn("00000000", e.get("value_map", {}))
+
+    def test_kh1_60fps_condition_value_map_battle(self):
+        """AE3EAA05:D02BFD98 value_map must include 00000001 (battle mode)."""
+        e = self._entry("AE3EAA05:EE:D02BFD98")
+        self.assertIn("00000001", e.get("value_map", {}))
+
+    def test_kh1_60fps_condition_paired_toggle_present(self):
+        """AE3EAA05 must still have existing 002B624C 60fps toggle entry."""
+        self.assertIn("AE3EAA05:EE:002B624C", self.pnach_db,
+                      "Paired 60fps toggle entry 002B624C must remain in DB")
