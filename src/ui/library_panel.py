@@ -232,6 +232,18 @@ class _GameDetailPane(QWidget):
             browse_btn.clicked.connect(lambda: self.browse_requested.emit(_serial))
             header_row.addWidget(browse_btn)
 
+            load_order_btn = QPushButton("⬆⬇ Load Order")
+            load_order_btn.setToolTip(
+                "Set the priority order for mods installed for this game.\n"
+                "Mods listed lower override those above (last-write wins)."
+            )
+            load_order_btn.setStyleSheet(
+                "background:#1a1a3a; color:#9090d0; border-radius:4px;"
+                "font-size:11px; padding:4px 10px;"
+            )
+            load_order_btn.clicked.connect(lambda: self._open_load_order(_serial))
+            header_row.addWidget(load_order_btn)
+
         layout.addLayout(header_row)
 
         if self._game.size_bytes:
@@ -351,6 +363,12 @@ class _GameDetailPane(QWidget):
 
         layout.addStretch()
         self._scroll.setWidget(container)
+
+    def _open_load_order(self, serial: str):
+        """Open the Load Order dialog for *serial*."""
+        from src.ui.widgets import LoadOrderDialog
+        dlg = LoadOrderDialog(serial, self.db, parent=self)
+        dlg.exec()
 
 
 # ---------------------------------------------------------------------------
@@ -659,6 +677,15 @@ class LibraryPanel(BasePanel):
 
         toolbar.addStretch()
 
+        # ── Profiles button ───────────────────────────────────────────────
+        profiles_btn = QPushButton("👤 Profiles")
+        profiles_btn.setToolTip(
+            "Manage named mod profiles — save, load, and switch between "
+            "preset configurations like 'Vanilla+' or 'HD Graphics'"
+        )
+        profiles_btn.clicked.connect(self._open_profiles_dialog)
+        toolbar.addWidget(profiles_btn)
+
         # ── View mode toggle ──────────────────────────────────────────────
         self._by_game_btn = QPushButton("🎮 By Game")
         self._by_game_btn.setCheckable(True)
@@ -959,3 +986,15 @@ class LibraryPanel(BasePanel):
         from src.ui.widgets import ConflictResolverDialog
         dlg = ConflictResolverDialog(self.config, self)
         dlg.exec()
+
+    def _open_profiles_dialog(self):
+        """Open the Mod Profiles management dialog."""
+        from src.ui.widgets import ModProfilesDialog
+        dlg = ModProfilesDialog(self.db, self.config, self)
+        dlg.profile_applied.connect(self._on_profile_applied)
+        dlg.exec()
+
+    def _on_profile_applied(self, name: str):
+        """Refresh the library after a profile is applied."""
+        self.refresh()
+        self.emit_status(f"Profile '{name}' applied")

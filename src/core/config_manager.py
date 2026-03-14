@@ -118,6 +118,8 @@ def get_user_catalogue_dir() -> Path:
 CONFIG_FILE = get_config_dir() / "config.json"
 MODS_DB_FILE = get_data_dir() / "mods.json"
 THUMBNAILS_DIR = get_data_dir() / "thumbnails"
+LOAD_ORDER_FILE = get_data_dir() / "load_order.json"
+PROFILES_FILE = get_data_dir() / "profiles.json"
 
 
 def ensure_dirs():

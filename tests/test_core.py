@@ -11479,3 +11479,215 @@ class TestWave56GameCardCoverArt(unittest.TestCase):
             self.assertTrue(found)
             self.assertIn("covers", found_path)
             self.assertIn(serial, found_path)
+
+
+# ---------------------------------------------------------------------------
+# Wave 57 — Load Order Manager UI + Mod Profiles Dialog
+# ---------------------------------------------------------------------------
+
+class TestWave57ConfigManagerPaths(unittest.TestCase):
+    """Wave 57: config_manager exports LOAD_ORDER_FILE and PROFILES_FILE constants."""
+
+    def test_load_order_file_constant_exists(self):
+        from src.core.config_manager import LOAD_ORDER_FILE
+        from pathlib import Path
+        self.assertIsInstance(LOAD_ORDER_FILE, Path)
+        self.assertEqual(LOAD_ORDER_FILE.name, "load_order.json")
+
+    def test_profiles_file_constant_exists(self):
+        from src.core.config_manager import PROFILES_FILE
+        from pathlib import Path
+        self.assertIsInstance(PROFILES_FILE, Path)
+        self.assertEqual(PROFILES_FILE.name, "profiles.json")
+
+    def test_both_are_under_data_dir(self):
+        from src.core.config_manager import LOAD_ORDER_FILE, PROFILES_FILE, get_data_dir
+        data_dir = get_data_dir()
+        self.assertEqual(LOAD_ORDER_FILE.parent, data_dir)
+        self.assertEqual(PROFILES_FILE.parent, data_dir)
+
+
+class TestWave57LoadOrderManagerUI(unittest.TestCase):
+    """Wave 57: LoadOrderManager UI logic via backend API (headless)."""
+
+    def _make_lom(self, tmpdir: str):
+        import os
+        from src.core.load_order_manager import LoadOrderManager
+        path = os.path.join(tmpdir, "load_order.json")
+        return LoadOrderManager(path)
+
+    def test_set_order_and_retrieve(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["pack-C", "pack-A", "pack-B"])
+            self.assertEqual(lom.get_order("SLUS-20062"), ["pack-C", "pack-A", "pack-B"])
+
+    def test_move_up_shifts_item(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["A", "B", "C"])
+            lom.move_up("SLUS-20062", "B")
+            self.assertEqual(lom.get_order("SLUS-20062"), ["B", "A", "C"])
+
+    def test_move_down_shifts_item(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["A", "B", "C"])
+            lom.move_down("SLUS-20062", "B")
+            self.assertEqual(lom.get_order("SLUS-20062"), ["A", "C", "B"])
+
+    def test_move_to_top(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["A", "B", "C"])
+            lom.move_to_top("SLUS-20062", "C")
+            self.assertEqual(lom.get_order("SLUS-20062")[0], "C")
+
+    def test_move_to_bottom(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["A", "B", "C"])
+            lom.move_to_bottom("SLUS-20062", "A")
+            self.assertEqual(lom.get_order("SLUS-20062")[-1], "A")
+
+    def test_winner_returns_last_in_order(self):
+        """Last item in load order (highest priority) wins conflicts."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            lom = self._make_lom(d)
+            lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-C"])
+            winner = lom.winner("SLUS-20062", ["pack-A", "pack-C"])
+            self.assertEqual(winner, "pack-C")
+
+    def test_persistence_roundtrip(self):
+        import tempfile, os
+        from src.core.load_order_manager import LoadOrderManager
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "order.json")
+            lom = LoadOrderManager(path)
+            lom.set_order("SLUS-20062", ["X", "Y", "Z"])
+            lom.save()
+            lom2 = LoadOrderManager(path)
+            self.assertEqual(lom2.get_order("SLUS-20062"), ["X", "Y", "Z"])
+
+
+class TestWave57ModProfilesUI(unittest.TestCase):
+    """Wave 57: ModProfileManager UI logic via backend API (headless)."""
+
+    def _make_pm(self, tmpdir: str):
+        import os
+        from src.core.mod_profile import ModProfileManager
+        path = os.path.join(tmpdir, "profiles.json")
+        return ModProfileManager(path)
+
+    def test_create_and_list(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Vanilla+", description="Minimal")
+            pm.create_profile("HD Graphics")
+            self.assertIn("Vanilla+", pm.list_profiles())
+            self.assertIn("HD Graphics", pm.list_profiles())
+
+    def test_set_active_and_get_active_name(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Vanilla+")
+            pm.set_active("Vanilla+")
+            self.assertEqual(pm.get_active_name(), "Vanilla+")
+
+    def test_save_snapshot_enabled_mods(self):
+        """Saving a snapshot captures enabled_mods list."""
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Test")
+            profile = pm.get_profile("Test")
+            profile.enabled_mods = ["mod-1", "mod-2", "mod-3"]
+            pm.save()
+
+            from src.core.mod_profile import ModProfileManager
+            import os
+            pm2 = ModProfileManager(os.path.join(d, "profiles.json"))
+            p2 = pm2.get_profile("Test")
+            self.assertEqual(sorted(p2.enabled_mods), ["mod-1", "mod-2", "mod-3"])
+
+    def test_duplicate_profile(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Original")
+            p = pm.get_profile("Original")
+            p.enabled_mods = ["mod-X"]
+            pm.duplicate_profile("Original", "Copy")
+            copy = pm.get_profile("Copy")
+            self.assertIsNotNone(copy)
+            self.assertEqual(copy.enabled_mods, ["mod-X"])
+
+    def test_rename_profile(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Old Name")
+            pm.rename_profile("Old Name", "New Name")
+            self.assertIn("New Name", pm.list_profiles())
+            self.assertNotIn("Old Name", pm.list_profiles())
+
+    def test_delete_profile(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("Temp")
+            pm.delete_profile("Temp")
+            self.assertNotIn("Temp", pm.list_profiles())
+
+    def test_apply_profile_enable_disable_logic(self):
+        """Applying a profile enables exactly the mods in enabled_mods."""
+        import tempfile
+        from src.models.mod import ModInfo, ModType
+        with tempfile.TemporaryDirectory() as d:
+            pm = self._make_pm(d)
+            pm.create_profile("HD")
+            profile = pm.get_profile("HD")
+            profile.enabled_mods = ["mod-A", "mod-B"]
+
+            # Simulate applying profile to a list of mods
+            all_mods = [
+                ModInfo(id="mod-A", name="Pack A", mod_type=ModType.TEXTURE_PACK,
+                        path="", game_id="SLUS-20062", enabled=False),
+                ModInfo(id="mod-B", name="Pack B", mod_type=ModType.TEXTURE_PACK,
+                        path="", game_id="SLUS-20062", enabled=False),
+                ModInfo(id="mod-C", name="Pack C", mod_type=ModType.TEXTURE_PACK,
+                        path="", game_id="SLUS-20062", enabled=True),
+            ]
+            enabled_set = set(profile.enabled_mods)
+            for m in all_mods:
+                m.enabled = m.id in enabled_set
+
+            self.assertTrue(all_mods[0].enabled)   # mod-A
+            self.assertTrue(all_mods[1].enabled)   # mod-B
+            self.assertFalse(all_mods[2].enabled)  # mod-C
+
+    def test_persistence_roundtrip(self):
+        import tempfile, os
+        from src.core.mod_profile import ModProfileManager
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "profiles.json")
+            pm = ModProfileManager(path)
+            pm.create_profile("Hardcore", description="Hard mode")
+            p = pm.get_profile("Hardcore")
+            p.enabled_mods = ["cheat-1", "cheat-2"]
+            pm.set_active("Hardcore")
+            pm.save()
+
+            pm2 = ModProfileManager(path)
+            self.assertEqual(pm2.get_active_name(), "Hardcore")
+            p2 = pm2.get_profile("Hardcore")
+            self.assertEqual(sorted(p2.enabled_mods), ["cheat-1", "cheat-2"])
+            self.assertEqual(p2.description, "Hard mode")

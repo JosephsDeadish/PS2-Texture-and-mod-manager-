@@ -4093,3 +4093,522 @@ class ModNotesDialog(QDialog):
             "✅ Export Complete",
             f"Notes exported to:\n{result}",
         )
+
+
+# ===========================================================================
+# Load Order Dialog
+# ===========================================================================
+
+class LoadOrderDialog(QDialog):
+    """Dialog to manage the load order of mods for a specific game serial.
+
+    Mods are displayed in order from lowest priority (top) to highest (bottom).
+    Drag-to-reorder is emulated via Up / Down / Top / Bottom buttons.
+    """
+
+    def __init__(self, serial: str, db, config=None, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(f"Load Order — {serial}")
+        self.resize(540, 480)
+        self._serial = serial
+        self._db = db
+        self._config = config
+
+        from src.core.config_manager import LOAD_ORDER_FILE
+        from src.core.load_order_manager import LoadOrderManager
+        self._lom = LoadOrderManager(str(LOAD_ORDER_FILE))
+
+        self._build()
+        self._populate()
+
+    # ------------------------------------------------------------------
+    def _build(self):
+        root = QVBoxLayout(self)
+        root.setSpacing(10)
+
+        # Info label
+        info = QLabel(
+            "Mods listed <b>lower</b> have <b>higher priority</b> — they override "
+            "textures or patches from mods above them.  "
+            "Drag or use the buttons to reorder."
+        )
+        info.setWordWrap(True)
+        info.setStyleSheet("color: #9090c0; font-size: 11px;")
+        root.addWidget(info)
+
+        # List widget
+        from PyQt6.QtWidgets import QListWidget, QListWidgetItem
+        self._list = QListWidget()
+        self._list.setDragDropMode(QListWidget.DragDropMode.InternalMove)
+        self._list.setAlternatingRowColors(True)
+        self._list.setStyleSheet(
+            "QListWidget { background: #0d0d1a; color: #d0d0f0; font-size: 12px; }"
+            "QListWidget::item:selected { background: #1a2a4a; }"
+            "QListWidget::item:alternate { background: #0f0f22; }"
+        )
+        root.addWidget(self._list, 1)
+
+        # Buttons row
+        btn_row = QHBoxLayout()
+
+        self._top_btn = QPushButton("⏫ Top")
+        self._up_btn = QPushButton("↑ Up")
+        self._down_btn = QPushButton("↓ Down")
+        self._bottom_btn = QPushButton("⏬ Bottom")
+        for b in (self._top_btn, self._up_btn, self._down_btn, self._bottom_btn):
+            b.setFixedHeight(28)
+            btn_row.addWidget(b)
+
+        btn_row.addStretch()
+
+        reset_btn = QPushButton("↺ Reset")
+        reset_btn.setToolTip("Reset to alphabetical order")
+        reset_btn.setFixedHeight(28)
+        reset_btn.clicked.connect(self._on_reset)
+        btn_row.addWidget(reset_btn)
+
+        root.addLayout(btn_row)
+
+        self._top_btn.clicked.connect(self._on_top)
+        self._up_btn.clicked.connect(self._on_up)
+        self._down_btn.clicked.connect(self._on_down)
+        self._bottom_btn.clicked.connect(self._on_bottom)
+
+        # Dialog buttons
+        from PyQt6.QtWidgets import QDialogButtonBox
+        bbox = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
+        )
+        bbox.accepted.connect(self._save_and_accept)
+        bbox.rejected.connect(self.reject)
+        root.addWidget(bbox)
+
+    def _populate(self):
+        from PyQt6.QtWidgets import QListWidgetItem
+        from src.models.mod import ModType
+
+        all_mods = self._db.all()
+        serial = self._serial.upper()
+        game_mods = {
+            m.id: m for m in all_mods
+            if m.game_id and m.game_id.upper() == serial
+            and m.mod_type in (ModType.TEXTURE_PACK, ModType.PNACH, ModType.CHEAT)
+        }
+
+        # Build display order: saved order first, then any new mods appended
+        saved_order = self._lom.get_order(self._serial)
+        ordered_ids = [mid for mid in saved_order if mid in game_mods]
+        remaining = [mid for mid in game_mods if mid not in set(ordered_ids)]
+        ordered_ids.extend(sorted(remaining, key=lambda mid: game_mods[mid].name or ""))
+
+        self._list.clear()
+        for i, mid in enumerate(ordered_ids):
+            mod = game_mods[mid]
+            label = f"{i + 1}.  {mod.name or mod.id}  [{mod.mod_type.value}]"
+            item = QListWidgetItem(label)
+            item.setData(256, mid)  # store mod id in UserRole
+            self._list.addItem(item)
+
+        if self._list.count() == 0:
+            placeholder = QListWidgetItem(
+                "(No texture pack, PNACH, or cheat mods installed for this game)"
+            )
+            placeholder.setFlags(placeholder.flags() & ~2)  # not selectable
+            placeholder.setForeground(__import__("PyQt6.QtGui", fromlist=["QColor"]).QColor("#505070"))
+            self._list.addItem(placeholder)
+
+    def _current_row(self) -> int:
+        return self._list.currentRow()
+
+    def _on_top(self):
+        row = self._current_row()
+        if row > 0:
+            item = self._list.takeItem(row)
+            self._list.insertItem(0, item)
+            self._list.setCurrentRow(0)
+            self._renumber()
+
+    def _on_up(self):
+        row = self._current_row()
+        if row > 0:
+            item = self._list.takeItem(row)
+            self._list.insertItem(row - 1, item)
+            self._list.setCurrentRow(row - 1)
+            self._renumber()
+
+    def _on_down(self):
+        row = self._current_row()
+        if row >= 0 and row < self._list.count() - 1:
+            item = self._list.takeItem(row)
+            self._list.insertItem(row + 1, item)
+            self._list.setCurrentRow(row + 1)
+            self._renumber()
+
+    def _on_bottom(self):
+        row = self._current_row()
+        if row >= 0 and row < self._list.count() - 1:
+            item = self._list.takeItem(row)
+            self._list.addItem(item)
+            self._list.setCurrentRow(self._list.count() - 1)
+            self._renumber()
+
+    def _on_reset(self):
+        items = [self._list.item(i) for i in range(self._list.count())]
+        items.sort(key=lambda it: (it.data(256) or ""))
+        self._list.clear()
+        for item in items:
+            self._list.addItem(item)
+        self._renumber()
+
+    def _renumber(self):
+        for i in range(self._list.count()):
+            item = self._list.item(i)
+            mid = item.data(256)
+            if not mid:
+                continue
+            # Rebuild label preserving [type] suffix
+            text = item.text()
+            suffix = text.split("[")[-1].rstrip("]") if "[" in text else ""
+            parts = text.split(".", 1)
+            name_part = parts[1].strip().rsplit("[", 1)[0].strip() if len(parts) > 1 else text
+            item.setText(f"{i + 1}.  {name_part}  [{suffix}]" if suffix else f"{i + 1}.  {name_part}")
+
+    def _save_and_accept(self):
+        order = []
+        for i in range(self._list.count()):
+            mid = self._list.item(i).data(256)
+            if mid:
+                order.append(mid)
+        self._lom.set_order(self._serial, order)
+        self._lom.save()
+        self.accept()
+
+
+# ===========================================================================
+# Mod Profiles Dialog
+# ===========================================================================
+
+class ModProfilesDialog(QDialog):
+    """Dialog for managing named mod profiles.
+
+    Profiles let users save named configurations of enabled mods and
+    instantly switch between them (e.g. "Vanilla+", "HD Graphics", etc.).
+
+    The currently active profile is highlighted.  Selecting a different
+    profile and clicking "Apply" enables/disables mods in the database to
+    match the saved profile state.
+    """
+
+    # Emitted when a profile is applied so the caller can refresh its view
+    profile_applied = pyqtSignal(str)  # emits profile name
+
+    def __init__(self, db, config=None, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Mod Profiles")
+        self.resize(580, 520)
+        self._db = db
+        self._config = config
+
+        from src.core.config_manager import PROFILES_FILE
+        from src.core.mod_profile import ModProfileManager
+        self._pm = ModProfileManager(str(PROFILES_FILE))
+
+        self._build()
+        self._refresh()
+
+    # ------------------------------------------------------------------
+    def _build(self):
+        root = QVBoxLayout(self)
+        root.setSpacing(10)
+
+        # Header
+        header = QLabel(
+            "Save your current mod configuration as a named profile, or switch "
+            "between saved profiles.  The <b>active profile</b> controls which "
+            "mods are enabled."
+        )
+        header.setWordWrap(True)
+        header.setStyleSheet("color: #9090c0; font-size: 11px;")
+        root.addWidget(header)
+
+        # Splitter: left = profile list, right = detail
+        from PyQt6.QtWidgets import QListWidget, QTextEdit
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+
+        left = QWidget()
+        left_lay = QVBoxLayout(left)
+        left_lay.setContentsMargins(0, 0, 0, 0)
+        left_lay.setSpacing(4)
+
+        list_lbl = QLabel("Saved Profiles")
+        list_lbl.setStyleSheet("font-weight:bold; color:#8090c0; font-size:12px;")
+        left_lay.addWidget(list_lbl)
+
+        self._profile_list = QListWidget()
+        self._profile_list.setMinimumWidth(180)
+        self._profile_list.currentRowChanged.connect(self._on_selection_changed)
+        self._profile_list.setStyleSheet(
+            "QListWidget { background:#0d0d1a; color:#d0d0f0; font-size:12px; }"
+            "QListWidget::item:selected { background:#1a2a4a; }"
+        )
+        left_lay.addWidget(self._profile_list, 1)
+
+        splitter.addWidget(left)
+
+        # Right panel: detail view
+        right = QWidget()
+        right_lay = QVBoxLayout(right)
+        right_lay.setContentsMargins(8, 0, 0, 0)
+        right_lay.setSpacing(6)
+
+        detail_lbl = QLabel("Profile Details")
+        detail_lbl.setStyleSheet("font-weight:bold; color:#8090c0; font-size:12px;")
+        right_lay.addWidget(detail_lbl)
+
+        self._detail_text = QTextEdit()
+        self._detail_text.setReadOnly(True)
+        self._detail_text.setStyleSheet(
+            "background:#0d0d1a; color:#c0c0e0; font-size:11px; border:none;"
+        )
+        right_lay.addWidget(self._detail_text, 1)
+
+        splitter.addWidget(right)
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
+
+        root.addWidget(splitter, 1)
+
+        # Action buttons row
+        act_row = QHBoxLayout()
+
+        self._save_btn = QPushButton("💾 Save Current State")
+        self._save_btn.setToolTip(
+            "Snapshot the current enabled/disabled state of all mods into a new profile"
+        )
+        self._save_btn.clicked.connect(self._on_save_as)
+
+        self._apply_btn = QPushButton("✅ Apply Profile")
+        self._apply_btn.setToolTip(
+            "Enable/disable mods to match the selected profile"
+        )
+        self._apply_btn.setEnabled(False)
+        self._apply_btn.clicked.connect(self._on_apply)
+
+        self._rename_btn = QPushButton("✏ Rename")
+        self._rename_btn.setEnabled(False)
+        self._rename_btn.clicked.connect(self._on_rename)
+
+        self._dup_btn = QPushButton("📋 Duplicate")
+        self._dup_btn.setEnabled(False)
+        self._dup_btn.clicked.connect(self._on_duplicate)
+
+        self._del_btn = QPushButton("🗑 Delete")
+        self._del_btn.setEnabled(False)
+        self._del_btn.setStyleSheet("color:#d06060;")
+        self._del_btn.clicked.connect(self._on_delete)
+
+        for b in (self._save_btn, self._apply_btn, self._rename_btn,
+                  self._dup_btn, self._del_btn):
+            b.setFixedHeight(28)
+            act_row.addWidget(b)
+
+        root.addLayout(act_row)
+
+        # Close button
+        from PyQt6.QtWidgets import QDialogButtonBox
+        bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        bbox.rejected.connect(self.accept)
+        root.addWidget(bbox)
+
+    # ------------------------------------------------------------------
+    def _refresh(self):
+        self._profile_list.clear()
+        active = self._pm.get_active_name()
+        for name in self._pm.list_profiles():
+            from PyQt6.QtWidgets import QListWidgetItem
+            label = f"{'★ ' if name == active else '   '}{name}"
+            item = QListWidgetItem(label)
+            item.setData(256, name)
+            if name == active:
+                from PyQt6.QtGui import QColor, QFont
+                item.setForeground(QColor("#60d060"))
+                font = item.font()
+                font.setBold(True)
+                item.setFont(font)
+            self._profile_list.addItem(item)
+
+        self._on_selection_changed(self._profile_list.currentRow())
+
+    def _selected_profile(self) -> str:
+        item = self._profile_list.currentItem()
+        if item:
+            return item.data(256) or ""
+        return ""
+
+    def _on_selection_changed(self, _row: int):
+        name = self._selected_profile()
+        has_sel = bool(name)
+        self._apply_btn.setEnabled(has_sel)
+        self._rename_btn.setEnabled(has_sel)
+        self._dup_btn.setEnabled(has_sel)
+        self._del_btn.setEnabled(has_sel)
+
+        if name:
+            profile = self._pm.get_profile(name)
+            if profile:
+                active = self._pm.get_active_name()
+                lines = [
+                    f"<b>{name}</b>{'  ★ active' if name == active else ''}",
+                ]
+                if profile.description:
+                    lines.append(f"<i>{profile.description}</i>")
+                lines.append(f"<br>Enabled mods: <b>{len(profile.enabled_mods)}</b>")
+                # Resolve mod names
+                all_mods = {m.id: m for m in self._db.all()}
+                mod_names = []
+                for mid in profile.enabled_mods[:12]:
+                    m = all_mods.get(mid)
+                    mod_names.append(
+                        f"  • {m.name or mid}" if m else f"  • <i>{mid}</i>"
+                    )
+                if len(profile.enabled_mods) > 12:
+                    mod_names.append(
+                        f"  <i>…and {len(profile.enabled_mods) - 12} more</i>"
+                    )
+                lines.extend(mod_names)
+                self._detail_text.setHtml("<br>".join(lines))
+            else:
+                self._detail_text.setPlainText("")
+        else:
+            self._detail_text.setPlainText("(select a profile to see details)")
+
+    def _on_save_as(self):
+        from PyQt6.QtWidgets import QInputDialog
+        name, ok = QInputDialog.getText(
+            self, "Save Profile", "Profile name:",
+            text=self._pm.get_active_name() or "My Profile"
+        )
+        if not ok or not name.strip():
+            return
+        name = name.strip()
+
+        desc, ok2 = QInputDialog.getText(
+            self, "Description", "Short description (optional):"
+        )
+        if not ok2:
+            return
+
+        # Snapshot the current mod enable state
+        all_mods = self._db.all()
+        enabled_ids = [m.id for m in all_mods if m.enabled]
+
+        try:
+            if name in self._pm.list_profiles():
+                # Overwrite existing profile
+                profile = self._pm.get_profile(name)
+                profile.enabled_mods = enabled_ids
+                if desc.strip():
+                    profile.description = desc.strip()
+            else:
+                self._pm.create_profile(name, description=desc.strip())
+                profile = self._pm.get_profile(name)
+                profile.enabled_mods = enabled_ids
+            self._pm.set_active(name)
+            self._pm.save()
+        except Exception as exc:
+            QMessageBox.critical(self, "Error", str(exc))
+            return
+
+        self._refresh()
+
+    def _on_apply(self):
+        name = self._selected_profile()
+        if not name:
+            return
+        profile = self._pm.get_profile(name)
+        if not profile:
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Apply Profile",
+            f"Apply profile <b>{name}</b>?<br><br>"
+            f"This will enable <b>{len(profile.enabled_mods)}</b> mod(s) and "
+            f"disable all others.  Continue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        # Enable/disable mods to match the profile
+        enabled_set = set(profile.enabled_mods)
+        for m in self._db.all():
+            new_state = m.id in enabled_set
+            if m.enabled != new_state:
+                m.enabled = new_state
+                self._db.update(m)
+
+        self._pm.set_active(name)
+        self._pm.save()
+        self._refresh()
+        self.profile_applied.emit(name)
+        QMessageBox.information(
+            self, "✅ Profile Applied",
+            f"Profile <b>{name}</b> applied — "
+            f"{len(profile.enabled_mods)} mod(s) enabled."
+        )
+
+    def _on_rename(self):
+        old = self._selected_profile()
+        if not old:
+            return
+        from PyQt6.QtWidgets import QInputDialog
+        new_name, ok = QInputDialog.getText(
+            self, "Rename Profile", "New name:", text=old
+        )
+        if not ok or not new_name.strip() or new_name.strip() == old:
+            return
+        try:
+            self._pm.rename_profile(old, new_name.strip())
+            self._pm.save()
+        except (ValueError, KeyError) as exc:
+            QMessageBox.critical(self, "Error", str(exc))
+            return
+        self._refresh()
+
+    def _on_duplicate(self):
+        src = self._selected_profile()
+        if not src:
+            return
+        from PyQt6.QtWidgets import QInputDialog
+        new_name, ok = QInputDialog.getText(
+            self, "Duplicate Profile", "New profile name:", text=f"{src} (copy)"
+        )
+        if not ok or not new_name.strip():
+            return
+        try:
+            self._pm.duplicate_profile(src, new_name.strip())
+            self._pm.save()
+        except (ValueError, KeyError) as exc:
+            QMessageBox.critical(self, "Error", str(exc))
+            return
+        self._refresh()
+
+    def _on_delete(self):
+        name = self._selected_profile()
+        if not name:
+            return
+        reply = QMessageBox.question(
+            self, "Delete Profile",
+            f"Delete profile <b>{name}</b>?<br>This cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            self._pm.delete_profile(name)
+            self._pm.save()
+        except (ValueError, KeyError) as exc:
+            QMessageBox.critical(self, "Error", str(exc))
+            return
+        self._refresh()
