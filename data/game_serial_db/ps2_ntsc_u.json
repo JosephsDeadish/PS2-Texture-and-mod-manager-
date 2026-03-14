@@ -935,12 +935,16 @@
       "serial": "SLUS-20964",
       "alt_serials": [],
       "crcs": [
-        "4C416932"
+        "4C416932",
+        "7ADCB24A"
       ],
       "release_date": "2005-03-01",
       "developer": "Capcom",
       "publisher": "Capcom",
-      "genre": "Action-Adventure"
+      "genre": "Action-Adventure",
+      "crc_labels": {
+        "7ADCB24A": "v1.00 (patched)"
+      }
     },
     "Devil May Cry 3 (DMD complete)": {
       "serial": "SLUS-20964",
@@ -1070,12 +1074,16 @@
       "crcs": [
         "428113C2",
         "4A9A1ABE",
-        "A9FE1E04"
+        "A9FE1E04",
+        "2A4B60EB"
       ],
       "release_date": "2004-11-16",
       "developer": "Dimps Corporation",
       "publisher": "Atari",
-      "genre": "Fighting"
+      "genre": "Fighting",
+      "crc_labels": {
+        "2A4B60EB": "v1.01"
+      }
     },
     "Dragon Ball Z: Budokai Tenkaichi": {
       "serial": "SLUS-21227",
@@ -1351,11 +1359,16 @@
       "alt_serials": [
         "SLES-51815"
       ],
-      "crcs": [],
+      "crcs": [
+        "48FE0C71"
+      ],
       "release_date": "2003-11-18",
       "developer": "Square Enix",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "48FE0C71": "v1.01"
+      }
     },
     "Final Fantasy X-2 (100% complete)": {
       "serial": "SLUS-20672",
@@ -1607,7 +1620,8 @@
         "77E61C8A",
         "77FEA582",
         "8D057621",
-        "E5BD2EA5"
+        "E5BD2EA5",
+        "44A61C8F"
       ],
       "release_date": "2006-03-01",
       "developer": "Polyphony Digital",
@@ -1617,7 +1631,8 @@
         "77E61C8A": "v1.00",
         "77FEA582": "v1.01",
         "8D057621": "v1.02",
-        "E5BD2EA5": "Greatest Hits"
+        "E5BD2EA5": "Greatest Hits",
+        "44A61C8F": "v1.00 (JPN/patched)"
       }
     },
     "Gran Turismo 4 Prologue": {
@@ -1648,12 +1663,16 @@
       "serial": "SLUS-21423",
       "alt_serials": [],
       "crcs": [
-        "0000C5AB"
+        "0000C5AB",
+        "7EA439F5"
       ],
       "release_date": "2006-06-06",
       "developer": "Rockstar Leeds",
       "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
+      "genre": "Action-Adventure",
+      "crc_labels": {
+        "7EA439F5": "v1.00 (patched)"
+      }
     },
     "Grand Theft Auto: San Andreas": {
       "serial": "SLUS-20946",
@@ -1896,12 +1915,16 @@
         "321DF6F5",
         "3B340B97",
         "4B80628D",
-        "C0FC8DA6"
+        "C0FC8DA6",
+        "901AAC09"
       ],
       "release_date": "2005-05-10",
       "developer": "Capcom Production Studio 1",
       "publisher": "Capcom",
-      "genre": "Survival Horror"
+      "genre": "Survival Horror",
+      "crc_labels": {
+        "901AAC09": "v1.01"
+      }
     },
     "Hitman 2: Silent Assassin": {
       "serial": "SLUS-20374",
@@ -2054,7 +2077,6 @@
       ],
       "crcs": [
         "2B2570A0",
-        "44A61C8F",
         "4D33E38A",
         "FFF16BAB"
       ],
@@ -2064,7 +2086,6 @@
       "genre": "Action, Adventure, Platform.",
       "crc_labels": {
         "2B2570A0": "v1.00",
-        "44A61C8F": "v1.01",
         "4D33E38A": "v1.02",
         "FFF16BAB": "Greatest Hits"
       }
@@ -2118,7 +2139,8 @@
         "39BB7DF5",
         "B3A9F9D5",
         "B7C17543",
-        "C2E7F10B"
+        "C2E7F10B",
+        "AE3EAA05"
       ],
       "release_date": "2002-09-16",
       "developer": "Square Enix",
@@ -2129,7 +2151,8 @@
         "B7C17543": "v1.01",
         "C2E7F10B": "v1.02",
         "0F6B6315": "Greatest Hits",
-        "B3A9F9D5": "Greatest Hits v1.01"
+        "B3A9F9D5": "Greatest Hits v1.01",
+        "AE3EAA05": "v1.00 (patched)"
       }
     },
     "Kingdom Hearts (Greatest Hits)": {
@@ -2890,8 +2913,12 @@
       "serial": "SLUS-21782",
       "alt_serials": [],
       "crcs": [
-        "0F6C0DB9"
-      ]
+        "0F6C0DB9",
+        "DEDC3B71"
+      ],
+      "crc_labels": {
+        "DEDC3B71": "v1.01"
+      }
     },
     "Phantom Brave": {
       "serial": "SLUS-20955",
@@ -2983,12 +3010,16 @@
       "serial": "SLUS-21262",
       "alt_serials": [],
       "crcs": [
-        "7CDA5F31"
+        "7CDA5F31",
+        "47B9B2FD"
       ],
       "release_date": "2005-09-06",
       "developer": "tri-Ace",
       "publisher": "Square Enix",
-      "genre": "Action, RPG."
+      "genre": "Action, RPG.",
+      "crc_labels": {
+        "47B9B2FD": "v1.01"
+      }
     },
     "Ratchet & Clank": {
       "serial": "SCUS-97199",

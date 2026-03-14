@@ -13038,3 +13038,202 @@ class TestWave63PnachEntries(unittest.TestCase):
                 missing = required - set(v.keys())
                 self.assertFalse(missing,
                                  f"Entry {k} missing fields: {missing}")
+
+
+class TestWave64DataQualityFixes(unittest.TestCase):
+    """Wave 64: Data quality fixes — correct serials, CRCs and game names across
+    the serial DB, pnach DB, and texture-pack catalogue.
+
+    Fixed issues
+    -----------
+    * 44A61C8F removed from Jak and Daxter; added to Gran Turismo 4 CRC list.
+    * Catalogue entry re_cvx_remastered_4k_ewgeha: serial corrected
+      SLUS-20512 → SLUS-20184 (Resident Evil Code: Veronica X).
+    * Pnach DB: game_serial / game name populated for CRCs that had empty
+      serial fields (7EA439F5, 7ADCB24A, 2A4B60EB, 44A61C8F).
+    * Serial DB: 8 previously-undocumented CRCs added to their correct games
+      (AE3EAA05, 48FE0C71, 901AAC09, DEDC3B71, 7EA439F5, 7ADCB24A, 2A4B60EB,
+      47B9B2FD).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.catalogue = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.cat_by_id = {e["id"]: e for e in cls.catalogue}
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        raw = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+        cls.games = raw["games"]
+
+    # ------------------------------------------------------------------
+    # Serial DB — CRC assignment fixes
+    # ------------------------------------------------------------------
+
+    def test_44a61c8f_not_in_jak_daxter_crcs(self):
+        """44A61C8F must no longer appear in Jak and Daxter CRC list."""
+        jd = self.games["Jak and Daxter: The Precursor Legacy"]
+        self.assertNotIn("44A61C8F", jd.get("crcs", []),
+                         "44A61C8F should not be in Jak and Daxter CRCs")
+
+    def test_44a61c8f_not_in_jak_daxter_crc_labels(self):
+        """44A61C8F must no longer appear in Jak and Daxter crc_labels."""
+        jd = self.games["Jak and Daxter: The Precursor Legacy"]
+        self.assertNotIn("44A61C8F", jd.get("crc_labels", {}),
+                         "44A61C8F should not be in Jak and Daxter crc_labels")
+
+    def test_44a61c8f_in_gran_turismo_4_crcs(self):
+        """44A61C8F must appear in Gran Turismo 4 CRC list."""
+        gt4 = self.games["Gran Turismo 4"]
+        self.assertIn("44A61C8F", gt4.get("crcs", []),
+                      "44A61C8F should be in Gran Turismo 4 CRCs")
+
+    def test_ae3eaa05_in_kingdom_hearts_crcs(self):
+        """AE3EAA05 (KH patched/60fps) must be in Kingdom Hearts CRC list."""
+        kh = self.games["Kingdom Hearts"]
+        self.assertIn("AE3EAA05", kh.get("crcs", []),
+                      "AE3EAA05 should be in Kingdom Hearts CRCs")
+
+    def test_48fe0c71_in_ffx2_crcs(self):
+        """48FE0C71 must be in Final Fantasy X-2 CRC list."""
+        ffx2 = self.games["Final Fantasy X-2"]
+        self.assertIn("48FE0C71", ffx2.get("crcs", []),
+                      "48FE0C71 should be in Final Fantasy X-2 CRCs")
+
+    def test_901aac09_in_haunting_ground_crcs(self):
+        """901AAC09 must be in Haunting Ground CRC list."""
+        hg = self.games["Haunting Ground"]
+        self.assertIn("901AAC09", hg.get("crcs", []),
+                      "901AAC09 should be in Haunting Ground CRCs")
+
+    def test_dedc3b71_in_persona_4_crcs(self):
+        """DEDC3B71 must be in Persona 4 CRC list."""
+        p4 = self.games["Persona 4"]
+        self.assertIn("DEDC3B71", p4.get("crcs", []),
+                      "DEDC3B71 should be in Persona 4 CRCs")
+
+    def test_7ea439f5_in_gtalcs_crcs(self):
+        """7EA439F5 must be in Grand Theft Auto: Liberty City Stories CRC list."""
+        gtalcs = self.games["Grand Theft Auto: Liberty City Stories"]
+        self.assertIn("7EA439F5", gtalcs.get("crcs", []),
+                      "7EA439F5 should be in GTA:LCS CRCs")
+
+    def test_7adcb24a_in_dmc3_crcs(self):
+        """7ADCB24A must be in Devil May Cry 3 CRC list."""
+        dmc3 = self.games["Devil May Cry 3"]
+        self.assertIn("7ADCB24A", dmc3.get("crcs", []),
+                      "7ADCB24A should be in Devil May Cry 3 CRCs")
+
+    def test_2a4b60eb_in_dbz_budokai3_crcs(self):
+        """2A4B60EB must be in Dragon Ball Z: Budokai 3 CRC list."""
+        dbz3 = self.games["Dragon Ball Z: Budokai 3"]
+        self.assertIn("2A4B60EB", dbz3.get("crcs", []),
+                      "2A4B60EB should be in DBZ Budokai 3 CRCs")
+
+    def test_47b9b2fd_in_radiata_stories_crcs(self):
+        """47B9B2FD must be in Radiata Stories CRC list."""
+        radiata = self.games["Radiata Stories"]
+        self.assertIn("47B9B2FD", radiata.get("crcs", []),
+                      "47B9B2FD should be in Radiata Stories CRCs")
+
+    def test_crc_labels_consistency(self):
+        """Every key in crc_labels must also appear in the crcs list."""
+        for title, info in self.games.items():
+            if not isinstance(info, dict):
+                continue
+            crcs_set = set(c.upper() for c in info.get("crcs", []))
+            for crc in info.get("crc_labels", {}):
+                self.assertIn(crc.upper(), crcs_set,
+                              f"{title!r}: crc_labels key {crc!r} not in crcs list")
+
+    # ------------------------------------------------------------------
+    # Catalogue — RE Code Veronica X serial
+    # ------------------------------------------------------------------
+
+    def test_re_cvx_serial_is_slus_20184(self):
+        """re_cvx_remastered_4k_ewgeha must use the correct serial SLUS-20184."""
+        entry = self.cat_by_id["re_cvx_remastered_4k_ewgeha"]
+        self.assertEqual(entry["game_serial"], "SLUS-20184",
+                         "RE CVX catalogue entry must use SLUS-20184, not SLUS-20512")
+
+    def test_re_cvx_description_no_wrong_serial(self):
+        """RE CVX catalogue description must not mention the old wrong serial."""
+        entry = self.cat_by_id["re_cvx_remastered_4k_ewgeha"]
+        for field in ("description", "context", "name"):
+            self.assertNotIn("SLUS-20512", entry.get(field, ""),
+                             f"RE CVX {field!r} must not contain old serial SLUS-20512")
+
+    def test_re_cvx_description_has_correct_serial(self):
+        """RE CVX catalogue description must contain the correct serial."""
+        entry = self.cat_by_id["re_cvx_remastered_4k_ewgeha"]
+        desc = entry.get("description", "")
+        self.assertIn("SLUS-20184", desc,
+                      "RE CVX description should reference correct serial SLUS-20184")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — fixed serial fields and game names
+    # ------------------------------------------------------------------
+
+    def _pnach_sample(self, crc):
+        """Return the first pnach entry for the given CRC prefix."""
+        key = next((k for k in self.pnach_db if k.startswith(crc + ":")), None)
+        return self.pnach_db[key] if key else None
+
+    def test_gtalcs_7ea439f5_has_serial(self):
+        """All 7EA439F5 (GTA:LCS patched) entries must have serial SLUS-21423."""
+        entries = {k: v for k, v in self.pnach_db.items()
+                   if k.startswith("7EA439F5:")}
+        self.assertGreater(len(entries), 0, "No 7EA439F5 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21423",
+                             f"{k}: game_serial must be SLUS-21423")
+
+    def test_dmc3_7adcb24a_has_serial(self):
+        """All 7ADCB24A (DMC3 patched) entries must have serial SLUS-20964."""
+        entries = {k: v for k, v in self.pnach_db.items()
+                   if k.startswith("7ADCB24A:")}
+        self.assertGreater(len(entries), 0, "No 7ADCB24A entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20964",
+                             f"{k}: game_serial must be SLUS-20964")
+
+    def test_dbz_budokai3_2a4b60eb_has_serial(self):
+        """All 2A4B60EB (DBZ Budokai 3) entries must have serial SLUS-20998."""
+        entries = {k: v for k, v in self.pnach_db.items()
+                   if k.startswith("2A4B60EB:")}
+        self.assertGreater(len(entries), 0, "No 2A4B60EB entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20998",
+                             f"{k}: game_serial must be SLUS-20998")
+
+    def test_gt4_44a61c8f_has_serial(self):
+        """All 44A61C8F (GT4) entries must have serial SCUS-97328."""
+        entries = {k: v for k, v in self.pnach_db.items()
+                   if k.startswith("44A61C8F:")}
+        self.assertGreater(len(entries), 0, "No 44A61C8F entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SCUS-97328",
+                             f"{k}: game_serial must be SCUS-97328")
+
+    def test_dmc3_7adcb24a_game_name_capitalisation(self):
+        """7ADCB24A game name must not have lower-case 'c' in 'Cry'."""
+        sample = self._pnach_sample("7ADCB24A")
+        self.assertIsNotNone(sample)
+        game_name = sample.get("game", "")
+        self.assertNotIn("cry 3", game_name,
+                         f"Game name {game_name!r} has wrong capitalisation for 'Cry'")
+
+    def test_dbz_budokai3_game_name_format(self):
+        """2A4B60EB game name must follow canonical 'Dragon Ball Z: Budokai 3' format."""
+        sample = self._pnach_sample("2A4B60EB")
+        self.assertIsNotNone(sample)
+        game_name = sample.get("game", "")
+        self.assertIn("Dragon Ball Z", game_name,
+                      f"DBZ game name {game_name!r} should contain 'Dragon Ball Z'")
+        self.assertNotIn("DragonBall", game_name,
+                         f"DBZ game name {game_name!r} should not use 'DragonBall' (missing space)")
