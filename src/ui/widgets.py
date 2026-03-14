@@ -1570,11 +1570,13 @@ class PnachCodeBuilderDialog(QDialog):
         self,
         game_serial: str = "",
         cheats_dir: str = "",
+        config=None,
         parent=None,
     ):
         super().__init__(parent)
         self._game_serial = game_serial.strip().upper()
         self._cheats_dir = cheats_dir
+        self._config = config
         self._patch_widgets: list = []  # list of (key, addr_widget)
         self.setWindowTitle("🧩 PNACH Code Builder — Apply DB Effects to Game")
         self.setMinimumSize(860, 600)
@@ -1621,7 +1623,12 @@ class PnachCodeBuilderDialog(QDialog):
         self._game_combo = QComboBox()
         self._game_combo.setMinimumWidth(350)
         self._game_combo.setEditable(True)
+        self._game_combo.lineEdit().setPlaceholderText(
+            "Type game name or serial to search…"
+        )
         self._populate_game_combo()
+        # Connect text changes for live search filtering
+        self._game_combo.lineEdit().textEdited.connect(self._on_game_search)
         game_row.addWidget(self._game_combo, 1)
 
         load_btn = QPushButton("Load Effects")
@@ -1691,21 +1698,107 @@ class PnachCodeBuilderDialog(QDialog):
     # Game combo
     # ------------------------------------------------------------------
 
-    def _populate_game_combo(self):
+    def _populate_game_combo(self, filter_text: str = ""):
+        """Populate (or re-filter) the game dropdown.
+
+        Shows **library games first** (if a library path is configured), then
+        all other known PS2 serials from the serial database (2000+ games).
+        When *filter_text* is provided only entries whose title or serial
+        contain the search string are shown (case-insensitive).
+        """
         from src.core.pnach_analyzer import list_all_serials_in_db
-        self._game_combo.clear()
-        self._game_combo.addItem("— Select a game —", "")
+
+        # ── Gather library serials ─────────────────────────────────────
+        library_serials: frozenset = frozenset()
+        try:
+            lib_path = getattr(self._config, "game_library_path", "") or ""
+            if lib_path:
+                from src.core.game_library import get_library_serials
+                library_serials = get_library_serials(lib_path)
+        except Exception:
+            pass
+
+        # ── Build full serial→title mapping from serial DB ────────────
+        all_serials: dict[str, str] = {}
+        try:
+            from src.core.serial_validator import SerialDatabase
+            sdb = SerialDatabase()
+            for title in sdb.all_titles():
+                info = sdb.get_info(title)
+                if info and info.serial:
+                    all_serials[info.serial.upper()] = title
+        except Exception:
+            pass
+        # Overlay pnach DB entries (may have CRC-only entries not in serial DB)
         for serial, title in list_all_serials_in_db():
-            self._game_combo.addItem(f"{title}  ({serial})", serial)
-        # Pre-select current game
-        if self._game_serial:
+            if serial not in all_serials:
+                all_serials[serial] = title
+
+        # ── Filter ────────────────────────────────────────────────────
+        needle = filter_text.strip().lower()
+        filtered = [
+            (serial, title)
+            for serial, title in all_serials.items()
+            if not needle
+            or needle in title.lower()
+            or needle in serial.lower()
+        ]
+
+        # ── Sort: library games first, then alphabetical by title ─────
+        def _sort_key(item):
+            serial, title = item
+            return (0 if serial in library_serials else 1, title.lower())
+
+        filtered.sort(key=_sort_key)
+
+        # ── Rebuild combo (preserve current selection) ─────────────────
+        previously_selected = self._game_combo.currentData()
+        self._game_combo.blockSignals(True)
+        self._game_combo.clear()
+        if not needle:
+            self._game_combo.addItem("— Select a game —", "")
+        for serial, title in filtered:
+            prefix = "📁 " if serial in library_serials else ""
+            display = f"{prefix}{title}  ({serial})"
+            self._game_combo.addItem(display, serial)
+
+        # Restore previous selection if it still exists in filtered list
+        if previously_selected:
+            for i in range(self._game_combo.count()):
+                if self._game_combo.itemData(i) == previously_selected:
+                    self._game_combo.setCurrentIndex(i)
+                    break
+        elif self._game_serial:
             for i in range(self._game_combo.count()):
                 if self._game_combo.itemData(i) == self._game_serial:
                     self._game_combo.setCurrentIndex(i)
                     break
 
+        self._game_combo.blockSignals(False)
+
+    def _on_game_search(self, text: str):
+        """Called when the user types in the game combo — re-filter the list."""
+        self._populate_game_combo(filter_text=text)
+        # Reopen dropdown to show filtered results
+        if text.strip():
+            self._game_combo.showPopup()
+
     def _on_load_btn(self):
-        serial = self._game_combo.currentData() or self._game_combo.currentText().strip().upper()
+        """Load effects for the currently selected/typed game."""
+        serial = self._game_combo.currentData()
+        if not serial:
+            # User may have typed a name fragment — try to extract the serial
+            text = self._game_combo.currentText().strip()
+            # Common format: "Title  (SERIAL)" — extract the part in parens
+            import re as _re
+            m = _re.search(r'\(([A-Z]{2,4}-\d{5})\)', text.upper())
+            if m:
+                serial = m.group(1)
+            else:
+                # Try interpreting the whole text as a serial
+                from src.core.game_registry import is_valid_serial
+                if is_valid_serial(text.upper()):
+                    serial = text.upper()
         if serial and serial != "":
             self._load_game(serial)
 
@@ -2290,15 +2383,125 @@ class PnachCodeBuilderDialog(QDialog):
         os.makedirs(cheats_dir, exist_ok=True)
         dest = os.path.join(cheats_dir, f"{crc}.pnach")
 
-        # Warn if file already exists
+        # Smart conflict detection when file already exists
         if os.path.exists(dest):
-            reply = QMessageBox.question(
-                self, "File Exists",
-                f"{crc}.pnach already exists.\nOverwrite it?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            )
-            if reply != QMessageBox.StandardButton.Yes:
-                return
+            try:
+                from src.core.pnach import parse_pnach, PnachFile, PatchLine
+
+                existing = parse_pnach(dest)
+                # Parse new patches from the text we're about to write
+                new_file = PnachFile(game_crc=crc)
+                for raw in text.splitlines():
+                    line = raw.strip()
+                    if not line or line.startswith("//"):
+                        continue
+                    low = line.lower()
+                    if low.startswith("gametitle="):
+                        new_file.game_title = line.split("=", 1)[1].strip()
+                        continue
+                    if low.startswith("comment="):
+                        new_file.comment = line.split("=", 1)[1].strip()
+                        continue
+                    import re as _re
+                    m = _re.match(
+                        r"^\s*patch\s*=\s*(\d+)\s*,\s*(\w+)\s*,\s*([0-9A-Fa-f]+)\s*,"
+                        r"\s*(\w+)\s*,\s*([0-9A-Fa-f]+)",
+                        line, _re.IGNORECASE,
+                    )
+                    if m:
+                        new_file.patches.append(PatchLine(
+                            enabled=int(m.group(1)),
+                            processor=m.group(2).upper(),
+                            address=m.group(3).upper().zfill(8),
+                            size=m.group(4).lower(),
+                            value=m.group(5).upper(),
+                        ))
+
+                # Find overlapping addresses
+                existing_keys = {p.dedup_key for p in existing.patches}
+                new_keys = {p.dedup_key for p in new_file.patches}
+                overlapping = existing_keys & new_keys
+
+                if overlapping:
+                    # Build a readable summary of conflicts
+                    overlap_lines = []
+                    for pk in sorted(overlapping):
+                        ex_patch = next(
+                            (p for p in existing.patches if p.dedup_key == pk), None
+                        )
+                        nw_patch = next(
+                            (p for p in new_file.patches if p.dedup_key == pk), None
+                        )
+                        if ex_patch and nw_patch:
+                            overlap_lines.append(
+                                f"  {pk[0]}:{pk[1]}  "
+                                f"existing={ex_patch.value}  new={nw_patch.value}"
+                            )
+
+                    conflict_summary = "\n".join(overlap_lines[:10])
+                    if len(overlap_lines) > 10:
+                        conflict_summary += f"\n  … and {len(overlap_lines) - 10} more"
+
+                    from PyQt6.QtWidgets import QDialogButtonBox
+                    msg = QMessageBox(self)
+                    msg.setWindowTitle("PNACH Conflict Detected")
+                    msg.setIcon(QMessageBox.Icon.Warning)
+                    msg.setText(
+                        f"<b>{crc}.pnach</b> already exists and shares "
+                        f"<b>{len(overlapping)}</b> address(es) with the new patches:"
+                    )
+                    msg.setInformativeText(
+                        f"<pre>{conflict_summary}</pre>\n\n"
+                        "• <b>Merge</b>: keep existing patches, add new ones "
+                        "(new values win on address conflicts)\n"
+                        "• <b>Overwrite</b>: replace the file entirely with new patches\n"
+                        "• <b>Cancel</b>: abort"
+                    )
+                    merge_btn = msg.addButton("Merge", QMessageBox.ButtonRole.AcceptRole)
+                    over_btn = msg.addButton("Overwrite", QMessageBox.ButtonRole.DestructiveRole)
+                    msg.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+                    msg.exec()
+                    clicked = msg.clickedButton()
+                    if clicked is None or clicked.text() == "Cancel":
+                        return
+                    if clicked is merge_btn:
+                        # Merge: start with existing, new patches override on conflict
+                        merged_map: dict[tuple, object] = {p.dedup_key: p for p in existing.patches}
+                        for p in new_file.patches:
+                            merged_map[p.dedup_key] = p
+                        existing.patches = list(merged_map.values())
+                        text = existing.to_text()
+                    # else overwrite — use text as-is
+                else:
+                    # No overlapping addresses — ask user: merge or overwrite
+                    reply = QMessageBox.question(
+                        self, "File Exists",
+                        f"{crc}.pnach already exists ({len(existing.patches)} existing patch lines,\n"
+                        f"{len(new_file.patches)} new — no address conflicts).\n\n"
+                        "Merge new patches into the existing file, or overwrite?",
+                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                        | QMessageBox.StandardButton.Cancel,
+                    )
+                    if reply == QMessageBox.StandardButton.Cancel:
+                        return
+                    if reply == QMessageBox.StandardButton.Yes:
+                        # Merge: append new patches that aren't already present
+                        existing_keys2 = {p.dedup_key for p in existing.patches}
+                        for p in new_file.patches:
+                            if p.dedup_key not in existing_keys2:
+                                existing.patches.append(p)
+                        text = existing.to_text()
+                    # else: overwrite — use text as-is
+
+            except Exception:
+                # If parsing fails, fall back to simple overwrite prompt
+                reply = QMessageBox.question(
+                    self, "File Exists",
+                    f"{crc}.pnach already exists.\nOverwrite it?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                )
+                if reply != QMessageBox.StandardButton.Yes:
+                    return
 
         try:
             with open(dest, "w", encoding="utf-8") as f:
@@ -2306,7 +2509,8 @@ class PnachCodeBuilderDialog(QDialog):
             QMessageBox.information(
                 self, "✅ Installed",
                 f"PNACH written to:\n{dest}\n\n"
-                "Launch PCSX2 and the patch will be applied automatically."
+                "Launch PCSX2 and the patch will be applied automatically.\n\n"
+                "💡 Make sure 'Enable Cheats' is checked in PCSX2 → Game Properties."
             )
         except OSError as exc:
             QMessageBox.critical(self, "Write Error", f"Could not write PNACH:\n{exc}")

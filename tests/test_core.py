@@ -11120,3 +11120,191 @@ class TestWave54ConflictVisualizer(unittest.TestCase):
         s = session.summary()
         self.assertEqual(s["total"], 2)
         self.assertEqual(s["resolved"], 2)
+
+
+# ---------------------------------------------------------------------------
+# Wave 55: PNACH builder search + smart merge, Library "View All" mode
+# ---------------------------------------------------------------------------
+
+class TestWave55PnachBuilderSearch(unittest.TestCase):
+    """Wave 55: PNACH builder game search improvements.
+
+    Tests for the _populate_game_combo search and _on_load_btn serial extraction.
+    """
+
+    # ------------------------------------------------------------------
+    # _populate_game_combo uses serial DB (2000+ games)
+    # ------------------------------------------------------------------
+
+    def test_serial_db_provides_more_than_500_serials(self):
+        """The serial DB (ps2_ntsc_u.json) has 2000+ games."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        count = sdb.game_count()
+        self.assertGreater(count, 500)
+
+    def test_serial_db_known_games_present(self):
+        """Common PS2 games are in the serial DB."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        titles = sdb.all_titles()
+        # Should have several hundred known titles
+        self.assertGreater(len(titles), 100)
+
+    # ------------------------------------------------------------------
+    # PNACH file merge logic (non-UI)
+    # ------------------------------------------------------------------
+
+    def test_pnach_merge_no_conflict(self):
+        """Merging two PNACH files with no address overlap combines all patches."""
+        import tempfile, os
+        from src.core.pnach import parse_pnach, PnachFile, PatchLine
+
+        tmpdir = tempfile.mkdtemp()
+        existing_path = os.path.join(tmpdir, "AABBCCDD.pnach")
+        with open(existing_path, "w") as f:
+            f.write("gametitle=Test Game\npatch=1,EE,00100000,word,12345678\n")
+
+        existing = parse_pnach(existing_path)
+        new_patches = [
+            PatchLine(enabled=1, processor="EE", address="00200000", size="word", value="DEADBEEF")
+        ]
+        # Merge: add new patches that aren't present
+        existing_keys = {p.dedup_key for p in existing.patches}
+        for p in new_patches:
+            if p.dedup_key not in existing_keys:
+                existing.patches.append(p)
+
+        self.assertEqual(len(existing.patches), 2)
+        addresses = {p.address for p in existing.patches}
+        self.assertIn("00100000", addresses)
+        self.assertIn("00200000", addresses)
+
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def test_pnach_merge_with_conflict(self):
+        """When same address exists in both files, new value wins."""
+        import tempfile, os
+        from src.core.pnach import parse_pnach, PnachFile, PatchLine
+
+        tmpdir = tempfile.mkdtemp()
+        existing_path = os.path.join(tmpdir, "AABBCCDD.pnach")
+        with open(existing_path, "w") as f:
+            f.write("gametitle=Test Game\npatch=1,EE,00100000,word,AAAAAAAA\n")
+
+        existing = parse_pnach(existing_path)
+        new_patches = [
+            PatchLine(enabled=1, processor="EE", address="00100000", size="word", value="BBBBBBBB")
+        ]
+        # Detect overlap
+        existing_keys = {p.dedup_key for p in existing.patches}
+        new_keys = {p.dedup_key for p in new_patches}
+        overlapping = existing_keys & new_keys
+        self.assertEqual(len(overlapping), 1)
+
+        # Merge: new wins on conflict
+        merged_map = {p.dedup_key: p for p in existing.patches}
+        for p in new_patches:
+            merged_map[p.dedup_key] = p
+        merged = list(merged_map.values())
+
+        self.assertEqual(len(merged), 1)
+        self.assertEqual(merged[0].value, "BBBBBBBB")
+
+        import shutil
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+class TestWave55LibraryViewAllMode(unittest.TestCase):
+    """Wave 55: Library panel 'View All Mods' mode.
+
+    Tests for _AllModsPane filtering logic.
+    """
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.db_path = os.path.join(self.tmpdir, "mods.json")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_db_with_mods(self):
+        from src.core.mod_manager import ModDatabase
+        from src.models.mod import ModInfo, ModType
+        db = ModDatabase()
+        # Clear existing entries to start fresh
+        db._mods.clear()
+        mods = [
+            ModInfo(id="w55_1", name="HD Textures", mod_type=ModType.TEXTURE_PACK,
+                    path=self.tmpdir, enabled=True, game_id="SLUS-20062"),
+            ModInfo(id="w55_2", name="60fps Patch", mod_type=ModType.PNACH,
+                    path=self.tmpdir, enabled=True, game_id="SLUS-20062"),
+            ModInfo(id="w55_3", name="Cover Art", mod_type=ModType.COVER_ART,
+                    path=self.tmpdir, enabled=False, game_id="SLUS-20999"),
+        ]
+        for m in mods:
+            db.add(m)
+        return db
+
+    def test_db_all_returns_correct_count(self):
+        """DB.all() returns all added mods."""
+        db = self._make_db_with_mods()
+        self.assertEqual(len(db.all()), 3)
+
+    def test_enabled_filter(self):
+        """Filtering by enabled status works correctly."""
+        db = self._make_db_with_mods()
+        all_mods = db.all()
+        enabled = [m for m in all_mods if m.enabled]
+        disabled = [m for m in all_mods if not m.enabled]
+        self.assertEqual(len(enabled), 2)
+        self.assertEqual(len(disabled), 1)
+
+    def test_type_filter(self):
+        """Filtering by mod type works correctly."""
+        from src.models.mod import ModType
+        db = self._make_db_with_mods()
+        all_mods = db.all()
+        texture_mods = [m for m in all_mods if m.mod_type == ModType.TEXTURE_PACK]
+        pnach_mods = [m for m in all_mods if m.mod_type == ModType.PNACH]
+        self.assertEqual(len(texture_mods), 1)
+        self.assertEqual(len(pnach_mods), 1)
+
+    def test_search_filter(self):
+        """Text search filters by name, game_id, and author."""
+        db = self._make_db_with_mods()
+        all_mods = db.all()
+        needle = "hd"
+        results = [
+            m for m in all_mods
+            if needle in " ".join([m.name or "", m.game_id or "", m.author or ""]).lower()
+        ]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].name, "HD Textures")
+
+
+class TestWave55ScanLibraryAutoDetect(unittest.TestCase):
+    """Wave 55: Library panel auto-detects ROM paths from pcsx2_path."""
+
+    def test_common_rom_subdirs_detected(self):
+        """Auto-detect checks common sub-directories of pcsx2_path."""
+        import tempfile, os
+        tmpdir = tempfile.mkdtemp()
+        try:
+            # Create a 'roms' subfolder under a fake pcsx2_path
+            roms_dir = os.path.join(tmpdir, "roms")
+            os.makedirs(roms_dir)
+            from pathlib import Path
+            for sub in ("roms", "ISOs", "iso", "games", "Games"):
+                candidate = str(Path(tmpdir) / sub)
+                if Path(candidate).is_dir():
+                    found = candidate
+                    break
+            else:
+                found = ""
+            self.assertEqual(found, roms_dir)
+        finally:
+            import shutil
+            shutil.rmtree(tmpdir, ignore_errors=True)

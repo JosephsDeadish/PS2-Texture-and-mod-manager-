@@ -584,6 +584,7 @@ class ModPanel(BasePanel):
         dlg = PnachCodeBuilderDialog(
             game_serial=serial,
             cheats_dir=cheats_dir,
+            config=self.config,
             parent=self,
         )
         dlg.exec()
