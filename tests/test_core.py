@@ -11691,3 +11691,130 @@ class TestWave57ModProfilesUI(unittest.TestCase):
             p2 = pm2.get_profile("Hardcore")
             self.assertEqual(sorted(p2.enabled_mods), ["cheat-1", "cheat-2"])
             self.assertEqual(p2.description, "Hard mode")
+
+
+class TestWave58PnachReferenceEntries(unittest.TestCase):
+    """Wave 58: pnach DB entries from pnach_reference_expanded.2.txt attachment."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+
+    def test_wave58_pnach_db_size_over_47940(self):
+        """Wave 58: pnach DB should have more than 47,940 entries after new additions."""
+        self.assertGreater(
+            len(self.db), 47940,
+            f"Expected >47940 pnach DB entries after Wave 58, got {len(self.db)}"
+        )
+
+    def test_wave58_kingdom_hearts_crc_ae3eaa05_present(self):
+        """Wave 58: Kingdom Hearts CRC AE3EAA05 must have fps entries."""
+        kh_entries = [v for k, v in self.db.items() if "AE3EAA05" in k]
+        self.assertGreater(
+            len(kh_entries), 0,
+            "Expected at least 1 entry for Kingdom Hearts CRC AE3EAA05"
+        )
+
+    def test_wave58_kingdom_hearts_60fps_toggle_present(self):
+        """Wave 58: Kingdom Hearts AE3EAA05 60fps toggle address must be present."""
+        key = "AE3EAA05:EE:002B624C"
+        self.assertIn(key, self.db, f"Expected 60fps toggle entry {key} in pnach DB")
+        entry = self.db[key]
+        self.assertEqual(entry["category"], "fps")
+        self.assertEqual(entry["game_serial"], "SLUS-20370")
+
+    def test_wave58_kingdom_hearts_mode_flag_present(self):
+        """Wave 58: Kingdom Hearts AE3EAA05 game mode flag address must be present."""
+        key = "AE3EAA05:EE:002BFD98"
+        self.assertIn(key, self.db, f"Expected mode flag entry {key} in pnach DB")
+        entry = self.db[key]
+        self.assertEqual(entry["category"], "fps")
+
+    def test_wave58_persona4_exp_injection_complete(self):
+        """Wave 58: Persona 4 DEDC3B71 EXP injection code cave addresses 000A0000-0008 present."""
+        for addr in ["000A0000", "000A0004", "000A0008"]:
+            key = f"DEDC3B71:EE:{addr}"
+            self.assertIn(key, self.db, f"Expected P4 EXP injection address {key} in pnach DB")
+            entry = self.db[key]
+            self.assertEqual(entry["category"], "cheat")
+            self.assertEqual(entry["game_serial"], "SLUS-21782")
+
+    def test_wave58_persona4_max_hp_sp_me_present(self):
+        """Wave 58: Persona 4 DEDC3B71 MAX HP SP ME entry must be present."""
+        key = "DEDC3B71:EE:005DD874"
+        self.assertIn(key, self.db, f"Expected P4 MAX HP SP ME entry {key} in pnach DB")
+        entry = self.db[key]
+        self.assertEqual(entry["category"], "cheat")
+
+    def test_wave58_dmc3_infinite_health_cave_complete(self):
+        """Wave 58: DMC3 7ADCB24A Infinite Health code cave 000FFF00-08 addresses present."""
+        for addr in ["000FFF00", "000FFF04", "000FFF08"]:
+            key = f"7ADCB24A:EE:{addr}"
+            self.assertIn(key, self.db, f"Expected DMC3 health injection address {key} in pnach DB")
+            entry = self.db[key]
+            self.assertEqual(entry["category"], "cheat")
+            self.assertIn("Infinite Health", entry["description"])
+
+    def test_wave58_gtalcs_health_cave_complete(self):
+        """Wave 58: GTA LCS 7EA439F5 Infinite Health code cave 000C0220-022C present."""
+        for addr in ["000C0220", "000C0224", "000C0228", "000C022C"]:
+            key = f"7EA439F5:EE:{addr}"
+            self.assertIn(key, self.db, f"Expected GTA:LCS health injection {key} in pnach DB")
+            entry = self.db[key]
+            self.assertEqual(entry["category"], "cheat")
+            self.assertIn("Health", entry["description"])
+
+    def test_wave58_gtalcs_armor_cave_complete(self):
+        """Wave 58: GTA LCS 7EA439F5 Infinite Armor code cave 000C0230-023C present."""
+        for addr in ["000C0230", "000C0234", "000C0238", "000C023C"]:
+            key = f"7EA439F5:EE:{addr}"
+            self.assertIn(key, self.db, f"Expected GTA:LCS armor injection {key} in pnach DB")
+            entry = self.db[key]
+            self.assertEqual(entry["category"], "cheat")
+            self.assertIn("Armor", entry["description"])
+
+    def test_wave58_onimusha_deinterlace_present(self):
+        """Wave 58: Onimusha FE44479E de-interlace entry must be present."""
+        key = "FE44479E:EE:00178424"
+        self.assertIn(key, self.db, f"Expected Onimusha de-interlace {key} in pnach DB")
+        entry = self.db[key]
+        self.assertEqual(entry["category"], "visual")
+        self.assertEqual(entry["game_serial"], "SLUS-21180")
+
+    def test_wave58_onimusha_disable_effects_present(self):
+        """Wave 58: Onimusha FE44479E disable effects entries must be present."""
+        for addr in ["0084F480", "0084A200", "0084FC80", "0084F880"]:
+            key = f"FE44479E:EE:{addr}"
+            self.assertIn(key, self.db, f"Expected Onimusha effects entry {key} in pnach DB")
+            entry = self.db[key]
+            self.assertEqual(entry["category"], "visual")
+
+    def test_wave58_rayman2_60fps_new_address_present(self):
+        """Wave 58: Rayman 2 D2F77DF2 60fps address 0010121C must be present."""
+        key = "D2F77DF2:EE:0010121C"
+        self.assertIn(key, self.db, f"Expected Rayman2 60fps entry {key} in pnach DB")
+        entry = self.db[key]
+        self.assertEqual(entry["category"], "fps")
+        self.assertEqual(entry["game_serial"], "SLUS-20138")
+
+    def test_wave58_entry_structure_required_fields(self):
+        """Wave 58: All new Wave 58 entries must have required fields."""
+        wave58_keys = [
+            "AE3EAA05:EE:002B624C", "AE3EAA05:EE:002BFD98",
+            "DEDC3B71:EE:000A0000", "DEDC3B71:EE:005DD874",
+            "7ADCB24A:EE:000FFF00", "7EA439F5:EE:000C0220",
+            "FE44479E:EE:00178424", "D2F77DF2:EE:0010121C",
+        ]
+        required = {"game", "game_crc", "description", "category", "value_type",
+                    "verification_status", "patch_type"}
+        for key in wave58_keys:
+            with self.subTest(key=key):
+                self.assertIn(key, self.db)
+                entry = self.db[key]
+                for field in required:
+                    self.assertIn(field, entry, f"{key} missing field '{field}'")
+                # CRC in key must match game_crc
+                key_crc = key.split(":")[0].upper()
+                self.assertEqual(key_crc, entry["game_crc"].upper())
