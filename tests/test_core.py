@@ -14610,3 +14610,310 @@ class TestWave72PalSerialDb(unittest.TestCase):
                          "SLES-51619 must not be Devil May Cry 2 (that is SLES-51265)")
         self.assertIn("Clock Tower", title,
                       "SLES-51619 must be Clock Tower 3")
+
+
+# ===========================================================================
+# Wave 73: PAL DB – resolved unknown titles + new entries + alt serials
+# ===========================================================================
+
+class TestWave73PalDbResolvedTitles(unittest.TestCase):
+    """Wave 73: 8 previously-unknown PAL titles now have correct game names."""
+
+    def setUp(self):
+        import os, json
+        pal_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "game_serial_db", "ps2_pal.json"
+        )
+        with open(pal_path, encoding="utf-8") as f:
+            self.pal_db = json.load(f)
+        self.games = self.pal_db["games"]
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+        from src.core.game_registry import lookup_game_title
+        self.lookup = lookup_game_title
+
+    def _get_serial(self, title):
+        return self.games.get(title, {}).get("serial", "")
+
+    def _get_crcs(self, title):
+        return self.games.get(title, {}).get("crcs", [])
+
+    # -- no unknown titles remain -------------------------------------------
+
+    def test_no_unknown_pal_titles_remain(self):
+        """After Wave 73, no PAL DB entry should have 'Unknown' in its title."""
+        unknowns = [t for t in self.games if "Unknown" in t]
+        self.assertEqual(unknowns, [],
+                         f"Unexpected 'Unknown' entries remain: {unknowns}")
+
+    def test_pal_db_at_least_110_games(self):
+        """PAL DB must have at least 110 games after Wave 73 additions."""
+        self.assertGreaterEqual(len(self.games), 110)
+
+    # -- SLES-51654 Buffy ---------------------------------------------------
+
+    def test_buffy_chaos_bleeds_pal_serial(self):
+        """Buffy the Vampire Slayer: Chaos Bleeds (PAL) must map to SLES-51654."""
+        self.assertEqual(
+            self._get_serial("Buffy the Vampire Slayer: Chaos Bleeds (PAL)"),
+            "SLES-51654"
+        )
+
+    def test_buffy_chaos_bleeds_pal_crc(self):
+        """Buffy: Chaos Bleeds (PAL) must carry CRC CBC401C5."""
+        self.assertIn("CBC401C5", self._get_crcs("Buffy the Vampire Slayer: Chaos Bleeds (PAL)"))
+
+    def test_sdb_resolves_sles_51654(self):
+        """SerialDatabase must resolve SLES-51654 to Buffy: Chaos Bleeds."""
+        titles = self.sdb.titles_for_serial("SLES-51654")
+        self.assertTrue(len(titles) > 0, "SLES-51654 not resolved")
+        self.assertTrue(any("Buffy" in t or "Chaos" in t for t in titles),
+                        f"SLES-51654 titles do not mention Buffy: {titles}")
+
+    # -- SLES-52976 Fahrenheit ----------------------------------------------
+
+    def test_fahrenheit_pal_serial(self):
+        """Fahrenheit (PAL) must map to SLES-52976."""
+        self.assertEqual(self._get_serial("Fahrenheit (PAL)"), "SLES-52976")
+
+    def test_fahrenheit_pal_crc(self):
+        """Fahrenheit (PAL) must carry CRC 3BEBCCAC."""
+        self.assertIn("3BEBCCAC", self._get_crcs("Fahrenheit (PAL)"))
+
+    def test_sdb_resolves_sles_52976(self):
+        """SerialDatabase must resolve SLES-52976 to Fahrenheit."""
+        titles = self.sdb.titles_for_serial("SLES-52976")
+        self.assertTrue(len(titles) > 0, "SLES-52976 not resolved")
+        self.assertTrue(any("Fahrenheit" in t for t in titles),
+                        f"SLES-52976 titles do not mention Fahrenheit: {titles}")
+
+    # -- SLES-53194 Midnight Club 3 ----------------------------------------
+
+    def test_midnight_club_3_pal_serial(self):
+        """Midnight Club 3: Dub Edition (PAL) must map to SLES-53194."""
+        self.assertEqual(
+            self._get_serial("Midnight Club 3: Dub Edition (PAL)"),
+            "SLES-53194"
+        )
+
+    def test_midnight_club_3_pal_crc(self):
+        """Midnight Club 3 (PAL) must carry CRC B2408080."""
+        self.assertIn("B2408080", self._get_crcs("Midnight Club 3: Dub Edition (PAL)"))
+
+    def test_sdb_resolves_sles_53194(self):
+        """SerialDatabase must resolve SLES-53194 to Midnight Club 3."""
+        titles = self.sdb.titles_for_serial("SLES-53194")
+        self.assertTrue(len(titles) > 0, "SLES-53194 not resolved")
+        self.assertTrue(any("Midnight" in t or "Club" in t for t in titles),
+                        f"SLES-53194 titles do not mention Midnight Club 3: {titles}")
+
+    # -- SLES-54200 DBZ BT2 -----------------------------------------------
+
+    def test_dbz_bt2_pal_serial(self):
+        """Dragon Ball Z: Budokai Tenkaichi 2 (PAL) must map to SLES-54200."""
+        self.assertEqual(
+            self._get_serial("Dragon Ball Z: Budokai Tenkaichi 2 (PAL)"),
+            "SLES-54200"
+        )
+
+    def test_dbz_bt2_pal_crc(self):
+        """DBZ Budokai Tenkaichi 2 (PAL) must carry CRC 151DF9C9."""
+        self.assertIn("151DF9C9", self._get_crcs("Dragon Ball Z: Budokai Tenkaichi 2 (PAL)"))
+
+    def test_sdb_resolves_sles_54200(self):
+        """SerialDatabase must resolve SLES-54200 to DBZ BT2."""
+        titles = self.sdb.titles_for_serial("SLES-54200")
+        self.assertTrue(len(titles) > 0, "SLES-54200 not resolved")
+        self.assertTrue(any("Dragon Ball" in t or "Budokai" in t for t in titles),
+                        f"SLES-54200 titles do not mention Dragon Ball Z: {titles}")
+
+    # -- SLES-54221 PES 2007 -----------------------------------------------
+
+    def test_pes_2007_pal_serial(self):
+        """Pro Evolution Soccer 2007 (PAL) must map to SLES-54221."""
+        self.assertEqual(
+            self._get_serial("Pro Evolution Soccer 2007 (PAL)"),
+            "SLES-54221"
+        )
+
+    def test_pes_2007_pal_crc(self):
+        """PES 2007 (PAL) must carry CRC 37E36C6D."""
+        self.assertIn("37E36C6D", self._get_crcs("Pro Evolution Soccer 2007 (PAL)"))
+
+    def test_sdb_resolves_sles_54221(self):
+        """SerialDatabase must resolve SLES-54221 to Pro Evolution Soccer 2007."""
+        titles = self.sdb.titles_for_serial("SLES-54221")
+        self.assertTrue(len(titles) > 0, "SLES-54221 not resolved")
+        self.assertTrue(any("Pro Evolution" in t or "Soccer" in t or "PES" in t for t in titles),
+                        f"SLES-54221 titles do not mention PES 2007: {titles}")
+
+    # -- SLES-54493 NFS Carbon ----------------------------------------------
+
+    def test_nfs_carbon_pal_serial(self):
+        """Need for Speed: Carbon (PAL) must map to SLES-54493."""
+        self.assertEqual(
+            self._get_serial("Need for Speed: Carbon (PAL)"),
+            "SLES-54493"
+        )
+
+    def test_nfs_carbon_pal_crc(self):
+        """NFS Carbon (PAL) must carry CRC 58BED00E."""
+        self.assertIn("58BED00E", self._get_crcs("Need for Speed: Carbon (PAL)"))
+
+    def test_sdb_resolves_sles_54493(self):
+        """SerialDatabase must resolve SLES-54493 to NFS Carbon."""
+        titles = self.sdb.titles_for_serial("SLES-54493")
+        self.assertTrue(len(titles) > 0, "SLES-54493 not resolved")
+        self.assertTrue(any("Speed" in t or "Carbon" in t for t in titles),
+                        f"SLES-54493 titles do not mention NFS Carbon: {titles}")
+
+    # -- SLES-55003 Guitar Hero Aerosmith -----------------------------------
+
+    def test_gh_aerosmith_pal_serial(self):
+        """Guitar Hero: Aerosmith (PAL) must map to SLES-55003."""
+        self.assertEqual(self._get_serial("Guitar Hero: Aerosmith (PAL)"), "SLES-55003")
+
+    def test_gh_aerosmith_pal_crc(self):
+        """Guitar Hero: Aerosmith (PAL) must carry CRC EA8DC584."""
+        self.assertIn("EA8DC584", self._get_crcs("Guitar Hero: Aerosmith (PAL)"))
+
+    def test_sdb_resolves_sles_55003(self):
+        """SerialDatabase must resolve SLES-55003 to Guitar Hero: Aerosmith."""
+        titles = self.sdb.titles_for_serial("SLES-55003")
+        self.assertTrue(len(titles) > 0, "SLES-55003 not resolved")
+        self.assertTrue(any("Guitar" in t or "Aerosmith" in t for t in titles),
+                        f"SLES-55003 titles do not mention Guitar Hero Aerosmith: {titles}")
+
+    # -- SLES-55350 Lego Batman --------------------------------------------
+
+    def test_lego_batman_pal_serial(self):
+        """Lego Batman: The Videogame (PAL) must map to SLES-55350."""
+        self.assertEqual(
+            self._get_serial("Lego Batman: The Videogame (PAL)"),
+            "SLES-55350"
+        )
+
+    def test_lego_batman_pal_crc(self):
+        """Lego Batman (PAL) must carry CRC 2FCBAB60."""
+        self.assertIn("2FCBAB60", self._get_crcs("Lego Batman: The Videogame (PAL)"))
+
+    def test_sdb_resolves_sles_55350(self):
+        """SerialDatabase must resolve SLES-55350 to Lego Batman."""
+        titles = self.sdb.titles_for_serial("SLES-55350")
+        self.assertTrue(len(titles) > 0, "SLES-55350 not resolved")
+        self.assertTrue(any("Lego" in t or "Batman" in t for t in titles),
+                        f"SLES-55350 titles do not mention Lego Batman: {titles}")
+
+    # -- pnach DB resolved names -------------------------------------------
+
+    def test_pnach_pes2007_name_resolved(self):
+        """Pnach entries for CRC 37E36C6D must reference PES 2007, not Unknown."""
+        import json, os
+        pnach_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "pnach_db", "known_addresses.json"
+        )
+        with open(pnach_path, encoding="utf-8") as f:
+            pnach_db = json.load(f)
+        for addr, entry in pnach_db.items():
+            if entry.get("game_crc", "").upper() == "37E36C6D":
+                game = entry.get("game", "")
+                self.assertNotIn("SLES-54221", game.replace("(SLES-54221)", ""),
+                                 "37E36C6D pnach entry still has raw-serial-only name")
+                self.assertIn("Pro Evolution Soccer", game,
+                              f"37E36C6D entry game field should mention PES 2007, got: {game!r}")
+                break
+
+    def test_pnach_nfs_carbon_name_resolved(self):
+        """Pnach entries for CRC 58BED00E must reference NFS Carbon, not Unknown."""
+        import json, os
+        pnach_path = os.path.join(
+            os.path.dirname(__file__), "..", "data", "pnach_db", "known_addresses.json"
+        )
+        with open(pnach_path, encoding="utf-8") as f:
+            pnach_db = json.load(f)
+        for addr, entry in pnach_db.items():
+            if entry.get("game_crc", "").upper() == "58BED00E":
+                game = entry.get("game", "")
+                self.assertIn("Need for Speed", game,
+                              f"58BED00E entry should mention NFS Carbon, got: {game!r}")
+                break
+
+    # -- alt_serial additions ----------------------------------------------
+
+    def test_ico_pal_has_sces_50760_alt_serial(self):
+        """Ico (PAL) must have SCES-50760 as an alt_serial."""
+        alt = self.games.get("Ico (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SCES-50760", alt,
+                      "Ico (PAL) must list SCES-50760 as alt_serial")
+
+    def test_ffx_pal_has_sces_50492_alt_serial(self):
+        """Final Fantasy X (PAL) must have SCES-50492 as an alt_serial."""
+        alt = self.games.get("Final Fantasy X (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SCES-50492", alt,
+                      "Final Fantasy X (PAL) must list SCES-50492 as alt_serial")
+
+    def test_ffx2_pal_has_sles_51815_alt_serial(self):
+        """Final Fantasy X-2 (PAL) must have SLES-51815 as an alt_serial."""
+        alt = self.games.get("Final Fantasy X-2 (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SLES-51815", alt,
+                      "Final Fantasy X-2 (PAL) must list SLES-51815 as alt_serial")
+
+    def test_rc_pal_has_sces_50916_alt_serial(self):
+        """Ratchet & Clank (PAL) must have SCES-50916 as an alt_serial."""
+        alt = self.games.get("Ratchet & Clank (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SCES-50916", alt,
+                      "Ratchet & Clank (PAL) must list SCES-50916 as alt_serial")
+
+    def test_crash_twinsanity_pal_has_sles_52568_alt_serial(self):
+        """Crash Twinsanity (PAL) must have SLES-52568 as an alt_serial."""
+        alt = self.games.get("Crash Twinsanity (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SLES-52568", alt,
+                      "Crash Twinsanity (PAL) must list SLES-52568 as alt_serial")
+
+    # -- new game entries --------------------------------------------------
+
+    def test_gta3_pal_present(self):
+        """Grand Theft Auto III (PAL) must be in the PAL DB."""
+        self.assertIn("Grand Theft Auto III (PAL)", self.games)
+
+    def test_gta_lcs_pal_present(self):
+        """Grand Theft Auto: Liberty City Stories (PAL) must be in the PAL DB."""
+        self.assertIn("Grand Theft Auto: Liberty City Stories (PAL)", self.games)
+
+    def test_gta_vcs_pal_present(self):
+        """Grand Theft Auto: Vice City Stories (PAL) must be in the PAL DB."""
+        self.assertIn("Grand Theft Auto: Vice City Stories (PAL)", self.games)
+
+    def test_bully_pal_present(self):
+        """Bully (PAL) must be in the PAL DB."""
+        self.assertIn("Bully (PAL)", self.games)
+
+    def test_yakuza_pal_present(self):
+        """Yakuza (PAL) must be in the PAL DB."""
+        self.assertIn("Yakuza (PAL)", self.games)
+
+    def test_we_love_katamari_pal_present(self):
+        """We Love Katamari (PAL) must be in the PAL DB."""
+        self.assertIn("We Love Katamari (PAL)", self.games)
+
+    def test_zone_of_enders_pal_present(self):
+        """Zone of the Enders (PAL) must be in the PAL DB."""
+        self.assertIn("Zone of the Enders (PAL)", self.games)
+
+    def test_zone_of_enders_2_pal_present(self):
+        """Zone of the Enders: The 2nd Runner (PAL) must be in the PAL DB."""
+        self.assertIn("Zone of the Enders: The 2nd Runner (PAL)", self.games)
+
+    def test_pes_series_progression_pal(self):
+        """PAL DB must have both PES 6 (SLES-53982) and PES 2007 (SLES-54221)."""
+        serials = {info["serial"] for info in self.games.values()}
+        self.assertIn("SLES-53982", serials, "PES 6 (SLES-53982) must be present")
+        self.assertIn("SLES-54221", serials, "PES 2007 (SLES-54221) must be present")
+
+    def test_nfs_series_progression_pal(self):
+        """PAL DB must have NFS Underground, Underground 2, Most Wanted, and Carbon."""
+        serials = {info["serial"] for info in self.games.values()}
+        self.assertIn("SLES-50978", serials, "NFS Underground (SLES-50978) must be present")
+        self.assertIn("SLES-52725", serials, "NFS Underground 2 (SLES-52725) must be present")
+        self.assertIn("SLES-53816", serials, "NFS Most Wanted (SLES-53816) must be present")
+        self.assertIn("SLES-54493", serials, "NFS Carbon (SLES-54493) must be present")
