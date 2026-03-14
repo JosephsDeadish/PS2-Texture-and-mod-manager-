@@ -7968,20 +7968,22 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.assertGreater(len(info.crcs), 0)
 
     def test_games_with_crcs_count_over_200(self):
-        """At least 875 games in the serial DB must have CRC entries.
+        """At least 874 games in the serial DB must have CRC entries.
 
         Wave 41 established ≥900; Wave 51 consolidated ~10 duplicate/redundant
         entries; Wave 52 cleared CRCs from 7 more wrong-case/alias entries
         while preserving all unique CRC coverage.  Wave 66 removed the only
         CRC from the duplicate 'Godfather, The' entry (SLUS-21406), reducing
-        the count by 1 — ≥875 remains an adequate floor.
+        the count by 1 — ≥875.  Wave 67 cleared CRCs from the 'Resident Evil'
+        alias entry (SLUS-20184 is RE: Code Veronica X), reducing by 1 more —
+        ≥874 remains an adequate floor.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreaterEqual(count, 875,
-                                f"Expected ≥875 games with CRCs, got {count}")
+        self.assertGreaterEqual(count, 874,
+                                f"Expected ≥874 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8029,20 +8031,22 @@ class TestWave42SerialDb(unittest.TestCase):
         )
 
     def test_wave42_games_with_crcs_over_900(self):
-        """Wave 42: at least 875 games still have CRC entries.
+        """Wave 42: at least 874 games still have CRC entries.
 
         Wave 51 consolidated ~10 duplicate/redundant entries into canonical
         entries; Wave 52 cleared CRCs from 7 more alias/wrong-case entries,
         reducing the count while preserving all unique CRC coverage.
         Wave 66 removed the duplicate 'Godfather, The' (SLUS-21406) CRC,
-        so ≥875 is the updated floor.
+        so ≥875 was the floor.  Wave 67 cleared CRCs from the 'Resident Evil'
+        alias entry (SLUS-20184 belongs to RE: Code Veronica X), reducing
+        by 1 more — ≥874 is the updated floor.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreaterEqual(count, 875,
-                                f"Expected ≥875 games with CRCs, got {count}")
+        self.assertGreaterEqual(count, 874,
+                                f"Expected ≥874 games with CRCs, got {count}")
 
     def test_wave42_dbz_sagas_crc_fixed(self):
         """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
@@ -13692,3 +13696,168 @@ class TestWave66DataQualityFixes(unittest.TestCase):
         for k, v in entries.items():
             self.assertEqual(v.get("game_serial"), "SCUS-97328",
                              f"{k}: game_serial must be SCUS-97328 (Gran Turismo 4)")
+
+
+class TestWave67DataQualityFixes(unittest.TestCase):
+    """Wave 67: Data quality fixes — pnach DB serial corrections and CRC re-assignments;
+    serial DB alias entry CRC cleared.
+
+    Fixed issues
+    -----------
+    Serial DB — CRC removals:
+    * 'Resident Evil' alias entry (SLUS-20184) had CRCs 24036809 and 3BD4F8EB
+      wrongly duplicated from 'Resident Evil: Code Veronica X'.  Cleared.
+
+    Pnach DB — empty serial filled (20 entries across 5 CRC groups):
+    * 24036809  (RE: Code Veronica X)    → SLUS-20184
+    * 47B9B2FD  (Radiata Stories)        → SLUS-21262
+    * 901AAC09  (Haunting Ground)        → SLUS-21075
+    * DEDC3B71  (Persona 4)              → SLUS-21782
+    * E94FBF35  (Driv3r)                 → SLUS-20587
+
+    Pnach DB — CRC re-assignment (16 entries):
+    * 9FA0A1B0 Aeon Flux entries → CRC corrected to FA37A58A (Aeon Flux's real CRC).
+      CRC 9FA0A1B0 belongs to Star Ocean: TTEOT Director's Cut (SLUS-20488).
+
+    Pnach DB — serial / game-name fix (44 entries):
+    * 8DB76084 Curious George entries → serial SLUS-21354 → SLUS-21484,
+      game → 'Flushed Away (SLUS-21484)' to match CRC owner.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        raw = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+        cls.games = raw["games"]
+
+    def _entries_for_crc(self, crc: str) -> dict:
+        return {k: v for k, v in self.pnach_db.items()
+                if v.get("game_crc", "").upper() == crc.upper()}
+
+    # ------------------------------------------------------------------
+    # Serial DB — 'Resident Evil' alias entry CRC cleared
+    # ------------------------------------------------------------------
+
+    def test_resident_evil_alias_no_crcs(self):
+        """'Resident Evil' alias entry must have no CRCs (they belong to RE:CVX)."""
+        crcs = self.games.get("Resident Evil", {}).get("crcs", [])
+        self.assertEqual(crcs, [],
+                         "'Resident Evil' alias must have empty crcs list; "
+                         "CRCs 24036809/3BD4F8EB belong to RE: Code Veronica X")
+
+    def test_re_cvx_retains_crcs(self):
+        """'Resident Evil: Code Veronica X' must still have CRCs 24036809 and 3BD4F8EB."""
+        crcs = self.games.get("Resident Evil: Code Veronica X", {}).get("crcs", [])
+        self.assertIn("24036809", crcs, "RE:CVX must retain CRC 24036809")
+        self.assertIn("3BD4F8EB", crcs, "RE:CVX must retain CRC 3BD4F8EB")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — empty serials filled
+    # ------------------------------------------------------------------
+
+    def test_24036809_serial_filled(self):
+        """All 24036809 pnach entries must have game_serial SLUS-20184 (RE:CVX)."""
+        entries = self._entries_for_crc("24036809")
+        self.assertGreater(len(entries), 0, "No 24036809 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20184",
+                             f"{k}: game_serial must be SLUS-20184 (RE: Code Veronica X)")
+
+    def test_47b9b2fd_serial_filled(self):
+        """All 47B9B2FD pnach entries must have game_serial SLUS-21262 (Radiata Stories)."""
+        entries = self._entries_for_crc("47B9B2FD")
+        self.assertGreater(len(entries), 0, "No 47B9B2FD entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21262",
+                             f"{k}: game_serial must be SLUS-21262 (Radiata Stories)")
+
+    def test_901aac09_serial_filled(self):
+        """All 901AAC09 pnach entries must have game_serial SLUS-21075 (Haunting Ground)."""
+        entries = self._entries_for_crc("901AAC09")
+        self.assertGreater(len(entries), 0, "No 901AAC09 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21075",
+                             f"{k}: game_serial must be SLUS-21075 (Haunting Ground)")
+
+    def test_dedc3b71_serial_filled(self):
+        """All DEDC3B71 pnach entries must have game_serial SLUS-21782 (Persona 4)."""
+        entries = self._entries_for_crc("DEDC3B71")
+        self.assertGreater(len(entries), 0, "No DEDC3B71 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21782",
+                             f"{k}: game_serial must be SLUS-21782 (Persona 4)")
+
+    def test_e94fbf35_serial_filled(self):
+        """All E94FBF35 pnach entries must have game_serial SLUS-20587 (Driv3r)."""
+        entries = self._entries_for_crc("E94FBF35")
+        self.assertGreater(len(entries), 0, "No E94FBF35 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20587",
+                             f"{k}: game_serial must be SLUS-20587 (Driv3r)")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — 9FA0A1B0 Aeon Flux CRC re-assigned to FA37A58A
+    # ------------------------------------------------------------------
+
+    def test_9fa0a1b0_no_aeon_flux_entries(self):
+        """CRC 9FA0A1B0 must not contain Aeon Flux (SLUS-21205) entries."""
+        entries = self._entries_for_crc("9FA0A1B0")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21205"]
+        self.assertEqual(bad, [],
+                         "9FA0A1B0 belongs to Star Ocean DC, not Aeon Flux (SLUS-21205)")
+
+    def test_fa37a58a_has_aeon_flux_entries(self):
+        """FA37A58A (Aeon Flux's correct CRC) must have pnach entries with SLUS-21205."""
+        entries = self._entries_for_crc("FA37A58A")
+        self.assertGreater(len(entries), 0,
+                           "FA37A58A must have Aeon Flux pnach entries")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21205",
+                             f"{k}: FA37A58A entry must reference SLUS-21205 (Aeon Flux)")
+
+    def test_fa37a58a_game_crc_field(self):
+        """All FA37A58A entries must have game_crc='FA37A58A'."""
+        entries = self._entries_for_crc("FA37A58A")
+        self.assertGreater(len(entries), 0, "No FA37A58A entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_crc", "").upper(), "FA37A58A",
+                             f"{k}: game_crc field must be FA37A58A")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — 8DB76084 Curious George → Flushed Away fix
+    # ------------------------------------------------------------------
+
+    def test_8db76084_no_curious_george_serial(self):
+        """CRC 8DB76084 must not have entries with Curious George serial SLUS-21354."""
+        entries = self._entries_for_crc("8DB76084")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21354"]
+        self.assertEqual(bad, [],
+                         "8DB76084 belongs to Flushed Away, not Curious George (SLUS-21354)")
+
+    def test_8db76084_all_flushed_away_serial(self):
+        """All 8DB76084 pnach entries must have serial SLUS-21484 (Flushed Away)."""
+        entries = self._entries_for_crc("8DB76084")
+        self.assertGreater(len(entries), 0, "No 8DB76084 entries found")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21484",
+                             f"{k}: 8DB76084 entry must reference SLUS-21484 (Flushed Away)")
+
+    # ------------------------------------------------------------------
+    # Cross-validation: every pnach entry's CRC key must match game_crc
+    # ------------------------------------------------------------------
+
+    def test_key_crc_matches_game_crc(self):
+        """Every pnach key's CRC prefix must match the entry's game_crc field."""
+        mismatches = []
+        for key, data in self.pnach_db.items():
+            key_crc = key.split(":")[0].upper()
+            game_crc = data.get("game_crc", "").upper()
+            if game_crc and key_crc != game_crc:
+                mismatches.append(f"{key}: key CRC={key_crc}, game_crc={game_crc}")
+        self.assertEqual(mismatches, [],
+                         f"Key/game_crc mismatches found: {mismatches[:5]}")

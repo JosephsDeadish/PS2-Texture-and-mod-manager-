@@ -3116,10 +3116,7 @@
     "Resident Evil": {
       "serial": "SLUS-20184",
       "alt_serials": [],
-      "crcs": [
-        "24036809",
-        "3BD4F8EB"
-      ],
+      "crcs": [],
       "release_date": "2001-08-21",
       "developer": "Capcom",
       "publisher": "Capcom",
