@@ -4393,7 +4393,7 @@
       "publisher": "Namco Hometek",
       "genre": "RPG"
     },
-    "Xenosaga Episode II: Jenseits von Gut und Böse": {
+    "Xenosaga Episode II: Jenseits von Gut und B\u00f6se": {
       "serial": "SLUS-20892",
       "alt_serials": [
         "SLUS-21133"
@@ -9531,7 +9531,8 @@
       "serial": "SLUS-21037",
       "alt_serials": [],
       "crcs": [
-        "7849F069"
+        "7849F069",
+        "2BDA8ADB"
       ],
       "release_date": "2005-02-23",
       "developer": "Crystal Dynamics, Inc",
@@ -18143,7 +18144,7 @@
       "crcs": [],
       "genre": "MMORPG"
     },
-    "Madden NFL 08 en Español": {
+    "Madden NFL 08 en Espa\u00f1ol": {
       "serial": "SLUS-21705",
       "alt_serials": [],
       "crcs": [],
@@ -18840,7 +18841,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-10-21",
-      "developer": "Étranges Libellules",
+      "developer": "\u00c9tranges Libellules",
       "publisher": "Sierra Entertainment",
       "genre": "Action-Adventure"
     },

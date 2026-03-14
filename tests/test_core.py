@@ -8824,3 +8824,128 @@ class TestWave47NewGames(unittest.TestCase):
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2294 games (6 new games added)."""
         self.assertGreaterEqual(len(self.games), 2294)
+
+
+class TestWave48GabominatedPnachCodes(unittest.TestCase):
+    """Wave 48: fps/visual codes from Gabominated PCSX2 repo — 52 new CRCs (78 entries)."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
+        self.db = json.loads(db_path.read_text())
+        sdb_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.games = json.loads(sdb_path.read_text())["games"]
+
+    # ── pnach DB size ────────────────────────────────────────────────────────
+
+    def test_wave48_pnach_db_size_over_47900(self):
+        """Wave 48: pnach DB should have more than 47,900 entries after new fps code addition."""
+        self.assertGreater(
+            len(self.db), 47900,
+            f"Expected >47900 pnach DB entries after Wave 48, got {len(self.db)}"
+        )
+
+    def test_wave48_fps_entry_count_over_360(self):
+        """Wave 48: pnach DB should have >360 fps category entries after Wave 48."""
+        fps_entries = [e for e in self.db.values() if e.get("category") == "fps"]
+        self.assertGreater(
+            len(fps_entries), 360,
+            f"Expected >360 fps entries, got {len(fps_entries)}"
+        )
+
+    # ── specific new fps entries ─────────────────────────────────────────────
+
+    def test_wave48_horsez_fps_present(self):
+        """Wave 48: Horsez (F0512849) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("F0512849:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for Horsez CRC F0512849")
+        entry = self.db[keys[0]]
+        self.assertEqual(entry.get("category"), "fps")
+        self.assertEqual(entry.get("game_serial"), "SLUS-21563")
+
+    def test_wave48_uefa_euro_2008_fps_present(self):
+        """Wave 48: UEFA Euro 2008 (9703FCBF) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("9703FCBF:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 entries for UEFA Euro 2008 CRC 9703FCBF, got {len(keys)}")
+        for k in keys:
+            self.assertEqual(self.db[k].get("category"), "fps")
+            self.assertEqual(self.db[k].get("game_serial"), "SLUS-21699")
+
+    def test_wave48_silent_hill_4_fps_present(self):
+        """Wave 48: Silent Hill 4: The Room (3919136D) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("3919136D:EE:")]
+        self.assertGreaterEqual(
+            len(keys), 6,
+            f"Expected >=6 fps entries for Silent Hill 4 CRC 3919136D, got {len(keys)}"
+        )
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20873")
+
+    def test_wave48_freedom_fighters_fps_present(self):
+        """Wave 48: Freedom Fighters (1DA7E9BC) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("1DA7E9BC:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for Freedom Fighters CRC 1DA7E9BC")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20658")
+
+    def test_wave48_syphon_filter_omega_strain_fps_present(self):
+        """Wave 48: Syphon Filter: The Omega Strain (D5605611) fps entries in pnach DB."""
+        keys = [k for k in self.db if k.startswith("D5605611:EE:")]
+        self.assertGreaterEqual(len(keys), 3, f"Expected >=3 entries for Syphon Filter: The Omega Strain CRC D5605611, got {len(keys)}")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SCUS-97264")
+
+    def test_wave48_prince_of_persia_warrior_within_fps_present(self):
+        """Wave 48: Prince of Persia: Warrior Within (6B17B39F) fps+visual entries in pnach DB."""
+        keys = [k for k in self.db if k.startswith("6B17B39F:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 entries for Prince of Persia: Warrior Within CRC 6B17B39F")
+        categories = {self.db[k].get("category") for k in keys}
+        self.assertIn("fps", categories)
+        self.assertIn("visual", categories)
+
+    def test_wave48_grandia_iii_fps_present(self):
+        """Wave 48: Grandia III (5B657DAD) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("5B657DAD:EE:")]
+        self.assertGreaterEqual(len(keys), 2, f"Expected >=2 fps entries for Grandia III CRC 5B657DAD, got {len(keys)}")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-21334")
+
+    def test_wave48_blade_ii_fps_present(self):
+        """Wave 48: Blade II (6D0E5F2D) 60 FPS entries should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("6D0E5F2D:EE:")]
+        self.assertGreaterEqual(len(keys), 4, f"Expected >=4 fps entries for Blade II CRC 6D0E5F2D, got {len(keys)}")
+
+    def test_wave48_dbz_sagas_fps_present(self):
+        """Wave 48: Dragon Ball Z: Sagas (E36751DA) 60 FPS entry should be in pnach DB."""
+        keys = [k for k in self.db if k.startswith("E36751DA:EE:")]
+        self.assertGreater(len(keys), 0, "No pnach entries for DBZ Sagas CRC E36751DA")
+        self.assertEqual(self.db[keys[0]].get("game_serial"), "SLUS-20874")
+
+    # ── entry structure ──────────────────────────────────────────────────────
+
+    def test_wave48_new_entries_have_required_fields(self):
+        """Wave 48: new entries must have required fields (game, game_crc, game_serial, etc.)."""
+        new_crcs = [
+            "F0512849", "9703FCBF", "3919136D", "1DA7E9BC", "D5605611",
+            "6B17B39F", "5B657DAD", "6D0E5F2D", "E36751DA", "9798D85A",
+        ]
+        required_fields = ("game", "game_crc", "game_serial", "description", "category",
+                           "patch_type", "verification_status")
+        for crc in new_crcs:
+            keys = [k for k in self.db if k.startswith(f"{crc}:EE:")]
+            for key in keys:
+                entry = self.db[key]
+                with self.subTest(key=key):
+                    for field in required_fields:
+                        self.assertIn(field, entry, f"Entry {key} missing field '{field}'")
+                    key_crc = key.split(":")[0].upper()
+                    self.assertEqual(
+                        key_crc, entry["game_crc"].upper(),
+                        f"CRC mismatch for entry {key}: key={key_crc}, game_crc={entry['game_crc']}"
+                    )
+
+    # ── serial DB update ─────────────────────────────────────────────────────
+
+    def test_wave48_project_snowblind_has_2bda8adb_crc(self):
+        """Wave 48: Project Snowblind should have 2BDA8ADB as secondary CRC."""
+        game = self.games.get("Project - Snowblind")
+        self.assertIsNotNone(game, "Project - Snowblind not found in serial DB")
+        crcs = game.get("crcs", [])
+        self.assertIn("2BDA8ADB", crcs, f"Expected 2BDA8ADB in Project Snowblind CRCs, got {crcs}")
