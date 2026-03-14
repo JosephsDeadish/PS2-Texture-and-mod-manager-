@@ -293,7 +293,9 @@
     },
     "Armored Core: Nexus": {
       "serial": "SLUS-20986",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21079"
+      ],
       "crcs": [
         "A94BB42B"
       ],
@@ -1546,7 +1548,8 @@
     "Gran Turismo 4": {
       "serial": "SCUS-97328",
       "alt_serials": [
-        "SCUS-97436"
+        "SCUS-97436",
+        "SCUS-90682"
       ],
       "crcs": [
         "77E61C8A",
@@ -1965,7 +1968,9 @@
     },
     "Jak and Daxter: The Precursor Legacy": {
       "serial": "SCUS-97124",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-97124"
+      ],
       "crcs": [
         "2B2570A0",
         "44A61C8F",
@@ -2713,7 +2718,9 @@
     },
     "Onimusha: Dawn of Dreams": {
       "serial": "SLUS-21180",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21362"
+      ],
       "crcs": [
         "2CFFFC1E",
         "FE44479E"
@@ -2784,7 +2791,9 @@
     },
     "Primal": {
       "serial": "SCUS-97142",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-97142"
+      ],
       "crcs": [
         "FCD89DC3"
       ]
@@ -3219,7 +3228,9 @@
     },
     "Shadow Hearts: Covenant": {
       "serial": "SLUS-21041",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21044"
+      ],
       "crcs": [
         "1A9BFCD1",
         "3B9A81AD"
@@ -4208,7 +4219,9 @@
     },
     "War of the Monsters": {
       "serial": "SCUS-97197",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-91197"
+      ],
       "release_date": "2003-01-14",
       "developer": "Incognito Entertainment",
       "publisher": "Sony Computer Entertainment",
@@ -4238,7 +4251,9 @@
     },
     "Wild ARMs 3": {
       "serial": "SCUS-97203",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-97203"
+      ],
       "crcs": [
         "A53C9EC5",
         "B5B09F5D"
@@ -4354,9 +4369,11 @@
       "publisher": "Namco Hometek",
       "genre": "RPG"
     },
-    "Xenosaga Episode II: Jenseits von Gut und B\u00f6se": {
+    "Xenosaga Episode II: Jenseits von Gut und Böse": {
       "serial": "SLUS-20892",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21133"
+      ],
       "crcs": [
         "161E0B8D"
       ],
@@ -4393,7 +4410,9 @@
     },
     "Xenosaga Episode III: Also sprach Zarathustra": {
       "serial": "SLUS-21389",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21417"
+      ],
       "crcs": [
         "94A82AAA",
         "A4E6B8D2",
@@ -6911,7 +6930,9 @@
     },
     "Cy Girls": {
       "serial": "SLUS-20697",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20854"
+      ],
       "crcs": [
         "302797DF"
       ],
@@ -8633,7 +8654,9 @@
     },
     "Monsters, Inc.": {
       "serial": "SCUS-97123",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-21052"
+      ],
       "crcs": [
         "E157ACB8"
       ],
@@ -11183,7 +11206,9 @@
     },
     "ATV Offroad Fury 3": {
       "serial": "SCUS-97405",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-97405"
+      ],
       "crcs": [],
       "release_date": "2004-11-02",
       "developer": "Climax Group",
@@ -11230,7 +11255,9 @@
     },
     "EyeToy: Antigrav": {
       "serial": "SCUS-97414",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-97414"
+      ],
       "crcs": []
     },
     "Sly 2: Band of Thieves (SCUS-97415)": {
@@ -11870,7 +11897,9 @@
     },
     "SingStar Latino": {
       "serial": "SCUS-97660",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-94346"
+      ],
       "crcs": []
     },
     "SOCOM: U.S. Navy SEALs (SCUS-97859)": {
@@ -14501,7 +14530,9 @@
     },
     "Space Channel 5: Special Edition (Disc 1)": {
       "serial": "SLUS-20806",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20807"
+      ],
       "crcs": [],
       "release_date": "2003-11-18",
       "developer": "United Game Artists (Sega)",
@@ -14609,7 +14640,9 @@
     },
     "Ribbit King": {
       "serial": "SLUS-20837",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20914"
+      ],
       "crcs": [],
       "release_date": "2004-06-10",
       "developer": "Anthropomorphic Animals Jamsworks Co., Ltd",
@@ -15555,7 +15588,9 @@
     },
     "Mortal Kombat: Deception: Premium Pack": {
       "serial": "SLUS-21101",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21081"
+      ],
       "crcs": [],
       "release_date": "2004-10-04",
       "developer": "Midway",
@@ -16512,7 +16547,9 @@
     },
     "Metal Gear Solid 3: Subsistence (Disc 1) (Subsistence)": {
       "serial": "SLUS-21359",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21360"
+      ],
       "crcs": [],
       "release_date": "2006-03-14",
       "developer": "Konami",
@@ -18056,7 +18093,7 @@
       "crcs": [],
       "genre": "MMORPG"
     },
-    "Madden NFL 08 en Espa\u00f1ol": {
+    "Madden NFL 08 en Español": {
       "serial": "SLUS-21705",
       "alt_serials": [],
       "crcs": [],
@@ -18486,7 +18523,9 @@
     },
     "LEGO Batman: The Videogame": {
       "serial": "SLUS-21785",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-10380"
+      ],
       "crcs": [],
       "release_date": "2008-09-23",
       "developer": "Traveller's Tales",
@@ -18504,7 +18543,9 @@
     },
     "TNA Impact! Total Nonstop Action Wrestling": {
       "serial": "SLUS-21787",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21824"
+      ],
       "crcs": [],
       "release_date": "2008",
       "developer": "Midway",
@@ -18749,7 +18790,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-10-21",
-      "developer": "\u00c9tranges Libellules",
+      "developer": "Étranges Libellules",
       "publisher": "Sierra Entertainment",
       "genre": "Action-Adventure"
     },
@@ -19272,7 +19313,9 @@
     },
     "Sakura Wars: So Long, My Love (Disc 1) (English Voice Over)": {
       "serial": "SLUS-21927",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-21930"
+      ],
       "crcs": [],
       "release_date": "2010-03-30",
       "developer": "Red",
@@ -19299,7 +19342,9 @@
     },
     "Disney/Pixar Toy Story 3": {
       "serial": "SLUS-21931",
-      "alt_serials": [],
+      "alt_serials": [
+        "SCUS-90174"
+      ],
       "crcs": [],
       "release_date": "2010-11-02",
       "developer": "Asobo Studio",

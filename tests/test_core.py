@@ -8507,3 +8507,122 @@ class TestWave44FpsPnachCodes(unittest.TestCase):
             "SCUS-21117", alt_serials,
             f"Expected SCUS-21117 in alt_serials for WE8 International, got {alt_serials}"
         )
+
+
+class TestWave45AltSerials(unittest.TestCase):
+    """Wave 45: alt_serial additions for game variants and multi-disc entries from PS2.data.json."""
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        self.data = json.loads(db_path.read_text())["games"]
+
+    def _assert_alt_serial(self, title, expected_serial):
+        game = self.data.get(title)
+        self.assertIsNotNone(game, f"'{title}' not found in serial DB")
+        alts = game.get("alt_serials", [])
+        self.assertIn(
+            expected_serial, alts,
+            f"Expected {expected_serial} in alt_serials for '{title}', got {alts}",
+        )
+
+    # --- Variant/alternate-release alt_serials ---
+
+    def test_lego_batman_scus_10380_alt_serial(self):
+        """Wave 45: SCUS-10380 should be alt_serial for LEGO Batman: The Videogame."""
+        self._assert_alt_serial("LEGO Batman: The Videogame", "SCUS-10380")
+
+    def test_monsters_inc_scus_21052_alt_serial(self):
+        """Wave 45: SCUS-21052 should be alt_serial for Monsters, Inc."""
+        self._assert_alt_serial("Monsters, Inc.", "SCUS-21052")
+
+    def test_toy_story_3_scus_90174_alt_serial(self):
+        """Wave 45: SCUS-90174 should be alt_serial for Disney/Pixar Toy Story 3."""
+        self._assert_alt_serial("Disney/Pixar Toy Story 3", "SCUS-90174")
+
+    def test_gran_turismo_4_scus_90682_alt_serial(self):
+        """Wave 45: SCUS-90682 should be alt_serial for Gran Turismo 4."""
+        self._assert_alt_serial("Gran Turismo 4", "SCUS-90682")
+
+    def test_war_of_the_monsters_scus_91197_alt_serial(self):
+        """Wave 45: SCUS-91197 should be alt_serial for War of the Monsters."""
+        self._assert_alt_serial("War of the Monsters", "SCUS-91197")
+
+    def test_singstar_latino_scus_94346_alt_serial(self):
+        """Wave 45: SCUS-94346 should be alt_serial for SingStar Latino."""
+        self._assert_alt_serial("SingStar Latino", "SCUS-94346")
+
+    def test_jak_daxter_slus_97124_alt_serial(self):
+        """Wave 45: SLUS-97124 (GH) should be alt_serial for Jak and Daxter: The Precursor Legacy."""
+        self._assert_alt_serial("Jak and Daxter: The Precursor Legacy", "SLUS-97124")
+
+    def test_primal_slus_97142_alt_serial(self):
+        """Wave 45: SLUS-97142 should be alt_serial for Primal."""
+        self._assert_alt_serial("Primal", "SLUS-97142")
+
+    def test_wild_arms_3_slus_97203_alt_serial(self):
+        """Wave 45: SLUS-97203 (GH) should be alt_serial for Wild ARMs 3."""
+        self._assert_alt_serial("Wild ARMs 3", "SLUS-97203")
+
+    def test_atv_offroad_fury3_slus_97405_alt_serial(self):
+        """Wave 45: SLUS-97405 should be alt_serial for ATV Offroad Fury 3."""
+        self._assert_alt_serial("ATV Offroad Fury 3", "SLUS-97405")
+
+    def test_eyetoy_antigrav_slus_97414_alt_serial(self):
+        """Wave 45: SLUS-97414 should be alt_serial for EyeToy: Antigrav."""
+        self._assert_alt_serial("EyeToy: Antigrav", "SLUS-97414")
+
+    # --- Multi-disc alt_serials (Disc 2 / Disc 3 / Bonus Disc) ---
+
+    def test_space_channel_5_disc2_alt_serial(self):
+        """Wave 45: SLUS-20807 (Disc 2) should be alt_serial for Space Channel 5: Special Edition."""
+        self._assert_alt_serial("Space Channel 5: Special Edition (Disc 1)", "SLUS-20807")
+
+    def test_cy_girls_disc2_alt_serial(self):
+        """Wave 45: SLUS-20854 (Disc 2/Aska) should be alt_serial for Cy Girls."""
+        self._assert_alt_serial("Cy Girls", "SLUS-20854")
+
+    def test_ribbit_king_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-20914 (Bonus Disc) should be alt_serial for Ribbit King."""
+        self._assert_alt_serial("Ribbit King", "SLUS-20914")
+
+    def test_shadow_hearts_covenant_disc2_alt_serial(self):
+        """Wave 45: SLUS-21044 (Disc 2) should be alt_serial for Shadow Hearts: Covenant."""
+        self._assert_alt_serial("Shadow Hearts: Covenant", "SLUS-21044")
+
+    def test_armored_core_nexus_disc2_alt_serial(self):
+        """Wave 45: SLUS-21079 (Disc 2) should be alt_serial for Armored Core: Nexus."""
+        self._assert_alt_serial("Armored Core: Nexus", "SLUS-21079")
+
+    def test_mortal_kombat_deception_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-21081 (Bonus Disc) should be alt_serial for MK: Deception Premium Pack."""
+        self._assert_alt_serial("Mortal Kombat: Deception: Premium Pack", "SLUS-21081")
+
+    def test_xenosaga_ep2_disc2_alt_serial(self):
+        """Wave 45: SLUS-21133 (Disc 2) should be alt_serial for Xenosaga Episode II."""
+        self._assert_alt_serial("Xenosaga Episode II: Jenseits von Gut und Böse", "SLUS-21133")
+
+    def test_mgs3_subsistence_disc3_alt_serial(self):
+        """Wave 45: SLUS-21360 (Disc 3/Existence) should be alt_serial for MGS3 Subsistence Disc 1."""
+        self._assert_alt_serial(
+            "Metal Gear Solid 3: Subsistence (Disc 1) (Subsistence)", "SLUS-21360"
+        )
+
+    def test_onimusha_dawn_disc2_alt_serial(self):
+        """Wave 45: SLUS-21362 (Disc 2) should be alt_serial for Onimusha: Dawn of Dreams."""
+        self._assert_alt_serial("Onimusha: Dawn of Dreams", "SLUS-21362")
+
+    def test_xenosaga_ep3_disc2_alt_serial(self):
+        """Wave 45: SLUS-21417 (Disc 2) should be alt_serial for Xenosaga Episode III."""
+        self._assert_alt_serial("Xenosaga Episode III: Also sprach Zarathustra", "SLUS-21417")
+
+    def test_tna_impact_bonus_disc_alt_serial(self):
+        """Wave 45: SLUS-21824 (Bonus Disc) should be alt_serial for TNA Impact!."""
+        self._assert_alt_serial("TNA Impact! Total Nonstop Action Wrestling", "SLUS-21824")
+
+    def test_sakura_wars_disc2_alt_serial(self):
+        """Wave 45: SLUS-21930 (Disc 2/Japanese VO) should be alt_serial for Sakura Wars Disc 1."""
+        self._assert_alt_serial(
+            "Sakura Wars: So Long, My Love (Disc 1) (English Voice Over)", "SLUS-21930"
+        )
