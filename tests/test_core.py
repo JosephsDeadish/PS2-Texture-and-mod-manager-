@@ -12200,3 +12200,197 @@ class TestWave60CrcLabels(unittest.TestCase):
         """After Wave 60, at least 51 games should have crc_labels."""
         labeled = sum(1 for g in self.games.values() if g.get("crc_labels"))
         self.assertGreaterEqual(labeled, 51)
+
+
+class TestWave61PnachEntries(unittest.TestCase):
+    """Wave 61: pnach DB entries for 5 popular games that previously had 0 entries."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    # ------------------------------------------------------------------
+    # helpers
+    # ------------------------------------------------------------------
+    def _entries_for(self, crc):
+        return {k: v for k, v in self.db.items() if k.startswith(crc)}
+
+    def _assert_min_entries(self, crc, min_count, label=""):
+        entries = self._entries_for(crc)
+        self.assertGreaterEqual(
+            len(entries), min_count,
+            f"{label or crc}: expected ≥{min_count} entries, got {len(entries)}"
+        )
+
+    def _assert_ws_entry(self, crc, addr_key):
+        """Assert a widescreen entry is correctly formed (float + 3FAB851F key)."""
+        full_key = f"{crc}:EE:{addr_key}"
+        self.assertIn(full_key, self.db, f"Missing widescreen key: {full_key}")
+        v = self.db[full_key]
+        self.assertEqual(v["category"], "widescreen")
+        self.assertEqual(v["value_type"], "float",
+                         f"{full_key}: widescreen must use value_type=float")
+        vm = v.get("value_map", {})
+        self.assertTrue(
+            "3FAB851F" in vm or "3FAAAAAB" in vm,
+            f"{full_key}: widescreen value_map must contain 3FAB851F or 3FAAAAAB"
+        )
+
+    # ------------------------------------------------------------------
+    # Dragon Quest VIII
+    # ------------------------------------------------------------------
+    def test_dqviii_v100_has_entries(self):
+        self._assert_min_entries("F53B6210", 5, "DQ VIII v1.00")
+
+    def test_dqviii_v101_has_entries(self):
+        self._assert_min_entries("DA0F1E34", 2, "DQ VIII v1.01")
+
+    def test_dqviii_widescreen_v100(self):
+        self._assert_ws_entry("F53B6210", "00220000")
+
+    def test_dqviii_widescreen_v101(self):
+        self._assert_ws_entry("DA0F1E34", "00220000")
+
+    def test_dqviii_hp_cheat(self):
+        key = "F53B6210:EE:006B0000"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "cheat")
+        self.assertEqual(self.db[key]["value_type"], "int")
+
+    def test_dqviii_gold_cheat(self):
+        key = "F53B6210:EE:006B0008"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "cheat")
+
+    # ------------------------------------------------------------------
+    # Gradius V
+    # ------------------------------------------------------------------
+    def test_gradius_v_v100_has_entries(self):
+        self._assert_min_entries("FBBA1C3B", 4, "Gradius V v1.00")
+
+    def test_gradius_v_v101_has_entries(self):
+        self._assert_min_entries("58B9B9DC", 1, "Gradius V v1.01")
+
+    def test_gradius_v_lives_entry(self):
+        key = "FBBA1C3B:EE:006C0000"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "cheat")
+
+    def test_gradius_v_speed_float(self):
+        key = "FBBA1C3B:EE:006C000C"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["value_type"], "float")
+        self.assertEqual(self.db[key]["category"], "gameplay")
+
+    # ------------------------------------------------------------------
+    # Ridge Racer V
+    # ------------------------------------------------------------------
+    def test_rrv_v100_has_entries(self):
+        self._assert_min_entries("1F2C2BCE", 4, "Ridge Racer V v1.00")
+
+    def test_rrv_v101_has_entries(self):
+        self._assert_min_entries("5D498EE4", 2, "Ridge Racer V v1.01")
+
+    def test_rrv_widescreen_v100(self):
+        self._assert_ws_entry("1F2C2BCE", "00230000")
+
+    def test_rrv_widescreen_v101(self):
+        self._assert_ws_entry("5D498EE4", "00230000")
+
+    def test_rrv_speed_multiplier(self):
+        key = "1F2C2BCE:EE:006D0000"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["value_type"], "float")
+        self.assertEqual(self.db[key]["category"], "physics")
+
+    # ------------------------------------------------------------------
+    # Mortal Kombat: Deception
+    # ------------------------------------------------------------------
+    def test_mkd_v100_has_entries(self):
+        self._assert_min_entries("79E17EE2", 5, "MK Deception v1.00")
+
+    def test_mkd_v101_has_entries(self):
+        self._assert_min_entries("C7C09A27", 2, "MK Deception v1.01")
+
+    def test_mkd_p1_health(self):
+        key = "79E17EE2:EE:006E0000"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "combat")
+
+    def test_mkd_p2_health(self):
+        key = "79E17EE2:EE:006E0004"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "combat")
+
+    def test_mkd_round_timer(self):
+        key = "79E17EE2:EE:006E0008"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "gameplay")
+        self.assertEqual(self.db[key]["value_type"], "int")
+
+    def test_mkd_damage_multiplier_is_float(self):
+        key = "79E17EE2:EE:006E000C"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["value_type"], "float")
+
+    # ------------------------------------------------------------------
+    # Prince of Persia: Warrior Within
+    # ------------------------------------------------------------------
+    def test_popww_v100_has_entries(self):
+        self._assert_min_entries("4FC3FFF2", 2, "PoP WW v1.00")
+
+    def test_popww_v102_has_entries(self):
+        self._assert_min_entries("E94B4EA3", 2, "PoP WW v1.02")
+
+    def test_popww_60fps_v100(self):
+        key = "4FC3FFF2:EE:0052D5D8"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "fps")
+
+    def test_popww_60fps_v102(self):
+        key = "E94B4EA3:EE:0052D5D8"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "fps")
+
+    def test_popww_disable_blur_v100(self):
+        key = "4FC3FFF2:EE:005379AC"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "visual")
+
+    def test_popww_disable_blur_v102(self):
+        key = "E94B4EA3:EE:005379AC"
+        self.assertIn(key, self.db)
+        self.assertEqual(self.db[key]["category"], "visual")
+
+    # ------------------------------------------------------------------
+    # Structural invariants for all new entries
+    # ------------------------------------------------------------------
+    def test_all_new_entries_have_required_fields(self):
+        """All Wave 61 entries must have the 5 required fields."""
+        required = {"category", "description", "game", "game_crc", "game_serial"}
+        wave61_crcs = {
+            "F53B6210", "DA0F1E34", "FBBA1C3B", "58B9B9DC",
+            "1F2C2BCE", "5D498EE4", "79E17EE2", "C7C09A27",
+            "4FC3FFF2", "E94B4EA3"
+        }
+        for k, v in self.db.items():
+            if k.split(":")[0] in wave61_crcs:
+                missing = required - set(v.keys())
+                self.assertFalse(
+                    missing,
+                    f"Entry {k} missing fields: {missing}"
+                )
+
+    def test_all_new_widescreen_entries_are_valid(self):
+        """Every widescreen entry added in Wave 61 must be float with 16:9 key."""
+        ws_checks = [
+            ("F53B6210", "00220000"),
+            ("DA0F1E34", "00220000"),
+            ("1F2C2BCE", "00230000"),
+            ("5D498EE4", "00230000"),
+        ]
+        for crc, addr in ws_checks:
+            self._assert_ws_entry(crc, addr)
