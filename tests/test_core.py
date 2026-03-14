@@ -14062,3 +14062,218 @@ class TestWave69DataFixes(unittest.TestCase):
         """AE3EAA05 must still have existing 002B624C 60fps toggle entry."""
         self.assertIn("AE3EAA05:EE:002B624C", self.pnach_db,
                       "Paired 60fps toggle entry 002B624C must remain in DB")
+
+
+class TestWave70EmptySerialFix(unittest.TestCase):
+    """Wave 70: Fill 220 empty game_serial entries across 23 CRCs + normalize game names.
+
+    Fixes
+    -----
+    Cross-contamination (fill remaining empties):
+    * 5F3DD929 → SLUS-20387 (Suikoden III, 1 empty entry)
+    * 6624A78C → SCES-52004 (Killzone, 7 empty entries)
+    NTSC-U games (serial + game name normalisation):
+    * C39FF377/DA0535FD → SLUS-21005 (Kingdom Hearts II, typo "Hearth"→"Hearts" fixed)
+    * 0BED0AF9 → SLUS-20964 (Devil May Cry 3, capitalisation normalised)
+    * F321BC38 → SLUS-21168 (Castlevania: Curse of Darkness)
+    * 6CFEFAC1 → SLUS-21645 (WWE SmackDown vs. Raw 2008)
+    * F5625D83 → SLUS-21550 (Metal Slug Anthology, typo "Antology" fixed)
+    * 9D443C69 → SLUS-21042 (Darkwatch)
+    * 180F5C36 → SLUS-20595 (Area 51)
+    * D78D3D1F → SLUS-20782 (Blood Will Tell)
+    * 85E994DD → SLUS-20780 (R-Type Final)
+    * 3D02E0BF → SLUS-21087 (Mortal Kombat: Shaolin Monks)
+    * 160076FE → SLUS-20194 (Grandia II)
+    * 7E83CC5B → SLUS-21242 (Burnout Revenge)
+    * 612542D0 → SLUS-20824 (NASCAR Thunder 2004)
+    * 2498951B → SLUS-20622 (Silent Hill 3)
+    * 2CD5794C → SLUS-21075 (Haunting Ground)
+    * B5A7735B → SLUS-20267 (.hack//Infection)
+    * F4715852 → SLUS-21207 (Dragon Quest VIII)
+    * 0F877618 → SLUS-20712 (Gradius V)
+    * 0DEDC3B7/117D1977 → SLUS-21782 (Persona 4)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.pnach_db.items() if k.startswith(f"{crc}:")}
+
+    def _assert_crc_serial(self, crc, serial):
+        entries = self._crc_entries(crc)
+        empty = [k for k, v in entries.items() if not v.get("game_serial", "")]
+        self.assertEqual(empty, [],
+                         f"CRC {crc} still has empty game_serial entries: {empty}")
+        wrong = [(k, v.get("game_serial")) for k, v in entries.items()
+                 if v.get("game_serial") != serial]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc} entries with wrong serial (expected {serial}): {wrong}")
+
+    # ------------------------------------------------------------------
+    # Cross-contamination fixes
+    # ------------------------------------------------------------------
+
+    def test_5f3dd929_no_empty_serial(self):
+        """5F3DD929 (Suikoden III): no entries may have empty game_serial."""
+        self._assert_crc_serial("5F3DD929", "SLUS-20387")
+
+    def test_5f3dd929_entry_count(self):
+        """5F3DD929 must have 554 entries total."""
+        self.assertEqual(len(self._crc_entries("5F3DD929")), 554)
+
+    def test_5f3dd929_game_name(self):
+        """5F3DD929 entries must use normalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("5F3DD929").items()
+                 if v.get("game") != "Suikoden III (SLUS-20387)"]
+        self.assertEqual(wrong, [])
+
+    def test_6624a78c_no_empty_serial(self):
+        """6624A78C (Killzone): all 32 entries must have game_serial SCES-52004."""
+        self._assert_crc_serial("6624A78C", "SCES-52004")
+        self.assertEqual(len(self._crc_entries("6624A78C")), 32)
+
+    # ------------------------------------------------------------------
+    # NTSC-U games — Kingdom Hearts II
+    # ------------------------------------------------------------------
+
+    def test_c39ff377_kh2_serial(self):
+        """C39FF377 (Kingdom Hearts II): all 36 entries must have game_serial SLUS-21005."""
+        self._assert_crc_serial("C39FF377", "SLUS-21005")
+        self.assertEqual(len(self._crc_entries("C39FF377")), 36)
+
+    def test_c39ff377_kh2_game_name(self):
+        """C39FF377 must use corrected game name (typo 'Hearth' → 'Hearts')."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("C39FF377").items()
+                 if v.get("game") != "Kingdom Hearts II (SLUS-21005)"]
+        self.assertEqual(wrong, [])
+
+    def test_da0535fd_kh2_serial(self):
+        """DA0535FD (Kingdom Hearts II): single entry must have game_serial SLUS-21005."""
+        self._assert_crc_serial("DA0535FD", "SLUS-21005")
+
+    # ------------------------------------------------------------------
+    # NTSC-U games — Devil May Cry 3
+    # ------------------------------------------------------------------
+
+    def test_0bed0af9_dmc3_serial(self):
+        """0BED0AF9 (Devil May Cry 3): all 30 entries must have serial SLUS-20964."""
+        self._assert_crc_serial("0BED0AF9", "SLUS-20964")
+        self.assertEqual(len(self._crc_entries("0BED0AF9")), 30)
+
+    def test_0bed0af9_dmc3_game_name(self):
+        """0BED0AF9 must use correctly capitalised game name."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("0BED0AF9").items()
+                 if v.get("game") != "Devil May Cry 3 (SLUS-20964)"]
+        self.assertEqual(wrong, [])
+
+    # ------------------------------------------------------------------
+    # NTSC-U games — Castlevania: Curse of Darkness
+    # ------------------------------------------------------------------
+
+    def test_f321bc38_castlevania_serial(self):
+        """F321BC38 (Castlevania: Curse of Darkness): 31 entries, serial SLUS-21168."""
+        self._assert_crc_serial("F321BC38", "SLUS-21168")
+        self.assertEqual(len(self._crc_entries("F321BC38")), 31)
+
+    def test_f321bc38_castlevania_game_name(self):
+        """F321BC38 must use canonical game name with colon."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("F321BC38").items()
+                 if v.get("game") != "Castlevania: Curse of Darkness (SLUS-21168)"]
+        self.assertEqual(wrong, [])
+
+    # ------------------------------------------------------------------
+    # NTSC-U games — Metal Slug Anthology
+    # ------------------------------------------------------------------
+
+    def test_f5625d83_metalslug_serial(self):
+        """F5625D83 (Metal Slug Anthology): 21 entries, serial SLUS-21550."""
+        self._assert_crc_serial("F5625D83", "SLUS-21550")
+        self.assertEqual(len(self._crc_entries("F5625D83")), 21)
+
+    def test_f5625d83_metalslug_game_name(self):
+        """F5625D83 must use correctly spelled game name ('Anthology' not 'Antology')."""
+        wrong = [(k, v.get("game")) for k, v in self._crc_entries("F5625D83").items()
+                 if v.get("game") != "Metal Slug Anthology (SLUS-21550)"]
+        self.assertEqual(wrong, [])
+
+    # ------------------------------------------------------------------
+    # NTSC-U games — remaining spot-checks
+    # ------------------------------------------------------------------
+
+    def test_9d443c69_darkwatch(self):
+        """9D443C69 (Darkwatch): 10 entries, serial SLUS-21042."""
+        self._assert_crc_serial("9D443C69", "SLUS-21042")
+        self.assertEqual(len(self._crc_entries("9D443C69")), 10)
+
+    def test_180f5c36_area51(self):
+        """180F5C36 (Area 51): 10 entries, serial SLUS-20595."""
+        self._assert_crc_serial("180F5C36", "SLUS-20595")
+        self.assertEqual(len(self._crc_entries("180F5C36")), 10)
+
+    def test_d78d3d1f_bloodwilltell(self):
+        """D78D3D1F (Blood Will Tell): 11 entries, serial SLUS-20782."""
+        self._assert_crc_serial("D78D3D1F", "SLUS-20782")
+        self.assertEqual(len(self._crc_entries("D78D3D1F")), 11)
+
+    def test_85e994dd_rtype(self):
+        """85E994DD (R-Type Final): 12 entries, serial SLUS-20780."""
+        self._assert_crc_serial("85E994DD", "SLUS-20780")
+        self.assertEqual(len(self._crc_entries("85E994DD")), 12)
+
+    def test_3d02e0bf_mk_shaolin_monks(self):
+        """3D02E0BF (MK: Shaolin Monks): 6 entries, serial SLUS-21087."""
+        self._assert_crc_serial("3D02E0BF", "SLUS-21087")
+        self.assertEqual(len(self._crc_entries("3D02E0BF")), 6)
+
+    def test_160076fe_grandia2(self):
+        """160076FE (Grandia II): 4 entries, serial SLUS-20194."""
+        self._assert_crc_serial("160076FE", "SLUS-20194")
+        self.assertEqual(len(self._crc_entries("160076FE")), 4)
+
+    def test_7e83cc5b_burnout_revenge(self):
+        """7E83CC5B (Burnout Revenge): 9 entries, serial SLUS-21242."""
+        self._assert_crc_serial("7E83CC5B", "SLUS-21242")
+        self.assertEqual(len(self._crc_entries("7E83CC5B")), 9)
+
+    def test_6cfefac1_smackdown_2008(self):
+        """6CFEFAC1 (WWE SmackDown vs. Raw 2008): 22 entries, serial SLUS-21645."""
+        self._assert_crc_serial("6CFEFAC1", "SLUS-21645")
+        self.assertEqual(len(self._crc_entries("6CFEFAC1")), 22)
+
+    def test_612542d0_nascar_2004(self):
+        """612542D0 (NASCAR Thunder 2004): 1 entry, serial SLUS-20824."""
+        self._assert_crc_serial("612542D0", "SLUS-20824")
+
+    def test_2498951b_silent_hill_3(self):
+        """2498951B (Silent Hill 3): 1 entry, serial SLUS-20622."""
+        self._assert_crc_serial("2498951B", "SLUS-20622")
+
+    def test_2cd5794c_haunting_ground(self):
+        """2CD5794C (Haunting Ground): 1 entry, serial SLUS-21075."""
+        self._assert_crc_serial("2CD5794C", "SLUS-21075")
+
+    def test_b5a7735b_hack_infection(self):
+        """B5A7735B (.hack//Infection): 2 entries, serial SLUS-20267."""
+        self._assert_crc_serial("B5A7735B", "SLUS-20267")
+        self.assertEqual(len(self._crc_entries("B5A7735B")), 2)
+
+    def test_f4715852_dq8(self):
+        """F4715852 (Dragon Quest VIII): 1 entry, serial SLUS-21207."""
+        self._assert_crc_serial("F4715852", "SLUS-21207")
+
+    def test_0f877618_gradius_v(self):
+        """0F877618 (Gradius V): 1 entry, serial SLUS-20712."""
+        self._assert_crc_serial("0F877618", "SLUS-20712")
+
+    def test_0dedc3b7_persona4(self):
+        """0DEDC3B7 (Persona 4): 1 entry, serial SLUS-21782."""
+        self._assert_crc_serial("0DEDC3B7", "SLUS-21782")
+
+    def test_117d1977_persona4(self):
+        """117D1977 (Persona 4): 1 entry, serial SLUS-21782."""
+        self._assert_crc_serial("117D1977", "SLUS-21782")
