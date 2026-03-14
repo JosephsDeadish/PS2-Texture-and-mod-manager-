@@ -362,7 +362,7 @@ class _GameCard(QFrame):
 
     clicked = pyqtSignal(object)  # emits the GameEntry
 
-    def __init__(self, game: GameEntry, mod_count: int, parent=None):
+    def __init__(self, game: GameEntry, mod_count: int, parent=None, config=None):
         super().__init__(parent)
         self.game = game
         self.setObjectName("card")
@@ -382,20 +382,32 @@ class _GameCard(QFrame):
         )
         thumb_loaded = False
         if game.serial:
+            from PyQt6.QtGui import QPixmap
             from src.core.config_manager import THUMBNAILS_DIR
-            for ext in (".png", ".jpg", ".jpeg", ".webp"):
-                thumb_path = THUMBNAILS_DIR / f"{game.serial}{ext}"
-                if thumb_path.is_file():
-                    from PyQt6.QtGui import QPixmap
-                    px = QPixmap(str(thumb_path))
-                    if not px.isNull():
-                        thumb_lbl.setPixmap(
-                            px.scaled(48, 68,
-                                      Qt.AspectRatioMode.KeepAspectRatio,
-                                      Qt.TransformationMode.SmoothTransformation)
-                        )
-                        thumb_loaded = True
-                        break
+
+            # Search order: PCSX2 covers folder → app thumbnail cache
+            cover_art_search_paths: list[Path] = []
+            if config:
+                cover_dir = getattr(config, "cover_art_path", "") or ""
+                if cover_dir and Path(cover_dir).is_dir():
+                    cover_art_search_paths.append(Path(cover_dir))
+            cover_art_search_paths.append(THUMBNAILS_DIR)
+
+            for search_dir in cover_art_search_paths:
+                for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                    thumb_path = search_dir / f"{game.serial}{ext}"
+                    if thumb_path.is_file():
+                        px = QPixmap(str(thumb_path))
+                        if not px.isNull():
+                            thumb_lbl.setPixmap(
+                                px.scaled(48, 68,
+                                          Qt.AspectRatioMode.KeepAspectRatio,
+                                          Qt.TransformationMode.SmoothTransformation)
+                            )
+                            thumb_loaded = True
+                            break
+                if thumb_loaded:
+                    break
         if not thumb_loaded:
             thumb_lbl.setText("💿")
             thumb_lbl.setStyleSheet(
@@ -783,6 +795,9 @@ class LibraryPanel(BasePanel):
             msg.setWordWrap(True)
             self._list_layout.addWidget(msg)
             self._count_lbl.setText("Not configured")
+
+            # Still show DB-tracked games even without a library path
+            self._populate_db_games()
             return
 
         games = scan_library(library_path)
@@ -797,6 +812,9 @@ class LibraryPanel(BasePanel):
             placeholder.setWordWrap(True)
             self._list_layout.addWidget(placeholder)
             self._count_lbl.setText("0 games")
+
+            # Still show DB-tracked games even if no ISO files were found
+            self._populate_db_games()
             return
 
         # Count mods per serial
@@ -807,21 +825,85 @@ class LibraryPanel(BasePanel):
                 key = m.game_id.upper()
                 mods_by_serial[key] = mods_by_serial.get(key, 0) + 1
 
+        # Track which serials are covered by library files
+        library_serials: set[str] = set()
         for game in games:
             serial_key = (game.serial or "").upper()
             mod_count = mods_by_serial.get(serial_key, 0)
-            card = _GameCard(game, mod_count)
+            card = _GameCard(game, mod_count, config=self.config)
             card.clicked.connect(self._on_game_clicked)
             self._list_layout.addWidget(card)
             self._cards.append(card)
+            if serial_key:
+                library_serials.add(serial_key)
+
+        # Add DB-only games (have mods but no matching ISO in the library)
+        db_only_games = self._get_db_only_games(library_serials)
+        if db_only_games:
+            sep_lbl = QLabel("── Installed (no disc image) ──")
+            sep_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            sep_lbl.setStyleSheet("color: #404070; font-size: 10px; margin-top: 4px;")
+            self._list_layout.addWidget(sep_lbl)
+            for game, mod_count in db_only_games:
+                card = _GameCard(game, mod_count, config=self.config)
+                card.clicked.connect(self._on_game_clicked)
+                self._list_layout.addWidget(card)
+                self._cards.append(card)
 
         self._list_layout.addStretch()
 
-        total = len(games)
+        total = len(games) + len(db_only_games)
         games_with_mods = sum(1 for g in games if mods_by_serial.get((g.serial or "").upper(), 0) > 0)
+        games_with_mods += len(db_only_games)
         self._count_lbl.setText(
-            f"{total} game(s) found  •  {games_with_mods} have mods installed"
+            f"{total} game(s)  •  {games_with_mods} have mods installed"
         )
+
+    # ------------------------------------------------------------------
+    # DB-game helpers
+    # ------------------------------------------------------------------
+
+    def _get_db_only_games(self, exclude_serials: set[str]) -> list[tuple[GameEntry, int]]:
+        """Build GameEntry objects for serials in the mod DB that aren't in exclude_serials."""
+        from src.core.game_registry import lookup_game_title
+        all_mods = self.db.all()
+        serials_with_mods: dict[str, int] = {}
+        for m in all_mods:
+            if m.game_id:
+                key = m.game_id.upper()
+                serials_with_mods[key] = serials_with_mods.get(key, 0) + 1
+
+        result: list[tuple[GameEntry, int]] = []
+        for serial, mod_count in sorted(serials_with_mods.items()):
+            if serial in exclude_serials:
+                continue
+            title = lookup_game_title(serial) or serial
+            entry = GameEntry(
+                path="",
+                filename="",
+                serial=serial,
+                title=title,
+                size_bytes=0,
+            )
+            result.append((entry, mod_count))
+        return result
+
+    def _populate_db_games(self):
+        """Add game cards for all serials that have mods in the DB."""
+        db_only = self._get_db_only_games(set())
+        if not db_only:
+            return
+        sep_lbl = QLabel("── Games with installed mods ──")
+        sep_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sep_lbl.setStyleSheet("color: #404070; font-size: 10px; margin-top: 4px;")
+        self._list_layout.addWidget(sep_lbl)
+        for game, mod_count in db_only:
+            card = _GameCard(game, mod_count, config=self.config)
+            card.clicked.connect(self._on_game_clicked)
+            self._list_layout.addWidget(card)
+            self._cards.append(card)
+        self._list_layout.addStretch()
+        self._count_lbl.setText(f"{len(db_only)} game(s) with mods installed")
 
     # ------------------------------------------------------------------
     # Handlers

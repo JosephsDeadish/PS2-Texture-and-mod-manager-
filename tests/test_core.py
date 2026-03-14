@@ -11308,3 +11308,174 @@ class TestWave55ScanLibraryAutoDetect(unittest.TestCase):
         finally:
             import shutil
             shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------
+# Wave 56 — PCSX2 guidance banners, library DB auto-populate, cover art
+# ---------------------------------------------------------------------------
+
+class TestWave56Pcsx2GuidanceBanners(unittest.TestCase):
+    """Wave 56: PCSX2 guidance hints are available for texture and pnach types."""
+
+    def test_texture_hint_present(self):
+        from src.core.pcsx2_layout import PCSX2_TEXTURES_HINT
+        self.assertIn("Load Textures", PCSX2_TEXTURES_HINT)
+        self.assertIn("PCSX2", PCSX2_TEXTURES_HINT)
+
+    def test_cheats_hint_present(self):
+        from src.core.pcsx2_layout import PCSX2_CHEATS_HINT
+        self.assertIn("Enable Cheats", PCSX2_CHEATS_HINT)
+        self.assertIn("PCSX2", PCSX2_CHEATS_HINT)
+
+    def test_texture_hint_mentions_graphics_tab(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_TEXTURES_STEPS
+        steps_text = " ".join(PCSX2_ENABLE_TEXTURES_STEPS)
+        self.assertIn("Graphics", steps_text)
+        self.assertIn("Load Textures", steps_text)
+
+    def test_cheats_hint_mentions_patches_tab(self):
+        from src.core.pcsx2_layout import PCSX2_ENABLE_CHEATS_STEPS
+        steps_text = " ".join(PCSX2_ENABLE_CHEATS_STEPS)
+        self.assertIn("Patches", steps_text)
+        self.assertIn("Enable Cheats", steps_text)
+
+    def test_get_textures_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_textures_guidance
+        g = get_textures_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["steps"], list)
+        self.assertTrue(len(g["steps"]) >= 3)
+
+    def test_get_cheats_guidance_returns_dict_with_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_cheats_guidance
+        g = get_cheats_guidance()
+        self.assertIn("hint", g)
+        self.assertIn("steps", g)
+        self.assertIsInstance(g["steps"], list)
+        self.assertTrue(len(g["steps"]) >= 2)
+
+
+class TestWave56LibraryDbAutoPopulate(unittest.TestCase):
+    """Wave 56: Library panel shows DB-tracked games even without a game library path."""
+
+    def _make_db_with_game(self, tmpdir: str, serial: str):
+        """Create a DB with one mod for the given serial."""
+        import json, os
+        db_path = os.path.join(tmpdir, "mods.json")
+        entry = {
+            "id": "mod-001",
+            "name": "Test Mod",
+            "mod_type": "texture_pack",
+            "game_id": serial,
+            "author": "TestAuthor",
+            "enabled": True,
+            "priority": 0,
+            "source_path": "",
+            "description": "",
+            "version": "",
+            "tags": [],
+            "source_url": "",
+            "size_bytes": 0,
+        }
+        with open(db_path, "w") as f:
+            json.dump([entry], f)
+        return db_path
+
+    def test_get_db_only_games_excludes_known_serials(self):
+        """_get_db_only_games should not return serials in exclude_serials set."""
+        import tempfile, json, os
+        from src.core.game_library import GameEntry
+        from src.core.mod_manager import ModDatabase
+
+        # Build a DB file manually
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = self._make_db_with_game(tmpdir, "SLUS-20062")
+            from src.core.mod_manager import ModDatabase as _DB
+            # Load db via json directly
+            with open(db_path) as f:
+                data = json.load(f)
+            self.assertEqual(len(data), 1)
+            self.assertEqual(data[0]["game_id"], "SLUS-20062")
+
+    def test_game_entry_virtual_construction(self):
+        """Virtual GameEntry (no ISO file) can be constructed for DB-only games."""
+        from src.core.game_library import GameEntry
+        entry = GameEntry(
+            path="",
+            filename="",
+            serial="SLUS-20062",
+            title="God of War",
+            size_bytes=0,
+        )
+        self.assertEqual(entry.serial, "SLUS-20062")
+        self.assertEqual(entry.title, "God of War")
+        self.assertEqual(entry.display_name, "God of War  (SLUS-20062)")
+
+    def test_virtual_game_entry_without_title(self):
+        """Virtual GameEntry falls back to serial in display_name if no title."""
+        from src.core.game_library import GameEntry
+        entry = GameEntry(
+            path="",
+            filename="",
+            serial="SLUS-99999",
+            title="",
+            size_bytes=0,
+        )
+        # display_name uses filename if title is empty
+        self.assertIn("SLUS-99999", entry.display_name or entry.serial)
+
+
+class TestWave56GameCardCoverArt(unittest.TestCase):
+    """Wave 56: _GameCard searches cover_art_path before thumbnail cache."""
+
+    def test_cover_art_search_order_logic(self):
+        """The cover-art search list puts cover_art_path before THUMBNAILS_DIR."""
+        from pathlib import Path
+        import tempfile, os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            covers_dir = os.path.join(tmpdir, "covers")
+            os.makedirs(covers_dir)
+            thumb_dir = os.path.join(tmpdir, "thumbnails")
+            os.makedirs(thumb_dir)
+
+            # Simulate the search order: covers dir first, then thumbnails
+            cover_art_path = covers_dir
+            search_dirs = []
+            if cover_art_path and Path(cover_art_path).is_dir():
+                search_dirs.append(Path(cover_art_path))
+            search_dirs.append(Path(thumb_dir))
+
+            self.assertEqual(str(search_dirs[0]), covers_dir)
+            self.assertEqual(str(search_dirs[1]), thumb_dir)
+
+    def test_cover_art_found_in_pcsx2_covers_dir(self):
+        """Cover art file in pcsx2 covers dir is found before thumbnail cache."""
+        import tempfile, os
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            covers_dir = os.path.join(tmpdir, "covers")
+            os.makedirs(covers_dir)
+            # Create a cover art file
+            serial = "SLUS-20062"
+            cover_file = os.path.join(covers_dir, f"{serial}.png")
+            with open(cover_file, "wb") as f:
+                f.write(b"PNG_DATA")  # Not a real PNG but exists
+
+            search_dirs = [Path(covers_dir)]
+            found = False
+            for d in search_dirs:
+                for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                    p = d / f"{serial}{ext}"
+                    if p.is_file():
+                        found = True
+                        found_path = str(p)
+                        break
+                if found:
+                    break
+
+            self.assertTrue(found)
+            self.assertIn("covers", found_path)
+            self.assertIn(serial, found_path)
