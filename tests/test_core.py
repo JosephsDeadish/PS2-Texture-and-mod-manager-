@@ -11818,3 +11818,197 @@ class TestWave58PnachReferenceEntries(unittest.TestCase):
                 # CRC in key must match game_crc
                 key_crc = key.split(":")[0].upper()
                 self.assertEqual(key_crc, entry["game_crc"].upper())
+
+
+class TestWave59Pcsx2GuidanceExpanded(unittest.TestCase):
+    """Wave 59: Expanded PCSX2 guidance constants and helpers in pcsx2_layout."""
+
+    # ------------------------------------------------------------------
+    # PNACH capabilities
+    # ------------------------------------------------------------------
+
+    def test_pnach_what_it_does_is_nonempty_string(self):
+        from src.core.pcsx2_layout import PNACH_WHAT_IT_DOES
+        self.assertIsInstance(PNACH_WHAT_IT_DOES, str)
+        self.assertGreater(len(PNACH_WHAT_IT_DOES), 20)
+
+    def test_pnach_what_it_cannot_do_is_nonempty_string(self):
+        from src.core.pcsx2_layout import PNACH_WHAT_IT_CANNOT_DO
+        self.assertIsInstance(PNACH_WHAT_IT_CANNOT_DO, str)
+        self.assertGreater(len(PNACH_WHAT_IT_CANNOT_DO), 20)
+
+    def test_pnach_capabilities_is_tuple_of_pairs(self):
+        from src.core.pcsx2_layout import PNACH_CAPABILITIES
+        self.assertIsInstance(PNACH_CAPABILITIES, tuple)
+        self.assertGreater(len(PNACH_CAPABILITIES), 0)
+        for item in PNACH_CAPABILITIES:
+            self.assertEqual(len(item), 2)
+            self.assertIsInstance(item[0], str)
+            self.assertIsInstance(item[1], str)
+
+    def test_get_pnach_capabilities_returns_required_keys(self):
+        from src.core.pcsx2_layout import get_pnach_capabilities
+        result = get_pnach_capabilities()
+        self.assertIn("can_do", result)
+        self.assertIn("cannot_do", result)
+        self.assertIn("capabilities", result)
+        self.assertIsInstance(result["capabilities"], list)
+        self.assertGreater(len(result["capabilities"]), 0)
+        for cap in result["capabilities"]:
+            self.assertIn("feature", cap)
+            self.assertIn("notes", cap)
+
+    def test_pnach_capabilities_mentions_60fps(self):
+        from src.core.pcsx2_layout import PNACH_WHAT_IT_DOES
+        self.assertIn("60 fps", PNACH_WHAT_IT_DOES)
+
+    def test_pnach_cannot_do_mentions_textures(self):
+        from src.core.pcsx2_layout import PNACH_WHAT_IT_CANNOT_DO
+        self.assertIn("texture", PNACH_WHAT_IT_CANNOT_DO.lower())
+
+    # ------------------------------------------------------------------
+    # CRC match hint
+    # ------------------------------------------------------------------
+
+    def test_crc_match_hint_is_nonempty_string(self):
+        from src.core.pcsx2_layout import CRC_MATCH_HINT
+        self.assertIsInstance(CRC_MATCH_HINT, str)
+        self.assertGreater(len(CRC_MATCH_HINT), 20)
+
+    def test_crc_match_hint_mentions_crc(self):
+        from src.core.pcsx2_layout import CRC_MATCH_HINT
+        self.assertIn("CRC", CRC_MATCH_HINT)
+
+    def test_pcsx2_find_crc_steps_is_tuple(self):
+        from src.core.pcsx2_layout import PCSX2_FIND_CRC_STEPS
+        self.assertIsInstance(PCSX2_FIND_CRC_STEPS, tuple)
+        self.assertGreaterEqual(len(PCSX2_FIND_CRC_STEPS), 2)
+
+    def test_get_crc_match_guidance_returns_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_crc_match_guidance
+        result = get_crc_match_guidance()
+        self.assertIn("hint", result)
+        self.assertIn("steps", result)
+        self.assertIsInstance(result["hint"], str)
+        self.assertIsInstance(result["steps"], list)
+        self.assertGreater(len(result["steps"]), 0)
+
+    # ------------------------------------------------------------------
+    # PNACH troubleshoot guidance
+    # ------------------------------------------------------------------
+
+    def test_pnach_troubleshoot_hint_is_nonempty_string(self):
+        from src.core.pcsx2_layout import PNACH_TROUBLESHOOT_HINT
+        self.assertIsInstance(PNACH_TROUBLESHOOT_HINT, str)
+        self.assertGreater(len(PNACH_TROUBLESHOOT_HINT), 20)
+
+    def test_pnach_troubleshoot_steps_is_tuple(self):
+        from src.core.pcsx2_layout import PNACH_TROUBLESHOOT_STEPS
+        self.assertIsInstance(PNACH_TROUBLESHOOT_STEPS, tuple)
+        self.assertGreaterEqual(len(PNACH_TROUBLESHOOT_STEPS), 5)
+
+    def test_pnach_troubleshoot_steps_cover_key_topics(self):
+        from src.core.pcsx2_layout import PNACH_TROUBLESHOOT_STEPS
+        combined = " ".join(PNACH_TROUBLESHOOT_STEPS).lower()
+        self.assertIn("enable cheats", combined)
+        self.assertIn("crc", combined)
+        self.assertIn("cheats", combined)
+
+    def test_get_pnach_troubleshoot_guidance_returns_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_pnach_troubleshoot_guidance
+        result = get_pnach_troubleshoot_guidance()
+        self.assertIn("hint", result)
+        self.assertIn("steps", result)
+        self.assertIsInstance(result["hint"], str)
+        self.assertIsInstance(result["steps"], list)
+        self.assertGreaterEqual(len(result["steps"]), 5)
+
+    # ------------------------------------------------------------------
+    # Texture troubleshoot guidance
+    # ------------------------------------------------------------------
+
+    def test_texture_troubleshoot_hint_is_nonempty_string(self):
+        from src.core.pcsx2_layout import TEXTURE_TROUBLESHOOT_HINT
+        self.assertIsInstance(TEXTURE_TROUBLESHOOT_HINT, str)
+        self.assertGreater(len(TEXTURE_TROUBLESHOOT_HINT), 20)
+
+    def test_texture_troubleshoot_steps_is_tuple(self):
+        from src.core.pcsx2_layout import TEXTURE_TROUBLESHOOT_STEPS
+        self.assertIsInstance(TEXTURE_TROUBLESHOOT_STEPS, tuple)
+        self.assertGreaterEqual(len(TEXTURE_TROUBLESHOOT_STEPS), 5)
+
+    def test_texture_troubleshoot_steps_cover_key_topics(self):
+        from src.core.pcsx2_layout import TEXTURE_TROUBLESHOOT_STEPS
+        combined = " ".join(TEXTURE_TROUBLESHOOT_STEPS).lower()
+        self.assertIn("load textures", combined)
+        self.assertIn("serial", combined)
+        self.assertIn("replacements", combined)
+
+    def test_get_texture_troubleshoot_guidance_returns_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_texture_troubleshoot_guidance
+        result = get_texture_troubleshoot_guidance()
+        self.assertIn("hint", result)
+        self.assertIn("steps", result)
+        self.assertIsInstance(result["hint"], str)
+        self.assertIsInstance(result["steps"], list)
+        self.assertGreaterEqual(len(result["steps"]), 5)
+
+    # ------------------------------------------------------------------
+    # Cover art guidance
+    # ------------------------------------------------------------------
+
+    def test_cover_art_hint_is_nonempty_string(self):
+        from src.core.pcsx2_layout import COVER_ART_HINT
+        self.assertIsInstance(COVER_ART_HINT, str)
+        self.assertGreater(len(COVER_ART_HINT), 20)
+
+    def test_cover_art_hint_mentions_serial(self):
+        from src.core.pcsx2_layout import COVER_ART_HINT
+        self.assertIn("serial", COVER_ART_HINT.lower())
+
+    def test_pcsx2_add_cover_art_steps_is_tuple(self):
+        from src.core.pcsx2_layout import PCSX2_ADD_COVER_ART_STEPS
+        self.assertIsInstance(PCSX2_ADD_COVER_ART_STEPS, tuple)
+        self.assertGreaterEqual(len(PCSX2_ADD_COVER_ART_STEPS), 3)
+
+    def test_get_cover_art_guidance_returns_hint_and_steps(self):
+        from src.core.pcsx2_layout import get_cover_art_guidance
+        result = get_cover_art_guidance()
+        self.assertIn("hint", result)
+        self.assertIn("steps", result)
+        self.assertIsInstance(result["hint"], str)
+        self.assertIsInstance(result["steps"], list)
+        self.assertGreater(len(result["steps"]), 0)
+
+    # ------------------------------------------------------------------
+    # Consistency checks
+    # ------------------------------------------------------------------
+
+    def test_all_new_step_tuples_are_all_strings(self):
+        from src.core.pcsx2_layout import (
+            PNACH_TROUBLESHOOT_STEPS,
+            TEXTURE_TROUBLESHOOT_STEPS,
+            PCSX2_FIND_CRC_STEPS,
+            PCSX2_ADD_COVER_ART_STEPS,
+        )
+        for tup in (PNACH_TROUBLESHOOT_STEPS, TEXTURE_TROUBLESHOOT_STEPS,
+                    PCSX2_FIND_CRC_STEPS, PCSX2_ADD_COVER_ART_STEPS):
+            for step in tup:
+                self.assertIsInstance(step, str)
+                self.assertGreater(len(step), 0)
+
+    def test_guidance_functions_return_lists_not_tuples(self):
+        """Helper functions always return plain lists for the 'steps' key."""
+        from src.core.pcsx2_layout import (
+            get_pnach_troubleshoot_guidance,
+            get_texture_troubleshoot_guidance,
+            get_crc_match_guidance,
+            get_cover_art_guidance,
+        )
+        for fn in (get_pnach_troubleshoot_guidance,
+                   get_texture_troubleshoot_guidance,
+                   get_crc_match_guidance,
+                   get_cover_art_guidance):
+            result = fn()
+            self.assertIsInstance(result["steps"], list,
+                                  f"{fn.__name__} returned non-list steps")
