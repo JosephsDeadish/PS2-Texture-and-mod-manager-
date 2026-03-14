@@ -446,7 +446,6 @@
       "serial": "SLUS-20499",
       "alt_serials": [],
       "crcs": [
-        "C2C5FE5F",
         "E8AC8B3A"
       ],
       "release_date": "2003-02-16",
@@ -873,7 +872,6 @@
       ],
       "crcs": [
         "9E0C4BC3",
-        "C2C5FE5F",
         "F4A7473E"
       ],
       "release_date": "2001-10-16",
@@ -882,7 +880,6 @@
       "genre": "Action, Shooter, Survival Horror",
       "crc_labels": {
         "9E0C4BC3": "v1.00",
-        "C2C5FE5F": "v1.01",
         "F4A7473E": "Greatest Hits"
       }
     },
@@ -1373,9 +1370,7 @@
     "Final Fantasy X-2 (100% complete)": {
       "serial": "SLUS-20672",
       "alt_serials": [],
-      "crcs": [
-        "E2F01792"
-      ],
+      "crcs": [],
       "release_date": "2003-11-18",
       "developer": "Square Enix",
       "publisher": "Square Enix",
@@ -1384,9 +1379,7 @@
     "Final Fantasy XI": {
       "serial": "SCUS-97266",
       "alt_serials": [],
-      "crcs": [
-        "C2C5FE5F"
-      ],
+      "crcs": [],
       "release_date": "2006-06-15",
       "developer": "Square PDD 3",
       "publisher": "Sony Computer Entertainment",
@@ -1395,9 +1388,7 @@
     "Final Fantasy XI Online": {
       "serial": "SCUS-97271",
       "alt_serials": [],
-      "crcs": [
-        "C2C5FE5F"
-      ]
+      "crcs": []
     },
     "Final Fantasy XII": {
       "serial": "SLUS-20963",
@@ -1914,7 +1905,6 @@
       "crcs": [
         "321DF6F5",
         "3B340B97",
-        "4B80628D",
         "C0FC8DA6",
         "901AAC09"
       ],
@@ -2365,7 +2355,6 @@
       "serial": "SLUS-21613",
       "alt_serials": [],
       "crcs": [
-        "3B0ADBEF",
         "7C0D1E42"
       ],
       "release_date": "2007-10-30",
@@ -2743,9 +2732,7 @@
     "Need for Speed: Hot Pursuit 2": {
       "serial": "SLUS-20362",
       "alt_serials": [],
-      "crcs": [
-        "96660560"
-      ],
+      "crcs": [],
       "release_date": "2002-10-01",
       "developer": "DreamWorks Interactive",
       "publisher": "Electronic Arts",
@@ -2784,8 +2771,8 @@
       "alt_serials": [],
       "crcs": [
         "6A2B7C19",
-        "96660560",
-        "F5C7B45F"
+        "F5C7B45F",
+        "E2F01792"
       ],
       "release_date": "2004-11-16",
       "developer": "EA",
@@ -8025,9 +8012,7 @@
     "Motocross Mania 3": {
       "serial": "SLUS-21229",
       "alt_serials": [],
-      "crcs": [
-        "00E9B795"
-      ],
+      "crcs": [],
       "release_date": "2005-05-01",
       "developer": "Deibus Studios",
       "publisher": "Global Star Software",
@@ -8238,9 +8223,7 @@
     "Curious George": {
       "serial": "SLUS-21354",
       "alt_serials": [],
-      "crcs": [
-        "8DB76084"
-      ],
+      "crcs": [],
       "release_date": "2006-09-08",
       "developer": "Monkey Bar Games",
       "publisher": "Namco",
@@ -8308,7 +8291,6 @@
       "serial": "SLUS-21400",
       "alt_serials": [],
       "crcs": [
-        "1AFD7469",
         "836BBACE"
       ],
       "release_date": "2006-07-18",
@@ -8509,7 +8491,10 @@
       "release_date": "2006-10-24",
       "developer": "Monkey Bar Games",
       "publisher": "D3 Publisher",
-      "genre": "Action, Platformer."
+      "genre": "Action, Platformer.",
+      "crcs": [
+        "8DB76084"
+      ]
     },
     "Eagle Eye Golf": {
       "serial": "SLUS-21486",

@@ -13237,3 +13237,276 @@ class TestWave64DataQualityFixes(unittest.TestCase):
                       f"DBZ game name {game_name!r} should contain 'Dragon Ball Z'")
         self.assertNotIn("DragonBall", game_name,
                          f"DBZ game name {game_name!r} should not use 'DragonBall' (missing space)")
+
+
+class TestWave65DataQualityFixes(unittest.TestCase):
+    """Wave 65: Data quality fixes — CRC cross-contamination removed from serial DB,
+    pnach DB game_serial / game fields corrected.
+
+    Fixed issues
+    -----------
+    Serial DB — CRC removals (CRC was wrongly assigned to the wrong game):
+    * 00E9B795 removed from 'Motocross Mania 3'   (belongs to Fantavision)
+    * 1AFD7469 removed from 'Monster House'        (belongs to Happy Feet)
+    * 3B0ADBEF removed from 'Manhunt 2'            (belongs to Twisted Metal: Black)
+    * 4B80628D removed from 'Haunting Ground'      (belongs to GUN)
+    * 8DB76084 removed from 'Curious George'       (belongs to Flushed Away)
+    * 96660560 removed from 'Need for Speed: Hot Pursuit 2' and
+                            'Need for Speed: Underground 2'
+                                                   (belongs to NFS: Underground)
+    * C2C5FE5F removed from 'Devil May Cry', 'Breath of Fire: Dragon Quarter',
+                            'Final Fantasy XI', 'Final Fantasy XI Online'
+                                                   (belongs to MK: Deadly Alliance)
+    * E2F01792 removed from 'Final Fantasy X-2 (100% complete)' save-state variant
+                                                   (belongs to NFS: Underground 2)
+
+    Serial DB — CRC additions (CRC was missing from the correct game):
+    * 8DB76084 added to 'Flushed Away'
+    * E2F01792 added to 'Need for Speed: Underground 2'
+
+    Pnach DB — game_serial / game name corrections (34 entries fixed):
+    * 3B0ADBEF entries with SLUS-21613 or SLUS-20136 → SCUS-97101
+      (Twisted Metal: Black)
+    * 96660560 entries with game='Phantom Brave' → 'Need for Speed: Underground'
+    * B7ECDECD entries with SLUS-21488 → SLUS-21389
+      (Xenosaga Episode III: Also sprach Zarathustra)
+    * C2C5FE5F entries with SLUS-20487 → SLUS-20423 (MK: Deadly Alliance)
+    * DA5CC7A3 entries with SLUS-21050 → SLUS-20851 (Ace Combat 5)
+    * E2F01792 entries with SLUS-20672 → SLUS-21065 (NFS: Underground 2)
+    * F0A235D4 entries with SLUS-20216 → SLUS-21134 (Resident Evil 4)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        raw = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+        cls.games = raw["games"]
+
+    # ------------------------------------------------------------------
+    # Serial DB — CRC removals
+    # ------------------------------------------------------------------
+
+    def test_motocross_mania3_no_fantavision_crc(self):
+        """Motocross Mania 3 must not contain 00E9B795 (Fantavision's CRC)."""
+        crcs = self.games.get("Motocross Mania 3", {}).get("crcs", [])
+        self.assertNotIn("00E9B795", crcs,
+                         "00E9B795 belongs to Fantavision, not Motocross Mania 3")
+
+    def test_fantavision_has_correct_crc(self):
+        """Fantavision must retain its CRC 00E9B795."""
+        crcs = self.games.get("Fantavision", {}).get("crcs", [])
+        self.assertIn("00E9B795", crcs,
+                      "Fantavision must have CRC 00E9B795")
+
+    def test_monster_house_no_happy_feet_crc(self):
+        """Monster House must not contain 1AFD7469 (Happy Feet's CRC)."""
+        crcs = self.games.get("Monster House", {}).get("crcs", [])
+        self.assertNotIn("1AFD7469", crcs,
+                         "1AFD7469 belongs to Happy Feet, not Monster House")
+
+    def test_happy_feet_has_correct_crc(self):
+        """Happy Feet must retain its CRC 1AFD7469."""
+        crcs = self.games.get("Happy Feet", {}).get("crcs", [])
+        self.assertIn("1AFD7469", crcs,
+                      "Happy Feet must have CRC 1AFD7469")
+
+    def test_manhunt2_no_tm_black_crc(self):
+        """Manhunt 2 must not contain 3B0ADBEF (Twisted Metal: Black's CRC)."""
+        crcs = self.games.get("Manhunt 2", {}).get("crcs", [])
+        self.assertNotIn("3B0ADBEF", crcs,
+                         "3B0ADBEF belongs to Twisted Metal: Black, not Manhunt 2")
+
+    def test_tm_black_has_correct_crc(self):
+        """Twisted Metal: Black must retain its CRC 3B0ADBEF."""
+        crcs = self.games.get("Twisted Metal: Black", {}).get("crcs", [])
+        self.assertIn("3B0ADBEF", crcs,
+                      "Twisted Metal: Black must have CRC 3B0ADBEF")
+
+    def test_haunting_ground_no_gun_crc(self):
+        """Haunting Ground must not contain 4B80628D (GUN's CRC)."""
+        crcs = self.games.get("Haunting Ground", {}).get("crcs", [])
+        self.assertNotIn("4B80628D", crcs,
+                         "4B80628D belongs to GUN, not Haunting Ground")
+
+    def test_gun_has_correct_crc(self):
+        """GUN must retain its CRC 4B80628D."""
+        crcs = self.games.get("GUN", {}).get("crcs", [])
+        self.assertIn("4B80628D", crcs,
+                      "GUN must have CRC 4B80628D")
+
+    def test_curious_george_no_flushed_away_crc(self):
+        """Curious George must not contain 8DB76084 (Flushed Away's CRC)."""
+        crcs = self.games.get("Curious George", {}).get("crcs", [])
+        self.assertNotIn("8DB76084", crcs,
+                         "8DB76084 belongs to Flushed Away, not Curious George")
+
+    def test_flushed_away_has_crc(self):
+        """Flushed Away must have CRC 8DB76084."""
+        crcs = self.games.get("Flushed Away", {}).get("crcs", [])
+        self.assertIn("8DB76084", crcs,
+                      "Flushed Away must have CRC 8DB76084")
+
+    def test_nfs_hp2_no_nfs_underground_crc(self):
+        """NFS: Hot Pursuit 2 must not contain 96660560 (NFS: Underground's CRC)."""
+        crcs = self.games.get("Need for Speed: Hot Pursuit 2", {}).get("crcs", [])
+        self.assertNotIn("96660560", crcs,
+                         "96660560 belongs to NFS: Underground, not NFS: HP2")
+
+    def test_nfs_u2_no_nfs_underground_crc(self):
+        """NFS: Underground 2 must not contain 96660560 (NFS: Underground's CRC)."""
+        crcs = self.games.get("Need for Speed: Underground 2", {}).get("crcs", [])
+        self.assertNotIn("96660560", crcs,
+                         "96660560 belongs to NFS: Underground, not NFS: U2")
+
+    def test_nfs_underground_has_crc(self):
+        """NFS: Underground must retain 96660560."""
+        crcs = self.games.get("Need for Speed: Underground", {}).get("crcs", [])
+        self.assertIn("96660560", crcs,
+                      "NFS: Underground must have CRC 96660560")
+
+    def test_dmc_no_mkda_crc(self):
+        """Devil May Cry must not contain C2C5FE5F (MK: Deadly Alliance's CRC)."""
+        crcs = self.games.get("Devil May Cry", {}).get("crcs", [])
+        self.assertNotIn("C2C5FE5F", crcs,
+                         "C2C5FE5F belongs to MK: Deadly Alliance, not Devil May Cry")
+
+    def test_dmc_no_mkda_crc_label(self):
+        """Devil May Cry crc_labels must not contain C2C5FE5F."""
+        labels = self.games.get("Devil May Cry", {}).get("crc_labels", {})
+        self.assertNotIn("C2C5FE5F", labels,
+                         "crc_labels for Devil May Cry must not reference C2C5FE5F")
+
+    def test_bof_dragon_quarter_no_mkda_crc(self):
+        """Breath of Fire: Dragon Quarter must not contain C2C5FE5F."""
+        crcs = self.games.get("Breath of Fire: Dragon Quarter", {}).get("crcs", [])
+        self.assertNotIn("C2C5FE5F", crcs,
+                         "C2C5FE5F belongs to MK: Deadly Alliance, not BoF: DQ")
+
+    def test_ffxi_no_mkda_crc(self):
+        """Final Fantasy XI must not contain C2C5FE5F."""
+        crcs = self.games.get("Final Fantasy XI", {}).get("crcs", [])
+        self.assertNotIn("C2C5FE5F", crcs,
+                         "C2C5FE5F belongs to MK: Deadly Alliance, not FFXI")
+
+    def test_ffxi_online_no_mkda_crc(self):
+        """Final Fantasy XI Online must not contain C2C5FE5F."""
+        crcs = self.games.get("Final Fantasy XI Online", {}).get("crcs", [])
+        self.assertNotIn("C2C5FE5F", crcs,
+                         "C2C5FE5F belongs to MK: Deadly Alliance, not FFXI Online")
+
+    def test_mkda_has_correct_crc(self):
+        """Mortal Kombat: Deadly Alliance must retain CRC C2C5FE5F."""
+        crcs = self.games.get("Mortal Kombat: Deadly Alliance", {}).get("crcs", [])
+        self.assertIn("C2C5FE5F", crcs,
+                      "Mortal Kombat: Deadly Alliance must have CRC C2C5FE5F")
+
+    def test_ffx2_complete_no_nfsu2_crc(self):
+        """FFX-2 (100% complete) save-state variant must not contain E2F01792."""
+        crcs = self.games.get("Final Fantasy X-2 (100% complete)", {}).get("crcs", [])
+        self.assertNotIn("E2F01792", crcs,
+                         "E2F01792 belongs to NFS: Underground 2, not FFX-2 complete")
+
+    def test_nfsu2_has_e2f01792(self):
+        """NFS: Underground 2 must have CRC E2F01792."""
+        crcs = self.games.get("Need for Speed: Underground 2", {}).get("crcs", [])
+        self.assertIn("E2F01792", crcs,
+                      "NFS: Underground 2 must have CRC E2F01792")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — corrected game_serial / game name fields
+    # ------------------------------------------------------------------
+
+    def _entries_for_crc(self, crc):
+        return {k: v for k, v in self.pnach_db.items()
+                if v.get("game_crc", "").upper() == crc.upper()}
+
+    def test_tm_black_no_manhunt2_serial(self):
+        """3B0ADBEF pnach entries must not use Manhunt 2's serial SLUS-21613."""
+        entries = self._entries_for_crc("3B0ADBEF")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21613"]
+        self.assertEqual(bad, [],
+                         f"3B0ADBEF entries must not reference Manhunt 2 (SLUS-21613): {bad}")
+
+    def test_tm_black_no_barbarian_serial(self):
+        """3B0ADBEF pnach entries must not use Barbarian's serial SLUS-20136."""
+        entries = self._entries_for_crc("3B0ADBEF")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-20136"]
+        self.assertEqual(bad, [],
+                         f"3B0ADBEF entries must not reference Barbarian (SLUS-20136): {bad}")
+
+    def test_tm_black_3b0adbef_serial(self):
+        """3B0ADBEF pnach entries must use SCUS-97101 (Twisted Metal: Black)."""
+        entries = self._entries_for_crc("3B0ADBEF")
+        self.assertGreater(len(entries), 0, "No 3B0ADBEF entries found")
+        serials = {v.get("game_serial") for v in entries.values()}
+        self.assertEqual(serials, {"SCUS-97101"},
+                         f"All 3B0ADBEF entries must use SCUS-97101, got: {serials}")
+
+    def test_nfs_underground_96660560_game_name(self):
+        """96660560/SLUS-20811 pnach entries must say NFS: Underground, not Phantom Brave."""
+        entries = {k: v for k, v in self._entries_for_crc("96660560").items()
+                   if v.get("game_serial") == "SLUS-20811"}
+        phantom_entries = [k for k, v in entries.items()
+                           if "Phantom Brave" in v.get("game", "")]
+        self.assertEqual(phantom_entries, [],
+                         f"96660560/SLUS-20811 entries must not say 'Phantom Brave': {phantom_entries}")
+
+    def test_xenosaga3_b7ecdecd_serial(self):
+        """B7ECDECD pnach entries must use SLUS-21389 (Xenosaga III), not SLUS-21488."""
+        entries = self._entries_for_crc("B7ECDECD")
+        self.assertGreater(len(entries), 0, "No B7ECDECD entries found")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21488"]
+        self.assertEqual(bad, [],
+                         f"B7ECDECD entries must not use .hack//G.U. serial SLUS-21488: {bad}")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21389",
+                             f"{k}: game_serial must be SLUS-21389 (Xenosaga III)")
+
+    def test_mkda_c2c5fe5f_serial(self):
+        """C2C5FE5F pnach entries must use SLUS-20423 (MK: DA), not SLUS-20487 (Mega Man X7)."""
+        entries = self._entries_for_crc("C2C5FE5F")
+        self.assertGreater(len(entries), 0, "No C2C5FE5F entries found")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-20487"]
+        self.assertEqual(bad, [],
+                         f"C2C5FE5F entries must not use Mega Man X7 serial SLUS-20487: {bad}")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20423",
+                             f"{k}: game_serial must be SLUS-20423 (MK: Deadly Alliance)")
+
+    def test_ac5_da5cc7a3_serial(self):
+        """DA5CC7A3 pnach entries must use SLUS-20851 (Ace Combat 5), not SLUS-21050."""
+        entries = self._entries_for_crc("DA5CC7A3")
+        self.assertGreater(len(entries), 0, "No DA5CC7A3 entries found")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-21050"]
+        self.assertEqual(bad, [],
+                         f"DA5CC7A3 entries must not use Burnout 3 serial SLUS-21050: {bad}")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-20851",
+                             f"{k}: game_serial must be SLUS-20851 (Ace Combat 5)")
+
+    def test_nfsu2_e2f01792_serial(self):
+        """E2F01792 pnach entries must use SLUS-21065 (NFS: U2), not SLUS-20672 (FFX-2)."""
+        entries = self._entries_for_crc("E2F01792")
+        self.assertGreater(len(entries), 0, "No E2F01792 entries found")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-20672"]
+        self.assertEqual(bad, [],
+                         f"E2F01792 entries must not use FFX-2 serial SLUS-20672: {bad}")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21065",
+                             f"{k}: game_serial must be SLUS-21065 (NFS: Underground 2)")
+
+    def test_re4_f0a235d4_serial(self):
+        """F0A235D4 pnach entries must use SLUS-21134 (RE4), not SLUS-20216 (DMC)."""
+        entries = self._entries_for_crc("F0A235D4")
+        self.assertGreater(len(entries), 0, "No F0A235D4 entries found")
+        bad = [k for k, v in entries.items() if v.get("game_serial") == "SLUS-20216"]
+        self.assertEqual(bad, [],
+                         f"F0A235D4 entries must not use DMC serial SLUS-20216: {bad}")
+        for k, v in entries.items():
+            self.assertEqual(v.get("game_serial"), "SLUS-21134",
+                             f"{k}: game_serial must be SLUS-21134 (Resident Evil 4)")
