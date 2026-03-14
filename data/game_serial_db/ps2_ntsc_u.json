@@ -140,7 +140,12 @@
       "release_date": "2001-11-01",
       "developer": "Namco Bandai",
       "publisher": "Namco Bandai",
-      "genre": "Action, Shooter, Flight Simulator."
+      "genre": "Action, Shooter, Flight Simulator.",
+      "crc_labels": {
+        "9420D4F1": "v1.00",
+        "B54B0573": "v1.01",
+        "D2C31B25": "v1.02"
+      }
     },
     "Ace Combat 5: The Unsung War": {
       "serial": "SLUS-20851",
@@ -152,7 +157,11 @@
       "release_date": "2004-10-25",
       "developer": "Project Aces",
       "publisher": "Namco",
-      "genre": "Action, Shooter, Simulation."
+      "genre": "Action, Shooter, Simulation.",
+      "crc_labels": {
+        "4E5E69C7": "v1.00",
+        "DA5CC7A3": "v1.01"
+      }
     },
     "Ace Combat Zero: The Belkan War": {
       "serial": "SLUS-21346",
@@ -165,7 +174,12 @@
       "release_date": "2006-04-25",
       "developer": "Namco Bandai Games",
       "publisher": "Namco Bandai Games",
-      "genre": "Simulation"
+      "genre": "Simulation",
+      "crc_labels": {
+        "3E9E7B49": "v1.00",
+        "B3A9F9ED": "v1.01",
+        "BF5C2EAB": "v1.02"
+      }
     },
     "Ape Escape 2": {
       "serial": "SLUS-20685",
@@ -414,7 +428,11 @@
       "release_date": "2006-02-28",
       "developer": "Criterion Studios",
       "publisher": "Electronic Arts",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "5C891FF1": "v1.00",
+        "F0A235B4": "v1.01"
+      }
     },
     "Blood Omen 2: Legacy of Kain": {
       "serial": "SLUS-20024",
@@ -456,7 +474,12 @@
       "release_date": "2006-10-17",
       "developer": "Rockstar Games",
       "publisher": "Rockstar Games",
-      "genre": "Action, Adventure."
+      "genre": "Action, Adventure.",
+      "crc_labels": {
+        "28703748": "v1.00",
+        "5C7B2BDD": "v1.01",
+        "A86571F9": "v1.02"
+      }
     },
     "Burnout": {
       "serial": "SLUS-20307",
@@ -530,7 +553,11 @@
       "release_date": "2005-09-13",
       "developer": "Criterion Games",
       "publisher": "Electronic Arts",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "278700A0": "v1.00",
+        "C8FBC640": "v1.01"
+      }
     },
     "Call of Duty 2: Big Red One": {
       "serial": "SLUS-21228",
@@ -1115,7 +1142,11 @@
       "release_date": "2005-11-15",
       "developer": "Level 5",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "F53B6210": "v1.00",
+        "DA0F1E34": "v1.01"
+      }
     },
     "Dragon Quest VIII (post-game save)": {
       "serial": "SLUS-21207",
@@ -1127,7 +1158,11 @@
       "release_date": "2005-11-15",
       "developer": "Level 5",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "F53B6210": "v1.00",
+        "DA0F1E34": "v1.01"
+      }
     },
     "Dragon Quest VIII: Journey of the Cursed King": {
       "serial": "SLUS-21207",
@@ -1603,7 +1638,11 @@
       "release_date": "2001-10-23",
       "developer": "DMA Design Ltd",
       "publisher": "Rockstar Games",
-      "genre": "Action, Driving, Shooter"
+      "genre": "Action, Driving, Shooter",
+      "crc_labels": {
+        "5E115FB6": "v1.00",
+        "6F0E2BEE": "v1.01"
+      }
     },
     "Grand Theft Auto: Liberty City Stories": {
       "serial": "SLUS-21423",
@@ -2040,7 +2079,11 @@
       "release_date": "2004-09-21",
       "developer": "Now Production",
       "publisher": "Namco",
-      "genre": "Action."
+      "genre": "Action.",
+      "crc_labels": {
+        "09F2E574": "v1.00",
+        "D71B573D": "v1.01"
+      }
     },
     "Killzone": {
       "serial": "SCUS-97402",
@@ -2289,7 +2332,11 @@
       "release_date": "2003-11-18",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
-      "genre": "Action."
+      "genre": "Action.",
+      "crc_labels": {
+        "38DEA143": "v1.00",
+        "3B75CE2F": "v1.01"
+      }
     },
     "Manhunt 2": {
       "serial": "SLUS-21613",
@@ -2578,7 +2625,11 @@
       "release_date": "2004-10-04",
       "developer": "Midway Amusement Games, LLC",
       "publisher": "Midway",
-      "genre": "Action, Adventure, Beat'em Up, Chess, Fighting, Puzzle."
+      "genre": "Action, Adventure, Beat'em Up, Chess, Fighting, Puzzle.",
+      "crc_labels": {
+        "79E17EE2": "v1.00",
+        "C7C09A27": "v1.01"
+      }
     },
     "NBA Street Vol. 2": {
       "serial": "SLUS-20651",
@@ -2759,7 +2810,12 @@
       "release_date": "2006-09-19",
       "developer": "Clover Studio",
       "publisher": "Capcom",
-      "genre": "Action, Plataformer"
+      "genre": "Action, Plataformer",
+      "crc_labels": {
+        "1B594C95": "v1.00",
+        "21068223": "v1.01",
+        "F5D9DBBD": "v1.02"
+      }
     },
     "Onimusha 2: Samurai's Destiny": {
       "serial": "SLUS-20393",
@@ -3158,7 +3214,11 @@
       "release_date": "2000-10-26",
       "developer": "Namco",
       "publisher": "Namco",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "1F2C2BCE": "v1.00",
+        "5D498EE4": "v1.01"
+      }
     },
     "Ring of Red": {
       "serial": "SLUS-20145",
@@ -3561,7 +3621,11 @@
       "release_date": "2002-09-23",
       "developer": "Sucker Punch Productions",
       "publisher": "Sony Computer Entertainment",
-      "genre": "Action, Platformer."
+      "genre": "Action, Platformer.",
+      "crc_labels": {
+        "0FC13116": "v1.00",
+        "4A8DE991": "v1.01"
+      }
     },
     "Sonic Heroes": {
       "serial": "SLUS-20718",
@@ -3607,7 +3671,12 @@
       "release_date": "2003-08-27",
       "developer": "Project Soul",
       "publisher": "Namco",
-      "genre": "Fighting."
+      "genre": "Fighting.",
+      "crc_labels": {
+        "3A66F702": "v1.00",
+        "6E3E2B4E": "v1.01",
+        "E1B01308": "v1.02"
+      }
     },
     "SoulCalibur III": {
       "serial": "SLUS-21216",
@@ -4129,7 +4198,12 @@
       "release_date": "2001-10-31",
       "developer": "Activision",
       "publisher": "Neversoft Entertainment",
-      "genre": "Sports"
+      "genre": "Sports",
+      "crc_labels": {
+        "20E7CC63": "v1.00",
+        "5C6B98D8": "v1.01",
+        "77DEA027": "v1.02"
+      }
     },
     "Tony Hawk's Pro Skater 4": {
       "serial": "SLUS-20504",
@@ -4163,7 +4237,12 @@
       "release_date": "2003-10-28",
       "developer": "Neversoft Entertainment",
       "publisher": "Activision",
-      "genre": "Skateboarding."
+      "genre": "Skateboarding.",
+      "crc_labels": {
+        "8A9CE7E6": "v1.00",
+        "B222B7A4": "v1.01",
+        "ED21DDE0": "v1.02"
+      }
     },
     "Tony Hawk's Underground 2": {
       "serial": "SLUS-20965",
@@ -4231,7 +4310,11 @@
       "release_date": "2006-09-26",
       "developer": "tri-Ace",
       "publisher": "Square Enix",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "2B81C7F3": "v1.00",
+        "2CFF5D40": "v1.01"
+      }
     },
     "Viewtiful Joe": {
       "serial": "SLUS-20951",
@@ -4366,7 +4449,11 @@
       "release_date": "2002-10-15",
       "developer": "Media Vision (Sony)",
       "publisher": "Sony",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "A53C9EC5": "v1.00",
+        "B5B09F5D": "v1.01"
+      }
     },
     "Wild ARMs 4": {
       "serial": "SLUS-21292",
@@ -4448,7 +4535,12 @@
       "release_date": "2003-02-26",
       "developer": "Monolith Soft",
       "publisher": "Namco",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "7F52BE3B": "v1.00",
+        "A790F8C9": "v1.01",
+        "E4FD7B8D": "v1.02"
+      }
     },
     "Xenosaga Episode I: Der Wille zur Macht": {
       "serial": "SLUS-20469",
@@ -4461,7 +4553,12 @@
       "release_date": "2003-02-26",
       "developer": "Monolith Soft",
       "publisher": "Namco",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "7F52BE3B": "v1.00",
+        "A790F8C9": "v1.01",
+        "E4FD7B8D": "v1.02"
+      }
     },
     "Xenosaga Episode II": {
       "serial": "SLUS-20892",

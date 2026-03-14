@@ -12012,3 +12012,191 @@ class TestWave59Pcsx2GuidanceExpanded(unittest.TestCase):
             result = fn()
             self.assertIsInstance(result["steps"], list,
                                   f"{fn.__name__} returned non-list steps")
+
+
+class TestWave60CrcLabels(unittest.TestCase):
+    """Wave 60: crc_labels added to 22 popular game entries (20 unique titles)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        data = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+        cls.games = data["games"]
+
+    # ------------------------------------------------------------------
+    # helper
+    # ------------------------------------------------------------------
+    def _assert_labels(self, title, expected):
+        g = self.games.get(title)
+        self.assertIsNotNone(g, f"Game not found: {title!r}")
+        labels = g.get("crc_labels", {})
+        self.assertTrue(labels, f"No crc_labels on {title!r}")
+        crcs = set(g.get("crcs", []))
+        for crc, label in expected.items():
+            self.assertIn(crc, crcs,
+                          f"CRC {crc} not in crcs list for {title!r}")
+            self.assertEqual(labels.get(crc), label,
+                             f"{title!r} CRC {crc}: expected {label!r}, "
+                             f"got {labels.get(crc)!r}")
+
+    # ------------------------------------------------------------------
+    # Ace Combat trilogy
+    # ------------------------------------------------------------------
+    def test_ace_combat_04_labels(self):
+        self._assert_labels("Ace Combat 04: Shattered Skies", {
+            "9420D4F1": "v1.00", "B54B0573": "v1.01", "D2C31B25": "v1.02",
+        })
+
+    def test_ace_combat_5_labels(self):
+        self._assert_labels("Ace Combat 5: The Unsung War", {
+            "4E5E69C7": "v1.00", "DA5CC7A3": "v1.01",
+        })
+
+    def test_ace_combat_zero_labels(self):
+        self._assert_labels("Ace Combat Zero: The Belkan War", {
+            "3E9E7B49": "v1.00", "B3A9F9ED": "v1.01", "BF5C2EAB": "v1.02",
+        })
+
+    # ------------------------------------------------------------------
+    # Shooter / Action
+    # ------------------------------------------------------------------
+    def test_black_labels(self):
+        self._assert_labels("Black", {
+            "5C891FF1": "v1.00", "F0A235B4": "v1.01",
+        })
+
+    def test_manhunt_labels(self):
+        self._assert_labels("Manhunt", {
+            "38DEA143": "v1.00", "3B75CE2F": "v1.01",
+        })
+
+    # ------------------------------------------------------------------
+    # Open world / GTA
+    # ------------------------------------------------------------------
+    def test_gta3_labels(self):
+        self._assert_labels("Grand Theft Auto III", {
+            "5E115FB6": "v1.00", "6F0E2BEE": "v1.01",
+        })
+
+    def test_bully_labels(self):
+        self._assert_labels("Bully / Canis Canem Edit", {
+            "28703748": "v1.00", "5C7B2BDD": "v1.01", "A86571F9": "v1.02",
+        })
+
+    # ------------------------------------------------------------------
+    # Racing
+    # ------------------------------------------------------------------
+    def test_burnout_revenge_labels(self):
+        self._assert_labels("Burnout Revenge", {
+            "278700A0": "v1.00", "C8FBC640": "v1.01",
+        })
+
+    def test_ridge_racer_v_labels(self):
+        self._assert_labels("Ridge Racer V", {
+            "1F2C2BCE": "v1.00", "5D498EE4": "v1.01",
+        })
+
+    # ------------------------------------------------------------------
+    # RPG
+    # ------------------------------------------------------------------
+    def test_dragon_quest_viii_labels(self):
+        self._assert_labels("Dragon Quest VIII", {
+            "F53B6210": "v1.00", "DA0F1E34": "v1.01",
+        })
+
+    def test_dragon_quest_viii_postgame_labels(self):
+        self._assert_labels("Dragon Quest VIII (post-game save)", {
+            "F53B6210": "v1.00", "DA0F1E34": "v1.01",
+        })
+
+    def test_okami_labels(self):
+        self._assert_labels("Okami", {
+            "1B594C95": "v1.00", "21068223": "v1.01", "F5D9DBBD": "v1.02",
+        })
+
+    def test_valkyrie_profile_2_labels(self):
+        self._assert_labels("Valkyrie Profile 2: Silmeria", {
+            "2B81C7F3": "v1.00", "2CFF5D40": "v1.01",
+        })
+
+    def test_wild_arms_3_labels(self):
+        self._assert_labels("Wild ARMs 3", {
+            "A53C9EC5": "v1.00", "B5B09F5D": "v1.01",
+        })
+
+    def test_xenosaga_episode_i_labels(self):
+        self._assert_labels("Xenosaga Episode I", {
+            "7F52BE3B": "v1.00", "A790F8C9": "v1.01", "E4FD7B8D": "v1.02",
+        })
+
+    def test_xenosaga_episode_i_full_title_labels(self):
+        self._assert_labels("Xenosaga Episode I: Der Wille zur Macht", {
+            "7F52BE3B": "v1.00", "A790F8C9": "v1.01", "E4FD7B8D": "v1.02",
+        })
+
+    # ------------------------------------------------------------------
+    # Fighting / Sports
+    # ------------------------------------------------------------------
+    def test_mortal_kombat_deception_labels(self):
+        self._assert_labels("Mortal Kombat: Deception", {
+            "79E17EE2": "v1.00", "C7C09A27": "v1.01",
+        })
+
+    def test_soulcalibur_ii_labels(self):
+        self._assert_labels("SoulCalibur II", {
+            "3A66F702": "v1.00", "6E3E2B4E": "v1.01", "E1B01308": "v1.02",
+        })
+
+    def test_tony_hawk_pro_skater_3_labels(self):
+        self._assert_labels("Tony Hawk's Pro Skater 3", {
+            "20E7CC63": "v1.00", "5C6B98D8": "v1.01", "77DEA027": "v1.02",
+        })
+
+    def test_tony_hawk_underground_labels(self):
+        self._assert_labels("Tony Hawk's Underground", {
+            "8A9CE7E6": "v1.00", "B222B7A4": "v1.01", "ED21DDE0": "v1.02",
+        })
+
+    # ------------------------------------------------------------------
+    # Platformer / Adventure
+    # ------------------------------------------------------------------
+    def test_katamari_damacy_labels(self):
+        self._assert_labels("Katamari Damacy", {
+            "09F2E574": "v1.00", "D71B573D": "v1.01",
+        })
+
+    def test_sly_cooper_labels(self):
+        self._assert_labels("Sly Cooper and the Thievius Raccoonus", {
+            "0FC13116": "v1.00", "4A8DE991": "v1.01",
+        })
+
+    # ------------------------------------------------------------------
+    # Structural invariants
+    # ------------------------------------------------------------------
+    def test_labeled_crcs_all_in_crcs_list(self):
+        """Every CRC key in crc_labels must also appear in the crcs array."""
+        wave60_titles = {
+            "Ace Combat 04: Shattered Skies", "Ace Combat 5: The Unsung War",
+            "Ace Combat Zero: The Belkan War", "Black",
+            "Bully / Canis Canem Edit", "Burnout Revenge",
+            "Dragon Quest VIII", "Dragon Quest VIII (post-game save)",
+            "Grand Theft Auto III", "Katamari Damacy", "Manhunt",
+            "Mortal Kombat: Deception", "Okami", "Ridge Racer V",
+            "Sly Cooper and the Thievius Raccoonus", "SoulCalibur II",
+            "Tony Hawk's Pro Skater 3", "Tony Hawk's Underground",
+            "Valkyrie Profile 2: Silmeria", "Wild ARMs 3",
+            "Xenosaga Episode I", "Xenosaga Episode I: Der Wille zur Macht",
+        }
+        for title in wave60_titles:
+            g = self.games.get(title, {})
+            crcs = set(g.get("crcs", []))
+            for crc in g.get("crc_labels", {}):
+                self.assertIn(crc, crcs,
+                              f"{title}: label CRC {crc} missing from crcs list")
+
+    def test_total_labeled_games_increased(self):
+        """After Wave 60, at least 51 games should have crc_labels."""
+        labeled = sum(1 for g in self.games.values() if g.get("crc_labels"))
+        self.assertGreaterEqual(labeled, 51)
