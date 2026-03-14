@@ -7999,18 +7999,18 @@ class TestSerialDbCrcs(unittest.TestCase):
         self.assertGreater(len(info.crcs), 0)
 
     def test_games_with_crcs_count_over_200(self):
-        """At least 885 games in the serial DB must have CRC entries.
+        """At least 875 games in the serial DB must have CRC entries.
 
         Wave 41 established ≥900; Wave 51 consolidated ~10 duplicate/redundant
-        entries (moving their CRCs into canonical entries) which reduced the
-        count slightly while preserving all unique CRC coverage.
+        entries; Wave 52 cleared CRCs from 7 more wrong-case/alias entries
+        while preserving all unique CRC coverage.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 885,
-                           f"Expected >885 games with CRCs, got {count}")
+        self.assertGreater(count, 875,
+                           f"Expected >875 games with CRCs, got {count}")
 
     def test_crcs_are_8_hex_uppercase(self):
         """All CRC values must be 8 uppercase hex characters."""
@@ -8058,17 +8058,18 @@ class TestWave42SerialDb(unittest.TestCase):
         )
 
     def test_wave42_games_with_crcs_over_900(self):
-        """Wave 42: at least 885 games still have CRC entries.
+        """Wave 42: at least 875 games still have CRC entries.
 
         Wave 51 consolidated ~10 duplicate/redundant entries into canonical
-        entries, reducing the count slightly while preserving all unique CRCs.
+        entries; Wave 52 cleared CRCs from 7 more alias/wrong-case entries,
+        reducing the count while preserving all unique CRC coverage.
         """
         count = sum(
             1 for t in self.sdb.all_titles()
             if self.sdb.get_info(t) and self.sdb.get_info(t).crcs
         )
-        self.assertGreater(count, 885,
-                           f"Expected >885 games with CRCs, got {count}")
+        self.assertGreater(count, 875,
+                           f"Expected >875 games with CRCs, got {count}")
 
     def test_wave42_dbz_sagas_crc_fixed(self):
         """Dragon Ball Z: Sagas must include CRC E36751DA (Wave 42 fix)."""
@@ -9599,4 +9600,192 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count must remain 2294."""
+        self.assertEqual(len(self.raw_games), 2294)
+
+
+class TestWave52CrcQualityFixes(unittest.TestCase):
+    """Wave 52: CRC ownership fixes + crc_labels expansion."""
+
+    @classmethod
+    def setUpClass(cls):
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+        import json
+        from pathlib import Path
+        raw = json.loads(
+            (Path(__file__).parent.parent / "data/game_serial_db/ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        cls.raw_games = raw["games"]
+
+    # ── crc_labels count ─────────────────────────────────────────────────────
+
+    def test_wave52_crc_labels_count_at_least_28(self):
+        """Wave 52: At least 28 game entries must have crc_labels populated."""
+        count = sum(1 for info in self.raw_games.values() if info.get("crc_labels"))
+        self.assertGreaterEqual(count, 28,
+                                f"Expected ≥28 games with crc_labels, got {count}")
+
+    # ── Wrong-case duplicate entries must have CRCs cleared ──────────────────
+
+    def test_wave52_ico_uppercase_crcs_cleared(self):
+        """Wave 52: 'ICO' (wrong-case) entry must have CRCs cleared."""
+        ico_upper = self.raw_games.get("ICO", {})
+        self.assertEqual(ico_upper.get("crcs", []), [],
+                         "'ICO' wrong-case entry must have empty CRCs (canonical is 'Ico')")
+
+    def test_wave52_shadow_of_rome_wrong_case_crcs_cleared(self):
+        """Wave 52: 'Shadow Of Rome' wrong-case entry must have CRCs cleared."""
+        entry = self.raw_games.get("Shadow Of Rome", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Shadow Of Rome' wrong-case entry must have empty CRCs")
+
+    # ── Way of the Samurai 2 CRC moved to canonical entry ────────────────────
+
+    def test_wave52_way_of_samurai2_canonical_has_crc(self):
+        """Wave 52: 'Way of the Samurai 2' canonical entry must have CRC 7B79C53C."""
+        entry = self.raw_games.get("Way of the Samurai 2", {})
+        self.assertIn("7B79C53C", entry.get("crcs", []),
+                      "CRC 7B79C53C must be in 'Way of the Samurai 2'")
+
+    def test_wave52_way_of_samurai2_wrong_case_crcs_cleared(self):
+        """Wave 52: 'Way Of The Samurai 2' wrong-case entry must have CRCs cleared."""
+        entry = self.raw_games.get("Way Of The Samurai 2", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Way Of The Samurai 2' wrong-case entry must have empty CRCs")
+
+    def test_wave52_way_of_samurai2_crc_maps_to_canonical(self):
+        """Wave 52: CRC 7B79C53C must resolve to 'Way of the Samurai 2'."""
+        title = self.sdb._crc_to_title.get("7B79C53C")
+        self.assertEqual(title, "Way of the Samurai 2",
+                         "CRC 7B79C53C must map to canonical 'Way of the Samurai 2'")
+
+    # ── Alias entries with duplicate CRCs must be cleared ────────────────────
+
+    def test_wave52_ffx_slash_xii_crcs_cleared(self):
+        """Wave 52: 'Final Fantasy X / XII' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Final Fantasy X / XII", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Final Fantasy X / XII' alias must have empty CRCs")
+
+    def test_wave52_ffx_crc_maps_to_canonical(self):
+        """Wave 52: FFX CRC 941AE3A4 must resolve to 'Final Fantasy X'."""
+        title = self.sdb._crc_to_title.get("941AE3A4")
+        self.assertEqual(title, "Final Fantasy X",
+                         "CRC 941AE3A4 must map to canonical 'Final Fantasy X'")
+
+    def test_wave52_jak2_slash_jak3_crcs_cleared(self):
+        """Wave 52: 'Jak II / Jak 3' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Jak II / Jak 3", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Jak II / Jak 3' alias must have empty CRCs")
+
+    def test_wave52_jak2_crc_maps_to_canonical(self):
+        """Wave 52: Jak II CRC 9184AAF1 must resolve to 'Jak II'."""
+        title = self.sdb._crc_to_title.get("9184AAF1")
+        self.assertEqual(title, "Jak II",
+                         "CRC 9184AAF1 must map to canonical 'Jak II'")
+
+    def test_wave52_rc_series_crcs_cleared(self):
+        """Wave 52: 'Ratchet & Clank series' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Ratchet & Clank series", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Ratchet & Clank series' alias must have empty CRCs")
+
+    def test_wave52_dark_cloud_slash_dark_chronicle_crcs_cleared(self):
+        """Wave 52: 'Dark Cloud / Dark Chronicle' alias entry must have empty CRCs."""
+        entry = self.raw_games.get("Dark Cloud / Dark Chronicle", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Dark Cloud / Dark Chronicle' alias must have empty CRCs")
+
+    def test_wave52_dark_cloud_crc_maps_to_canonical(self):
+        """Wave 52: Dark Cloud CRC 1DF75E06 must resolve to 'Dark Cloud'."""
+        title = self.sdb._crc_to_title.get("1DF75E06")
+        self.assertEqual(title, "Dark Cloud",
+                         "CRC 1DF75E06 must map to canonical 'Dark Cloud'")
+
+    def test_wave52_bully_short_crcs_cleared(self):
+        """Wave 52: 'Bully' short alias must have empty CRCs (canonical is 'Bully / Canis Canem Edit')."""
+        entry = self.raw_games.get("Bully", {})
+        self.assertEqual(entry.get("crcs", []), [],
+                         "'Bully' short alias must have empty CRCs")
+
+    # ── Final Fantasy X crc_labels ────────────────────────────────────────────
+
+    def test_wave52_ffx_v100_label(self):
+        """Wave 52: FFX CRC 941AE3A4 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("941AE3A4"), "v1.00")
+
+    def test_wave52_ffx_greatest_hits_label(self):
+        """Wave 52: FFX CRC CF8ABA10 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("CF8ABA10"), "Greatest Hits")
+
+    # ── Jak II crc_labels ─────────────────────────────────────────────────────
+
+    def test_wave52_jak2_v100_label(self):
+        """Wave 52: Jak II CRC 9184AAF1 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("9184AAF1"), "v1.00")
+
+    def test_wave52_jak2_v101_label(self):
+        """Wave 52: Jak II CRC A5C02F40 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("A5C02F40"), "v1.01")
+
+    def test_wave52_jak2_greatest_hits_label(self):
+        """Wave 52: Jak II CRC C5CA2AB3 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("C5CA2AB3"), "Greatest Hits")
+
+    def test_wave52_jak2_all_3_crcs_present(self):
+        """Wave 52: Jak II must have 3 CRCs."""
+        info = self.sdb.get_info("Jak II")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 3, f"Expected 3 CRCs, got {info.crcs}")
+
+    # ── Jak 3 crc_labels ──────────────────────────────────────────────────────
+
+    def test_wave52_jak3_v100_label(self):
+        """Wave 52: Jak 3 CRC 3F5A3B78 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("3F5A3B78"), "v1.00")
+
+    def test_wave52_jak3_v101_label(self):
+        """Wave 52: Jak 3 CRC 44A3A9D5 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("44A3A9D5"), "v1.01")
+
+    def test_wave52_jak3_v102_label(self):
+        """Wave 52: Jak 3 CRC 644CFD03 must be labelled 'v1.02'."""
+        self.assertEqual(self.sdb.label_for_crc("644CFD03"), "v1.02")
+
+    def test_wave52_jak3_greatest_hits_label(self):
+        """Wave 52: Jak 3 CRC 6F942E31 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("6F942E31"), "Greatest Hits")
+
+    def test_wave52_jak3_all_4_crcs_present(self):
+        """Wave 52: Jak 3 must have 4 CRCs."""
+        info = self.sdb.get_info("Jak 3")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 4, f"Expected 4 CRCs, got {info.crcs}")
+
+    # ── Ratchet & Clank: Going Commando crc_labels ────────────────────────────
+
+    def test_wave52_rcgoc_v100_label(self):
+        """Wave 52: R&C Going Commando CRC 4A8BB2F9 must be labelled 'v1.00'."""
+        self.assertEqual(self.sdb.label_for_crc("4A8BB2F9"), "v1.00")
+
+    def test_wave52_rcgoc_v101_label(self):
+        """Wave 52: R&C Going Commando CRC A51FB9E1 must be labelled 'v1.01'."""
+        self.assertEqual(self.sdb.label_for_crc("A51FB9E1"), "v1.01")
+
+    def test_wave52_rcgoc_greatest_hits_label(self):
+        """Wave 52: R&C Going Commando CRC F7C04473 must be labelled 'Greatest Hits'."""
+        self.assertEqual(self.sdb.label_for_crc("F7C04473"), "Greatest Hits")
+
+    def test_wave52_rcgoc_all_3_crcs_present(self):
+        """Wave 52: R&C Going Commando must have 3 CRCs."""
+        info = self.sdb.get_info("Ratchet & Clank: Going Commando")
+        self.assertIsNotNone(info)
+        self.assertEqual(len(info.crcs), 3, f"Expected 3 CRCs, got {info.crcs}")
+
+    # ── Serial DB game count unchanged ───────────────────────────────────────
+
+    def test_wave52_serial_db_game_count_unchanged(self):
+        """Wave 52: serial DB game count must remain 2294."""
         self.assertEqual(len(self.raw_games), 2294)

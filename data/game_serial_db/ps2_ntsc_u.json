@@ -439,10 +439,7 @@
     "Bully": {
       "serial": "SLUS-21269",
       "alt_serials": [],
-      "crcs": [
-        "5C7B2BDD",
-        "A86571F9"
-      ],
+      "crcs": [],
       "release_date": "2006-10-17",
       "developer": "Rockstar Games",
       "publisher": "Rockstar Games",
@@ -777,9 +774,7 @@
     "Dark Cloud / Dark Chronicle": {
       "serial": "SCUS-97111",
       "alt_serials": [],
-      "crcs": [
-        "1DF75E06"
-      ],
+      "crcs": [],
       "release_date": "2001-05-28",
       "developer": "Level 5",
       "publisher": "Sony",
@@ -1301,15 +1296,16 @@
       "release_date": "2001-12-17",
       "developer": "Square Co. Ltd",
       "publisher": "Square Enix",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "941AE3A4": "v1.00",
+        "CF8ABA10": "Greatest Hits"
+      }
     },
     "Final Fantasy X / XII": {
       "serial": "SLUS-20312",
       "alt_serials": [],
-      "crcs": [
-        "941AE3A4",
-        "CF8ABA10"
-      ],
+      "crcs": [],
       "release_date": "2001-12-17",
       "developer": "Square Co. Ltd",
       "publisher": "Square Enix",
@@ -1917,11 +1913,7 @@
     "ICO": {
       "serial": "SCUS-97113",
       "alt_serials": [],
-      "crcs": [
-        "4D4B0C8F",
-        "52F2E55D",
-        "8CDCB89D"
-      ],
+      "crcs": [],
       "release_date": "2001-09-24",
       "developer": "Sony Computer Entertaiment",
       "publisher": "Sony Computer Entertaiment",
@@ -1973,7 +1965,13 @@
       "release_date": "2004-11-09",
       "developer": "Naughty Dog",
       "publisher": "Sony Computer Entertainment America",
-      "genre": "Platformer"
+      "genre": "Platformer",
+      "crc_labels": {
+        "3F5A3B78": "v1.00",
+        "44A3A9D5": "v1.01",
+        "644CFD03": "v1.02",
+        "6F942E31": "Greatest Hits"
+      }
     },
     "Jak II": {
       "serial": "SCUS-97265",
@@ -1986,16 +1984,17 @@
       "release_date": "2003-10-14",
       "developer": "Naughty Dog",
       "publisher": "Sony",
-      "genre": "Action, Adventure, Platform."
+      "genre": "Action, Adventure, Platform.",
+      "crc_labels": {
+        "9184AAF1": "v1.00",
+        "A5C02F40": "v1.01",
+        "C5CA2AB3": "Greatest Hits"
+      }
     },
     "Jak II / Jak 3": {
       "serial": "SCUS-97265",
       "alt_serials": [],
-      "crcs": [
-        "9184AAF1",
-        "A5C02F40",
-        "C5CA2AB3"
-      ],
+      "crcs": [],
       "release_date": "2003-10-14",
       "developer": "Naughty Dog",
       "publisher": "Sony",
@@ -2960,10 +2959,7 @@
     "Ratchet & Clank series": {
       "serial": "SCUS-97199",
       "alt_serials": [],
-      "crcs": [
-        "3E1CC296",
-        "8CC67FC1"
-      ],
+      "crcs": [],
       "release_date": "2002-11-04",
       "developer": "Insomniac Games",
       "publisher": "Sony",
@@ -2980,7 +2976,12 @@
       "release_date": "2003-11-11",
       "developer": "Insomniac Games",
       "publisher": "Sony Computer Entertainment America",
-      "genre": "Action"
+      "genre": "Action",
+      "crc_labels": {
+        "4A8BB2F9": "v1.00",
+        "A51FB9E1": "v1.01",
+        "F7C04473": "Greatest Hits"
+      }
     },
     "Ratchet & Clank: Up Your Arsenal": {
       "serial": "SCUS-97353",
@@ -4334,7 +4335,9 @@
     "Way of the Samurai 2": {
       "serial": "SLUS-20893",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "7B79C53C"
+      ],
       "release_date": "2004-05-21",
       "developer": "Acquire",
       "publisher": "Capcom",
@@ -5277,9 +5280,7 @@
     "Way Of The Samurai 2": {
       "serial": "SLUS-20893",
       "alt_serials": [],
-      "crcs": [
-        "7B79C53C"
-      ],
+      "crcs": [],
       "release_date": "2004-05-21",
       "developer": "Acquire",
       "publisher": "Capcom",
@@ -7403,9 +7404,7 @@
     "Shadow Of Rome": {
       "serial": "SLUS-20902",
       "alt_serials": [],
-      "crcs": [
-        "57818AF6"
-      ],
+      "crcs": [],
       "release_date": "2005-02-08",
       "developer": "Capcom",
       "publisher": "Capcom",
