@@ -14453,13 +14453,17 @@ class TestWave72PalSerialDb(unittest.TestCase):
                              f"Bad serial for '{title}': {serial!r}")
 
     def test_pal_db_all_serials_are_pal_region(self):
-        """Every primary serial in the PAL DB must begin with SLES or SCES."""
-        pal_prefixes = ("SLES", "SCES", "SLEH", "SCEH")
+        """Every primary serial in the PAL DB must begin with a PAL or Japan prefix.
+
+        Japan (SLPM/SLPS/SCPS) entries are permitted in this file because no
+        separate Japan DB exists; they are flagged as region='Japan'.
+        """
+        allowed_prefixes = ("SLES", "SCES", "SLEH", "SCEH", "SLPM", "SLPS", "SCPS")
         for title, info in self.pal_db["games"].items():
             serial = info.get("serial", "")
             self.assertTrue(
-                serial.startswith(pal_prefixes),
-                f"Non-PAL serial {serial!r} in PAL DB for '{title}'"
+                serial.startswith(allowed_prefixes),
+                f"Unexpected serial prefix {serial!r} in PAL/JP DB for '{title}'"
             )
 
     def test_pal_db_all_crcs_valid_format(self):
@@ -15135,36 +15139,36 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_1629d655_red_faction2_game_name(self):
-        """1629D655: game name must be normalised to Red Faction II (PAL)."""
-        self._assert_crc_game("1629D655", "Red Faction II (PAL)")
+        """1629D655: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("1629D655", "Red Faction II (SLES-51194)")
 
     def test_dbaab66d_pes2011_game_name(self):
-        """DBAAB66D: game name must be normalised to Pro Evolution Soccer 2011 (PAL)."""
-        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (PAL)")
+        """DBAAB66D: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55799)")
 
     def test_ee8404aa_yugioh_tagforce_game_name(self):
-        """EE8404AA: game name must be normalised."""
-        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (PAL)")
+        """EE8404AA: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-53968)")
 
     def test_ef97ec8f_10000bullets_game_name(self):
-        """EF97EC8F: game name must be normalised to 10,000 Bullets (PAL)."""
-        self._assert_crc_game("EF97EC8F", "10,000 Bullets (PAL)")
+        """EF97EC8F: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-52707)")
 
     def test_76a68274_virtua_cop_game_name(self):
-        """76A68274: game name must be normalised to Virtua Cop: Elite Edition (PAL)."""
-        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (PAL)")
+        """76A68274: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51707)")
 
     def test_e09e454c_dqv_game_name(self):
-        """E09E454C: game name must be normalised to Dragon Quest V (Japan)."""
-        self._assert_crc_game("E09E454C", "Dragon Quest V (Japan)")
+        """E09E454C: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65515)")
 
     def test_f26af996_smugglers_run2_game_name(self):
-        """F26AF996: game name must be normalised."""
-        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (PAL)")
+        """F26AF996: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
 
     def test_02e1970f_sega_ages_26_game_name(self):
-        """02E1970F: game name must be normalised."""
-        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol.26: Dynamite Deka (PAL)")
+        """02E1970F: game name updated to include serial (resolved in Wave 75)."""
+        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol.26: Dynamite Deka (SLPM-62517)")
 
     # ------------------------------------------------------------------
     # PAL DB: new entries presence + serials
@@ -15308,3 +15312,199 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         """NTSC-U DB: Ford Racing 3 must include CRC 47E1A07A."""
         g = self.ntsc_db['games'].get("Ford Racing 3", {})
         self.assertIn("47E1A07A", g.get('crcs', []))
+
+
+# ===========================================================================
+# Wave 75 — resolve 50 empty-serial pnach entries across 8 CRCs
+# ===========================================================================
+
+class TestWave75EmptySerialFix(unittest.TestCase):
+    """Wave 75: Resolve 50 empty-serial pnach entries across 8 CRCs.
+
+    All 8 CRCs were left in Group C by Wave 74 (game names normalised, serials
+    TBD).  This wave assigns confirmed serials and adds each game to the PAL/
+    Japan serial DB.
+
+    Fixes applied:
+      1629D655 → SLES-51194  (Red Faction II PAL, 2 entries)
+      76A68274 → SLES-51707  (Virtua Cop: Elite Edition PAL, 11 entries)
+      DBAAB66D → SLES-55799  (Pro Evolution Soccer 2011 PAL, 13 entries)
+      EE8404AA → SLES-53968  (Yu-Gi-Oh! GX: Tag Force Evolution PAL, 3 entries)
+      EF97EC8F → SLES-52707  (10,000 Bullets PAL, 6 entries)
+      F26AF996 → SLES-50477  (Smuggler's Run 2: Hostile Territory PAL, 5 entries)
+      E09E454C → SLPM-65515  (Dragon Quest V Japan, 9 entries)
+      02E1970F → SLPM-62517  (Sega Ages 2500 Series Vol.26: Dynamite Deka Japan, 1 entry)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        cls.pal_db = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_pal.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.pnach_db.items() if k.startswith(f"{crc}:")}
+
+    def _assert_crc_serial(self, crc, serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game_serial")) for k, v in entries.items()
+                 if v.get("game_serial") != serial]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc} entries with wrong serial (expected {serial}): {wrong[:3]}")
+
+    def _assert_crc_game(self, crc, game):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game")) for k, v in entries.items()
+                 if v.get("game") != game]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc} entries with wrong game name (expected {game!r}): {wrong[:3]}")
+
+    # ------------------------------------------------------------------
+    # Serial fixes
+    # ------------------------------------------------------------------
+
+    def test_1629d655_red_faction2_serial(self):
+        """1629D655: all 2 entries must have game_serial SLES-51194."""
+        self._assert_crc_serial("1629D655", "SLES-51194")
+        self.assertEqual(len(self._crc_entries("1629D655")), 2)
+
+    def test_76a68274_virtua_cop_serial(self):
+        """76A68274: all 11 entries must have game_serial SLES-51707."""
+        self._assert_crc_serial("76A68274", "SLES-51707")
+        self.assertEqual(len(self._crc_entries("76A68274")), 11)
+
+    def test_dbaab66d_pes2011_serial(self):
+        """DBAAB66D: all 13 entries must have game_serial SLES-55799."""
+        self._assert_crc_serial("DBAAB66D", "SLES-55799")
+        self.assertEqual(len(self._crc_entries("DBAAB66D")), 13)
+
+    def test_ee8404aa_yugioh_serial(self):
+        """EE8404AA: all 3 entries must have game_serial SLES-53968."""
+        self._assert_crc_serial("EE8404AA", "SLES-53968")
+        self.assertEqual(len(self._crc_entries("EE8404AA")), 3)
+
+    def test_ef97ec8f_10000bullets_serial(self):
+        """EF97EC8F: all 6 entries must have game_serial SLES-52707."""
+        self._assert_crc_serial("EF97EC8F", "SLES-52707")
+        self.assertEqual(len(self._crc_entries("EF97EC8F")), 6)
+
+    def test_f26af996_smugglers_run2_serial(self):
+        """F26AF996: all 5 entries must have game_serial SLES-50477."""
+        self._assert_crc_serial("F26AF996", "SLES-50477")
+        self.assertEqual(len(self._crc_entries("F26AF996")), 5)
+
+    def test_e09e454c_dqv_serial(self):
+        """E09E454C: all 9 entries must have game_serial SLPM-65515."""
+        self._assert_crc_serial("E09E454C", "SLPM-65515")
+        self.assertEqual(len(self._crc_entries("E09E454C")), 9)
+
+    def test_02e1970f_sega_ages_serial(self):
+        """02E1970F: the 1 entry must have game_serial SLPM-62517."""
+        self._assert_crc_serial("02E1970F", "SLPM-62517")
+        self.assertEqual(len(self._crc_entries("02E1970F")), 1)
+
+    # ------------------------------------------------------------------
+    # Game name updates (serial now embedded)
+    # ------------------------------------------------------------------
+
+    def test_1629d655_red_faction2_game_name(self):
+        """1629D655: game name must include serial."""
+        self._assert_crc_game("1629D655", "Red Faction II (SLES-51194)")
+
+    def test_76a68274_virtua_cop_game_name(self):
+        """76A68274: game name must include serial."""
+        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51707)")
+
+    def test_dbaab66d_pes2011_game_name(self):
+        """DBAAB66D: game name must include serial."""
+        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55799)")
+
+    def test_ee8404aa_yugioh_game_name(self):
+        """EE8404AA: game name must include serial."""
+        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-53968)")
+
+    def test_ef97ec8f_10000bullets_game_name(self):
+        """EF97EC8F: game name must include serial."""
+        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-52707)")
+
+    def test_f26af996_smugglers_run2_game_name(self):
+        """F26AF996: game name must include serial."""
+        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
+
+    def test_e09e454c_dqv_game_name(self):
+        """E09E454C: game name must include serial."""
+        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65515)")
+
+    def test_02e1970f_sega_ages_game_name(self):
+        """02E1970F: game name must include serial."""
+        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol.26: Dynamite Deka (SLPM-62517)")
+
+    # ------------------------------------------------------------------
+    # PAL/Japan DB: new entries
+    # ------------------------------------------------------------------
+
+    def test_pal_db_red_faction2_entry(self):
+        """PAL DB must have Red Faction II (PAL) with serial SLES-51194 and CRC 1629D655."""
+        g = self.pal_db['games'].get("Red Faction II (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-51194")
+        self.assertIn("1629D655", g.get('crcs', []))
+
+    def test_pal_db_virtua_cop_entry(self):
+        """PAL DB must have Virtua Cop: Elite Edition (PAL) with serial SLES-51707."""
+        g = self.pal_db['games'].get("Virtua Cop: Elite Edition (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-51707")
+        self.assertIn("76A68274", g.get('crcs', []))
+
+    def test_pal_db_pes2011_entry(self):
+        """PAL DB must have Pro Evolution Soccer 2011 (PAL) with serial SLES-55799."""
+        g = self.pal_db['games'].get("Pro Evolution Soccer 2011 (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-55799")
+        self.assertIn("DBAAB66D", g.get('crcs', []))
+
+    def test_pal_db_yugioh_entry(self):
+        """PAL DB must have Yu-Gi-Oh! GX: Tag Force Evolution (PAL) with serial SLES-53968."""
+        g = self.pal_db['games'].get("Yu-Gi-Oh! GX: Tag Force Evolution (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-53968")
+        self.assertIn("EE8404AA", g.get('crcs', []))
+
+    def test_pal_db_10000bullets_entry(self):
+        """PAL DB must have 10,000 Bullets (PAL) with serial SLES-52707."""
+        g = self.pal_db['games'].get("10,000 Bullets (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-52707")
+        self.assertIn("EF97EC8F", g.get('crcs', []))
+
+    def test_pal_db_smugglers_run2_entry(self):
+        """PAL DB must have Smuggler's Run 2: Hostile Territory (PAL) with serial SLES-50477."""
+        g = self.pal_db['games'].get("Smuggler's Run 2: Hostile Territory (PAL)", {})
+        self.assertEqual(g.get('serial'), "SLES-50477")
+        self.assertIn("F26AF996", g.get('crcs', []))
+
+    def test_pal_db_dqv_japan_entry(self):
+        """PAL DB must have Dragon Quest V Japan entry with serial SLPM-65515."""
+        g = self.pal_db['games'].get("Dragon Quest V: Hand of the Heavenly Bride (Japan)", {})
+        self.assertEqual(g.get('serial'), "SLPM-65515")
+        self.assertIn("E09E454C", g.get('crcs', []))
+
+    def test_pal_db_sega_ages_26_entry(self):
+        """PAL DB must have Sega Ages 2500 Vol.26 Japan entry with serial SLPM-62517."""
+        g = self.pal_db['games'].get(
+            "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)", {}
+        )
+        self.assertEqual(g.get('serial'), "SLPM-62517")
+        self.assertIn("02E1970F", g.get('crcs', []))
+
+    # ------------------------------------------------------------------
+    # Zero empty serials remaining
+    # ------------------------------------------------------------------
+
+    def test_no_empty_serials_remain(self):
+        """After Wave 75 all pnach DB entries must have a non-empty game_serial."""
+        empty = [(k, v.get('game', '')) for k, v in self.pnach_db.items()
+                 if not (v.get('game_serial') or '').strip()]
+        self.assertEqual(empty, [], f"Still-empty serials: {empty[:5]}")

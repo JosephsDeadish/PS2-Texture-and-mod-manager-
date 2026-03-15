@@ -2,6 +2,52 @@
   "version": "1.0",
   "description": "PS2 PAL/European authoritative serial database. Maps SLES/SCES game titles to their canonical serials with CRC associations.",
   "games": {
+    "10,000 Bullets (PAL)": {
+      "serial": "SLES-52707",
+      "alt_serials": [],
+      "crcs": [
+        "EF97EC8F"
+      ],
+      "region": "PAL",
+      "release_date": "2005-04-01",
+      "developer": "Neverland",
+      "publisher": "Oxygen Games",
+      "genre": "Action"
+    },
+    "7 Sins (PAL)": {
+      "serial": "SLES-53280",
+      "alt_serials": [
+        "SLES-53297"
+      ],
+      "crcs": [
+        "6926B199"
+      ],
+      "region": "PAL",
+      "release_date": "2004-03-05",
+      "developer": "Monte Cristo",
+      "publisher": "MC2-Microids",
+      "genre": "Action"
+    },
+    "Ace Combat 04: Shattered Skies (PAL)": {
+      "serial": "SCES-50410",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2002-01-25",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Flight Simulator"
+    },
+    "Ace Combat 5: The Unsung War (PAL)": {
+      "serial": "SCES-52424",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2005-01-28",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Flight Simulator"
+    },
     "Baldur's Gate: Dark Alliance (PAL)": {
       "serial": "SLES-51642",
       "alt_serials": [
@@ -24,6 +70,30 @@
       "publisher": "Interplay",
       "genre": "Action-RPG"
     },
+    "Battlefield 2: Modern Combat (PAL)": {
+      "serial": "SLES-53827",
+      "alt_serials": [],
+      "crcs": [
+        "186B0D8A"
+      ],
+      "region": "PAL",
+      "release_date": "2006-03-31",
+      "developer": "Digital Illusions CE",
+      "publisher": "Electronic Arts",
+      "genre": "First-Person Shooter"
+    },
+    "Beyond Good & Evil (PAL)": {
+      "serial": "SLES-51917",
+      "alt_serials": [],
+      "crcs": [
+        "591ABA45"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-28",
+      "developer": "Ubisoft Montreal",
+      "publisher": "Ubisoft",
+      "genre": "Action-Adventure"
+    },
     "Black (PAL)": {
       "serial": "SLES-53886",
       "alt_serials": [],
@@ -35,6 +105,28 @@
       "developer": "Criterion Games",
       "publisher": "Electronic Arts",
       "genre": "First-Person Shooter"
+    },
+    "Buffy the Vampire Slayer: Chaos Bleeds (PAL)": {
+      "serial": "SLES-51654",
+      "alt_serials": [],
+      "crcs": [
+        "CBC401C5"
+      ],
+      "region": "PAL",
+      "release_date": "2003-08-29",
+      "developer": "The Collective",
+      "publisher": "Vivendi Universal Games",
+      "genre": "Action"
+    },
+    "Bully (PAL)": {
+      "serial": "SLES-54145",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2006-10-27",
+      "developer": "Rockstar Vancouver",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure"
     },
     "Burnout 3: Takedown (PAL)": {
       "serial": "SLES-54586",
@@ -178,6 +270,60 @@
       "publisher": "Capcom",
       "genre": "Action"
     },
+    "Dragon Ball Z: Budokai 3 (PAL)": {
+      "serial": "SLES-53072",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2004-12-03",
+      "developer": "Dimps",
+      "publisher": "Atari",
+      "genre": "Fighting"
+    },
+    "Dragon Ball Z: Budokai Tenkaichi (PAL)": {
+      "serial": "SLES-53713",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2005-11-25",
+      "developer": "Spike",
+      "publisher": "Atari",
+      "genre": "Fighting"
+    },
+    "Dragon Ball Z: Budokai Tenkaichi 2 (PAL)": {
+      "serial": "SLES-54200",
+      "alt_serials": [],
+      "crcs": [
+        "151DF9C9"
+      ],
+      "region": "PAL",
+      "release_date": "2006-11-03",
+      "developer": "Spike",
+      "publisher": "Namco Bandai Games",
+      "genre": "Fighting"
+    },
+    "Dragon Ball Z: Budokai Tenkaichi 3 (PAL)": {
+      "serial": "SLES-54994",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2007-11-09",
+      "developer": "Spike",
+      "publisher": "Namco Bandai Games",
+      "genre": "Fighting"
+    },
+    "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
+      "serial": "SLPM-65515",
+      "alt_serials": [],
+      "crcs": [
+        "E09E454C"
+      ],
+      "region": "Japan",
+      "release_date": "2004-07-22",
+      "developer": "ArtePiazza",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
     "Dragon Quest VIII: Journey of the Cursed King (PAL)": {
       "serial": "SLES-53831",
       "alt_serials": [],
@@ -219,6 +365,18 @@
       "developer": "SCE London Studio",
       "publisher": "Sony Computer Entertainment",
       "genre": "Sports"
+    },
+    "Fahrenheit (PAL)": {
+      "serial": "SLES-52976",
+      "alt_serials": [],
+      "crcs": [
+        "3BEBCCAC"
+      ],
+      "region": "PAL",
+      "release_date": "2005-09-16",
+      "developer": "Quantic Dream",
+      "publisher": "Atari",
+      "genre": "Action-Adventure"
     },
     "Final Fantasy X (PAL)": {
       "serial": "SLES-50490",
@@ -342,6 +500,28 @@
       "publisher": "Sony Computer Entertainment",
       "genre": "Racing"
     },
+    "Grand Theft Auto III (PAL)": {
+      "serial": "SLES-50330",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2002-05-03",
+      "developer": "Rockstar North",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure"
+    },
+    "Grand Theft Auto: Liberty City Stories (PAL)": {
+      "serial": "SLES-53561",
+      "alt_serials": [],
+      "crcs": [
+        "D693D4CF"
+      ],
+      "region": "PAL",
+      "release_date": "2006-06-23",
+      "developer": "Rockstar North",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure"
+    },
     "Grand Theft Auto: San Andreas (PAL)": {
       "serial": "SLES-52927",
       "alt_serials": [],
@@ -359,6 +539,16 @@
       "region": "PAL",
       "release_date": "2003-05-09",
       "developer": "Rockstar North",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure"
+    },
+    "Grand Theft Auto: Vice City Stories (PAL)": {
+      "serial": "SLES-54622",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2007-03-09",
+      "developer": "Rockstar Leeds",
       "publisher": "Rockstar Games",
       "genre": "Action-Adventure"
     },
@@ -397,6 +587,18 @@
       "developer": "Neversoft",
       "publisher": "Activision",
       "genre": "Music"
+    },
+    "Guitar Hero: Aerosmith (PAL)": {
+      "serial": "SLES-55003",
+      "alt_serials": [],
+      "crcs": [
+        "EA8DC584"
+      ],
+      "region": "PAL",
+      "release_date": "2008-07-18",
+      "developer": "Neversoft",
+      "publisher": "Activision",
+      "genre": "Rhythm"
     },
     "Ico (PAL)": {
       "serial": "SLES-51128",
@@ -448,6 +650,16 @@
       "publisher": "Sony Computer Entertainment",
       "genre": "Platformer"
     },
+    "Katamari Damacy (PAL)": {
+      "serial": "SCES-52805",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2004-03-19",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Action-Puzzle"
+    },
     "Killer 7 (PAL)": {
       "serial": "SCES-53366",
       "alt_serials": [],
@@ -498,6 +710,30 @@
       "publisher": "Square Enix",
       "genre": "Action-RPG"
     },
+    "L.A. Rush (PAL)": {
+      "serial": "SLES-53553",
+      "alt_serials": [],
+      "crcs": [
+        "EA0CB4B8"
+      ],
+      "region": "PAL",
+      "release_date": "2005-09-30",
+      "developer": "Fluid Studios",
+      "publisher": "Midway",
+      "genre": "Racing"
+    },
+    "Lego Batman: The Videogame (PAL)": {
+      "serial": "SLES-55350",
+      "alt_serials": [],
+      "crcs": [
+        "2FCBAB60"
+      ],
+      "region": "PAL",
+      "release_date": "2008-10-17",
+      "developer": "Traveller's Tales",
+      "publisher": "Warner Bros. Interactive Entertainment",
+      "genre": "Action-Adventure"
+    },
     "Max Payne (PAL)": {
       "serial": "SLES-50325",
       "alt_serials": [],
@@ -509,6 +745,18 @@
       "developer": "Remedy Entertainment",
       "publisher": "Gathering of Developers",
       "genre": "Third-Person Shooter"
+    },
+    "Mercenaries: Playground of Destruction (PAL)": {
+      "serial": "SLES-52586",
+      "alt_serials": [],
+      "crcs": [
+        "84930ED2"
+      ],
+      "region": "PAL",
+      "release_date": "2005-06-10",
+      "developer": "Pandemic Studios",
+      "publisher": "LucasArts",
+      "genre": "Action"
     },
     "Metal Gear Solid 2: Sons of Liberty (PAL)": {
       "serial": "SLES-50383",
@@ -550,6 +798,18 @@
       "publisher": "Konami",
       "genre": "Action"
     },
+    "Midnight Club 3: Dub Edition (PAL)": {
+      "serial": "SLES-53194",
+      "alt_serials": [],
+      "crcs": [
+        "B2408080"
+      ],
+      "region": "PAL",
+      "release_date": "2005-06-03",
+      "developer": "Rockstar San Diego",
+      "publisher": "Rockstar Games",
+      "genre": "Racing"
+    },
     "Mortal Kombat: Deadly Alliance (PAL)": {
       "serial": "SLES-51483",
       "alt_serials": [],
@@ -569,6 +829,18 @@
       "developer": "Midway",
       "publisher": "Midway",
       "genre": "Fighting"
+    },
+    "Need for Speed: Carbon (PAL)": {
+      "serial": "SLES-54493",
+      "alt_serials": [],
+      "crcs": [
+        "58BED00E"
+      ],
+      "region": "PAL",
+      "release_date": "2006-11-03",
+      "developer": "EA Black Box",
+      "publisher": "Electronic Arts",
+      "genre": "Racing"
     },
     "Need for Speed: Most Wanted (PAL)": {
       "serial": "SLES-53816",
@@ -680,6 +952,30 @@
       "publisher": "Ubisoft",
       "genre": "Action-Adventure"
     },
+    "Pro Evolution Soccer 2007 (PAL)": {
+      "serial": "SLES-54221",
+      "alt_serials": [],
+      "crcs": [
+        "37E36C6D"
+      ],
+      "region": "PAL",
+      "release_date": "2006-10-27",
+      "developer": "Konami",
+      "publisher": "Konami",
+      "genre": "Sports"
+    },
+    "Pro Evolution Soccer 2011 (PAL)": {
+      "serial": "SLES-55799",
+      "alt_serials": [],
+      "crcs": [
+        "DBAAB66D"
+      ],
+      "region": "PAL",
+      "release_date": "2010-09-29",
+      "developer": "PES Productions",
+      "publisher": "Konami",
+      "genre": "Sports"
+    },
     "Pro Evolution Soccer 6 (PAL)": {
       "serial": "SLES-53982",
       "alt_serials": [],
@@ -704,6 +1000,28 @@
       "publisher": "Sony Computer Entertainment",
       "genre": "Platformer"
     },
+    "Ratchet & Clank 2: Going Commando (PAL)": {
+      "serial": "SCES-51561",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "PAL",
+      "release_date": "2003-11-07",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "Action-Platformer"
+    },
+    "Red Faction II (PAL)": {
+      "serial": "SLES-51194",
+      "alt_serials": [],
+      "crcs": [
+        "1629D655"
+      ],
+      "region": "PAL",
+      "release_date": "2003-03-28",
+      "developer": "Volition",
+      "publisher": "THQ",
+      "genre": "First-Person Shooter"
+    },
     "Resident Evil 4 (PAL)": {
       "serial": "SLES-53702",
       "alt_serials": [],
@@ -725,6 +1043,30 @@
       "developer": "Capcom",
       "publisher": "Capcom",
       "genre": "Survival Horror"
+    },
+    "Rule of Rose (PAL)": {
+      "serial": "SLES-54218",
+      "alt_serials": [],
+      "crcs": [
+        "52585249"
+      ],
+      "region": "PAL",
+      "release_date": "2006-09-01",
+      "developer": "Punchline Co., Ltd.",
+      "publisher": "505 Games",
+      "genre": "Survival Horror"
+    },
+    "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)": {
+      "serial": "SLPM-62517",
+      "alt_serials": [],
+      "crcs": [
+        "02E1970F"
+      ],
+      "region": "Japan",
+      "release_date": "2006-08-10",
+      "developer": "Sega",
+      "publisher": "Sega",
+      "genre": "Action"
     },
     "Shadow of the Colossus (PAL)": {
       "serial": "SCES-53326",
@@ -821,6 +1163,30 @@
       "publisher": "Sony Computer Entertainment",
       "genre": "Platformer"
     },
+    "Smuggler's Run 2: Hostile Territory (PAL)": {
+      "serial": "SLES-50477",
+      "alt_serials": [],
+      "crcs": [
+        "F26AF996"
+      ],
+      "region": "PAL",
+      "release_date": "2002-02-22",
+      "developer": "Angel Studios",
+      "publisher": "Rockstar Games",
+      "genre": "Racing"
+    },
+    "Sonic Riders (PAL)": {
+      "serial": "SLES-54083",
+      "alt_serials": [],
+      "crcs": [
+        "F881CD68"
+      ],
+      "region": "PAL",
+      "release_date": "2006-03-24",
+      "developer": "Sonic Team",
+      "publisher": "Sega",
+      "genre": "Racing"
+    },
     "SoulCalibur II (PAL)": {
       "serial": "SCES-52423",
       "alt_serials": [],
@@ -870,6 +1236,18 @@
       "developer": "Pandemic Studios",
       "publisher": "LucasArts",
       "genre": "Third-Person Shooter"
+    },
+    "Street Racing Syndicate (PAL)": {
+      "serial": "SLES-52916",
+      "alt_serials": [],
+      "crcs": [
+        "18C101A7"
+      ],
+      "region": "PAL",
+      "release_date": "2004-11-19",
+      "developer": "Namco Hometek Inc.",
+      "publisher": "Namco",
+      "genre": "Racing"
     },
     "Suikoden V (PAL)": {
       "serial": "SLES-53693",
@@ -939,6 +1317,30 @@
       "publisher": "Atari",
       "genre": "Racing"
     },
+    "The Fast and the Furious (PAL)": {
+      "serial": "SLES-53272",
+      "alt_serials": [],
+      "crcs": [
+        "91100045"
+      ],
+      "region": "PAL",
+      "release_date": "2006-04-07",
+      "developer": "Eutechnyx",
+      "publisher": "Vivendi Games",
+      "genre": "Racing"
+    },
+    "The Getaway: Black Monday (PAL)": {
+      "serial": "SCES-52810",
+      "alt_serials": [],
+      "crcs": [
+        "09C3DF79"
+      ],
+      "region": "PAL",
+      "release_date": "2004-11-05",
+      "developer": "SCEE London Studio",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action"
+    },
     "The Incredibles (PAL)": {
       "serial": "SLES-52812",
       "alt_serials": [],
@@ -950,6 +1352,18 @@
       "developer": "Heavy Iron Studios",
       "publisher": "THQ",
       "genre": "Action-Platformer"
+    },
+    "The Simpsons: Hit & Run (PAL)": {
+      "serial": "SLES-51432",
+      "alt_serials": [],
+      "crcs": [
+        "0F0C4A9C"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-07",
+      "developer": "Radical Entertainment",
+      "publisher": "Vivendi Universal Games",
+      "genre": "Action"
     },
     "TimeSplitters 2 (PAL)": {
       "serial": "SLES-51277",
@@ -995,6 +1409,42 @@
       "publisher": "Activision",
       "genre": "Sports"
     },
+    "True Crime: New York City (PAL)": {
+      "serial": "SLES-54040",
+      "alt_serials": [],
+      "crcs": [
+        "77B4F13C"
+      ],
+      "region": "PAL",
+      "release_date": "2005-11-25",
+      "developer": "Luxoflux",
+      "publisher": "Activision",
+      "genre": "Action"
+    },
+    "True Crime: Streets of L.A. (PAL)": {
+      "serial": "SLES-51466",
+      "alt_serials": [],
+      "crcs": [
+        "6B9AEA0D"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-28",
+      "developer": "Luxoflux",
+      "publisher": "Activision",
+      "genre": "Action"
+    },
+    "Virtua Cop: Elite Edition (PAL)": {
+      "serial": "SLES-51707",
+      "alt_serials": [],
+      "crcs": [
+        "76A68274"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-21",
+      "developer": "Sega AM2",
+      "publisher": "Sega",
+      "genre": "Light Gun Shooter"
+    },
     "WWE SmackDown! vs. Raw (PAL)": {
       "serial": "SLES-51459",
       "alt_serials": [],
@@ -1015,183 +1465,59 @@
       "publisher": "THQ",
       "genre": "Sports"
     },
-    "Buffy the Vampire Slayer: Chaos Bleeds (PAL)": {
-      "serial": "SLES-51654",
-      "alt_serials": [],
-      "crcs": [
-        "CBC401C5"
-      ],
-      "region": "PAL",
-      "release_date": "2003-08-29",
-      "developer": "The Collective",
-      "publisher": "Vivendi Universal Games",
-      "genre": "Action"
-    },
-    "Fahrenheit (PAL)": {
-      "serial": "SLES-52976",
-      "alt_serials": [],
-      "crcs": [
-        "3BEBCCAC"
-      ],
-      "region": "PAL",
-      "release_date": "2005-09-16",
-      "developer": "Quantic Dream",
-      "publisher": "Atari",
-      "genre": "Action-Adventure"
-    },
-    "Midnight Club 3: Dub Edition (PAL)": {
-      "serial": "SLES-53194",
-      "alt_serials": [],
-      "crcs": [
-        "B2408080"
-      ],
-      "region": "PAL",
-      "release_date": "2005-06-03",
-      "developer": "Rockstar San Diego",
-      "publisher": "Rockstar Games",
-      "genre": "Racing"
-    },
-    "Dragon Ball Z: Budokai Tenkaichi 2 (PAL)": {
-      "serial": "SLES-54200",
-      "alt_serials": [],
-      "crcs": [
-        "151DF9C9"
-      ],
-      "region": "PAL",
-      "release_date": "2006-11-03",
-      "developer": "Spike",
-      "publisher": "Namco Bandai Games",
-      "genre": "Fighting"
-    },
-    "Pro Evolution Soccer 2007 (PAL)": {
-      "serial": "SLES-54221",
-      "alt_serials": [],
-      "crcs": [
-        "37E36C6D"
-      ],
-      "region": "PAL",
-      "release_date": "2006-10-27",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Sports"
-    },
-    "Need for Speed: Carbon (PAL)": {
-      "serial": "SLES-54493",
-      "alt_serials": [],
-      "crcs": [
-        "58BED00E"
-      ],
-      "region": "PAL",
-      "release_date": "2006-11-03",
-      "developer": "EA Black Box",
-      "publisher": "Electronic Arts",
-      "genre": "Racing"
-    },
-    "Guitar Hero: Aerosmith (PAL)": {
-      "serial": "SLES-55003",
-      "alt_serials": [],
-      "crcs": [
-        "EA8DC584"
-      ],
-      "region": "PAL",
-      "release_date": "2008-07-18",
-      "developer": "Neversoft",
-      "publisher": "Activision",
-      "genre": "Rhythm"
-    },
-    "Lego Batman: The Videogame (PAL)": {
-      "serial": "SLES-55350",
-      "alt_serials": [],
-      "crcs": [
-        "2FCBAB60"
-      ],
-      "region": "PAL",
-      "release_date": "2008-10-17",
-      "developer": "Traveller's Tales",
-      "publisher": "Warner Bros. Interactive Entertainment",
-      "genre": "Action-Adventure"
-    },
-    "Grand Theft Auto III (PAL)": {
-      "serial": "SLES-50330",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2002-05-03",
-      "developer": "Rockstar North",
-      "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
-    },
-    "Grand Theft Auto: Liberty City Stories (PAL)": {
-      "serial": "SLES-53561",
-      "alt_serials": [],
-      "crcs": [
-        "D693D4CF"
-      ],
-      "region": "PAL",
-      "release_date": "2006-06-23",
-      "developer": "Rockstar North",
-      "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
-    },
-    "Grand Theft Auto: Vice City Stories (PAL)": {
-      "serial": "SLES-54622",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2007-03-09",
-      "developer": "Rockstar Leeds",
-      "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
-    },
-    "Ratchet & Clank 2: Going Commando (PAL)": {
-      "serial": "SCES-51561",
+    "WWE SmackDown!: Here Comes the Pain (PAL)": {
+      "serial": "SLES-51717",
       "alt_serials": [],
       "crcs": [],
       "region": "PAL",
       "release_date": "2003-11-07",
-      "developer": "Insomniac Games",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action-Platformer"
+      "developer": "Yuke's",
+      "publisher": "THQ",
+      "genre": "Wrestling"
     },
-    "Dragon Ball Z: Budokai 3 (PAL)": {
-      "serial": "SLES-53072",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2004-12-03",
-      "developer": "Dimps",
-      "publisher": "Atari",
-      "genre": "Fighting"
-    },
-    "Dragon Ball Z: Budokai Tenkaichi (PAL)": {
-      "serial": "SLES-53713",
+    "We Love Katamari (PAL)": {
+      "serial": "SCES-53582",
       "alt_serials": [],
       "crcs": [],
       "region": "PAL",
       "release_date": "2005-11-25",
-      "developer": "Spike",
-      "publisher": "Atari",
-      "genre": "Fighting"
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Action-Puzzle"
     },
-    "Ace Combat 04: Shattered Skies (PAL)": {
-      "serial": "SCES-50410",
+    "Yakuza (PAL)": {
+      "serial": "SLES-54169",
       "alt_serials": [],
       "crcs": [],
       "region": "PAL",
-      "release_date": "2002-01-25",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Flight Simulator"
+      "release_date": "2006-11-17",
+      "developer": "Ryu Ga Gotoku Studio",
+      "publisher": "Sega",
+      "genre": "Action-Adventure"
     },
-    "Ace Combat 5: The Unsung War (PAL)": {
-      "serial": "SCES-52424",
+    "Yu-Gi-Oh! GX: Tag Force Evolution (PAL)": {
+      "serial": "SLES-53968",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "EE8404AA"
+      ],
       "region": "PAL",
-      "release_date": "2005-01-28",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Flight Simulator"
+      "release_date": "2007-10-19",
+      "developer": "Konami",
+      "publisher": "Konami",
+      "genre": "Card Game"
+    },
+    "Zombie Hunters 2 (PAL)": {
+      "serial": "SLES-54569",
+      "alt_serials": [],
+      "crcs": [
+        "07608CA2"
+      ],
+      "region": "PAL",
+      "release_date": "2006-11-17",
+      "developer": "Nowproduction",
+      "publisher": "505 Games",
+      "genre": "Action"
     },
     "Zone of the Enders (PAL)": {
       "serial": "SLES-50552",
@@ -1212,236 +1538,6 @@
       "developer": "Cavia",
       "publisher": "Konami",
       "genre": "Mech Action"
-    },
-    "Bully (PAL)": {
-      "serial": "SLES-54145",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2006-10-27",
-      "developer": "Rockstar Vancouver",
-      "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
-    },
-    "Yakuza (PAL)": {
-      "serial": "SLES-54169",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2006-11-17",
-      "developer": "Ryu Ga Gotoku Studio",
-      "publisher": "Sega",
-      "genre": "Action-Adventure"
-    },
-    "We Love Katamari (PAL)": {
-      "serial": "SCES-53582",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2005-11-25",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Action-Puzzle"
-    },
-    "Katamari Damacy (PAL)": {
-      "serial": "SCES-52805",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2004-03-19",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Action-Puzzle"
-    },
-    "WWE SmackDown!: Here Comes the Pain (PAL)": {
-      "serial": "SLES-51717",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2003-11-07",
-      "developer": "Yuke's",
-      "publisher": "THQ",
-      "genre": "Wrestling"
-    },
-    "Dragon Ball Z: Budokai Tenkaichi 3 (PAL)": {
-      "serial": "SLES-54994",
-      "alt_serials": [],
-      "crcs": [],
-      "region": "PAL",
-      "release_date": "2007-11-09",
-      "developer": "Spike",
-      "publisher": "Namco Bandai Games",
-      "genre": "Fighting"
-    },
-    "Beyond Good & Evil (PAL)": {
-      "serial": "SLES-51917",
-      "alt_serials": [],
-      "crcs": [
-        "591ABA45"
-      ],
-      "region": "PAL",
-      "release_date": "2003-11-28",
-      "developer": "Ubisoft Montreal",
-      "publisher": "Ubisoft",
-      "genre": "Action-Adventure"
-    },
-    "Rule of Rose (PAL)": {
-      "serial": "SLES-54218",
-      "alt_serials": [],
-      "crcs": [
-        "52585249"
-      ],
-      "region": "PAL",
-      "release_date": "2006-09-01",
-      "developer": "Punchline Co., Ltd.",
-      "publisher": "505 Games",
-      "genre": "Survival Horror"
-    },
-    "Zombie Hunters 2 (PAL)": {
-      "serial": "SLES-54569",
-      "alt_serials": [],
-      "crcs": [
-        "07608CA2"
-      ],
-      "region": "PAL",
-      "release_date": "2006-11-17",
-      "developer": "Nowproduction",
-      "publisher": "505 Games",
-      "genre": "Action"
-    },
-    "Mercenaries: Playground of Destruction (PAL)": {
-      "serial": "SLES-52586",
-      "alt_serials": [],
-      "crcs": [
-        "84930ED2"
-      ],
-      "region": "PAL",
-      "release_date": "2005-06-10",
-      "developer": "Pandemic Studios",
-      "publisher": "LucasArts",
-      "genre": "Action"
-    },
-    "Sonic Riders (PAL)": {
-      "serial": "SLES-54083",
-      "alt_serials": [],
-      "crcs": [
-        "F881CD68"
-      ],
-      "region": "PAL",
-      "release_date": "2006-03-24",
-      "developer": "Sonic Team",
-      "publisher": "Sega",
-      "genre": "Racing"
-    },
-    "Battlefield 2: Modern Combat (PAL)": {
-      "serial": "SLES-53827",
-      "alt_serials": [],
-      "crcs": [
-        "186B0D8A"
-      ],
-      "region": "PAL",
-      "release_date": "2006-03-31",
-      "developer": "Digital Illusions CE",
-      "publisher": "Electronic Arts",
-      "genre": "First-Person Shooter"
-    },
-    "The Fast and the Furious (PAL)": {
-      "serial": "SLES-53272",
-      "alt_serials": [],
-      "crcs": [
-        "91100045"
-      ],
-      "region": "PAL",
-      "release_date": "2006-04-07",
-      "developer": "Eutechnyx",
-      "publisher": "Vivendi Games",
-      "genre": "Racing"
-    },
-    "True Crime: Streets of L.A. (PAL)": {
-      "serial": "SLES-51466",
-      "alt_serials": [],
-      "crcs": [
-        "6B9AEA0D"
-      ],
-      "region": "PAL",
-      "release_date": "2003-11-28",
-      "developer": "Luxoflux",
-      "publisher": "Activision",
-      "genre": "Action"
-    },
-    "Street Racing Syndicate (PAL)": {
-      "serial": "SLES-52916",
-      "alt_serials": [],
-      "crcs": [
-        "18C101A7"
-      ],
-      "region": "PAL",
-      "release_date": "2004-11-19",
-      "developer": "Namco Hometek Inc.",
-      "publisher": "Namco",
-      "genre": "Racing"
-    },
-    "True Crime: New York City (PAL)": {
-      "serial": "SLES-54040",
-      "alt_serials": [],
-      "crcs": [
-        "77B4F13C"
-      ],
-      "region": "PAL",
-      "release_date": "2005-11-25",
-      "developer": "Luxoflux",
-      "publisher": "Activision",
-      "genre": "Action"
-    },
-    "L.A. Rush (PAL)": {
-      "serial": "SLES-53553",
-      "alt_serials": [],
-      "crcs": [
-        "EA0CB4B8"
-      ],
-      "region": "PAL",
-      "release_date": "2005-09-30",
-      "developer": "Fluid Studios",
-      "publisher": "Midway",
-      "genre": "Racing"
-    },
-    "The Getaway: Black Monday (PAL)": {
-      "serial": "SCES-52810",
-      "alt_serials": [],
-      "crcs": [
-        "09C3DF79"
-      ],
-      "region": "PAL",
-      "release_date": "2004-11-05",
-      "developer": "SCEE London Studio",
-      "publisher": "Sony Computer Entertainment Europe",
-      "genre": "Action"
-    },
-    "The Simpsons: Hit & Run (PAL)": {
-      "serial": "SLES-51432",
-      "alt_serials": [],
-      "crcs": [
-        "0F0C4A9C"
-      ],
-      "region": "PAL",
-      "release_date": "2003-11-07",
-      "developer": "Radical Entertainment",
-      "publisher": "Vivendi Universal Games",
-      "genre": "Action"
-    },
-    "7 Sins (PAL)": {
-      "serial": "SLES-53280",
-      "alt_serials": [
-        "SLES-53297"
-      ],
-      "crcs": [
-        "6926B199"
-      ],
-      "region": "PAL",
-      "release_date": "2004-03-05",
-      "developer": "Monte Cristo",
-      "publisher": "MC2-Microids",
-      "genre": "Action"
     }
   }
 }
