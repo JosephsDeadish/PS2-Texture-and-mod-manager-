@@ -210,10 +210,8 @@
       "genre": "Platformer"
     },
     "Crash Twinsanity (PAL)": {
-      "serial": "SLES-52606",
-      "alt_serials": [
-        "SLES-52568"
-      ],
+      "serial": "SLES-52568",
+      "alt_serials": [],
       "crcs": [
         "1510E1D1"
       ],

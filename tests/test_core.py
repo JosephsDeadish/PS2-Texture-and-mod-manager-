@@ -14868,11 +14868,11 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("SCES-50916", alt,
                       "Ratchet & Clank (PAL) must list SCES-50916 as alt_serial")
 
-    def test_crash_twinsanity_pal_has_sles_52568_alt_serial(self):
-        """Crash Twinsanity (PAL) must have SLES-52568 as an alt_serial."""
-        alt = self.games.get("Crash Twinsanity (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SLES-52568", alt,
-                      "Crash Twinsanity (PAL) must list SLES-52568 as alt_serial")
+    def test_crash_twinsanity_pal_has_sles_52568_primary_serial(self):
+        """Crash Twinsanity (PAL) must have SLES-52568 as its primary serial (SLES-52606 was fabricated)."""
+        entry = self.games.get("Crash Twinsanity (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-52568",
+                         "Crash Twinsanity (PAL) primary serial must be SLES-52568, not the fabricated SLES-52606")
 
     # -- new game entries --------------------------------------------------
 
@@ -16204,22 +16204,21 @@ class TestWave78SerialNameFixes(unittest.TestCase):
 
 
 class TestWave79PalSerialFixes(unittest.TestCase):
-    """Wave 79: Fix 7 PAL CRC groups using alt serials instead of primary serials (995 entries).
+    """Wave 79 + Wave 80 corrections: PAL serial fixes (990 entries net).
 
-    All 7 CRCs had pnach DB entries using alt serials (as listed in ps2_pal.json)
-    instead of the primary serial for the CRC.  Fixed to use the primary serial so
-    that the pnach DB is consistent with the serial DB.
+    Wave 79 originally fixed 7 PAL CRC groups.  Wave 80 reverts the fabricated
+    SLES-52606 for CRC 1510E1D1 back to the real verified serial SLES-52568.
 
-    Fixes:
-      1510E1D1  Crash Twinsanity (PAL):    SLES-52568 → SLES-52606  (5 entries)
-      2251E14D  Tekken 4 (PAL):            SCES-50878 → SLES-51552  (37 entries)
-      5C991F4E  Ico (PAL):                 SCES-50760 → SLES-51128  (7 entries)
-      6A8F18B9  Ratchet & Clank (PAL):     SCES-50916 → SCES-50391  (160 entries)
-      7D8F539A  Devil May Cry (PAL):       SLES-50358 → SLES-50873  (119 entries)
-      941BB7D9  Final Fantasy X (PAL):     SCES-50492 → SLES-50490  (499 entries)
-      9AAC5309  Final Fantasy X-2 (PAL):   SLES-51815 → SLES-51818  (168 entries)
+    Current state after Wave 80 correction:
+      1510E1D1  Crash Twinsanity (PAL):    SLES-52568 (real; SLES-52606 removed as fabricated)
+      2251E14D  Tekken 4 (PAL):            SLES-51552
+      5C991F4E  Ico (PAL):                 SLES-51128
+      6A8F18B9  Ratchet & Clank (PAL):     SCES-50391
+      7D8F539A  Devil May Cry (PAL):       SLES-50873
+      941BB7D9  Final Fantasy X (PAL):     SLES-50490
+      9AAC5309  Final Fantasy X-2 (PAL):   SLES-51818
 
-    Also (serial DB):
+    Serial DB:
       "Godfather, The" (SLUS-21406) renamed to "The Godfather (Limited Edition)"
       SLUS-21406 removed from alt_serials of "The Godfather" (separate edition)
     """
@@ -16258,12 +16257,12 @@ class TestWave79PalSerialFixes(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_1510e1d1_crash_twinsanity_serial(self):
-        """1510E1D1: game_serial must be SLES-52606 (primary), not SLES-52568 (alt)."""
-        self._assert_crc_serial("1510E1D1", "SLES-52606")
+        """1510E1D1: game_serial must be SLES-52568 (real verified serial; SLES-52606 was fabricated)."""
+        self._assert_crc_serial("1510E1D1", "SLES-52568")
 
     def test_1510e1d1_crash_twinsanity_name(self):
-        """1510E1D1: game must be 'Crash Twinsanity (SLES-52606)'."""
-        self._assert_crc_game("1510E1D1", "Crash Twinsanity (SLES-52606)")
+        """1510E1D1: game must be 'Crash Twinsanity (SLES-52568)'."""
+        self._assert_crc_game("1510E1D1", "Crash Twinsanity (SLES-52568)")
 
     def test_2251e14d_tekken4_serial(self):
         """2251E14D: game_serial must be SLES-51552 (primary), not SCES-50878 (alt)."""
@@ -16343,9 +16342,9 @@ class TestWave79PalSerialFixes(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_no_alt_serial_contamination_in_pal_crcs(self):
-        """None of the 7 fixed CRCs should still have the old alt serials."""
+        """None of the 7 fixed CRCs should still have the old (wrong) serials."""
         old_serials = {
-            '1510E1D1': 'SLES-52568',
+            '1510E1D1': 'SLES-52606',  # fabricated; real serial is SLES-52568
             '2251E14D': 'SCES-50878',
             '5C991F4E': 'SCES-50760',
             '6A8F18B9': 'SCES-50916',
@@ -16359,4 +16358,4 @@ class TestWave79PalSerialFixes(unittest.TestCase):
             if crc in old_serials and entry.get("game_serial") == old_serials[crc]:
                 bad.append((crc, key, entry.get("game_serial")))
         self.assertEqual(bad, [],
-                         f"Old alt serials still present: {bad[:5]}")
+                         f"Wrong serials still present: {bad[:5]}")
