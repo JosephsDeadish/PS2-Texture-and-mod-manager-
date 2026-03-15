@@ -16044,3 +16044,160 @@ class TestWave77NameNormalizationFixes(unittest.TestCase):
         multi = {c: sorted(n) for c, n in crc_names.items() if len(n) > 1}
         self.assertEqual(multi, {},
                          f"CRCs with multiple game names: {list(multi.items())[:5]}")
+
+
+class TestWave78SerialNameFixes(unittest.TestCase):
+    """Wave 78: Fix serial / game-name mismatches across 5 CRC groups (17 entries).
+
+    Group A — serial cross-contamination (1 CRC, 1 entry):
+      D850707E  The Godfather: SLUS-21406 → SLUS-21385
+
+    Group B — game name contains wrong serial in parentheses (2 CRCs, 5 entries):
+      4A2FF487  Arc the Lad: Twilight of the Spirits: '(SLUS-20743)' → '(SCUS-97231)'
+      D7C97CF4  Arc the Lad: Twilight of the Spirits: '(SLUS-20743)' → '(SCUS-97231)'
+      (SLUS-20743 is the Prince of Persia: Sands of Time serial — cross-contamination)
+
+    Group C — wrong alt serial in Haunting Ground name (1 CRC, 4 entries):
+      C0FC8DA6  'Haunting Ground (SLUS-21171 alt)' → 'Haunting Ground (SLUS-21075)'
+      (SLUS-21171 is Harvest Moon: A Wonderful Life Special Edition)
+
+    Group D — Sly 3 entries in Ape Escape 3 CRC removed (1 CRC, 7 entries deleted):
+      B3A9F9E7  7 entries labelled 'Sly 3: Honor Among Thieves (SCUS-97501)' removed;
+               B3A9F9E7 belongs to Ape Escape 3 per the serial DB; Sly 3 entries
+               already exist under the correct CRCs 5958680D / B9BD9CE0.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.db.items() if v.get("game_crc") == crc}
+
+    def _assert_crc_game(self, crc, expected_name):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game")) for k, v in entries.items()
+                 if v.get("game") != expected_name]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc}: wrong game names (expected {expected_name!r}): {wrong[:3]}")
+
+    def _assert_crc_serial(self, crc, expected_serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game_serial")) for k, v in entries.items()
+                 if v.get("game_serial") != expected_serial]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc}: wrong serials (expected {expected_serial!r}): {wrong[:3]}")
+
+    # ------------------------------------------------------------------
+    # Group A — The Godfather serial fix
+    # ------------------------------------------------------------------
+
+    def test_d850707e_godfather_serial(self):
+        """D850707E: game_serial must be SLUS-21385 (not SLUS-21406)."""
+        self._assert_crc_serial("D850707E", "SLUS-21385")
+
+    def test_d850707e_godfather_name(self):
+        """D850707E: all entries must use 'The Godfather (SLUS-21385)'."""
+        self._assert_crc_game("D850707E", "The Godfather (SLUS-21385)")
+
+    # ------------------------------------------------------------------
+    # Group B — Arc the Lad serial in game name
+    # ------------------------------------------------------------------
+
+    def test_4a2ff487_arc_the_lad_name(self):
+        """4A2FF487: all entries must use 'Arc the Lad: Twilight of the Spirits (SCUS-97231)'."""
+        self._assert_crc_game("4A2FF487", "Arc the Lad: Twilight of the Spirits (SCUS-97231)")
+
+    def test_d7c97cf4_arc_the_lad_name(self):
+        """D7C97CF4: all entries must use 'Arc the Lad: Twilight of the Spirits (SCUS-97231)'."""
+        self._assert_crc_game("D7C97CF4", "Arc the Lad: Twilight of the Spirits (SCUS-97231)")
+
+    def test_arc_the_lad_no_pop_serial_in_name(self):
+        """No Arc the Lad entry (SCUS-97231) may reference the PoP serial SLUS-20743."""
+        contaminated = [
+            (k, v["game"])
+            for k, v in self.db.items()
+            if v.get("game_serial") == "SCUS-97231" and "SLUS-20743" in v.get("game", "")
+        ]
+        self.assertEqual(contaminated, [],
+                         f"Arc the Lad entries still reference PoP serial: {contaminated}")
+
+    # ------------------------------------------------------------------
+    # Group C — Haunting Ground alt CRC name fix
+    # ------------------------------------------------------------------
+
+    def test_c0fc8da6_haunting_ground_name(self):
+        """C0FC8DA6: all entries must use 'Haunting Ground (SLUS-21075)'."""
+        self._assert_crc_game("C0FC8DA6", "Haunting Ground (SLUS-21075)")
+
+    def test_c0fc8da6_haunting_ground_no_wrong_serial(self):
+        """C0FC8DA6: game name must NOT contain 'SLUS-21171' (Harvest Moon serial)."""
+        bad = [
+            (k, v["game"])
+            for k, v in self.db.items()
+            if v.get("game_crc") == "C0FC8DA6" and "SLUS-21171" in v.get("game", "")
+        ]
+        self.assertEqual(bad, [],
+                         f"C0FC8DA6 still references SLUS-21171: {bad}")
+
+    # ------------------------------------------------------------------
+    # Group D — B3A9F9E7 Sly 3 entries removed
+    # ------------------------------------------------------------------
+
+    def test_b3a9f9e7_no_sly3_entries(self):
+        """B3A9F9E7 (Ape Escape 3 CRC) must not contain any Sly 3 entries."""
+        sly3_in_ae3 = [
+            k for k, v in self.db.items()
+            if v.get("game_crc") == "B3A9F9E7" and "Sly 3" in v.get("game", "")
+        ]
+        self.assertEqual(sly3_in_ae3, [],
+                         f"B3A9F9E7 still has Sly 3 entries: {sly3_in_ae3}")
+
+    def test_b3a9f9e7_absent_from_db(self):
+        """B3A9F9E7 should have zero entries after removing the misattributed Sly 3 data."""
+        entries = self._crc_entries("B3A9F9E7")
+        self.assertEqual(len(entries), 0,
+                         f"Expected 0 entries for B3A9F9E7, got {len(entries)}")
+
+    def test_sly3_correct_crcs_present(self):
+        """Sly 3 entries must exist under the correct CRCs 5958680D and B9BD9CE0."""
+        for crc in ("5958680D", "B9BD9CE0"):
+            entries = self._crc_entries(crc)
+            self.assertGreater(len(entries), 0,
+                               f"Expected Sly 3 entries at CRC {crc}, found none")
+            for k, v in entries.items():
+                self.assertEqual(v.get("game_serial"), "SCUS-97464",
+                                 f"{crc} entry {k} has wrong serial {v.get('game_serial')!r}")
+
+    # ------------------------------------------------------------------
+    # Regression: global invariant still holds
+    # ------------------------------------------------------------------
+
+    def test_no_crc_with_multiple_game_names(self):
+        """No CRC may have entries with two or more distinct game names."""
+        import collections
+        crc_names = collections.defaultdict(set)
+        for v in self.db.values():
+            crc = v.get("game_crc", "")
+            game = v.get("game", "")
+            if crc:
+                crc_names[crc].add(game)
+        multi = {c: sorted(n) for c, n in crc_names.items() if len(n) > 1}
+        self.assertEqual(multi, {},
+                         f"CRCs with multiple game names: {list(multi.items())[:5]}")
+
+    def test_no_empty_game_serials(self):
+        """All pnach DB entries must have a non-empty game_serial."""
+        empty = [k for k, v in self.db.items() if not v.get("game_serial", "").strip()]
+        self.assertEqual(empty, [],
+                         f"Entries with empty game_serial: {empty[:5]}")
+
+    def test_db_entry_count_after_wave78(self):
+        """DB must have at most 48144 entries — confirming the 7 B3A9F9E7 entries were removed."""
+        self.assertLessEqual(len(self.db), 48144,
+                             f"Expected ≤48144 entries after Wave 78 deletions, got {len(self.db)}")
