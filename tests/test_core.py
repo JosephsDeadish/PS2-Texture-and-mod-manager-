@@ -15849,3 +15849,198 @@ class TestWave76CrossContaminationFixes(unittest.TestCase):
         empty = [(k, v.get('game', '')) for k, v in self.pnach_db.items()
                  if not (v.get('game_serial') or '').strip()]
         self.assertEqual(empty, [], f"Still-empty serials: {empty[:5]}")
+
+
+class TestWave77NameNormalizationFixes(unittest.TestCase):
+    """Wave 77: Normalise game names across 24 CRCs in the pnach DB.
+
+    All entries for a given CRC must share exactly one game-name string.
+    215 entries updated across four groups:
+
+    Group A — add missing serial to game name (14 CRCs):
+      0779FBDB  'Final Fantasy XII'                      → 'Final Fantasy XII (SLUS-20963)'         3 entries
+      28703748  'Bully / Canis Canem Edit (SLUS-21269)'  → 'Bully (SLUS-21269)'                     2 entries
+      47B9B2FD  'Radiata Stories'                        → 'Radiata Stories (SLUS-21262)'            1 entry
+      4B80628D  'GUN (SLUS-21139)'                       → 'Gun (SLUS-21139)'                        1 entry
+      5E115FB6  'Grand Theft Auto III'                   → 'Grand Theft Auto III (SLUS-20062)'      19 entries
+      6624A78C  'Killzone'                               → 'Killzone (SCES-52004)'                   7 entries
+      8176235A  'Van Helsing'                            → 'Van Helsing (SLUS-20738)'                4 entries
+      901AAC09  'Haunting Ground'                        → 'Haunting Ground (SLUS-21075)'            1 entry
+      B59EF006  'Area 51'                                → 'Area 51 (SLUS-20595)'                    6 entries
+      CAAEC49C  'Killzone'                               → 'Killzone (SCUS-97402)'                   6 entries
+      DEDC3B71  'Persona 4'                              → 'Persona 4 (SLUS-21782)'                  9 entries
+      E1F17139  'Teen Titans'                            → 'Teen Titans (SLUS-21183)'                9 entries
+      F1C7201E  '24'                                     → '24 - The Game (SLUS-21268)'              3 entries
+      FFF16BAB  'Jak and Daxter' / '(SCUS-97123 alt CRC)'→ 'Jak and Daxter: The Precursor Legacy (SCUS-97124)'  2 entries
+
+    Group B — remove wrong '(alt)' label from primary CRC (2 CRCs):
+      6A928BAE  'Prince of Persia: The Sands of Time (SLUS-20743 alt)' → '...(SLUS-20743)'          5 entries
+      77E61C8A  'Gran Turismo 4 (SCUS-97328 alt)'                      → '...(SCUS-97328)'           5 entries
+
+    Group C — add '(alt)' label to secondary CRC (1 CRC):
+      CF8ABA10  'Final Fantasy X (SLUS-20312)' → 'Final Fantasy X (SLUS-20312 alt)'                 3 entries
+
+    Group D — capitalisation / wording fixes (4 CRCs):
+      D6385328  'God Of War' / 'God Of War (SCUS-97399)' / 'God of War (God Mode complete)...'
+                  → 'God of War (SCUS-97399)'                                                       42 entries
+      83FB515E  'Heroes Of The Pacific (SLUS-20943)' → 'Heroes of the Pacific (SLUS-20943)'        13 entries
+      E0127F2D  'Flatout (SLUS-20901)'               → 'FlatOut (SLUS-20901)'                      55 entries
+      A81B3903  'Leisure Suit Larry: MCL (SLUS-20956)' → '...Magna Cum Laude (SLUS-20956)'         15 entries
+
+    Group E — miscellaneous name fixes (2 CRCs, 3 CRC values):
+      52F2E55D  'Ico (SCUS-97113 alt) (52F2E55D)' → 'Ico (SCUS-97113 alt)'                         2 entries
+      2C6BE434  'Grand Theft Auto: San Andreas (v2) (SLUS-20946)' → '...(SLUS-20946)'              1 entry
+      399A49CA  'Grand Theft Auto: San Andreas (v2) (SLUS-20946)' → '...(SLUS-20946)'              1 entry
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.db.items() if v.get("game_crc") == crc}
+
+    def _assert_crc_game(self, crc, expected_name):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game")) for k, v in entries.items()
+                 if v.get("game") != expected_name]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc}: wrong game names (expected {expected_name!r}): {wrong[:3]}")
+
+    # ------------------------------------------------------------------
+    # Group A
+    # ------------------------------------------------------------------
+
+    def test_0779fbdb_ffxii_name(self):
+        """0779FBDB: all entries must use 'Final Fantasy XII (SLUS-20963)'."""
+        self._assert_crc_game("0779FBDB", "Final Fantasy XII (SLUS-20963)")
+
+    def test_28703748_bully_name(self):
+        """28703748: all entries must use 'Bully (SLUS-21269)'."""
+        self._assert_crc_game("28703748", "Bully (SLUS-21269)")
+
+    def test_47b9b2fd_radiata_name(self):
+        """47B9B2FD: all entries must use 'Radiata Stories (SLUS-21262)'."""
+        self._assert_crc_game("47B9B2FD", "Radiata Stories (SLUS-21262)")
+
+    def test_4b80628d_gun_name(self):
+        """4B80628D: all entries must use 'Gun (SLUS-21139)'."""
+        self._assert_crc_game("4B80628D", "Gun (SLUS-21139)")
+
+    def test_5e115fb6_gta3_name(self):
+        """5E115FB6: all entries must use 'Grand Theft Auto III (SLUS-20062)'."""
+        self._assert_crc_game("5E115FB6", "Grand Theft Auto III (SLUS-20062)")
+
+    def test_6624a78c_killzone_pal_name(self):
+        """6624A78C: all entries must use 'Killzone (SCES-52004)'."""
+        self._assert_crc_game("6624A78C", "Killzone (SCES-52004)")
+
+    def test_8176235a_van_helsing_name(self):
+        """8176235A: all entries must use 'Van Helsing (SLUS-20738)'."""
+        self._assert_crc_game("8176235A", "Van Helsing (SLUS-20738)")
+
+    def test_901aac09_haunting_ground_name(self):
+        """901AAC09: all entries must use 'Haunting Ground (SLUS-21075)'."""
+        self._assert_crc_game("901AAC09", "Haunting Ground (SLUS-21075)")
+
+    def test_b59ef006_area51_name(self):
+        """B59EF006: all entries must use 'Area 51 (SLUS-20595)'."""
+        self._assert_crc_game("B59EF006", "Area 51 (SLUS-20595)")
+
+    def test_caaec49c_killzone_ntsc_name(self):
+        """CAAEC49C: all entries must use 'Killzone (SCUS-97402)'."""
+        self._assert_crc_game("CAAEC49C", "Killzone (SCUS-97402)")
+
+    def test_dedc3b71_persona4_name(self):
+        """DEDC3B71: all entries must use 'Persona 4 (SLUS-21782)'."""
+        self._assert_crc_game("DEDC3B71", "Persona 4 (SLUS-21782)")
+
+    def test_e1f17139_teen_titans_name(self):
+        """E1F17139: all entries must use 'Teen Titans (SLUS-21183)'."""
+        self._assert_crc_game("E1F17139", "Teen Titans (SLUS-21183)")
+
+    def test_f1c7201e_24_game_name(self):
+        """F1C7201E: all entries must use '24 - The Game (SLUS-21268)'."""
+        self._assert_crc_game("F1C7201E", "24 - The Game (SLUS-21268)")
+
+    def test_fff16bab_jak_daxter_name(self):
+        """FFF16BAB: all entries must use 'Jak and Daxter: The Precursor Legacy (SCUS-97124)'."""
+        self._assert_crc_game("FFF16BAB", "Jak and Daxter: The Precursor Legacy (SCUS-97124)")
+
+    # ------------------------------------------------------------------
+    # Group B
+    # ------------------------------------------------------------------
+
+    def test_6a928bae_pop_sot_no_alt_label(self):
+        """6A928BAE (primary PoP:SoT CRC): must NOT use '(alt)' suffix."""
+        self._assert_crc_game("6A928BAE",
+                              "Prince of Persia: The Sands of Time (SLUS-20743)")
+
+    def test_77e61c8a_gt4_no_alt_label(self):
+        """77E61C8A (primary GT4 CRC): must NOT use '(alt)' suffix."""
+        self._assert_crc_game("77E61C8A", "Gran Turismo 4 (SCUS-97328)")
+
+    # ------------------------------------------------------------------
+    # Group C
+    # ------------------------------------------------------------------
+
+    def test_cf8aba10_ffx_alt_label(self):
+        """CF8ABA10 (secondary FFX CRC): all entries must include '(alt)'."""
+        self._assert_crc_game("CF8ABA10", "Final Fantasy X (SLUS-20312 alt)")
+
+    # ------------------------------------------------------------------
+    # Group D
+    # ------------------------------------------------------------------
+
+    def test_d6385328_god_of_war_name(self):
+        """D6385328: all 42 entries must use 'God of War (SCUS-97399)' (correct case)."""
+        self._assert_crc_game("D6385328", "God of War (SCUS-97399)")
+
+    def test_83fb515e_heroes_pacific_name(self):
+        """83FB515E: all entries must use 'Heroes of the Pacific (SLUS-20943)' (lowercase)."""
+        self._assert_crc_game("83FB515E", "Heroes of the Pacific (SLUS-20943)")
+
+    def test_e0127f2d_flatout_name(self):
+        """E0127F2D: all entries must use 'FlatOut (SLUS-20901)' (official capitalisation)."""
+        self._assert_crc_game("E0127F2D", "FlatOut (SLUS-20901)")
+
+    def test_a81b3903_lsl_name(self):
+        """A81B3903: all entries must use 'Leisure Suit Larry: Magna Cum Laude (SLUS-20956)'."""
+        self._assert_crc_game("A81B3903", "Leisure Suit Larry: Magna Cum Laude (SLUS-20956)")
+
+    # ------------------------------------------------------------------
+    # Group E
+    # ------------------------------------------------------------------
+
+    def test_52f2e55d_ico_no_crc_suffix(self):
+        """52F2E55D: name must not repeat the CRC hex in parentheses."""
+        self._assert_crc_game("52F2E55D", "Ico (SCUS-97113 alt)")
+
+    def test_2c6be434_gta_sa_no_v2(self):
+        """2C6BE434: GTA:SA entry must not include '(v2)'."""
+        self._assert_crc_game("2C6BE434", "Grand Theft Auto: San Andreas (SLUS-20946)")
+
+    def test_399a49ca_gta_sa_no_v2(self):
+        """399A49CA: all GTA:SA entries must not include '(v2)'."""
+        self._assert_crc_game("399A49CA", "Grand Theft Auto: San Andreas (SLUS-20946)")
+
+    # ------------------------------------------------------------------
+    # Global invariant — no CRC should have more than one game name
+    # ------------------------------------------------------------------
+
+    def test_no_crc_with_multiple_game_names(self):
+        """No CRC in the pnach DB should have entries with two or more distinct game names."""
+        import collections
+        crc_names = collections.defaultdict(set)
+        for v in self.db.values():
+            crc = v.get("game_crc", "")
+            game = v.get("game", "")
+            if crc:
+                crc_names[crc].add(game)
+        multi = {c: sorted(n) for c, n in crc_names.items() if len(n) > 1}
+        self.assertEqual(multi, {},
+                         f"CRCs with multiple game names: {list(multi.items())[:5]}")
