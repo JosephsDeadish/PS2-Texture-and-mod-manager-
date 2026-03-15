@@ -14326,8 +14326,8 @@ class TestWave71EmptySerialFix(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_37e36c6d_sles54221_serial(self):
-        """37E36C6D: all 168 entries must have game_serial SLES-54221."""
-        self._assert_crc_serial("37E36C6D", "SLES-54221")
+        """37E36C6D: all 168 entries must have game_serial SLES-54203 (corrected by Wave 83; SLES-54221 = LEGO Star Wars II)."""
+        self._assert_crc_serial("37E36C6D", "SLES-54203")
         self.assertEqual(len(self._crc_entries("37E36C6D")), 168)
 
     def test_9f6f78db_guitar_hero3_pal_serial(self):
@@ -14358,32 +14358,32 @@ class TestWave71EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("58BED00E")), 17)
 
     def test_3bebccac_sles52976_serial(self):
-        """3BEBCCAC: all 11 entries must have game_serial SLES-52976."""
-        self._assert_crc_serial("3BEBCCAC", "SLES-52976")
+        """3BEBCCAC: all 11 entries must have game_serial SLES-53539 (corrected by Wave 83; SLES-52976 = GoldenEye: Rogue Agent)."""
+        self._assert_crc_serial("3BEBCCAC", "SLES-53539")
         self.assertEqual(len(self._crc_entries("3BEBCCAC")), 11)
 
     def test_151df9c9_sles54200_serial(self):
-        """151DF9C9: all 7 entries must have game_serial SLES-54200."""
-        self._assert_crc_serial("151DF9C9", "SLES-54200")
+        """151DF9C9: all 7 entries must have game_serial SLES-54164 (corrected by Wave 83; SLES-54200 = Just Cause)."""
+        self._assert_crc_serial("151DF9C9", "SLES-54164")
         self.assertEqual(len(self._crc_entries("151DF9C9")), 7)
 
     def test_b2408080_sles53194_serial(self):
-        """B2408080: all 7 entries must have game_serial SLES-53194."""
-        self._assert_crc_serial("B2408080", "SLES-53194")
+        """B2408080: all 7 entries must have game_serial SLES-52942 (corrected by Wave 83; SLES-53194 = LEGO Star Wars)."""
+        self._assert_crc_serial("B2408080", "SLES-52942")
         self.assertEqual(len(self._crc_entries("B2408080")), 7)
 
     def test_ea8dc584_sles55003_serial(self):
-        """EA8DC584: all 6 entries must have game_serial SLES-55003."""
-        self._assert_crc_serial("EA8DC584", "SLES-55003")
+        """EA8DC584: all 6 entries must have game_serial SLES-55191 (corrected by Wave 83; SLES-55003 = NFS: ProStreet)."""
+        self._assert_crc_serial("EA8DC584", "SLES-55191")
         self.assertEqual(len(self._crc_entries("EA8DC584")), 6)
 
     def test_cbc401c5_sles51654_serial(self):
-        """CBC401C5: single entry must have game_serial SLES-51654."""
-        self._assert_crc_serial("CBC401C5", "SLES-51654")
+        """CBC401C5: single entry must have game_serial SLES-51890 (corrected by Wave 83; SLES-51654 = Mace Griffin)."""
+        self._assert_crc_serial("CBC401C5", "SLES-51890")
 
     def test_2fcbab60_sles55350_serial(self):
-        """2FCBAB60: single entry must have game_serial SLES-55350."""
-        self._assert_crc_serial("2FCBAB60", "SLES-55350")
+        """2FCBAB60: single entry must have game_serial SLES-55135 (corrected by Wave 83; SLES-55350 = NFS: Undercover)."""
+        self._assert_crc_serial("2FCBAB60", "SLES-55135")
 
     # ------------------------------------------------------------------
     # Group B — NTSC-U games
@@ -14538,10 +14538,10 @@ class TestWave72PalSerialDb(unittest.TestCase):
         self.assertIn("6624A78C", self._get_crcs("Killzone (PAL)"))
 
     def test_all_8_unknown_pal_titles_present(self):
-        """All 8 previously-unknown PAL serials must be present in PAL DB."""
+        """All 8 previously-unknown PAL serials (corrected by Wave 83) must be present in PAL DB."""
         unknown_serials = {
-            "SLES-51654", "SLES-52976", "SLES-53194", "SLES-54200",
-            "SLES-54221", "SLES-54493", "SLES-55003", "SLES-55350",
+            "SLES-51890", "SLES-53539", "SLES-52942", "SLES-54164",
+            "SLES-54203", "SLES-54493", "SLES-55191", "SLES-55135",
         }
         all_serials = {
             info.get("serial", "")
@@ -14566,10 +14566,10 @@ class TestWave72PalSerialDb(unittest.TestCase):
         self.assertTrue(len(titles) > 0, "SLES-54974 not found in SerialDatabase")
 
     def test_sdb_resolves_all_unknown_pal_serials(self):
-        """All 8 previously-unknown PAL serials must now be found in SerialDatabase."""
+        """All 8 previously-unknown PAL serials (corrected by Wave 83) must be found in SerialDatabase."""
         unknown_serials = [
-            "SLES-51654", "SLES-52976", "SLES-53194", "SLES-54200",
-            "SLES-54221", "SLES-54493", "SLES-55003", "SLES-55350",
+            "SLES-51890", "SLES-53539", "SLES-52942", "SLES-54164",
+            "SLES-54203", "SLES-54493", "SLES-55191", "SLES-55135",
         ]
         for serial in unknown_serials:
             titles = self.sdb.titles_for_serial(serial)
@@ -14657,10 +14657,10 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
     # -- SLES-51654 Buffy ---------------------------------------------------
 
     def test_buffy_chaos_bleeds_pal_serial(self):
-        """Buffy the Vampire Slayer: Chaos Bleeds (PAL) must map to SLES-51654."""
+        """Buffy the Vampire Slayer: Chaos Bleeds (PAL) must map to SLES-51890 (corrected by Wave 83; SLES-51654 = Mace Griffin)."""
         self.assertEqual(
             self._get_serial("Buffy the Vampire Slayer: Chaos Bleeds (PAL)"),
-            "SLES-51654"
+            "SLES-51890"
         )
 
     def test_buffy_chaos_bleeds_pal_crc(self):
@@ -14668,36 +14668,36 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("CBC401C5", self._get_crcs("Buffy the Vampire Slayer: Chaos Bleeds (PAL)"))
 
     def test_sdb_resolves_sles_51654(self):
-        """SerialDatabase must resolve SLES-51654 to Buffy: Chaos Bleeds."""
-        titles = self.sdb.titles_for_serial("SLES-51654")
-        self.assertTrue(len(titles) > 0, "SLES-51654 not resolved")
+        """SerialDatabase must resolve SLES-51890 (corrected Buffy serial) to Buffy: Chaos Bleeds."""
+        titles = self.sdb.titles_for_serial("SLES-51890")
+        self.assertTrue(len(titles) > 0, "SLES-51890 not resolved")
         self.assertTrue(any("Buffy" in t or "Chaos" in t for t in titles),
-                        f"SLES-51654 titles do not mention Buffy: {titles}")
+                        f"SLES-51890 titles do not mention Buffy: {titles}")
 
     # -- SLES-52976 Fahrenheit ----------------------------------------------
 
     def test_fahrenheit_pal_serial(self):
-        """Fahrenheit (PAL) must map to SLES-52976."""
-        self.assertEqual(self._get_serial("Fahrenheit (PAL)"), "SLES-52976")
+        """Fahrenheit (PAL) must map to SLES-53539 (corrected by Wave 83; SLES-52976 = GoldenEye: Rogue Agent)."""
+        self.assertEqual(self._get_serial("Fahrenheit (PAL)"), "SLES-53539")
 
     def test_fahrenheit_pal_crc(self):
         """Fahrenheit (PAL) must carry CRC 3BEBCCAC."""
         self.assertIn("3BEBCCAC", self._get_crcs("Fahrenheit (PAL)"))
 
     def test_sdb_resolves_sles_52976(self):
-        """SerialDatabase must resolve SLES-52976 to Fahrenheit."""
-        titles = self.sdb.titles_for_serial("SLES-52976")
-        self.assertTrue(len(titles) > 0, "SLES-52976 not resolved")
+        """SerialDatabase must resolve SLES-53539 (corrected Fahrenheit serial) to Fahrenheit."""
+        titles = self.sdb.titles_for_serial("SLES-53539")
+        self.assertTrue(len(titles) > 0, "SLES-53539 not resolved")
         self.assertTrue(any("Fahrenheit" in t for t in titles),
-                        f"SLES-52976 titles do not mention Fahrenheit: {titles}")
+                        f"SLES-53539 titles do not mention Fahrenheit: {titles}")
 
     # -- SLES-53194 Midnight Club 3 ----------------------------------------
 
     def test_midnight_club_3_pal_serial(self):
-        """Midnight Club 3: Dub Edition (PAL) must map to SLES-53194."""
+        """Midnight Club 3: Dub Edition (PAL) must map to SLES-52942 (corrected by Wave 83; SLES-53194 = LEGO Star Wars)."""
         self.assertEqual(
             self._get_serial("Midnight Club 3: Dub Edition (PAL)"),
-            "SLES-53194"
+            "SLES-52942"
         )
 
     def test_midnight_club_3_pal_crc(self):
@@ -14705,19 +14705,19 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("B2408080", self._get_crcs("Midnight Club 3: Dub Edition (PAL)"))
 
     def test_sdb_resolves_sles_53194(self):
-        """SerialDatabase must resolve SLES-53194 to Midnight Club 3."""
-        titles = self.sdb.titles_for_serial("SLES-53194")
-        self.assertTrue(len(titles) > 0, "SLES-53194 not resolved")
+        """SerialDatabase must resolve SLES-52942 (corrected MC3 serial) to Midnight Club 3."""
+        titles = self.sdb.titles_for_serial("SLES-52942")
+        self.assertTrue(len(titles) > 0, "SLES-52942 not resolved")
         self.assertTrue(any("Midnight" in t or "Club" in t for t in titles),
-                        f"SLES-53194 titles do not mention Midnight Club 3: {titles}")
+                        f"SLES-52942 titles do not mention Midnight Club 3: {titles}")
 
     # -- SLES-54200 DBZ BT2 -----------------------------------------------
 
     def test_dbz_bt2_pal_serial(self):
-        """Dragon Ball Z: Budokai Tenkaichi 2 (PAL) must map to SLES-54200."""
+        """Dragon Ball Z: Budokai Tenkaichi 2 (PAL) must map to SLES-54164 (corrected by Wave 83; SLES-54200 = Just Cause)."""
         self.assertEqual(
             self._get_serial("Dragon Ball Z: Budokai Tenkaichi 2 (PAL)"),
-            "SLES-54200"
+            "SLES-54164"
         )
 
     def test_dbz_bt2_pal_crc(self):
@@ -14725,31 +14725,31 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("151DF9C9", self._get_crcs("Dragon Ball Z: Budokai Tenkaichi 2 (PAL)"))
 
     def test_sdb_resolves_sles_54200(self):
-        """SerialDatabase must resolve SLES-54200 to DBZ BT2."""
-        titles = self.sdb.titles_for_serial("SLES-54200")
-        self.assertTrue(len(titles) > 0, "SLES-54200 not resolved")
+        """SerialDatabase must resolve SLES-54164 (corrected DBZ BT2 serial) to DBZ BT2."""
+        titles = self.sdb.titles_for_serial("SLES-54164")
+        self.assertTrue(len(titles) > 0, "SLES-54164 not resolved")
         self.assertTrue(any("Dragon Ball" in t or "Budokai" in t for t in titles),
-                        f"SLES-54200 titles do not mention Dragon Ball Z: {titles}")
+                        f"SLES-54164 titles do not mention Dragon Ball Z: {titles}")
 
     # -- SLES-54221 PES 2007 -----------------------------------------------
 
     def test_pes_2007_pal_serial(self):
-        """Pro Evolution Soccer 2007 (PAL) must map to SLES-54221."""
+        """Pro Evolution Soccer 6 (PAL) must map to SLES-54203 (corrected by Wave 83; SLES-54221 = LEGO Star Wars II; entry renamed PES 2007→PES 6)."""
         self.assertEqual(
-            self._get_serial("Pro Evolution Soccer 2007 (PAL)"),
-            "SLES-54221"
+            self._get_serial("Pro Evolution Soccer 6 (PAL)"),
+            "SLES-54203"
         )
 
     def test_pes_2007_pal_crc(self):
-        """PES 2007 (PAL) must carry CRC 37E36C6D."""
-        self.assertIn("37E36C6D", self._get_crcs("Pro Evolution Soccer 2007 (PAL)"))
+        """PES 6 (PAL) must carry CRC 37E36C6D (entry renamed from PES 2007 by Wave 83)."""
+        self.assertIn("37E36C6D", self._get_crcs("Pro Evolution Soccer 6 (PAL)"))
 
     def test_sdb_resolves_sles_54221(self):
-        """SerialDatabase must resolve SLES-54221 to Pro Evolution Soccer 2007."""
-        titles = self.sdb.titles_for_serial("SLES-54221")
-        self.assertTrue(len(titles) > 0, "SLES-54221 not resolved")
+        """SerialDatabase must resolve SLES-54203 (corrected PES 6 serial) to Pro Evolution Soccer 6."""
+        titles = self.sdb.titles_for_serial("SLES-54203")
+        self.assertTrue(len(titles) > 0, "SLES-54203 not resolved")
         self.assertTrue(any("Pro Evolution" in t or "Soccer" in t or "PES" in t for t in titles),
-                        f"SLES-54221 titles do not mention PES 2007: {titles}")
+                        f"SLES-54203 titles do not mention PES 6: {titles}")
 
     # -- SLES-54493 NFS Carbon ----------------------------------------------
 
@@ -14774,27 +14774,27 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
     # -- SLES-55003 Guitar Hero Aerosmith -----------------------------------
 
     def test_gh_aerosmith_pal_serial(self):
-        """Guitar Hero: Aerosmith (PAL) must map to SLES-55003."""
-        self.assertEqual(self._get_serial("Guitar Hero: Aerosmith (PAL)"), "SLES-55003")
+        """Guitar Hero: Aerosmith (PAL) must map to SLES-55191 (corrected by Wave 83; SLES-55003 = NFS: ProStreet)."""
+        self.assertEqual(self._get_serial("Guitar Hero: Aerosmith (PAL)"), "SLES-55191")
 
     def test_gh_aerosmith_pal_crc(self):
         """Guitar Hero: Aerosmith (PAL) must carry CRC EA8DC584."""
         self.assertIn("EA8DC584", self._get_crcs("Guitar Hero: Aerosmith (PAL)"))
 
     def test_sdb_resolves_sles_55003(self):
-        """SerialDatabase must resolve SLES-55003 to Guitar Hero: Aerosmith."""
-        titles = self.sdb.titles_for_serial("SLES-55003")
-        self.assertTrue(len(titles) > 0, "SLES-55003 not resolved")
+        """SerialDatabase must resolve SLES-55191 (corrected GH Aerosmith serial) to Guitar Hero: Aerosmith."""
+        titles = self.sdb.titles_for_serial("SLES-55191")
+        self.assertTrue(len(titles) > 0, "SLES-55191 not resolved")
         self.assertTrue(any("Guitar" in t or "Aerosmith" in t for t in titles),
-                        f"SLES-55003 titles do not mention Guitar Hero Aerosmith: {titles}")
+                        f"SLES-55191 titles do not mention Guitar Hero Aerosmith: {titles}")
 
     # -- SLES-55350 Lego Batman --------------------------------------------
 
     def test_lego_batman_pal_serial(self):
-        """Lego Batman: The Videogame (PAL) must map to SLES-55350."""
+        """Lego Batman: The Videogame (PAL) must map to SLES-55135 (corrected by Wave 83; SLES-55350 = NFS: Undercover)."""
         self.assertEqual(
             self._get_serial("Lego Batman: The Videogame (PAL)"),
-            "SLES-55350"
+            "SLES-55135"
         )
 
     def test_lego_batman_pal_crc(self):
@@ -14802,11 +14802,11 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("2FCBAB60", self._get_crcs("Lego Batman: The Videogame (PAL)"))
 
     def test_sdb_resolves_sles_55350(self):
-        """SerialDatabase must resolve SLES-55350 to Lego Batman."""
-        titles = self.sdb.titles_for_serial("SLES-55350")
-        self.assertTrue(len(titles) > 0, "SLES-55350 not resolved")
+        """SerialDatabase must resolve SLES-55135 (corrected Lego Batman serial) to Lego Batman."""
+        titles = self.sdb.titles_for_serial("SLES-55135")
+        self.assertTrue(len(titles) > 0, "SLES-55135 not resolved")
         self.assertTrue(any("Lego" in t or "Batman" in t for t in titles),
-                        f"SLES-55350 titles do not mention Lego Batman: {titles}")
+                        f"SLES-55135 titles do not mention Lego Batman: {titles}")
 
     # -- pnach DB resolved names -------------------------------------------
 
@@ -14909,10 +14909,10 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("Zone of the Enders: The 2nd Runner (PAL)", self.games)
 
     def test_pes_series_progression_pal(self):
-        """PAL DB must have both PES 6 (SLES-53982) and PES 2007 (SLES-54221)."""
+        """PAL DB must have PES 6 (SLES-54203, corrected by Wave 83) and not the stale SLES-53982 entry."""
         serials = {info["serial"] for info in self.games.values()}
-        self.assertIn("SLES-53982", serials, "PES 6 (SLES-53982) must be present")
-        self.assertIn("SLES-54221", serials, "PES 2007 (SLES-54221) must be present")
+        self.assertIn("SLES-54203", serials, "PES 6 (SLES-54203) must be present")
+        self.assertNotIn("SLES-53982", serials, "Stale PES 6 (SLES-53982 = Fight Night Round 3) must be removed")
 
     def test_nfs_series_progression_pal(self):
         """PAL DB must have NFS Underground, Underground 2, Most Wanted, and Carbon."""
@@ -15043,12 +15043,12 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_serial("73E68475", "SCES-53326")
 
     def test_d693d4cf_gta_lcs_serial(self):
-        """D693D4CF: all 7 entries must have game_serial SLES-53561."""
-        self._assert_crc_serial("D693D4CF", "SLES-53561")
+        """D693D4CF: all 7 entries must have game_serial SLES-54135 (corrected by Wave 83; SLES-53561 = Canis Canem Edit)."""
+        self._assert_crc_serial("D693D4CF", "SLES-54135")
 
     def test_306cdada_castlevania_loi_serial(self):
-        """306CDADA: all 20 entries must have game_serial SLES-51044."""
-        self._assert_crc_serial("306CDADA", "SLES-51044")
+        """306CDADA: all 20 entries must have game_serial SLES-52118 (corrected by Wave 83; SLES-51044 = Burnout 2)."""
+        self._assert_crc_serial("306CDADA", "SLES-52118")
 
     def test_0197ebd0_nfsu2_serial(self):
         """0197EBD0: all 23 entries must have game_serial SLES-52725."""
@@ -15075,20 +15075,20 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_serial("84930ED2", "SLES-52589")
 
     def test_f881cd68_sonic_riders_serial(self):
-        """F881CD68: all 3 entries must have game_serial SLES-54083."""
-        self._assert_crc_serial("F881CD68", "SLES-54083")
+        """F881CD68: all 3 entries must have game_serial SLES-53560 (corrected by Wave 83; SLES-54083 = Pirates of the Caribbean)."""
+        self._assert_crc_serial("F881CD68", "SLES-53560")
 
     def test_186b0d8a_bf2mc_serial(self):
-        """186B0D8A: all 21 entries must have game_serial SLES-53827."""
-        self._assert_crc_serial("186B0D8A", "SLES-53827")
+        """186B0D8A: all 21 entries must have game_serial SLES-53729 (corrected by Wave 83; SLES-53827 = Splinter Cell: Double Agent)."""
+        self._assert_crc_serial("186B0D8A", "SLES-53729")
 
     def test_91100045_fast_furious_serial(self):
         """91100045: all 8 entries must have game_serial SLES-54483 (corrected from SLES-53272 in Wave 82)."""
         self._assert_crc_serial("91100045", "SLES-54483")
 
     def test_6b9aea0d_tc_streets_la_serial(self):
-        """6B9AEA0D: all 20 entries must have game_serial SLES-51466."""
-        self._assert_crc_serial("6B9AEA0D", "SLES-51466")
+        """6B9AEA0D: all 20 entries must have game_serial SLES-51753 (corrected by Wave 83; SLES-51466 = Splinter Cell)."""
+        self._assert_crc_serial("6B9AEA0D", "SLES-51753")
 
     def test_18c101a7_srs_serial(self):
         """18C101A7: all 12 entries must have game_serial SLES-53045 (corrected from SLES-52916 in Wave 82)."""
@@ -15099,8 +15099,8 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_serial("77B4F13C", "SLES-53616")
 
     def test_ea0cb4b8_la_rush_serial(self):
-        """EA0CB4B8: all 2 entries must have game_serial SLES-53553."""
-        self._assert_crc_serial("EA0CB4B8", "SLES-53553")
+        """EA0CB4B8: all 2 entries must have game_serial SLES-53419 (corrected by Wave 83; SLES-53553 = James Bond: From Russia...)."""
+        self._assert_crc_serial("EA0CB4B8", "SLES-53419")
 
     def test_09c3df79_getaway_bm_serial(self):
         """09C3DF79: single entry must have game_serial SCES-52758 (corrected from SCES-52810 in Wave 82)."""
@@ -15139,24 +15139,24 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_1629d655_red_faction2_game_name(self):
-        """1629D655: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("1629D655", "Red Faction II (SLES-51194)")
+        """1629D655: game name updated to include serial (corrected to SLES-51133 by Wave 83)."""
+        self._assert_crc_game("1629D655", "Red Faction II (SLES-51133)")
 
     def test_dbaab66d_pes2011_game_name(self):
         """DBAAB66D: game name updated to include serial (corrected to SLES-55636 in Wave 82)."""
         self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55636)")
 
     def test_ee8404aa_yugioh_tagforce_game_name(self):
-        """EE8404AA: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-53968)")
+        """EE8404AA: game name updated to include serial (corrected to SLES-55017 by Wave 83)."""
+        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-55017)")
 
     def test_ef97ec8f_10000bullets_game_name(self):
-        """EF97EC8F: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-52707)")
+        """EF97EC8F: game name updated to include serial (corrected to SLES-53481 by Wave 83)."""
+        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-53481)")
 
     def test_76a68274_virtua_cop_game_name(self):
-        """76A68274: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51707)")
+        """76A68274: game name updated to include serial (corrected to SLES-51229 by Wave 83)."""
+        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51229)")
 
     def test_e09e454c_dqv_game_name(self):
         """E09E454C: game name updated to include serial (resolved in Wave 75)."""
@@ -15205,14 +15205,14 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-52589")
 
     def test_pal_db_sonic_riders_entry(self):
-        """PAL DB must have Sonic Riders with SLES-54083."""
+        """PAL DB must have Sonic Riders with SLES-53560 (corrected by Wave 83; SLES-54083 = Pirates of the Caribbean)."""
         g = self.pal_db['games'].get("Sonic Riders (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-54083")
+        self.assertEqual(g.get('serial'), "SLES-53560")
 
     def test_pal_db_bf2mc_entry(self):
-        """PAL DB must have Battlefield 2: Modern Combat with SLES-53827."""
+        """PAL DB must have Battlefield 2: Modern Combat with SLES-53729 (corrected by Wave 83; SLES-53827 = Splinter Cell: Double Agent)."""
         g = self.pal_db['games'].get("Battlefield 2: Modern Combat (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-53827")
+        self.assertEqual(g.get('serial'), "SLES-53729")
 
     def test_pal_db_fast_furious_entry(self):
         """PAL DB must have The Fast and the Furious with SLES-54483 (corrected from SLES-53272 in Wave 82)."""
@@ -15220,9 +15220,9 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-54483")
 
     def test_pal_db_true_crime_la_entry(self):
-        """PAL DB must have True Crime: Streets of L.A. with SLES-51466."""
+        """PAL DB must have True Crime: Streets of L.A. with SLES-51753 (corrected by Wave 83; SLES-51466 = Splinter Cell)."""
         g = self.pal_db['games'].get("True Crime: Streets of L.A. (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-51466")
+        self.assertEqual(g.get('serial'), "SLES-51753")
 
     def test_pal_db_street_racing_syndicate_entry(self):
         """PAL DB must have Street Racing Syndicate with SLES-53045 (corrected from SLES-52916 in Wave 82)."""
@@ -15235,9 +15235,9 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-53616")
 
     def test_pal_db_la_rush_entry(self):
-        """PAL DB must have L.A. Rush with SLES-53553."""
+        """PAL DB must have L.A. Rush with SLES-53419 (corrected by Wave 83; SLES-53553 = James Bond: From Russia...)."""
         g = self.pal_db['games'].get("L.A. Rush (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-53553")
+        self.assertEqual(g.get('serial'), "SLES-53419")
 
     def test_pal_db_getaway_bm_entry(self):
         """PAL DB must have The Getaway: Black Monday with SCES-52758 (corrected from SCES-52810 in Wave 82)."""
@@ -15370,13 +15370,13 @@ class TestWave75EmptySerialFix(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_1629d655_red_faction2_serial(self):
-        """1629D655: all 2 entries must have game_serial SLES-51194."""
-        self._assert_crc_serial("1629D655", "SLES-51194")
+        """1629D655: all 2 entries must have game_serial SLES-51133 (corrected by Wave 83; SLES-51194 = Harry Potter German)."""
+        self._assert_crc_serial("1629D655", "SLES-51133")
         self.assertEqual(len(self._crc_entries("1629D655")), 2)
 
     def test_76a68274_virtua_cop_serial(self):
-        """76A68274: all 11 entries must have game_serial SLES-51707."""
-        self._assert_crc_serial("76A68274", "SLES-51707")
+        """76A68274: all 11 entries must have game_serial SLES-51229 (corrected by Wave 83; SLES-51707 = Secret Weapons Over Normandy)."""
+        self._assert_crc_serial("76A68274", "SLES-51229")
         self.assertEqual(len(self._crc_entries("76A68274")), 11)
 
     def test_dbaab66d_pes2011_serial(self):
@@ -15385,13 +15385,13 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("DBAAB66D")), 13)
 
     def test_ee8404aa_yugioh_serial(self):
-        """EE8404AA: all 3 entries must have game_serial SLES-53968."""
-        self._assert_crc_serial("EE8404AA", "SLES-53968")
+        """EE8404AA: all 3 entries must have game_serial SLES-55017 (corrected by Wave 83; SLES-53968 = The Godfather)."""
+        self._assert_crc_serial("EE8404AA", "SLES-55017")
         self.assertEqual(len(self._crc_entries("EE8404AA")), 3)
 
     def test_ef97ec8f_10000bullets_serial(self):
-        """EF97EC8F: all 6 entries must have game_serial SLES-52707."""
-        self._assert_crc_serial("EF97EC8F", "SLES-52707")
+        """EF97EC8F: all 6 entries must have game_serial SLES-53481 (corrected by Wave 83; SLES-52707 = Monster Hunter)."""
+        self._assert_crc_serial("EF97EC8F", "SLES-53481")
         self.assertEqual(len(self._crc_entries("EF97EC8F")), 6)
 
     def test_f26af996_smugglers_run2_serial(self):
@@ -15414,24 +15414,24 @@ class TestWave75EmptySerialFix(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_1629d655_red_faction2_game_name(self):
-        """1629D655: game name must include serial."""
-        self._assert_crc_game("1629D655", "Red Faction II (SLES-51194)")
+        """1629D655: game name must include serial (corrected to SLES-51133 by Wave 83)."""
+        self._assert_crc_game("1629D655", "Red Faction II (SLES-51133)")
 
     def test_76a68274_virtua_cop_game_name(self):
-        """76A68274: game name must include serial."""
-        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51707)")
+        """76A68274: game name must include serial (corrected to SLES-51229 by Wave 83)."""
+        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51229)")
 
     def test_dbaab66d_pes2011_game_name(self):
         """DBAAB66D: game name must include serial (corrected to SLES-55636 in Wave 82)."""
         self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55636)")
 
     def test_ee8404aa_yugioh_game_name(self):
-        """EE8404AA: game name must include serial."""
-        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-53968)")
+        """EE8404AA: game name must include serial (corrected to SLES-55017 by Wave 83)."""
+        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-55017)")
 
     def test_ef97ec8f_10000bullets_game_name(self):
-        """EF97EC8F: game name must include serial."""
-        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-52707)")
+        """EF97EC8F: game name must include serial (corrected to SLES-53481 by Wave 83)."""
+        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-53481)")
 
     def test_f26af996_smugglers_run2_game_name(self):
         """F26AF996: game name must include serial."""
@@ -15450,15 +15450,15 @@ class TestWave75EmptySerialFix(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_pal_db_red_faction2_entry(self):
-        """PAL DB must have Red Faction II (PAL) with serial SLES-51194 and CRC 1629D655."""
+        """PAL DB must have Red Faction II (PAL) with serial SLES-51133 (corrected by Wave 83; SLES-51194 = Harry Potter German) and CRC 1629D655."""
         g = self.pal_db['games'].get("Red Faction II (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-51194")
+        self.assertEqual(g.get('serial'), "SLES-51133")
         self.assertIn("1629D655", g.get('crcs', []))
 
     def test_pal_db_virtua_cop_entry(self):
-        """PAL DB must have Virtua Cop: Elite Edition (PAL) with serial SLES-51707."""
+        """PAL DB must have Virtua Cop: Elite Edition (PAL) with serial SLES-51229 (corrected by Wave 83; SLES-51707 = Secret Weapons Over Normandy)."""
         g = self.pal_db['games'].get("Virtua Cop: Elite Edition (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-51707")
+        self.assertEqual(g.get('serial'), "SLES-51229")
         self.assertIn("76A68274", g.get('crcs', []))
 
     def test_pal_db_pes2011_entry(self):
@@ -15468,15 +15468,15 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertIn("DBAAB66D", g.get('crcs', []))
 
     def test_pal_db_yugioh_entry(self):
-        """PAL DB must have Yu-Gi-Oh! GX: Tag Force Evolution (PAL) with serial SLES-53968."""
+        """PAL DB must have Yu-Gi-Oh! GX: Tag Force Evolution (PAL) with serial SLES-55017 (corrected by Wave 83; SLES-53968 = The Godfather)."""
         g = self.pal_db['games'].get("Yu-Gi-Oh! GX: Tag Force Evolution (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-53968")
+        self.assertEqual(g.get('serial'), "SLES-55017")
         self.assertIn("EE8404AA", g.get('crcs', []))
 
     def test_pal_db_10000bullets_entry(self):
-        """PAL DB must have 10,000 Bullets (PAL) with serial SLES-52707."""
+        """PAL DB must have 10,000 Bullets (PAL) with serial SLES-53481 (corrected by Wave 83; SLES-52707 = Monster Hunter)."""
         g = self.pal_db['games'].get("10,000 Bullets (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-52707")
+        self.assertEqual(g.get('serial'), "SLES-53481")
         self.assertIn("EF97EC8F", g.get('crcs', []))
 
     def test_pal_db_smugglers_run2_entry(self):
@@ -16588,4 +16588,350 @@ class TestWave82PalSerialFixes(unittest.TestCase):
 
     def test_pnach_db_size_over_48100(self):
         """Pnach DB must have at least 48100 entries after Wave 82 fixes (109 serials corrected)."""
+        self.assertGreater(len(self.db), 48100)
+
+
+class TestWave83PalSerialFixes(unittest.TestCase):
+    """Wave 83: 17 fabricated/wrong PAL serials corrected against PS2.txt reference.
+
+    Cross-checked all SLES/SCES serials in the pnach DB and PAL serial DB
+    against the PS2.txt reference attachment (issue).  Found 17 fake or
+    wrong PAL serials; fixed 296 pnach entries and 17 PAL serial DB entries.
+
+    Corrected state (verified against PS2.txt):
+      306CDADA  Castlevania: Lament of Innocence: SLES-52118 (SLES-51044 = Burnout 2)
+      1629D655  Red Faction II:                   SLES-51133 (SLES-51194 = Harry Potter German)
+      6B9AEA0D  True Crime: Streets of L.A.:      SLES-51753 (SLES-51466 = Splinter Cell)
+      CBC401C5  Buffy: Chaos Bleeds:               SLES-51890 (SLES-51654 = Mace Griffin)
+      76A68274  Virtua Cop: Elite Edition:         SLES-51229 (SLES-51707 = Secret Weapons Over Normandy)
+      EF97EC8F  10,000 Bullets:                    SLES-53481 (SLES-52707 = Monster Hunter)
+      3BEBCCAC  Fahrenheit:                        SLES-53539 (SLES-52976 = GoldenEye: Rogue Agent)
+      B2408080  Midnight Club 3: Dub Edition:      SLES-52942 (SLES-53194 = LEGO Star Wars)
+      EA0CB4B8  L.A. Rush:                         SLES-53419 (SLES-53553 = James Bond: From Russia...)
+      D693D4CF  GTA: Liberty City Stories:         SLES-54135 (SLES-53561 = Canis Canem Edit)
+      186B0D8A  Battlefield 2: Modern Combat:      SLES-53729 (SLES-53827 = Splinter Cell: Double Agent)
+      EE8404AA  Yu-Gi-Oh! GX: Tag Force Evolution: SLES-55017 (SLES-53968 = The Godfather)
+      F881CD68  Sonic Riders:                      SLES-53560 (SLES-54083 = Pirates of the Caribbean)
+      151DF9C9  Dragon Ball Z: Budokai Tenkaichi 2: SLES-54164 (SLES-54200 = Just Cause)
+      37E36C6D  Pro Evolution Soccer 6:            SLES-54203 (SLES-54221 = LEGO Star Wars II)
+      EA8DC584  Guitar Hero: Aerosmith:            SLES-55191 (SLES-55003 = NFS: ProStreet)
+      2FCBAB60  Lego Batman: The Videogame:        SLES-55135 (SLES-55350 = NFS: Undercover)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        cls.pal_games = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_pal.json").read_text()
+        )["games"]
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.db.items() if v.get("game_crc") == crc}
+
+    def _assert_crc_serial(self, crc, expected_serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game_serial"]) for k, v in entries.items()
+               if v.get("game_serial") != expected_serial]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected all serials={expected_serial!r}, mismatches: {bad[:3]}")
+
+    def _assert_crc_game(self, crc, expected_name):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game"]) for k, v in entries.items()
+               if v.get("game") != expected_name]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected game={expected_name!r}, mismatches: {bad[:3]}")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — serial fixes
+    # ------------------------------------------------------------------
+
+    def test_306cdada_castlevania_loi_serial(self):
+        """306CDADA: game_serial must be SLES-52118 (verified; SLES-51044 = Burnout 2)."""
+        self._assert_crc_serial("306CDADA", "SLES-52118")
+
+    def test_306cdada_castlevania_loi_name(self):
+        """306CDADA: game must be 'Castlevania: Lament of Innocence (SLES-52118)'."""
+        self._assert_crc_game("306CDADA", "Castlevania: Lament of Innocence (SLES-52118)")
+
+    def test_1629d655_red_faction_ii_serial(self):
+        """1629D655: game_serial must be SLES-51133 (verified; SLES-51194 = Harry Potter German)."""
+        self._assert_crc_serial("1629D655", "SLES-51133")
+
+    def test_1629d655_red_faction_ii_name(self):
+        """1629D655: game must be 'Red Faction II (SLES-51133)'."""
+        self._assert_crc_game("1629D655", "Red Faction II (SLES-51133)")
+
+    def test_6b9aea0d_true_crime_la_serial(self):
+        """6B9AEA0D: game_serial must be SLES-51753 (verified; SLES-51466 = Splinter Cell)."""
+        self._assert_crc_serial("6B9AEA0D", "SLES-51753")
+
+    def test_6b9aea0d_true_crime_la_name(self):
+        """6B9AEA0D: game must be 'True Crime: Streets of L.A. (SLES-51753)'."""
+        self._assert_crc_game("6B9AEA0D", "True Crime: Streets of L.A. (SLES-51753)")
+
+    def test_cbc401c5_buffy_serial(self):
+        """CBC401C5: game_serial must be SLES-51890 (verified; SLES-51654 = Mace Griffin)."""
+        self._assert_crc_serial("CBC401C5", "SLES-51890")
+
+    def test_cbc401c5_buffy_name(self):
+        """CBC401C5: game must be 'Buffy the Vampire Slayer: Chaos Bleeds (SLES-51890)'."""
+        self._assert_crc_game("CBC401C5", "Buffy the Vampire Slayer: Chaos Bleeds (SLES-51890)")
+
+    def test_76a68274_virtua_cop_serial(self):
+        """76A68274: game_serial must be SLES-51229 (verified; SLES-51707 = Secret Weapons Over Normandy)."""
+        self._assert_crc_serial("76A68274", "SLES-51229")
+
+    def test_76a68274_virtua_cop_name(self):
+        """76A68274: game must be 'Virtua Cop: Elite Edition (SLES-51229)'."""
+        self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51229)")
+
+    def test_ef97ec8f_10k_bullets_serial(self):
+        """EF97EC8F: game_serial must be SLES-53481 (verified; SLES-52707 = Monster Hunter)."""
+        self._assert_crc_serial("EF97EC8F", "SLES-53481")
+
+    def test_ef97ec8f_10k_bullets_name(self):
+        """EF97EC8F: game must be '10,000 Bullets (SLES-53481)'."""
+        self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-53481)")
+
+    def test_3bebccac_fahrenheit_serial(self):
+        """3BEBCCAC: game_serial must be SLES-53539 (verified; SLES-52976 = GoldenEye: Rogue Agent)."""
+        self._assert_crc_serial("3BEBCCAC", "SLES-53539")
+
+    def test_3bebccac_fahrenheit_name(self):
+        """3BEBCCAC: game must be 'Fahrenheit (SLES-53539)'."""
+        self._assert_crc_game("3BEBCCAC", "Fahrenheit (SLES-53539)")
+
+    def test_b2408080_mc3_serial(self):
+        """B2408080: game_serial must be SLES-52942 (verified; SLES-53194 = LEGO Star Wars)."""
+        self._assert_crc_serial("B2408080", "SLES-52942")
+
+    def test_b2408080_mc3_name(self):
+        """B2408080: game must be 'Midnight Club 3: Dub Edition (SLES-52942)'."""
+        self._assert_crc_game("B2408080", "Midnight Club 3: Dub Edition (SLES-52942)")
+
+    def test_ea0cb4b8_la_rush_serial(self):
+        """EA0CB4B8: game_serial must be SLES-53419 (verified; SLES-53553 = James Bond: From Russia...)."""
+        self._assert_crc_serial("EA0CB4B8", "SLES-53419")
+
+    def test_ea0cb4b8_la_rush_name(self):
+        """EA0CB4B8: game must be 'L.A. Rush (SLES-53419)'."""
+        self._assert_crc_game("EA0CB4B8", "L.A. Rush (SLES-53419)")
+
+    def test_d693d4cf_gta_lcs_serial(self):
+        """D693D4CF: game_serial must be SLES-54135 (verified; SLES-53561 = Canis Canem Edit)."""
+        self._assert_crc_serial("D693D4CF", "SLES-54135")
+
+    def test_d693d4cf_gta_lcs_name(self):
+        """D693D4CF: game must be 'Grand Theft Auto: Liberty City Stories (SLES-54135)'."""
+        self._assert_crc_game("D693D4CF", "Grand Theft Auto: Liberty City Stories (SLES-54135)")
+
+    def test_186b0d8a_bf2mc_serial(self):
+        """186B0D8A: game_serial must be SLES-53729 (verified; SLES-53827 = Splinter Cell: Double Agent)."""
+        self._assert_crc_serial("186B0D8A", "SLES-53729")
+
+    def test_186b0d8a_bf2mc_name(self):
+        """186B0D8A: game must be 'Battlefield 2: Modern Combat (SLES-53729)'."""
+        self._assert_crc_game("186B0D8A", "Battlefield 2: Modern Combat (SLES-53729)")
+
+    def test_ee8404aa_yugioh_gx_serial(self):
+        """EE8404AA: game_serial must be SLES-55017 (verified; SLES-53968 = The Godfather)."""
+        self._assert_crc_serial("EE8404AA", "SLES-55017")
+
+    def test_ee8404aa_yugioh_gx_name(self):
+        """EE8404AA: game must be 'Yu-Gi-Oh! GX: Tag Force Evolution (SLES-55017)'."""
+        self._assert_crc_game("EE8404AA", "Yu-Gi-Oh! GX: Tag Force Evolution (SLES-55017)")
+
+    def test_f881cd68_sonic_riders_serial(self):
+        """F881CD68: game_serial must be SLES-53560 (verified; SLES-54083 = Pirates of the Caribbean)."""
+        self._assert_crc_serial("F881CD68", "SLES-53560")
+
+    def test_f881cd68_sonic_riders_name(self):
+        """F881CD68: game must be 'Sonic Riders (SLES-53560)'."""
+        self._assert_crc_game("F881CD68", "Sonic Riders (SLES-53560)")
+
+    def test_151df9c9_dbz_bt2_serial(self):
+        """151DF9C9: game_serial must be SLES-54164 (verified; SLES-54200 = Just Cause)."""
+        self._assert_crc_serial("151DF9C9", "SLES-54164")
+
+    def test_151df9c9_dbz_bt2_name(self):
+        """151DF9C9: game must be 'Dragon Ball Z: Budokai Tenkaichi 2 (SLES-54164)'."""
+        self._assert_crc_game("151DF9C9", "Dragon Ball Z: Budokai Tenkaichi 2 (SLES-54164)")
+
+    def test_37e36c6d_pes6_serial(self):
+        """37E36C6D: game_serial must be SLES-54203 (verified PES 6 PAL; SLES-54221 = LEGO Star Wars II)."""
+        self._assert_crc_serial("37E36C6D", "SLES-54203")
+
+    def test_37e36c6d_pes6_name(self):
+        """37E36C6D: game must be 'Pro Evolution Soccer 2007 (SLES-54203)'."""
+        self._assert_crc_game("37E36C6D", "Pro Evolution Soccer 2007 (SLES-54203)")
+
+    def test_ea8dc584_gh_aerosmith_serial(self):
+        """EA8DC584: game_serial must be SLES-55191 (verified; SLES-55003 = NFS: ProStreet)."""
+        self._assert_crc_serial("EA8DC584", "SLES-55191")
+
+    def test_ea8dc584_gh_aerosmith_name(self):
+        """EA8DC584: game must be 'Guitar Hero: Aerosmith (SLES-55191)'."""
+        self._assert_crc_game("EA8DC584", "Guitar Hero: Aerosmith (SLES-55191)")
+
+    def test_2fcbab60_lego_batman_serial(self):
+        """2FCBAB60: game_serial must be SLES-55135 (verified; SLES-55350 = NFS: Undercover)."""
+        self._assert_crc_serial("2FCBAB60", "SLES-55135")
+
+    def test_2fcbab60_lego_batman_name(self):
+        """2FCBAB60: game must be 'Lego Batman: The Videogame (SLES-55135)'."""
+        self._assert_crc_game("2FCBAB60", "Lego Batman: The Videogame (SLES-55135)")
+
+    # ------------------------------------------------------------------
+    # PAL serial DB — serial fixes
+    # ------------------------------------------------------------------
+
+    def test_pal_db_castlevania_loi_serial(self):
+        """PAL serial DB: Castlevania: Lament of Innocence must have serial SLES-52118."""
+        entry = self.pal_games.get("Castlevania: Lament of Innocence (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-52118",
+                         f"Expected SLES-52118, got {entry.get('serial')!r}")
+
+    def test_pal_db_red_faction_ii_serial(self):
+        """PAL serial DB: Red Faction II must have serial SLES-51133."""
+        entry = self.pal_games.get("Red Faction II (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-51133",
+                         f"Expected SLES-51133, got {entry.get('serial')!r}")
+
+    def test_pal_db_true_crime_la_serial(self):
+        """PAL serial DB: True Crime: Streets of L.A. must have serial SLES-51753."""
+        entry = self.pal_games.get("True Crime: Streets of L.A. (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-51753",
+                         f"Expected SLES-51753, got {entry.get('serial')!r}")
+
+    def test_pal_db_buffy_serial(self):
+        """PAL serial DB: Buffy the Vampire Slayer: Chaos Bleeds must have serial SLES-51890."""
+        entry = self.pal_games.get("Buffy the Vampire Slayer: Chaos Bleeds (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-51890",
+                         f"Expected SLES-51890, got {entry.get('serial')!r}")
+
+    def test_pal_db_virtua_cop_serial(self):
+        """PAL serial DB: Virtua Cop: Elite Edition must have serial SLES-51229."""
+        entry = self.pal_games.get("Virtua Cop: Elite Edition (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-51229",
+                         f"Expected SLES-51229, got {entry.get('serial')!r}")
+
+    def test_pal_db_10k_bullets_serial(self):
+        """PAL serial DB: 10,000 Bullets must have serial SLES-53481."""
+        entry = self.pal_games.get("10,000 Bullets (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53481",
+                         f"Expected SLES-53481, got {entry.get('serial')!r}")
+
+    def test_pal_db_fahrenheit_serial(self):
+        """PAL serial DB: Fahrenheit must have serial SLES-53539."""
+        entry = self.pal_games.get("Fahrenheit (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53539",
+                         f"Expected SLES-53539, got {entry.get('serial')!r}")
+
+    def test_pal_db_mc3_serial(self):
+        """PAL serial DB: Midnight Club 3: Dub Edition must have serial SLES-52942."""
+        entry = self.pal_games.get("Midnight Club 3: Dub Edition (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-52942",
+                         f"Expected SLES-52942, got {entry.get('serial')!r}")
+
+    def test_pal_db_la_rush_serial(self):
+        """PAL serial DB: L.A. Rush must have serial SLES-53419."""
+        entry = self.pal_games.get("L.A. Rush (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53419",
+                         f"Expected SLES-53419, got {entry.get('serial')!r}")
+
+    def test_pal_db_gta_lcs_serial(self):
+        """PAL serial DB: Grand Theft Auto: Liberty City Stories must have serial SLES-54135."""
+        entry = self.pal_games.get("Grand Theft Auto: Liberty City Stories (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-54135",
+                         f"Expected SLES-54135, got {entry.get('serial')!r}")
+
+    def test_pal_db_bf2mc_serial(self):
+        """PAL serial DB: Battlefield 2: Modern Combat must have serial SLES-53729."""
+        entry = self.pal_games.get("Battlefield 2: Modern Combat (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53729",
+                         f"Expected SLES-53729, got {entry.get('serial')!r}")
+
+    def test_pal_db_yugioh_gx_serial(self):
+        """PAL serial DB: Yu-Gi-Oh! GX: Tag Force Evolution must have serial SLES-55017."""
+        entry = self.pal_games.get("Yu-Gi-Oh! GX: Tag Force Evolution (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-55017",
+                         f"Expected SLES-55017, got {entry.get('serial')!r}")
+
+    def test_pal_db_sonic_riders_serial(self):
+        """PAL serial DB: Sonic Riders must have serial SLES-53560."""
+        entry = self.pal_games.get("Sonic Riders (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53560",
+                         f"Expected SLES-53560, got {entry.get('serial')!r}")
+
+    def test_pal_db_dbz_bt2_serial(self):
+        """PAL serial DB: Dragon Ball Z: Budokai Tenkaichi 2 must have serial SLES-54164."""
+        entry = self.pal_games.get("Dragon Ball Z: Budokai Tenkaichi 2 (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-54164",
+                         f"Expected SLES-54164, got {entry.get('serial')!r}")
+
+    def test_pal_db_pes6_serial(self):
+        """PAL serial DB: Pro Evolution Soccer 6 must have serial SLES-54203."""
+        entry = self.pal_games.get("Pro Evolution Soccer 6 (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-54203",
+                         f"Expected SLES-54203, got {entry.get('serial')!r}")
+
+    def test_pal_db_pes6_no_stale_entry(self):
+        """PAL serial DB: No entry should carry stale PES 6 serial SLES-53982 (= Fight Night Round 3)."""
+        bad = [name for name, g in self.pal_games.items()
+               if g.get("serial") == "SLES-53982"]
+        self.assertEqual(bad, [], f"Stale SLES-53982 entry still present: {bad}")
+
+    def test_pal_db_gh_aerosmith_serial(self):
+        """PAL serial DB: Guitar Hero: Aerosmith must have serial SLES-55191."""
+        entry = self.pal_games.get("Guitar Hero: Aerosmith (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-55191",
+                         f"Expected SLES-55191, got {entry.get('serial')!r}")
+
+    def test_pal_db_lego_batman_serial(self):
+        """PAL serial DB: Lego Batman: The Videogame must have serial SLES-55135."""
+        entry = self.pal_games.get("Lego Batman: The Videogame (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-55135",
+                         f"Expected SLES-55135, got {entry.get('serial')!r}")
+
+    # ------------------------------------------------------------------
+    # Regression: no fabricated serials remain
+    # ------------------------------------------------------------------
+
+    def test_no_wave83_fabricated_serials_remain(self):
+        """None of the 17 fixed CRCs should still carry their Wave 83 wrong serials."""
+        bad_serials = {
+            '306CDADA': 'SLES-51044',  # was Burnout 2; real is SLES-52118
+            '1629D655': 'SLES-51194',  # was Harry Potter German; real is SLES-51133
+            '6B9AEA0D': 'SLES-51466',  # was Splinter Cell; real is SLES-51753
+            'CBC401C5': 'SLES-51654',  # was Mace Griffin; real is SLES-51890
+            '76A68274': 'SLES-51707',  # was Secret Weapons Over Normandy; real is SLES-51229
+            'EF97EC8F': 'SLES-52707',  # was Monster Hunter; real is SLES-53481
+            '3BEBCCAC': 'SLES-52976',  # was GoldenEye: Rogue Agent; real is SLES-53539
+            'B2408080': 'SLES-53194',  # was LEGO Star Wars; real is SLES-52942
+            'EA0CB4B8': 'SLES-53553',  # was James Bond: From Russia...; real is SLES-53419
+            'D693D4CF': 'SLES-53561',  # was Canis Canem Edit; real is SLES-54135
+            '186B0D8A': 'SLES-53827',  # was Splinter Cell: Double Agent; real is SLES-53729
+            'EE8404AA': 'SLES-53968',  # was The Godfather; real is SLES-55017
+            'F881CD68': 'SLES-54083',  # was Pirates of the Caribbean; real is SLES-53560
+            '151DF9C9': 'SLES-54200',  # was Just Cause; real is SLES-54164
+            '37E36C6D': 'SLES-54221',  # was LEGO Star Wars II; real is SLES-54203
+            'EA8DC584': 'SLES-55003',  # was NFS: ProStreet; real is SLES-55191
+            '2FCBAB60': 'SLES-55350',  # was NFS: Undercover; real is SLES-55135
+        }
+        bad = []
+        for key, entry in self.db.items():
+            crc = entry.get("game_crc", "").upper()
+            if crc in bad_serials and entry.get("game_serial") == bad_serials[crc]:
+                bad.append((crc, key, entry.get("game_serial")))
+        self.assertEqual(bad, [],
+                         f"Wrong serials still present: {bad[:5]}")
+
+    def test_pnach_db_size_after_wave83(self):
+        """Pnach DB must still have at least 48100 entries after Wave 83 fixes."""
         self.assertGreater(len(self.db), 48100)

@@ -11,7 +11,7 @@
       "publisher": "Oxygen Games",
       "region": "PAL",
       "release_date": "2005-04-01",
-      "serial": "SLES-52707"
+      "serial": "SLES-53481"
     },
     "7 Sins (PAL)": {
       "alt_serials": [
@@ -79,7 +79,7 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2006-03-31",
-      "serial": "SLES-53827"
+      "serial": "SLES-53729"
     },
     "Beyond Good & Evil (PAL)": {
       "alt_serials": [],
@@ -115,7 +115,7 @@
       "publisher": "Vivendi Universal Games",
       "region": "PAL",
       "release_date": "2003-08-29",
-      "serial": "SLES-51654"
+      "serial": "SLES-51890"
     },
     "Bully (PAL)": {
       "alt_serials": [],
@@ -180,7 +180,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2004-02-27",
-      "serial": "SLES-51044"
+      "serial": "SLES-52118"
     },
     "Clock Tower 3 (PAL)": {
       "alt_serials": [],
@@ -294,7 +294,7 @@
       "publisher": "Namco Bandai Games",
       "region": "PAL",
       "release_date": "2006-11-03",
-      "serial": "SLES-54200"
+      "serial": "SLES-54164"
     },
     "Dragon Ball Z: Budokai Tenkaichi 3 (PAL)": {
       "alt_serials": [],
@@ -370,7 +370,7 @@
       "publisher": "Atari",
       "region": "PAL",
       "release_date": "2005-09-16",
-      "serial": "SLES-52976"
+      "serial": "SLES-53539"
     },
     "Final Fantasy X (PAL)": {
       "alt_serials": [
@@ -514,7 +514,7 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2006-06-23",
-      "serial": "SLES-53561"
+      "serial": "SLES-54135"
     },
     "Grand Theft Auto: San Andreas (PAL)": {
       "alt_serials": [],
@@ -592,7 +592,7 @@
       "publisher": "Activision",
       "region": "PAL",
       "release_date": "2008-07-18",
-      "serial": "SLES-55003"
+      "serial": "SLES-55191"
     },
     "Ico (PAL)": {
       "alt_serials": [],
@@ -712,7 +712,7 @@
       "publisher": "Midway",
       "region": "PAL",
       "release_date": "2005-09-30",
-      "serial": "SLES-53553"
+      "serial": "SLES-53419"
     },
     "Lego Batman: The Videogame (PAL)": {
       "alt_serials": [],
@@ -724,7 +724,7 @@
       "publisher": "Warner Bros. Interactive Entertainment",
       "region": "PAL",
       "release_date": "2008-10-17",
-      "serial": "SLES-55350"
+      "serial": "SLES-55135"
     },
     "Max Payne (PAL)": {
       "alt_serials": [],
@@ -803,7 +803,7 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2005-06-03",
-      "serial": "SLES-53194"
+      "serial": "SLES-52942"
     },
     "Mortal Kombat: Deadly Alliance (PAL)": {
       "alt_serials": [],
@@ -950,7 +950,7 @@
       "release_date": "2004-12-10",
       "serial": "SLES-52726"
     },
-    "Pro Evolution Soccer 2007 (PAL)": {
+    "Pro Evolution Soccer 6 (PAL)": {
       "alt_serials": [],
       "crcs": [
         "37E36C6D"
@@ -960,7 +960,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2006-10-27",
-      "serial": "SLES-54221"
+      "serial": "SLES-54203"
     },
     "Pro Evolution Soccer 2011 (PAL)": {
       "alt_serials": [
@@ -976,16 +976,6 @@
       "region": "PAL",
       "release_date": "2010-09-29",
       "serial": "SLES-55636"
-    },
-    "Pro Evolution Soccer 6 (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami",
-      "genre": "Sports",
-      "publisher": "Konami",
-      "region": "PAL",
-      "release_date": "2006-10-20",
-      "serial": "SLES-53982"
     },
     "Ratchet & Clank (PAL)": {
       "alt_serials": [],
@@ -1019,7 +1009,7 @@
       "publisher": "THQ",
       "region": "PAL",
       "release_date": "2003-03-28",
-      "serial": "SLES-51194"
+      "serial": "SLES-51133"
     },
     "Resident Evil 4 (PAL)": {
       "alt_serials": [],
@@ -1184,7 +1174,7 @@
       "publisher": "Sega",
       "region": "PAL",
       "release_date": "2006-03-24",
-      "serial": "SLES-54083"
+      "serial": "SLES-53560"
     },
     "SoulCalibur II (PAL)": {
       "alt_serials": [],
@@ -1433,7 +1423,7 @@
       "publisher": "Activision",
       "region": "PAL",
       "release_date": "2003-11-28",
-      "serial": "SLES-51466"
+      "serial": "SLES-51753"
     },
     "Virtua Cop: Elite Edition (PAL)": {
       "alt_serials": [],
@@ -1445,7 +1435,7 @@
       "publisher": "Sega",
       "region": "PAL",
       "release_date": "2003-11-21",
-      "serial": "SLES-51707"
+      "serial": "SLES-51229"
     },
     "WWE SmackDown! vs. Raw (PAL)": {
       "alt_serials": [],
@@ -1507,7 +1497,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2007-10-19",
-      "serial": "SLES-53968"
+      "serial": "SLES-55017"
     },
     "Zombie Hunters 2 (PAL)": {
       "alt_serials": [],
