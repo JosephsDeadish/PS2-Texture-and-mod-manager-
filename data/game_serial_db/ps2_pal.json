@@ -82,7 +82,9 @@
     "Castlevania: Lament of Innocence (PAL)": {
       "serial": "SLES-51044",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "306CDADA"
+      ],
       "region": "PAL",
       "release_date": "2004-02-27",
       "developer": "Konami",
@@ -102,9 +104,13 @@
       "genre": "Survival Horror"
     },
     "Crash Bandicoot: The Wrath of Cortex (PAL)": {
-      "serial": "SLES-51176",
-      "alt_serials": [],
-      "crcs": [],
+      "serial": "SLES-50386",
+      "alt_serials": [
+        "SLES-51176"
+      ],
+      "crcs": [
+        "35D70452"
+      ],
       "region": "PAL",
       "release_date": "2001-11-23",
       "developer": "Traveller's Tales",
@@ -567,7 +573,10 @@
     "Need for Speed: Most Wanted (PAL)": {
       "serial": "SLES-53816",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "CA2A1B04",
+        "1FA82CDF"
+      ],
       "region": "PAL",
       "release_date": "2005-11-25",
       "developer": "EA Black Box",
@@ -587,7 +596,10 @@
     "Need for Speed: Underground 2 (PAL)": {
       "serial": "SLES-52725",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "0197EBD0",
+        "CFB873AD"
+      ],
       "region": "PAL",
       "release_date": "2004-11-19",
       "developer": "EA Black Box",
@@ -719,7 +731,9 @@
       "alt_serials": [
         "SCES-53005"
       ],
-      "crcs": [],
+      "crcs": [
+        "73E68475"
+      ],
       "region": "PAL",
       "release_date": "2006-02-17",
       "developer": "Team Ico",
@@ -1110,7 +1124,9 @@
     "Grand Theft Auto: Liberty City Stories (PAL)": {
       "serial": "SLES-53561",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "D693D4CF"
+      ],
       "region": "PAL",
       "release_date": "2006-06-23",
       "developer": "Rockstar North",
@@ -1256,6 +1272,176 @@
       "developer": "Spike",
       "publisher": "Namco Bandai Games",
       "genre": "Fighting"
+    },
+    "Beyond Good & Evil (PAL)": {
+      "serial": "SLES-51917",
+      "alt_serials": [],
+      "crcs": [
+        "591ABA45"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-28",
+      "developer": "Ubisoft Montreal",
+      "publisher": "Ubisoft",
+      "genre": "Action-Adventure"
+    },
+    "Rule of Rose (PAL)": {
+      "serial": "SLES-54218",
+      "alt_serials": [],
+      "crcs": [
+        "52585249"
+      ],
+      "region": "PAL",
+      "release_date": "2006-09-01",
+      "developer": "Punchline Co., Ltd.",
+      "publisher": "505 Games",
+      "genre": "Survival Horror"
+    },
+    "Zombie Hunters 2 (PAL)": {
+      "serial": "SLES-54569",
+      "alt_serials": [],
+      "crcs": [
+        "07608CA2"
+      ],
+      "region": "PAL",
+      "release_date": "2006-11-17",
+      "developer": "Nowproduction",
+      "publisher": "505 Games",
+      "genre": "Action"
+    },
+    "Mercenaries: Playground of Destruction (PAL)": {
+      "serial": "SLES-52586",
+      "alt_serials": [],
+      "crcs": [
+        "84930ED2"
+      ],
+      "region": "PAL",
+      "release_date": "2005-06-10",
+      "developer": "Pandemic Studios",
+      "publisher": "LucasArts",
+      "genre": "Action"
+    },
+    "Sonic Riders (PAL)": {
+      "serial": "SLES-54083",
+      "alt_serials": [],
+      "crcs": [
+        "F881CD68"
+      ],
+      "region": "PAL",
+      "release_date": "2006-03-24",
+      "developer": "Sonic Team",
+      "publisher": "Sega",
+      "genre": "Racing"
+    },
+    "Battlefield 2: Modern Combat (PAL)": {
+      "serial": "SLES-53827",
+      "alt_serials": [],
+      "crcs": [
+        "186B0D8A"
+      ],
+      "region": "PAL",
+      "release_date": "2006-03-31",
+      "developer": "Digital Illusions CE",
+      "publisher": "Electronic Arts",
+      "genre": "First-Person Shooter"
+    },
+    "The Fast and the Furious (PAL)": {
+      "serial": "SLES-53272",
+      "alt_serials": [],
+      "crcs": [
+        "91100045"
+      ],
+      "region": "PAL",
+      "release_date": "2006-04-07",
+      "developer": "Eutechnyx",
+      "publisher": "Vivendi Games",
+      "genre": "Racing"
+    },
+    "True Crime: Streets of L.A. (PAL)": {
+      "serial": "SLES-51466",
+      "alt_serials": [],
+      "crcs": [
+        "6B9AEA0D"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-28",
+      "developer": "Luxoflux",
+      "publisher": "Activision",
+      "genre": "Action"
+    },
+    "Street Racing Syndicate (PAL)": {
+      "serial": "SLES-52916",
+      "alt_serials": [],
+      "crcs": [
+        "18C101A7"
+      ],
+      "region": "PAL",
+      "release_date": "2004-11-19",
+      "developer": "Namco Hometek Inc.",
+      "publisher": "Namco",
+      "genre": "Racing"
+    },
+    "True Crime: New York City (PAL)": {
+      "serial": "SLES-54040",
+      "alt_serials": [],
+      "crcs": [
+        "77B4F13C"
+      ],
+      "region": "PAL",
+      "release_date": "2005-11-25",
+      "developer": "Luxoflux",
+      "publisher": "Activision",
+      "genre": "Action"
+    },
+    "L.A. Rush (PAL)": {
+      "serial": "SLES-53553",
+      "alt_serials": [],
+      "crcs": [
+        "EA0CB4B8"
+      ],
+      "region": "PAL",
+      "release_date": "2005-09-30",
+      "developer": "Fluid Studios",
+      "publisher": "Midway",
+      "genre": "Racing"
+    },
+    "The Getaway: Black Monday (PAL)": {
+      "serial": "SCES-52810",
+      "alt_serials": [],
+      "crcs": [
+        "09C3DF79"
+      ],
+      "region": "PAL",
+      "release_date": "2004-11-05",
+      "developer": "SCEE London Studio",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action"
+    },
+    "The Simpsons: Hit & Run (PAL)": {
+      "serial": "SLES-51432",
+      "alt_serials": [],
+      "crcs": [
+        "0F0C4A9C"
+      ],
+      "region": "PAL",
+      "release_date": "2003-11-07",
+      "developer": "Radical Entertainment",
+      "publisher": "Vivendi Universal Games",
+      "genre": "Action"
+    },
+    "7 Sins (PAL)": {
+      "serial": "SLES-53280",
+      "alt_serials": [
+        "SLES-53297"
+      ],
+      "crcs": [
+        "6926B199"
+      ],
+      "region": "PAL",
+      "release_date": "2004-03-05",
+      "developer": "Monte Cristo",
+      "publisher": "MC2-Microids",
+      "genre": "Action"
     }
   }
 }

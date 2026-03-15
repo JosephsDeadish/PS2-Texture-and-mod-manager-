@@ -5478,7 +5478,8 @@
       "serial": "SLUS-20976",
       "alt_serials": [],
       "crcs": [
-        "9AB1CAE9"
+        "9AB1CAE9",
+        "47E1A07A"
       ],
       "release_date": "2005-03-22",
       "developer": "Razorworks Stodio",
@@ -8735,7 +8736,8 @@
       "serial": "SLUS-20831",
       "alt_serials": [],
       "crcs": [
-        "0F932D81"
+        "0F932D81",
+        "0F9348FF"
       ],
       "release_date": "2003-11-18",
       "developer": "Crave Entertainment",
@@ -14947,7 +14949,9 @@
     "Tim Burton's The Nightmare Before Christmas: Oogie's Revenge": {
       "serial": "SLUS-20860",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "8AD8BA91"
+      ],
       "release_date": "2005-10-10",
       "developer": "Capcom Co., Ltd",
       "publisher": "Buena Vista Games Inc",
@@ -15312,7 +15316,9 @@
     "Enthusia: Professional Racing": {
       "serial": "SLUS-20967",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "81D233DC"
+      ],
       "release_date": "2005-05-03",
       "developer": "Konami",
       "publisher": "Konami",
@@ -18231,7 +18237,9 @@
     "Alone in the Dark": {
       "serial": "SLUS-21690",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "1E811D9A"
+      ],
       "release_date": "2008-06-23",
       "developer": "Hydravision",
       "publisher": "Atari",
