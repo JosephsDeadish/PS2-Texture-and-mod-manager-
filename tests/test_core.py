@@ -9151,9 +9151,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count should still be 2291 (only CRCs changed, not game entries)."""
+        """Wave 49: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
         self.assertEqual(
-            len(self.games), 2291,
+            len(self.games), 2292,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9374,8 +9374,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count must remain 2291 (only crc_labels added)."""
-        self.assertEqual(len(self.raw_games), 2291)
+        """Wave 50: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
+        self.assertEqual(len(self.raw_games), 2292)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9579,8 +9579,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count must remain 2291."""
-        self.assertEqual(len(self.raw_games), 2291)
+        """Wave 51: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
+        self.assertEqual(len(self.raw_games), 2292)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9767,8 +9767,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count must remain 2291."""
-        self.assertEqual(len(self.raw_games), 2291)
+        """Wave 52: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
+        self.assertEqual(len(self.raw_games), 2292)
 
 
 # ===========================================================================
@@ -17609,3 +17609,132 @@ class TestWave86CatalogueAndFixes(unittest.TestCase):
         self.assertEqual(
             self.by_id["jungle_book_rng_hd"]["game_serial"], "SLUS-20075"
         )
+
+
+class TestWave87ConnectivityAndDbFixes(unittest.TestCase):
+    """Wave 87: UI connectivity fixes and database corrections.
+
+    Fixes:
+    - Renamed sidebar 'Browse' → 'Discover'; BrowsePanel title updated to match.
+    - BrowsePanel emits mod_installed signal after each install dialog closes,
+      so library/mod panels refresh automatically.
+    - PAL DB: Prince of Persia: The Sands of Time fixed SLES-52171 → SLES-51918
+      (SLES-52171 is Dynasty Warriors 4: Xtreme Legends, not PoP SoT).
+    - NTSC-U DB: Added Dragon Ball Z: Budokai Tenkaichi 4 (SLUS-21978).
+    - PAL DB: Added God Hand (PAL, SLES-53091).
+    - Catalogue: pop_trilogy_hd_xxtherockoxx game_serial filled (SLUS-20743).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # PAL DB: PoP Sands of Time serial fixed
+    # ------------------------------------------------------------------
+    def test_pop_sot_pal_serial_corrected(self):
+        """Prince of Persia: The Sands of Time (PAL) must use SLES-51918."""
+        titles = self.sdb.titles_for_serial("SLES-51918")
+        self.assertTrue(len(titles) > 0, "SLES-51918 must be in SerialDatabase")
+        self.assertTrue(
+            any("prince of persia" in t.lower() for t in titles),
+            f"SLES-51918 should map to PoP SoT, got: {titles}"
+        )
+
+    def test_dynasty_warriors_4_xl_not_misnamed_as_pop(self):
+        """SLES-52171 must not be misattributed to PoP SoT."""
+        titles = self.sdb.titles_for_serial("SLES-52171")
+        for title in titles:
+            self.assertNotIn("persia", title.lower(),
+                             "SLES-52171 is Dynasty Warriors 4 XL, not Prince of Persia")
+
+    # ------------------------------------------------------------------
+    # NTSC-U DB: DBZ BT4 added
+    # ------------------------------------------------------------------
+    def test_dbz_bt4_serial_in_db(self):
+        """SLUS-21978 (Dragon Ball Z: Budokai Tenkaichi 4) must be in SerialDatabase."""
+        titles = self.sdb.titles_for_serial("SLUS-21978")
+        self.assertTrue(len(titles) > 0, "SLUS-21978 must be in SerialDatabase")
+        self.assertTrue(
+            any("budokai tenkaichi 4" in t.lower() for t in titles),
+            f"SLUS-21978 should map to DBZ BT4, got: {titles}"
+        )
+
+    def test_dbz_bt4_catalogue_serial_valid(self):
+        """Catalogue entry dbz_bt4_ai_upscale serial must resolve in SerialDatabase."""
+        entry = self.by_id.get("dbz_bt4_ai_upscale", {})
+        serial = entry.get("game_serial", "")
+        self.assertEqual(serial, "SLUS-21978")
+        self.assertTrue(
+            len(self.sdb.titles_for_serial(serial)) > 0,
+            f"{serial} not found in SerialDatabase"
+        )
+
+    # ------------------------------------------------------------------
+    # PAL DB: God Hand added
+    # ------------------------------------------------------------------
+    def test_god_hand_pal_serial_in_db(self):
+        """SLES-53091 (God Hand PAL) must be in SerialDatabase."""
+        titles = self.sdb.titles_for_serial("SLES-53091")
+        self.assertTrue(len(titles) > 0, "SLES-53091 (God Hand PAL) must be in SerialDatabase")
+        self.assertTrue(
+            any("god hand" in t.lower() for t in titles),
+            f"SLES-53091 should map to God Hand, got: {titles}"
+        )
+
+    # ------------------------------------------------------------------
+    # Catalogue: pop_trilogy serial filled
+    # ------------------------------------------------------------------
+    def test_pop_trilogy_serial_not_empty(self):
+        """pop_trilogy_hd_xxtherockoxx must have a non-empty game_serial."""
+        entry = self.by_id.get("pop_trilogy_hd_xxtherockoxx", {})
+        self.assertNotEqual(entry.get("game_serial", ""), "",
+                            "pop_trilogy_hd_xxtherockoxx must have game_serial set")
+        self.assertEqual(entry.get("game_serial"), "SLUS-20743")
+
+    # ------------------------------------------------------------------
+    # Catalogue: all serials resolve in SerialDatabase
+    # ------------------------------------------------------------------
+    def test_all_catalogue_serials_resolve(self):
+        """Every non-empty game_serial in the catalogue must resolve in SerialDatabase."""
+        missing = []
+        for entry in self.packs:
+            serial = entry.get("game_serial", "")
+            if serial and not self.sdb.titles_for_serial(serial):
+                missing.append(f'{entry["id"]}: {serial}')
+        self.assertEqual(missing, [],
+                         "Catalogue entries with serials not in DB:\n" + "\n".join(missing))
+
+    # ------------------------------------------------------------------
+    # BrowsePanel: mod_installed signal present
+    # ------------------------------------------------------------------
+    def test_browse_panel_has_mod_installed_signal(self):
+        """BrowsePanel must declare a mod_installed pyqtSignal in its source."""
+        import pathlib
+        src = pathlib.Path("src/ui/browse_panel.py").read_text()
+        # Find the BrowsePanel class definition and check for mod_installed signal
+        class_start = src.find("class BrowsePanel(")
+        self.assertGreater(class_start, -1, "BrowsePanel class not found in browse_panel.py")
+        # Signal must appear in the class body (within 300 chars of class definition)
+        class_body = src[class_start:class_start + 500]
+        self.assertIn("mod_installed", class_body,
+                      "BrowsePanel must have a mod_installed signal")
+
+    # ------------------------------------------------------------------
+    # BrowsePanel: title updated to Discover
+    # ------------------------------------------------------------------
+    def test_browse_panel_title_is_discover(self):
+        """BrowsePanel panel heading must say 'Discover'."""
+        import pathlib
+        src = pathlib.Path("src/ui/browse_panel.py").read_text()
+        class_start = src.find("class BrowsePanel(")
+        init_start = src.find("def __init__", class_start)
+        init_body = src[init_start:init_start + 400]
+        self.assertIn("Discover", init_body,
+                      "BrowsePanel.__init__ must reference 'Discover' in panel title")

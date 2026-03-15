@@ -2013,9 +2013,11 @@ class _CatalogueTabContent(QWidget):
 class BrowsePanel(BasePanel):
     """Panel for discovering and downloading mods from public sources."""
 
+    mod_installed = pyqtSignal()   # emitted after any install dialog closes
+
     def __init__(self, config: AppConfig, parent=None):
         super().__init__(
-            "🌐  Browse & Download",
+            "🌐  Discover",
             "Discover community mods and resources",
             parent=parent,
         )
@@ -2403,6 +2405,7 @@ class BrowsePanel(BasePanel):
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _install_catalogue_entry(self, entry: dict):
         """Open the appropriate download dialog pre-filled from a catalogue entry."""
@@ -2424,6 +2427,7 @@ class BrowsePanel(BasePanel):
                     "Texture Packs panel to install it."
                 )
                 dlg.exec()
+                self.mod_installed.emit()
             else:
                 # No direct MEGA link — send user to the source page
                 msg = (
@@ -2471,6 +2475,7 @@ class BrowsePanel(BasePanel):
                 hint += f"\n\nSource page: {source_url}"
             dlg._status.setText(hint)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _prefill_dialog(self, dlg, entry: dict):
         """Prefill a DownloadInstallDialog with metadata from a catalogue entry."""
@@ -2494,10 +2499,12 @@ class BrowsePanel(BasePanel):
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _open_gbatemp_scraper(self):
         dlg = GBATempScraperDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _open_cover_art_dialog(self):
         """Open the Cover Art download dialog from the toolbar."""

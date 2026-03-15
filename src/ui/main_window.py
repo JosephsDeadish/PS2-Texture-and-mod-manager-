@@ -113,7 +113,7 @@ class MainWindow(QMainWindow):
         # Navigation items
         nav_items = [
             ("🏠", "Dashboard"),
-            ("🌐", "Browse"),
+            ("🌐", "Discover"),
             ("🎮", "My Library"),
             ("📥", "Downloads"),
             ("🎨", "Texture Packs"),
@@ -166,6 +166,7 @@ class MainWindow(QMainWindow):
 
         self._browse_panel = BrowsePanel(self.config)
         self._browse_panel.set_db(self.db)
+        self._browse_panel.mod_installed.connect(self._on_mod_installed)
         self._stack.addWidget(self._browse_panel)       # index 1
 
         self._library_panel = LibraryPanel(self.db, self.config)
@@ -270,9 +271,26 @@ class MainWindow(QMainWindow):
     # Handlers
     # ------------------------------------------------------------------
 
+    def _on_mod_installed(self):
+        """Refresh all mod panels after a mod is installed from the Discover panel."""
+        for panel in (
+            self._texture_panel,
+            self._pnach_panel,
+            self._cover_panel,
+            self._cheat_panel,
+        ):
+            try:
+                panel._apply_filter()
+            except Exception:
+                pass  # Never crash the UI if a panel isn't ready
+        try:
+            self._library_panel.refresh()
+        except Exception:
+            pass  # Never crash the UI if the library panel isn't ready
+
     def _on_library_browse_game(self, serial: str):
-        """Navigate to the Browse panel and pre-filter by *serial*."""
-        self._activate_nav(1)  # Browse is at index 1
+        """Navigate to the Discover panel and pre-filter by *serial*."""
+        self._activate_nav(1)  # Discover is at index 1
         if hasattr(self._browse_panel, "filter_by_serial"):
             self._browse_panel.filter_by_serial(serial)
         self._show_status(f"Browsing catalogue for {serial}")
