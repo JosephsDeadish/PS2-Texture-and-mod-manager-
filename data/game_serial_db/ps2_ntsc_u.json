@@ -10035,15 +10035,6 @@
       "publisher": "Ubisoft",
       "genre": "Third-person Shooter"
     },
-    "Godfather, The": {
-      "serial": "SLUS-21406",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2006-03-21",
-      "developer": "EA Redwood Shores",
-      "publisher": "Electronic Arts",
-      "genre": "Action."
-    },
     "Nickelodeon SpongeBob SquarePants - Creature from the Krusty Krab": {
       "serial": "SLUS-21391",
       "alt_serials": [],
@@ -10758,9 +10749,7 @@
     },
     "The Godfather": {
       "serial": "SLUS-21385",
-      "alt_serials": [
-        "SLUS-21406"
-      ],
+      "alt_serials": [],
       "crcs": [
         "D850707E"
       ],
@@ -20870,6 +20859,15 @@
     "M&M's Adventure": {
       "serial": "SLUS-21875",
       "crcs": []
+    },
+    "The Godfather (Limited Edition)": {
+      "serial": "SLUS-21406",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2006-03-21",
+      "developer": "EA Redwood Shores",
+      "publisher": "Electronic Arts",
+      "genre": "Action."
     }
   }
 }

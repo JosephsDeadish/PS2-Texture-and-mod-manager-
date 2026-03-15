@@ -16201,3 +16201,162 @@ class TestWave78SerialNameFixes(unittest.TestCase):
         """DB must have at most 48144 entries — confirming the 7 B3A9F9E7 entries were removed."""
         self.assertLessEqual(len(self.db), 48144,
                              f"Expected ≤48144 entries after Wave 78 deletions, got {len(self.db)}")
+
+
+class TestWave79PalSerialFixes(unittest.TestCase):
+    """Wave 79: Fix 7 PAL CRC groups using alt serials instead of primary serials (995 entries).
+
+    All 7 CRCs had pnach DB entries using alt serials (as listed in ps2_pal.json)
+    instead of the primary serial for the CRC.  Fixed to use the primary serial so
+    that the pnach DB is consistent with the serial DB.
+
+    Fixes:
+      1510E1D1  Crash Twinsanity (PAL):    SLES-52568 → SLES-52606  (5 entries)
+      2251E14D  Tekken 4 (PAL):            SCES-50878 → SLES-51552  (37 entries)
+      5C991F4E  Ico (PAL):                 SCES-50760 → SLES-51128  (7 entries)
+      6A8F18B9  Ratchet & Clank (PAL):     SCES-50916 → SCES-50391  (160 entries)
+      7D8F539A  Devil May Cry (PAL):       SLES-50358 → SLES-50873  (119 entries)
+      941BB7D9  Final Fantasy X (PAL):     SCES-50492 → SLES-50490  (499 entries)
+      9AAC5309  Final Fantasy X-2 (PAL):   SLES-51815 → SLES-51818  (168 entries)
+
+    Also (serial DB):
+      "Godfather, The" (SLUS-21406) renamed to "The Godfather (Limited Edition)"
+      SLUS-21406 removed from alt_serials of "The Godfather" (separate edition)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        cls.games = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )["games"]
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.db.items() if v.get("game_crc") == crc}
+
+    def _assert_crc_serial(self, crc, expected_serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game_serial"]) for k, v in entries.items()
+               if v.get("game_serial") != expected_serial]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected all serials={expected_serial!r}, mismatches: {bad[:3]}")
+
+    def _assert_crc_game(self, crc, expected_name):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game"]) for k, v in entries.items()
+               if v.get("game") != expected_name]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected game={expected_name!r}, mismatches: {bad[:3]}")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — 7 PAL CRC serial fixes
+    # ------------------------------------------------------------------
+
+    def test_1510e1d1_crash_twinsanity_serial(self):
+        """1510E1D1: game_serial must be SLES-52606 (primary), not SLES-52568 (alt)."""
+        self._assert_crc_serial("1510E1D1", "SLES-52606")
+
+    def test_1510e1d1_crash_twinsanity_name(self):
+        """1510E1D1: game must be 'Crash Twinsanity (SLES-52606)'."""
+        self._assert_crc_game("1510E1D1", "Crash Twinsanity (SLES-52606)")
+
+    def test_2251e14d_tekken4_serial(self):
+        """2251E14D: game_serial must be SLES-51552 (primary), not SCES-50878 (alt)."""
+        self._assert_crc_serial("2251E14D", "SLES-51552")
+
+    def test_2251e14d_tekken4_name(self):
+        """2251E14D: game must be 'Tekken 4 (SLES-51552)'."""
+        self._assert_crc_game("2251E14D", "Tekken 4 (SLES-51552)")
+
+    def test_5c991f4e_ico_serial(self):
+        """5C991F4E: game_serial must be SLES-51128 (primary), not SCES-50760 (alt)."""
+        self._assert_crc_serial("5C991F4E", "SLES-51128")
+
+    def test_5c991f4e_ico_name(self):
+        """5C991F4E: game must be 'Ico (SLES-51128)'."""
+        self._assert_crc_game("5C991F4E", "Ico (SLES-51128)")
+
+    def test_6a8f18b9_rac_serial(self):
+        """6A8F18B9: game_serial must be SCES-50391 (primary), not SCES-50916 (alt)."""
+        self._assert_crc_serial("6A8F18B9", "SCES-50391")
+
+    def test_6a8f18b9_rac_name(self):
+        """6A8F18B9: game must be 'Ratchet & Clank (SCES-50391)'."""
+        self._assert_crc_game("6A8F18B9", "Ratchet & Clank (SCES-50391)")
+
+    def test_7d8f539a_dmc_serial(self):
+        """7D8F539A: game_serial must be SLES-50873 (primary), not SLES-50358 (alt)."""
+        self._assert_crc_serial("7D8F539A", "SLES-50873")
+
+    def test_7d8f539a_dmc_name(self):
+        """7D8F539A: game must be 'Devil May Cry (SLES-50873)'."""
+        self._assert_crc_game("7D8F539A", "Devil May Cry (SLES-50873)")
+
+    def test_941bb7d9_ffx_serial(self):
+        """941BB7D9: game_serial must be SLES-50490 (primary), not SCES-50492 (alt)."""
+        self._assert_crc_serial("941BB7D9", "SLES-50490")
+
+    def test_941bb7d9_ffx_name(self):
+        """941BB7D9: game must be 'Final Fantasy X (SLES-50490)'."""
+        self._assert_crc_game("941BB7D9", "Final Fantasy X (SLES-50490)")
+
+    def test_9aac5309_ffx2_serial(self):
+        """9AAC5309: game_serial must be SLES-51818 (primary), not SLES-51815 (alt)."""
+        self._assert_crc_serial("9AAC5309", "SLES-51818")
+
+    def test_9aac5309_ffx2_name(self):
+        """9AAC5309: game must be 'Final Fantasy X-2 (SLES-51818)'."""
+        self._assert_crc_game("9AAC5309", "Final Fantasy X-2 (SLES-51818)")
+
+    # ------------------------------------------------------------------
+    # Serial DB — Godfather Limited Edition fixes
+    # ------------------------------------------------------------------
+
+    def test_godfather_limited_edition_entry_exists(self):
+        """Serial DB must have 'The Godfather (Limited Edition)' with serial SLUS-21406."""
+        entry = self.games.get("The Godfather (Limited Edition)")
+        self.assertIsNotNone(entry,
+                             "Expected 'The Godfather (Limited Edition)' entry in serial DB")
+        self.assertEqual(entry.get("serial"), "SLUS-21406",
+                         f"Expected serial SLUS-21406, got {entry.get('serial')!r}")
+
+    def test_godfather_the_no_slus21406_alt(self):
+        """'The Godfather' (SLUS-21385) must NOT have SLUS-21406 as alt_serial."""
+        entry = self.games.get("The Godfather", {})
+        alts = entry.get("alt_serials", [])
+        self.assertNotIn("SLUS-21406", alts,
+                         "SLUS-21406 should be removed from alt_serials of 'The Godfather' "
+                         "(it belongs to the Limited Edition, a separate DB entry)")
+
+    def test_godfather_the_key_removed(self):
+        """The old 'Godfather, The' key must no longer exist in the serial DB."""
+        self.assertNotIn("Godfather, The", self.games,
+                         "Old 'Godfather, The' key should be renamed to 'The Godfather (Limited Edition)'")
+
+    # ------------------------------------------------------------------
+    # Regression: no alt-serial contamination remains for these 7 CRCs
+    # ------------------------------------------------------------------
+
+    def test_no_alt_serial_contamination_in_pal_crcs(self):
+        """None of the 7 fixed CRCs should still have the old alt serials."""
+        old_serials = {
+            '1510E1D1': 'SLES-52568',
+            '2251E14D': 'SCES-50878',
+            '5C991F4E': 'SCES-50760',
+            '6A8F18B9': 'SCES-50916',
+            '7D8F539A': 'SLES-50358',
+            '941BB7D9': 'SCES-50492',
+            '9AAC5309': 'SLES-51815',
+        }
+        bad = []
+        for key, entry in self.db.items():
+            crc = entry.get("game_crc", "").upper()
+            if crc in old_serials and entry.get("game_serial") == old_serials[crc]:
+                bad.append((crc, key, entry.get("game_serial")))
+        self.assertEqual(bad, [],
+                         f"Old alt serials still present: {bad[:5]}")
