@@ -4052,12 +4052,14 @@ class TestCCKrizalidEntries(unittest.TestCase):
         self.assertIn("cckrizalid.606805", e["author_url"])
 
     def test_all_cckrizalid_entries_have_thread_url(self):
-        thread = "mega-library-of-hd-texture-packs-by-cckrizalid.618690"
+        """All CCKrizalid entries must have a GBATemp thread URL.
+        Individual packs may use their own thread (not the mega-library hub)."""
+        gbatemp_base = "gbatemp.net/threads/"
         cc = [e for e in self.entries.values() if e.get("author") == "CCKrizalid"]
         self.assertGreater(len(cc), 0)
         for e in cc:
-            self.assertIn(thread, e["url"],
-                          f"{e['id']}: url should contain the thread slug")
+            self.assertIn(gbatemp_base, e["url"],
+                          f"{e['id']}: url should be a GBATemp thread URL")
 
     def test_all_cckrizalid_entries_are_texture_packs(self):
         from src.models.mod import ModType
@@ -17412,3 +17414,198 @@ class TestWave85CatalogueAndSerialFixes(unittest.TestCase):
     def test_pal_db_ben_10_poe(self):
         self.assertIn("SLES-54952", self.pal_serial_set,
                       "Ben 10: Protector of Earth PAL (SLES-54952) missing from PAL DB")
+
+
+class TestWave86CatalogueAndFixes(unittest.TestCase):
+    """Wave 86: fix false info (ratchet_clank_upa_hd author GBAtemp→Unknown,
+    update CCKrizalid individual pack URLs from mega-library to own threads),
+    add 20 new texture-pack catalogue entries verified against GBATemp v13.1
+    document attached to issues.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+
+    # ------------------------------------------------------------------
+    # Catalogue size
+    # ------------------------------------------------------------------
+    def test_catalogue_size_after_wave86(self):
+        """After Wave 86 there should be at least 145 texture-pack entries."""
+        self.assertGreaterEqual(len(self.packs), 145,
+                                f"Expected ≥145 packs, got {len(self.packs)}")
+
+    def test_no_duplicate_ids(self):
+        ids = [p["id"] for p in self.packs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate catalogue IDs found")
+
+    # ------------------------------------------------------------------
+    # False-info fix: ratchet_clank_upa_hd author was "GBAtemp" (website)
+    # ------------------------------------------------------------------
+    def test_ratchet_clank_upa_author_not_gbatemp(self):
+        """ratchet_clank_upa_hd author must not be 'GBAtemp' (that is the
+        website name, not a person). Should be 'Unknown'."""
+        p = self.by_id["ratchet_clank_upa_hd"]
+        self.assertNotEqual(p["author"], "GBAtemp",
+                            "GBAtemp is a website, not an author")
+        self.assertEqual(p["author"], "Unknown",
+                         "ratchet_clank_upa_hd author should be Unknown")
+
+    # ------------------------------------------------------------------
+    # CCKrizalid URL fixes — individual thread URLs
+    # ------------------------------------------------------------------
+    def test_ghost_rider_cckrizalid_uses_own_thread(self):
+        """ghost_rider_hd_cckrizalid should point to its own thread, not the mega-library."""
+        p = self.by_id["ghost_rider_hd_cckrizalid"]
+        self.assertIn("617744", p["url"],
+                      "ghost_rider_hd_cckrizalid URL should reference thread 617744")
+        self.assertNotIn("618690", p["url"],
+                         "ghost_rider_hd_cckrizalid should not use mega-library URL")
+
+    def test_chaos_legion_cckrizalid_uses_own_thread(self):
+        p = self.by_id["chaos_legion_hd_cckrizalid"]
+        self.assertIn("618046", p["url"],
+                      "chaos_legion_hd_cckrizalid URL should reference thread 618046")
+        self.assertNotIn("618690", p["url"],
+                         "chaos_legion_hd_cckrizalid should not use mega-library URL")
+
+    def test_dmc3_nonse_cckrizalid_uses_own_thread(self):
+        p = self.by_id["dmc3_nonse_hd_cckrizalid"]
+        self.assertIn("618142", p["url"],
+                      "dmc3_nonse_hd_cckrizalid URL should reference thread 618142")
+        self.assertNotIn("618690", p["url"],
+                         "dmc3_nonse_hd_cckrizalid should not use mega-library URL")
+
+    def test_dmc3_se_cckrizalid_uses_own_thread(self):
+        p = self.by_id["dmc3_se_hd_cckrizalid"]
+        self.assertIn("618140", p["url"],
+                      "dmc3_se_hd_cckrizalid URL should reference thread 618140")
+        self.assertNotIn("618690", p["url"],
+                         "dmc3_se_hd_cckrizalid should not use mega-library URL")
+
+    # ------------------------------------------------------------------
+    # New entries — ironhulk33 packs
+    # ------------------------------------------------------------------
+    def test_ironhulk33_hub_present(self):
+        self.assertIn("ironhulk33_hd_ps2_hub", self.by_id)
+        self.assertEqual(self.by_id["ironhulk33_hd_ps2_hub"]["is_hub"], True)
+
+    def test_sonic_heroes_ironhulk33_present(self):
+        self.assertIn("sonic_heroes_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["sonic_heroes_hd_ironhulk33"]["game_serial"], "SLUS-20718"
+        )
+
+    def test_re_outbreak_ironhulk33_present(self):
+        self.assertIn("re_outbreak_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["re_outbreak_hd_ironhulk33"]["game_serial"], "SLUS-20765"
+        )
+
+    def test_spongebob_bfbb_ironhulk33_present(self):
+        self.assertIn("spongebob_bfbb_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["spongebob_bfbb_hd_ironhulk33"]["game_serial"], "SLUS-20680"
+        )
+
+    def test_spyro_eternal_night_ironhulk33_present(self):
+        self.assertIn("spyro_eternal_night_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["spyro_eternal_night_hd_ironhulk33"]["game_serial"], "SLUS-21607"
+        )
+
+    def test_raiden3_ironhulk33_present(self):
+        self.assertIn("raiden3_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["raiden3_hd_ironhulk33"]["game_serial"], "SLUS-21465"
+        )
+
+    def test_spongebob_movie_ironhulk33_present(self):
+        self.assertIn("spongebob_movie_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["spongebob_movie_hd_ironhulk33"]["game_serial"], "SLUS-20904"
+        )
+
+    def test_dr_muto_ironhulk33_present(self):
+        self.assertIn("dr_muto_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["dr_muto_hd_ironhulk33"]["game_serial"], "SLUS-20458"
+        )
+
+    def test_meet_robinsons_ironhulk33_present(self):
+        self.assertIn("meet_robinsons_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["meet_robinsons_hd_ironhulk33"]["game_serial"], "SLUS-21453"
+        )
+
+    def test_cod_finest_hour_ironhulk33_present(self):
+        self.assertIn("cod_finest_hour_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["cod_finest_hour_hd_ironhulk33"]["game_serial"], "SLUS-20725"
+        )
+
+    def test_popcap_hits_ironhulk33_present(self):
+        self.assertIn("popcap_hits_hd_ironhulk33", self.by_id)
+        self.assertEqual(
+            self.by_id["popcap_hits_hd_ironhulk33"]["game_serial"], "SLUS-21710"
+        )
+
+    def test_walle_95hinch95_present(self):
+        self.assertIn("walle_hd_95hinch95", self.by_id)
+        self.assertEqual(
+            self.by_id["walle_hd_95hinch95"]["game_serial"], "SLUS-21736"
+        )
+        self.assertEqual(self.by_id["walle_hd_95hinch95"]["author"], "95HINCH95")
+
+    # ------------------------------------------------------------------
+    # New entries — other new packs
+    # ------------------------------------------------------------------
+    def test_devil_may_cry_1_hd_v2_present(self):
+        self.assertIn("devil_may_cry_1_hd_v2", self.by_id)
+        self.assertEqual(
+            self.by_id["devil_may_cry_1_hd_v2"]["game_serial"], "SLUS-20216"
+        )
+
+    def test_pop_sot_pal_hd_v1_present(self):
+        self.assertIn("pop_sot_pal_hd_v1", self.by_id)
+        self.assertEqual(
+            self.by_id["pop_sot_pal_hd_v1"]["game_serial"], "SLES-51918"
+        )
+
+    def test_dbz_bt4_ai_upscale_present(self):
+        self.assertIn("dbz_bt4_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["dbz_bt4_ai_upscale"]["game_serial"], "SLUS-21978"
+        )
+
+    def test_xiii_ai_hd_v3_present(self):
+        self.assertIn("xiii_ai_hd_v3", self.by_id)
+        self.assertEqual(
+            self.by_id["xiii_ai_hd_v3"]["game_serial"], "SLUS-20677"
+        )
+
+    def test_sonic_unleashed_hd_present(self):
+        self.assertIn("sonic_unleashed_hd", self.by_id)
+        self.assertEqual(
+            self.by_id["sonic_unleashed_hd"]["game_serial"], "SLUS-21846"
+        )
+
+    def test_crazy_taxi_hd_present(self):
+        self.assertIn("crazy_taxi_hd", self.by_id)
+        self.assertEqual(
+            self.by_id["crazy_taxi_hd"]["game_serial"], "SLUS-20202"
+        )
+
+    def test_silent_hill_series_hd_present(self):
+        self.assertIn("silent_hill_series_hd", self.by_id)
+        self.assertEqual(self.by_id["silent_hill_series_hd"]["author"], "Unknown")
+
+    def test_jungle_book_rng_hd_present(self):
+        self.assertIn("jungle_book_rng_hd", self.by_id)
+        self.assertEqual(
+            self.by_id["jungle_book_rng_hd"]["game_serial"], "SLUS-20075"
+        )
