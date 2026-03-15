@@ -14919,7 +14919,7 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         serials = {info["serial"] for info in self.games.values()}
         self.assertIn("SLES-50978", serials, "NFS Underground (SLES-50978) must be present")
         self.assertIn("SLES-52725", serials, "NFS Underground 2 (SLES-52725) must be present")
-        self.assertIn("SLES-53816", serials, "NFS Most Wanted (SLES-53816) must be present")
+        self.assertIn("SLES-53557", serials, "NFS Most Wanted (SLES-53557) must be present")
         self.assertIn("SLES-54493", serials, "NFS Carbon (SLES-54493) must be present")
 
 
@@ -14936,19 +14936,19 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
       306CDADA → SLES-51044  (Castlevania: Lament of Innocence, 20 entries)
       0197EBD0 → SLES-52725  (NFS Underground 2, 23 entries)
       CFB873AD → SLES-52725  (NFS Underground 2 alt-CRC, 23 entries)
-      CA2A1B04 → SLES-53816  (NFS Most Wanted, 9 entries)
-      1FA82CDF → SLES-53816  (NFS Most Wanted alt-CRC, 4 entries)
+      CA2A1B04 → SLES-53557  (NFS Most Wanted, 9 entries; corrected in Wave 82)
+      1FA82CDF → SLES-53557  (NFS Most Wanted alt-CRC, 4 entries; corrected in Wave 82)
       6926B199 → SLES-53280  (7 Sins, 11 entries)
-      84930ED2 → SLES-52586  (Mercenaries, 4 entries)
+      84930ED2 → SLES-52589  (Mercenaries, 4 entries; corrected in Wave 82)
       F881CD68 → SLES-54083  (Sonic Riders, 3 entries)
       186B0D8A → SLES-53827  (Battlefield 2: Modern Combat, 21 entries)
-      91100045 → SLES-53272  (The Fast and the Furious, 8 entries)
+      91100045 → SLES-54483  (The Fast and the Furious, 8 entries; corrected in Wave 82)
       6B9AEA0D → SLES-51466  (True Crime: Streets of L.A., 20 entries)
-      18C101A7 → SLES-52916  (Street Racing Syndicate, 12 entries)
-      77B4F13C → SLES-54040  (True Crime: New York City, 3 entries)
+      18C101A7 → SLES-53045  (Street Racing Syndicate, 12 entries; corrected in Wave 82)
+      77B4F13C → SLES-53616  (True Crime: New York City, 3 entries; corrected in Wave 82)
       EA0CB4B8 → SLES-53553  (L.A. Rush, 2 entries)
-      09C3DF79 → SCES-52810  (The Getaway: Black Monday, 1 entry)
-      0F0C4A9C → SLES-51432  (The Simpsons: Hit & Run, 24 entries)
+      09C3DF79 → SCES-52758  (The Getaway: Black Monday, 1 entry; corrected in Wave 82)
+      0F0C4A9C → SLES-51897  (The Simpsons: Hit & Run, 24 entries; corrected in Wave 82)
     Group B — NTSC-U games matched to known serials:
       81D233DC → SLUS-20967  (Enthusia Professional Racing, 22 entries)
       0F9348FF → SLUS-20831  (Tokyo Xtreme Racer 3, 8 entries)
@@ -15059,20 +15059,20 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_serial("CFB873AD", "SLES-52725")
 
     def test_ca2a1b04_nfsmw_serial(self):
-        """CA2A1B04: all 9 entries must have game_serial SLES-53816."""
-        self._assert_crc_serial("CA2A1B04", "SLES-53816")
+        """CA2A1B04: all 9 entries must have game_serial SLES-53557 (corrected from SLES-53816 in Wave 82)."""
+        self._assert_crc_serial("CA2A1B04", "SLES-53557")
 
     def test_1fa82cdf_nfsmw_altcrc_serial(self):
-        """1FA82CDF: all 4 entries must have game_serial SLES-53816 (alt disc)."""
-        self._assert_crc_serial("1FA82CDF", "SLES-53816")
+        """1FA82CDF: all 4 entries must have game_serial SLES-53557 (corrected from SLES-53816 in Wave 82)."""
+        self._assert_crc_serial("1FA82CDF", "SLES-53557")
 
     def test_6926b199_7sins_serial(self):
         """6926B199: all 11 entries must have game_serial SLES-53280."""
         self._assert_crc_serial("6926B199", "SLES-53280")
 
     def test_84930ed2_mercenaries_serial(self):
-        """84930ED2: all 4 entries must have game_serial SLES-52586."""
-        self._assert_crc_serial("84930ED2", "SLES-52586")
+        """84930ED2: all 4 entries must have game_serial SLES-52589 (corrected from SLES-52586 in Wave 82)."""
+        self._assert_crc_serial("84930ED2", "SLES-52589")
 
     def test_f881cd68_sonic_riders_serial(self):
         """F881CD68: all 3 entries must have game_serial SLES-54083."""
@@ -15083,32 +15083,32 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_serial("186B0D8A", "SLES-53827")
 
     def test_91100045_fast_furious_serial(self):
-        """91100045: all 8 entries must have game_serial SLES-53272."""
-        self._assert_crc_serial("91100045", "SLES-53272")
+        """91100045: all 8 entries must have game_serial SLES-54483 (corrected from SLES-53272 in Wave 82)."""
+        self._assert_crc_serial("91100045", "SLES-54483")
 
     def test_6b9aea0d_tc_streets_la_serial(self):
         """6B9AEA0D: all 20 entries must have game_serial SLES-51466."""
         self._assert_crc_serial("6B9AEA0D", "SLES-51466")
 
     def test_18c101a7_srs_serial(self):
-        """18C101A7: all 12 entries must have game_serial SLES-52916."""
-        self._assert_crc_serial("18C101A7", "SLES-52916")
+        """18C101A7: all 12 entries must have game_serial SLES-53045 (corrected from SLES-52916 in Wave 82)."""
+        self._assert_crc_serial("18C101A7", "SLES-53045")
 
     def test_77b4f13c_tc_nyc_serial(self):
-        """77B4F13C: all 3 entries must have game_serial SLES-54040."""
-        self._assert_crc_serial("77B4F13C", "SLES-54040")
+        """77B4F13C: all 3 entries must have game_serial SLES-53616 (corrected from SLES-54040 in Wave 82)."""
+        self._assert_crc_serial("77B4F13C", "SLES-53616")
 
     def test_ea0cb4b8_la_rush_serial(self):
         """EA0CB4B8: all 2 entries must have game_serial SLES-53553."""
         self._assert_crc_serial("EA0CB4B8", "SLES-53553")
 
     def test_09c3df79_getaway_bm_serial(self):
-        """09C3DF79: single entry must have game_serial SCES-52810."""
-        self._assert_crc_serial("09C3DF79", "SCES-52810")
+        """09C3DF79: single entry must have game_serial SCES-52758 (corrected from SCES-52810 in Wave 82)."""
+        self._assert_crc_serial("09C3DF79", "SCES-52758")
 
     def test_0f0c4a9c_simpsons_hit_run_serial(self):
-        """0F0C4A9C: all 24 entries must have game_serial SLES-51432."""
-        self._assert_crc_serial("0F0C4A9C", "SLES-51432")
+        """0F0C4A9C: all 24 entries must have game_serial SLES-51897 (corrected from SLES-51432 in Wave 82)."""
+        self._assert_crc_serial("0F0C4A9C", "SLES-51897")
 
     # ------------------------------------------------------------------
     # Group B — NTSC-U serials
@@ -15143,8 +15143,8 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_game("1629D655", "Red Faction II (SLES-51194)")
 
     def test_dbaab66d_pes2011_game_name(self):
-        """DBAAB66D: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55799)")
+        """DBAAB66D: game name updated to include serial (corrected to SLES-55636 in Wave 82)."""
+        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55636)")
 
     def test_ee8404aa_yugioh_tagforce_game_name(self):
         """EE8404AA: game name updated to include serial (resolved in Wave 75)."""
@@ -15200,9 +15200,9 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertIn("35D70452", g.get('crcs', []))
 
     def test_pal_db_mercenaries_entry(self):
-        """PAL DB must have Mercenaries with SLES-52586."""
+        """PAL DB must have Mercenaries with SLES-52589 (corrected from SLES-52586 in Wave 82)."""
         g = self.pal_db['games'].get("Mercenaries: Playground of Destruction (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-52586")
+        self.assertEqual(g.get('serial'), "SLES-52589")
 
     def test_pal_db_sonic_riders_entry(self):
         """PAL DB must have Sonic Riders with SLES-54083."""
@@ -15215,9 +15215,9 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-53827")
 
     def test_pal_db_fast_furious_entry(self):
-        """PAL DB must have The Fast and the Furious with SLES-53272."""
+        """PAL DB must have The Fast and the Furious with SLES-54483 (corrected from SLES-53272 in Wave 82)."""
         g = self.pal_db['games'].get("The Fast and the Furious (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-53272")
+        self.assertEqual(g.get('serial'), "SLES-54483")
 
     def test_pal_db_true_crime_la_entry(self):
         """PAL DB must have True Crime: Streets of L.A. with SLES-51466."""
@@ -15225,14 +15225,14 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-51466")
 
     def test_pal_db_street_racing_syndicate_entry(self):
-        """PAL DB must have Street Racing Syndicate with SLES-52916."""
+        """PAL DB must have Street Racing Syndicate with SLES-53045 (corrected from SLES-52916 in Wave 82)."""
         g = self.pal_db['games'].get("Street Racing Syndicate (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-52916")
+        self.assertEqual(g.get('serial'), "SLES-53045")
 
     def test_pal_db_true_crime_nyc_entry(self):
-        """PAL DB must have True Crime: New York City with SLES-54040."""
+        """PAL DB must have True Crime: New York City with SLES-53616 (corrected from SLES-54040 in Wave 82)."""
         g = self.pal_db['games'].get("True Crime: New York City (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-54040")
+        self.assertEqual(g.get('serial'), "SLES-53616")
 
     def test_pal_db_la_rush_entry(self):
         """PAL DB must have L.A. Rush with SLES-53553."""
@@ -15240,14 +15240,14 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertEqual(g.get('serial'), "SLES-53553")
 
     def test_pal_db_getaway_bm_entry(self):
-        """PAL DB must have The Getaway: Black Monday with SCES-52810."""
+        """PAL DB must have The Getaway: Black Monday with SCES-52758 (corrected from SCES-52810 in Wave 82)."""
         g = self.pal_db['games'].get("The Getaway: Black Monday (PAL)", {})
-        self.assertEqual(g.get('serial'), "SCES-52810")
+        self.assertEqual(g.get('serial'), "SCES-52758")
 
     def test_pal_db_simpsons_hr_entry(self):
-        """PAL DB must have The Simpsons: Hit & Run with SLES-51432."""
+        """PAL DB must have The Simpsons: Hit & Run with SLES-51897 (corrected from SLES-51432 in Wave 82)."""
         g = self.pal_db['games'].get("The Simpsons: Hit & Run (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-51432")
+        self.assertEqual(g.get('serial'), "SLES-51897")
 
     def test_pal_db_7sins_entry(self):
         """PAL DB must have 7 Sins with SLES-53280 (primary) and SLES-53297 (alt)."""
@@ -15328,7 +15328,7 @@ class TestWave75EmptySerialFix(unittest.TestCase):
     Fixes applied:
       1629D655 → SLES-51194  (Red Faction II PAL, 2 entries)
       76A68274 → SLES-51707  (Virtua Cop: Elite Edition PAL, 11 entries)
-      DBAAB66D → SLES-55799  (Pro Evolution Soccer 2011 PAL, 13 entries)
+      DBAAB66D → SLES-55636  (Pro Evolution Soccer 2011 PAL, 13 entries; corrected in Wave 82)
       EE8404AA → SLES-53968  (Yu-Gi-Oh! GX: Tag Force Evolution PAL, 3 entries)
       EF97EC8F → SLES-52707  (10,000 Bullets PAL, 6 entries)
       F26AF996 → SLES-50477  (Smuggler's Run 2: Hostile Territory PAL, 5 entries)
@@ -15380,8 +15380,8 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("76A68274")), 11)
 
     def test_dbaab66d_pes2011_serial(self):
-        """DBAAB66D: all 13 entries must have game_serial SLES-55799."""
-        self._assert_crc_serial("DBAAB66D", "SLES-55799")
+        """DBAAB66D: all 13 entries must have game_serial SLES-55636 (corrected from SLES-55799 in Wave 82)."""
+        self._assert_crc_serial("DBAAB66D", "SLES-55636")
         self.assertEqual(len(self._crc_entries("DBAAB66D")), 13)
 
     def test_ee8404aa_yugioh_serial(self):
@@ -15422,8 +15422,8 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51707)")
 
     def test_dbaab66d_pes2011_game_name(self):
-        """DBAAB66D: game name must include serial."""
-        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55799)")
+        """DBAAB66D: game name must include serial (corrected to SLES-55636 in Wave 82)."""
+        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55636)")
 
     def test_ee8404aa_yugioh_game_name(self):
         """EE8404AA: game name must include serial."""
@@ -15462,9 +15462,9 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertIn("76A68274", g.get('crcs', []))
 
     def test_pal_db_pes2011_entry(self):
-        """PAL DB must have Pro Evolution Soccer 2011 (PAL) with serial SLES-55799."""
+        """PAL DB must have Pro Evolution Soccer 2011 (PAL) with serial SLES-55636 (corrected from SLES-55799 in Wave 82)."""
         g = self.pal_db['games'].get("Pro Evolution Soccer 2011 (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-55799")
+        self.assertEqual(g.get('serial'), "SLES-55636")
         self.assertIn("DBAAB66D", g.get('crcs', []))
 
     def test_pal_db_yugioh_entry(self):
@@ -16362,3 +16362,230 @@ class TestWave79PalSerialFixes(unittest.TestCase):
                 bad.append((crc, key, entry.get("game_serial")))
         self.assertEqual(bad, [],
                          f"Fabricated/wrong serials still present: {bad[:5]}")
+
+
+class TestWave82PalSerialFixes(unittest.TestCase):
+    """Wave 82: 9 fabricated/wrong PAL serials corrected against reference attachments.
+
+    Cross-checked all SLES/SCES serials in the pnach DB and PAL serial DB
+    against the verified PS2.txt, PS2.titles.json, and PS2.data.json reference
+    attachments (issue #13).  Found 9 fake or wrong PAL serials.
+
+    Corrected state (verified against issue attachments):
+      09C3DF79  The Getaway: Black Monday:  SCES-52758  (SCES-52810 was fabricated)
+      54EF429A  Killer 7:                   SLES-53366  (SCES-53366 had wrong prefix)
+      0F0C4A9C  The Simpsons: Hit & Run:    SLES-51897  (SLES-51432 was fabricated)
+      84930ED2  Mercenaries: PoD:           SLES-52589  (SLES-52586 was fabricated)
+      18C101A7  Street Racing Syndicate:    SLES-53045  (SLES-52916 was fabricated)
+      91100045  The Fast and the Furious:   SLES-54483  (SLES-53272 was fabricated)
+      1FA82CDF  Need for Speed: Most Wanted:SLES-53557  (SLES-53816 was fabricated)
+      CA2A1B04  Need for Speed: Most Wanted:SLES-53557  (SLES-53816 was fabricated)
+      77B4F13C  True Crime: New York City:  SLES-53616  (SLES-54040 was fabricated)
+      DBAAB66D  Pro Evolution Soccer 2011:  SLES-55636  (SLES-55799 was fabricated)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        cls.pal_games = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_pal.json").read_text()
+        )["games"]
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.db.items() if v.get("game_crc") == crc}
+
+    def _assert_crc_serial(self, crc, expected_serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game_serial"]) for k, v in entries.items()
+               if v.get("game_serial") != expected_serial]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected all serials={expected_serial!r}, mismatches: {bad[:3]}")
+
+    def _assert_crc_game(self, crc, expected_name):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        bad = [(k, v["game"]) for k, v in entries.items()
+               if v.get("game") != expected_name]
+        self.assertEqual(bad, [],
+                         f"{crc}: expected game={expected_name!r}, mismatches: {bad[:3]}")
+
+    # ------------------------------------------------------------------
+    # Pnach DB — serial fixes
+    # ------------------------------------------------------------------
+
+    def test_09c3df79_getaway_bm_serial(self):
+        """09C3DF79: game_serial must be SCES-52758 (verified; SCES-52810 was fabricated)."""
+        self._assert_crc_serial("09C3DF79", "SCES-52758")
+
+    def test_09c3df79_getaway_bm_name(self):
+        """09C3DF79: game must be 'The Getaway: Black Monday (SCES-52758)'."""
+        self._assert_crc_game("09C3DF79", "The Getaway: Black Monday (SCES-52758)")
+
+    def test_54ef429a_killer7_serial(self):
+        """54EF429A: game_serial must be SLES-53366 (correct prefix; SCES-53366 had wrong SCES prefix)."""
+        self._assert_crc_serial("54EF429A", "SLES-53366")
+
+    def test_54ef429a_killer7_name(self):
+        """54EF429A: game must be 'Killer 7 (SLES-53366)'."""
+        self._assert_crc_game("54EF429A", "Killer 7 (SLES-53366)")
+
+    def test_0f0c4a9c_simpsons_serial(self):
+        """0F0C4A9C: game_serial must be SLES-51897 (verified H&R serial; SLES-51432 was fabricated)."""
+        self._assert_crc_serial("0F0C4A9C", "SLES-51897")
+
+    def test_0f0c4a9c_simpsons_name(self):
+        """0F0C4A9C: game must be 'The Simpsons: Hit & Run (SLES-51897)'."""
+        self._assert_crc_game("0F0C4A9C", "The Simpsons: Hit & Run (SLES-51897)")
+
+    def test_84930ed2_mercenaries_serial(self):
+        """84930ED2: game_serial must be SLES-52589 (verified PoD serial; SLES-52586 was fabricated)."""
+        self._assert_crc_serial("84930ED2", "SLES-52589")
+
+    def test_84930ed2_mercenaries_name(self):
+        """84930ED2: game must be 'Mercenaries: Playground of Destruction (SLES-52589)'."""
+        self._assert_crc_game("84930ED2", "Mercenaries: Playground of Destruction (SLES-52589)")
+
+    def test_18c101a7_srs_serial(self):
+        """18C101A7: game_serial must be SLES-53045 (verified SRS serial; SLES-52916 was fabricated)."""
+        self._assert_crc_serial("18C101A7", "SLES-53045")
+
+    def test_18c101a7_srs_name(self):
+        """18C101A7: game must be 'Street Racing Syndicate (SLES-53045)'."""
+        self._assert_crc_game("18C101A7", "Street Racing Syndicate (SLES-53045)")
+
+    def test_91100045_fast_furious_serial(self):
+        """91100045: game_serial must be SLES-54483 (verified serial; SLES-53272 was fabricated)."""
+        self._assert_crc_serial("91100045", "SLES-54483")
+
+    def test_91100045_fast_furious_name(self):
+        """91100045: game must be 'The Fast and the Furious (SLES-54483)'."""
+        self._assert_crc_game("91100045", "The Fast and the Furious (SLES-54483)")
+
+    def test_1fa82cdf_nfsmw_serial(self):
+        """1FA82CDF: game_serial must be SLES-53557 (verified NFS:MW serial; SLES-53816 was fabricated)."""
+        self._assert_crc_serial("1FA82CDF", "SLES-53557")
+
+    def test_1fa82cdf_nfsmw_name(self):
+        """1FA82CDF: game must be 'Need for Speed: Most Wanted (SLES-53557)'."""
+        self._assert_crc_game("1FA82CDF", "Need for Speed: Most Wanted (SLES-53557)")
+
+    def test_ca2a1b04_nfsmw_serial(self):
+        """CA2A1B04: game_serial must be SLES-53557 (verified NFS:MW serial; SLES-53816 was fabricated)."""
+        self._assert_crc_serial("CA2A1B04", "SLES-53557")
+
+    def test_ca2a1b04_nfsmw_name(self):
+        """CA2A1B04: game must be 'Need for Speed: Most Wanted (SLES-53557)'."""
+        self._assert_crc_game("CA2A1B04", "Need for Speed: Most Wanted (SLES-53557)")
+
+    def test_77b4f13c_true_crime_serial(self):
+        """77B4F13C: game_serial must be SLES-53616 (verified serial; SLES-54040 was fabricated)."""
+        self._assert_crc_serial("77B4F13C", "SLES-53616")
+
+    def test_77b4f13c_true_crime_name(self):
+        """77B4F13C: game must be 'True Crime: New York City (SLES-53616)'."""
+        self._assert_crc_game("77B4F13C", "True Crime: New York City (SLES-53616)")
+
+    def test_dbaab66d_pes2011_serial(self):
+        """DBAAB66D: game_serial must be SLES-55636 (verified PES 2011 serial; SLES-55799 was fabricated)."""
+        self._assert_crc_serial("DBAAB66D", "SLES-55636")
+
+    def test_dbaab66d_pes2011_name(self):
+        """DBAAB66D: game must be 'Pro Evolution Soccer 2011 (SLES-55636)'."""
+        self._assert_crc_game("DBAAB66D", "Pro Evolution Soccer 2011 (SLES-55636)")
+
+    # ------------------------------------------------------------------
+    # PAL serial DB — serial fixes
+    # ------------------------------------------------------------------
+
+    def test_pal_db_getaway_bm_serial(self):
+        """PAL serial DB: The Getaway: Black Monday must have serial SCES-52758."""
+        entry = self.pal_games.get("The Getaway: Black Monday (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SCES-52758",
+                         f"Expected SCES-52758, got {entry.get('serial')!r}")
+
+    def test_pal_db_getaway_bm_alt_serial(self):
+        """PAL serial DB: The Getaway: Black Monday must have SCES-52948 as alt_serial."""
+        entry = self.pal_games.get("The Getaway: Black Monday (PAL)", {})
+        self.assertIn("SCES-52948", entry.get("alt_serials", []))
+
+    def test_pal_db_killer7_serial(self):
+        """PAL serial DB: Killer 7 must have serial SLES-53366."""
+        entry = self.pal_games.get("Killer 7 (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53366",
+                         f"Expected SLES-53366, got {entry.get('serial')!r}")
+
+    def test_pal_db_simpsons_serial(self):
+        """PAL serial DB: The Simpsons: Hit & Run must have serial SLES-51897."""
+        entry = self.pal_games.get("The Simpsons: Hit & Run (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-51897",
+                         f"Expected SLES-51897, got {entry.get('serial')!r}")
+
+    def test_pal_db_mercenaries_serial(self):
+        """PAL serial DB: Mercenaries: Playground of Destruction must have serial SLES-52589."""
+        entry = self.pal_games.get("Mercenaries: Playground of Destruction (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-52589",
+                         f"Expected SLES-52589, got {entry.get('serial')!r}")
+
+    def test_pal_db_srs_serial(self):
+        """PAL serial DB: Street Racing Syndicate must have serial SLES-53045."""
+        entry = self.pal_games.get("Street Racing Syndicate (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53045",
+                         f"Expected SLES-53045, got {entry.get('serial')!r}")
+
+    def test_pal_db_fast_furious_serial(self):
+        """PAL serial DB: The Fast and the Furious must have serial SLES-54483."""
+        entry = self.pal_games.get("The Fast and the Furious (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-54483",
+                         f"Expected SLES-54483, got {entry.get('serial')!r}")
+
+    def test_pal_db_nfsmw_serial(self):
+        """PAL serial DB: Need for Speed: Most Wanted must have serial SLES-53557."""
+        entry = self.pal_games.get("Need for Speed: Most Wanted (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53557",
+                         f"Expected SLES-53557, got {entry.get('serial')!r}")
+
+    def test_pal_db_true_crime_serial(self):
+        """PAL serial DB: True Crime: New York City must have serial SLES-53616."""
+        entry = self.pal_games.get("True Crime: New York City (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-53616",
+                         f"Expected SLES-53616, got {entry.get('serial')!r}")
+
+    def test_pal_db_pes2011_serial(self):
+        """PAL serial DB: Pro Evolution Soccer 2011 must have serial SLES-55636."""
+        entry = self.pal_games.get("Pro Evolution Soccer 2011 (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-55636",
+                         f"Expected SLES-55636, got {entry.get('serial')!r}")
+
+    # ------------------------------------------------------------------
+    # Regression: no fabricated serials remain
+    # ------------------------------------------------------------------
+
+    def test_no_fabricated_serials_remain(self):
+        """None of the 9 fixed CRCs should still carry the fabricated Wave 82 serials."""
+        bad_serials = {
+            '09C3DF79': 'SCES-52810',  # fabricated; real is SCES-52758
+            '54EF429A': 'SCES-53366',  # wrong prefix; real is SLES-53366
+            '0F0C4A9C': 'SLES-51432',  # fabricated; real is SLES-51897
+            '84930ED2': 'SLES-52586',  # fabricated; real is SLES-52589
+            '18C101A7': 'SLES-52916',  # fabricated; real is SLES-53045
+            '91100045': 'SLES-53272',  # fabricated; real is SLES-54483
+            '1FA82CDF': 'SLES-53816',  # fabricated; real is SLES-53557
+            'CA2A1B04': 'SLES-53816',  # fabricated; real is SLES-53557
+            '77B4F13C': 'SLES-54040',  # fabricated; real is SLES-53616
+            'DBAAB66D': 'SLES-55799',  # fabricated; real is SLES-55636
+        }
+        bad = []
+        for key, entry in self.db.items():
+            crc = entry.get("game_crc", "").upper()
+            if crc in bad_serials and entry.get("game_serial") == bad_serials[crc]:
+                bad.append((crc, key, entry.get("game_serial")))
+        self.assertEqual(bad, [],
+                         f"Fabricated serials still present: {bad[:5]}")
+
+    def test_pnach_db_size_over_48100(self):
+        """Pnach DB must have at least 48100 entries after Wave 82 fixes (109 serials corrected)."""
+        self.assertGreater(len(self.db), 48100)
