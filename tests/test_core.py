@@ -17277,3 +17277,138 @@ class TestWave84CatalogueSerialFixes(unittest.TestCase):
     def test_pal_db_curse_eye_of_isis(self):
         self.assertIn("SLES-51934", self.pal_serial_set,
                       "Curse: The Eye of Isis PAL (SLES-51934) missing from PAL DB")
+
+
+# Wave 85: Fix false author attribution + 11 new catalogue entries from
+# GBATemp expansions 9–11, + 2 PAL serial DB additions.
+# ---------------------------------------------------------------------------
+class TestWave85CatalogueAndSerialFixes(unittest.TestCase):
+    """Wave 85: fix false info (second_sight_hd author TexMaster→Curse_Arms),
+    add 11 new texture-pack catalogue entries verified against attached PS2
+    GAMEID/title documents, add 2 PAL serial DB entries (SLES-55605/54952).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+        with open("data/game_serial_db/ps2_pal.json") as fh:
+            pal_db = json.load(fh)
+        cls.pal_serial_set = set()
+        for g in pal_db["games"].values():
+            cls.pal_serial_set.add(g["serial"])
+            cls.pal_serial_set.update(g.get("alt_serials", []))
+
+    # ------------------------------------------------------------------
+    # Catalogue size
+    # ------------------------------------------------------------------
+    def test_catalogue_size_after_wave85(self):
+        """After Wave 85 there should be at least 125 texture-pack entries."""
+        self.assertGreaterEqual(len(self.packs), 125,
+                                f"Expected ≥125 packs, got {len(self.packs)}")
+
+    def test_no_duplicate_ids(self):
+        ids = [p["id"] for p in self.packs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate catalogue IDs found")
+
+    # ------------------------------------------------------------------
+    # False-info fix: second_sight_hd author attribution
+    # ------------------------------------------------------------------
+    def test_second_sight_author_fixed(self):
+        """second_sight_hd author must be Curse_Arms, not TexMaster
+        (GBATemp entry 126 confirms Curse_Arms as thread starter)."""
+        p = self.by_id["second_sight_hd"]
+        self.assertEqual(p["author"], "Curse_Arms",
+                         "second_sight_hd author should be Curse_Arms")
+        self.assertNotEqual(p["author"], "TexMaster",
+                            "TexMaster was a false attribution for second_sight_hd")
+
+    def test_second_sight_author_url_updated(self):
+        p = self.by_id["second_sight_hd"]
+        self.assertIn("curse_arms", p["author_url"].lower())
+
+    # ------------------------------------------------------------------
+    # New entries — Expansion 9
+    # ------------------------------------------------------------------
+    def test_indigo_prophecy_cckrizalid_entry_present(self):
+        self.assertIn("indigo_prophecy_hd_cckrizalid", self.by_id)
+        self.assertEqual(
+            self.by_id["indigo_prophecy_hd_cckrizalid"]["game_serial"], "SLUS-21196"
+        )
+
+    def test_midnight_club_3_remix_entry_present(self):
+        self.assertIn("midnight_club_3_remix_hd", self.by_id)
+        self.assertEqual(
+            self.by_id["midnight_club_3_remix_hd"]["game_serial"], "SLUS-21355"
+        )
+
+    def test_urban_chaos_entry_present(self):
+        self.assertIn("urban_chaos_hd_xxtherockoxx", self.by_id)
+        self.assertEqual(
+            self.by_id["urban_chaos_hd_xxtherockoxx"]["game_serial"], "SLUS-21390"
+        )
+
+    def test_dmc3_se_cckrizalid_entry_present(self):
+        self.assertIn("dmc3_se_hd_cckrizalid", self.by_id)
+        self.assertEqual(
+            self.by_id["dmc3_se_hd_cckrizalid"]["game_serial"], "SLUS-21361"
+        )
+
+    def test_viewtiful_joe_2_entry_present(self):
+        self.assertIn("viewtiful_joe_2_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["viewtiful_joe_2_ai_upscale"]["game_serial"], "SLUS-20939"
+        )
+
+    def test_tmnt_2007_entry_present(self):
+        self.assertIn("tmnt_2007_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["tmnt_2007_ai_upscale"]["game_serial"], "SLUS-21595"
+        )
+
+    def test_naruto_un5_pal_entry_present(self):
+        self.assertIn("naruto_un5_ai_upscale_pal", self.by_id)
+        self.assertEqual(
+            self.by_id["naruto_un5_ai_upscale_pal"]["game_serial"], "SLES-55605"
+        )
+
+    def test_ben_10_poe_pal_entry_present(self):
+        self.assertIn("ben_10_poe_hd_pal", self.by_id)
+        self.assertEqual(
+            self.by_id["ben_10_poe_hd_pal"]["game_serial"], "SLES-54952"
+        )
+
+    # ------------------------------------------------------------------
+    # New entries — Expansion 11
+    # ------------------------------------------------------------------
+    def test_shrek_smash_crash_entry_present(self):
+        self.assertIn("shrek_smash_crash_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["shrek_smash_crash_ai_upscale"]["game_serial"], "SLUS-21392"
+        )
+
+    def test_dbz_infinite_world_entry_present(self):
+        self.assertIn("dbz_infinite_world_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["dbz_infinite_world_ai_upscale"]["game_serial"], "SLUS-21842"
+        )
+
+    def test_sonic_riders_zg_entry_present(self):
+        self.assertIn("sonic_riders_zg_ai_upscale", self.by_id)
+        self.assertEqual(
+            self.by_id["sonic_riders_zg_ai_upscale"]["game_serial"], "SLUS-21642"
+        )
+
+    # ------------------------------------------------------------------
+    # PAL serial DB additions
+    # ------------------------------------------------------------------
+    def test_pal_db_naruto_un5(self):
+        self.assertIn("SLES-55605", self.pal_serial_set,
+                      "Naruto: Ultimate Ninja 5 PAL (SLES-55605) missing from PAL DB")
+
+    def test_pal_db_ben_10_poe(self):
+        self.assertIn("SLES-54952", self.pal_serial_set,
+                      "Ben 10: Protector of Earth PAL (SLES-54952) missing from PAL DB")

@@ -1590,6 +1590,26 @@
       "publisher": "DreamCatcher Interactive",
       "region": "PAL",
       "release_date": "2003-11-14"
+    },
+    "Naruto: Ultimate Ninja 5 (PAL)": {
+      "serial": "SLES-55605",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "CyberConnect2",
+      "genre": "Fighting",
+      "publisher": "Namco Bandai",
+      "region": "PAL",
+      "release_date": "2008-11-28"
+    },
+    "Ben 10: Protector of Earth (PAL)": {
+      "serial": "SLES-54952",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "High Voltage Software",
+      "genre": "Action",
+      "publisher": "D3 Publisher",
+      "region": "PAL",
+      "release_date": "2007-10-26"
     }
   },
   "version": "1.0"
