@@ -140,7 +140,12 @@
       "release_date": "2001-11-01",
       "developer": "Namco Bandai",
       "publisher": "Namco Bandai",
-      "genre": "Action, Shooter, Flight Simulator."
+      "genre": "Action, Shooter, Flight Simulator.",
+      "crc_labels": {
+        "9420D4F1": "v1.00",
+        "B54B0573": "v1.01",
+        "D2C31B25": "v1.02"
+      }
     },
     "Ace Combat 5: The Unsung War": {
       "serial": "SLUS-20851",
@@ -152,7 +157,11 @@
       "release_date": "2004-10-25",
       "developer": "Project Aces",
       "publisher": "Namco",
-      "genre": "Action, Shooter, Simulation."
+      "genre": "Action, Shooter, Simulation.",
+      "crc_labels": {
+        "4E5E69C7": "v1.00",
+        "DA5CC7A3": "v1.01"
+      }
     },
     "Ace Combat Zero: The Belkan War": {
       "serial": "SLUS-21346",
@@ -165,7 +174,12 @@
       "release_date": "2006-04-25",
       "developer": "Namco Bandai Games",
       "publisher": "Namco Bandai Games",
-      "genre": "Simulation"
+      "genre": "Simulation",
+      "crc_labels": {
+        "3E9E7B49": "v1.00",
+        "B3A9F9ED": "v1.01",
+        "BF5C2EAB": "v1.02"
+      }
     },
     "Ape Escape 2": {
       "serial": "SLUS-20685",
@@ -327,8 +341,7 @@
       "serial": "SLUS-21327",
       "alt_serials": [],
       "crcs": [
-        "8E9C0D58",
-        "FCD6E9FA"
+        "8E9C0D58"
       ],
       "release_date": "2006-04-25",
       "developer": "Gust",
@@ -414,7 +427,11 @@
       "release_date": "2006-02-28",
       "developer": "Criterion Studios",
       "publisher": "Electronic Arts",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "5C891FF1": "v1.00",
+        "F0A235B4": "v1.01"
+      }
     },
     "Blood Omen 2: Legacy of Kain": {
       "serial": "SLUS-20024",
@@ -428,7 +445,6 @@
       "serial": "SLUS-20499",
       "alt_serials": [],
       "crcs": [
-        "C2C5FE5F",
         "E8AC8B3A"
       ],
       "release_date": "2003-02-16",
@@ -456,7 +472,12 @@
       "release_date": "2006-10-17",
       "developer": "Rockstar Games",
       "publisher": "Rockstar Games",
-      "genre": "Action, Adventure."
+      "genre": "Action, Adventure.",
+      "crc_labels": {
+        "28703748": "v1.00",
+        "5C7B2BDD": "v1.01",
+        "A86571F9": "v1.02"
+      }
     },
     "Burnout": {
       "serial": "SLUS-20307",
@@ -530,7 +551,11 @@
       "release_date": "2005-09-13",
       "developer": "Criterion Games",
       "publisher": "Electronic Arts",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "278700A0": "v1.00",
+        "C8FBC640": "v1.01"
+      }
     },
     "Call of Duty 2: Big Red One": {
       "serial": "SLUS-21228",
@@ -846,7 +871,6 @@
       ],
       "crcs": [
         "9E0C4BC3",
-        "C2C5FE5F",
         "F4A7473E"
       ],
       "release_date": "2001-10-16",
@@ -855,7 +879,6 @@
       "genre": "Action, Shooter, Survival Horror",
       "crc_labels": {
         "9E0C4BC3": "v1.00",
-        "C2C5FE5F": "v1.01",
         "F4A7473E": "Greatest Hits"
       }
     },
@@ -908,12 +931,16 @@
       "serial": "SLUS-20964",
       "alt_serials": [],
       "crcs": [
-        "4C416932"
+        "4C416932",
+        "7ADCB24A"
       ],
       "release_date": "2005-03-01",
       "developer": "Capcom",
       "publisher": "Capcom",
-      "genre": "Action-Adventure"
+      "genre": "Action-Adventure",
+      "crc_labels": {
+        "7ADCB24A": "v1.00 (patched)"
+      }
     },
     "Devil May Cry 3 (DMD complete)": {
       "serial": "SLUS-20964",
@@ -939,7 +966,8 @@
       "serial": "SLUS-21361",
       "alt_serials": [],
       "crcs": [
-        "0EC5F7A0"
+        "0EC5F7A0",
+        "4C45B7CF"
       ]
     },
     "Devil Summoner 2: Raidou Kuzunoha vs. King Abaddon": {
@@ -1043,12 +1071,16 @@
       "crcs": [
         "428113C2",
         "4A9A1ABE",
-        "A9FE1E04"
+        "A9FE1E04",
+        "2A4B60EB"
       ],
       "release_date": "2004-11-16",
       "developer": "Dimps Corporation",
       "publisher": "Atari",
-      "genre": "Fighting"
+      "genre": "Fighting",
+      "crc_labels": {
+        "2A4B60EB": "v1.01"
+      }
     },
     "Dragon Ball Z: Budokai Tenkaichi": {
       "serial": "SLUS-21227",
@@ -1115,7 +1147,11 @@
       "release_date": "2005-11-15",
       "developer": "Level 5",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "F53B6210": "v1.00",
+        "DA0F1E34": "v1.01"
+      }
     },
     "Dragon Quest VIII (post-game save)": {
       "serial": "SLUS-21207",
@@ -1127,7 +1163,11 @@
       "release_date": "2005-11-15",
       "developer": "Level 5",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "F53B6210": "v1.00",
+        "DA0F1E34": "v1.01"
+      }
     },
     "Dragon Quest VIII: Journey of the Cursed King": {
       "serial": "SLUS-21207",
@@ -1170,7 +1210,8 @@
       "serial": "SLUS-21373",
       "alt_serials": [],
       "crcs": [
-        "1648E3C9"
+        "1648E3C9",
+        "CE48FF9F"
       ],
       "release_date": "2006-02-14",
       "developer": "Cavia",
@@ -1266,7 +1307,8 @@
         "2C2B7C50",
         "9A51B627",
         "9B4D085A",
-        "A9461CB0"
+        "A9461CB0",
+        "25A2A16E"
       ],
       "release_date": "2003-12-12",
       "developer": "Tecmo",
@@ -1302,32 +1344,26 @@
         "CF8ABA10": "Greatest Hits"
       }
     },
-    "Final Fantasy X / XII": {
-      "serial": "SLUS-20312",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-12-17",
-      "developer": "Square Co. Ltd",
-      "publisher": "Square Enix",
-      "genre": "RPG"
-    },
     "Final Fantasy X-2": {
       "serial": "SLUS-20672",
       "alt_serials": [
         "SLES-51815"
       ],
-      "crcs": [],
+      "crcs": [
+        "48FE0C71"
+      ],
       "release_date": "2003-11-18",
       "developer": "Square Enix",
       "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "48FE0C71": "v1.01"
+      }
     },
     "Final Fantasy X-2 (100% complete)": {
       "serial": "SLUS-20672",
       "alt_serials": [],
-      "crcs": [
-        "E2F01792"
-      ],
+      "crcs": [],
       "release_date": "2003-11-18",
       "developer": "Square Enix",
       "publisher": "Square Enix",
@@ -1336,9 +1372,7 @@
     "Final Fantasy XI": {
       "serial": "SCUS-97266",
       "alt_serials": [],
-      "crcs": [
-        "C2C5FE5F"
-      ],
+      "crcs": [],
       "release_date": "2006-06-15",
       "developer": "Square PDD 3",
       "publisher": "Sony Computer Entertainment",
@@ -1347,9 +1381,7 @@
     "Final Fantasy XI Online": {
       "serial": "SCUS-97271",
       "alt_serials": [],
-      "crcs": [
-        "C2C5FE5F"
-      ]
+      "crcs": []
     },
     "Final Fantasy XII": {
       "serial": "SLUS-20963",
@@ -1572,6 +1604,7 @@
         "77E61C8A",
         "77FEA582",
         "8D057621",
+        "44A61C8F",
         "E5BD2EA5"
       ],
       "release_date": "2006-03-01",
@@ -1582,7 +1615,8 @@
         "77E61C8A": "v1.00",
         "77FEA582": "v1.01",
         "8D057621": "v1.02",
-        "E5BD2EA5": "Greatest Hits"
+        "E5BD2EA5": "Greatest Hits",
+        "44A61C8F": "v1.00 (JPN/patched)"
       }
     },
     "Gran Turismo 4 Prologue": {
@@ -1603,18 +1637,26 @@
       "release_date": "2001-10-23",
       "developer": "DMA Design Ltd",
       "publisher": "Rockstar Games",
-      "genre": "Action, Driving, Shooter"
+      "genre": "Action, Driving, Shooter",
+      "crc_labels": {
+        "5E115FB6": "v1.00",
+        "6F0E2BEE": "v1.01"
+      }
     },
     "Grand Theft Auto: Liberty City Stories": {
       "serial": "SLUS-21423",
       "alt_serials": [],
       "crcs": [
-        "0000C5AB"
+        "0000C5AB",
+        "7EA439F5"
       ],
       "release_date": "2006-06-06",
       "developer": "Rockstar Leeds",
       "publisher": "Rockstar Games",
-      "genre": "Action-Adventure"
+      "genre": "Action-Adventure",
+      "crc_labels": {
+        "7EA439F5": "v1.00 (patched)"
+      }
     },
     "Grand Theft Auto: San Andreas": {
       "serial": "SLUS-20946",
@@ -1856,13 +1898,16 @@
       "crcs": [
         "321DF6F5",
         "3B340B97",
-        "4B80628D",
-        "C0FC8DA6"
+        "C0FC8DA6",
+        "901AAC09"
       ],
       "release_date": "2005-05-10",
       "developer": "Capcom Production Studio 1",
       "publisher": "Capcom",
-      "genre": "Survival Horror"
+      "genre": "Survival Horror",
+      "crc_labels": {
+        "901AAC09": "v1.01"
+      }
     },
     "Hitman 2: Silent Assassin": {
       "serial": "SLUS-20374",
@@ -1991,15 +2036,6 @@
         "C5CA2AB3": "Greatest Hits"
       }
     },
-    "Jak II / Jak 3": {
-      "serial": "SCUS-97265",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2003-10-14",
-      "developer": "Naughty Dog",
-      "publisher": "Sony",
-      "genre": "Action, Adventure, Platform."
-    },
     "Jak X: Combat Racing": {
       "serial": "SCUS-97429",
       "alt_serials": [],
@@ -2015,7 +2051,6 @@
       ],
       "crcs": [
         "2B2570A0",
-        "44A61C8F",
         "4D33E38A",
         "FFF16BAB"
       ],
@@ -2025,7 +2060,6 @@
       "genre": "Action, Adventure, Platform.",
       "crc_labels": {
         "2B2570A0": "v1.00",
-        "44A61C8F": "v1.01",
         "4D33E38A": "v1.02",
         "FFF16BAB": "Greatest Hits"
       }
@@ -2040,7 +2074,11 @@
       "release_date": "2004-09-21",
       "developer": "Now Production",
       "publisher": "Namco",
-      "genre": "Action."
+      "genre": "Action.",
+      "crc_labels": {
+        "09F2E574": "v1.00",
+        "D71B573D": "v1.01"
+      }
     },
     "Killzone": {
       "serial": "SCUS-97402",
@@ -2075,7 +2113,8 @@
         "39BB7DF5",
         "B3A9F9D5",
         "B7C17543",
-        "C2E7F10B"
+        "C2E7F10B",
+        "AE3EAA05"
       ],
       "release_date": "2002-09-16",
       "developer": "Square Enix",
@@ -2086,7 +2125,8 @@
         "B7C17543": "v1.01",
         "C2E7F10B": "v1.02",
         "0F6B6315": "Greatest Hits",
-        "B3A9F9D5": "Greatest Hits v1.01"
+        "B3A9F9D5": "Greatest Hits v1.01",
+        "AE3EAA05": "v1.00 (patched)"
       }
     },
     "Kingdom Hearts (Greatest Hits)": {
@@ -2213,7 +2253,10 @@
       "release_date": "2002-10-01",
       "developer": "Prokion",
       "publisher": "Fresh Games, Eidos Interactive",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crcs": [
+        "AE64F9B7"
+      ]
     },
     "Leisure Suit Larry: Magna Cum Laude": {
       "serial": "SLUS-20956",
@@ -2289,13 +2332,16 @@
       "release_date": "2003-11-18",
       "developer": "Rockstar North",
       "publisher": "Rockstar Games",
-      "genre": "Action."
+      "genre": "Action.",
+      "crc_labels": {
+        "38DEA143": "v1.00",
+        "3B75CE2F": "v1.01"
+      }
     },
     "Manhunt 2": {
       "serial": "SLUS-21613",
       "alt_serials": [],
       "crcs": [
-        "3B0ADBEF",
         "7C0D1E42"
       ],
       "release_date": "2007-10-30",
@@ -2514,7 +2560,7 @@
       "alt_serials": []
     },
     "Midnight Club 3: DUB Edition Remix": {
-      "serial": "SLUS-21029",
+      "serial": "SLUS-21355",
       "alt_serials": [],
       "crcs": [
         "C2395B46"
@@ -2578,7 +2624,11 @@
       "release_date": "2004-10-04",
       "developer": "Midway Amusement Games, LLC",
       "publisher": "Midway",
-      "genre": "Action, Adventure, Beat'em Up, Chess, Fighting, Puzzle."
+      "genre": "Action, Adventure, Beat'em Up, Chess, Fighting, Puzzle.",
+      "crc_labels": {
+        "79E17EE2": "v1.00",
+        "C7C09A27": "v1.01"
+      }
     },
     "NBA Street Vol. 2": {
       "serial": "SLUS-20651",
@@ -2669,9 +2719,7 @@
     "Need for Speed: Hot Pursuit 2": {
       "serial": "SLUS-20362",
       "alt_serials": [],
-      "crcs": [
-        "96660560"
-      ],
+      "crcs": [],
       "release_date": "2002-10-01",
       "developer": "DreamWorks Interactive",
       "publisher": "Electronic Arts",
@@ -2710,8 +2758,8 @@
       "alt_serials": [],
       "crcs": [
         "6A2B7C19",
-        "96660560",
-        "F5C7B45F"
+        "F5C7B45F",
+        "E2F01792"
       ],
       "release_date": "2004-11-16",
       "developer": "EA",
@@ -2759,7 +2807,12 @@
       "release_date": "2006-09-19",
       "developer": "Clover Studio",
       "publisher": "Capcom",
-      "genre": "Action, Plataformer"
+      "genre": "Action, Plataformer",
+      "crc_labels": {
+        "1B594C95": "v1.00",
+        "21068223": "v1.01",
+        "F5D9DBBD": "v1.02"
+      }
     },
     "Onimusha 2: Samurai's Destiny": {
       "serial": "SLUS-20393",
@@ -2834,8 +2887,12 @@
       "serial": "SLUS-21782",
       "alt_serials": [],
       "crcs": [
-        "0F6C0DB9"
-      ]
+        "0F6C0DB9",
+        "DEDC3B71"
+      ],
+      "crc_labels": {
+        "DEDC3B71": "v1.01"
+      }
     },
     "Phantom Brave": {
       "serial": "SLUS-20955",
@@ -2927,12 +2984,16 @@
       "serial": "SLUS-21262",
       "alt_serials": [],
       "crcs": [
-        "7CDA5F31"
+        "7CDA5F31",
+        "47B9B2FD"
       ],
       "release_date": "2005-09-06",
       "developer": "tri-Ace",
       "publisher": "Square Enix",
-      "genre": "Action, RPG."
+      "genre": "Action, RPG.",
+      "crc_labels": {
+        "47B9B2FD": "v1.01"
+      }
     },
     "Ratchet & Clank": {
       "serial": "SCUS-97199",
@@ -2955,15 +3016,6 @@
         "AF9B5C62": "v1.02",
         "E4E70DCE": "Greatest Hits"
       }
-    },
-    "Ratchet & Clank series": {
-      "serial": "SCUS-97199",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2002-11-04",
-      "developer": "Insomniac Games",
-      "publisher": "Sony",
-      "genre": "Action, PLatformer, Shooter."
     },
     "Ratchet & Clank: Going Commando": {
       "serial": "SCUS-97268",
@@ -3043,10 +3095,7 @@
     "Resident Evil": {
       "serial": "SLUS-20184",
       "alt_serials": [],
-      "crcs": [
-        "24036809",
-        "3BD4F8EB"
-      ],
+      "crcs": [],
       "release_date": "2001-08-21",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -3094,8 +3143,7 @@
       "serial": "SLUS-20984",
       "alt_serials": [],
       "crcs": [
-        "C0437D3A",
-        "E360416A"
+        "C0437D3A"
       ],
       "release_date": "2005-04-26",
       "developer": "Capcom",
@@ -3158,7 +3206,11 @@
       "release_date": "2000-10-26",
       "developer": "Namco",
       "publisher": "Namco",
-      "genre": "Racing"
+      "genre": "Racing",
+      "crc_labels": {
+        "1F2C2BCE": "v1.00",
+        "5D498EE4": "v1.01"
+      }
     },
     "Ring of Red": {
       "serial": "SLUS-20145",
@@ -3278,7 +3330,8 @@
       "serial": "SLUS-20878",
       "alt_serials": [],
       "crcs": [
-        "CF11CD83"
+        "CF11CD83",
+        "D6F4BE78"
       ],
       "release_date": "2004-02-24",
       "developer": "Koei",
@@ -3561,7 +3614,11 @@
       "release_date": "2002-09-23",
       "developer": "Sucker Punch Productions",
       "publisher": "Sony Computer Entertainment",
-      "genre": "Action, Platformer."
+      "genre": "Action, Platformer.",
+      "crc_labels": {
+        "0FC13116": "v1.00",
+        "4A8DE991": "v1.01"
+      }
     },
     "Sonic Heroes": {
       "serial": "SLUS-20718",
@@ -3607,7 +3664,12 @@
       "release_date": "2003-08-27",
       "developer": "Project Soul",
       "publisher": "Namco",
-      "genre": "Fighting."
+      "genre": "Fighting.",
+      "crc_labels": {
+        "3A66F702": "v1.00",
+        "6E3E2B4E": "v1.01",
+        "E1B01308": "v1.02"
+      }
     },
     "SoulCalibur III": {
       "serial": "SLUS-21216",
@@ -3690,7 +3752,8 @@
         "SLUS-20891"
       ],
       "crcs": [
-        "CF5F6552"
+        "CF5F6552",
+        "33EC7780"
       ],
       "release_date": "2004-08-31",
       "developer": "tri-Ace",
@@ -3811,7 +3874,8 @@
       "serial": "SLUS-21291",
       "alt_serials": [],
       "crcs": [
-        "BCD0B7CD"
+        "BCD0B7CD",
+        "8028A9B5"
       ],
       "release_date": "2006-03-21",
       "developer": "Konami Computer Entertainment Japan",
@@ -4010,8 +4074,7 @@
       "alt_serials": [],
       "crcs": [
         "3F9E2D59",
-        "B67577F3",
-        "E360416A"
+        "B67577F3"
       ],
       "release_date": "2005-10-25",
       "developer": "Maxis",
@@ -4129,7 +4192,12 @@
       "release_date": "2001-10-31",
       "developer": "Activision",
       "publisher": "Neversoft Entertainment",
-      "genre": "Sports"
+      "genre": "Sports",
+      "crc_labels": {
+        "20E7CC63": "v1.00",
+        "5C6B98D8": "v1.01",
+        "77DEA027": "v1.02"
+      }
     },
     "Tony Hawk's Pro Skater 4": {
       "serial": "SLUS-20504",
@@ -4163,7 +4231,12 @@
       "release_date": "2003-10-28",
       "developer": "Neversoft Entertainment",
       "publisher": "Activision",
-      "genre": "Skateboarding."
+      "genre": "Skateboarding.",
+      "crc_labels": {
+        "8A9CE7E6": "v1.00",
+        "B222B7A4": "v1.01",
+        "ED21DDE0": "v1.02"
+      }
     },
     "Tony Hawk's Underground 2": {
       "serial": "SLUS-20965",
@@ -4231,7 +4304,11 @@
       "release_date": "2006-09-26",
       "developer": "tri-Ace",
       "publisher": "Square Enix",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "2B81C7F3": "v1.00",
+        "2CFF5D40": "v1.01"
+      }
     },
     "Viewtiful Joe": {
       "serial": "SLUS-20951",
@@ -4366,7 +4443,11 @@
       "release_date": "2002-10-15",
       "developer": "Media Vision (Sony)",
       "publisher": "Sony",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "A53C9EC5": "v1.00",
+        "B5B09F5D": "v1.01"
+      }
     },
     "Wild ARMs 4": {
       "serial": "SLUS-21292",
@@ -4410,7 +4491,8 @@
       "serial": "SLUS-21615",
       "alt_serials": [],
       "crcs": [
-        "ADFCC5A1"
+        "ADFCC5A1",
+        "7D9D0E40"
       ],
       "release_date": "2007-08-28",
       "developer": "Media.Vision",
@@ -4448,7 +4530,12 @@
       "release_date": "2003-02-26",
       "developer": "Monolith Soft",
       "publisher": "Namco",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "7F52BE3B": "v1.00",
+        "A790F8C9": "v1.01",
+        "E4FD7B8D": "v1.02"
+      }
     },
     "Xenosaga Episode I: Der Wille zur Macht": {
       "serial": "SLUS-20469",
@@ -4461,7 +4548,12 @@
       "release_date": "2003-02-26",
       "developer": "Monolith Soft",
       "publisher": "Namco",
-      "genre": "RPG"
+      "genre": "RPG",
+      "crc_labels": {
+        "7F52BE3B": "v1.00",
+        "A790F8C9": "v1.01",
+        "E4FD7B8D": "v1.02"
+      }
     },
     "Xenosaga Episode II": {
       "serial": "SLUS-20892",
@@ -4551,7 +4643,10 @@
       "release_date": "2005-02-22",
       "developer": "Falcon",
       "publisher": "Konami",
-      "genre": "Action RPG"
+      "genre": "Action RPG",
+      "crcs": [
+        "1E75FE3A"
+      ]
     },
     "Zone of the Enders": {
       "serial": "SLUS-20148",
@@ -5369,7 +5464,8 @@
       "serial": "SLUS-20976",
       "alt_serials": [],
       "crcs": [
-        "9AB1CAE9"
+        "9AB1CAE9",
+        "47E1A07A"
       ],
       "release_date": "2005-03-22",
       "developer": "Razorworks Stodio",
@@ -7897,9 +7993,7 @@
     "Motocross Mania 3": {
       "serial": "SLUS-21229",
       "alt_serials": [],
-      "crcs": [
-        "00E9B795"
-      ],
+      "crcs": [],
       "release_date": "2005-05-01",
       "developer": "Deibus Studios",
       "publisher": "Global Star Software",
@@ -8110,9 +8204,7 @@
     "Curious George": {
       "serial": "SLUS-21354",
       "alt_serials": [],
-      "crcs": [
-        "8DB76084"
-      ],
+      "crcs": [],
       "release_date": "2006-09-08",
       "developer": "Monkey Bar Games",
       "publisher": "Namco",
@@ -8180,7 +8272,6 @@
       "serial": "SLUS-21400",
       "alt_serials": [],
       "crcs": [
-        "1AFD7469",
         "836BBACE"
       ],
       "release_date": "2006-07-18",
@@ -8381,7 +8472,10 @@
       "release_date": "2006-10-24",
       "developer": "Monkey Bar Games",
       "publisher": "D3 Publisher",
-      "genre": "Action, Platformer."
+      "genre": "Action, Platformer.",
+      "crcs": [
+        "8DB76084"
+      ]
     },
     "Eagle Eye Golf": {
       "serial": "SLUS-21486",
@@ -8570,7 +8664,6 @@
       "serial": "SLUS-21205",
       "alt_serials": [],
       "crcs": [
-        "9FA0A1B0",
         "FA37A58A"
       ],
       "release_date": "2005-11-15",
@@ -8629,7 +8722,8 @@
       "serial": "SLUS-20831",
       "alt_serials": [],
       "crcs": [
-        "0F932D81"
+        "0F932D81",
+        "0F9348FF"
       ],
       "release_date": "2003-11-18",
       "developer": "Crave Entertainment",
@@ -9941,17 +10035,6 @@
       "publisher": "Ubisoft",
       "genre": "Third-person Shooter"
     },
-    "Godfather, The": {
-      "serial": "SLUS-21406",
-      "alt_serials": [],
-      "crcs": [
-        "D850707E"
-      ],
-      "release_date": "2006-03-21",
-      "developer": "EA Redwood Shores",
-      "publisher": "Electronic Arts",
-      "genre": "Action."
-    },
     "Nickelodeon SpongeBob SquarePants - Creature from the Krusty Krab": {
       "serial": "SLUS-21391",
       "alt_serials": [],
@@ -10666,9 +10749,7 @@
     },
     "The Godfather": {
       "serial": "SLUS-21385",
-      "alt_serials": [
-        "SLUS-21406"
-      ],
+      "alt_serials": [],
       "crcs": [
         "D850707E"
       ],
@@ -12180,7 +12261,9 @@
     "NFL Blitz 2002": {
       "serial": "SLUS-20051",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "3A32FD60"
+      ],
       "release_date": "2002-02-07",
       "developer": "Midway",
       "publisher": "Midway",
@@ -14843,7 +14926,9 @@
     "Tim Burton's The Nightmare Before Christmas: Oogie's Revenge": {
       "serial": "SLUS-20860",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "8AD8BA91"
+      ],
       "release_date": "2005-10-10",
       "developer": "Capcom Co., Ltd",
       "publisher": "Buena Vista Games Inc",
@@ -15208,7 +15293,9 @@
     "Enthusia: Professional Racing": {
       "serial": "SLUS-20967",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "81D233DC"
+      ],
       "release_date": "2005-05-03",
       "developer": "Konami",
       "publisher": "Konami",
@@ -16918,7 +17005,9 @@
     "Delta Force: Black Hawk Down: Team Sabre": {
       "serial": "SLUS-21414",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "A8DB29DF"
+      ],
       "developer": "Rebellion",
       "publisher": "NovaLogic",
       "genre": "First-person Shooter"
@@ -18127,7 +18216,9 @@
     "Alone in the Dark": {
       "serial": "SLUS-21690",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "1E811D9A"
+      ],
       "release_date": "2008-06-23",
       "developer": "Hydravision",
       "publisher": "Atari",
@@ -20768,6 +20859,15 @@
     "M&M's Adventure": {
       "serial": "SLUS-21875",
       "crcs": []
+    },
+    "The Godfather (Limited Edition)": {
+      "serial": "SLUS-21406",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2006-03-21",
+      "developer": "EA Redwood Shores",
+      "publisher": "Electronic Arts",
+      "genre": "Action."
     }
   }
 }

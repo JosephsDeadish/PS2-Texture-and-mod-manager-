@@ -184,6 +184,225 @@ def get_dump_textures_guidance() -> dict:
 
 
 # ---------------------------------------------------------------------------
+# PNACH capabilities — what patches can and cannot do
+# ---------------------------------------------------------------------------
+
+#: Brief summary of what PNACH patches are capable of.
+PNACH_WHAT_IT_DOES: str = (
+    "PNACH patches are raw memory-write files applied by PCSX2 on game boot.  "
+    "They can: modify game constants (health, ammo, speed), unlock features, "
+    "fix frame-rate limiters (60 fps patches), enable widescreen rendering, "
+    "adjust physics values, and redirect code execution via code-cave injection."
+)
+
+#: Brief summary of what PNACH patches cannot do.
+PNACH_WHAT_IT_CANNOT_DO: str = (
+    "PNACH patches cannot: add new game content, replace audio or video assets, "
+    "change textures (use the texture replacement system instead), or run "
+    "arbitrary compiled code outside the PS2 EE processor's address space.  "
+    "They also have no effect if 'Enable Cheats' is not ticked in PCSX2."
+)
+
+#: Tuple of (capability, limitation) string pairs for structured display.
+PNACH_CAPABILITIES: tuple[tuple[str, str], ...] = (
+    ("Modify game values", "Health, ammo, money, speed, timers"),
+    ("Fix frame-rate", "60 fps and frame-pacing patches via code caves"),
+    ("Widescreen", "Aspect-ratio override writes to renderer constants"),
+    ("Unlock features", "Force-enable debug modes, skip checks, unlock levels"),
+    ("Code caves", "Redirect EE code to injected MIPS instructions"),
+    ("No texture changes", "Use the texture replacement system for visuals"),
+    ("No new content", "Cannot add assets that don't exist in the game binary"),
+    ("CRC-specific", "Each patch file targets exactly one game CRC (disc build)"),
+)
+
+
+# ---------------------------------------------------------------------------
+# CRC matching guidance
+# ---------------------------------------------------------------------------
+
+#: Plain-English hint explaining why CRC matching matters for PNACH patches.
+CRC_MATCH_HINT: str = (
+    "⚠️  Every PNACH patch file is tied to a single game CRC — the 8-character "
+    "hex checksum PCSX2 computes from the disc image.  If the CRC of your disc "
+    "does not exactly match the CRC in the patch filename, the patch is silently "
+    "ignored.  Different regional releases, Greatest Hits pressings, or "
+    "'complete edition' discs almost always have different CRCs even for the "
+    "same game title.  Check the PCSX2 title bar or game properties to find "
+    "your disc's CRC, and use that value when naming or selecting a patch."
+)
+
+#: Step-by-step instructions for finding a game's CRC inside PCSX2.
+PCSX2_FIND_CRC_STEPS: tuple[str, ...] = (
+    "Launch the game in PCSX2.",
+    "Look at the PCSX2 window title bar — it shows the game CRC in brackets, "
+    "e.g. 'Game Title [F0A235B4]'.",
+    "Alternatively, right-click the game in the PCSX2 game list and choose "
+    "'Properties' — the CRC is shown on the 'Summary' tab.",
+    "Use this 8-character hex value as the name of your PNACH file, "
+    "e.g. F0A235B4.pnach, and place it in the cheats/ folder.",
+)
+
+
+# ---------------------------------------------------------------------------
+# PNACH troubleshooting guidance
+# ---------------------------------------------------------------------------
+
+#: Plain-English hint shown when a user reports that patches are not working.
+PNACH_TROUBLESHOOT_HINT: str = (
+    "🔧  If a PNACH patch is not taking effect, work through the checklist below.  "
+    "The most common cause is a CRC mismatch — the patch file name must exactly "
+    "match the 8-character hex CRC that PCSX2 shows for your disc."
+)
+
+#: Step-by-step troubleshooting checklist for PNACH patches not working.
+PNACH_TROUBLESHOOT_STEPS: tuple[str, ...] = (
+    "Confirm 'Enable Cheats' is ticked: right-click the game → Properties → "
+    "Patches tab → tick 'Enable Cheats'.",
+    "Check the CRC: the patch filename (e.g. F0A235B4.pnach) must exactly match "
+    "the CRC shown in the PCSX2 title bar or game Properties → Summary.",
+    "Verify the patch file is in the correct folder: "
+    "<pcsx2_root>/cheats/<CRC>.pnach  (not in patches/ or cheats_ws/).",
+    "Restart the game completely — patches are only applied on boot, not mid-session.",
+    "Open the PCSX2 log (View → Log Window) and look for lines mentioning the "
+    "patch file; warnings such as 'not found' or 'bad CRC' indicate the problem.",
+    "If using a Greatest Hits, Platinum, or non-NTSC disc, obtain a patch file "
+    "built for that specific CRC — the addresses differ between pressings.",
+    "Confirm the patch uses valid EE address ranges (0x00000000–0x01FFFFFF for "
+    "main RAM); addresses outside this range will not be applied.",
+)
+
+
+# ---------------------------------------------------------------------------
+# Texture replacement troubleshooting guidance
+# ---------------------------------------------------------------------------
+
+#: Plain-English hint shown when texture replacements are not loading.
+TEXTURE_TROUBLESHOOT_HINT: str = (
+    "🔧  If replacement textures are not appearing in-game, work through the "
+    "checklist below.  The path layout must be exact: PCSX2 is case-sensitive "
+    "on Linux and expects the serial in 'XXXX-NNNNN' format."
+)
+
+#: Step-by-step troubleshooting checklist for texture replacement issues.
+TEXTURE_TROUBLESHOOT_STEPS: tuple[str, ...] = (
+    "Enable texture loading: right-click the game → Properties → Graphics tab → "
+    "tick 'Load Textures'.",
+    "Verify the folder layout: textures/<SERIAL>/replacements/<filename>.  "
+    "The serial must be in normalised form, e.g. SLUS-20062 (uppercase, hyphen).",
+    "Confirm the texture filenames match the names dumped by PCSX2 exactly — "
+    "including capitalisation.  On Linux the filesystem is case-sensitive.",
+    "Check that the texture files are PNG or DDS — other formats are not loaded "
+    "by PCSX2's texture replacement system.",
+    "If textures still do not load, enable 'Dump Textures' for one session to "
+    "see what filenames PCSX2 expects, then rename your replacements to match.",
+    "Tick 'Precache Textures' to avoid stutter when textures are loaded lazily "
+    "for the first time during gameplay.",
+    "Restart the game after making any changes — texture replacements are loaded "
+    "on game boot, not during an active session.",
+)
+
+
+# ---------------------------------------------------------------------------
+# Cover art guidance
+# ---------------------------------------------------------------------------
+
+#: Plain-English hint explaining how cover art is used in PCSX2.
+COVER_ART_HINT: str = (
+    "ℹ️  PCSX2 displays cover art in the game list when an image named after the "
+    "disc serial is placed in the covers/ folder.  The file must be named "
+    "<SERIAL>.png (e.g. SLUS-20062.png) and placed directly in covers/ — "
+    "sub-folders are not searched.  Recommended resolution is 512 × 512 px or "
+    "a standard game-box aspect ratio (2:3).  JPEG files are also accepted "
+    "(.jpg extension) but PNG is preferred for quality."
+)
+
+#: Step-by-step instructions for adding cover art in PCSX2.
+PCSX2_ADD_COVER_ART_STEPS: tuple[str, ...] = (
+    "Find or create a cover image for the game (PNG recommended, ~512 × 512 px).",
+    "Rename the file to match the disc serial in 'XXXX-NNNNN' form, "
+    "e.g. SLUS-20062.png.",
+    "Copy the file into <pcsx2_root>/covers/.",
+    "Refresh the PCSX2 game list (right-click → Refresh or restart PCSX2) — "
+    "the cover art will appear next to the game entry.",
+)
+
+
+def get_pnach_troubleshoot_guidance() -> dict:
+    """Return structured troubleshooting guidance for PNACH patches.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": PNACH_TROUBLESHOOT_HINT,
+        "steps": list(PNACH_TROUBLESHOOT_STEPS),
+    }
+
+
+def get_texture_troubleshoot_guidance() -> dict:
+    """Return structured troubleshooting guidance for texture replacement.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": TEXTURE_TROUBLESHOOT_HINT,
+        "steps": list(TEXTURE_TROUBLESHOOT_STEPS),
+    }
+
+
+def get_pnach_capabilities() -> dict:
+    """Return a structured summary of PNACH patch capabilities and limits.
+
+    Returns
+    -------
+    dict
+        Keys: ``"can_do"`` (str), ``"cannot_do"`` (str),
+        ``"capabilities"`` (list[dict] with ``"feature"`` and ``"notes"`` keys).
+    """
+    return {
+        "can_do": PNACH_WHAT_IT_DOES,
+        "cannot_do": PNACH_WHAT_IT_CANNOT_DO,
+        "capabilities": [
+            {"feature": feat, "notes": notes}
+            for feat, notes in PNACH_CAPABILITIES
+        ],
+    }
+
+
+def get_crc_match_guidance() -> dict:
+    """Return structured guidance explaining CRC matching for PNACH patches.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": CRC_MATCH_HINT,
+        "steps": list(PCSX2_FIND_CRC_STEPS),
+    }
+
+
+def get_cover_art_guidance() -> dict:
+    """Return structured guidance for adding cover art in PCSX2.
+
+    Returns
+    -------
+    dict
+        Keys: ``"hint"`` (str), ``"steps"`` (list[str]).
+    """
+    return {
+        "hint": COVER_ART_HINT,
+        "steps": list(PCSX2_ADD_COVER_ART_STEPS),
+    }
+
+
+# ---------------------------------------------------------------------------
 # ModType → PCSX2 folder mapping
 # ---------------------------------------------------------------------------
 

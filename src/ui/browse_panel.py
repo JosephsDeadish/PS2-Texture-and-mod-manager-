@@ -2068,31 +2068,6 @@ class BrowsePanel(BasePanel):
         tools_row = QHBoxLayout()
         tools_row.setSpacing(6)
 
-        pnach_btn = QPushButton("🔧 Fetch PNACH from GitHub")
-        pnach_btn.setToolTip(
-            "Browse and download official PCSX2 widescreen PNACH patches "
-            "directly from the PCSX2 GitHub repository"
-        )
-        pnach_btn.clicked.connect(self._open_pnach_github_dialog)
-        tools_row.addWidget(pnach_btn)
-
-        gbatemp_btn = QPushButton("🔍 Scan GBAtemp/PS2-Home Post")
-        gbatemp_btn.setToolTip(
-            "Paste a GBAtemp thread, GBAtemp Downloads page, or PS2-Home forum topic URL "
-            "to auto-discover the author, game serial, and all download links "
-            "for one-click in-app installation"
-        )
-        gbatemp_btn.clicked.connect(self._open_gbatemp_scraper)
-        tools_row.addWidget(gbatemp_btn)
-
-        scan_btn = QPushButton("🔍 Scan PCSX2 Folder")
-        scan_btn.setToolTip(
-            "Scan your PCSX2 directory for texture packs, PNACH files, and cover art\n"
-            "that were installed outside of PS2 Mod Manager so you can manage them here"
-        )
-        scan_btn.clicked.connect(self._open_installed_scanner)
-        tools_row.addWidget(scan_btn)
-
         create_card_btn = QPushButton("✏ New Custom Card")
         create_card_btn.setToolTip(
             "Create a catalogue card for a mod not in the built-in catalogue.\n"
@@ -2100,17 +2075,6 @@ class BrowsePanel(BasePanel):
         )
         create_card_btn.clicked.connect(self._open_custom_card_dialog)
         tools_row.addWidget(create_card_btn)
-
-        conflict_btn = QPushButton("⚠ Resolve Conflicts")
-        conflict_btn.setToolTip(
-            "Scan your installed PCSX2 content for conflicts:\n"
-            "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
-            "• PNACH patches writing to the same memory address\n"
-            "• Multiple cover-art images for the same serial\n"
-            "• Merged texture packs that may override each other"
-        )
-        conflict_btn.clicked.connect(self._open_conflict_resolver)
-        tools_row.addWidget(conflict_btn)
 
         backup_btn = QPushButton("💾 Backup / Restore")
         backup_btn.setToolTip(
@@ -2121,26 +2085,6 @@ class BrowsePanel(BasePanel):
         )
         backup_btn.clicked.connect(self._open_backup_manager)
         tools_row.addWidget(backup_btn)
-
-        history_btn = QPushButton("📋 History")
-        history_btn.setToolTip(
-            "View the download and installation history log:\n"
-            "• Browse past installations by type, status or serial\n"
-            "• Delete individual entries or clear the whole log\n"
-            "• Export the log as a CSV file"
-        )
-        history_btn.clicked.connect(self._open_download_history)
-        tools_row.addWidget(history_btn)
-
-        notes_btn = QPushButton("📝 Notes")
-        notes_btn.setToolTip(
-            "Write and manage personal notes for catalogue entries:\n"
-            "• Attach free-text annotations to any texture pack, PNACH or save\n"
-            "• Filter notes by mod type or search text\n"
-            "• Export all notes to a CSV file"
-        )
-        notes_btn.clicked.connect(self._open_mod_notes)
-        tools_row.addWidget(notes_btn)
 
         tools_row.addStretch()
         content.addLayout(tools_row)
@@ -2275,41 +2219,6 @@ class BrowsePanel(BasePanel):
         )
         note.setWordWrap(True)
         content.addWidget(note)
-
-        # ── Patreon support banner ────────────────────────────────────────
-        from PyQt6.QtWidgets import QFrame as _QFrame
-        patreon_frame = _QFrame()
-        patreon_frame.setObjectName("card")
-        patreon_frame.setStyleSheet(
-            "QFrame#card { border: 1px solid #f96854; background: #1e1010; "
-            "border-radius: 8px; padding: 0px; }"
-        )
-        patreon_row = QHBoxLayout(patreon_frame)
-        patreon_row.setContentsMargins(14, 10, 14, 10)
-        patreon_row.setSpacing(12)
-        heart_lbl = QLabel("❤")
-        heart_lbl.setStyleSheet("font-size: 24px;")
-        patreon_row.addWidget(heart_lbl)
-        p_msg = QLabel(
-            "<b style='color:#f96854;'>Enjoying PS2 Mod Manager?</b>  "
-            "Support the developer on "
-            "<a href='https://www.patreon.com/c/DeadOnTheInside' "
-            "style='color:#f96854;'>Patreon</a> "
-            "to keep the project alive!"
-        )
-        p_msg.setOpenExternalLinks(True)
-        p_msg.setWordWrap(False)
-        p_msg.setStyleSheet("color: #c0a0a0; font-size: 12px;")
-        patreon_row.addWidget(p_msg, 1)
-        p_btn = QPushButton("❤  Patreon")
-        p_btn.setObjectName("patreon_btn")
-        p_btn.setFixedWidth(110)
-        p_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        p_btn.clicked.connect(
-            lambda: self._open_url("https://www.patreon.com/c/DeadOnTheInside")
-        )
-        patreon_row.addWidget(p_btn)
-        content.addWidget(patreon_frame)
 
         # ── Tabs ─────────────────────────────────────────────────────────
         self._tabs = QTabWidget()

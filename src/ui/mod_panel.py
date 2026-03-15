@@ -200,6 +200,11 @@ class ModPanel(BasePanel):
         author_row.addWidget(self._count_lbl)
         content.addLayout(author_row)
 
+        # ---- PCSX2 guidance banner (texture / pnach / cheat panels only) ----
+        if self.mod_type in (ModType.TEXTURE_PACK, ModType.PNACH, ModType.CHEAT):
+            self._guidance_banner = self._make_guidance_banner()
+            content.addWidget(self._guidance_banner)
+
         # ---- Scroll area for mod items ----
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
@@ -222,6 +227,64 @@ class ModPanel(BasePanel):
     def refresh(self):
         self._refresh_author_filter()
         self._apply_filter()
+
+    def _make_guidance_banner(self) -> QWidget:
+        """Build a dismissable PCSX2 guidance banner for texture/pnach/cheat panels."""
+        from src.core.pcsx2_layout import PCSX2_TEXTURES_HINT, PCSX2_CHEATS_HINT
+
+        if self.mod_type == ModType.TEXTURE_PACK:
+            hint = PCSX2_TEXTURES_HINT
+            detail = (
+                "Right-click the game → Properties → Graphics tab → "
+                "tick <b>Load Textures</b>."
+            )
+        else:  # PNACH or CHEAT
+            hint = PCSX2_CHEATS_HINT
+            detail = (
+                "Right-click the game → Properties → Patches tab → "
+                "tick <b>Enable Cheats</b>."
+            )
+
+        banner = QFrame()
+        banner.setObjectName("guidance_banner")
+        banner.setStyleSheet(
+            "QFrame#guidance_banner {"
+            "  background: #1a2a1a; border: 1px solid #2a5a2a;"
+            "  border-radius: 4px; margin: 2px 0;"
+            "}"
+        )
+        row = QHBoxLayout(banner)
+        row.setContentsMargins(10, 6, 6, 6)
+        row.setSpacing(8)
+
+        icon_lbl = QLabel("ℹ️")
+        icon_lbl.setFixedWidth(20)
+        row.addWidget(icon_lbl)
+
+        text_col = QVBoxLayout()
+        text_col.setSpacing(2)
+        short_lbl = QLabel(hint)
+        short_lbl.setWordWrap(True)
+        short_lbl.setStyleSheet("color: #90d090; font-size: 11px;")
+        text_col.addWidget(short_lbl)
+        detail_lbl = QLabel(detail)
+        detail_lbl.setWordWrap(True)
+        detail_lbl.setStyleSheet("color: #60a060; font-size: 10px;")
+        text_col.addWidget(detail_lbl)
+        row.addLayout(text_col, 1)
+
+        dismiss_btn = QPushButton("✕")
+        dismiss_btn.setFixedSize(22, 22)
+        dismiss_btn.setToolTip("Dismiss this hint")
+        dismiss_btn.setStyleSheet(
+            "QPushButton { background: transparent; color: #60a060; "
+            "border: none; font-size: 12px; }"
+            "QPushButton:hover { color: #a0d0a0; }"
+        )
+        dismiss_btn.clicked.connect(banner.hide)
+        row.addWidget(dismiss_btn)
+
+        return banner
 
     def _refresh_author_filter(self):
         """Rebuild the author dropdown from the current mod list."""
@@ -584,6 +647,7 @@ class ModPanel(BasePanel):
         dlg = PnachCodeBuilderDialog(
             game_serial=serial,
             cheats_dir=cheats_dir,
+            config=self.config,
             parent=self,
         )
         dlg.exec()
