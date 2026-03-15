@@ -14844,29 +14844,29 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
 
     # -- alt_serial additions ----------------------------------------------
 
-    def test_ico_pal_has_sces_50760_alt_serial(self):
-        """Ico (PAL) must have SCES-50760 as an alt_serial."""
-        alt = self.games.get("Ico (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SCES-50760", alt,
-                      "Ico (PAL) must list SCES-50760 as alt_serial")
+    def test_ico_pal_has_sces_50760_primary_serial(self):
+        """Ico (PAL) must have SCES-50760 as the primary serial (Wave 79 fake SLES-51128 removed)."""
+        serial = self.games.get("Ico (PAL)", {}).get("serial", "")
+        self.assertEqual(serial, "SCES-50760",
+                         "Ico (PAL) primary serial must be SCES-50760")
 
-    def test_ffx_pal_has_sces_50492_alt_serial(self):
-        """Final Fantasy X (PAL) must have SCES-50492 as an alt_serial."""
-        alt = self.games.get("Final Fantasy X (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SCES-50492", alt,
-                      "Final Fantasy X (PAL) must list SCES-50492 as alt_serial")
+    def test_ffx_pal_has_sces_50492_primary_serial(self):
+        """Final Fantasy X (PAL) must have SCES-50492 as the primary serial (Wave 79 fake SLES-50490 reverted)."""
+        serial = self.games.get("Final Fantasy X (PAL)", {}).get("serial", "")
+        self.assertEqual(serial, "SCES-50492",
+                         "Final Fantasy X (PAL) primary serial must be SCES-50492")
 
-    def test_ffx2_pal_has_sles_51815_alt_serial(self):
-        """Final Fantasy X-2 (PAL) must have SLES-51815 as an alt_serial."""
-        alt = self.games.get("Final Fantasy X-2 (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SLES-51815", alt,
-                      "Final Fantasy X-2 (PAL) must list SLES-51815 as alt_serial")
+    def test_ffx2_pal_has_sles_51815_primary_serial(self):
+        """Final Fantasy X-2 (PAL) must have SLES-51815 (English) as the primary serial."""
+        serial = self.games.get("Final Fantasy X-2 (PAL)", {}).get("serial", "")
+        self.assertEqual(serial, "SLES-51815",
+                         "Final Fantasy X-2 (PAL) primary serial must be SLES-51815 (English)")
 
-    def test_rc_pal_has_sces_50916_alt_serial(self):
-        """Ratchet & Clank (PAL) must have SCES-50916 as an alt_serial."""
-        alt = self.games.get("Ratchet & Clank (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SCES-50916", alt,
-                      "Ratchet & Clank (PAL) must list SCES-50916 as alt_serial")
+    def test_rc_pal_has_sces_50916_primary_serial(self):
+        """Ratchet & Clank (PAL) must have SCES-50916 as the primary serial (Wave 79 fake SCES-50391 removed)."""
+        serial = self.games.get("Ratchet & Clank (PAL)", {}).get("serial", "")
+        self.assertEqual(serial, "SCES-50916",
+                         "Ratchet & Clank (PAL) primary serial must be SCES-50916")
 
     def test_crash_twinsanity_pal_has_sles_52568_primary_serial(self):
         """Crash Twinsanity (PAL) must have SLES-52568 as its primary serial (SLES-52606 was fabricated)."""
@@ -16204,19 +16204,20 @@ class TestWave78SerialNameFixes(unittest.TestCase):
 
 
 class TestWave79PalSerialFixes(unittest.TestCase):
-    """Wave 79 + Wave 80 corrections: PAL serial fixes (990 entries net).
+    """Wave 79 reverted: all 7 fabricated/wrong PAL serials replaced with reference-verified ones.
 
-    Wave 79 originally fixed 7 PAL CRC groups.  Wave 80 reverts the fabricated
-    SLES-52606 for CRC 1510E1D1 back to the real verified serial SLES-52568.
+    Wave 79 assigned unverified or wrong serials to 7 PAL CRC groups.  All 7
+    have been reverted to the real serials confirmed by the PS2 reference
+    attachments (PS2.titles.json / PS2.data.json / PS2_ID_List.htm).
 
-    Current state after Wave 80 correction:
-      1510E1D1  Crash Twinsanity (PAL):    SLES-52568 (real; SLES-52606 removed as fabricated)
-      2251E14D  Tekken 4 (PAL):            SLES-51552
-      5C991F4E  Ico (PAL):                 SLES-51128
-      6A8F18B9  Ratchet & Clank (PAL):     SCES-50391
-      7D8F539A  Devil May Cry (PAL):       SLES-50873
-      941BB7D9  Final Fantasy X (PAL):     SLES-50490
-      9AAC5309  Final Fantasy X-2 (PAL):   SLES-51818
+    Corrected state (verified against issue attachments):
+      1510E1D1  Crash Twinsanity (PAL):    SLES-52568  (SLES-52606 was fabricated)
+      2251E14D  Tekken 4 (PAL):            SCES-50878  (SLES-51552 was fabricated)
+      5C991F4E  Ico (PAL):                 SCES-50760  (SLES-51128 = Total Immersion Racing)
+      6A8F18B9  Ratchet & Clank (PAL):     SCES-50916  (SCES-50391 was fabricated)
+      7D8F539A  Devil May Cry (PAL):       SLES-50358  (SLES-50873 = Reign of Fire)
+      941BB7D9  Final Fantasy X (PAL):     SCES-50492  (SLES-50490 kept as alt)
+      9AAC5309  Final Fantasy X-2 (PAL):   SLES-51815  (English; SLES-51818 Italian kept as alt)
 
     Serial DB:
       "Godfather, The" (SLUS-21406) renamed to "The Godfather (Limited Edition)"
@@ -16265,52 +16266,52 @@ class TestWave79PalSerialFixes(unittest.TestCase):
         self._assert_crc_game("1510E1D1", "Crash Twinsanity (SLES-52568)")
 
     def test_2251e14d_tekken4_serial(self):
-        """2251E14D: game_serial must be SLES-51552 (primary), not SCES-50878 (alt)."""
-        self._assert_crc_serial("2251E14D", "SLES-51552")
+        """2251E14D: game_serial must be SCES-50878 (real verified Tekken 4 PAL; SLES-51552 was fabricated)."""
+        self._assert_crc_serial("2251E14D", "SCES-50878")
 
     def test_2251e14d_tekken4_name(self):
-        """2251E14D: game must be 'Tekken 4 (SLES-51552)'."""
-        self._assert_crc_game("2251E14D", "Tekken 4 (SLES-51552)")
+        """2251E14D: game must be 'Tekken 4 (SCES-50878)'."""
+        self._assert_crc_game("2251E14D", "Tekken 4 (SCES-50878)")
 
     def test_5c991f4e_ico_serial(self):
-        """5C991F4E: game_serial must be SLES-51128 (primary), not SCES-50760 (alt)."""
-        self._assert_crc_serial("5C991F4E", "SLES-51128")
+        """5C991F4E: game_serial must be SCES-50760 (real verified Ico PAL; SLES-51128 = Total Immersion Racing)."""
+        self._assert_crc_serial("5C991F4E", "SCES-50760")
 
     def test_5c991f4e_ico_name(self):
-        """5C991F4E: game must be 'Ico (SLES-51128)'."""
-        self._assert_crc_game("5C991F4E", "Ico (SLES-51128)")
+        """5C991F4E: game must be 'Ico (SCES-50760)'."""
+        self._assert_crc_game("5C991F4E", "Ico (SCES-50760)")
 
     def test_6a8f18b9_rac_serial(self):
-        """6A8F18B9: game_serial must be SCES-50391 (primary), not SCES-50916 (alt)."""
-        self._assert_crc_serial("6A8F18B9", "SCES-50391")
+        """6A8F18B9: game_serial must be SCES-50916 (real verified R&C PAL; SCES-50391 was fabricated)."""
+        self._assert_crc_serial("6A8F18B9", "SCES-50916")
 
     def test_6a8f18b9_rac_name(self):
-        """6A8F18B9: game must be 'Ratchet & Clank (SCES-50391)'."""
-        self._assert_crc_game("6A8F18B9", "Ratchet & Clank (SCES-50391)")
+        """6A8F18B9: game must be 'Ratchet & Clank (SCES-50916)'."""
+        self._assert_crc_game("6A8F18B9", "Ratchet & Clank (SCES-50916)")
 
     def test_7d8f539a_dmc_serial(self):
-        """7D8F539A: game_serial must be SLES-50873 (primary), not SLES-50358 (alt)."""
-        self._assert_crc_serial("7D8F539A", "SLES-50873")
+        """7D8F539A: game_serial must be SLES-50358 (real verified DMC PAL; SLES-50873 = Reign of Fire)."""
+        self._assert_crc_serial("7D8F539A", "SLES-50358")
 
     def test_7d8f539a_dmc_name(self):
-        """7D8F539A: game must be 'Devil May Cry (SLES-50873)'."""
-        self._assert_crc_game("7D8F539A", "Devil May Cry (SLES-50873)")
+        """7D8F539A: game must be 'Devil May Cry (SLES-50358)'."""
+        self._assert_crc_game("7D8F539A", "Devil May Cry (SLES-50358)")
 
     def test_941bb7d9_ffx_serial(self):
-        """941BB7D9: game_serial must be SLES-50490 (primary), not SCES-50492 (alt)."""
-        self._assert_crc_serial("941BB7D9", "SLES-50490")
+        """941BB7D9: game_serial must be SCES-50492 (confirmed FFX PAL; SLES-50490 kept as alt_serial)."""
+        self._assert_crc_serial("941BB7D9", "SCES-50492")
 
     def test_941bb7d9_ffx_name(self):
-        """941BB7D9: game must be 'Final Fantasy X (SLES-50490)'."""
-        self._assert_crc_game("941BB7D9", "Final Fantasy X (SLES-50490)")
+        """941BB7D9: game must be 'Final Fantasy X (SCES-50492)'."""
+        self._assert_crc_game("941BB7D9", "Final Fantasy X (SCES-50492)")
 
     def test_9aac5309_ffx2_serial(self):
-        """9AAC5309: game_serial must be SLES-51818 (primary), not SLES-51815 (alt)."""
-        self._assert_crc_serial("9AAC5309", "SLES-51818")
+        """9AAC5309: game_serial must be SLES-51815 (English PAL primary; SLES-51818 Italian kept as alt)."""
+        self._assert_crc_serial("9AAC5309", "SLES-51815")
 
     def test_9aac5309_ffx2_name(self):
-        """9AAC5309: game must be 'Final Fantasy X-2 (SLES-51818)'."""
-        self._assert_crc_game("9AAC5309", "Final Fantasy X-2 (SLES-51818)")
+        """9AAC5309: game must be 'Final Fantasy X-2 (SLES-51815)'."""
+        self._assert_crc_game("9AAC5309", "Final Fantasy X-2 (SLES-51815)")
 
     # ------------------------------------------------------------------
     # Serial DB — Godfather Limited Edition fixes
@@ -16342,20 +16343,22 @@ class TestWave79PalSerialFixes(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_no_alt_serial_contamination_in_pal_crcs(self):
-        """None of the 7 fixed CRCs should still have the old (wrong) serials."""
-        old_serials = {
+        """None of the 7 fixed CRCs should still carry the fabricated/wrong Wave 79 serials."""
+        # These are the BAD serials that Wave 79 incorrectly assigned — none should
+        # appear as game_serial in any pnach entry for the given CRC.
+        bad_serials = {
             '1510E1D1': 'SLES-52606',  # fabricated; real serial is SLES-52568
-            '2251E14D': 'SCES-50878',
-            '5C991F4E': 'SCES-50760',
-            '6A8F18B9': 'SCES-50916',
-            '7D8F539A': 'SLES-50358',
-            '941BB7D9': 'SCES-50492',
-            '9AAC5309': 'SLES-51815',
+            '2251E14D': 'SLES-51552',  # fabricated; real serial is SCES-50878
+            '5C991F4E': 'SLES-51128',  # wrong game (Total Immersion Racing); real is SCES-50760
+            '6A8F18B9': 'SCES-50391',  # fabricated; real serial is SCES-50916
+            '7D8F539A': 'SLES-50873',  # wrong game (Reign of Fire); real is SLES-50358
+            '941BB7D9': 'SLES-50490',  # unverified; real primary is SCES-50492
+            '9AAC5309': 'SLES-51818',  # Italian alt; English primary is SLES-51815
         }
         bad = []
         for key, entry in self.db.items():
             crc = entry.get("game_crc", "").upper()
-            if crc in old_serials and entry.get("game_serial") == old_serials[crc]:
+            if crc in bad_serials and entry.get("game_serial") == bad_serials[crc]:
                 bad.append((crc, key, entry.get("game_serial")))
         self.assertEqual(bad, [],
-                         f"Wrong serials still present: {bad[:5]}")
+                         f"Fabricated/wrong serials still present: {bad[:5]}")

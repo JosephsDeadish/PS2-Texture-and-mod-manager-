@@ -222,11 +222,8 @@
       "genre": "Platformer"
     },
     "Devil May Cry (PAL)": {
-      "serial": "SLES-50873",
-      "alt_serials": [
-        "SLES-50300",
-        "SLES-50358"
-      ],
+      "serial": "SLES-50358",
+      "alt_serials": [],
       "crcs": [
         "7D8F539A"
       ],
@@ -377,9 +374,9 @@
       "genre": "Action-Adventure"
     },
     "Final Fantasy X (PAL)": {
-      "serial": "SLES-50490",
+      "serial": "SCES-50492",
       "alt_serials": [
-        "SCES-50492"
+        "SLES-50490"
       ],
       "crcs": [
         "941BB7D9"
@@ -391,9 +388,9 @@
       "genre": "RPG"
     },
     "Final Fantasy X-2 (PAL)": {
-      "serial": "SLES-51818",
+      "serial": "SLES-51815",
       "alt_serials": [
-        "SLES-51815"
+        "SLES-51818"
       ],
       "crcs": [
         "9AAC5309"
@@ -599,10 +596,8 @@
       "genre": "Rhythm"
     },
     "Ico (PAL)": {
-      "serial": "SLES-51128",
-      "alt_serials": [
-        "SCES-50760"
-      ],
+      "serial": "SCES-50760",
+      "alt_serials": [],
       "crcs": [
         "5C991F4E"
       ],
@@ -985,10 +980,8 @@
       "genre": "Sports"
     },
     "Ratchet & Clank (PAL)": {
-      "serial": "SCES-50391",
-      "alt_serials": [
-        "SCES-50916"
-      ],
+      "serial": "SCES-50916",
+      "alt_serials": [],
       "crcs": [
         "6A8F18B9"
       ],
@@ -1268,10 +1261,8 @@
       "genre": "Action-RPG"
     },
     "Tekken 4 (PAL)": {
-      "serial": "SLES-51552",
-      "alt_serials": [
-        "SCES-50878"
-      ],
+      "serial": "SCES-50878",
+      "alt_serials": [],
       "crcs": [
         "2251E14D"
       ],
