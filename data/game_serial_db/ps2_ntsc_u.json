@@ -966,7 +966,8 @@
       "serial": "SLUS-21361",
       "alt_serials": [],
       "crcs": [
-        "0EC5F7A0"
+        "0EC5F7A0",
+        "4C45B7CF"
       ]
     },
     "Devil Summoner 2: Raidou Kuzunoha vs. King Abaddon": {
@@ -1209,7 +1210,8 @@
       "serial": "SLUS-21373",
       "alt_serials": [],
       "crcs": [
-        "1648E3C9"
+        "1648E3C9",
+        "CE48FF9F"
       ],
       "release_date": "2006-02-14",
       "developer": "Cavia",
@@ -1305,7 +1307,8 @@
         "2C2B7C50",
         "9A51B627",
         "9B4D085A",
-        "A9461CB0"
+        "A9461CB0",
+        "25A2A16E"
       ],
       "release_date": "2003-12-12",
       "developer": "Tecmo",
@@ -1340,15 +1343,6 @@
         "941AE3A4": "v1.00",
         "CF8ABA10": "Greatest Hits"
       }
-    },
-    "Final Fantasy X / XII": {
-      "serial": "SLUS-20312",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-12-17",
-      "developer": "Square Co. Ltd",
-      "publisher": "Square Enix",
-      "genre": "RPG"
     },
     "Final Fantasy X-2": {
       "serial": "SLUS-20672",
@@ -2042,15 +2036,6 @@
         "C5CA2AB3": "Greatest Hits"
       }
     },
-    "Jak II / Jak 3": {
-      "serial": "SCUS-97265",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2003-10-14",
-      "developer": "Naughty Dog",
-      "publisher": "Sony",
-      "genre": "Action, Adventure, Platform."
-    },
     "Jak X: Combat Racing": {
       "serial": "SCUS-97429",
       "alt_serials": [],
@@ -2268,7 +2253,10 @@
       "release_date": "2002-10-01",
       "developer": "Prokion",
       "publisher": "Fresh Games, Eidos Interactive",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crcs": [
+        "AE64F9B7"
+      ]
     },
     "Leisure Suit Larry: Magna Cum Laude": {
       "serial": "SLUS-20956",
@@ -3029,15 +3017,6 @@
         "E4E70DCE": "Greatest Hits"
       }
     },
-    "Ratchet & Clank series": {
-      "serial": "SCUS-97199",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2002-11-04",
-      "developer": "Insomniac Games",
-      "publisher": "Sony",
-      "genre": "Action, PLatformer, Shooter."
-    },
     "Ratchet & Clank: Going Commando": {
       "serial": "SCUS-97268",
       "alt_serials": [],
@@ -3351,7 +3330,8 @@
       "serial": "SLUS-20878",
       "alt_serials": [],
       "crcs": [
-        "CF11CD83"
+        "CF11CD83",
+        "D6F4BE78"
       ],
       "release_date": "2004-02-24",
       "developer": "Koei",
@@ -3772,7 +3752,8 @@
         "SLUS-20891"
       ],
       "crcs": [
-        "CF5F6552"
+        "CF5F6552",
+        "33EC7780"
       ],
       "release_date": "2004-08-31",
       "developer": "tri-Ace",
@@ -3893,7 +3874,8 @@
       "serial": "SLUS-21291",
       "alt_serials": [],
       "crcs": [
-        "BCD0B7CD"
+        "BCD0B7CD",
+        "8028A9B5"
       ],
       "release_date": "2006-03-21",
       "developer": "Konami Computer Entertainment Japan",
@@ -4509,7 +4491,8 @@
       "serial": "SLUS-21615",
       "alt_serials": [],
       "crcs": [
-        "ADFCC5A1"
+        "ADFCC5A1",
+        "7D9D0E40"
       ],
       "release_date": "2007-08-28",
       "developer": "Media.Vision",
@@ -4660,7 +4643,10 @@
       "release_date": "2005-02-22",
       "developer": "Falcon",
       "publisher": "Konami",
-      "genre": "Action RPG"
+      "genre": "Action RPG",
+      "crcs": [
+        "1E75FE3A"
+      ]
     },
     "Zone of the Enders": {
       "serial": "SLUS-20148",
@@ -12286,7 +12272,9 @@
     "NFL Blitz 2002": {
       "serial": "SLUS-20051",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "3A32FD60"
+      ],
       "release_date": "2002-02-07",
       "developer": "Midway",
       "publisher": "Midway",
@@ -17028,7 +17016,9 @@
     "Delta Force: Black Hawk Down: Team Sabre": {
       "serial": "SLUS-21414",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "A8DB29DF"
+      ],
       "developer": "Rebellion",
       "publisher": "NovaLogic",
       "genre": "First-person Shooter"

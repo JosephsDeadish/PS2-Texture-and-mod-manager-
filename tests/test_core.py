@@ -8810,8 +8810,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2294 games (6 new games added)."""
-        self.assertGreaterEqual(len(self.games), 2294)
+        """Wave 47: serial DB should have at least 2291 games (6 new games added)."""
+        self.assertGreaterEqual(len(self.games), 2291)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9149,9 +9149,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count should still be 2294 (only CRCs changed, not game entries)."""
+        """Wave 49: serial DB game count should still be 2291 (only CRCs changed, not game entries)."""
         self.assertEqual(
-            len(self.games), 2294,
+            len(self.games), 2291,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9372,8 +9372,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count must remain 2294 (only crc_labels added)."""
-        self.assertEqual(len(self.raw_games), 2294)
+        """Wave 50: serial DB game count must remain 2291 (only crc_labels added)."""
+        self.assertEqual(len(self.raw_games), 2291)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9577,8 +9577,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count must remain 2294."""
-        self.assertEqual(len(self.raw_games), 2294)
+        """Wave 51: serial DB game count must remain 2291."""
+        self.assertEqual(len(self.raw_games), 2291)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9765,8 +9765,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count must remain 2294."""
-        self.assertEqual(len(self.raw_games), 2294)
+        """Wave 52: serial DB game count must remain 2291."""
+        self.assertEqual(len(self.raw_games), 2291)
 
 
 # ===========================================================================
@@ -14390,25 +14390,25 @@ class TestWave71EmptySerialFix(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_a8db29df_delta_force_serial(self):
-        """A8DB29DF (Delta Force BHD Team Sabre): 11 entries, serial SLUS-20781."""
-        self._assert_crc_serial("A8DB29DF", "SLUS-20781")
+        """A8DB29DF (Delta Force BHD Team Sabre): 11 entries, serial corrected to SLUS-21414 by Wave 76."""
+        self._assert_crc_serial("A8DB29DF", "SLUS-21414")
         self.assertEqual(len(self._crc_entries("A8DB29DF")), 11)
 
     def test_a8db29df_delta_force_game_name(self):
-        """A8DB29DF must use normalised game name."""
+        """A8DB29DF must use normalised game name (corrected by Wave 76)."""
         wrong = [(k, v.get("game")) for k, v in self._crc_entries("A8DB29DF").items()
-                 if v.get("game") != "Delta Force: Black Hawk Down - Team Sabre (SLUS-20781)"]
+                 if v.get("game") != "Delta Force: Black Hawk Down: Team Sabre (SLUS-21414)"]
         self.assertEqual(wrong, [])
 
     def test_3a32fd60_nfl_blitz_serial(self):
-        """3A32FD60 (NFL Blitz 2002): 3 entries, serial SLUS-20233."""
-        self._assert_crc_serial("3A32FD60", "SLUS-20233")
+        """3A32FD60 (NFL Blitz 2002): 3 entries, serial corrected to SLUS-20051 by Wave 76."""
+        self._assert_crc_serial("3A32FD60", "SLUS-20051")
         self.assertEqual(len(self._crc_entries("3A32FD60")), 3)
 
     def test_3a32fd60_nfl_blitz_game_name(self):
-        """3A32FD60 must use normalised game name."""
+        """3A32FD60 must use normalised game name (corrected by Wave 76)."""
         wrong = [(k, v.get("game")) for k, v in self._crc_entries("3A32FD60").items()
-                 if v.get("game") != "NFL Blitz 2002 (SLUS-20233)"]
+                 if v.get("game") != "NFL Blitz 2002 (SLUS-20051)"]
         self.assertEqual(wrong, [])
 
 
@@ -15505,6 +15505,347 @@ class TestWave75EmptySerialFix(unittest.TestCase):
 
     def test_no_empty_serials_remain(self):
         """After Wave 75 all pnach DB entries must have a non-empty game_serial."""
+        empty = [(k, v.get('game', '')) for k, v in self.pnach_db.items()
+                 if not (v.get('game_serial') or '').strip()]
+        self.assertEqual(empty, [], f"Still-empty serials: {empty[:5]}")
+
+
+# ===========================================================================
+# Wave 76 — Fix CRC cross-contamination in pnach DB (32 CRCs, ~925 entries)
+# ===========================================================================
+
+class TestWave76CrossContaminationFixes(unittest.TestCase):
+    """Wave 76: Fix CRC cross-contamination — wrong game names / serials in
+    pnach DB, duplicate entries removed from serial DB, and new CRCs added to
+    serial DB.
+
+    Group 1 (name-only fixes — serial + CRC are correct in DB):
+      2999BCF9  BMX XXX            → NBA Street Vol. 2         (SLUS-20651, 379 entries)
+      E328D848  Over The Hedge     → Naruto: Ultimate Ninja 3  (SLUS-21727, 142 entries)
+      D1DFF756  Fisherman's Ch.    → ZotE: 2nd Runner          (SLUS-20545, 60 entries)
+      9AEECC9D  World Ch. Poker 2  → Viewtiful Joe 2           (SLUS-20939, 51 entries)
+      E9720D3E  Bard's Tale, The   → Baldur's Gate: DAII       (SLUS-20675, 34 entries)
+      03854A28  Gadget Racers      → Medal of Honor: Frontline (SLUS-20368, 31 entries)
+      BA7C4436  Endgame            → Shinobi                   (SLUS-20459, 12 entries)
+      C949BD58  Duel Masters       → GUN                       (SLUS-21139, 10 entries)
+      C4F9E878  NFS: Hot Pursuit 2 → NFS: Underground          (SLUS-20811,  8 entries)
+      BC0198AB  Rule of Rose       → GTA: Vice City Stories    (SLUS-21590, 17 entries)
+      C2395B46  PoP: Warrior Wthn  → MC3: DUB Edition Remix    (SLUS-21029,  7 entries)
+      DA5CC7A3  Burnout 3 (×5)     → Ace Combat 5              (SLUS-20851,  5 of 16)
+      836BBACE  Magna Carta        → Monster House             (SLUS-21400,  4 entries)
+      C01C06BC  Ar Tonelico        → Atelier Iris 3            (SLUS-21564,  4 entries)
+      CF736A9D  Aqua Aqua          → Tekken: Tag Tournament    (SLUS-20001,  4 entries)
+      FD8A9A89  In The Groove      → Armored Core: NB          (SLUS-21200,  4 entries)
+      ED21DDE0  Burnout 3          → Tony Hawk's Underground   (SLUS-20731,  3 entries)
+      F7C04473  R&C: Up Arsenal    → R&C: Going Commando       (SCUS-97268,  2 entries)
+      3FBF0EA6  Dino Stalker       → Dynasty Warriors 4        (SLUS-20653, 10 entries)
+      8CC67FC1  R&C: Going Cmd.    → Ratchet & Clank           (SCUS-97199,  2 entries)
+      42E152EF  Power Drome (wrong)→ Silent Hill 4: The Room  (SLUS-20873, 69 entries)
+
+    Group 2 (serial + name fixes, CRCs added to serial DB):
+      25A2A16E  SLUS-21183 → SLUS-20766  Fatal Frame II: CB           (19 entries)
+      A8DB29DF  SLUS-20781 → SLUS-21414  Delta Force: BHD Team Sabre  (11 entries)
+      1E75FE3A  SLUS-21441 → SLUS-20980  Ys: The Ark of Napishtim      (7 entries)
+      33EC7780  SLUS-20492 → SLUS-20488  Star Ocean: TTEOT DC          (5 entries)
+      7D9D0E40  SLUS-21842 → SLUS-21615  Wild Arms 5                   (5 entries)
+      4C45B7CF  SLUS-21224 → SLUS-21361  Devil May Cry 3: SE           (4 entries)
+      AE64F9B7  SLUS-20524 → SLUS-20414  Legaia 2: Duel Saga           (4 entries)
+      CE48FF9F  SLUS-21221 → SLUS-21373  Drakengard 2                  (4 entries)
+      D6F4BE78  SLUS-20685 → SLUS-20878  Samurai Warriors              (4 entries)
+      3A32FD60  SLUS-20233 → SLUS-20051  NFL Blitz 2002                (3 entries)
+      8028A9B5  SLUS-21615 → SLUS-21291  Suikoden V                    (1 entry)
+
+    Serial DB changes:
+      Removed: 'Ratchet & Clank series' (duplicate of 'Ratchet & Clank' SCUS-97199)
+      Removed: 'Final Fantasy X / XII' (wrong — SLUS-20312 is FFX only)
+      Removed: 'Jak II / Jak 3' (wrong — SCUS-97265 is Jak II only)
+      Added CRCs: 25A2A16E, A8DB29DF, 1E75FE3A, 33EC7780, 7D9D0E40,
+                  4C45B7CF, AE64F9B7, CE48FF9F, D6F4BE78, 3A32FD60, 8028A9B5
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.pnach_db = json.loads(
+            pathlib.Path("data/pnach_db/known_addresses.json").read_text()
+        )
+        cls.ntsc_db = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_ntsc_u.json").read_text()
+        )
+
+    def _crc_entries(self, crc):
+        return {k: v for k, v in self.pnach_db.items() if v.get('game_crc') == crc}
+
+    def _assert_crc_serial(self, crc, serial):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game_serial")) for k, v in entries.items()
+                 if v.get("game_serial") != serial]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc}: entries with wrong serial (expected {serial}): {wrong[:3]}")
+
+    def _assert_crc_game(self, crc, game):
+        entries = self._crc_entries(crc)
+        self.assertGreater(len(entries), 0, f"No entries found for CRC {crc}")
+        wrong = [(k, v.get("game")) for k, v in entries.items()
+                 if v.get("game") != game]
+        self.assertEqual(wrong, [],
+                         f"CRC {crc}: entries with wrong game name (expected {game!r}): {wrong[:3]}")
+
+    # ------------------------------------------------------------------
+    # Group 1 — name-only fixes
+    # ------------------------------------------------------------------
+
+    def test_2999bcf9_nba_street_vol2_name(self):
+        """2999BCF9: all entries must say 'NBA Street Vol. 2 (SLUS-20651)'."""
+        self._assert_crc_game("2999BCF9", "NBA Street Vol. 2 (SLUS-20651)")
+        self._assert_crc_serial("2999BCF9", "SLUS-20651")
+
+    def test_e328d848_naruto_un3_name(self):
+        """E328D848: all entries must say 'Naruto: Ultimate Ninja 3 (SLUS-21727)'."""
+        self._assert_crc_game("E328D848", "Naruto: Ultimate Ninja 3 (SLUS-21727)")
+        self._assert_crc_serial("E328D848", "SLUS-21727")
+
+    def test_d1dff756_zone_of_enders_name(self):
+        """D1DFF756: all entries must say 'Zone of the Enders: The 2nd Runner (SLUS-20545)'."""
+        self._assert_crc_game("D1DFF756", "Zone of the Enders: The 2nd Runner (SLUS-20545)")
+        self._assert_crc_serial("D1DFF756", "SLUS-20545")
+
+    def test_9aeecc9d_viewtiful_joe2_name(self):
+        """9AEECC9D: all entries must say 'Viewtiful Joe 2 (SLUS-20939)'."""
+        self._assert_crc_game("9AEECC9D", "Viewtiful Joe 2 (SLUS-20939)")
+        self._assert_crc_serial("9AEECC9D", "SLUS-20939")
+
+    def test_e9720d3e_baldurs_gate_daii_name(self):
+        """E9720D3E: all entries must say \"Baldur's Gate: Dark Alliance II (SLUS-20675)\"."""
+        self._assert_crc_game("E9720D3E", "Baldur's Gate: Dark Alliance II (SLUS-20675)")
+        self._assert_crc_serial("E9720D3E", "SLUS-20675")
+
+    def test_03854a28_medal_of_honor_name(self):
+        """03854A28: all entries must say 'Medal of Honor: Frontline (SLUS-20368)'."""
+        self._assert_crc_game("03854A28", "Medal of Honor: Frontline (SLUS-20368)")
+        self._assert_crc_serial("03854A28", "SLUS-20368")
+
+    def test_ba7c4436_shinobi_name(self):
+        """BA7C4436: all entries must say 'Shinobi (SLUS-20459)'."""
+        self._assert_crc_game("BA7C4436", "Shinobi (SLUS-20459)")
+        self._assert_crc_serial("BA7C4436", "SLUS-20459")
+
+    def test_c949bd58_gun_name(self):
+        """C949BD58: all entries must say 'GUN (SLUS-21139)'."""
+        self._assert_crc_game("C949BD58", "GUN (SLUS-21139)")
+        self._assert_crc_serial("C949BD58", "SLUS-21139")
+
+    def test_c4f9e878_nfs_underground_name(self):
+        """C4F9E878: all entries must say 'Need for Speed: Underground (SLUS-20811)'."""
+        self._assert_crc_game("C4F9E878", "Need for Speed: Underground (SLUS-20811)")
+        self._assert_crc_serial("C4F9E878", "SLUS-20811")
+
+    def test_bc0198ab_gta_vcs_name(self):
+        """BC0198AB: all entries must say 'Grand Theft Auto: Vice City Stories (SLUS-21590)'."""
+        self._assert_crc_game("BC0198AB", "Grand Theft Auto: Vice City Stories (SLUS-21590)")
+        self._assert_crc_serial("BC0198AB", "SLUS-21590")
+
+    def test_c2395b46_mc3_dub_remix_name(self):
+        """C2395B46: all entries must say 'Midnight Club 3: DUB Edition Remix (SLUS-21029)'."""
+        self._assert_crc_game("C2395B46", "Midnight Club 3: DUB Edition Remix (SLUS-21029)")
+        self._assert_crc_serial("C2395B46", "SLUS-21029")
+
+    def test_da5cc7a3_ace_combat5_name(self):
+        """DA5CC7A3: all 16 entries must say 'Ace Combat 5: The Unsung War (SLUS-20851)'."""
+        self._assert_crc_game("DA5CC7A3", "Ace Combat 5: The Unsung War (SLUS-20851)")
+        self._assert_crc_serial("DA5CC7A3", "SLUS-20851")
+
+    def test_836bbace_monster_house_name(self):
+        """836BBACE: all entries must say 'Monster House (SLUS-21400)'."""
+        self._assert_crc_game("836BBACE", "Monster House (SLUS-21400)")
+        self._assert_crc_serial("836BBACE", "SLUS-21400")
+
+    def test_c01c06bc_atelier_iris3_name(self):
+        """C01C06BC: all entries must say 'Atelier Iris 3: Grand Phantasm (SLUS-21564)'."""
+        self._assert_crc_game("C01C06BC", "Atelier Iris 3: Grand Phantasm (SLUS-21564)")
+        self._assert_crc_serial("C01C06BC", "SLUS-21564")
+
+    def test_cf736a9d_tekken_ttt_name(self):
+        """CF736A9D: all entries must say 'Tekken: Tag Tournament (SLUS-20001)'."""
+        self._assert_crc_game("CF736A9D", "Tekken: Tag Tournament (SLUS-20001)")
+        self._assert_crc_serial("CF736A9D", "SLUS-20001")
+
+    def test_fd8a9a89_armored_core_nb_name(self):
+        """FD8A9A89: all entries must say 'Armored Core: Nine Breaker (SLUS-21200)'."""
+        self._assert_crc_game("FD8A9A89", "Armored Core: Nine Breaker (SLUS-21200)")
+        self._assert_crc_serial("FD8A9A89", "SLUS-21200")
+
+    def test_ed21dde0_tony_hawks_underground_name(self):
+        """ED21DDE0: all entries must say \"Tony Hawk's Underground (SLUS-20731)\"."""
+        self._assert_crc_game("ED21DDE0", "Tony Hawk's Underground (SLUS-20731)")
+        self._assert_crc_serial("ED21DDE0", "SLUS-20731")
+
+    def test_f7c04473_rac_going_commando_name(self):
+        """F7C04473: all entries must say 'Ratchet & Clank: Going Commando (SCUS-97268)'."""
+        self._assert_crc_game("F7C04473", "Ratchet & Clank: Going Commando (SCUS-97268)")
+        self._assert_crc_serial("F7C04473", "SCUS-97268")
+
+    def test_3fbf0ea6_dynasty_warriors4_name(self):
+        """3FBF0EA6: all entries must say 'Dynasty Warriors 4 (SLUS-20653)'."""
+        self._assert_crc_game("3FBF0EA6", "Dynasty Warriors 4 (SLUS-20653)")
+        self._assert_crc_serial("3FBF0EA6", "SLUS-20653")
+
+    def test_8cc67fc1_ratchet_clank1_name(self):
+        """8CC67FC1: all entries must say 'Ratchet & Clank (SCUS-97199)' not Going Commando."""
+        self._assert_crc_game("8CC67FC1", "Ratchet & Clank (SCUS-97199)")
+        self._assert_crc_serial("8CC67FC1", "SCUS-97199")
+
+    # ------------------------------------------------------------------
+    # Group 2 — serial + name fixes
+    # ------------------------------------------------------------------
+
+    def test_42e152ef_sh4_name_fix(self):
+        """42E152EF: game name was 'Power Drome' (wrong); must now be 'Silent Hill 4: The Room (SLUS-20873)'."""
+        self._assert_crc_serial("42E152EF", "SLUS-20873")
+        self._assert_crc_game("42E152EF", "Silent Hill 4: The Room (SLUS-20873)")
+
+    def test_25a2a16e_fatal_frame2_serial(self):
+        """25A2A16E: serial must be SLUS-20766 (Fatal Frame II), not SLUS-21183 (Teen Titans)."""
+        self._assert_crc_serial("25A2A16E", "SLUS-20766")
+        self._assert_crc_game("25A2A16E", "Fatal Frame II: Crimson Butterfly (SLUS-20766)")
+
+    def test_a8db29df_delta_force_team_sabre_serial(self):
+        """A8DB29DF: serial must be SLUS-21414 (DF:BHD Team Sabre), not SLUS-20781 (Karaoke Rev)."""
+        self._assert_crc_serial("A8DB29DF", "SLUS-21414")
+        self._assert_crc_game("A8DB29DF", "Delta Force: Black Hawk Down: Team Sabre (SLUS-21414)")
+
+    def test_1e75fe3a_ys_napishtim_serial(self):
+        """1E75FE3A: serial must be SLUS-20980 (Ys Napishtim), not SLUS-21441 (DBZ BT2)."""
+        self._assert_crc_serial("1E75FE3A", "SLUS-20980")
+        self._assert_crc_game("1E75FE3A", "Ys: The Ark of Napishtim (SLUS-20980)")
+
+    def test_33ec7780_star_ocean_tteot_serial(self):
+        """33EC7780: serial must be SLUS-20488 (Star Ocean TTEOT), not SLUS-20492 (Ninja Assault)."""
+        self._assert_crc_serial("33EC7780", "SLUS-20488")
+
+    def test_7d9d0e40_wild_arms5_serial(self):
+        """7D9D0E40: serial must be SLUS-21615 (Wild Arms 5), not SLUS-21842 (DBZ:IW)."""
+        self._assert_crc_serial("7D9D0E40", "SLUS-21615")
+        self._assert_crc_game("7D9D0E40", "Wild Arms 5 (SLUS-21615)")
+
+    def test_4c45b7cf_dmc3se_serial(self):
+        """4C45B7CF: serial must be SLUS-21361 (DMC3 SE), not SLUS-21224 (Guitar Hero)."""
+        self._assert_crc_serial("4C45B7CF", "SLUS-21361")
+        self._assert_crc_game("4C45B7CF", "Devil May Cry 3: Special Edition (SLUS-21361)")
+
+    def test_ae64f9b7_legaia2_serial(self):
+        """AE64F9B7: serial must be SLUS-20414 (Legaia 2), not SLUS-20524 (Fighter Maker 2)."""
+        self._assert_crc_serial("AE64F9B7", "SLUS-20414")
+        self._assert_crc_game("AE64F9B7", "Legaia 2: Duel Saga (SLUS-20414)")
+
+    def test_ce48ff9f_drakengard2_serial(self):
+        """CE48FF9F: serial must be SLUS-21373 (Drakengard 2), not SLUS-21221 (Magna Carta)."""
+        self._assert_crc_serial("CE48FF9F", "SLUS-21373")
+        self._assert_crc_game("CE48FF9F", "Drakengard 2 (SLUS-21373)")
+
+    def test_d6f4be78_samurai_warriors_serial(self):
+        """D6F4BE78: serial must be SLUS-20878 (Samurai Warriors), not SLUS-20685 (Ape Escape 2)."""
+        self._assert_crc_serial("D6F4BE78", "SLUS-20878")
+        self._assert_crc_game("D6F4BE78", "Samurai Warriors (SLUS-20878)")
+
+    def test_3a32fd60_nfl_blitz2002_serial(self):
+        """3A32FD60: serial must be SLUS-20051 (NFL Blitz 2002), not SLUS-20233 (MSG: Zeonic)."""
+        self._assert_crc_serial("3A32FD60", "SLUS-20051")
+        self._assert_crc_game("3A32FD60", "NFL Blitz 2002 (SLUS-20051)")
+
+    def test_8028a9b5_suikoden5_serial(self):
+        """8028A9B5: serial must be SLUS-21291 (Suikoden V), not SLUS-21615 (Wild Arms 5)."""
+        self._assert_crc_serial("8028A9B5", "SLUS-21291")
+        self._assert_crc_game("8028A9B5", "Suikoden V (SLUS-21291)")
+
+    # ------------------------------------------------------------------
+    # Serial DB: duplicate entries removed
+    # ------------------------------------------------------------------
+
+    def test_ntsc_db_no_rac_series_duplicate(self):
+        """'Ratchet & Clank series' must be removed (was duplicate of 'Ratchet & Clank')."""
+        self.assertNotIn("Ratchet & Clank series", self.ntsc_db['games'])
+
+    def test_ntsc_db_no_ffx_xii_combo(self):
+        """'Final Fantasy X / XII' must be removed (SLUS-20312 is FFX only)."""
+        self.assertNotIn("Final Fantasy X / XII", self.ntsc_db['games'])
+
+    def test_ntsc_db_no_jak2_jak3_combo(self):
+        """'Jak II / Jak 3' must be removed (SCUS-97265 is Jak II only)."""
+        self.assertNotIn("Jak II / Jak 3", self.ntsc_db['games'])
+
+    # ------------------------------------------------------------------
+    # Serial DB: new CRCs added
+    # ------------------------------------------------------------------
+
+    def test_ntsc_db_sh4_crc_42e152ef(self):
+        """NTSC-U DB: Silent Hill 4: The Room must include CRC 42E152EF (v1.03 label preserved)."""
+        g = self.ntsc_db['games'].get("Silent Hill 4: The Room", {})
+        self.assertIn("42E152EF", g.get('crcs', []))
+        self.assertEqual(g.get('crc_labels', {}).get('42E152EF'), 'v1.03')
+
+    def test_ntsc_db_fatal_frame2_crc(self):
+        """NTSC-U DB: Fatal Frame II: Crimson Butterfly must include CRC 25A2A16E."""
+        g = self.ntsc_db['games'].get("Fatal Frame II: Crimson Butterfly", {})
+        self.assertIn("25A2A16E", g.get('crcs', []))
+
+    def test_ntsc_db_delta_force_team_sabre_crc(self):
+        """NTSC-U DB: Delta Force: BHD: Team Sabre must include CRC A8DB29DF."""
+        g = self.ntsc_db['games'].get("Delta Force: Black Hawk Down: Team Sabre", {})
+        self.assertIn("A8DB29DF", g.get('crcs', []))
+
+    def test_ntsc_db_ys_napishtim_crc(self):
+        """NTSC-U DB: Ys: The Ark of Napishtim must include CRC 1E75FE3A."""
+        g = self.ntsc_db['games'].get("Ys: The Ark of Napishtim", {})
+        self.assertIn("1E75FE3A", g.get('crcs', []))
+
+    def test_ntsc_db_star_ocean_tteot_crc(self):
+        """NTSC-U DB: Star Ocean: TTEOT must include CRC 33EC7780."""
+        g = self.ntsc_db['games'].get("Star Ocean: Till the End of Time", {})
+        self.assertIn("33EC7780", g.get('crcs', []))
+
+    def test_ntsc_db_wild_arms5_crc(self):
+        """NTSC-U DB: Wild Arms 5 must include CRC 7D9D0E40."""
+        g = self.ntsc_db['games'].get("Wild Arms 5", {})
+        self.assertIn("7D9D0E40", g.get('crcs', []))
+
+    def test_ntsc_db_dmc3se_crc(self):
+        """NTSC-U DB: Devil May Cry 3: Special Edition must include CRC 4C45B7CF."""
+        g = self.ntsc_db['games'].get("Devil May Cry 3: Special Edition", {})
+        self.assertIn("4C45B7CF", g.get('crcs', []))
+
+    def test_ntsc_db_legaia2_crc(self):
+        """NTSC-U DB: Legaia 2: Duel Saga must include CRC AE64F9B7."""
+        g = self.ntsc_db['games'].get("Legaia 2: Duel Saga", {})
+        self.assertIn("AE64F9B7", g.get('crcs', []))
+
+    def test_ntsc_db_drakengard2_crc(self):
+        """NTSC-U DB: Drakengard 2 must include CRC CE48FF9F."""
+        g = self.ntsc_db['games'].get("Drakengard 2", {})
+        self.assertIn("CE48FF9F", g.get('crcs', []))
+
+    def test_ntsc_db_samurai_warriors_crc(self):
+        """NTSC-U DB: Samurai Warriors must include CRC D6F4BE78."""
+        g = self.ntsc_db['games'].get("Samurai Warriors", {})
+        self.assertIn("D6F4BE78", g.get('crcs', []))
+
+    def test_ntsc_db_nfl_blitz2002_crc(self):
+        """NTSC-U DB: NFL Blitz 2002 must include CRC 3A32FD60."""
+        g = self.ntsc_db['games'].get("NFL Blitz 2002", {})
+        self.assertIn("3A32FD60", g.get('crcs', []))
+
+    def test_ntsc_db_suikoden5_crc(self):
+        """NTSC-U DB: Suikoden V must include CRC 8028A9B5."""
+        g = self.ntsc_db['games'].get("Suikoden V", {})
+        self.assertIn("8028A9B5", g.get('crcs', []))
+
+    # ------------------------------------------------------------------
+    # Sanity: still zero empty serials
+    # ------------------------------------------------------------------
+
+    def test_no_empty_serials_remain(self):
+        """After Wave 76 all pnach DB entries must still have a non-empty game_serial."""
         empty = [(k, v.get('game', '')) for k, v in self.pnach_db.items()
                  if not (v.get('game_serial') or '').strip()]
         self.assertEqual(empty, [], f"Still-empty serials: {empty[:5]}")
