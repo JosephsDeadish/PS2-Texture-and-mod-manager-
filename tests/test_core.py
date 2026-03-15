@@ -12567,7 +12567,7 @@ class TestWave62GBATempTexturePacks(unittest.TestCase):
     def test_hack_imoq_entry_present(self):
         self.assertIn("hack_imoq_2k_mrdiggle", self.by_id)
         p = self.by_id["hack_imoq_2k_mrdiggle"]
-        self.assertEqual(p["game_serial"], "SLUS-20461")
+        self.assertEqual(p["game_serial"], "SLUS-20267")  # fixed Wave 84: was wrong SLUS-20461
         self.assertIn("drive.google.com", p["direct_download_url"])
 
     def test_shadow_hearts_ftnw_entry_present(self):
@@ -16935,3 +16935,345 @@ class TestWave83PalSerialFixes(unittest.TestCase):
     def test_pnach_db_size_after_wave83(self):
         """Pnach DB must still have at least 48100 entries after Wave 83 fixes."""
         self.assertGreater(len(self.db), 48100)
+
+
+# ---------------------------------------------------------------------------
+# Wave 84: Fix false serials in catalogue descriptions/context + new entries
+# ---------------------------------------------------------------------------
+class TestWave84CatalogueSerialFixes(unittest.TestCase):
+    """Wave 84: 25 false-serial fixes in existing catalogue entries and 32 new
+    entries from GBatemp FURTHER EXPANSION 5–8.  Also adds 6 PAL serial DB
+    entries (SLES-55345/51507/53703/55448/55622/51934).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+        with open("data/game_serial_db/ps2_pal.json") as fh:
+            pal_db = json.load(fh)
+        cls.pal_serial_set = set()
+        for g in pal_db["games"].values():
+            cls.pal_serial_set.add(g["serial"])
+            cls.pal_serial_set.update(g.get("alt_serials", []))
+
+    # ------------------------------------------------------------------
+    # Catalogue size
+    # ------------------------------------------------------------------
+    def test_catalogue_size_after_wave84(self):
+        """After Wave 84 there should be at least 114 texture-pack entries."""
+        self.assertGreaterEqual(len(self.packs), 114,
+                                f"Expected ≥114 packs, got {len(self.packs)}")
+
+    def test_no_duplicate_ids(self):
+        ids = [p["id"] for p in self.packs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate catalogue IDs found")
+
+    # ------------------------------------------------------------------
+    # False-serial fixes in game_serial field
+    # ------------------------------------------------------------------
+    def test_hack_imoq_game_serial_fixed(self):
+        """hack_imoq_2k_mrdiggle must have game_serial SLUS-20267 (.hack//Infection),
+        not SLUS-20461 (BloodRayne)."""
+        p = self.by_id["hack_imoq_2k_mrdiggle"]
+        self.assertEqual(p["game_serial"], "SLUS-20267")
+
+    # ------------------------------------------------------------------
+    # False-serial fixes in description/context (CCKrizalid group)
+    # ------------------------------------------------------------------
+    def test_ghost_rider_desc_serial_fixed(self):
+        p = self.by_id["ghost_rider_hd_cckrizalid"]
+        self.assertNotIn("SLUS-21376", p["description"])
+        self.assertNotIn("SLUS-21376", p["context"])
+        self.assertIn("SLUS-21306", p["description"])
+
+    def test_chaos_legion_desc_serial_fixed(self):
+        p = self.by_id["chaos_legion_hd_cckrizalid"]
+        self.assertNotIn("SLUS-20814", p["description"])
+        self.assertNotIn("SLUS-20814", p["context"])
+        self.assertIn("SLUS-20695", p["description"])
+
+    def test_dmc3_nonse_desc_serial_fixed(self):
+        p = self.by_id["dmc3_nonse_hd_cckrizalid"]
+        self.assertNotIn("SLUS-21042", p["description"])
+        self.assertNotIn("SLUS-21042", p["context"])
+        self.assertIn("SLUS-20964", p["description"])
+
+    # ------------------------------------------------------------------
+    # False-serial fixes in description/context (ewgeha group)
+    # ------------------------------------------------------------------
+    def test_gow1_desc_serial_fixed(self):
+        p = self.by_id["god_of_war_remastered_ewgeha"]
+        self.assertNotIn("SCUS-97481", p["description"])
+        self.assertNotIn("SCUS-97481", p["context"])
+        self.assertIn("SCUS-97399", p["description"])
+
+    def test_gow2_desc_serial_fixed(self):
+        p = self.by_id["god_of_war_2_remastered_ewgeha"]
+        self.assertNotIn("SCUS-97399", p["description"])
+        self.assertNotIn("SCUS-97399", p["context"])
+        self.assertIn("SCUS-97481", p["description"])
+
+    def test_pop_ww_desc_serial_fixed(self):
+        p = self.by_id["pop_ww_remastered_ewgeha"]
+        self.assertNotIn("SLUS-20907", p["description"])
+        self.assertNotIn("SLUS-20907", p["context"])
+        self.assertIn("SLUS-21022", p["description"])
+
+    def test_pop_tt_desc_serial_fixed(self):
+        p = self.by_id["pop_tt_remastered_ewgeha"]
+        self.assertNotIn("SLUS-21065", p["description"])
+        self.assertIn("SLUS-21287", p["description"])
+
+    def test_pop_sot_desc_serial_fixed(self):
+        p = self.by_id["pop_sot_remastered_ewgeha"]
+        self.assertNotIn("SLUS-20492", p["description"])
+        self.assertIn("SLUS-20743", p["description"])
+
+    def test_silent_hill_4_desc_serial_fixed(self):
+        p = self.by_id["silent_hill_4_remastered_ewgeha"]
+        self.assertNotIn("SLUS-20953", p["description"])
+        self.assertIn("SLUS-20873", p["description"])
+
+    # ------------------------------------------------------------------
+    # False-serial fixes in description/context (Panda_Venom group)
+    # ------------------------------------------------------------------
+    def test_suikoden_iv_desc_serial_fixed(self):
+        p = self.by_id["suikoden_iv_hd_pandavenom"]
+        self.assertNotIn("SLUS-20947", p["description"])
+        self.assertIn("SLUS-20979", p["description"])
+
+    def test_suikoden_iii_desc_serial_fixed(self):
+        p = self.by_id["suikoden_iii_hd_pandavenom"]
+        self.assertNotIn("SLUS-20561", p["description"])
+        self.assertIn("SLUS-20387", p["description"])
+
+    def test_persona_4_desc_serial_fixed(self):
+        p = self.by_id["persona_4_hd_pandavenom"]
+        self.assertNotIn("SLUS-21790", p["description"])
+        self.assertIn("SLUS-21782", p["description"])
+
+    def test_dds1_desc_serial_fixed(self):
+        p = self.by_id["dds1_hd_pandavenom"]
+        self.assertNotIn("SLUS-20921", p["description"])
+        self.assertIn("SLUS-20974", p["description"])
+
+    def test_grimgrimoire_desc_serial_fixed(self):
+        p = self.by_id["grimgrimoire_hd_pandavenom"]
+        self.assertNotIn("SLUS-21612", p["description"])
+        self.assertIn("SLUS-21604", p["description"])
+
+    def test_wild_arms_5_desc_serial_fixed(self):
+        p = self.by_id["wild_arms_5_hd_pandavenom"]
+        self.assertNotIn("SLUS-21363", p["description"])
+        self.assertIn("SLUS-21615", p["description"])
+
+    def test_burnout_dominator_desc_serial_fixed(self):
+        p = self.by_id["burnout_dominator_hd_pandavenom"]
+        self.assertNotIn("SLUS-21672", p["description"])
+        self.assertIn("SLUS-21596", p["description"])
+
+    def test_ratchet_clank_1_desc_serial_fixed(self):
+        p = self.by_id["ratchet_clank_1_hd_pandavenom"]
+        self.assertNotIn("SCUS-97198", p["description"])
+        self.assertIn("SCUS-97199", p["description"])
+
+    def test_ratchet_clank_gc_desc_serial_fixed(self):
+        p = self.by_id["ratchet_clank_gc_hd_pandavenom"]
+        self.assertNotIn("SCUS-97273", p["description"])
+        self.assertIn("SCUS-97268", p["description"])
+
+    def test_castlevania_cod_desc_serial_fixed(self):
+        p = self.by_id["castlevania_cod_hd_pandavenom"]
+        self.assertNotIn("SLUS-21140", p["description"])
+        self.assertIn("SLUS-21168", p["description"])
+
+    def test_cod3_desc_serial_fixed(self):
+        p = self.by_id["call_of_duty_3_hd_pandavenom"]
+        self.assertNotIn("SLUS-21423", p["description"])
+        self.assertIn("SLUS-21426", p["description"])
+
+    def test_tales_legendia_desc_serial_fixed(self):
+        p = self.by_id["tales_legendia_hd_pandavenom"]
+        self.assertNotIn("SLUS-21058", p["description"])
+        self.assertIn("SLUS-21201", p["description"])
+
+    def test_haunting_ground_desc_serial_fixed(self):
+        p = self.by_id["haunting_ground_hd_juancho"]
+        self.assertNotIn("SLUS-21095", p["description"])
+        self.assertIn("SLUS-21075", p["description"])
+
+    def test_ssx_tricky_desc_serial_fixed(self):
+        p = self.by_id["ssx_tricky_hd_sombershroud"]
+        self.assertNotIn("SLUS-20271", p["description"])
+        self.assertIn("SLUS-20326", p["description"])
+
+    def test_tekken_4_desc_serial_fixed(self):
+        p = self.by_id["tekken_4_hd_sombershroud"]
+        self.assertNotIn("SLUS-20170", p["description"])
+        self.assertIn("SLUS-20328", p["description"])
+
+    # ------------------------------------------------------------------
+    # New entries from FURTHER EXPANSION 5–8
+    # ------------------------------------------------------------------
+    def test_bully_v2_entry_present(self):
+        self.assertIn("bully_canis_v2_hd", self.by_id)
+        self.assertEqual(self.by_id["bully_canis_v2_hd"]["game_serial"], "SLUS-21269")
+
+    def test_guitar_hero_1_2_entry_present(self):
+        self.assertIn("guitar_hero_1_2_hd", self.by_id)
+        self.assertEqual(self.by_id["guitar_hero_1_2_hd"]["game_serial"], "SLUS-21224")
+
+    def test_onimusha_dod_entry_present(self):
+        self.assertIn("onimusha_dod_hd", self.by_id)
+        self.assertEqual(self.by_id["onimusha_dod_hd"]["game_serial"], "SLUS-21180")
+
+    def test_bouncer_entry_present(self):
+        self.assertIn("bouncer_hd_teodormax", self.by_id)
+        self.assertEqual(self.by_id["bouncer_hd_teodormax"]["game_serial"], "SLUS-20069")
+
+    def test_gun_entry_present(self):
+        self.assertIn("gun_hd", self.by_id)
+        self.assertEqual(self.by_id["gun_hd"]["game_serial"], "SLUS-21139")
+
+    def test_great_escape_entry_present(self):
+        self.assertIn("great_escape_hd", self.by_id)
+        self.assertEqual(self.by_id["great_escape_hd"]["game_serial"], "SLUS-20670")
+
+    def test_toy_story_3_pal_entry_present(self):
+        self.assertIn("toy_story_3_4k_pal", self.by_id)
+        self.assertEqual(self.by_id["toy_story_3_4k_pal"]["game_serial"], "SLES-55622")
+
+    def test_godfather_hd_entry_present(self):
+        self.assertIn("godfather_hd", self.by_id)
+        self.assertEqual(self.by_id["godfather_hd"]["game_serial"], "SLUS-21385")
+
+    def test_dark_cloud_2_entry_present(self):
+        self.assertIn("dark_cloud_2_hd", self.by_id)
+        self.assertEqual(self.by_id["dark_cloud_2_hd"]["game_serial"], "SCUS-97213")
+
+    def test_dq8_pandavenom_entry_present(self):
+        self.assertIn("dragon_quest_viii_hd_pandavenom", self.by_id)
+        p = self.by_id["dragon_quest_viii_hd_pandavenom"]
+        self.assertEqual(p["game_serial"], "SLUS-21207")
+        self.assertFalse(p["is_complete"])
+
+    def test_evil_dead_regen_entry_present(self):
+        self.assertIn("evil_dead_regen_hd", self.by_id)
+        self.assertEqual(self.by_id["evil_dead_regen_hd"]["game_serial"], "SLUS-21048")
+
+    def test_crash_twinsanity_entry_present(self):
+        self.assertIn("crash_twinsanity_hd_durindragon", self.by_id)
+        self.assertEqual(self.by_id["crash_twinsanity_hd_durindragon"]["game_serial"], "SLUS-20909")
+
+    def test_gta3_entry_present(self):
+        self.assertIn("gta3_hd_beto818", self.by_id)
+        self.assertEqual(self.by_id["gta3_hd_beto818"]["game_serial"], "SLUS-20062")
+
+    def test_vcs_entry_present(self):
+        self.assertIn("gta_vcs_hd_beto818", self.by_id)
+        self.assertEqual(self.by_id["gta_vcs_hd_beto818"]["game_serial"], "SLUS-21590")
+
+    def test_thps3_entry_present(self):
+        self.assertIn("thps3_hd_beto818", self.by_id)
+        self.assertEqual(self.by_id["thps3_hd_beto818"]["game_serial"], "SLUS-20013")
+
+    def test_gungriffon_blaze_entry_present(self):
+        self.assertIn("gungriffon_blaze_hd", self.by_id)
+        self.assertEqual(self.by_id["gungriffon_blaze_hd"]["game_serial"], "SLUS-20080")
+
+    def test_obscure_entry_present(self):
+        self.assertIn("obscure_hd", self.by_id)
+        self.assertEqual(self.by_id["obscure_hd"]["game_serial"], "SLUS-20777")
+
+    def test_armored_core_2_entry_present(self):
+        self.assertIn("armored_core_2_hd", self.by_id)
+        self.assertEqual(self.by_id["armored_core_2_hd"]["game_serial"], "SLUS-20014")
+
+    def test_twisted_metal_ho_ete_entry_present(self):
+        self.assertIn("twisted_metal_ho_ete_hd", self.by_id)
+        self.assertEqual(self.by_id["twisted_metal_ho_ete_hd"]["game_serial"], "SCUS-97621")
+
+    def test_naruto_un3_entry_present(self):
+        self.assertIn("naruto_un3_ai_upscale", self.by_id)
+        self.assertEqual(self.by_id["naruto_un3_ai_upscale"]["game_serial"], "SLUS-21727")
+
+    def test_dbz_bt1_entry_present(self):
+        self.assertIn("dbz_bt1_ai_upscale", self.by_id)
+        self.assertEqual(self.by_id["dbz_bt1_ai_upscale"]["game_serial"], "SLUS-21227")
+
+    def test_guitar_hero_sombershroud_entry_present(self):
+        self.assertIn("guitar_hero_hd_sombershroud", self.by_id)
+        self.assertEqual(self.by_id["guitar_hero_hd_sombershroud"]["game_serial"], "SLUS-21224")
+
+    def test_jak3_entry_present(self):
+        self.assertIn("jak3_hd_curse_arms", self.by_id)
+        self.assertEqual(self.by_id["jak3_hd_curse_arms"]["game_serial"], "SCUS-97330")
+
+    def test_ape_escape_3_uhd_entry_present(self):
+        self.assertIn("ape_escape_3_uhd_quicksilver", self.by_id)
+        self.assertEqual(self.by_id["ape_escape_3_uhd_quicksilver"]["game_serial"], "SCUS-97501")
+
+    def test_ape_escape_3_mvp_entry_present(self):
+        self.assertIn("ape_escape_3_hd_mvp899", self.by_id)
+        p = self.by_id["ape_escape_3_hd_mvp899"]
+        self.assertEqual(p["game_serial"], "SCUS-97501")
+        self.assertFalse(p["is_complete"])
+
+    def test_xfiles_ros_entry_present(self):
+        self.assertIn("xfiles_ros_hd_teodormax", self.by_id)
+        self.assertEqual(self.by_id["xfiles_ros_hd_teodormax"]["game_serial"], "SLUS-20179")
+
+    def test_dmc3_se_entry_present(self):
+        self.assertIn("dmc3_se_hd", self.by_id)
+        self.assertEqual(self.by_id["dmc3_se_hd"]["game_serial"], "SLUS-21361")
+
+    def test_tmnt_ai_entry_present(self):
+        self.assertIn("tmnt_ai_upscale", self.by_id)
+        self.assertEqual(self.by_id["tmnt_ai_upscale"]["game_serial"], "SLUS-20716")
+
+    def test_dbz_bt3_entry_present(self):
+        self.assertIn("dbz_bt3_ai_upscale", self.by_id)
+        self.assertEqual(self.by_id["dbz_bt3_ai_upscale"]["game_serial"], "SLUS-21678")
+
+    def test_xiii_ai_hd_entry_present(self):
+        self.assertIn("xiii_ai_hd", self.by_id)
+        self.assertEqual(self.by_id["xiii_ai_hd"]["game_serial"], "SLUS-20677")
+
+    def test_xiii_ai_hd_v2_entry_present(self):
+        self.assertIn("xiii_ai_hd_v2", self.by_id)
+        self.assertEqual(self.by_id["xiii_ai_hd_v2"]["game_serial"], "SLUS-20677")
+
+    def test_curse_eye_of_isis_entry_present(self):
+        self.assertIn("curse_eye_of_isis_hd", self.by_id)
+        self.assertEqual(self.by_id["curse_eye_of_isis_hd"]["game_serial"], "SLES-51934")
+
+    # ------------------------------------------------------------------
+    # PAL serial DB additions
+    # ------------------------------------------------------------------
+    def test_pal_db_007_qos(self):
+        self.assertIn("SLES-55345", self.pal_serial_set,
+                      "007: Quantum of Solace PAL (SLES-55345) missing from PAL DB")
+
+    def test_pal_db_futurama(self):
+        self.assertIn("SLES-51507", self.pal_serial_set,
+                      "Futurama PAL (SLES-51507) missing from PAL DB")
+
+    def test_pal_db_king_kong(self):
+        self.assertIn("SLES-53703", self.pal_serial_set,
+                      "Peter Jackson's King Kong PAL (SLES-53703) missing from PAL DB")
+
+    def test_pal_db_indiana_jones_sok(self):
+        self.assertIn("SLES-55448", self.pal_serial_set,
+                      "Indiana Jones and the Staff of Kings PAL (SLES-55448) missing from PAL DB")
+
+    def test_pal_db_toy_story_3(self):
+        self.assertIn("SLES-55622", self.pal_serial_set,
+                      "Toy Story 3 PAL (SLES-55622) missing from PAL DB")
+
+    def test_pal_db_curse_eye_of_isis(self):
+        self.assertIn("SLES-51934", self.pal_serial_set,
+                      "Curse: The Eye of Isis PAL (SLES-51934) missing from PAL DB")

@@ -1530,6 +1530,66 @@
       "region": "PAL",
       "release_date": "2003-09-05",
       "serial": "SLES-51434"
+    },
+    "007: Quantum of Solace (PAL)": {
+      "serial": "SLES-55345",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Treyarch",
+      "genre": "Action",
+      "publisher": "Activision",
+      "region": "PAL",
+      "release_date": "2008-11-14"
+    },
+    "Futurama (PAL)": {
+      "serial": "SLES-51507",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Unique Development Studios",
+      "genre": "Action",
+      "publisher": "Vivendi Universal Games",
+      "region": "PAL",
+      "release_date": "2003-09-05"
+    },
+    "Peter Jackson's King Kong (PAL)": {
+      "serial": "SLES-53703",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Ubisoft Montpellier",
+      "genre": "Action",
+      "publisher": "Ubisoft",
+      "region": "PAL",
+      "release_date": "2005-11-17"
+    },
+    "Indiana Jones and the Staff of Kings (PAL)": {
+      "serial": "SLES-55448",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "A2M",
+      "genre": "Action-Adventure",
+      "publisher": "LucasArts",
+      "region": "PAL",
+      "release_date": "2009-06-12"
+    },
+    "Toy Story 3 (PAL)": {
+      "serial": "SLES-55622",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Avalanche Software",
+      "genre": "Action",
+      "publisher": "Disney Interactive Studios",
+      "region": "PAL",
+      "release_date": "2010-06-18"
+    },
+    "Curse: The Eye of Isis (PAL)": {
+      "serial": "SLES-51934",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Kuju Entertainment",
+      "genre": "Action-Adventure",
+      "publisher": "DreamCatcher Interactive",
+      "region": "PAL",
+      "release_date": "2003-11-14"
     }
   },
   "version": "1.0"
