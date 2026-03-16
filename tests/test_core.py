@@ -17491,8 +17491,9 @@ class TestWave86CatalogueAndFixes(unittest.TestCase):
     # New entries — ironhulk33 packs
     # ------------------------------------------------------------------
     def test_ironhulk33_hub_present(self):
-        self.assertIn("ironhulk33_hd_ps2_hub", self.by_id)
-        self.assertEqual(self.by_id["ironhulk33_hd_ps2_hub"]["is_hub"], True)
+        # Wave 86 added the hub; Wave 88 renamed the id to josephsdeadish_hd_ps2_hub
+        self.assertIn("josephsdeadish_hd_ps2_hub", self.by_id)
+        self.assertEqual(self.by_id["josephsdeadish_hd_ps2_hub"]["is_hub"], True)
 
     def test_sonic_heroes_ironhulk33_present(self):
         self.assertIn("sonic_heroes_hd_ironhulk33", self.by_id)
@@ -17738,3 +17739,128 @@ class TestWave87ConnectivityAndDbFixes(unittest.TestCase):
         init_body = src[init_start:init_start + 400]
         self.assertIn("Discover", init_body,
                       "BrowsePanel.__init__ must reference 'Discover' in panel title")
+
+
+class TestWave88HubAuthorAndGuitarHeroII(unittest.TestCase):
+    """Wave 88: Hub attribution fix and Guitar Hero II catalogue entry.
+
+    Fixes:
+    - Renamed ironhulk33_hd_ps2_hub → josephsdeadish_hd_ps2_hub.
+      Thread 677743 is confirmed as started by JosephsDeadish (ref entries
+      127, 152, 166, 167 in gbatemp_ps2_texture_packs_expanded_v13.1.txt).
+      Hub convention: author="" (empty); creator name encoded in the 'name'
+      field as "HD PS2 Texture by JosephsDeadish".
+    - Added guitar_hero_2_hd catalogue entry (SLUS-21447) so Guitar Hero II
+      is discoverable by its own serial; both GH1 and GH2 share the same
+      GBAtemp thread 667554 (ref entry 107).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import json, pathlib
+        cls.packs = json.loads(
+            pathlib.Path("data/catalogue/texture_packs.json").read_text()
+        )
+        cls.by_id = {p["id"]: p for p in cls.packs}
+        from src.core.serial_validator import SerialDatabase
+        cls.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # Catalogue size
+    # ------------------------------------------------------------------
+    def test_catalogue_size_after_wave88(self):
+        """After Wave 88 there should be at least 146 texture-pack entries."""
+        self.assertGreaterEqual(len(self.packs), 146,
+                                f"Expected ≥146 packs, got {len(self.packs)}")
+
+    def test_no_duplicate_ids(self):
+        ids = [p["id"] for p in self.packs]
+        self.assertEqual(len(ids), len(set(ids)), "Duplicate catalogue IDs found")
+
+    # ------------------------------------------------------------------
+    # Hub renamed: ironhulk33_hd_ps2_hub → josephsdeadish_hd_ps2_hub
+    # ------------------------------------------------------------------
+    def test_josephsdeadish_hub_present(self):
+        """josephsdeadish_hd_ps2_hub must exist and be flagged as a hub."""
+        self.assertIn("josephsdeadish_hd_ps2_hub", self.by_id)
+        self.assertEqual(self.by_id["josephsdeadish_hd_ps2_hub"]["is_hub"], True)
+
+    def test_josephsdeadish_hub_name_credits_josephsdeadish(self):
+        """Hub name must credit JosephsDeadish as the creator.
+        Hub convention: author="" (empty), creator encoded in 'name' field."""
+        entry = self.by_id["josephsdeadish_hd_ps2_hub"]
+        self.assertIn(
+            "JosephsDeadish", entry["name"],
+            "Hub name must reference JosephsDeadish (confirmed by ref entries 127/152)"
+        )
+
+    def test_josephsdeadish_hub_url_correct(self):
+        """Hub must point to GBAtemp thread 677743."""
+        entry = self.by_id["josephsdeadish_hd_ps2_hub"]
+        self.assertIn("677743", entry["url"],
+                      "Hub URL must reference thread 677743")
+
+    def test_josephsdeadish_hub_name_not_ironhulk33(self):
+        """Hub name must not attribute the thread to ironhulk33."""
+        entry = self.by_id["josephsdeadish_hd_ps2_hub"]
+        self.assertNotIn(
+            "ironhulk33", entry["name"].lower(),
+            "Hub name must not credit ironhulk33 (thread starter is JosephsDeadish)"
+        )
+
+    def test_old_ironhulk33_hub_id_removed(self):
+        """The old ironhulk33_hd_ps2_hub id must not appear in the catalogue."""
+        self.assertNotIn(
+            "ironhulk33_hd_ps2_hub", self.by_id,
+            "ironhulk33_hd_ps2_hub was renamed to josephsdeadish_hd_ps2_hub in Wave 88"
+        )
+
+    # ------------------------------------------------------------------
+    # New entry: Guitar Hero II (SLUS-21447)
+    # ------------------------------------------------------------------
+    def test_guitar_hero_2_hd_present(self):
+        """guitar_hero_2_hd must be present in the catalogue."""
+        self.assertIn("guitar_hero_2_hd", self.by_id)
+
+    def test_guitar_hero_2_hd_serial_correct(self):
+        """guitar_hero_2_hd must use serial SLUS-21447."""
+        entry = self.by_id["guitar_hero_2_hd"]
+        self.assertEqual(entry["game_serial"], "SLUS-21447")
+
+    def test_guitar_hero_2_hd_serial_resolves(self):
+        """SLUS-21447 (Guitar Hero II) must be in SerialDatabase."""
+        titles = self.sdb.titles_for_serial("SLUS-21447")
+        self.assertTrue(len(titles) > 0, "SLUS-21447 must be in SerialDatabase")
+        self.assertTrue(
+            any("guitar hero ii" in t.lower() or "guitar hero 2" in t.lower()
+                for t in titles),
+            f"SLUS-21447 should map to Guitar Hero II, got: {titles}"
+        )
+
+    def test_guitar_hero_2_hd_url_correct(self):
+        """guitar_hero_2_hd must point to GBAtemp thread 667554."""
+        entry = self.by_id["guitar_hero_2_hd"]
+        self.assertIn("667554", entry["url"],
+                      "guitar_hero_2_hd URL must reference thread 667554")
+
+    def test_guitar_hero_2_hd_shares_thread_with_gh1(self):
+        """guitar_hero_2_hd and guitar_hero_1_2_hd must share the same thread URL."""
+        gh1_entry = self.by_id.get("guitar_hero_1_2_hd", {})
+        gh2_entry = self.by_id.get("guitar_hero_2_hd", {})
+        self.assertEqual(
+            gh1_entry.get("url"), gh2_entry.get("url"),
+            "GH1+2 combined entry and GH2-specific entry must point to the same thread"
+        )
+
+    # ------------------------------------------------------------------
+    # All catalogue serials still resolve
+    # ------------------------------------------------------------------
+    def test_all_catalogue_serials_resolve(self):
+        """Every non-empty game_serial in the catalogue must resolve in SerialDatabase."""
+        missing = []
+        for entry in self.packs:
+            serial = entry.get("game_serial", "")
+            if serial and not self.sdb.titles_for_serial(serial):
+                missing.append(f'{entry["id"]}: {serial}')
+        self.assertEqual(missing, [],
+                         "Catalogue entries with serials not in DB:\n" + "\n".join(missing))
