@@ -66,6 +66,11 @@ class GameInfo:
     # "Greatest Hits", "Disc 2", etc.  Only populated for games where
     # specific version information is known; absent keys mean unknown.
     crc_labels: Dict[str, str] = field(default_factory=dict)
+    # Human-readable search aliases: common abbreviations (e.g. "DMC", "GoW"),
+    # regional alternative titles (e.g. "Dark Chronicle" for Dark Cloud 2),
+    # and series shorthand (e.g. "GTA III" for Grand Theft Auto III).
+    # The title itself is implicitly searchable; aliases extend coverage.
+    aliases: List[str] = field(default_factory=list)
 
     def all_serials(self) -> Set[str]:
         """Return the primary serial plus all known alt serials."""
@@ -113,6 +118,7 @@ class SerialDatabase:
         self._games: Dict[str, GameInfo] = {}
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
         self._crc_to_title: Dict[str, str] = {}            # CRC (upper) → game title
+        self._alias_to_titles: Dict[str, List[str]] = {}   # alias lower → game titles
         self._load()
 
     # ------------------------------------------------------------------
@@ -131,6 +137,7 @@ class SerialDatabase:
         self._games = {}
         self._serial_to_titles = {}
         self._crc_to_title = {}
+        self._alias_to_titles = {}
         for path in (self._path, self._pal_path):
             if not path.is_file():
                 continue
@@ -149,12 +156,15 @@ class SerialDatabase:
                     publisher=info.get("publisher") or None,
                     genre=info.get("genre") or None,
                     crc_labels=info.get("crc_labels") or {},
+                    aliases=info.get("aliases") or [],
                 )
                 self._games[title] = gi
                 for s in gi.all_serials():
                     self._serial_to_titles.setdefault(s, []).append(title)
                 for crc in gi.crcs:
                     self._crc_to_title[crc.upper()] = title
+                for alias in gi.aliases:
+                    self._alias_to_titles.setdefault(alias.lower(), []).append(title)
 
     def reload(self) -> None:
         """Reload the database from disk (picks up on-disk changes)."""
@@ -203,6 +213,63 @@ class SerialDatabase:
     def game_count(self) -> int:
         """Return the total number of games in the database."""
         return len(self._games)
+
+    def aliases_for_title(self, title: str) -> List[str]:
+        """Return the list of search aliases for *title* (empty if none)."""
+        gi = self._games.get(title)
+        return list(gi.aliases) if gi else []
+
+    def search_titles(self, query: str) -> List[str]:
+        """Return all game titles whose title *or* any alias contains *query*.
+
+        The match is a case-insensitive substring check against the canonical
+        title and every alias stored for that game.  Useful for resolving
+        abbreviations (e.g. "GoW" → ["God of War"]) and regional variant
+        names (e.g. "Dark Chronicle" → ["Dark Cloud 2"]).
+
+        Examples::
+
+            sdb.search_titles("GoW")           # ["God of War", "God of War II", ...]
+            sdb.search_titles("dark chronicle") # ["Dark Cloud 2"]
+            sdb.search_titles("gta iii")        # ["Grand Theft Auto III"]
+        """
+        q = query.strip().lower()
+        if not q:
+            return []
+        seen: set = set()
+        results: List[str] = []
+        for title, gi in self._games.items():
+            if title in seen:
+                continue
+            if q in title.lower() or any(q in a.lower() for a in gi.aliases):
+                results.append(title)
+                seen.add(title)
+        return sorted(results)
+
+    def title_matches_query(self, game_title: str, query: str) -> bool:
+        """Return ``True`` if *query* matches *game_title* or any of its aliases.
+
+        Used by search/filter UIs so that a user can type an abbreviation
+        (e.g. ``"DMC3"``) and still find an entry whose ``game`` field contains
+        the full canonical name (``"Devil May Cry 3: Dante's Awakening"``).
+
+        The match is a case-insensitive substring check::
+
+            sdb.title_matches_query("Devil May Cry 3: Dante's Awakening", "DMC3")
+            # True — "DMC3" is an alias for that title
+
+            sdb.title_matches_query("Devil May Cry 3: Dante's Awakening", "Dante")
+            # True — "Dante" appears in the title itself
+        """
+        q = query.strip().lower()
+        if not q:
+            return True
+        if q in game_title.lower():
+            return True
+        gi = self._games.get(game_title)
+        if gi:
+            return any(q in a.lower() for a in gi.aliases)
+        return False
 
     def serial_for_crc(self, crc: str) -> Optional[str]:
         """Return the primary serial for the game that owns *crc*, or ``None``.

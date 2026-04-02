@@ -125,7 +125,11 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2006-10-27",
-      "serial": "SLES-54145"
+      "serial": "SLES-54145",
+      "aliases": [
+        "Bully Canis Canem Edit",
+        "Canis Canem Edit"
+      ]
     },
     "Burnout 3: Takedown (PAL)": {
       "alt_serials": [
@@ -138,7 +142,11 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2004-09-10",
-      "serial": "SLES-54586"
+      "serial": "SLES-54586",
+      "aliases": [
+        "BO3",
+        "Burnout 3"
+      ]
     },
     "Burnout Revenge (PAL)": {
       "alt_serials": [],
@@ -230,7 +238,11 @@
       "publisher": "Capcom",
       "region": "PAL",
       "release_date": "2002-01-11",
-      "serial": "SLES-50358"
+      "serial": "SLES-50358",
+      "aliases": [
+        "DMC",
+        "DMC1"
+      ]
     },
     "Devil May Cry 2 (PAL)": {
       "alt_serials": [],
@@ -240,7 +252,10 @@
       "publisher": "Capcom",
       "region": "PAL",
       "release_date": "2003-07-11",
-      "serial": "SLES-51265"
+      "serial": "SLES-51265",
+      "aliases": [
+        "DMC2"
+      ]
     },
     "Devil May Cry 3: Dante's Awakening (PAL)": {
       "alt_serials": [
@@ -252,7 +267,11 @@
       "publisher": "Capcom",
       "region": "PAL",
       "release_date": "2005-09-30",
-      "serial": "SLES-52806"
+      "serial": "SLES-52806",
+      "aliases": [
+        "DMC 3",
+        "DMC3"
+      ]
     },
     "Devil May Cry 3: Special Edition (PAL)": {
       "alt_serials": [],
@@ -294,7 +313,10 @@
       "publisher": "Namco Bandai Games",
       "region": "PAL",
       "release_date": "2006-11-03",
-      "serial": "SLES-54164"
+      "serial": "SLES-54164",
+      "aliases": [
+        "DBZ BT2"
+      ]
     },
     "Dragon Ball Z: Budokai Tenkaichi 3 (PAL)": {
       "alt_serials": [],
@@ -304,7 +326,10 @@
       "publisher": "Namco Bandai Games",
       "region": "PAL",
       "release_date": "2007-11-09",
-      "serial": "SLES-54994"
+      "serial": "SLES-54994",
+      "aliases": [
+        "DBZ BT3"
+      ]
     },
     "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
       "alt_serials": [],
@@ -370,7 +395,10 @@
       "publisher": "Atari",
       "region": "PAL",
       "release_date": "2005-09-16",
-      "serial": "SLES-53539"
+      "serial": "SLES-53539",
+      "aliases": [
+        "Indigo Prophecy"
+      ]
     },
     "Final Fantasy X (PAL)": {
       "alt_serials": [
@@ -384,7 +412,11 @@
       "publisher": "Square Electronic Arts",
       "region": "PAL",
       "release_date": "2002-05-24",
-      "serial": "SCES-50492"
+      "serial": "SCES-50492",
+      "aliases": [
+        "FF10",
+        "FFX"
+      ]
     },
     "Final Fantasy X-2 (PAL)": {
       "alt_serials": [
@@ -398,7 +430,11 @@
       "publisher": "Square Enix",
       "region": "PAL",
       "release_date": "2003-11-21",
-      "serial": "SLES-51815"
+      "serial": "SLES-51815",
+      "aliases": [
+        "FFX-2",
+        "FFX2"
+      ]
     },
     "Final Fantasy XII (PAL)": {
       "alt_serials": [],
@@ -408,7 +444,11 @@
       "publisher": "Square Enix",
       "region": "PAL",
       "release_date": "2006-11-10",
-      "serial": "SLES-54354"
+      "serial": "SLES-54354",
+      "aliases": [
+        "FF12",
+        "FFXII"
+      ]
     },
     "Finding Nemo (PAL)": {
       "alt_serials": [],
@@ -462,7 +502,11 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2005-07-08",
-      "serial": "SCES-53133"
+      "serial": "SCES-53133",
+      "aliases": [
+        "GoW",
+        "GoW1"
+      ]
     },
     "God of War II (PAL)": {
       "alt_serials": [],
@@ -472,7 +516,12 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2007-06-08",
-      "serial": "SCES-54803"
+      "serial": "SCES-54803",
+      "aliases": [
+        "GoW 2",
+        "GoW II",
+        "GoW2"
+      ]
     },
     "Gran Turismo 3: A-spec (PAL)": {
       "alt_serials": [],
@@ -512,7 +561,11 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2002-05-03",
-      "serial": "SLES-50330"
+      "serial": "SLES-50330",
+      "aliases": [
+        "GTA III",
+        "GTA3"
+      ]
     },
     "Grand Theft Auto: Liberty City Stories (PAL)": {
       "alt_serials": [],
@@ -524,7 +577,10 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2006-06-23",
-      "serial": "SLES-54135"
+      "serial": "SLES-54135",
+      "aliases": [
+        "GTA LCS"
+      ]
     },
     "Grand Theft Auto: San Andreas (PAL)": {
       "alt_serials": [],
@@ -534,7 +590,11 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2005-01-25",
-      "serial": "SLES-52927"
+      "serial": "SLES-52927",
+      "aliases": [
+        "GTA SA",
+        "GTASA"
+      ]
     },
     "Grand Theft Auto: Vice City (PAL)": {
       "alt_serials": [],
@@ -544,7 +604,11 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2003-05-09",
-      "serial": "SLES-51999"
+      "serial": "SLES-51999",
+      "aliases": [
+        "GTA VC",
+        "GTAVC"
+      ]
     },
     "Grand Theft Auto: Vice City Stories (PAL)": {
       "alt_serials": [],
@@ -696,7 +760,11 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2002-11-15",
-      "serial": "SLES-51152"
+      "serial": "SLES-51152",
+      "aliases": [
+        "KH",
+        "KH1"
+      ]
     },
     "Kingdom Hearts II (PAL)": {
       "alt_serials": [
@@ -710,7 +778,10 @@
       "publisher": "Square Enix",
       "region": "PAL",
       "release_date": "2006-09-29",
-      "serial": "SLES-54114"
+      "serial": "SLES-54114",
+      "aliases": [
+        "KH2"
+      ]
     },
     "L.A. Rush (PAL)": {
       "alt_serials": [],
@@ -771,7 +842,10 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2002-03-08",
-      "serial": "SLES-50383"
+      "serial": "SLES-50383",
+      "aliases": [
+        "MGS2"
+      ]
     },
     "Metal Gear Solid 2: Substance (PAL)": {
       "alt_serials": [],
@@ -791,7 +865,10 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2004-12-10",
-      "serial": "SLES-52557"
+      "serial": "SLES-52557",
+      "aliases": [
+        "MGS3"
+      ]
     },
     "Metal Gear Solid 3: Subsistence (PAL)": {
       "alt_serials": [],
@@ -845,7 +922,10 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2006-11-03",
-      "serial": "SLES-54493"
+      "serial": "SLES-54493",
+      "aliases": [
+        "NFSC"
+      ]
     },
     "Need for Speed: Most Wanted (PAL)": {
       "alt_serials": [
@@ -861,7 +941,10 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2005-11-25",
-      "serial": "SLES-53557"
+      "serial": "SLES-53557",
+      "aliases": [
+        "NFSMW"
+      ]
     },
     "Need for Speed: Underground (PAL)": {
       "alt_serials": [],
@@ -871,7 +954,10 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2003-11-21",
-      "serial": "SLES-50978"
+      "serial": "SLES-50978",
+      "aliases": [
+        "NFSU"
+      ]
     },
     "Need for Speed: Underground 2 (PAL)": {
       "alt_serials": [],
@@ -884,7 +970,10 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2004-11-19",
-      "serial": "SLES-52725"
+      "serial": "SLES-52725",
+      "aliases": [
+        "NFSU2"
+      ]
     },
     "Neopets: The Darkest Fairy (PAL)": {
       "alt_serials": [],
@@ -1007,7 +1096,12 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2003-11-07",
-      "serial": "SCES-51561"
+      "serial": "SCES-51561",
+      "aliases": [
+        "Locked and Loaded",
+        "RC2",
+        "Ratchet & Clank: Going Commando"
+      ]
     },
     "Red Faction II (PAL)": {
       "alt_serials": [],
@@ -1031,7 +1125,10 @@
       "publisher": "Capcom",
       "region": "PAL",
       "release_date": "2005-11-04",
-      "serial": "SLES-53702"
+      "serial": "SLES-53702",
+      "aliases": [
+        "RE4"
+      ]
     },
     "Resident Evil Code: Veronica X (PAL)": {
       "alt_serials": [],
@@ -1079,7 +1176,11 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2006-02-17",
-      "serial": "SCES-53326"
+      "serial": "SCES-53326",
+      "aliases": [
+        "SOTC",
+        "SotC"
+      ]
     },
     "Silent Hill 2 (PAL)": {
       "alt_serials": [
@@ -1091,7 +1192,10 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2002-02-22",
-      "serial": "SLES-50356"
+      "serial": "SLES-50356",
+      "aliases": [
+        "SH2"
+      ]
     },
     "Silent Hill 3 (PAL)": {
       "alt_serials": [
@@ -1103,7 +1207,10 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2003-08-22",
-      "serial": "SLES-51428"
+      "serial": "SLES-51428",
+      "aliases": [
+        "SH3"
+      ]
     },
     "Silent Hill 4: The Room (PAL)": {
       "alt_serials": [

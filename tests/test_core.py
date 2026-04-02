@@ -18145,3 +18145,289 @@ class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
         record_event_pos = src_text.find("record_event", install_patch_pos)
         self.assertGreater(record_event_pos, install_patch_pos,
                            "_install_patch must call record_event")
+
+
+# ---------------------------------------------------------------------------
+# Wave 90 – Aliases, regional variants & alias-aware search
+# ---------------------------------------------------------------------------
+
+class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
+    """Wave 90: aliases field added to DB; search_titles + title_matches_query."""
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        from src.core.serial_validator import SerialDatabase, GameInfo
+
+        cls.sdb = SerialDatabase()
+        db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        with open(db_path, encoding="utf-8") as f:
+            raw = json.load(f)
+        cls.games = raw["games"]
+
+        pal_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
+        with open(pal_path, encoding="utf-8") as f:
+            raw_pal = json.load(f)
+        cls.pal_games = raw_pal["games"]
+
+    # ------------------------------------------------------------------
+    # GameInfo dataclass has aliases field
+    # ------------------------------------------------------------------
+
+    def test_gameinfo_has_aliases_field(self):
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test Game", serial="SLUS-99999", aliases=["TG", "TG2"])
+        self.assertEqual(gi.aliases, ["TG", "TG2"])
+
+    def test_gameinfo_aliases_default_empty(self):
+        from src.core.serial_validator import GameInfo
+        gi = GameInfo(title="Test Game", serial="SLUS-99999")
+        self.assertEqual(gi.aliases, [])
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.aliases_for_title()
+    # ------------------------------------------------------------------
+
+    def test_aliases_for_title_gow(self):
+        self.assertIn("GoW", self.sdb.aliases_for_title("God of War"))
+
+    def test_aliases_for_title_dmc3(self):
+        aliases = self.sdb.aliases_for_title("Devil May Cry 3: Dante's Awakening")
+        self.assertTrue(any("DMC3" in a for a in aliases))
+
+    def test_aliases_for_title_kh2(self):
+        aliases = self.sdb.aliases_for_title("Kingdom Hearts II")
+        self.assertIn("KH2", aliases)
+
+    def test_aliases_for_title_unknown_game(self):
+        self.assertEqual(self.sdb.aliases_for_title("Nonexistent Game XYZ"), [])
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.search_titles() – abbreviation search
+    # ------------------------------------------------------------------
+
+    def test_search_titles_dmc3(self):
+        results = self.sdb.search_titles("DMC3")
+        titles_lower = [r.lower() for r in results]
+        self.assertTrue(any("devil may cry 3" in t for t in titles_lower),
+                        f"DMC3 should resolve to Devil May Cry 3, got: {results}")
+
+    def test_search_titles_gow(self):
+        results = self.sdb.search_titles("GoW")
+        self.assertTrue(any("god of war" in r.lower() for r in results))
+
+    def test_search_titles_gta_iii(self):
+        results = self.sdb.search_titles("GTA III")
+        self.assertTrue(any("grand theft auto iii" in r.lower() for r in results))
+
+    def test_search_titles_gtasa(self):
+        results = self.sdb.search_titles("GTASA")
+        self.assertTrue(any("san andreas" in r.lower() for r in results))
+
+    def test_search_titles_kh2(self):
+        results = self.sdb.search_titles("KH2")
+        self.assertTrue(any("kingdom hearts ii" in r.lower() for r in results))
+
+    def test_search_titles_ffx(self):
+        results = self.sdb.search_titles("FFX")
+        self.assertTrue(any("final fantasy x" in r.lower() for r in results))
+
+    def test_search_titles_mgs3(self):
+        results = self.sdb.search_titles("MGS3")
+        self.assertTrue(any("metal gear solid 3" in r.lower() for r in results))
+
+    def test_search_titles_sotc(self):
+        results = self.sdb.search_titles("SotC")
+        self.assertTrue(any("shadow of the colossus" in r.lower() for r in results))
+
+    def test_search_titles_dq8(self):
+        results = self.sdb.search_titles("DQ8")
+        self.assertTrue(any("dragon quest viii" in r.lower() for r in results))
+
+    def test_search_titles_nfsmw(self):
+        results = self.sdb.search_titles("NFSMW")
+        self.assertTrue(any("most wanted" in r.lower() for r in results))
+
+    def test_search_titles_re4(self):
+        results = self.sdb.search_titles("RE4")
+        self.assertTrue(any("resident evil 4" in r.lower() for r in results))
+
+    def test_search_titles_sh2(self):
+        results = self.sdb.search_titles("SH2")
+        self.assertTrue(any("silent hill 2" in r.lower() for r in results))
+
+    def test_search_titles_empty_query(self):
+        self.assertEqual(self.sdb.search_titles(""), [])
+
+    def test_search_titles_unknown_query_returns_empty(self):
+        results = self.sdb.search_titles("ZZZZZ_INVALID_9999")
+        self.assertEqual(results, [])
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.search_titles() – regional alternate title search
+    # ------------------------------------------------------------------
+
+    def test_search_titles_dark_chronicle(self):
+        """'dark chronicle' (PAL name) should resolve to Dark Cloud 2."""
+        results = self.sdb.search_titles("dark chronicle")
+        self.assertTrue(any("dark cloud 2" in r.lower() for r in results),
+                        f"Expected Dark Cloud 2 in results, got: {results}")
+
+    def test_search_titles_canis_canem_edit(self):
+        """'canis canem edit' (PAL name) should resolve to Bully."""
+        results = self.sdb.search_titles("canis canem")
+        self.assertTrue(any("bully" in r.lower() for r in results),
+                        f"Expected Bully in results, got: {results}")
+
+    def test_search_titles_indigo_prophecy(self):
+        """'indigo prophecy' (NTSC name) should resolve to Fahrenheit."""
+        results = self.sdb.search_titles("indigo prophecy")
+        self.assertTrue(any("fahrenheit" in r.lower() for r in results),
+                        f"Expected Fahrenheit in results, got: {results}")
+
+    def test_search_titles_locked_and_loaded(self):
+        """'locked and loaded' (PAL Ratchet 2 title) should resolve to Ratchet & Clank: Going Commando."""
+        results = self.sdb.search_titles("locked and loaded")
+        self.assertTrue(any("ratchet" in r.lower() for r in results),
+                        f"Expected Ratchet in results, got: {results}")
+
+    def test_search_titles_fahrenheit_as_ntsc_title(self):
+        """'fahrenheit' matches both NTSC 'Fahrenheit / Indigo Prophecy' and PAL 'Fahrenheit'."""
+        results = self.sdb.search_titles("fahrenheit")
+        self.assertTrue(len(results) >= 1)
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.title_matches_query()
+    # ------------------------------------------------------------------
+
+    def test_title_matches_query_abbreviation(self):
+        self.assertTrue(self.sdb.title_matches_query("Devil May Cry 3: Dante's Awakening", "DMC3"))
+
+    def test_title_matches_query_full_name(self):
+        self.assertTrue(self.sdb.title_matches_query("Grand Theft Auto III", "grand theft auto"))
+
+    def test_title_matches_query_regional_alias(self):
+        self.assertTrue(self.sdb.title_matches_query("Dark Cloud 2", "dark chronicle"))
+
+    def test_title_matches_query_regional_bully(self):
+        self.assertTrue(self.sdb.title_matches_query("Bully", "canis canem"))
+
+    def test_title_matches_query_false_when_no_match(self):
+        self.assertFalse(self.sdb.title_matches_query("Kingdom Hearts", "DMC3"))
+
+    def test_title_matches_query_empty_returns_true(self):
+        self.assertTrue(self.sdb.title_matches_query("Kingdom Hearts", ""))
+
+    def test_title_matches_query_unknown_title(self):
+        """Unknown title (not in DB) falls back to substring check only."""
+        self.assertTrue(self.sdb.title_matches_query("Some Unknown Game", "unknown"))
+        self.assertFalse(self.sdb.title_matches_query("Some Unknown Game", "DMC3"))
+
+    # ------------------------------------------------------------------
+    # Alias data correctness in NTSC-U JSON
+    # ------------------------------------------------------------------
+
+    def test_god_of_war_has_gow_alias(self):
+        self.assertIn("GoW", self.games.get("God of War", {}).get("aliases", []))
+
+    def test_devil_may_cry_3_has_dmc3_alias(self):
+        aliases = self.games.get("Devil May Cry 3: Dante's Awakening", {}).get("aliases", [])
+        self.assertIn("DMC3", aliases)
+
+    def test_kingdom_hearts_ii_has_kh2_alias(self):
+        self.assertIn("KH2", self.games.get("Kingdom Hearts II", {}).get("aliases", []))
+
+    def test_final_fantasy_x_has_ffx_alias(self):
+        self.assertIn("FFX", self.games.get("Final Fantasy X", {}).get("aliases", []))
+
+    def test_gta_iii_has_gta_iii_alias(self):
+        self.assertIn("GTA III", self.games.get("Grand Theft Auto III", {}).get("aliases", []))
+
+    def test_dark_cloud_2_has_dark_chronicle_alias(self):
+        self.assertIn("Dark Chronicle", self.games.get("Dark Cloud 2", {}).get("aliases", []))
+
+    def test_bully_has_canis_canem_alias(self):
+        self.assertIn("Canis Canem Edit", self.games.get("Bully", {}).get("aliases", []))
+
+    def test_indigo_prophecy_is_alias_of_fahrenheit(self):
+        """'Fahrenheit / Indigo Prophecy' or similar entry should mention indigo prophecy."""
+        # Check both NTSC and PAL versions
+        all_titles = dict(**self.games, **self.pal_games)
+        fahrenheit_entries = [(t, info) for t, info in all_titles.items() if "fahrenheit" in t.lower()]
+        has_indigo_alias = any(
+            "Indigo Prophecy" in info.get("aliases", [])
+            for _, info in fahrenheit_entries
+        )
+        self.assertTrue(has_indigo_alias,
+                        f"Fahrenheit entry should have 'Indigo Prophecy' alias. Entries: {fahrenheit_entries}")
+
+    def test_ratchet_going_commando_has_locked_and_loaded_alias(self):
+        """At least one Ratchet: Going Commando entry should have 'Locked and Loaded' alias."""
+        all_titles = dict(**self.games, **self.pal_games)
+        locked_alias_entries = [
+            t for t, info in all_titles.items()
+            if "Locked and Loaded" in info.get("aliases", [])
+        ]
+        self.assertTrue(len(locked_alias_entries) >= 1,
+                        f"No entries have 'Locked and Loaded' alias; searched {len(all_titles)} titles")
+
+    # ------------------------------------------------------------------
+    # PAL alias data correctness
+    # ------------------------------------------------------------------
+
+    def test_pal_gow_has_gow_alias(self):
+        self.assertIn("GoW", self.pal_games.get("God of War (PAL)", {}).get("aliases", []))
+
+    def test_pal_dmc_has_dmc1_alias(self):
+        self.assertIn("DMC", self.pal_games.get("Devil May Cry (PAL)", {}).get("aliases", []))
+
+    def test_pal_bully_has_canis_canem_edit_alias(self):
+        self.assertIn("Canis Canem Edit", self.pal_games.get("Bully (PAL)", {}).get("aliases", []))
+
+    def test_pal_fahrenheit_has_indigo_prophecy_alias(self):
+        self.assertIn("Indigo Prophecy", self.pal_games.get("Fahrenheit (PAL)", {}).get("aliases", []))
+
+    def test_pal_ratchet2_has_locked_and_loaded_alias(self):
+        self.assertIn("Locked and Loaded",
+                      self.pal_games.get("Ratchet & Clank 2: Going Commando (PAL)", {}).get("aliases", []))
+
+    # ------------------------------------------------------------------
+    # serial_validator.py code checks
+    # ------------------------------------------------------------------
+
+    def test_serial_validator_has_aliases_in_load(self):
+        """serial_validator._load must load the 'aliases' field from JSON."""
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "core" / "serial_validator.py").read_text(encoding="utf-8")
+        self.assertIn('aliases=info.get("aliases")', src,
+                      "_load must read 'aliases' from JSON")
+
+    def test_serial_validator_has_search_titles_method(self):
+        from src.core.serial_validator import SerialDatabase
+        self.assertTrue(hasattr(SerialDatabase, "search_titles"))
+
+    def test_serial_validator_has_title_matches_query_method(self):
+        from src.core.serial_validator import SerialDatabase
+        self.assertTrue(hasattr(SerialDatabase, "title_matches_query"))
+
+    def test_browse_panel_uses_title_matches_query(self):
+        """browse_panel.apply_filters must use title_matches_query for alias expansion."""
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py").read_text(encoding="utf-8")
+        self.assertIn("title_matches_query", src,
+                      "apply_filters must call title_matches_query for alias-aware search")
+
+    # ------------------------------------------------------------------
+    # Games with aliases count
+    # ------------------------------------------------------------------
+
+    def test_ntsc_u_games_with_aliases_count(self):
+        count = sum(1 for info in self.games.values() if info.get("aliases"))
+        self.assertGreaterEqual(count, 100,
+                                f"Expected ≥100 NTSC-U games with aliases, got {count}")
+
+    def test_pal_games_with_aliases_count(self):
+        count = sum(1 for info in self.pal_games.values() if info.get("aliases"))
+        self.assertGreaterEqual(count, 20,
+                                f"Expected ≥20 PAL games with aliases, got {count}")

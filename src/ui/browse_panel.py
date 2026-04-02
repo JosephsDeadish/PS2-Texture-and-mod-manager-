@@ -1951,6 +1951,17 @@ class _CatalogueTabContent(QWidget):
         q = query.lower()
         fav_authors = getattr(self.config, "favorite_authors", [])
 
+        # Resolve alias-aware game title matching via the serial database.
+        # This lets users search "DMC3", "GoW", "GTA III" etc. and find entries
+        # whose catalogue "game" field uses the full canonical title.
+        _sdb = None
+        if q:
+            try:
+                from src.core.serial_validator import SerialDatabase
+                _sdb = SerialDatabase()
+            except Exception:
+                pass
+
         filtered = []
         for e in self._all_entries:
             # NSFW filter — hide adult-content entries unless the user enables them
@@ -1968,15 +1979,27 @@ class _CatalogueTabContent(QWidget):
             # In-app download filter — hide entries that require a browser or external tool
             if in_app_only and not _entry_is_in_app_downloadable(e):
                 continue
-            if q and not (
-                q in e.get("name", "").lower()
-                or q in e.get("description", "").lower()
-                or q in e.get("author", "").lower()
-                or q in e.get("game", "").lower()
-                or q in e.get("context", "").lower()
-                or any(q in t.lower() for t in e.get("tags", []))
-            ):
-                continue
+            if q:
+                game_field = e.get("game", "")
+                # Alias-aware game field matching: if the query doesn't match
+                # the raw game string, check via SerialDatabase aliases.
+                game_matches = (
+                    q in game_field.lower()
+                    or (
+                        _sdb is not None
+                        and game_field
+                        and _sdb.title_matches_query(game_field, q)
+                    )
+                )
+                if not (
+                    q in e.get("name", "").lower()
+                    or q in e.get("description", "").lower()
+                    or q in e.get("author", "").lower()
+                    or game_matches
+                    or q in e.get("context", "").lower()
+                    or any(q in t.lower() for t in e.get("tags", []))
+                ):
+                    continue
             if source and e.get("source", "") != source:
                 continue
             if author and e.get("author", "") != author:

@@ -968,6 +968,9 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     Reverse lookup: return all ``(serial, title)`` pairs whose title contains
     *title_fragment* as a case-insensitive substring.
 
+    Also searches game aliases via :class:`~src.core.serial_validator.SerialDatabase`
+    so that abbreviations like ``"GoW"`` or ``"DMC3"`` resolve correctly.
+
     Useful for "find all serials for Kingdom Hearts" style searches.
 
     Example::
@@ -979,11 +982,23 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     if not title_fragment:
         return []
     frag = title_fragment.lower()
-    return sorted(
+    results = sorted(
         [(serial, title) for serial, title in _KNOWN_SERIALS.items()
          if frag in title.lower()],
         key=lambda x: x[0],
     )
+    # Also resolve via serial DB aliases so abbreviations like "GoW" work.
+    try:
+        from src.core.serial_validator import SerialDatabase
+        _sdb = SerialDatabase()
+        alias_titles = set(_sdb.search_titles(title_fragment)) - {t for _, t in results}
+        for title in sorted(alias_titles):
+            serial = _sdb.get_serial(title)
+            if serial:
+                results.append((serial, title))
+    except Exception:
+        pass
+    return results
 
 
 def is_valid_serial(text: str) -> bool:
