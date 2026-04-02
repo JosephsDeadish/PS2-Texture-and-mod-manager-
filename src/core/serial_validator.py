@@ -79,6 +79,22 @@ class GameInfo:
         """Return the primary serial plus all known alt serials."""
         return {self.serial} | set(self.alt_serials)
 
+    @property
+    def region(self) -> str:
+        """Return the region derived from the primary serial prefix.
+
+        Returns one of ``"NTSC-U"``, ``"PAL"``, ``"NTSC-J"``, ``"NTSC-K"``,
+        ``"Asia"``, or ``""`` when the prefix is not recognised.
+
+        Examples::
+
+            GameInfo(serial="SLUS-20062", ...).region  # "NTSC-U"
+            GameInfo(serial="SLES-50000", ...).region  # "PAL"
+            GameInfo(serial="SLPS-25000", ...).region  # "NTSC-J"
+        """
+        from src.core.game_registry import serial_to_region  # local import avoids circular dep
+        return serial_to_region(self.serial)
+
 
 @dataclass
 class ValidationIssue:
@@ -209,6 +225,41 @@ class SerialDatabase:
     def titles_for_serial(self, serial: str) -> List[str]:
         """Return all game titles that list *serial* (primary or alt)."""
         return list(self._serial_to_titles.get(serial, []))
+
+    def info_for_serial(self, serial: str) -> Optional[GameInfo]:
+        """Return the :class:`GameInfo` for the game that owns *serial*, or ``None``.
+
+        Both primary and alt serials are searched.  When multiple titles share
+        *serial* (rare edge-case), the first match is returned.
+
+        Examples::
+
+            sdb.info_for_serial("SLUS-20062")  # GameInfo for "Spyro: Enter the Dragonfly"
+            sdb.info_for_serial("SCUS-97113")  # GameInfo for "Ico"
+        """
+        titles = self._serial_to_titles.get(serial.upper() if serial else "", [])
+        for title in titles:
+            gi = self._games.get(title)
+            if gi:
+                return gi
+        return None
+
+    def crcs_for_serial(self, serial: str) -> List[str]:
+        """Return the list of known CRCs for the game that owns *serial*.
+
+        Both primary and alt serials are searched.  Returns an empty list when
+        the serial is not in the database or has no CRCs recorded.
+
+        Examples::
+
+            sdb.crcs_for_serial("SCUS-97399")
+            # ["17D68D15", "F0A34C75"]  (God of War original + Greatest Hits)
+
+            sdb.crcs_for_serial("SLUS-99999")
+            # []  (unknown serial)
+        """
+        gi = self.info_for_serial(serial)
+        return list(gi.crcs) if gi else []
 
     def all_titles(self) -> List[str]:
         """Return all game titles in the database (sorted)."""

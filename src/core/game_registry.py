@@ -84,6 +84,51 @@ SERIAL_PREFIXES: Tuple[str, ...] = (
 )
 
 # ---------------------------------------------------------------------------
+# Region mapping — serial prefix → human-readable region name
+# ---------------------------------------------------------------------------
+
+#: Maps each 4-letter serial prefix to its region string.
+_PREFIX_TO_REGION: dict[str, str] = {
+    # North America
+    "SLUS": "NTSC-U", "SCUS": "NTSC-U",
+    "SCCD": "NTSC-U", "SLCD": "NTSC-U",  # NA demo/promo
+    # Europe / PAL
+    "SLES": "PAL", "SCES": "PAL",
+    "SLEH": "PAL", "SCEH": "PAL",
+    "SLED": "PAL", "SCED": "PAL",  # PAL demo
+    "SCZS": "PAL",                  # European special
+    # Japan
+    "SLPS": "NTSC-J", "SCPS": "NTSC-J",
+    "SLPM": "NTSC-J", "SCPM": "NTSC-J",
+    "SLPD": "NTSC-J", "SCPD": "NTSC-J",  # JP demo/promo
+    # Korea
+    "SLKA": "NTSC-K", "SCKA": "NTSC-K",
+    # Asia (general)
+    "SLAJ": "Asia",   "SCAJ": "Asia",
+    "SCCS": "Asia",   "SLCS": "Asia",    # Chinese / Taiwan
+}
+
+
+def serial_to_region(serial: str) -> str:
+    """Return the region name for *serial* (e.g. ``"NTSC-U"`` for ``"SLUS-…"``).
+
+    Returns an empty string when the prefix is not recognised (e.g. ``"PBPX"``
+    or an empty/invalid input).
+
+    Examples::
+
+        serial_to_region("SLUS-20062")  # -> "NTSC-U"
+        serial_to_region("SLES-50000")  # -> "PAL"
+        serial_to_region("SLPS-25000")  # -> "NTSC-J"
+        serial_to_region("SLKA-10000")  # -> "NTSC-K"
+        serial_to_region("")            # -> ""
+    """
+    if not serial:
+        return ""
+    return _PREFIX_TO_REGION.get(serial[:4].upper(), "")
+
+
+# ---------------------------------------------------------------------------
 # Serial detection regex
 # ---------------------------------------------------------------------------
 

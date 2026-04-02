@@ -18753,3 +18753,201 @@ class TestWave91And92And93(unittest.TestCase):
         self.assertEqual(iss.code, "test_code")
         self.assertEqual(iss.message, "test message")
         self.assertIsNone(iss.patch)
+
+
+# ===========================================================================
+# Wave 97 — Game Identity (region, disc_type, crcs, serial_to_region)
+# ===========================================================================
+
+class TestWave97GameIdentity(unittest.TestCase):
+    """Tests for full game identity: region, disc_type, CRCs, serial_to_region."""
+
+    # ------------------------------------------------------------------
+    # serial_to_region() in game_registry
+    # ------------------------------------------------------------------
+
+    def test_serial_to_region_ntsc_u(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("SLUS-20062"), "NTSC-U")
+        self.assertEqual(serial_to_region("SCUS-97399"), "NTSC-U")
+
+    def test_serial_to_region_pal(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("SLES-50000"), "PAL")
+        self.assertEqual(serial_to_region("SCES-50000"), "PAL")
+
+    def test_serial_to_region_ntsc_j(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("SLPS-25000"), "NTSC-J")
+        self.assertEqual(serial_to_region("SLPM-65515"), "NTSC-J")
+
+    def test_serial_to_region_ntsc_k(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("SLKA-10000"), "NTSC-K")
+
+    def test_serial_to_region_unknown(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("PBPX-99999"), "")
+        self.assertEqual(serial_to_region(""), "")
+
+    def test_serial_to_region_case_insensitive(self):
+        from src.core.game_registry import serial_to_region
+        self.assertEqual(serial_to_region("slus-20062"), "NTSC-U")
+        self.assertEqual(serial_to_region("Sles-50000"), "PAL")
+
+    # ------------------------------------------------------------------
+    # GameInfo.region property
+    # ------------------------------------------------------------------
+
+    def test_game_info_region_ntsc_u(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        gi = sdb.info_for_serial("SCUS-97399")  # God of War
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "NTSC-U")
+
+    def test_game_info_region_pal(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        gi = sdb.info_for_serial("SLES-51918")  # Prince of Persia: The Sands of Time PAL
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "PAL")
+
+    def test_game_info_region_ntsc_j(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        gi = sdb.info_for_serial("SLPM-65515")  # Dragon Quest V JP
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "NTSC-J")
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.info_for_serial()
+    # ------------------------------------------------------------------
+
+    def test_info_for_serial_primary(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        gi = sdb.info_for_serial("SLUS-20370")  # Kingdom Hearts
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.title, "Kingdom Hearts")
+
+    def test_info_for_serial_alt(self):
+        """info_for_serial must find games via alt_serials too."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        # Black has SLUS-21376 as primary; SLES-53886 is in alt_serials for
+        # cross-region matching — look up the PAL alt
+        gi = sdb.info_for_serial("SLES-53886")
+        # Should find the game through its alt_serial
+        self.assertIsNotNone(gi, "info_for_serial should resolve alt_serials")
+
+    def test_info_for_serial_unknown(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        self.assertIsNone(sdb.info_for_serial("SLUS-99999"))
+
+    # ------------------------------------------------------------------
+    # SerialDatabase.crcs_for_serial()
+    # ------------------------------------------------------------------
+
+    def test_crcs_for_serial_has_results(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        crcs = sdb.crcs_for_serial("SCUS-97399")  # God of War — has 2+ known CRCs
+        self.assertIsInstance(crcs, list)
+        self.assertGreater(len(crcs), 0, "God of War should have at least one CRC")
+
+    def test_crcs_for_serial_format(self):
+        """Each CRC must be an 8-character uppercase hex string."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        crcs = sdb.crcs_for_serial("SCUS-97399")
+        for crc in crcs:
+            self.assertRegex(crc, r'^[0-9A-F]{8}$',
+                             f"CRC {crc!r} must be 8 uppercase hex digits")
+
+    def test_crcs_for_serial_unknown_returns_empty(self):
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        self.assertEqual(sdb.crcs_for_serial("SLUS-99999"), [])
+
+    # ------------------------------------------------------------------
+    # GameEntry.disc_type property
+    # ------------------------------------------------------------------
+
+    def test_game_entry_disc_type_iso(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/game.iso", filename="game.iso",
+                      serial="", title="")
+        self.assertEqual(e.disc_type, "ISO")
+
+    def test_game_entry_disc_type_chd(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/game.chd", filename="game.chd",
+                      serial="", title="")
+        self.assertEqual(e.disc_type, "CHD")
+
+    def test_game_entry_disc_type_bin(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/game.bin", filename="game.bin",
+                      serial="", title="")
+        self.assertEqual(e.disc_type, "BIN")
+
+    def test_game_entry_disc_type_case_insensitive(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/game.ISO", filename="game.ISO",
+                      serial="", title="")
+        self.assertEqual(e.disc_type, "ISO")
+
+    # ------------------------------------------------------------------
+    # GameEntry.region property
+    # ------------------------------------------------------------------
+
+    def test_game_entry_region_ntsc_u(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/SLUS-20062.iso", filename="SLUS-20062.iso",
+                      serial="SLUS-20062", title="Spyro: Enter the Dragonfly")
+        self.assertEqual(e.region, "NTSC-U")
+
+    def test_game_entry_region_pal(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/SLES-50000.iso", filename="SLES-50000.iso",
+                      serial="SLES-50000", title="")
+        self.assertEqual(e.region, "PAL")
+
+    def test_game_entry_region_unknown_serial(self):
+        from src.core.game_library import GameEntry
+        e = GameEntry(path="/roms/game.iso", filename="game.iso",
+                      serial="", title="")
+        self.assertEqual(e.region, "")
+
+    # ------------------------------------------------------------------
+    # GameEntry.crcs populated by scan_library
+    # ------------------------------------------------------------------
+
+    def test_scan_library_populates_crcs(self):
+        """scan_library must populate GameEntry.crcs from the serial DB."""
+        import tempfile, os
+        from src.core.game_library import scan_library
+        with tempfile.TemporaryDirectory() as tmp:
+            # Create a fake ISO file named after God of War (SCUS-97399)
+            iso = os.path.join(tmp, "SCUS-97399.iso")
+            open(iso, "wb").close()
+            entries = scan_library(tmp)
+            self.assertEqual(len(entries), 1)
+            e = entries[0]
+            self.assertEqual(e.serial, "SCUS-97399")
+            self.assertIsInstance(e.crcs, list)
+            self.assertGreater(len(e.crcs), 0,
+                               "scan_library must populate crcs for a known serial")
+
+    def test_scan_library_crcs_empty_for_unknown_serial(self):
+        """scan_library crcs must be empty for files with no detectable serial."""
+        import tempfile, os
+        from src.core.game_library import scan_library
+        with tempfile.TemporaryDirectory() as tmp:
+            iso = os.path.join(tmp, "mystery_game.iso")
+            open(iso, "wb").close()
+            entries = scan_library(tmp)
+            self.assertEqual(len(entries), 1)
+            self.assertEqual(entries[0].crcs, [])

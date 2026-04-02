@@ -40,6 +40,20 @@ from src.core.game_registry import detect_game_serial, serial_to_display
 
 log = logging.getLogger(__name__)
 
+# Lazy-loaded serial database singleton used to resolve CRCs for each
+# detected game serial.  Imported here to avoid a circular import at module
+# level (game_registry ← game_library ← serial_validator is safe because
+# serial_validator does *not* import game_library).
+_sdb = None
+
+
+def _get_sdb():
+    global _sdb
+    if _sdb is None:
+        from src.core.serial_validator import SerialDatabase
+        _sdb = SerialDatabase()
+    return _sdb
+
 # ---------------------------------------------------------------------------
 # Supported disc-image extensions (lower-case, with leading dot)
 # ---------------------------------------------------------------------------
@@ -79,6 +93,11 @@ class GameEntry:
     #: File size in bytes.
     size_bytes: int = 0
 
+    #: Known CRCs for this game, looked up from the serial database.
+    #: An empty list means the serial was not found in the DB or no CRCs
+    #: are recorded for this game.
+    crcs: List[str] = field(default_factory=list)
+
     @property
     def display_name(self) -> str:
         """Return a UI-friendly label: ``"Title (SERIAL)"`` or just the filename."""
@@ -91,6 +110,43 @@ class GameEntry:
     @property
     def extension(self) -> str:
         return Path(self.path).suffix.lower()
+
+    @property
+    def disc_type(self) -> str:
+        """Return the disc image format as an upper-case string.
+
+        Common values: ``"ISO"``, ``"CHD"``, ``"BIN"``, ``"IMG"``, ``"MDF"``,
+        ``"NRG"``, ``"CSO"``, ``"GZ"``.  Falls back to the extension without
+        the leading dot (upper-cased) for any other extension.
+
+        Examples::
+
+            GameEntry(path="/roms/game.iso", ...).disc_type  # "ISO"
+            GameEntry(path="/roms/game.chd", ...).disc_type  # "CHD"
+        """
+        _EXT_MAP = {
+            ".iso": "ISO", ".chd": "CHD", ".bin": "BIN",
+            ".img": "IMG", ".mdf": "MDF", ".nrg": "NRG",
+            ".cso": "CSO", ".gz":  "GZ",
+        }
+        ext = self.extension
+        return _EXT_MAP.get(ext, ext.lstrip(".").upper() or "Unknown")
+
+    @property
+    def region(self) -> str:
+        """Return the region derived from the detected serial prefix.
+
+        Returns one of ``"NTSC-U"``, ``"PAL"``, ``"NTSC-J"``, ``"NTSC-K"``,
+        ``"Asia"``, or an empty string when the serial is missing/unknown.
+
+        Examples::
+
+            GameEntry(serial="SLUS-20062", ...).region  # "NTSC-U"
+            GameEntry(serial="SLES-50000", ...).region  # "PAL"
+            GameEntry(serial="SLPS-25000", ...).region  # "NTSC-J"
+        """
+        from src.core.game_registry import serial_to_region
+        return serial_to_region(self.serial)
 
 
 # ---------------------------------------------------------------------------
@@ -145,11 +201,13 @@ def scan_library(
                 serial = detect_game_serial(full)
 
             title = ""
+            crcs: List[str] = []
             if serial:
                 display = serial_to_display(serial)
                 # serial_to_display returns "SERIAL — Title" or just "SERIAL"
                 if " — " in display:
                     title = display.split(" — ", 1)[1]
+                crcs = _get_sdb().crcs_for_serial(serial)
 
             try:
                 size = Path(full).stat().st_size
@@ -162,6 +220,7 @@ def scan_library(
                 serial=serial,
                 title=title,
                 size_bytes=size,
+                crcs=crcs,
             ))
 
     entries.sort(key=lambda e: e.display_name.lower())
