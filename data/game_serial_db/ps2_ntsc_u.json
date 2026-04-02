@@ -2,39 +2,6 @@
   "version": "1.0",
   "description": "PS2 NTSC-U authoritative serial database. Majority-vote + CRC + manual overrides.",
   "games": {
-    ".hack//G.U. Vol. 1//Rebirth": {
-      "serial": "SLUS-21258",
-      "alt_serials": [],
-      "crcs": [
-        "4E5C7A89"
-      ],
-      "release_date": "2006-10-24",
-      "developer": "CyberConnect2",
-      "publisher": "Namco Bandai",
-      "genre": "Action-RPG"
-    },
-    ".hack//G.U. Vol. 2//Reminisce": {
-      "serial": "SLUS-21488",
-      "alt_serials": [],
-      "crcs": [
-        "91A69524"
-      ],
-      "release_date": "2007-05-08",
-      "developer": "CyberConnect2",
-      "publisher": "Namco Bandai Games",
-      "genre": "Action-RPG"
-    },
-    ".hack//G.U. Vol. 3//Redemption": {
-      "serial": "SLUS-21489",
-      "alt_serials": [],
-      "crcs": [
-        "D7D7A24B"
-      ],
-      "release_date": "2007-09-10",
-      "developer": "CyberConnect2",
-      "publisher": "Namco Bandai",
-      "genre": "Action-RPG"
-    },
     ".hack//G.U. Vol.1//Rebirth": {
       "serial": "SLUS-21258",
       "alt_serials": [],
@@ -42,28 +9,6 @@
         "4E5C7A89"
       ],
       "release_date": "2006-10-24",
-      "developer": "CyberConnect2",
-      "publisher": "Namco Bandai",
-      "genre": "Action-RPG"
-    },
-    ".hack//G.U. Vol.2: Reminisce": {
-      "serial": "SLUS-21488",
-      "alt_serials": [],
-      "crcs": [
-        "91A69524"
-      ],
-      "release_date": "2007-05-08",
-      "developer": "CyberConnect2",
-      "publisher": "Namco Bandai Games",
-      "genre": "Action-RPG"
-    },
-    ".hack//G.U. Vol.3: Redemption": {
-      "serial": "SLUS-21489",
-      "alt_serials": [],
-      "crcs": [
-        "D7D7A24B"
-      ],
-      "release_date": "2007-09-10",
       "developer": "CyberConnect2",
       "publisher": "Namco Bandai",
       "genre": "Action-RPG"
@@ -433,14 +378,6 @@
         "F0A235B4": "v1.01"
       }
     },
-    "Blood Omen 2: Legacy of Kain": {
-      "serial": "SLUS-20024",
-      "alt_serials": [],
-      "release_date": "2002-03-21",
-      "developer": "Crystal Dynamics, Inc",
-      "publisher": "Eidos Interactive",
-      "genre": "Action, Adventure."
-    },
     "Breath of Fire: Dragon Quarter": {
       "serial": "SLUS-20499",
       "alt_serials": [],
@@ -451,33 +388,6 @@
       "developer": "Capcom Co., Ltd",
       "publisher": "Capcom",
       "genre": "RPG"
-    },
-    "Bully": {
-      "serial": "SLUS-21269",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2006-10-17",
-      "developer": "Rockstar Games",
-      "publisher": "Rockstar Games",
-      "genre": "Action, Adventure."
-    },
-    "Bully / Canis Canem Edit": {
-      "serial": "SLUS-21269",
-      "alt_serials": [],
-      "crcs": [
-        "28703748",
-        "5C7B2BDD",
-        "A86571F9"
-      ],
-      "release_date": "2006-10-17",
-      "developer": "Rockstar Games",
-      "publisher": "Rockstar Games",
-      "genre": "Action, Adventure.",
-      "crc_labels": {
-        "28703748": "v1.00",
-        "5C7B2BDD": "v1.01",
-        "A86571F9": "v1.02"
-      }
     },
     "Burnout": {
       "serial": "SLUS-20307",
@@ -569,23 +479,12 @@
       "publisher": "Activision",
       "genre": "Action, First Person Shooter."
     },
-    "Capcom vs. SNK 2": {
+    "Capcom vs. SNK 2: Mark of the Millennium 2001": {
       "serial": "SLUS-20246",
       "alt_serials": [],
       "crcs": [
         "1D568F61",
         "D79F697A"
-      ],
-      "release_date": "2001-11-06",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Fighting"
-    },
-    "Capcom vs. SNK 2: Mark of the Millennium 2001": {
-      "serial": "SLUS-20246",
-      "alt_serials": [],
-      "crcs": [
-        "1D568F61"
       ],
       "release_date": "2001-11-06",
       "developer": "Capcom",
@@ -620,22 +519,12 @@
         "A5B82E82": "v1.01"
       }
     },
-    "Champions of Norrath": {
-      "serial": "SLUS-20565",
-      "alt_serials": [],
-      "crcs": [
-        "F27239BA"
-      ],
-      "release_date": "2004-02-10",
-      "developer": "Snowblind Studios, Inc",
-      "publisher": "Sony",
-      "genre": "Action, RPG."
-    },
     "Champions of Norrath: Realms of EverQuest": {
       "serial": "SLUS-20565",
       "alt_serials": [],
       "crcs": [
-        "22CA9B7A"
+        "22CA9B7A",
+        "F27239BA"
       ],
       "release_date": "2004-02-10",
       "developer": "Snowblind Studios, Inc",
@@ -684,17 +573,7 @@
         "0CA3A7E2",
         "43AB7196",
         "A91F4EAE",
-        "F0A26C87"
-      ],
-      "release_date": "2001-10-31",
-      "developer": "Traveller's Tales",
-      "publisher": "Universal Interactive Studios",
-      "genre": "Action, Platformer."
-    },
-    "Crash Bandicoot: Wrath of Cortex": {
-      "serial": "SLUS-20238",
-      "alt_serials": [],
-      "crcs": [
+        "F0A26C87",
         "D764DFC1"
       ],
       "release_date": "2001-10-31",
@@ -762,28 +641,6 @@
       "publisher": "Sierra Entertainment",
       "genre": "Action"
     },
-    "Crash: Mind over Mutant": {
-      "serial": "SLUS-21728",
-      "alt_serials": [],
-      "crcs": [
-        "0A2A7DE0"
-      ],
-      "release_date": "2008-10-07",
-      "developer": "Radical Entertainment",
-      "publisher": "Sierra Entertainment",
-      "genre": "Action"
-    },
-    "Dark Chronicle (Dark Cloud 2)": {
-      "serial": "SCUS-97213",
-      "alt_serials": [],
-      "crcs": [
-        "47AAB3DC"
-      ],
-      "release_date": "2003-02-17",
-      "developer": "Level-5",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action, Beat'em Up, RPG."
-    },
     "Dark Cloud": {
       "serial": "SCUS-97111",
       "alt_serials": [],
@@ -796,31 +653,12 @@
       "publisher": "Sony",
       "genre": "Action, Building, RPG"
     },
-    "Dark Cloud / Dark Chronicle": {
-      "serial": "SCUS-97111",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-05-28",
-      "developer": "Level 5",
-      "publisher": "Sony",
-      "genre": "Action, Building, RPG"
-    },
     "Dark Cloud 2": {
       "serial": "SCUS-97213",
       "alt_serials": [],
       "crcs": [
         "1DF41F33",
-        "23A0BB39"
-      ],
-      "release_date": "2003-02-17",
-      "developer": "Level-5",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action, Beat'em Up, RPG."
-    },
-    "Dark Cloud 2 / Dark Chronicle": {
-      "serial": "SCUS-97213",
-      "alt_serials": [],
-      "crcs": [
+        "23A0BB39",
         "47AAB3DC"
       ],
       "release_date": "2003-02-17",
@@ -882,15 +720,6 @@
         "F4A7473E": "Greatest Hits"
       }
     },
-    "Devil May Cry (DMD complete)": {
-      "serial": "SLUS-20216",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-10-16",
-      "developer": "Capcom Co., Ltd",
-      "publisher": "Capcom",
-      "genre": "Action, Shooter, Survival Horror"
-    },
     "Devil May Cry 2": {
       "serial": "SLUS-20484",
       "alt_serials": [],
@@ -942,15 +771,6 @@
         "7ADCB24A": "v1.00 (patched)"
       }
     },
-    "Devil May Cry 3 (DMD complete)": {
-      "serial": "SLUS-20964",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2005-03-01",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action-Adventure"
-    },
     "Devil May Cry 3: Dante's Awakening": {
       "serial": "SLUS-20964",
       "alt_serials": [],
@@ -991,28 +811,6 @@
       "developer": "Atlus",
       "publisher": "Atlus",
       "genre": "Action-RPG"
-    },
-    "Digital Devil Saga": {
-      "serial": "SLUS-20974",
-      "alt_serials": [],
-      "crcs": [
-        "3EEA81E4"
-      ],
-      "release_date": "2005-04-05",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "RPG"
-    },
-    "Digital Devil Saga 2": {
-      "serial": "SLUS-21152",
-      "alt_serials": [],
-      "crcs": [
-        "2B2C9BA6"
-      ],
-      "release_date": "2005-10-11",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "RPG"
     },
     "Disgaea 2: Cursed Memories": {
       "serial": "SLUS-21397",
@@ -1146,63 +944,25 @@
       "publisher": "Atari",
       "genre": "Action"
     },
-    "Dragon Quest VIII": {
-      "serial": "SLUS-21207",
-      "alt_serials": [],
-      "crcs": [
-        "F53B6210",
-        "DA0F1E34"
-      ],
-      "release_date": "2005-11-15",
-      "developer": "Level 5",
-      "publisher": "Square Enix",
-      "genre": "RPG.",
-      "crc_labels": {
-        "F53B6210": "v1.00",
-        "DA0F1E34": "v1.01"
-      }
-    },
-    "Dragon Quest VIII (post-game save)": {
-      "serial": "SLUS-21207",
-      "alt_serials": [],
-      "crcs": [
-        "F53B6210",
-        "DA0F1E34"
-      ],
-      "release_date": "2005-11-15",
-      "developer": "Level 5",
-      "publisher": "Square Enix",
-      "genre": "RPG.",
-      "crc_labels": {
-        "F53B6210": "v1.00",
-        "DA0F1E34": "v1.01"
-      }
-    },
     "Dragon Quest VIII: Journey of the Cursed King": {
       "serial": "SLUS-21207",
       "alt_serials": [
         "SLUS-21275"
       ],
       "crcs": [
+        "F53B6210",
+        "DA0F1E34",
         "30B05B6E"
       ],
       "release_date": "2005-11-15",
       "developer": "Level 5",
       "publisher": "Square Enix",
-      "genre": "RPG."
-    },
-    "Dragon Quest VIII: Journey of the Cursed King (alt)": {
-      "serial": "SLUS-21207",
-      "alt_serials": [
-        "SLUS-21275"
-      ],
-      "crcs": [
-        "30B05B6E"
-      ],
-      "release_date": "2005-11-15",
-      "developer": "Level 5",
-      "publisher": "Square Enix",
-      "genre": "RPG."
+      "genre": "RPG.",
+      "crc_labels": {
+        "F53B6210": "v1.00",
+        "DA0F1E34": "v1.01",
+        "30B05B6E": "v1.02"
+      }
     },
     "Drakengard": {
       "serial": "SLUS-20732",
@@ -1369,15 +1129,6 @@
         "48FE0C71": "v1.01"
       }
     },
-    "Final Fantasy X-2 (100% complete)": {
-      "serial": "SLUS-20672",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2003-11-18",
-      "developer": "Square Enix",
-      "publisher": "Square Enix",
-      "genre": "RPG."
-    },
     "Final Fantasy XI": {
       "serial": "SCUS-97266",
       "alt_serials": [],
@@ -1404,17 +1155,6 @@
       "genre": "RPG"
     },
     "Final Fantasy XII (100% complete)": {
-      "serial": "SLUS-20963",
-      "alt_serials": [],
-      "crcs": [
-        "0779FBDB"
-      ],
-      "release_date": "2006-10-31",
-      "developer": "S-Force",
-      "publisher": "Square Enix",
-      "genre": "RPG"
-    },
-    "Final Fantasy XII (Greatest Hits)": {
       "serial": "SLUS-20963",
       "alt_serials": [],
       "crcs": [
@@ -1455,32 +1195,6 @@
       "developer": "Square Enix",
       "publisher": "Square Enix",
       "genre": "Strategy"
-    },
-    "GTA III": {
-      "serial": "SLUS-20062",
-      "alt_serials": [],
-      "release_date": "2001-10-23",
-      "developer": "DMA Design Ltd",
-      "publisher": "Rockstar Games",
-      "genre": "Action, Driving, Shooter"
-    },
-    "GTA San Andreas": {
-      "serial": "SLUS-20946",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-10-26",
-      "developer": "Rockstar North",
-      "publisher": "Rockstar Games",
-      "genre": "Action"
-    },
-    "GTA Vice City": {
-      "serial": "SLUS-20552",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2002-10-29",
-      "developer": "Rockstar North",
-      "publisher": "Rockstar Games",
-      "genre": "Action, Driving, Shooter"
     },
     "GUN": {
       "serial": "SLUS-21139",
@@ -1529,15 +1243,6 @@
         "FB0E6A61": "v1.03"
       }
     },
-    "God of War (God Mode complete)": {
-      "serial": "SCUS-97399",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2005-03-22",
-      "developer": "SCE Studio Santa Monica",
-      "publisher": "Sony",
-      "genre": "Action, Platform, Beat'em Up."
-    },
     "God of War II": {
       "serial": "SCUS-97481",
       "alt_serials": [],
@@ -1555,15 +1260,6 @@
         "2F123FD8": "v1.01",
         "44A8A22A": "Greatest Hits"
       }
-    },
-    "God of War II (Titan Mode complete)": {
-      "serial": "SCUS-97481",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2007-03-13",
-      "developer": "Sony",
-      "publisher": "Sony",
-      "genre": "Action, Adventure, Beat'em Up."
     },
     "Gradius V": {
       "serial": "SLUS-20712",
@@ -1594,14 +1290,6 @@
         "C12E4587": "v1.01",
         "F9F416C5": "Greatest Hits"
       }
-    },
-    "Gran Turismo 3: A-spec": {
-      "serial": "SCUS-97102",
-      "alt_serials": [],
-      "release_date": "2001-07-09",
-      "developer": "Polyphony Digital",
-      "publisher": "Sony",
-      "genre": "Driving, Racing."
     },
     "Gran Turismo 4": {
       "serial": "SCUS-97328",
@@ -1686,15 +1374,6 @@
         "B3D64CF8": "Greatest Hits",
         "2C6BE434": "v2.00"
       }
-    },
-    "Grand Theft Auto: San Andreas (v2)": {
-      "serial": "SLUS-20946",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-10-26",
-      "developer": "Rockstar North",
-      "publisher": "Rockstar Games",
-      "genre": "Action"
     },
     "Grand Theft Auto: Vice City": {
       "serial": "SLUS-20552",
@@ -1807,17 +1486,6 @@
       "genre": "Fighting."
     },
     "Guilty Gear X2: #Reload": {
-      "serial": "SLUS-20436",
-      "alt_serials": [],
-      "crcs": [
-        "9BC6CE0E"
-      ],
-      "release_date": "2003-02-05",
-      "developer": "Arc System Works Co. Ltd",
-      "publisher": "Sammy Studios, Inc",
-      "genre": "Fighting."
-    },
-    "Guilty Gear X2: The Midnight Carnival": {
       "serial": "SLUS-20436",
       "alt_serials": [],
       "crcs": [
@@ -1963,15 +1631,6 @@
       "developer": "Clap Hanz",
       "publisher": "Sony",
       "genre": "Golf."
-    },
-    "ICO": {
-      "serial": "SCUS-97113",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-09-24",
-      "developer": "Sony Computer Entertaiment",
-      "publisher": "Sony Computer Entertaiment",
-      "genre": "Action, Adventure, Platform"
     },
     "Ico": {
       "serial": "SCUS-97113",
@@ -2167,24 +1826,6 @@
       "publisher": "Square Enix",
       "genre": "Action-RPG"
     },
-    "Kingdom Hearts Re:Chain of Memories": {
-      "serial": "SLUS-21799",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2008-12-02",
-      "developer": "Jupiter Corporation",
-      "publisher": "Square Enix",
-      "genre": "Action, RPG."
-    },
-    "Kingdom Hearts: Chain of Memories (Re:CoM)": {
-      "serial": "SLUS-21799",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2008-12-02",
-      "developer": "Jupiter Corporation",
-      "publisher": "Square Enix",
-      "genre": "Action, RPG."
-    },
     "Kingdom Hearts: Re:Chain of Memories": {
       "serial": "SLUS-21799",
       "alt_serials": [],
@@ -2358,17 +1999,6 @@
       "publisher": "Rockstar Games, Take 2",
       "genre": "Action."
     },
-    "Marvel vs. Capcom 2": {
-      "serial": "SLUS-20486",
-      "alt_serials": [],
-      "crcs": [
-        "4D228733"
-      ],
-      "release_date": "2002-12-21",
-      "developer": "Capcom Co., Ltd",
-      "publisher": "Capcom",
-      "genre": "Fighting"
-    },
     "Marvel vs. Capcom 2: New Age of Heroes": {
       "serial": "SLUS-20486",
       "alt_serials": [],
@@ -2481,15 +2111,6 @@
         "1540CFB5": "Greatest Hits"
       }
     },
-    "Metal Gear Solid 2: Sons of Liberty (alt)": {
-      "serial": "SLUS-20144",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-12-11",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Action, Adventure"
-    },
     "Metal Gear Solid 2: Substance": {
       "serial": "SLUS-20554",
       "alt_serials": [],
@@ -2500,15 +2121,6 @@
       "developer": "Konami Computer Entertainment Japan",
       "publisher": "Konami",
       "genre": "Action"
-    },
-    "Metal Gear Solid 3": {
-      "serial": "SLUS-20915",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-11-17",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Action, Adventure."
     },
     "Metal Gear Solid 3: Snake Eater": {
       "serial": "SLUS-20915",
@@ -2532,15 +2144,6 @@
         "D4FA1757": "v1.04"
       }
     },
-    "Metal Gear Solid 3: Snake Eater (GH)": {
-      "serial": "SLUS-20915",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-11-17",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Action, Adventure."
-    },
     "Metal Gear Solid 3: Subsistence": {
       "serial": "SLUS-21243",
       "alt_serials": [],
@@ -2563,10 +2166,6 @@
       "developer": "Rockstar San Diego",
       "publisher": "Rockstar Games",
       "genre": "Racing"
-    },
-    "Midnight Club 3: DUB Edition (Remix)": {
-      "serial": "SLUS-21355",
-      "alt_serials": []
     },
     "Midnight Club 3: DUB Edition Remix": {
       "serial": "SLUS-21355",
@@ -2703,14 +2302,6 @@
       "developer": "EA Black Box",
       "publisher": "Electronic Arts",
       "genre": "Driving, Racing."
-    },
-    "Need for Speed Underground 2": {
-      "serial": "SLUS-21065",
-      "alt_serials": [],
-      "release_date": "2004-11-16",
-      "developer": "EA",
-      "publisher": "EA Canada",
-      "genre": "Racing"
     },
     "Need for Speed: Carbon": {
       "serial": "SLUS-21493",
@@ -2871,17 +2462,6 @@
       "genre": "RPG"
     },
     "Persona 3 FES": {
-      "serial": "SLUS-21621",
-      "alt_serials": [],
-      "crcs": [
-        "B3B56447"
-      ],
-      "release_date": "2008-10-17",
-      "developer": "Atlus Co., Ltd",
-      "publisher": "Atlus U.S.A., Inc",
-      "genre": "RPG"
-    },
-    "Persona 3 FES (The Journey + The Answer)": {
       "serial": "SLUS-21621",
       "alt_serials": [],
       "crcs": [
@@ -3101,15 +2681,6 @@
       "publisher": "Ubisoft",
       "genre": "Action, Mini Games"
     },
-    "Resident Evil": {
-      "serial": "SLUS-20184",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-08-21",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Survival Horror."
-    },
     "Resident Evil 4": {
       "serial": "SLUS-21134",
       "alt_serials": [
@@ -3147,17 +2718,6 @@
       "developer": "Capcom",
       "publisher": "Capcom",
       "genre": "Action, Shooter, Survival Horror."
-    },
-    "Resident Evil Outbreak File #2": {
-      "serial": "SLUS-20984",
-      "alt_serials": [],
-      "crcs": [
-        "C0437D3A"
-      ],
-      "release_date": "2005-04-26",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Survival Horror"
     },
     "Resident Evil: Code Veronica X": {
       "serial": "SLUS-20184",
@@ -3428,6 +2988,7 @@
       "serial": "SLUS-20974",
       "alt_serials": [],
       "crcs": [
+        "3EEA81E4",
         "4C7BBDC5",
         "7B4F6E5A"
       ],
@@ -3802,17 +3363,6 @@
       "publisher": "Pandemic Studios",
       "genre": "Third-person Shooter"
     },
-    "Star Wars Battlefront II (all unlocked)": {
-      "serial": "SLUS-21240",
-      "alt_serials": [],
-      "crcs": [
-        "0F900EAA"
-      ],
-      "release_date": "2005-11-01",
-      "developer": "LucasArts",
-      "publisher": "Pandemic Studios",
-      "genre": "Third-person Shooter"
-    },
     "Star Wars: Battlefront": {
       "serial": "SLUS-20898",
       "alt_serials": [],
@@ -3891,19 +3441,6 @@
       "publisher": "Konami",
       "genre": "RPG"
     },
-    "Tales Of Legendia": {
-      "serial": "SLUS-21201",
-      "alt_serials": [
-        "SLPS-25533"
-      ],
-      "crcs": [
-        "1BC9364D"
-      ],
-      "release_date": "2006-02-07",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "RPG."
-    },
     "Tales of Destiny (PS2 remake)": {
       "serial": "SLPS-25715",
       "alt_serials": [],
@@ -3918,7 +3455,9 @@
     },
     "Tales of Legendia": {
       "serial": "SLUS-21201",
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPS-25533"
+      ],
       "crcs": [
         "1BC9364D"
       ],
@@ -3952,17 +3491,6 @@
       "alt_serials": [
         "SCES-50878"
       ],
-      "crcs": [
-        "9A8D68A9"
-      ],
-      "release_date": "2002-09-25",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Fighting"
-    },
-    "Tekken 4 (all characters)": {
-      "serial": "SLUS-20328",
-      "alt_serials": [],
       "crcs": [
         "9A8D68A9"
       ],
@@ -4348,13 +3876,6 @@
       "publisher": "Capcom",
       "genre": "Action"
     },
-    "Virtua Fighter 4 Evolution": {
-      "serial": "SLUS-20616",
-      "alt_serials": [],
-      "crcs": [
-        "1E9DAD32"
-      ]
-    },
     "Virtua Fighter 4: Evolution": {
       "serial": "SLUS-20616",
       "alt_serials": [],
@@ -4407,16 +3928,6 @@
       "developer": "Yuke's",
       "publisher": "THQ",
       "genre": "Sports"
-    },
-    "War of the Monsters": {
-      "serial": "SCUS-97197",
-      "alt_serials": [
-        "SCUS-91197"
-      ],
-      "release_date": "2003-01-14",
-      "developer": "Incognito Entertainment",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Fighting"
     },
     "Way of the Samurai 2": {
       "serial": "SLUS-20893",
@@ -4528,24 +4039,6 @@
       "publisher": "Psygnosis Liverpool Studio",
       "genre": "Racing"
     },
-    "Xenosaga Episode I": {
-      "serial": "SLUS-20469",
-      "alt_serials": [],
-      "crcs": [
-        "7F52BE3B",
-        "A790F8C9",
-        "E4FD7B8D"
-      ],
-      "release_date": "2003-02-26",
-      "developer": "Monolith Soft",
-      "publisher": "Namco",
-      "genre": "RPG",
-      "crc_labels": {
-        "7F52BE3B": "v1.00",
-        "A790F8C9": "v1.01",
-        "E4FD7B8D": "v1.02"
-      }
-    },
     "Xenosaga Episode I: Der Wille zur Macht": {
       "serial": "SLUS-20469",
       "alt_serials": [],
@@ -4564,17 +4057,6 @@
         "E4FD7B8D": "v1.02"
       }
     },
-    "Xenosaga Episode II": {
-      "serial": "SLUS-20892",
-      "alt_serials": [],
-      "crcs": [
-        "161E0B8D"
-      ],
-      "release_date": "2005-02-15",
-      "developer": "Monolith Soft",
-      "publisher": "Namco Hometek",
-      "genre": "RPG"
-    },
     "Xenosaga Episode II: Jenseits von Gut und Böse": {
       "serial": "SLUS-20892",
       "alt_serials": [
@@ -4586,24 +4068,6 @@
       "release_date": "2005-02-15",
       "developer": "Monolith Soft",
       "publisher": "Namco Hometek",
-      "genre": "RPG"
-    },
-    "Xenosaga Episode III": {
-      "serial": "SLUS-21389",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2006-08-29",
-      "developer": "Monolith Soft",
-      "publisher": "Namco Bandai Games",
-      "genre": "RPG"
-    },
-    "Xenosaga Episode III: Also Sprach Zarathustra": {
-      "serial": "SLUS-21389",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2006-08-29",
-      "developer": "Monolith Soft",
-      "publisher": "Namco Bandai Games",
       "genre": "RPG"
     },
     "Xenosaga Episode III: Also sprach Zarathustra": {
@@ -4768,15 +4232,6 @@
       "publisher": "Sony",
       "genre": "Survival Horror."
     },
-    "Gran Turismo 3 A-Spec": {
-      "serial": "SCUS-97102",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2001-07-09",
-      "developer": "Polyphony Digital",
-      "publisher": "Sony",
-      "genre": "Driving, Racing."
-    },
     "Fantavision": {
       "serial": "SCUS-97105",
       "alt_serials": [],
@@ -4842,17 +4297,6 @@
       "developer": "Incog Inc. Entertainment",
       "publisher": "Codemasters",
       "genre": "Racing."
-    },
-    "War Of The Monsters": {
-      "serial": "SCUS-97197",
-      "alt_serials": [],
-      "crcs": [
-        "2EDE12D1"
-      ],
-      "release_date": "2003-01-14",
-      "developer": "Incognito Entertainment",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Fighting"
     },
     "My Street": {
       "serial": "SCUS-97212",
@@ -5381,15 +4825,6 @@
       "publisher": "Capcom",
       "genre": "Puzzle"
     },
-    "Way Of The Samurai 2": {
-      "serial": "SLUS-20893",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-05-21",
-      "developer": "Acquire",
-      "publisher": "Capcom",
-      "genre": "Action-Adventure"
-    },
     "187 Ride Or Die": {
       "serial": "SLUS-21116",
       "alt_serials": [],
@@ -5630,17 +5065,6 @@
       "publisher": "Koei",
       "genre": "Music."
     },
-    "Capcom Vs. SNK 2": {
-      "serial": "SLUS-20246",
-      "alt_serials": [],
-      "crcs": [
-        "D79F697A"
-      ],
-      "release_date": "2001-11-06",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Fighting"
-    },
     "Crimson Tears": {
       "serial": "SLUS-20948",
       "alt_serials": [],
@@ -5717,17 +5141,6 @@
       "developer": "From Software",
       "publisher": "Agetec",
       "genre": "Action, Adventure, Role-playing."
-    },
-    "Blood Omen 2": {
-      "serial": "SLUS-20024",
-      "alt_serials": [],
-      "crcs": [
-        "9A8DC7D3"
-      ],
-      "release_date": "2002-03-21",
-      "developer": "Crystal Dynamics, Inc",
-      "publisher": "Eidos Interactive",
-      "genre": "Action, Adventure."
     },
     "Run Like Hell": {
       "serial": "SLUS-20037",
@@ -7506,15 +6919,6 @@
       "publisher": "Ubi Soft",
       "genre": "First Person Shooter."
     },
-    "Shadow Of Rome": {
-      "serial": "SLUS-20902",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2005-02-08",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Beat'em Up"
-    },
     "Fight Night 2004": {
       "serial": "SLUS-20906",
       "alt_serials": [],
@@ -8375,17 +7779,6 @@
       "developer": "Atomic Planet",
       "publisher": "Global Star Software",
       "genre": "Other"
-    },
-    "Rule Of Rose": {
-      "serial": "SLUS-21448",
-      "alt_serials": [],
-      "crcs": [
-        "F3FD313E"
-      ],
-      "release_date": "2006-09-12",
-      "developer": "Punchline CG",
-      "publisher": "Atlus",
-      "genre": "Adventure, Survival Horror."
     },
     "Fast And The Furious, The": {
       "serial": "SLUS-21449",
@@ -20877,6 +20270,70 @@
       "developer": "EA Redwood Shores",
       "publisher": "Electronic Arts",
       "genre": "Action."
+    },
+    "War of the Monsters": {
+      "serial": "SCUS-97197",
+      "alt_serials": [
+        "SCUS-91197"
+      ],
+      "crcs": [
+        "2EDE12D1"
+      ],
+      "release_date": "2003-01-14",
+      "developer": "Incognito Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "Fighting"
+    },
+    "Bully": {
+      "serial": "SLUS-21269",
+      "alt_serials": [],
+      "crcs": [
+        "28703748",
+        "5C7B2BDD",
+        "A86571F9"
+      ],
+      "release_date": "2006-10-17",
+      "developer": "Rockstar Games",
+      "publisher": "Rockstar Games",
+      "genre": "Action, Adventure.",
+      "crc_labels": {
+        "28703748": "v1.00",
+        "5C7B2BDD": "v1.01",
+        "A86571F9": "v1.02"
+      }
+    },
+    "Blood Omen 2: Legacy of Kain": {
+      "serial": "SLUS-20024",
+      "alt_serials": [],
+      "crcs": [
+        "9A8DC7D3"
+      ],
+      "release_date": "2002-03-21",
+      "developer": "Crystal Dynamics, Inc",
+      "publisher": "Eidos Interactive",
+      "genre": "Action, Adventure."
+    },
+    ".hack//G.U. Vol.2//Reminisce": {
+      "serial": "SLUS-21488",
+      "alt_serials": [],
+      "crcs": [
+        "91A69524"
+      ],
+      "release_date": "2007-05-08",
+      "developer": "CyberConnect2",
+      "publisher": "Namco Bandai Games",
+      "genre": "Action-RPG"
+    },
+    ".hack//G.U. Vol.3//Redemption": {
+      "serial": "SLUS-21489",
+      "alt_serials": [],
+      "crcs": [
+        "D7D7A24B"
+      ],
+      "release_date": "2007-09-10",
+      "developer": "CyberConnect2",
+      "publisher": "Namco Bandai",
+      "genre": "Action-RPG"
     }
   }
 }

@@ -8723,8 +8723,8 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("ESPN NBA 2Night", "release_date", "2001")
 
     def test_serial_db_wave46_game_count(self):
-        """Wave 46: serial DB should have at least 2288 games (FIFA 13 added)."""
-        self.assertGreaterEqual(len(self.data), 2288)
+        """Wave 46: serial DB should have at least 2237 games (Wave 89 dedup; was 2288)."""
+        self.assertGreaterEqual(len(self.data), 2237)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8812,8 +8812,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2291 games (6 new games added)."""
-        self.assertGreaterEqual(len(self.games), 2291)
+        """Wave 47: serial DB should have at least 2237 games (Wave 89 dedup; was 2291)."""
+        self.assertGreaterEqual(len(self.games), 2237)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9151,9 +9151,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
+        """Wave 49: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
         self.assertEqual(
-            len(self.games), 2292,
+            len(self.games), 2237,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9374,8 +9374,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
-        self.assertEqual(len(self.raw_games), 2292)
+        """Wave 50: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2237)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9579,8 +9579,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
-        self.assertEqual(len(self.raw_games), 2292)
+        """Wave 51: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2237)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9685,10 +9685,10 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
                          "CRC 1DF75E06 must map to canonical 'Dark Cloud'")
 
     def test_wave52_bully_short_crcs_cleared(self):
-        """Wave 52: 'Bully' short alias must have empty CRCs (canonical is 'Bully / Canis Canem Edit')."""
+        """Wave 52→89: 'Bully' is now the canonical entry (with CRCs); 'Bully / Canis Canem Edit' removed."""
         entry = self.raw_games.get("Bully", {})
-        self.assertEqual(entry.get("crcs", []), [],
-                         "'Bully' short alias must have empty CRCs")
+        self.assertTrue(entry.get("crcs"),
+                        "'Bully' must have CRCs after Wave 89 rename from Bully / Canis Canem Edit")
 
     # ── Final Fantasy X crc_labels ────────────────────────────────────────────
 
@@ -9767,8 +9767,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2292 (Wave 87 added DBZ BT4)."""
-        self.assertEqual(len(self.raw_games), 2292)
+        """Wave 52: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2237)
 
 
 # ===========================================================================
@@ -12092,7 +12092,7 @@ class TestWave60CrcLabels(unittest.TestCase):
         })
 
     def test_bully_labels(self):
-        self._assert_labels("Bully / Canis Canem Edit", {
+        self._assert_labels("Bully", {
             "28703748": "v1.00", "5C7B2BDD": "v1.01", "A86571F9": "v1.02",
         })
 
@@ -12113,12 +12113,13 @@ class TestWave60CrcLabels(unittest.TestCase):
     # RPG
     # ------------------------------------------------------------------
     def test_dragon_quest_viii_labels(self):
-        self._assert_labels("Dragon Quest VIII", {
+        self._assert_labels("Dragon Quest VIII: Journey of the Cursed King", {
             "F53B6210": "v1.00", "DA0F1E34": "v1.01",
         })
 
     def test_dragon_quest_viii_postgame_labels(self):
-        self._assert_labels("Dragon Quest VIII (post-game save)", {
+        """Wave 60→89: post-game save entry removed; CRCs now live on full title."""
+        self._assert_labels("Dragon Quest VIII: Journey of the Cursed King", {
             "F53B6210": "v1.00", "DA0F1E34": "v1.01",
         })
 
@@ -12138,7 +12139,8 @@ class TestWave60CrcLabels(unittest.TestCase):
         })
 
     def test_xenosaga_episode_i_labels(self):
-        self._assert_labels("Xenosaga Episode I", {
+        """Wave 60→89: abbreviated Xenosaga I removed; use full title."""
+        self._assert_labels("Xenosaga Episode I: Der Wille zur Macht", {
             "7F52BE3B": "v1.00", "A790F8C9": "v1.01", "E4FD7B8D": "v1.02",
         })
 
@@ -17864,3 +17866,282 @@ class TestWave88HubAuthorAndGuitarHeroII(unittest.TestCase):
                 missing.append(f'{entry["id"]}: {serial}')
         self.assertEqual(missing, [],
                          "Catalogue entries with serials not in DB:\n" + "\n".join(missing))
+
+
+# ===========================================================================
+# Wave 89 — DB deduplication, connectivity fix, CRC merges
+# ===========================================================================
+
+class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
+    """Verify the Wave 89 serial DB cleanup and download-history connectivity."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json
+        from src.core.serial_validator import SerialDatabase
+        _db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        with open(_db_path, encoding='utf-8') as f:
+            ntsc = json.load(f)
+        cls.games = ntsc["games"]
+        cls.sdb = SerialDatabase()
+
+    # ------------------------------------------------------------------
+    # Save-state variants removed
+    # ------------------------------------------------------------------
+    def test_dmc_dmd_complete_removed(self):
+        self.assertNotIn("Devil May Cry (DMD complete)", self.games,
+                         "Save-state variant should be removed")
+
+    def test_dmc3_dmd_complete_removed(self):
+        self.assertNotIn("Devil May Cry 3 (DMD complete)", self.games,
+                         "Save-state variant should be removed")
+
+    def test_ffx2_100_complete_removed(self):
+        self.assertNotIn("Final Fantasy X-2 (100% complete)", self.games,
+                         "Save-state variant should be removed")
+
+    def test_gow_god_mode_complete_removed(self):
+        self.assertNotIn("God of War (God Mode complete)", self.games,
+                         "Save-state variant should be removed")
+
+    def test_gow2_titan_mode_complete_removed(self):
+        self.assertNotIn("God of War II (Titan Mode complete)", self.games,
+                         "Save-state variant should be removed")
+
+    def test_dq8_post_game_save_removed(self):
+        self.assertNotIn("Dragon Quest VIII (post-game save)", self.games,
+                         "Save-state variant should be removed")
+
+    # ------------------------------------------------------------------
+    # Abbreviation entries removed
+    # ------------------------------------------------------------------
+    def test_gta3_abbreviation_removed(self):
+        self.assertNotIn("GTA III", self.games,
+                         "Abbreviated title should be removed")
+
+    def test_gta_sa_abbreviation_removed(self):
+        self.assertNotIn("GTA San Andreas", self.games)
+
+    def test_gta_vc_abbreviation_removed(self):
+        self.assertNotIn("GTA Vice City", self.games)
+
+    def test_grand_theft_auto_3_kept(self):
+        self.assertIn("Grand Theft Auto III", self.games,
+                      "Full title Grand Theft Auto III must remain")
+        self.assertTrue(self.games["Grand Theft Auto III"].get("crcs"),
+                        "Grand Theft Auto III must have CRCs")
+
+    # ------------------------------------------------------------------
+    # Wrong-capitalisation entries removed
+    # ------------------------------------------------------------------
+    def test_ico_uppercase_removed(self):
+        self.assertNotIn("ICO", self.games,
+                         "Wrong-caps ICO entry should be removed")
+
+    def test_ico_correct_case_kept(self):
+        self.assertIn("Ico", self.games)
+        self.assertTrue(self.games["Ico"].get("crcs"))
+
+    def test_shadow_of_rome_allcaps_removed(self):
+        self.assertNotIn("Shadow Of Rome", self.games)
+
+    def test_shadow_of_rome_correct_kept(self):
+        self.assertIn("Shadow of Rome", self.games)
+        self.assertTrue(self.games["Shadow of Rome"].get("crcs"))
+
+    def test_rule_of_rose_allcaps_removed(self):
+        self.assertNotIn("Rule Of Rose", self.games)
+
+    def test_rule_of_rose_correct_kept(self):
+        self.assertIn("Rule of Rose", self.games)
+        self.assertTrue(self.games["Rule of Rose"].get("crcs"))
+
+    def test_tales_of_legendia_allcaps_removed(self):
+        self.assertNotIn("Tales Of Legendia", self.games)
+
+    def test_tales_of_legendia_correct_kept(self):
+        self.assertIn("Tales of Legendia", self.games)
+
+    # ------------------------------------------------------------------
+    # Renames applied correctly
+    # ------------------------------------------------------------------
+    def test_war_of_monsters_correct_caps(self):
+        self.assertIn("War of the Monsters", self.games,
+                      "Renamed entry must exist with correct capitalisation")
+        self.assertTrue(self.games["War of the Monsters"].get("crcs"),
+                        "War of the Monsters must have CRCs after rename")
+
+    def test_war_of_monsters_allcaps_removed(self):
+        self.assertNotIn("War Of The Monsters", self.games)
+
+    def test_bully_renamed(self):
+        self.assertIn("Bully", self.games)
+        self.assertTrue(self.games["Bully"].get("crcs"),
+                        "Bully must have CRCs after rename from Bully / Canis Canem Edit")
+
+    def test_bully_canis_canem_removed(self):
+        self.assertNotIn("Bully / Canis Canem Edit", self.games)
+
+    def test_blood_omen_2_full_title(self):
+        self.assertIn("Blood Omen 2: Legacy of Kain", self.games)
+        self.assertTrue(self.games["Blood Omen 2: Legacy of Kain"].get("crcs"))
+
+    def test_blood_omen_2_abbreviated_removed(self):
+        self.assertNotIn("Blood Omen 2", self.games)
+
+    # ------------------------------------------------------------------
+    # .hack G.U. format corrected
+    # ------------------------------------------------------------------
+    def test_hack_gu_vol1_correct_format(self):
+        self.assertIn(".hack//G.U. Vol.1//Rebirth", self.games)
+        self.assertNotIn(".hack//G.U. Vol. 1//Rebirth", self.games,
+                         "Wrong-format .hack GU Vol.1 entry must be removed")
+
+    def test_hack_gu_vol2_correct_format(self):
+        self.assertIn(".hack//G.U. Vol.2//Reminisce", self.games)
+        self.assertNotIn(".hack//G.U. Vol. 2//Reminisce", self.games)
+        self.assertNotIn(".hack//G.U. Vol.2: Reminisce", self.games)
+
+    def test_hack_gu_vol3_correct_format(self):
+        self.assertIn(".hack//G.U. Vol.3//Redemption", self.games)
+        self.assertNotIn(".hack//G.U. Vol. 3//Redemption", self.games)
+        self.assertNotIn(".hack//G.U. Vol.3: Redemption", self.games)
+
+    # ------------------------------------------------------------------
+    # CRC merges verified
+    # ------------------------------------------------------------------
+    def test_dq8_crcs_merged(self):
+        """Dragon Quest VIII full title must have all 3 known CRCs."""
+        entry = self.games.get("Dragon Quest VIII: Journey of the Cursed King", {})
+        crcs = entry.get("crcs", [])
+        for expected_crc in ("F53B6210", "DA0F1E34", "30B05B6E"):
+            self.assertIn(expected_crc, crcs,
+                          f"DQ8 CRC {expected_crc} missing after merge")
+
+    def test_dq8_abbreviated_removed(self):
+        self.assertNotIn("Dragon Quest VIII", self.games,
+                         "Abbreviated Dragon Quest VIII entry should be removed")
+
+    def test_smt_dds_crcs_merged(self):
+        """SMT Digital Devil Saga must have all 3 known CRCs after merge."""
+        entry = self.games.get("Shin Megami Tensei: Digital Devil Saga", {})
+        crcs = entry.get("crcs", [])
+        for expected_crc in ("3EEA81E4", "4C7BBDC5", "7B4F6E5A"):
+            self.assertIn(expected_crc, crcs,
+                          f"SMT DDS CRC {expected_crc} missing after merge")
+
+    def test_digital_devil_saga_abbreviated_removed(self):
+        self.assertNotIn("Digital Devil Saga", self.games)
+
+    def test_dark_cloud_2_crcs_include_47aab3dc(self):
+        """Dark Cloud 2 must include CRC 47AAB3DC after merge."""
+        entry = self.games.get("Dark Cloud 2", {})
+        self.assertIn("47AAB3DC", entry.get("crcs", []))
+
+    def test_dark_chronicle_duplicate_removed(self):
+        self.assertNotIn("Dark Chronicle (Dark Cloud 2)", self.games)
+        self.assertNotIn("Dark Cloud 2 / Dark Chronicle", self.games)
+
+    def test_capcom_vs_snk2_crcs_merged(self):
+        """Full-title Capcom vs SNK 2 must have both CRCs."""
+        entry = self.games.get("Capcom vs. SNK 2: Mark of the Millennium 2001", {})
+        crcs = entry.get("crcs", [])
+        self.assertIn("1D568F61", crcs)
+        self.assertIn("D79F697A", crcs)
+
+    def test_capcom_vs_snk2_abbreviated_removed(self):
+        self.assertNotIn("Capcom vs. SNK 2", self.games)
+        self.assertNotIn("Capcom Vs. SNK 2", self.games)
+
+    def test_champions_of_norrath_crcs_merged(self):
+        entry = self.games.get("Champions of Norrath: Realms of EverQuest", {})
+        crcs = entry.get("crcs", [])
+        self.assertIn("22CA9B7A", crcs)
+        self.assertIn("F27239BA", crcs)
+
+    def test_crash_woc_crcs_merged(self):
+        entry = self.games.get("Crash Bandicoot: The Wrath of Cortex", {})
+        crcs = entry.get("crcs", [])
+        self.assertIn("D764DFC1", crcs, "D764DFC1 must be merged from abbreviated entry")
+
+    # ------------------------------------------------------------------
+    # Full-title canonical entries kept and resolve in serial DB
+    # ------------------------------------------------------------------
+    def test_xenosaga_3_full_title_kept(self):
+        self.assertIn("Xenosaga Episode III: Also sprach Zarathustra", self.games)
+        self.assertNotIn("Xenosaga Episode III", self.games)
+        self.assertNotIn("Xenosaga Episode III: Also Sprach Zarathustra", self.games)
+
+    def test_xenosaga_1_full_title_kept(self):
+        self.assertIn("Xenosaga Episode I: Der Wille zur Macht", self.games)
+        self.assertNotIn("Xenosaga Episode I", self.games)
+
+    def test_xenosaga_2_full_title_kept(self):
+        self.assertIn("Xenosaga Episode II: Jenseits von Gut und Böse", self.games)
+        self.assertNotIn("Xenosaga Episode II", self.games)
+
+    def test_ff12_greatest_hits_removed(self):
+        self.assertNotIn("Final Fantasy XII (Greatest Hits)", self.games)
+        self.assertIn("Final Fantasy XII", self.games)
+
+    def test_virtua_fighter_4_full_title(self):
+        self.assertIn("Virtua Fighter 4: Evolution", self.games)
+        self.assertNotIn("Virtua Fighter 4 Evolution", self.games)
+
+    def test_marvel_vs_capcom_2_full_title(self):
+        self.assertIn("Marvel vs. Capcom 2: New Age of Heroes", self.games)
+        self.assertNotIn("Marvel vs. Capcom 2", self.games)
+
+    def test_resident_evil_code_veronica_kept(self):
+        self.assertIn("Resident Evil: Code Veronica X", self.games)
+
+    def test_resident_evil_abbreviated_removed(self):
+        # SLUS-20184 is Code Veronica X, not the original RE1
+        self.assertNotIn("Resident Evil", self.games)
+
+    # ------------------------------------------------------------------
+    # Overall count sanity
+    # ------------------------------------------------------------------
+    def test_ntsc_db_count_reduced(self):
+        """After Wave 89 cleanup the NTSC-U DB should have ≤2238 entries."""
+        self.assertLessEqual(len(self.games), 2238,
+                             f"NTSC-U DB count should be ≤2238 after cleanup, got {len(self.games)}")
+
+    def test_no_duplicate_serials_for_different_games(self):
+        """No two entries that are clearly different games should share a serial."""
+        serial_to_titles = {}
+        for title, info in self.games.items():
+            s = info.get("serial", "")
+            if s:
+                serial_to_titles.setdefault(s, []).append(title)
+        # After cleanup, no serial should appear more than 2 times
+        problems = {s: ts for s, ts in serial_to_titles.items() if len(ts) > 2}
+        self.assertEqual(problems, {},
+                         "Serials with >2 titles after cleanup:\n" +
+                         "\n".join(f"  {s}: {ts}" for s, ts in list(problems.items())[:5]))
+
+    # ------------------------------------------------------------------
+    # Download history connectivity
+    # ------------------------------------------------------------------
+    def test_download_history_save_file_mod_type_label(self):
+        """DownloadHistory must recognise save_file mod type."""
+        from src.core.download_history import MOD_TYPE_LABEL
+        self.assertIn("save_file", MOD_TYPE_LABEL,
+                      "MOD_TYPE_LABEL must include save_file key")
+
+    def test_run_download_references_record_event(self):
+        """browse_panel._run_download must call record_event on success and failure."""
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src_text = bp_path.read_text(encoding="utf-8")
+        self.assertIn("record_event", src_text,
+                      "browse_panel must call record_event for download history")
+
+    def test_pnach_install_references_record_event(self):
+        """PnachGitHubDialog._install_patch must call record_event."""
+        bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
+        src_text = bp_path.read_text(encoding="utf-8")
+        # Verify record_event appears after _install_patch definition
+        install_patch_pos = src_text.find("def _install_patch")
+        record_event_pos = src_text.find("record_event", install_patch_pos)
+        self.assertGreater(record_event_pos, install_patch_pos,
+                           "_install_patch must call record_event")

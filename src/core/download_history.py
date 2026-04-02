@@ -81,6 +81,7 @@ MOD_TYPE_LABEL: dict = {
     "pnach":        "🔧 PNACH Patch",
     "cover_art":    "🖼 Cover Art",
     "save":         "💾 Game Save",
+    "save_file":    "💾 Game Save",
     "cheat":        "🕹 Cheat",
     "other":        "📦 Other",
 }

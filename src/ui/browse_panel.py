@@ -1284,7 +1284,27 @@ class DownloadInstallDialog(QDialog):
                     description=description, source_url=source_url,
                 )
                 import shutil
+                try:
+                    installed_size = sum(
+                        f.stat().st_size for f in Path(dest).rglob('*') if f.is_file()
+                    ) if Path(dest).exists() else 0
+                except Exception:
+                    installed_size = 0
                 shutil.rmtree(tmpdir, ignore_errors=True)
+
+                try:
+                    from src.core.download_history import record_event, STATUS_SUCCESS
+                    record_event(
+                        self.config,
+                        mod_name=mod.name,
+                        mod_type=mod_type.value,
+                        serial=game,
+                        source_url=source_url,
+                        status=STATUS_SUCCESS,
+                        size_bytes=installed_size,
+                    )
+                except Exception:
+                    pass
 
                 def _done():
                     self._progress.setRange(0, 100)
@@ -1293,14 +1313,42 @@ class DownloadInstallDialog(QDialog):
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _done)
             except DownloadError as exc:
+                _download_err_msg = str(exc)
+                try:
+                    from src.core.download_history import record_event, STATUS_FAILED
+                    record_event(
+                        self.config,
+                        mod_name=_name_text or Path(urlparse(url).path).name,
+                        mod_type=mod_type.value,
+                        serial=_game_text,
+                        source_url=_source_url_text or raw_url,
+                        status=STATUS_FAILED,
+                        note=_download_err_msg,
+                    )
+                except Exception:
+                    pass
                 def _err():
-                    self._status.setText(f"❌  Download failed: {exc}")
+                    self._status.setText(f"❌  Download failed: {_download_err_msg}")
                     self._progress.hide()
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _err)
             except Exception as exc:
+                _general_err_msg = str(exc)
+                try:
+                    from src.core.download_history import record_event, STATUS_FAILED
+                    record_event(
+                        self.config,
+                        mod_name=_name_text or Path(urlparse(url).path).name,
+                        mod_type=mod_type.value,
+                        serial=_game_text,
+                        source_url=_source_url_text or raw_url,
+                        status=STATUS_FAILED,
+                        note=_general_err_msg,
+                    )
+                except Exception:
+                    pass
                 def _err2():
-                    self._status.setText(f"❌  Error: {exc}")
+                    self._status.setText(f"❌  Error: {_general_err_msg}")
                     self._progress.hide()
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _err2)
@@ -1540,6 +1588,7 @@ class PnachGitHubDialog(QDialog):
                     if self.db is not None:
                         try:
                             pnach_file_path = Path(path)
+                            _sz = pnach_file_path.stat().st_size if pnach_file_path.exists() else 0
                             mod_record = ModInfo(
                                 id=str(uuid.uuid4()),
                                 name=f"Widescreen Patch ({patch['crc']})",
@@ -1551,15 +1600,37 @@ class PnachGitHubDialog(QDialog):
                                     f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
                                 ),
                                 files=[path],
-                                size_bytes=pnach_file_path.stat().st_size if pnach_file_path.exists() else 0,
+                                size_bytes=_sz,
                             )
                             self.db.add(mod_record)
+                            try:
+                                from src.core.download_history import record_event, STATUS_SUCCESS
+                                record_event(
+                                    self.config,
+                                    mod_name=f"Widescreen Patch ({patch['crc']})",
+                                    mod_type="pnach",
+                                    source_url=mod_record.source_url,
+                                    status=STATUS_SUCCESS,
+                                    size_bytes=_sz,
+                                )
+                            except Exception:
+                                pass
                         except Exception as _reg_exc:  # DB registration is best-effort
                             import sys
                             print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)
                 else:
                     btn.setText("⬇ Install")
                     self._status.setText(f"❌  Download failed for {patch['filename']}.")
+                    try:
+                        from src.core.download_history import record_event, STATUS_FAILED
+                        record_event(
+                            self.config,
+                            mod_name=f"Widescreen Patch ({patch['crc']})",
+                            mod_type="pnach",
+                            status=STATUS_FAILED,
+                        )
+                    except Exception:
+                        pass
 
             QTimer.singleShot(0, _done)
 
