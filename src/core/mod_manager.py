@@ -821,7 +821,40 @@ class ModManager:
                 deduped.append(r)
         return deduped
 
-    def detect_shadowed_mods(self, mod_type: Optional[ModType] = None) -> Dict[str, List[str]]:
+    def validate_all_pnach(self) -> Dict[str, list]:
+        """
+        Run :func:`src.core.pnach.validate_pnach_file` on all enabled
+        PNACH and CHEAT mods.
+
+        Returns a dict mapping ``mod_id`` → list of
+        :class:`~src.core.pnach.ValidationIssue`.  Only mods with at least
+        one issue are included; mods that pass cleanly are omitted.
+        """
+        from src.core.pnach import validate_pnach_file
+        from pathlib import Path as _Path
+
+        results: Dict[str, list] = {}
+        for mt in (ModType.PNACH, ModType.CHEAT):
+            for mod in self.db.by_type(mt):
+                if not mod.enabled:
+                    continue
+                src = _Path(mod.path)
+                pnach_files = (
+                    list(src.rglob("*.pnach")) if src.is_dir()
+                    else [src] if src.suffix.lower() == ".pnach" else []
+                )
+                all_issues = []
+                for pf in pnach_files:
+                    try:
+                        issues = validate_pnach_file(str(pf))
+                        all_issues.extend(issues)
+                    except Exception:
+                        pass
+                if all_issues:
+                    results[mod.id] = all_issues
+        return results
+
+
         """
         Detect enabled mods that are **completely shadowed** by higher-priority mods.
 

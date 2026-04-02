@@ -310,3 +310,193 @@ def find_pnach_conflicts(pnach_paths: List[str]) -> List[PnachConflict]:
                 seen[key] = (path, patch.value, patch.size)
 
     return conflicts
+
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+# Valid size identifiers accepted by PCSX2
+_VALID_SIZES = {"byte", "short", "word", "double", "extended"}
+
+# Maximum value widths (in hex nibbles) per size type
+_SIZE_MAX_NIBBLES = {
+    "byte":     2,   # 1 byte  = 0xFF
+    "short":    4,   # 2 bytes = 0xFFFF
+    "word":     8,   # 4 bytes = 0xFFFFFFFF
+    "double":   16,  # 8 bytes
+    "extended": 16,  # extended is used for multi-line / special codes
+}
+
+# PCSX2 EE RAM is 32 MB: 0x00000000–0x01FFFFFF (mirrored at 0x20000000)
+# IOP RAM is 2 MB: 0x00000000–0x001FFFFF
+_EE_MAX_ADDR  = 0x1FFFFFFF
+_IOP_MAX_ADDR = 0x001FFFFF
+
+_VALID_PROCESSORS = {"EE", "IOP"}
+
+
+@dataclass
+class ValidationIssue:
+    """A single problem found in a PNACH file."""
+    line_number: int        # 1-based, 0 if not applicable
+    severity: str           # "error" | "warning"
+    code: str               # short machine-readable code, e.g. "invalid_size"
+    message: str            # human-readable description
+    patch: Optional["PatchLine"] = None
+
+
+def validate_pnach_file(path: str) -> List[ValidationIssue]:
+    """
+    Validate a PNACH file and return a list of :class:`ValidationIssue`.
+
+    Checks performed:
+    - File must have a valid 8-hex-digit CRC as its name (error).
+    - ``gametitle`` should be non-empty (warning).
+    - Each ``patch=`` line is checked for:
+        * Unknown processor (error)
+        * Invalid size keyword (error)
+        * Value too wide for the declared size (error)
+        * EE address out of expected RAM range (warning)
+        * IOP address out of expected RAM range (warning)
+    - Duplicate address entries (same processor+address) with different values are
+      flagged as conflicts (warning) — same as ``find_pnach_conflicts`` but inline.
+    - Duplicate address entries with identical values are flagged as redundant (warning).
+
+    Returns an empty list if the file is clean.
+    Raises :class:`ValueError` if the file cannot be read.
+    """
+    p = Path(path)
+    issues: List[ValidationIssue] = []
+
+    # --- CRC in filename ---
+    crc = extract_game_crc(str(p))
+    if not crc:
+        issues.append(ValidationIssue(
+            line_number=0,
+            severity="error",
+            code="invalid_filename",
+            message=(
+                f"Filename '{p.name}' is not a valid PNACH filename. "
+                "PCSX2 requires the filename to be exactly the 8-digit game CRC, "
+                f"e.g. 'ABCD1234.pnach'."
+            ),
+        ))
+
+    pf = parse_pnach(path)  # raises ValueError if unreadable
+
+    if not pf.game_title:
+        issues.append(ValidationIssue(
+            line_number=0,
+            severity="warning",
+            code="missing_gametitle",
+            message="No 'gametitle=' line found. Adding one helps identify the file.",
+        ))
+
+    # Track addresses for duplicate detection
+    seen_addr: Dict[Tuple[str, str], Tuple[str, int]] = {}  # key → (value, line_num)
+    line_num = 0
+
+    for patch in pf.patches:
+        line_num += 1
+        proc = patch.processor.upper()
+        size = patch.size.lower()
+
+        if proc not in _VALID_PROCESSORS:
+            issues.append(ValidationIssue(
+                line_number=line_num,
+                severity="error",
+                code="invalid_processor",
+                message=(
+                    f"Unknown processor '{patch.processor}' at address {patch.address}. "
+                    f"Valid values are: {', '.join(sorted(_VALID_PROCESSORS))}."
+                ),
+                patch=patch,
+            ))
+
+        if size not in _VALID_SIZES:
+            issues.append(ValidationIssue(
+                line_number=line_num,
+                severity="error",
+                code="invalid_size",
+                message=(
+                    f"Unknown size '{patch.size}' at address {patch.address}. "
+                    f"Valid values are: {', '.join(sorted(_VALID_SIZES))}."
+                ),
+                patch=patch,
+            ))
+        else:
+            max_nibbles = _SIZE_MAX_NIBBLES[size]
+            val_stripped = patch.value.lstrip("0") or "0"
+            if len(val_stripped) > max_nibbles:
+                issues.append(ValidationIssue(
+                    line_number=line_num,
+                    severity="error",
+                    code="value_overflow",
+                    message=(
+                        f"Value '{patch.value}' is too large for size '{size}' "
+                        f"(max {max_nibbles} hex digits) at address {patch.address}."
+                    ),
+                    patch=patch,
+                ))
+
+        # Address range check
+        try:
+            addr_int = int(patch.address, 16)
+            if proc == "EE" and addr_int > _EE_MAX_ADDR:
+                issues.append(ValidationIssue(
+                    line_number=line_num,
+                    severity="warning",
+                    code="address_out_of_range",
+                    message=(
+                        f"EE address {patch.address} exceeds expected PS2 RAM range "
+                        f"(max 0x{_EE_MAX_ADDR:08X}). Check the code is correct."
+                    ),
+                    patch=patch,
+                ))
+            elif proc == "IOP" and addr_int > _IOP_MAX_ADDR:
+                issues.append(ValidationIssue(
+                    line_number=line_num,
+                    severity="warning",
+                    code="address_out_of_range",
+                    message=(
+                        f"IOP address {patch.address} exceeds expected IOP RAM range "
+                        f"(max 0x{_IOP_MAX_ADDR:08X}). Check the code is correct."
+                    ),
+                    patch=patch,
+                ))
+        except ValueError:
+            pass  # already caught by regex in parse_pnach
+
+        # Duplicate detection
+        key = patch.dedup_key
+        if key in seen_addr:
+            prev_val, prev_line = seen_addr[key]
+            if prev_val.upper() == patch.value.upper():
+                issues.append(ValidationIssue(
+                    line_number=line_num,
+                    severity="warning",
+                    code="redundant_duplicate",
+                    message=(
+                        f"Address {patch.address} ({proc}) appears more than once "
+                        f"with the same value '{patch.value}' (first at line {prev_line}). "
+                        "The duplicate entry is redundant and can be removed."
+                    ),
+                    patch=patch,
+                ))
+            else:
+                issues.append(ValidationIssue(
+                    line_number=line_num,
+                    severity="warning",
+                    code="address_conflict",
+                    message=(
+                        f"Address {patch.address} ({proc}) is set to '{patch.value}' here "
+                        f"but was already set to '{prev_val}' at line {prev_line}. "
+                        "Only the last value will take effect."
+                    ),
+                    patch=patch,
+                ))
+        else:
+            seen_addr[key] = (patch.value, line_num)
+
+    return issues

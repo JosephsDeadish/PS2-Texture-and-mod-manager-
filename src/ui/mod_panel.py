@@ -166,6 +166,16 @@ class ModPanel(BasePanel):
             builder_btn.clicked.connect(self._open_code_builder)
             toolbar.addWidget(builder_btn)
 
+        # Validate Codes button — only for PNACH/Cheat panels
+        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+            validate_btn = QPushButton("🔍 Validate Codes")
+            validate_btn.setToolTip(
+                "Scan all enabled PNACH files for invalid codes, bad addresses,\n"
+                "wrong size values, and internal address conflicts."
+            )
+            validate_btn.clicked.connect(self._validate_pnach_codes)
+            toolbar.addWidget(validate_btn)
+
         content.addLayout(toolbar)
 
         # ---- Author + library filter row ----

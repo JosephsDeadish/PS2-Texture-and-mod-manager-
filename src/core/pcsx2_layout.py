@@ -589,7 +589,6 @@ def detect_pcsx2_subfolders(pcsx2_root: str) -> Dict[str, str]:
         "pnach_path":            ["cheats", "Cheats", "patches", "Patches"],
         "cover_art_path":        ["covers", "Covers", "cover art"],
         "memcards_path":         ["memcards", "MemoryCards"],
-        "cheats_path":           ["cheats_ws", "Cheats_WS", "cheats", "Cheats"],
         "partial_textures_path": ["textures", "Textures"],  # same root, sub-structured by serial
     }
 
@@ -605,6 +604,9 @@ def detect_pcsx2_subfolders(pcsx2_root: str) -> Dict[str, str]:
             # Use the first (canonical) name as the default even if it doesn't exist
             found = str(root / names[0])
         result[key] = found
+
+    # cheats_path is the same folder as pnach_path — PCSX2 uses one cheats/ dir
+    result["cheats_path"] = result["pnach_path"]
 
     return result
 
