@@ -21,6 +21,7 @@
       "serial": "SLUS-20267",
       "alt_serials": [],
       "crcs": [
+        "B5A7735B",
         "D3C7A0A3"
       ],
       "release_date": "2003-03-10",
@@ -473,6 +474,7 @@
       "serial": "SLUS-21596",
       "alt_serials": [],
       "crcs": [
+        "3AB9F8AE",
         "C7B3A9E2"
       ],
       "release_date": "2007-03-06",
@@ -485,6 +487,7 @@
       "alt_serials": [],
       "crcs": [
         "278700A0",
+        "7E83CC5B",
         "C8FBC640"
       ],
       "release_date": "2005-09-13",
@@ -532,7 +535,9 @@
       "alt_serials": [],
       "crcs": [
         "7152BCA7",
-        "8E3F7DC1"
+        "8E3F7DC1",
+        "9C81D68B",
+        "F321BC38"
       ],
       "release_date": "2005-11-01",
       "developer": "Konami Computer Entertainment Japan",
@@ -583,7 +588,8 @@
       "serial": "SLUS-20973",
       "alt_serials": [],
       "crcs": [
-        "4F44BCDE"
+        "4F44BCDE",
+        "66CB9620"
       ],
       "release_date": "2005-02-08",
       "developer": "Snowblind Studios",
@@ -607,7 +613,8 @@
       "serial": "SLUS-20306",
       "alt_serials": [],
       "crcs": [
-        "5C6EF847"
+        "5C6EF847",
+        "BB3D833A"
       ],
       "release_date": "2002-10-23",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
@@ -665,6 +672,7 @@
         "SLES-52568"
       ],
       "crcs": [
+        "1EB6F5D4",
         "3B698B6E",
         "BD2AC49F",
         "CA5B7A61"
@@ -704,7 +712,8 @@
       "alt_serials": [],
       "crcs": [
         "0E7B9852",
-        "1DF75E06"
+        "1DF75E06",
+        "A5C05C78"
       ],
       "release_date": "2001-05-28",
       "developer": "Level 5",
@@ -773,6 +782,7 @@
         "SLES-50358"
       ],
       "crcs": [
+        "4F32A9FD",
         "9E0C4BC3",
         "F4A7473E"
       ],
@@ -834,8 +844,10 @@
       "serial": "SLUS-20964",
       "alt_serials": [],
       "crcs": [
+        "0BED0AF9",
         "4C416932",
-        "7ADCB24A"
+        "7ADCB24A",
+        "A94BB42B"
       ],
       "release_date": "2005-03-01",
       "developer": "Capcom",
@@ -1046,9 +1058,10 @@
       "serial": "SLUS-21207",
       "alt_serials": [],
       "crcs": [
-        "F53B6210",
+        "30B05B6E",
         "DA0F1E34",
-        "30B05B6E"
+        "F4715852",
+        "F53B6210"
       ],
       "release_date": "2005-11-15",
       "developer": "Level-5",
@@ -1070,7 +1083,9 @@
       "serial": "SLUS-20732",
       "alt_serials": [],
       "crcs": [
-        "9F943FDD"
+        "9679D44C",
+        "9F943FDD",
+        "F0A37E8B"
       ],
       "release_date": "2004-03-02",
       "developer": "Cavia Inc",
@@ -1106,6 +1121,7 @@
       "alt_serials": [],
       "crcs": [
         "3FBF0EA6",
+        "6C89132B",
         "B1C3B0A5"
       ],
       "release_date": "2003-03-26",
@@ -1117,7 +1133,8 @@
       "serial": "SLUS-21153",
       "alt_serials": [],
       "crcs": [
-        "2E0CB9FC"
+        "2E0CB9FC",
+        "6677B437"
       ],
       "release_date": "2005-03-29",
       "developer": "Koei",
@@ -1128,6 +1145,7 @@
       "serial": "SLUS-21322",
       "alt_serials": [],
       "crcs": [
+        "7E3C6FDE",
         "E9E0A33C"
       ],
       "release_date": "2006-11-14",
@@ -1267,7 +1285,8 @@
       "serial": "SLUS-20888",
       "alt_serials": [],
       "crcs": [
-        "5F5DEAE6"
+        "5F5DEAE6",
+        "EB3AC800"
       ],
       "release_date": "2004-06-15",
       "developer": "Square Enix",
@@ -1365,8 +1384,9 @@
       "serial": "SLUS-20712",
       "alt_serials": [],
       "crcs": [
-        "FBBA1C3B",
-        "58B9B9DC"
+        "0F877618",
+        "58B9B9DC",
+        "FBBA1C3B"
       ],
       "release_date": "2004-09-14",
       "developer": "Treasure",
@@ -1542,7 +1562,8 @@
         "SLES-50498"
       ],
       "crcs": [
-        "00DC3F8E"
+        "00DC3F8E",
+        "160076FE"
       ],
       "release_date": "2002-01-30",
       "developer": "Gamearts",
@@ -1560,7 +1581,8 @@
       ],
       "crcs": [
         "07DADC7E",
-        "5B657DAD"
+        "5B657DAD",
+        "7E7D7B87"
       ],
       "release_date": "2006-02-14",
       "developer": "Game Arts",
@@ -1647,6 +1669,7 @@
       "serial": "SLUS-21224",
       "alt_serials": [],
       "crcs": [
+        "B815F724",
         "E9E2B97C"
       ],
       "release_date": "2005-11-01",
@@ -1730,10 +1753,12 @@
       "serial": "SLUS-21075",
       "alt_serials": [],
       "crcs": [
+        "2CD5794C",
         "321DF6F5",
         "3B340B97",
-        "C0FC8DA6",
-        "901AAC09"
+        "901AAC09",
+        "B9B0ECA5",
+        "C0FC8DA6"
       ],
       "release_date": "2005-05-10",
       "developer": "Capcom Production Studio 1",
@@ -1928,7 +1953,8 @@
       "alt_serials": [],
       "crcs": [
         "09F2E574",
-        "D71B573D"
+        "D71B573D",
+        "FA7E3081"
       ],
       "release_date": "2004-09-21",
       "developer": "Now Production",
@@ -1999,6 +2025,8 @@
         "SLES-54114"
       ],
       "crcs": [
+        "C39FF377",
+        "DA0535FD",
         "F266B00B"
       ],
       "release_date": "2006-03-28",
@@ -2050,7 +2078,8 @@
       "serial": "SLUS-21007",
       "alt_serials": [],
       "crcs": [
-        "1BF11B18"
+        "1BF11B18",
+        "9AC63A2E"
       ],
       "release_date": "2004-12-16",
       "developer": "FromSoftware, Inc",
@@ -2069,6 +2098,7 @@
       "serial": "SLUS-20773",
       "alt_serials": [],
       "crcs": [
+        "728AB07C",
         "FAF8A84A"
       ],
       "release_date": "2003-11-11",
@@ -2259,7 +2289,8 @@
       "serial": "SLUS-21370",
       "alt_serials": [],
       "crcs": [
-        "D3E1EE08"
+        "D3E1EE08",
+        "DB581CF5"
       ],
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -2269,7 +2300,8 @@
       "serial": "SLUS-20487",
       "alt_serials": [],
       "crcs": [
-        "6F536DEA"
+        "6F536DEA",
+        "E3D9C115"
       ],
       "release_date": "2003-10-14",
       "developer": "Capcom Production Studio 3",
@@ -2413,7 +2445,8 @@
       "serial": "SLUS-20209",
       "alt_serials": [],
       "crcs": [
-        "49FBF26F"
+        "49FBF26F",
+        "C1625F14"
       ],
       "release_date": "2003-04-08",
       "developer": "Rockstar San Diego",
@@ -2424,6 +2457,7 @@
       "serial": "SLUS-20896",
       "alt_serials": [],
       "crcs": [
+        "0EF16A99",
         "4B5E8A26"
       ],
       "release_date": "2004-09-21",
@@ -2465,6 +2499,7 @@
       "alt_serials": [],
       "crcs": [
         "79E17EE2",
+        "8B9A70C4",
         "C7C09A27"
       ],
       "release_date": "2004-10-04",
@@ -2543,7 +2578,9 @@
     "Need for Speed: Hot Pursuit 2": {
       "serial": "SLUS-20362",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "06A33E38"
+      ],
       "release_date": "2002-10-01",
       "developer": "DreamWorks Interactive",
       "publisher": "Electronic Arts",
@@ -2627,13 +2664,17 @@
       "release_date": "2004-02-10",
       "developer": "Sega Wow Entertainment, Inc",
       "publisher": "Sega",
-      "genre": "Action, Beat'em Up"
+      "genre": "Action, Beat'em Up",
+      "crcs": [
+        "519E816B"
+      ]
     },
     "Odin Sphere": {
       "serial": "SLUS-21577",
       "alt_serials": [],
       "crcs": [
-        "7C8B4E5A"
+        "7C8B4E5A",
+        "FD5DEDEF"
       ],
       "release_date": "2007-05-22",
       "developer": "Vanillaware, Ltd",
@@ -2659,7 +2700,7 @@
       },
       "aliases": [
         "Wolf Game",
-        "Ōkami"
+        "\u014ckami"
       ]
     },
     "Onimusha 2: Samurai's Destiny": {
@@ -2673,7 +2714,9 @@
     "Onimusha 3: Demon Siege": {
       "serial": "SLUS-20694",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "87B6DEF2"
+      ],
       "release_date": "2004-04-27",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -2695,7 +2738,10 @@
     "Onimusha: Warlords": {
       "serial": "SLUS-20018",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "17D78D05",
+        "3BA51AC3"
+      ],
       "release_date": "2001-03-13",
       "developer": "Capcom",
       "publisher": "Capcom",
@@ -2728,7 +2774,9 @@
       "serial": "SLUS-21782",
       "alt_serials": [],
       "crcs": [
+        "0DEDC3B7",
         "0F6C0DB9",
+        "117D1977",
         "DEDC3B71"
       ],
       "crc_labels": {
@@ -2742,6 +2790,7 @@
       "serial": "SLUS-20955",
       "alt_serials": [],
       "crcs": [
+        "B43000A1",
         "E3A4B312"
       ],
       "release_date": "2004-08-31",
@@ -3043,6 +3092,7 @@
       "serial": "SLUS-20002",
       "alt_serials": [],
       "crcs": [
+        "06AD9CA0",
         "1F2C2BCE",
         "5D498EE4"
       ],
@@ -3154,6 +3204,7 @@
       "serial": "SLUS-20772",
       "alt_serials": [],
       "crcs": [
+        "08FFF00D",
         "1491EFCC"
       ],
       "release_date": "2003-10-21",
@@ -3177,7 +3228,9 @@
       "alt_serials": [],
       "crcs": [
         "0E82B2D2",
-        "B0791D8E"
+        "8E7CFF62",
+        "B0791D8E",
+        "BAADDF51"
       ],
       "release_date": "2001-11-07",
       "developer": "EA Canada",
@@ -3200,7 +3253,8 @@
       "serial": "SLUS-20347",
       "alt_serials": [],
       "crcs": [
-        "3E34F9D4"
+        "3E34F9D4",
+        "8BE3D7B2"
       ],
       "release_date": "2001-12-14",
       "developer": "Forest Entertainment, Inc",
@@ -3214,7 +3268,8 @@
       ],
       "crcs": [
         "1A9BFCD1",
-        "3B9A81AD"
+        "3B9A81AD",
+        "C7B16C2C"
       ],
       "release_date": "2004-09-27",
       "developer": "Aruze Corp",
@@ -3250,6 +3305,7 @@
       "crcs": [
         "2C50B4DB",
         "B7FD7B53",
+        "B9D90F75",
         "C19A374E"
       ],
       "release_date": "2005-10-18",
@@ -3317,7 +3373,8 @@
       "serial": "SLUS-20911",
       "alt_serials": [],
       "crcs": [
-        "AEF2012F"
+        "AEF2012F",
+        "D3F182E8"
       ],
       "release_date": "2004-10-12",
       "developer": "Atlus",
@@ -3334,7 +3391,8 @@
       "alt_serials": [],
       "crcs": [
         "8F4A3C21",
-        "BA7C4436"
+        "BA7C4436",
+        "BFCC3E7E"
       ],
       "release_date": "2002-11-10",
       "developer": "Overworks",
@@ -3370,6 +3428,7 @@
         "SLPM-65257"
       ],
       "crcs": [
+        "2498951B",
         "3B1C5E13",
         "482D4237",
         "C0B84965",
@@ -3508,6 +3567,7 @@
       "alt_serials": [],
       "crcs": [
         "3A66F702",
+        "4ADB5E4E",
         "6E3E2B4E",
         "E1B01308"
       ],
@@ -3541,6 +3601,7 @@
       "alt_serials": [],
       "crcs": [
         "2E01B00C",
+        "2EB5B9A9",
         "DB3BCCE8",
         "E2DFCE12"
       ],
@@ -3651,6 +3712,7 @@
       "alt_serials": [],
       "crcs": [
         "0F900EAA",
+        "14FE13DE",
         "249540F3"
       ],
       "release_date": "2005-11-01",
@@ -3686,7 +3748,8 @@
       "serial": "SLUS-20387",
       "alt_serials": [],
       "crcs": [
-        "09E4EC93"
+        "09E4EC93",
+        "5F3DD929"
       ],
       "release_date": "2002-10-22",
       "developer": "Konami Computer Entertainment Japan",
@@ -3701,7 +3764,8 @@
       "serial": "SLUS-20979",
       "alt_serials": [],
       "crcs": [
-        "D14EA600"
+        "D14EA600",
+        "E2984005"
       ],
       "release_date": "2005-01-11",
       "developer": "Konami Computer Entertainment Japan",
@@ -3716,8 +3780,9 @@
       "serial": "SLUS-21291",
       "alt_serials": [],
       "crcs": [
-        "BCD0B7CD",
-        "8028A9B5"
+        "6A6B22A1",
+        "8028A9B5",
+        "BCD0B7CD"
       ],
       "release_date": "2006-03-21",
       "developer": "Konami Computer Entertainment Japan",
@@ -3989,6 +4054,9 @@
       "aliases": [
         "SC1",
         "Splinter Cell 1"
+      ],
+      "crcs": [
+        "A1B095EC"
       ]
     },
     "Tony Hawk's American Wasteland": {
@@ -4119,6 +4187,7 @@
       "serial": "SLUS-21452",
       "alt_serials": [],
       "crcs": [
+        "1F5D6258",
         "2B81C7F3",
         "2CFF5D40"
       ],
@@ -4285,6 +4354,10 @@
       "genre": "RPG",
       "aliases": [
         "WA4"
+      ],
+      "crcs": [
+        "5CE36D2C",
+        "BBC3EFFA"
       ]
     },
     "Wild ARMs 5": {
@@ -4346,7 +4419,7 @@
         "Xenosaga I"
       ]
     },
-    "Xenosaga Episode II: Jenseits von Gut und Böse": {
+    "Xenosaga Episode II: Jenseits von Gut und B\u00f6se": {
       "serial": "SLUS-20892",
       "alt_serials": [
         "SLUS-21133"
@@ -4396,6 +4469,7 @@
       "serial": "SLUS-21348",
       "alt_serials": [],
       "crcs": [
+        "388F687B",
         "CEEF2AC2"
       ],
       "release_date": "2006-09-08",
@@ -4534,6 +4608,7 @@
       "serial": "SCUS-97355",
       "alt_serials": [],
       "crcs": [
+        "7A5C6B1E",
         "FDDE7528"
       ],
       "release_date": "2004-04-20",
@@ -5360,6 +5435,7 @@
       "serial": "SLUS-20780",
       "alt_serials": [],
       "crcs": [
+        "85E994DD",
         "D0E17D26"
       ],
       "release_date": "2004-02-03",
@@ -6555,6 +6631,7 @@
       "serial": "SLUS-20595",
       "alt_serials": [],
       "crcs": [
+        "180F5C36",
         "B59EF006"
       ],
       "release_date": "2005-04-25",
@@ -7621,6 +7698,7 @@
       "serial": "SLUS-21215",
       "alt_serials": [],
       "crcs": [
+        "2CFFFC1E",
         "B99A75DE"
       ],
       "release_date": "2005-10-18",
@@ -8152,6 +8230,7 @@
       "serial": "SLUS-20703",
       "alt_serials": [],
       "crcs": [
+        "8A8FC183",
         "B55F4D5D"
       ],
       "release_date": "2004-02-03",
@@ -8163,6 +8242,7 @@
       "serial": "SLUS-20327",
       "alt_serials": [],
       "crcs": [
+        "67DB3ED8",
         "BAFF7A27"
       ],
       "release_date": "2002-05-30",
@@ -8225,6 +8305,7 @@
       "serial": "SLUS-20790",
       "alt_serials": [],
       "crcs": [
+        "9B1635C5",
         "E32DCF24"
       ],
       "release_date": "2003-12-02",
@@ -8236,7 +8317,8 @@
       "serial": "SLUS-20894",
       "alt_serials": [],
       "crcs": [
-        "2B3CF29C"
+        "2B3CF29C",
+        "97E76C44"
       ],
       "release_date": "2004-03-09",
       "developer": "Team17 Software, Ltd",
@@ -8247,7 +8329,8 @@
       "serial": "SLUS-20917",
       "alt_serials": [],
       "crcs": [
-        "4DC37ADA"
+        "4DC37ADA",
+        "F54CC240"
       ],
       "release_date": "2004-11-02",
       "developer": "Sega Enterprises Ltd.",
@@ -8269,6 +8352,7 @@
       "serial": "SLUS-20966",
       "alt_serials": [],
       "crcs": [
+        "6A6BB52F",
         "DA4C1E8E"
       ],
       "release_date": "2006-02-14",
@@ -8551,7 +8635,8 @@
       "serial": "SLUS-20012",
       "alt_serials": [],
       "crcs": [
-        "6AEABF4E"
+        "6AEABF4E",
+        "80E9B7EF"
       ],
       "release_date": "2001-10-24",
       "developer": "Activision",
@@ -9082,7 +9167,8 @@
       "serial": "SLUS-20782",
       "alt_serials": [],
       "crcs": [
-        "89954774"
+        "89954774",
+        "D78D3D1F"
       ],
       "release_date": "2004-09-21",
       "developer": "WOW Entertainment/ Red",
@@ -9336,7 +9422,8 @@
       "serial": "SLUS-21042",
       "alt_serials": [],
       "crcs": [
-        "327053E8"
+        "327053E8",
+        "9D443C69"
       ],
       "release_date": "2005-08-16",
       "developer": "High Moon Studios",
@@ -9391,6 +9478,7 @@
       "serial": "SLUS-21087",
       "alt_serials": [],
       "crcs": [
+        "3D02E0BF",
         "455DD546"
       ],
       "release_date": "2005-09-19",
@@ -14454,7 +14542,9 @@
       "alt_serials": [
         "SLUS-20754"
       ],
-      "crcs": [],
+      "crcs": [
+        "612542D0"
+      ],
       "release_date": "2003-09-16",
       "developer": "EA",
       "publisher": "Electronic Arts Tiburon",
@@ -17100,7 +17190,9 @@
     "Metal Slug Anthology": {
       "serial": "SLUS-21550",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "F5625D83"
+      ],
       "release_date": "2007-03-27",
       "developer": "SNK Playmore",
       "publisher": "SNK Playmore",
@@ -17631,7 +17723,9 @@
     "WWE SmackDown vs. Raw 2008": {
       "serial": "SLUS-21645",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "6CFEFAC1"
+      ],
       "release_date": "2007-11-13",
       "developer": "YUKE's Future Media Creator",
       "publisher": "THQ",
@@ -17960,7 +18054,7 @@
       "crcs": [],
       "genre": "MMORPG"
     },
-    "Madden NFL 08 en Español": {
+    "Madden NFL 08 en Espa\u00f1ol": {
       "serial": "SLUS-21705",
       "alt_serials": [],
       "crcs": [],
@@ -18657,7 +18751,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-10-21",
-      "developer": "Étranges Libellules",
+      "developer": "\u00c9tranges Libellules",
       "publisher": "Sierra Entertainment",
       "genre": "Action-Adventure"
     },
@@ -20557,7 +20651,9 @@
       "crcs": [
         "28703748",
         "5C7B2BDD",
-        "A86571F9"
+        "A86571F9",
+        "CE26E6D8",
+        "F070ECA8"
       ],
       "release_date": "2006-10-17",
       "developer": "Rockstar Games",

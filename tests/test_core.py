@@ -15654,9 +15654,9 @@ class TestWave76CrossContaminationFixes(unittest.TestCase):
         self._assert_crc_serial("BC0198AB", "SLUS-21590")
 
     def test_c2395b46_mc3_dub_remix_name(self):
-        """C2395B46: all entries must say 'Midnight Club 3: DUB Edition Remix (SLUS-21029)'."""
-        self._assert_crc_game("C2395B46", "Midnight Club 3: DUB Edition Remix (SLUS-21029)")
-        self._assert_crc_serial("C2395B46", "SLUS-21029")
+        """C2395B46: all entries must say 'Midnight Club 3: DUB Edition Remix (SLUS-21355)' (Wave98 corrected serial)."""
+        self._assert_crc_game("C2395B46", "Midnight Club 3: DUB Edition Remix (SLUS-21355)")
+        self._assert_crc_serial("C2395B46", "SLUS-21355")
 
     def test_da5cc7a3_ace_combat5_name(self):
         """DA5CC7A3: all 16 entries must say 'Ace Combat 5: The Unsung War (SLUS-20851)'."""
