@@ -358,9 +358,9 @@
       "crcs": [
         "68DAC75E"
       ],
-      "developer": "ESPN Video Games",
+      "developer": "Konami Computer Entertainment Osaka",
       "genre": "Sports",
-      "publisher": "Konami",
+      "publisher": "Konami of Europe",
       "region": "PAL",
       "release_date": "2001",
       "serial": "SLES-50075"
@@ -477,11 +477,11 @@
       "crcs": [
         "51D8A6A9"
       ],
-      "developer": "Broadsword Interactive",
-      "genre": "Racing",
-      "publisher": "Midas Interactive",
+      "developer": "Rage Software",
+      "genre": "Driving, Racing",
+      "publisher": "Rage Software",
       "region": "PAL",
-      "release_date": "2001",
+      "release_date": "2001-11-16",
       "serial": "SLES-50472"
     },
     "God Hand (PAL)": {
@@ -1451,7 +1451,7 @@
         "EBDB6E4B"
       ],
       "developer": "Heavy Iron Studios",
-      "genre": "Action-Platformer",
+      "genre": "Action, Adventure, Platformer",
       "publisher": "THQ",
       "region": "PAL",
       "release_date": "2004-11-05",
@@ -1725,6 +1725,61 @@
       "publisher": "D3 Publisher",
       "region": "PAL",
       "release_date": "2007-10-26"
+    },
+    "Tales of Legendia (JP)": {
+      "serial": "SLPS-25533",
+      "crcs": [
+        "1F8640E0"
+      ],
+      "aliases": [
+        "Tales of Legendia Japan"
+      ]
+    },
+    "Grandia III (JP)": {
+      "serial": "SLPM-65976",
+      "crcs": [
+        "5B659BED"
+      ],
+      "aliases": []
+    },
+    "Viewtiful Joe (JP)": {
+      "serial": "SLPM-65699",
+      "crcs": [
+        "634947D7"
+      ],
+      "aliases": []
+    },
+    "Silent Hill 3 (JP)": {
+      "serial": "SLPM-65257",
+      "crcs": [
+        "8CFE667F"
+      ],
+      "aliases": []
+    },
+    "Armored Core 3 (JP)": {
+      "serial": "SLPS-25112",
+      "crcs": [
+        "F49E991D"
+      ],
+      "aliases": []
+    },
+    "Viewtiful Joe 2 (JP)": {
+      "serial": "SLPM-65824",
+      "crcs": [
+        "F977249C"
+      ],
+      "aliases": []
+    },
+    "Forbidden Siren 2 (JP)": {
+      "serial": "SCPS-15106",
+      "crcs": [],
+      "aliases": [
+        "Siren 2 (JP)"
+      ],
+      "release_date": "2006-02-09",
+      "developer": "SCE Japan Studio",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Survival Horror"
     }
   },
   "version": "1.0"

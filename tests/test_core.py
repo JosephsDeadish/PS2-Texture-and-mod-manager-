@@ -8626,10 +8626,13 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         from pathlib import Path
         import json
         db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        pal_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
         self.data = json.loads(db_path.read_text())["games"]
+        self.pal_data = json.loads(pal_path.read_text())["games"]
 
-    def _assert_metadata(self, title, field, expected=None):
-        game = self.data.get(title)
+    def _assert_metadata(self, title, field, expected=None, db=None):
+        source = db if db is not None else self.data
+        game = source.get(title)
         self.assertIsNotNone(game, f"'{title}' not found in serial DB")
         value = game.get(field)
         self.assertIsNotNone(value, f"Expected '{field}' to be set for '{title}'")
@@ -8683,12 +8686,12 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("Gran Turismo 4 Prologue", "developer", "Polyphony Digital")
 
     def test_incredibles_has_release_date(self):
-        """Wave 46: Incredibles, The should have release_date from PS2.data.json."""
-        self._assert_metadata("Incredibles, The", "release_date", "2004-11-05")
+        """Wave 46: Incredibles (PAL) should have release_date from PS2.data.json."""
+        self._assert_metadata("The Incredibles (PAL)", "release_date", "2004-11-05", db=self.pal_data)
 
     def test_incredibles_has_developer(self):
-        """Wave 46: Incredibles, The should have developer Heavy Iron Studios."""
-        self._assert_metadata("Incredibles, The", "developer", "Heavy Iron Studios")
+        """Wave 46: Incredibles (PAL) should have developer Heavy Iron Studios."""
+        self._assert_metadata("The Incredibles (PAL)", "developer", "Heavy Iron Studios", db=self.pal_data)
 
     def test_tales_of_destiny_ps2_has_release_date(self):
         """Wave 46: Tales of Destiny (PS2 remake) should have release_date."""
@@ -8707,24 +8710,24 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("Tales of Rebirth", "developer", "Namco Bandai")
 
     def test_forbidden_siren_2_has_developer(self):
-        """Wave 46: Forbidden Siren 2 should have developer SCE Japan Studio."""
-        self._assert_metadata("Forbidden Siren 2", "developer", "SCE Japan Studio")
+        """Wave 46: Forbidden Siren 2 (JP) should have developer SCE Japan Studio (Japan-only title)."""
+        self._assert_metadata("Forbidden Siren 2 (JP)", "developer", "SCE Japan Studio", db=self.pal_data)
 
     def test_front_mission_5_has_developer(self):
         """Wave 46: Front Mission 5: Scars of the War should have developer Square Enix."""
         self._assert_metadata("Front Mission 5: Scars of the War", "developer", "Square Enix")
 
     def test_gtc_africa_has_developer(self):
-        """Wave 46: GTC Africa should have developer Rage Software."""
-        self._assert_metadata("GTC Africa", "developer", "Rage Software")
+        """Wave 46: GTC Africa (PAL) should have developer Rage Software."""
+        self._assert_metadata("GTC Africa (PAL)", "developer", "Rage Software", db=self.pal_data)
 
     def test_espn_nba_2night_has_release_date(self):
-        """Wave 46: ESPN NBA 2Night should have release_date."""
-        self._assert_metadata("ESPN NBA 2Night", "release_date", "2001")
+        """Wave 46: ESPN NBA 2Night (PAL) should have release_date."""
+        self._assert_metadata("ESPN NBA 2Night (PAL)", "release_date", "2001", db=self.pal_data)
 
     def test_serial_db_wave46_game_count(self):
-        """Wave 46: serial DB should have at least 2213 games (Wave 91 dedup; was 2288)."""
-        self.assertGreaterEqual(len(self.data), 2213)
+        """Wave 46: serial DB should have at least 2206 games (Wave 95 cleanup; was 2288)."""
+        self.assertGreaterEqual(len(self.data), 2206)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8812,8 +8815,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2213 games (Wave 91 dedup; was 2291)."""
-        self.assertGreaterEqual(len(self.games), 2213)
+        """Wave 47: serial DB should have at least 2206 games (Wave 95 cleanup; was 2291)."""
+        self.assertGreaterEqual(len(self.games), 2206)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9151,9 +9154,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
+        """Wave 49: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
         self.assertEqual(
-            len(self.games), 2213,
+            len(self.games), 2206,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9374,8 +9377,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2213)
+        """Wave 50: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2206)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9579,8 +9582,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2213)
+        """Wave 51: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2206)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9767,8 +9770,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2213)
+        """Wave 52: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2206)
 
 
 # ===========================================================================

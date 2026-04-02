@@ -1263,18 +1263,6 @@
         "Final Fantasy 12"
       ]
     },
-    "Forbidden Siren 2": {
-      "serial": "SCPS-15106",
-      "alt_serials": [],
-      "release_date": "2006-02-09",
-      "developer": "SCE Japan Studio",
-      "publisher": "Sony Computer Entertainment Inc.",
-      "genre": "Survival Horror"
-    },
-    "Forbidden Siren 2 (PAL)": {
-      "serial": "SLES-53851",
-      "alt_serials": []
-    },
     "Front Mission 4": {
       "serial": "SLUS-20888",
       "alt_serials": [],
@@ -3943,17 +3931,6 @@
       "publisher": "EA Games",
       "genre": "Simulation"
     },
-    "The Sims Bustin' Out": {
-      "serial": "SLUS-20842",
-      "alt_serials": [],
-      "crcs": [
-        "1371A2F5"
-      ],
-      "release_date": "2003-12-15",
-      "developer": "Maxis",
-      "publisher": "EA Games",
-      "genre": "Simulation"
-    },
     "The Sims: Bustin' Out": {
       "serial": "SLUS-20842",
       "alt_serials": [],
@@ -4749,17 +4726,6 @@
       "publisher": "Epic Games",
       "genre": "Action"
     },
-    "ESPN NBA 2Night": {
-      "serial": "SLES-50075",
-      "alt_serials": [],
-      "crcs": [
-        "68DAC75E"
-      ],
-      "release_date": "2001",
-      "developer": "Konami Computer Entertainment Osaka",
-      "publisher": "Konami of Europe",
-      "genre": "Sports"
-    },
     "Super Bust-A-Move": {
       "serial": "SLUS-20115",
       "alt_serials": [],
@@ -4823,17 +4789,6 @@
       "developer": "Broadsword Interactive",
       "publisher": "Acclaim",
       "genre": "Driving, Racing."
-    },
-    "GTC Africa": {
-      "serial": "SLES-50472",
-      "alt_serials": [],
-      "crcs": [
-        "51D8A6A9"
-      ],
-      "release_date": "2001-11-16",
-      "developer": "Rage Software",
-      "publisher": "Rage Software",
-      "genre": "Driving, Racing"
     },
     "Vexx": {
       "serial": "SLUS-20383",
@@ -5105,13 +5060,6 @@
       "publisher": "Acclaim",
       "genre": "Sports, Beach Volleyball"
     },
-    "Finding Nemo": {
-      "serial": "SLES-51871",
-      "alt_serials": [],
-      "crcs": [
-        "5D02E529"
-      ]
-    },
     "Van Helsing": {
       "serial": "SLUS-20738",
       "alt_serials": [],
@@ -5247,17 +5195,6 @@
       "developer": "Razorworks Stodio",
       "publisher": "2K Games",
       "genre": "Racing"
-    },
-    "Incredibles, The": {
-      "serial": "SLES-52812",
-      "alt_serials": [],
-      "crcs": [
-        "EBDB6E4B"
-      ],
-      "release_date": "2004-11-05",
-      "developer": "Heavy Iron Studios",
-      "publisher": "THQ",
-      "genre": "Action, Adventure, Platformer"
     },
     "FIFA Street": {
       "serial": "SLUS-21147",
