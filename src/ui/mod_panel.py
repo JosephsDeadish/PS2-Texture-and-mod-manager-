@@ -42,8 +42,8 @@ _TYPE_META = {
     },
     ModType.PNACH: {
         "icon": "🔧",
-        "label": "PNACH Patches",
-        "desc": "Game patches and cheats applied at runtime",
+        "label": "PNACH Codes & Cheats",
+        "desc": "Game patches, widescreen cheats, and other code mods applied via PCSX2",
         "ext_filter": "PNACH Files (*.pnach);;All Files (*)",
         "folder": False,
         "deploy_key": "pnach_path",
@@ -65,12 +65,12 @@ _TYPE_META = {
         "deploy_key": "memcards_path",
     },
     ModType.CHEAT: {
-        "icon": "⚡",
-        "label": "Cheats (WS)",
-        "desc": "Widescreen and other cheat patches",
-        "ext_filter": "Cheat Files (*.pnach *.txt);;All Files (*)",
+        "icon": "🔧",
+        "label": "PNACH Codes & Cheats",
+        "desc": "Game patches, widescreen cheats, and other code mods applied via PCSX2",
+        "ext_filter": "PNACH Files (*.pnach);;All Files (*)",
         "folder": False,
-        "deploy_key": "cheats_path",
+        "deploy_key": "pnach_path",
     },
 }
 
@@ -87,7 +87,8 @@ class ModPanel(BasePanel):
     # Payload: (author: str, target_mod_type: ModType)
     navigate_to_author_type = pyqtSignal(str, object)
 
-    def __init__(self, mod_type: ModType, db: ModDatabase, config: AppConfig, parent=None):
+    def __init__(self, mod_type: ModType, db: ModDatabase, config: AppConfig,
+                 extra_types: list = None, parent=None):
         meta = _TYPE_META[mod_type]
         super().__init__(
             f"{meta['icon']}  {meta['label']}",
@@ -95,10 +96,23 @@ class ModPanel(BasePanel):
             parent=parent,
         )
         self.mod_type = mod_type
+        self.extra_types: list = list(extra_types or [])
         self.db = db
         self.config = config
         self.manager = ModManager(db)
         self._build()
+
+    def _all_mods(self) -> list:
+        """Return all mods for the primary type and any extra types, deduped by id."""
+        seen: set = set()
+        result = []
+        for mt in [self.mod_type] + self.extra_types:
+            for m in self.db.by_type(mt):
+                if m.id not in seen:
+                    seen.add(m.id)
+                    result.append(m)
+        return result
+
 
     # ------------------------------------------------------------------
     # Build
@@ -294,7 +308,7 @@ class ModPanel(BasePanel):
         self._author_filter.addItem("All Authors", "")
 
         authors = sorted(
-            {m.author for m in self.db.by_type(self.mod_type) if m.author and m.author != "Unknown"},
+            {m.author for m in self._all_mods() if m.author and m.author != "Unknown"},
         )
         for a in authors:
             # Mark favorite authors with a heart
@@ -316,7 +330,7 @@ class ModPanel(BasePanel):
         query = self._search.text().lower()
         author_filter = self._author_filter.currentData() or ""
         library_only = self._library_filter_check.isChecked()
-        mods = self.db.by_type(self.mod_type)
+        mods = self._all_mods()
         sort_idx = self._sort_combo.currentIndex()
 
         if query:
@@ -352,8 +366,10 @@ class ModPanel(BasePanel):
         reverse = [False, True, False, True, True]
         mods = sorted(mods, key=sort_keys[sort_idx], reverse=reverse[sort_idx])
 
-        # Conflict info
-        conflicts = self.manager.detect_conflicts(self.mod_type)
+        # Conflict info — aggregate across all managed types
+        conflicts = []
+        for mt in [self.mod_type] + self.extra_types:
+            conflicts.extend(self.manager.detect_conflicts(mt))
         conflicting_ids = set()
         for c in conflicts:
             conflicting_ids.add(c.mod_a_id)
@@ -393,8 +409,9 @@ class ModPanel(BasePanel):
                 widget.filter_by_author.connect(self._filter_by_author)
                 self._list_layout.insertWidget(i, widget)
 
-        enabled_count = sum(1 for m in self.db.by_type(self.mod_type) if m.enabled)
-        total_count = len(self.db.by_type(self.mod_type))
+        all_mods = self._all_mods()
+        enabled_count = sum(1 for m in all_mods if m.enabled)
+        total_count = len(all_mods)
         shadow_note = f"  •  {len(shadowed_ids)} shadowed" if shadowed_ids else ""
         self._count_lbl.setText(
             f"{enabled_count}/{total_count} enabled"
@@ -572,14 +589,15 @@ class ModPanel(BasePanel):
     def _enable_all(self):
         meta = _TYPE_META[self.mod_type]
         target_path = getattr(self.config, meta["deploy_key"], "")
-        for mod in self.db.by_type(self.mod_type):
+        all_types = [self.mod_type] + self.extra_types
+        for mod in self._all_mods():
             if not mod.enabled:
                 mod.enabled = True
                 self.db.update(mod)
         # Single bulk deploy after all flags are set
         if target_path:
-            count, _ = self.manager.deploy(self.mod_type, target_path)
-            self.emit_status(f"All {meta['label'].lower()} enabled — deployed {count} to PCSX2")
+            total = sum(self.manager.deploy(mt, target_path)[0] for mt in all_types)
+            self.emit_status(f"All {meta['label'].lower()} enabled — deployed {total} to PCSX2")
         else:
             self.emit_status(f"All {meta['label'].lower()} enabled (configure path in Settings to deploy)")
         self._apply_filter()
@@ -587,24 +605,30 @@ class ModPanel(BasePanel):
     def _disable_all(self):
         meta = _TYPE_META[self.mod_type]
         target_path = getattr(self.config, meta["deploy_key"], "")
-        for mod in self.db.by_type(self.mod_type):
+        all_types = [self.mod_type] + self.extra_types
+        for mod in self._all_mods():
             if mod.enabled:
                 mod.enabled = False
                 self.db.update(mod)
         # Re-deploy (nothing enabled → clears deployed files via empty deploy)
         if target_path:
-            self.manager.deploy(self.mod_type, target_path)
+            for mt in all_types:
+                self.manager.deploy(mt, target_path)
         self.emit_status(f"All {meta['label'].lower()} disabled")
         self._apply_filter()
 
     def _show_conflicts(self):
-        conflicts = self.manager.detect_conflicts(self.mod_type)
+        all_types = [self.mod_type] + self.extra_types
+        conflicts = []
+        for mt in all_types:
+            conflicts.extend(self.manager.detect_conflicts(mt))
         pnach_conflicts = []
-        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
-            try:
-                pnach_conflicts = self.manager.detect_pnach_conflicts(self.mod_type)
-            except Exception:
-                pass
+        for mt in all_types:
+            if mt in (ModType.PNACH, ModType.CHEAT):
+                try:
+                    pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
+                except Exception:
+                    pass
 
         if not conflicts and not pnach_conflicts:
             QMessageBox.information(
@@ -661,7 +685,7 @@ class ModPanel(BasePanel):
         from src.core.updater import UpdateChecker
 
         mods_with_source = [
-            m for m in self.db.by_type(self.mod_type)
+            m for m in self._all_mods()
             if m.source_url
         ]
         if not mods_with_source:

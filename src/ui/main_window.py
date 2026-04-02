@@ -117,10 +117,9 @@ class MainWindow(QMainWindow):
             ("🎮", "My Library"),
             ("📥", "Downloads"),
             ("🎨", "Texture Packs"),
-            ("🔧", "PNACH Patches"),
+            ("🔧", "PNACH Codes & Cheats"),
             ("🖼️", "Cover Art"),
             ("💾", "Memory Cards"),
-            ("⚡", "Cheats"),
         ]
 
         for icon, label in nav_items:
@@ -179,7 +178,8 @@ class MainWindow(QMainWindow):
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
         self._stack.addWidget(self._texture_panel)      # index 4
 
-        self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config)
+        self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config,
+                                      extra_types=[ModType.CHEAT])
         self._stack.addWidget(self._pnach_panel)        # index 5
 
         self._cover_panel = ModPanel(ModType.COVER_ART, self.db, self.config)
@@ -188,26 +188,22 @@ class MainWindow(QMainWindow):
         self._memcard_panel = MemoryCardPanel(self.config)
         self._stack.addWidget(self._memcard_panel)      # index 7
 
-        self._cheat_panel = ModPanel(ModType.CHEAT, self.db, self.config)
-        self._stack.addWidget(self._cheat_panel)        # index 8
-
         self._settings_panel = SettingsPanel(self.config)
         self._settings_panel.settings_saved.connect(self._on_settings_saved)
         self._settings_panel.rerun_wizard.connect(self._run_wizard)
-        self._stack.addWidget(self._settings_panel)     # index 9
+        self._stack.addWidget(self._settings_panel)     # index 8
 
         # Wire cross-panel "see more by author" navigation
         _panel_nav_index = {
             ModType.TEXTURE_PACK: 4,
             ModType.PNACH: 5,
             ModType.COVER_ART: 6,
-            ModType.CHEAT: 8,
+            ModType.CHEAT: 5,   # merged into PNACH panel
         }
         for panel in (
             self._texture_panel,
             self._pnach_panel,
             self._cover_panel,
-            self._cheat_panel,
         ):
             panel.navigate_to_author_type.connect(
                 lambda author, mod_type, _nav=_panel_nav_index: self._navigate_to_author_type(
@@ -222,7 +218,6 @@ class MainWindow(QMainWindow):
             self._pnach_panel,
             self._cover_panel,
             self._memcard_panel,
-            self._cheat_panel,
             self._browse_panel,
             self._library_panel,
             self._downloads_panel,
@@ -277,7 +272,6 @@ class MainWindow(QMainWindow):
             self._texture_panel,
             self._pnach_panel,
             self._cover_panel,
-            self._cheat_panel,
         ):
             try:
                 panel._apply_filter()
@@ -302,7 +296,6 @@ class MainWindow(QMainWindow):
         self._pnach_panel.config = config
         self._cover_panel.config = config
         self._memcard_panel.config = config
-        self._cheat_panel.config = config
         self._browse_panel.config = config
         self._library_panel.config = config
         self._downloads_panel.config = config
@@ -362,7 +355,6 @@ class MainWindow(QMainWindow):
                 self._texture_panel,
                 self._pnach_panel,
                 self._cover_panel,
-                self._cheat_panel,
             ):
                 try:
                     panel._apply_filter()

@@ -170,22 +170,12 @@
       "publisher": "Sony",
       "genre": "Action, Platform."
     },
-    "Ar tonelico 2: Melody of Metafalica": {
-      "serial": "SLUS-21788",
-      "alt_serials": [],
-      "crcs": [
-        "D8E1F4A7"
-      ],
-      "release_date": "2009-01-20",
-      "developer": "Gust",
-      "publisher": "NIS America",
-      "genre": "RPG"
-    },
     "Ar tonelico II: Melody of Metafalica": {
       "serial": "SLUS-21788",
       "alt_serials": [],
       "crcs": [
-        "6F1E8D2B"
+        "6F1E8D2B",
+        "D8E1F4A7"
       ],
       "release_date": "2009-01-20",
       "developer": "Gust",
@@ -193,7 +183,8 @@
       "genre": "RPG",
       "aliases": [
         "AT2",
-        "Ar Tonelico 2"
+        "Ar Tonelico 2",
+        "Ar tonelico 2"
       ]
     },
     "Ar tonelico: Melody of Elemia": {
@@ -477,17 +468,6 @@
         "BO3",
         "Burnout 3"
       ]
-    },
-    "Burnout 3: Takedown (alt serial)": {
-      "serial": "SLUS-21050",
-      "alt_serials": [],
-      "crcs": [
-        "1CD5CC9D"
-      ],
-      "release_date": "2004-09-07",
-      "developer": "EA",
-      "publisher": "Criterion Studios",
-      "genre": "Racing"
     },
     "Burnout Dominator": {
       "serial": "SLUS-21596",
@@ -850,26 +830,12 @@
       "publisher": "Capcom",
       "genre": "Action, Platformer, Beat'em Up, Survival Horror."
     },
-    "Devil May Cry 3": {
+    "Devil May Cry 3: Dante's Awakening": {
       "serial": "SLUS-20964",
       "alt_serials": [],
       "crcs": [
         "4C416932",
         "7ADCB24A"
-      ],
-      "release_date": "2005-03-01",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action-Adventure",
-      "crc_labels": {
-        "7ADCB24A": "v1.00 (patched)"
-      }
-    },
-    "Devil May Cry 3: Dante's Awakening": {
-      "serial": "SLUS-20964",
-      "alt_serials": [],
-      "crcs": [
-        "4C416932"
       ],
       "release_date": "2005-03-01",
       "developer": "Capcom",
@@ -1078,9 +1044,7 @@
     },
     "Dragon Quest VIII: Journey of the Cursed King": {
       "serial": "SLUS-21207",
-      "alt_serials": [
-        "SLUS-21275"
-      ],
+      "alt_serials": [],
       "crcs": [
         "F53B6210",
         "DA0F1E34",
@@ -1181,17 +1145,6 @@
       "developer": "Flight-Plan",
       "publisher": "Atlus, Bandai Namco Games",
       "genre": "Tactical RPG."
-    },
-    "Fahrenheit / Indigo Prophecy": {
-      "serial": "SLUS-21196",
-      "alt_serials": [],
-      "crcs": [
-        "7EEF0BF5"
-      ],
-      "release_date": "2005-09-26",
-      "developer": "Quantic Dreams",
-      "publisher": "Atari",
-      "genre": "Action, Adventure"
     },
     "Fatal Frame": {
       "serial": "SLUS-20388",
@@ -1309,17 +1262,6 @@
         "FFXII",
         "Final Fantasy 12"
       ]
-    },
-    "Final Fantasy XII (100% complete)": {
-      "serial": "SLUS-20963",
-      "alt_serials": [],
-      "crcs": [
-        "0779FBDB"
-      ],
-      "release_date": "2006-10-31",
-      "developer": "S-Force",
-      "publisher": "Square Enix",
-      "genre": "RPG"
     },
     "Forbidden Siren 2": {
       "serial": "SCPS-15106",
@@ -1696,7 +1638,8 @@
       "serial": "SLUS-20436",
       "alt_serials": [],
       "crcs": [
-        "9BC6CE0E"
+        "9BC6CE0E",
+        "913FBFB8"
       ],
       "release_date": "2003-02-05",
       "developer": "Arc System Works Co. Ltd",
@@ -2061,22 +2004,6 @@
         "KH1",
         "Kingdom Hearts 1"
       ]
-    },
-    "Kingdom Hearts (Greatest Hits)": {
-      "serial": "SLUS-20370",
-      "alt_serials": [],
-      "crcs": [
-        "0F6B6315",
-        "B3A9F9D5"
-      ],
-      "release_date": "2002-09-16",
-      "developer": "Square Enix",
-      "publisher": "Square Co. Ltd",
-      "genre": "Action, RPG",
-      "crc_labels": {
-        "0F6B6315": "Greatest Hits v1.00",
-        "B3A9F9D5": "Greatest Hits v1.01"
-      }
     },
     "Kingdom Hearts II": {
       "serial": "SLUS-21005",
@@ -2607,35 +2534,14 @@
       "publisher": "Namco Bandai",
       "genre": "Action, Fighting."
     },
-    "Need for Speed Carbon": {
-      "serial": "SLUS-21493",
-      "alt_serials": [],
-      "crcs": [
-        "78F0DF7B"
-      ],
-      "release_date": "2006-10-31",
-      "developer": "Criterion Studios",
-      "publisher": "EA Games",
-      "genre": "Driving, Racing."
-    },
-    "Need for Speed Underground": {
-      "serial": "SLUS-20811",
-      "alt_serials": [],
-      "crcs": [
-        "F2ADBD41"
-      ],
-      "release_date": "2003-11-17",
-      "developer": "EA Black Box",
-      "publisher": "Electronic Arts",
-      "genre": "Driving, Racing."
-    },
     "Need for Speed: Carbon": {
       "serial": "SLUS-21493",
       "alt_serials": [],
       "crcs": [
         "0B77FE0C",
         "3AA8E025",
-        "F8A7B6C0"
+        "F8A7B6C0",
+        "78F0DF7B"
       ],
       "release_date": "2006-10-31",
       "developer": "Criterion Studios",
@@ -2685,7 +2591,8 @@
       "alt_serials": [],
       "crcs": [
         "96660560",
-        "C4F9E878"
+        "C4F9E878",
+        "F2ADBD41"
       ],
       "release_date": "2003-11-17",
       "developer": "EA Black Box",
@@ -3080,7 +2987,8 @@
       ],
       "crcs": [
         "D697D204",
-        "F0A235D4"
+        "F0A235D4",
+        "013E349D"
       ],
       "release_date": "2005-10-25",
       "developer": "Capcom",
@@ -3089,33 +2997,6 @@
       "aliases": [
         "RE 4",
         "RE4"
-      ]
-    },
-    "Resident Evil 4 (Professional complete)": {
-      "serial": "SLUS-21134",
-      "alt_serials": [],
-      "crcs": [
-        "013E349D",
-        "D697D204",
-        "F0A235D4"
-      ],
-      "release_date": "2005-10-25",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Adventure, Survival Horror"
-    },
-    "Resident Evil Outbreak": {
-      "serial": "SLUS-20765",
-      "alt_serials": [],
-      "crcs": [
-        "4EEE8A2A"
-      ],
-      "release_date": "2004-03-31",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Shooter, Survival Horror.",
-      "aliases": [
-        "RE Outbreak"
       ]
     },
     "Resident Evil: Code Veronica X": {
@@ -3151,7 +3032,8 @@
       "alt_serials": [],
       "crcs": [
         "0245EF6D",
-        "5741B3B4"
+        "5741B3B4",
+        "4EEE8A2A"
       ],
       "release_date": "2004-03-31",
       "developer": "Capcom",
@@ -3401,7 +3283,8 @@
       "serial": "SLUS-21261",
       "alt_serials": [],
       "crcs": [
-        "A7B86483"
+        "A7B86483",
+        "A5D29941"
       ],
       "release_date": "2005-11-15",
       "developer": "Sega",
@@ -3476,7 +3359,8 @@
       "crcs": [
         "4A0E5B3A",
         "7BBFE394",
-        "CC2AE534"
+        "CC2AE534",
+        "FE06A030"
       ],
       "release_date": "2001-09-24",
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
@@ -3491,26 +3375,6 @@
         "SH 2",
         "SH2"
       ]
-    },
-    "Silent Hill 2 (Greatest Hits)": {
-      "serial": "SLUS-20228",
-      "alt_serials": [],
-      "crcs": [
-        "4A0E5B3A",
-        "7BBFE394",
-        "CC2AE534",
-        "FE06A030"
-      ],
-      "release_date": "2001-09-24",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
-      "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror.",
-      "crc_labels": {
-        "4A0E5B3A": "Greatest Hits v1.00",
-        "7BBFE394": "Greatest Hits v1.01",
-        "CC2AE534": "Greatest Hits v1.02",
-        "FE06A030": "Greatest Hits v1.03"
-      }
     },
     "Silent Hill 3": {
       "serial": "SLUS-20622",
@@ -3537,19 +3401,6 @@
         "SH 3",
         "SH3"
       ]
-    },
-    "Silent Hill 3 (GH)": {
-      "serial": "SLUS-20622",
-      "alt_serials": [],
-      "crcs": [
-        "3B1C5E13",
-        "482D4237",
-        "C0B84965"
-      ],
-      "release_date": "2003-08-08",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
-      "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror."
     },
     "Silent Hill 4: The Room": {
       "serial": "SLUS-20873",
@@ -3588,17 +3439,6 @@
       "developer": "Climax Group",
       "publisher": "Konami",
       "genre": "Survival Horror."
-    },
-    "Sly 2 / Sly 3": {
-      "serial": "SCUS-97316",
-      "alt_serials": [],
-      "crcs": [
-        "07652DD9"
-      ],
-      "release_date": "2004-09-14",
-      "developer": "Sucker Punch Productions",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action, Platform."
     },
     "Sly 2: Band of Thieves": {
       "serial": "SCUS-97316",
@@ -3667,17 +3507,7 @@
       "serial": "SLUS-21603",
       "alt_serials": [],
       "crcs": [
-        "3CF0A5A2"
-      ],
-      "release_date": "2007-09-25",
-      "developer": "Nippon Ichi Software Inc",
-      "publisher": "NIS America",
-      "genre": "Tactical RPG."
-    },
-    "Soul Nomad and the World Eaters": {
-      "serial": "SLUS-21603",
-      "alt_serials": [],
-      "crcs": [
+        "3CF0A5A2",
         "DFC7A0A8"
       ],
       "release_date": "2007-09-25",
@@ -3784,12 +3614,9 @@
     },
     "Star Ocean: Till the End of Time": {
       "serial": "SLUS-20488",
-      "alt_serials": [
-        "SLUS-20891"
-      ],
+      "alt_serials": [],
       "crcs": [
-        "CF5F6552",
-        "33EC7780"
+        "CF5F6552"
       ],
       "release_date": "2004-08-31",
       "developer": "tri-Ace",
@@ -3801,10 +3628,11 @@
       ]
     },
     "Star Ocean: Till the End of Time Director's Cut": {
-      "serial": "SLUS-20488",
+      "serial": "SLUS-20891",
       "alt_serials": [],
       "crcs": [
-        "9FA0A1B0"
+        "9FA0A1B0",
+        "33EC7780"
       ],
       "release_date": "2004-08-31",
       "developer": "tri-Ace",
@@ -3814,28 +3642,6 @@
         "SO3 DC",
         "SO3DC"
       ]
-    },
-    "Star Wars Battlefront": {
-      "serial": "SLUS-20898",
-      "alt_serials": [],
-      "crcs": [
-        "F9E4F5C1"
-      ],
-      "release_date": "2004-09-20",
-      "developer": "Pandemic Studios",
-      "publisher": "Lucasarts",
-      "genre": "Action, Shooter, Strategy."
-    },
-    "Star Wars Battlefront II": {
-      "serial": "SLUS-21240",
-      "alt_serials": [],
-      "crcs": [
-        "0F900EAA"
-      ],
-      "release_date": "2005-11-01",
-      "developer": "LucasArts",
-      "publisher": "Pandemic Studios",
-      "genre": "Third-person Shooter"
     },
     "Star Wars: Battlefront": {
       "serial": "SLUS-20898",
@@ -4031,17 +3837,7 @@
       "alt_serials": [],
       "crcs": [
         "C5EDAD55",
-        "CF736A9D"
-      ],
-      "release_date": "2000-10-26",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Fighting."
-    },
-    "Tekken: Tag Tournament": {
-      "serial": "SLUS-20001",
-      "alt_serials": [],
-      "crcs": [
+        "CF736A9D",
         "1FCFDC7B",
         "64C7E58B"
       ],
@@ -4104,7 +3900,8 @@
       "serial": "SLUS-20573",
       "alt_serials": [],
       "crcs": [
-        "EA5C3E8B"
+        "EA5C3E8B",
+        "A4B3D285"
       ],
       "release_date": "2003-01-16",
       "developer": "Maxis",
@@ -4310,7 +4107,8 @@
       "serial": "SLUS-20571",
       "alt_serials": [],
       "crcs": [
-        "E4E15CA3"
+        "E4E15CA3",
+        "4F755D39"
       ],
       "release_date": "2002-09-10",
       "developer": "Krome Studios",
@@ -4486,7 +4284,8 @@
       ],
       "crcs": [
         "A53C9EC5",
-        "B5B09F5D"
+        "B5B09F5D",
+        "8B84D0BE"
       ],
       "release_date": "2002-10-15",
       "developer": "Media Vision (Sony)",
@@ -4515,7 +4314,8 @@
       "serial": "SLUS-21615",
       "alt_serials": [],
       "crcs": [
-        "ADFCC5A1"
+        "ADFCC5A1",
+        "7D9D0E40"
       ],
       "release_date": "2007-08-28",
       "developer": "Media.Vision",
@@ -4524,37 +4324,6 @@
       "aliases": [
         "WA5"
       ]
-    },
-    "Wild Arms 3": {
-      "serial": "SCUS-97203",
-      "alt_serials": [],
-      "crcs": [
-        "8B84D0BE"
-      ],
-      "release_date": "2002-10-15",
-      "developer": "Media Vision (Sony)",
-      "publisher": "Sony",
-      "genre": "RPG"
-    },
-    "Wild Arms 4": {
-      "serial": "SLUS-21292",
-      "alt_serials": [],
-      "release_date": "2006-01-10",
-      "developer": "Media.Vision",
-      "publisher": "XSEED Games",
-      "genre": "RPG"
-    },
-    "Wild Arms 5": {
-      "serial": "SLUS-21615",
-      "alt_serials": [],
-      "crcs": [
-        "ADFCC5A1",
-        "7D9D0E40"
-      ],
-      "release_date": "2007-08-28",
-      "developer": "Media.Vision",
-      "publisher": "XSEED Games",
-      "genre": "RPG"
     },
     "Wild Arms: Alter Code F": {
       "serial": "SLUS-20937",
@@ -6501,17 +6270,6 @@
       "publisher": "Bam! Entertainment",
       "genre": "Racing"
     },
-    "Guilty Gear X2": {
-      "serial": "SLUS-20436",
-      "alt_serials": [],
-      "crcs": [
-        "913FBFB8"
-      ],
-      "release_date": "2003-02-05",
-      "developer": "Arc System Works Co. Ltd",
-      "publisher": "Sammy Studios, Inc",
-      "genre": "Fighting."
-    },
     "Futurama": {
       "serial": "SLUS-20439",
       "alt_serials": [],
@@ -6801,17 +6559,6 @@
       "publisher": "Agetec Inc",
       "genre": "Action, Adventure"
     },
-    "Ty The Tasmanian Tiger": {
-      "serial": "SLUS-20571",
-      "alt_serials": [],
-      "crcs": [
-        "4F755D39"
-      ],
-      "release_date": "2002-09-10",
-      "developer": "Krome Studios",
-      "publisher": "Electronic Arts",
-      "genre": "Action, Platformer."
-    },
     "Tiger Woods PGA Tour 2003": {
       "serial": "SLUS-20572",
       "alt_serials": [],
@@ -6822,17 +6569,6 @@
       "developer": "EA",
       "publisher": "Electronic Arts",
       "genre": "Sports"
-    },
-    "Sims, The": {
-      "serial": "SLUS-20573",
-      "alt_serials": [],
-      "crcs": [
-        "A4B3D285"
-      ],
-      "release_date": "2003-01-16",
-      "developer": "Maxis",
-      "publisher": "Electronic Arts",
-      "genre": "Simulation"
     },
     "Island Xtreme Stunts": {
       "serial": "SLUS-20575",
@@ -8036,17 +7772,6 @@
       "developer": "Tecmo",
       "publisher": "Tecmo",
       "genre": "Strategy"
-    },
-    "Shadow The Hedgehog": {
-      "serial": "SLUS-21261",
-      "alt_serials": [],
-      "crcs": [
-        "A5D29941"
-      ],
-      "release_date": "2005-11-15",
-      "developer": "Sega",
-      "publisher": "Sega",
-      "genre": "Action, Platformer."
     },
     "Romancing Saga": {
       "serial": "SLUS-21263",

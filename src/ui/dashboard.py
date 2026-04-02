@@ -166,6 +166,7 @@ class DashboardPanel(BasePanel):
             "PNACH": self.config.pnach_path,
             "Cover Art": self.config.cover_art_path,
             "Memory Cards": self.config.memcards_path,
+            "Cheats (WS)": self.config.cheats_path,
         }
 
         for key, val in paths.items():
