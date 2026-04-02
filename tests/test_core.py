@@ -18353,7 +18353,7 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
     def test_indigo_prophecy_is_alias_of_fahrenheit(self):
         """'Fahrenheit / Indigo Prophecy' or similar entry should mention indigo prophecy."""
         # Check both NTSC and PAL versions
-        all_titles = dict(**self.games, **self.pal_games)
+        all_titles = {**self.games, **self.pal_games}
         fahrenheit_entries = [(t, info) for t, info in all_titles.items() if "fahrenheit" in t.lower()]
         has_indigo_alias = any(
             "Indigo Prophecy" in info.get("aliases", [])
@@ -18364,7 +18364,7 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
 
     def test_ratchet_going_commando_has_locked_and_loaded_alias(self):
         """At least one Ratchet: Going Commando entry should have 'Locked and Loaded' alias."""
-        all_titles = dict(**self.games, **self.pal_games)
+        all_titles = {**self.games, **self.pal_games}
         locked_alias_entries = [
             t for t, info in all_titles.items()
             if "Locked and Loaded" in info.get("aliases", [])

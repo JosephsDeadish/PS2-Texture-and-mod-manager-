@@ -71,6 +71,9 @@ class GameInfo:
     # and series shorthand (e.g. "GTA III" for Grand Theft Auto III).
     # The title itself is implicitly searchable; aliases extend coverage.
     aliases: List[str] = field(default_factory=list)
+    # Pre-computed lowercase aliases for fast case-insensitive substring search.
+    # Populated automatically by SerialDatabase._load(); not stored in JSON.
+    _aliases_lower: List[str] = field(default_factory=list, compare=False, repr=False)
 
     def all_serials(self) -> Set[str]:
         """Return the primary serial plus all known alt serials."""
@@ -158,6 +161,7 @@ class SerialDatabase:
                     crc_labels=info.get("crc_labels") or {},
                     aliases=info.get("aliases") or [],
                 )
+                gi._aliases_lower = [a.lower() for a in gi.aliases]
                 self._games[title] = gi
                 for s in gi.all_serials():
                     self._serial_to_titles.setdefault(s, []).append(title)
@@ -241,7 +245,7 @@ class SerialDatabase:
         for title, gi in self._games.items():
             if title in seen:
                 continue
-            if q in title.lower() or any(q in a.lower() for a in gi.aliases):
+            if q in title.lower() or any(q in a for a in gi._aliases_lower):
                 results.append(title)
                 seen.add(title)
         return sorted(results)
@@ -268,7 +272,7 @@ class SerialDatabase:
             return True
         gi = self._games.get(game_title)
         if gi:
-            return any(q in a.lower() for a in gi.aliases)
+            return any(q in a for a in gi._aliases_lower)
         return False
 
     def serial_for_crc(self, crc: str) -> Optional[str]:
