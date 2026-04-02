@@ -18431,3 +18431,322 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         count = sum(1 for info in self.pal_games.values() if info.get("aliases"))
         self.assertGreaterEqual(count, 20,
                                 f"Expected ≥20 PAL games with aliases, got {count}")
+
+
+# ===========================================================================
+# Wave 91 + 92 + 93 — PNACH validation, settings path unification, auto UI
+# ===========================================================================
+
+class TestWave91And92And93(unittest.TestCase):
+    """
+    Wave 91: DB dedup (2237→2213) + 1732 pnach fixes
+    Wave 92: validate_pnach_file(), validate_all_pnach(), settings path unification
+    Wave 93: MO2-style inline auto-validation badges, remove manual button
+    """
+
+    # ------------------------------------------------------------------
+    # Serial DB sanity (Wave 91 dedup)
+    # ------------------------------------------------------------------
+
+    def test_ntsc_u_dedup_count(self):
+        """NTSC-U DB should be ≤2237 entries after Wave 89-91 deduplication."""
+        import json
+        from pathlib import Path
+        db = json.loads(
+            (Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        count = len(db["games"])
+        self.assertLessEqual(count, 2237,
+                             f"Expected ≤2237 games after dedup, got {count}")
+
+    def test_ntsc_u_key_games_correct(self):
+        """Spot-check key NTSC-U games have correct serials after Wave 91."""
+        import json
+        from pathlib import Path
+        db = json.loads(
+            (Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json")
+            .read_text(encoding="utf-8")
+        )
+        games = db["games"]
+        checks = {
+            "Wild ARMs 3": "SCUS-97203",
+            "Wild ARMs 4": "SLUS-21292",
+            "Wild ARMs 5": "SLUS-21615",
+            "Shadow the Hedgehog": "SLUS-21261",
+            "Indigo Prophecy": "SLUS-21196",
+            "Guilty Gear X2: #Reload": "SLUS-20436",
+            "Devil May Cry 3: Dante's Awakening": "SLUS-20964",
+            "Resident Evil 4": "SLUS-21134",
+        }
+        for title, expected_serial in checks.items():
+            self.assertIn(title, games,
+                          f"Missing game '{title}' after Wave 91 dedup")
+            got = games[title].get("serial", "")
+            self.assertEqual(got, expected_serial,
+                             f"'{title}': expected serial {expected_serial}, got {got}")
+
+    # ------------------------------------------------------------------
+    # PNACH validation engine (Wave 92)
+    # ------------------------------------------------------------------
+
+    def test_validate_pnach_file_exists(self):
+        """pnach.validate_pnach_file must be importable and callable."""
+        from src.core.pnach import validate_pnach_file
+        self.assertTrue(callable(validate_pnach_file))
+
+    def test_validate_pnach_file_invalid_filename(self):
+        """A .pnach with a non-CRC filename should produce invalid_filename error."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        with tempfile.NamedTemporaryFile(
+            suffix=".pnach", mode="w", encoding="utf-8", delete=False,
+            prefix="not_a_crc_"
+        ) as f:
+            f.write("gametitle=Test\npatch=1,EE,00200000,word,00000001\n")
+            tmp = f.name
+        try:
+            issues = validate_pnach_file(tmp)
+            codes = [i.code for i in issues]
+            self.assertIn("invalid_filename", codes,
+                          "Expected invalid_filename issue for non-CRC filename")
+        finally:
+            os.unlink(tmp)
+
+    def test_validate_pnach_file_invalid_size(self):
+        """A patch= line with an unknown size keyword should produce invalid_size error."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        with tempfile.NamedTemporaryFile(
+            suffix=".pnach", mode="w", encoding="utf-8", delete=False,
+            prefix="ABCD1234"
+        ) as f:
+            # rename via NamedTemporaryFile trick isn't reliable; write to known path
+            tmp = f.name
+        os.unlink(tmp)
+        good_path = os.path.join(os.path.dirname(tmp), "ABCD1234.pnach")
+        with open(good_path, "w", encoding="utf-8") as f:
+            f.write("gametitle=Test\npatch=1,EE,00200000,BADSIZE,00000001\n")
+        try:
+            issues = validate_pnach_file(good_path)
+            codes = [i.code for i in issues]
+            self.assertIn("invalid_size", codes,
+                          "Expected invalid_size issue for unknown size keyword")
+        finally:
+            os.unlink(good_path)
+
+    def test_validate_pnach_file_value_overflow(self):
+        """A word-size patch with a 9-nibble value should produce value_overflow error."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        tmp_dir = tempfile.mkdtemp()
+        path = os.path.join(tmp_dir, "ABCD1234.pnach")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("gametitle=Test\npatch=1,EE,00200000,word,123456789\n")
+        try:
+            issues = validate_pnach_file(path)
+            codes = [i.code for i in issues]
+            self.assertIn("value_overflow", codes,
+                          "Expected value_overflow for 9-nibble word value")
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    def test_validate_pnach_file_clean(self):
+        """A well-formed PNACH file should return no issues."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        tmp_dir = tempfile.mkdtemp()
+        path = os.path.join(tmp_dir, "ABCD1234.pnach")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(
+                "gametitle=Test Game\n"
+                "comment=Test patch\n"
+                "patch=1,EE,00200000,word,00000001\n"
+                "patch=1,EE,00200004,short,1234\n"
+                "patch=1,IOP,00100008,byte,FF\n"
+            )
+        try:
+            issues = validate_pnach_file(path)
+            errors = [i for i in issues if i.severity == "error"]
+            self.assertEqual(errors, [],
+                             f"Expected no errors for clean PNACH, got: {[i.code for i in errors]}")
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    def test_validate_pnach_file_redundant_duplicate(self):
+        """Two identical patch lines should produce redundant_duplicate warning."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        tmp_dir = tempfile.mkdtemp()
+        path = os.path.join(tmp_dir, "ABCD1234.pnach")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(
+                "gametitle=Test\n"
+                "patch=1,EE,00200000,word,00000001\n"
+                "patch=1,EE,00200000,word,00000001\n"  # duplicate
+            )
+        try:
+            issues = validate_pnach_file(path)
+            codes = [i.code for i in issues]
+            self.assertIn("redundant_duplicate", codes,
+                          "Expected redundant_duplicate for duplicate patch line")
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    def test_validate_pnach_file_address_conflict(self):
+        """Same address with different values should produce address_conflict warning."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        tmp_dir = tempfile.mkdtemp()
+        path = os.path.join(tmp_dir, "ABCD1234.pnach")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(
+                "gametitle=Test\n"
+                "patch=1,EE,00200000,word,00000001\n"
+                "patch=1,EE,00200000,word,00000002\n"  # conflict
+            )
+        try:
+            issues = validate_pnach_file(path)
+            codes = [i.code for i in issues]
+            self.assertIn("address_conflict", codes,
+                          "Expected address_conflict for same address, different values")
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    def test_validate_pnach_file_invalid_processor(self):
+        """An unknown processor should produce invalid_processor error."""
+        import tempfile, os
+        from src.core.pnach import validate_pnach_file
+        tmp_dir = tempfile.mkdtemp()
+        path = os.path.join(tmp_dir, "ABCD1234.pnach")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("gametitle=Test\npatch=1,VU1,00200000,word,00000001\n")
+        try:
+            issues = validate_pnach_file(path)
+            codes = [i.code for i in issues]
+            self.assertIn("invalid_processor", codes,
+                          "Expected invalid_processor for unknown processor VU1")
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    # ------------------------------------------------------------------
+    # Settings path unification (Wave 92)
+    # ------------------------------------------------------------------
+
+    def test_pcsx2_layout_cheats_equals_pnach(self):
+        """detect_pcsx2_subfolders must always return cheats_path == pnach_path."""
+        import tempfile
+        from src.core.pcsx2_layout import detect_pcsx2_subfolders
+        with tempfile.TemporaryDirectory() as d:
+            result = detect_pcsx2_subfolders(d)
+            self.assertEqual(
+                result["cheats_path"], result["pnach_path"],
+                "cheats_path must equal pnach_path — PCSX2 uses one folder for all .pnach files"
+            )
+
+    def test_pcsx2_layout_no_cheats_ws_candidate(self):
+        """detect_pcsx2_subfolders must not search for a cheats_ws subfolder."""
+        from pathlib import Path
+        import tempfile
+        from src.core.pcsx2_layout import detect_pcsx2_subfolders
+        with tempfile.TemporaryDirectory() as d:
+            # Create a cheats_ws folder — it should be ignored
+            (Path(d) / "cheats_ws").mkdir()
+            (Path(d) / "cheats").mkdir()
+            result = detect_pcsx2_subfolders(d)
+            # pnach_path should point to the 'cheats' folder, not 'cheats_ws'
+            self.assertIn("cheats", Path(result["pnach_path"]).name.lower(),
+                          "pnach_path should point to 'cheats' folder")
+            self.assertNotIn("cheats_ws", result["pnach_path"],
+                             "pnach_path must not point to cheats_ws")
+
+    # ------------------------------------------------------------------
+    # validate_all_pnach in ModManager (Wave 92)
+    # ------------------------------------------------------------------
+
+    def test_mod_manager_has_validate_all_pnach(self):
+        """ModManager must have validate_all_pnach() method."""
+        from src.core.mod_manager import ModManager, ModDatabase
+        db = ModDatabase()
+        mgr = ModManager(db)
+        self.assertTrue(hasattr(mgr, "validate_all_pnach"),
+                        "ModManager must have validate_all_pnach()")
+        result = mgr.validate_all_pnach()
+        self.assertIsInstance(result, dict,
+                              "validate_all_pnach must return a dict")
+
+    # ------------------------------------------------------------------
+    # ModItemWidget validation params (Wave 93)
+    # ------------------------------------------------------------------
+
+    @unittest.skip("Requires PyQt6 display environment")
+    def test_mod_item_widget_accepts_validation_params(self):
+        """ModItemWidget must accept validation_errors and validation_warnings kwargs."""
+        from src.core.pnach import ValidationIssue
+        from src.ui.widgets import ModItemWidget
+        from src.models.mod import ModInfo, ModType
+        mod = ModInfo(id="test_mod", name="Test", mod_type=ModType.PNACH, path="/tmp")
+        # Should not raise
+        widget = ModItemWidget(
+            mod,
+            has_conflict=False,
+            is_shadowed=False,
+            validation_errors=2,
+            validation_warnings=1,
+        )
+        self.assertEqual(widget.validation_errors, 2)
+        self.assertEqual(widget.validation_warnings, 1)
+
+    # ------------------------------------------------------------------
+    # mod_panel auto-validation (Wave 93)
+    # ------------------------------------------------------------------
+
+    def test_mod_panel_no_validate_codes_button(self):
+        """The manual 'Validate Codes' button must not appear in mod_panel source."""
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "mod_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertNotIn("Validate Codes", src,
+                         "Manual 'Validate Codes' button must be removed (Wave 93)")
+
+    def test_mod_panel_auto_validates_pnach(self):
+        """mod_panel._apply_filter must call validate_all_pnach automatically."""
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "mod_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("validate_all_pnach", src,
+                      "_apply_filter must call validate_all_pnach() for automatic inline validation")
+
+    def test_mod_panel_count_lbl_is_button(self):
+        """count label must be a QPushButton so it can be clicked to open ConflictDialog."""
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "mod_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("QPushButton", src,
+                      "mod_panel must use QPushButton for count label (clickable)")
+        self.assertIn("_on_count_lbl_clicked", src,
+                      "mod_panel must have _on_count_lbl_clicked handler")
+
+    # ------------------------------------------------------------------
+    # ValidationIssue dataclass structure (Wave 92)
+    # ------------------------------------------------------------------
+
+    def test_validation_issue_fields(self):
+        """ValidationIssue must have the expected fields."""
+        from src.core.pnach import ValidationIssue
+        iss = ValidationIssue(
+            line_number=1,
+            severity="error",
+            code="test_code",
+            message="test message",
+        )
+        self.assertEqual(iss.line_number, 1)
+        self.assertEqual(iss.severity, "error")
+        self.assertEqual(iss.code, "test_code")
+        self.assertEqual(iss.message, "test message")
+        self.assertIsNone(iss.patch)

@@ -166,16 +166,6 @@ class ModPanel(BasePanel):
             builder_btn.clicked.connect(self._open_code_builder)
             toolbar.addWidget(builder_btn)
 
-        # Validate Codes button — only for PNACH/Cheat panels
-        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
-            validate_btn = QPushButton("🔍 Validate Codes")
-            validate_btn.setToolTip(
-                "Scan all enabled PNACH files for invalid codes, bad addresses,\n"
-                "wrong size values, and internal address conflicts."
-            )
-            validate_btn.clicked.connect(self._validate_pnach_codes)
-            toolbar.addWidget(validate_btn)
-
         content.addLayout(toolbar)
 
         # ---- Author + library filter row ----
@@ -219,8 +209,12 @@ class ModPanel(BasePanel):
         disable_all.clicked.connect(self._disable_all)
         author_row.addWidget(disable_all)
 
-        self._count_lbl = QLabel("")
-        self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
+        # Status / conflict label — acts as a clickable link when conflicts exist
+        self._count_lbl = QPushButton("")
+        self._count_lbl.setFlat(True)
+        self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px; text-align: left; border: none;")
+        self._count_lbl.setCursor(Qt.CursorShape.ArrowCursor)
+        self._count_lbl.clicked.connect(self._on_count_lbl_clicked)
         author_row.addWidget(self._count_lbl)
         content.addLayout(author_row)
 
@@ -391,6 +385,18 @@ class ModPanel(BasePanel):
             shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
             shadowed_ids = set(shadowed_map.keys())
 
+        # PNACH/Cheat validation — automatic, no button needed
+        pnach_validation: dict = {}  # mod_id → {"errors": int, "warnings": int}
+        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+            try:
+                raw = self.manager.validate_all_pnach()
+                for mid, issues in raw.items():
+                    errors = sum(1 for iss in issues if iss.severity == "error")
+                    warnings = sum(1 for iss in issues if iss.severity == "warning")
+                    pnach_validation[mid] = {"errors": errors, "warnings": warnings}
+            except Exception:
+                pass
+
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
             item = self._list_layout.takeAt(0)
@@ -405,10 +411,13 @@ class ModPanel(BasePanel):
             self._list_layout.insertWidget(0, empty)
         else:
             for i, mod in enumerate(mods):
+                v = pnach_validation.get(mod.id, {})
                 widget = ModItemWidget(
                     mod,
                     has_conflict=(mod.id in conflicting_ids),
                     is_shadowed=(mod.id in shadowed_ids),
+                    validation_errors=v.get("errors", 0),
+                    validation_warnings=v.get("warnings", 0),
                 )
                 widget.toggled.connect(self._on_toggle)
                 widget.remove_requested.connect(self._on_remove)
@@ -423,10 +432,24 @@ class ModPanel(BasePanel):
         enabled_count = sum(1 for m in all_mods if m.enabled)
         total_count = len(all_mods)
         shadow_note = f"  •  {len(shadowed_ids)} shadowed" if shadowed_ids else ""
-        self._count_lbl.setText(
+        invalid_mods = sum(1 for v in pnach_validation.values() if v.get("errors", 0))
+        invalid_note = f"  •  ❌ {invalid_mods} invalid" if invalid_mods else ""
+        has_any_issue = bool(conflicts or shadowed_ids or invalid_mods)
+        status = (
             f"{enabled_count}/{total_count} enabled"
-            + (f"  •  {len(conflicts)} conflict(s)" if conflicts else "")
+            + (f"  •  ⚠ {len(conflicts)} conflict(s) — click to resolve" if conflicts else "")
             + shadow_note
+            + invalid_note
+        )
+        self._count_lbl.setText(status)
+        # Make label clickable (pointer cursor) when there is something to resolve
+        self._count_lbl.setCursor(
+            Qt.CursorShape.PointingHandCursor if has_any_issue else Qt.CursorShape.ArrowCursor
+        )
+        self._count_lbl.setStyleSheet(
+            "color: #ff8080; font-size: 12px; text-align: left; border: none;"
+            if has_any_issue else
+            "color: #7070a0; font-size: 12px; text-align: left; border: none;"
         )
 
     # ------------------------------------------------------------------
@@ -626,6 +649,10 @@ class ModPanel(BasePanel):
                 self.manager.deploy(mt, target_path)
         self.emit_status(f"All {meta['label'].lower()} disabled")
         self._apply_filter()
+
+    def _on_count_lbl_clicked(self):
+        """Click handler for the status/count label — opens conflict resolver if issues exist."""
+        self._show_conflicts()
 
     def _show_conflicts(self):
         all_types = [self.mod_type] + self.extra_types
