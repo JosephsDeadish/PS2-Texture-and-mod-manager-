@@ -8723,8 +8723,8 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("ESPN NBA 2Night", "release_date", "2001")
 
     def test_serial_db_wave46_game_count(self):
-        """Wave 46: serial DB should have at least 2237 games (Wave 89 dedup; was 2288)."""
-        self.assertGreaterEqual(len(self.data), 2237)
+        """Wave 46: serial DB should have at least 2213 games (Wave 91 dedup; was 2288)."""
+        self.assertGreaterEqual(len(self.data), 2213)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8812,8 +8812,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2237 games (Wave 89 dedup; was 2291)."""
-        self.assertGreaterEqual(len(self.games), 2237)
+        """Wave 47: serial DB should have at least 2213 games (Wave 91 dedup; was 2291)."""
+        self.assertGreaterEqual(len(self.games), 2213)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9151,9 +9151,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
+        """Wave 49: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
         self.assertEqual(
-            len(self.games), 2237,
+            len(self.games), 2213,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9374,8 +9374,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2237)
+        """Wave 50: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2213)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9579,8 +9579,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2237)
+        """Wave 51: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2213)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9767,8 +9767,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2237 (Wave 89 dedup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2237)
+        """Wave 52: serial DB game count updated to 2213 (Wave 91 dedup; was 2292)."""
+        self.assertEqual(len(self.raw_games), 2213)
 
 
 # ===========================================================================
@@ -13137,10 +13137,10 @@ class TestWave64DataQualityFixes(unittest.TestCase):
                       "7EA439F5 should be in GTA:LCS CRCs")
 
     def test_7adcb24a_in_dmc3_crcs(self):
-        """7ADCB24A must be in Devil May Cry 3 CRC list."""
-        dmc3 = self.games["Devil May Cry 3"]
+        """7ADCB24A must be in Devil May Cry 3: Dante's Awakening CRC list."""
+        dmc3 = self.games["Devil May Cry 3: Dante's Awakening"]
         self.assertIn("7ADCB24A", dmc3.get("crcs", []),
-                      "7ADCB24A should be in Devil May Cry 3 CRCs")
+                      "7ADCB24A should be in Devil May Cry 3: Dante's Awakening CRCs")
 
     def test_2a4b60eb_in_dbz_budokai3_crcs(self):
         """2A4B60EB must be in Dragon Ball Z: Budokai 3 CRC list."""
@@ -14171,9 +14171,9 @@ class TestWave70EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("0BED0AF9")), 30)
 
     def test_0bed0af9_dmc3_game_name(self):
-        """0BED0AF9 must use correctly capitalised game name."""
+        """0BED0AF9 must use correctly capitalised game name (including subtitle)."""
         wrong = [(k, v.get("game")) for k, v in self._crc_entries("0BED0AF9").items()
-                 if v.get("game") != "Devil May Cry 3 (SLUS-20964)"]
+                 if v.get("game") != "Devil May Cry 3: Dante's Awakening (SLUS-20964)"]
         self.assertEqual(wrong, [])
 
     # ------------------------------------------------------------------
@@ -15671,8 +15671,8 @@ class TestWave76CrossContaminationFixes(unittest.TestCase):
         self._assert_crc_serial("C01C06BC", "SLUS-21564")
 
     def test_cf736a9d_tekken_ttt_name(self):
-        """CF736A9D: all entries must say 'Tekken: Tag Tournament (SLUS-20001)'."""
-        self._assert_crc_game("CF736A9D", "Tekken: Tag Tournament (SLUS-20001)")
+        """CF736A9D: all entries must say 'Tekken Tag Tournament (SLUS-20001)'."""
+        self._assert_crc_game("CF736A9D", "Tekken Tag Tournament (SLUS-20001)")
         self._assert_crc_serial("CF736A9D", "SLUS-20001")
 
     def test_fd8a9a89_armored_core_nb_name(self):
@@ -15725,13 +15725,13 @@ class TestWave76CrossContaminationFixes(unittest.TestCase):
         self._assert_crc_game("1E75FE3A", "Ys: The Ark of Napishtim (SLUS-20980)")
 
     def test_33ec7780_star_ocean_tteot_serial(self):
-        """33EC7780: serial must be SLUS-20488 (Star Ocean TTEOT), not SLUS-20492 (Ninja Assault)."""
-        self._assert_crc_serial("33EC7780", "SLUS-20488")
+        """33EC7780: serial must be SLUS-20891 (Star Ocean TTEOT Director's Cut CRC)."""
+        self._assert_crc_serial("33EC7780", "SLUS-20891")
 
     def test_7d9d0e40_wild_arms5_serial(self):
-        """7D9D0E40: serial must be SLUS-21615 (Wild Arms 5), not SLUS-21842 (DBZ:IW)."""
+        """7D9D0E40: serial must be SLUS-21615 (Wild ARMs 5), not SLUS-21842 (DBZ:IW)."""
         self._assert_crc_serial("7D9D0E40", "SLUS-21615")
-        self._assert_crc_game("7D9D0E40", "Wild Arms 5 (SLUS-21615)")
+        self._assert_crc_game("7D9D0E40", "Wild ARMs 5 (SLUS-21615)")
 
     def test_4c45b7cf_dmc3se_serial(self):
         """4C45B7CF: serial must be SLUS-21361 (DMC3 SE), not SLUS-21224 (Guitar Hero)."""
@@ -15805,13 +15805,13 @@ class TestWave76CrossContaminationFixes(unittest.TestCase):
         self.assertIn("1E75FE3A", g.get('crcs', []))
 
     def test_ntsc_db_star_ocean_tteot_crc(self):
-        """NTSC-U DB: Star Ocean: TTEOT must include CRC 33EC7780."""
-        g = self.ntsc_db['games'].get("Star Ocean: Till the End of Time", {})
+        """NTSC-U DB: Star Ocean: TTEOT Director's Cut must include CRC 33EC7780."""
+        g = self.ntsc_db['games'].get("Star Ocean: Till the End of Time Director's Cut", {})
         self.assertIn("33EC7780", g.get('crcs', []))
 
     def test_ntsc_db_wild_arms5_crc(self):
-        """NTSC-U DB: Wild Arms 5 must include CRC 7D9D0E40."""
-        g = self.ntsc_db['games'].get("Wild Arms 5", {})
+        """NTSC-U DB: Wild ARMs 5 must include CRC 7D9D0E40."""
+        g = self.ntsc_db['games'].get("Wild ARMs 5", {})
         self.assertIn("7D9D0E40", g.get('crcs', []))
 
     def test_ntsc_db_dmc3se_crc(self):
