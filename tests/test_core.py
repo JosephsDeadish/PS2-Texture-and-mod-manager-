@@ -19452,3 +19452,202 @@ class TestWave102DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('Mary-Kate and Ashley: Sweet 16: Licensed to Drive')
         self.assertEqual(gi.developer, 'n-Space, Inc.')
         self.assertEqual(gi.publisher, 'Club Acclaim')
+
+
+class TestWave103DbAuditFixes(unittest.TestCase):
+    """Wave 103: 30 dev/pub attribution errors — 11 Sega-internal studio swaps
+    (Visual Concepts/Kush/Black Box/Sonic Team/AM2/WOW), Army Men RTS, Hulk,
+    Wild Wild Racing, 4 Ubisoft swaps, 4 Majesco swaps, 2 Climax swaps,
+    2 Gathering swaps, Blade Interactive ×2, RoadKill pub fix, Simpsons Game fix."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── Sega-internal studio swaps ────────────────────────────────────────────
+    def test_espn_nfl_football_devpub(self):
+        """ESPN NFL Football (2003): dev=Visual Concepts, pub=Sega."""
+        gi = self._ntsc('ESPN - NFL Football')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_espn_college_hoops_devpub(self):
+        """ESPN College Hoops (2003): dev=Kush Games, pub=Sega."""
+        gi = self._ntsc('ESPN College Hoops')
+        self.assertEqual(gi.developer, 'Kush Games')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_espn_nhl_hockey_devpub(self):
+        """ESPN NHL Hockey (2003): dev=Kush Games, pub=Sega."""
+        gi = self._ntsc('ESPN NHL Hockey')
+        self.assertEqual(gi.developer, 'Kush Games')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_espn_mlb_devpub(self):
+        """ESPN Major League Baseball: dev=Visual Concepts, pub=Sega."""
+        gi = self._ntsc('ESPN Major League Baseball')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sega_soccer_slam_devpub(self):
+        """Sega Soccer Slam: dev=Black Box Games Ltd., pub=Sega."""
+        gi = self._ntsc('Sega Soccer Slam')
+        self.assertEqual(gi.developer, 'Black Box Games Ltd.')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sega_superstars_devpub(self):
+        """Sega Superstars: dev=Sonic Team, pub=Sega."""
+        gi = self._ntsc('Sega Superstars')
+        self.assertEqual(gi.developer, 'Sonic Team')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sonic_mega_collection_plus_devpub(self):
+        """Sonic Mega Collection Plus: dev=Sonic Team, pub=Sega."""
+        gi = self._ntsc('Sonic Mega Collection Plus')
+        self.assertEqual(gi.developer, 'Sonic Team')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sonic_riders_zero_gravity_devpub(self):
+        """Sonic Riders: Zero Gravity: dev=Sonic Team, pub=Sega."""
+        gi = self._ntsc('Sonic Riders: Zero Gravity')
+        self.assertEqual(gi.developer, 'Sonic Team')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sega_bass_fishing_duel_devpub(self):
+        """Sega Bass Fishing Duel: dev=WOW Entertainment, pub=Sega."""
+        gi = self._ntsc('Sega Bass Fishing Duel')
+        self.assertEqual(gi.developer, 'WOW Entertainment')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_king_of_route_66_devpub(self):
+        """The King of Route 66: dev=AM2, pub=Sega."""
+        gi = self._ntsc('The King of Route 66')
+        self.assertEqual(gi.developer, 'AM2')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_virtua_quest_devpub(self):
+        """Virtua Quest: dev=AM2, pub=Sega."""
+        gi = self._ntsc('Virtua Quest')
+        self.assertEqual(gi.developer, 'AM2')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    # ── Other publisher/developer swaps ──────────────────────────────────────
+    def test_army_men_rts_devpub(self):
+        """Army Men - RTS: dev=Pandemic Studios, pub=The 3DO Company."""
+        gi = self._ntsc('Army Men - RTS')
+        self.assertEqual(gi.developer, 'Pandemic Studios')
+        self.assertEqual(gi.publisher, 'The 3DO Company')
+
+    def test_hulk_devpub(self):
+        """Hulk (2003): dev=Radical Entertainment, pub=Universal Interactive."""
+        gi = self._ntsc('Hulk')
+        self.assertEqual(gi.developer, 'Radical Entertainment')
+        self.assertEqual(gi.publisher, 'Universal Interactive')
+
+    def test_wild_wild_racing_devpub(self):
+        """Wild Wild Racing: dev=Rage Software, pub=Interplay Entertainment."""
+        gi = self._ntsc('Wild Wild Racing')
+        self.assertEqual(gi.developer, 'Rage Software')
+        self.assertEqual(gi.publisher, 'Interplay Entertainment')
+
+    def test_monster_jam_maximum_destruction_devpub(self):
+        """Monster Jam: Maximum Destruction: dev=Inland Productions, pub=Ubisoft Entertainment."""
+        gi = self._ntsc('Monster Jam: Maximum Destruction')
+        self.assertEqual(gi.developer, 'Inland Productions, Inc.')
+        self.assertEqual(gi.publisher, 'Ubisoft Entertainment')
+
+    def test_dukes_of_hazzard_devpub(self):
+        """Dukes of Hazzard: Return of the General Lee: dev=Ratbag Games, pub=Ubisoft Entertainment."""
+        gi = self._ntsc('The Dukes of Hazzard: Return of the General Lee')
+        self.assertEqual(gi.developer, 'Ratbag Games')
+        self.assertEqual(gi.publisher, 'Ubisoft Entertainment')
+
+    def test_conflict_zone_devpub(self):
+        """Conflict Zone: Modern War Strategy: dev=Masa Group, pub=Ubisoft Entertainment."""
+        gi = self._ntsc('Conflict Zone: Modern War Strategy')
+        self.assertEqual(gi.developer, 'Masa Group')
+        self.assertEqual(gi.publisher, 'Ubisoft Entertainment')
+
+    def test_bloodrayne2_devpub(self):
+        """BloodRayne 2: dev=Terminal Reality, pub=Majesco."""
+        gi = self._ntsc('BloodRayne 2')
+        self.assertEqual(gi.developer, 'Terminal Reality')
+        self.assertEqual(gi.publisher, 'Majesco')
+
+    def test_black_and_bruised_devpub(self):
+        """Black & Bruised: dev=Digital Fiction, Inc., pub=Majesco."""
+        gi = self._ntsc('Black & Bruised')
+        self.assertEqual(gi.developer, 'Digital Fiction, Inc.')
+        self.assertEqual(gi.publisher, 'Majesco')
+
+    def test_blowout_devpub(self):
+        """Blowout: dev=KaosKontrol, Inc., pub=Majesco."""
+        gi = self._ntsc('Blowout')
+        self.assertEqual(gi.developer, 'KaosKontrol, Inc.')
+        self.assertEqual(gi.publisher, 'Majesco')
+
+    def test_hsx_hypersonic_xtreme_devpub(self):
+        """HSX: HyperSonic.Xtreme: dev=Blade Interactive Studios, pub=Majesco."""
+        gi = self._ntsc('HSX: HyperSonic.Xtreme')
+        self.assertEqual(gi.developer, 'Blade Interactive Studios')
+        self.assertEqual(gi.publisher, 'Majesco')
+
+    def test_crash_n_burn_devpub(self):
+        """Crash 'N' Burn: dev=Climax Group, pub=Eidos Interactive."""
+        gi = self._ntsc("Crash 'N' Burn")
+        self.assertEqual(gi.developer, 'Climax Group')
+        self.assertEqual(gi.publisher, 'Eidos Interactive')
+
+    def test_hot_wheels_world_race_devpub(self):
+        """Hot Wheels: World Race: dev=Climax Group, pub=THQ."""
+        gi = self._ntsc('Hot Wheels: World Race')
+        self.assertEqual(gi.developer, 'Climax Group')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_4x4_evo_devpub(self):
+        """4x4 Evo: dev=Terminal Reality, pub=Gathering of Developers."""
+        gi = self._ntsc('4x4 Evo')
+        self.assertEqual(gi.developer, 'Terminal Reality')
+        self.assertEqual(gi.publisher, 'Gathering of Developers')
+
+    def test_destruction_derby_arenas_devpub(self):
+        """Destruction Derby Arenas: dev=Studio 33 Ltd., pub=Gathering of Developers."""
+        gi = self._ntsc('Destruction Derby Arenas')
+        self.assertEqual(gi.developer, 'Studio 33 Ltd.')
+        self.assertEqual(gi.publisher, 'Gathering of Developers')
+
+    def test_world_championship_pool_2004_devpub(self):
+        """World Championship Pool 2004: dev=Blade Interactive Studios, pub=Jaleco."""
+        gi = self._ntsc('World Championship Pool 2004')
+        self.assertEqual(gi.developer, 'Blade Interactive Studios')
+        self.assertEqual(gi.publisher, 'Jaleco')
+
+    def test_yu_yu_hakusho_devpub(self):
+        """Yu Yu Hakusho: Dark Tournament: dev=Digital Fiction, Inc., pub=Atari."""
+        gi = self._ntsc('Yu Yu Hakusho: Dark Tournament')
+        self.assertEqual(gi.developer, 'Digital Fiction, Inc.')
+        self.assertEqual(gi.publisher, 'Atari')
+
+    def test_guy_game_devpub(self):
+        """Guy Game, The: dev=Topheavy Studios, pub=Gathering of Developers."""
+        gi = self._ntsc('Guy Game, The')
+        self.assertEqual(gi.developer, 'Topheavy Studios')
+        self.assertEqual(gi.publisher, 'Gathering of Developers')
+
+    # ── Wrong metadata fixes ──────────────────────────────────────────────────
+    def test_roadkill_publisher(self):
+        """RoadKill: pub=Midway Home Entertainment (not Terminal Reality)."""
+        gi = self._ntsc('RoadKill')
+        self.assertEqual(gi.publisher, 'Midway Home Entertainment')
+        self.assertNotEqual(gi.publisher, 'Terminal Reality')
+
+    def test_simpsons_game_devpub(self):
+        """The Simpsons Game: dev=EA Redwood Shores, pub=Electronic Arts."""
+        gi = self._ntsc('The Simpsons Game')
+        self.assertEqual(gi.developer, 'EA Redwood Shores')
+        self.assertEqual(gi.publisher, 'Electronic Arts')
