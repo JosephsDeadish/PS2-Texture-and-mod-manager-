@@ -894,60 +894,6 @@ class ModManager:
                     results[mod.id] = all_issues
         return results
 
-
-        """
-        Detect enabled mods that are **completely shadowed** by higher-priority mods.
-
-        A mod is considered shadowed when *all* of its registered files are also
-        present in at least one higher-priority enabled mod.
-
-        Returns a dict mapping ``mod_id`` → list of mod IDs that shadow it.
-        Only mods with at least one registered file are considered; mods with no
-        file list are skipped (they can't be shadowed by this analysis).
-        """
-        mods = self.db.by_type(mod_type) if mod_type else self.db.all()
-        enabled = sorted(
-            [m for m in mods if m.enabled],
-            key=lambda m: m.priority,
-            reverse=True,
-        )
-
-        # Build a map: file → set of mod_ids that own it (in priority order)
-        file_owners: Dict[str, List[str]] = {}
-        for mod in enabled:
-            for rel in mod.files:
-                file_owners.setdefault(rel, []).append(mod.id)
-
-        shadowed: Dict[str, List[str]] = {}
-
-        for mod in enabled:
-            if not mod.files:
-                continue  # can't determine shadowing without file list
-
-            # Gather all mod_ids that beat this mod's priority
-            higher_ids = {m.id for m in enabled if m.priority > mod.priority}
-            if not higher_ids:
-                continue
-
-            # Check whether every file of this mod is also owned by a higher-priority mod
-            shadowing: set = set()
-            for rel in mod.files:
-                owners = file_owners.get(rel, [])
-                # Find any higher-priority owner for this file
-                for owner_id in owners:
-                    if owner_id in higher_ids:
-                        shadowing.add(owner_id)
-                        break
-                else:
-                    # At least one file is NOT shadowed — mod is not fully shadowed
-                    shadowing = set()
-                    break
-
-            if shadowing:
-                shadowed[mod.id] = list(shadowing)
-
-        return shadowed
-
     def resolve_conflict(
         self,
         conflict: ConflictInfo,
