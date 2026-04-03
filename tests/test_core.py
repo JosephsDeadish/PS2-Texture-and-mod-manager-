@@ -19042,3 +19042,112 @@ class TestWave99DbMetadataFixes(unittest.TestCase):
             self.assertNotIn('(KCET)', dev,
                              f"{title!r}: (KCET) suffix should be removed, got {dev!r}")
             self.assertEqual(dev, 'Konami Computer Entertainment Tokyo')
+
+
+class TestWave100DbMetadataFixes(unittest.TestCase):
+    """Wave 100: publisher/developer normalisation + MGS2 date fix."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _info(self, title):
+        gi = self.sdb._games.get(title)
+        if gi is None:
+            return {}
+        return {'developer': gi.developer, 'publisher': gi.publisher,
+                'genre': gi.genre, 'release_date': gi.release_date}
+
+    # ── MGS2 date ────────────────────────────────────────────────────────────
+    def test_mgs2_release_date(self):
+        """MGS2 NA release must be 2001-11-12 (was 2001-12-11, digits transposed)."""
+        info = self._info('Metal Gear Solid 2: Sons of Liberty')
+        self.assertEqual(info.get('release_date'), '2001-11-12')
+
+    # ── Batman Rise of Sin Tzu pub/dev swap ──────────────────────────────────
+    def test_batman_rise_publisher(self):
+        """Batman: Rise of Sin Tzu publisher must be Ubisoft (not Montreal)."""
+        info = self._info('Batman: Rise of Sin Tzu')
+        self.assertEqual(info.get('publisher'), 'Ubisoft')
+
+    def test_batman_rise_developer(self):
+        """Batman: Rise of Sin Tzu developer must be Ubisoft Montreal."""
+        info = self._info('Batman: Rise of Sin Tzu')
+        self.assertEqual(info.get('developer'), 'Ubisoft Montreal')
+
+    # ── Rocky capitalisation ─────────────────────────────────────────────────
+    def test_rocky_publisher_capitalisation(self):
+        """Rocky publisher must be 'Ubisoft' not 'UbiSoft'."""
+        info = self._info('Rocky')
+        self.assertEqual(info.get('publisher'), 'Ubisoft')
+
+    # ── TMNT2 truncated dev ──────────────────────────────────────────────────
+    def test_tmnt2_developer_not_truncated(self):
+        """TMNT2 Battle Nexus developer must not be truncated."""
+        info = self._info('Teenage Mutant Ninja Turtles 2 - Battle Nexus')
+        dev = info.get('developer', '')
+        self.assertNotIn(', I', dev[-3:],
+                         f"Developer appears truncated: {dev!r}")
+        self.assertEqual(dev, 'Konami Computer Entertainment Studios, Inc')
+
+    # ── Lego Racers 2 publisher ───────────────────────────────────────────────
+    def test_lego_racers_2_publisher(self):
+        """Lego Racers 2 publisher must be LEGO Software (EA was not involved)."""
+        info = self._info('Lego Racers 2')
+        pub = info.get('publisher', '')
+        self.assertNotIn('Electronics', pub)
+        self.assertEqual(pub, 'LEGO Software')
+
+    # ── Konami studio names not used as publisher ────────────────────────────
+    def test_no_konami_studio_as_publisher(self):
+        """No entry should use a Konami internal-studio name as publisher."""
+        bad_konami_pubs = {
+            'Konami Computer Entertainment Japan Co., Ltd.',
+            'Konami Computer Entertainment Osaka (KCEO)',
+            'Konami Computer Entertainment Tokyo (KCET)',
+            'Konami Computer Entertainment Hawaii, Inc.',
+            'Konami Digital Entertainment America',
+            'Konami TYO Ltd.',
+        }
+        for title, gi in self.sdb._games.items():
+            pub = gi.publisher or ''
+            self.assertNotIn(pub, bad_konami_pubs,
+                             f"{title!r}: publisher should be 'Konami', got {pub!r}")
+
+    # ── Activision variants normalised ───────────────────────────────────────
+    def test_no_activision_inc_suffix(self):
+        """No entry should use 'Activision Publishing, Inc.' or 'Activision, Inc'."""
+        bad = {'Activision Publishing, Inc.', 'Activision, Inc'}
+        for title, gi in self.sdb._games.items():
+            pub = gi.publisher or ''
+            self.assertNotIn(pub, bad,
+                             f"{title!r}: use 'Activision', got {pub!r}")
+
+    def test_no_activision_value_long(self):
+        """Activision Value budget label must be 'Activision Value' (not with Inc/Publishing)."""
+        bad = {'Activision Value Publishing', 'Activision Value Publishing Inc'}
+        for title, gi in self.sdb._games.items():
+            pub = gi.publisher or ''
+            self.assertNotIn(pub, bad,
+                             f"{title!r}: use 'Activision Value', got {pub!r}")
+
+    # ── Harry Potter CoS NTSC-U ───────────────────────────────────────────────
+    def test_harry_potter_cos_publisher(self):
+        """Harry Potter Chamber of Secrets NTSC-U must have 'Electronic Arts' not Europe."""
+        info = self._info('Harry Potter And The Chamber Of Secrets')
+        self.assertEqual(info.get('publisher'), 'Electronic Arts')
+
+    # ── Cy Girls dev simplified ───────────────────────────────────────────────
+    def test_cy_girls_developer(self):
+        """Cy Girls developer must be 'Konami Computer Entertainment Japan'."""
+        info = self._info('Cy Girls')
+        self.assertEqual(info.get('developer'), 'Konami Computer Entertainment Japan')
+
+    # ── Shaman King dev simplified ───────────────────────────────────────────
+    def test_shaman_king_developer(self):
+        """Shaman King developer must not contain the full legal KCEJ name."""
+        info = self._info("Shonen Jump's Shaman King: Power of Spirit")
+        dev = info.get('developer', '')
+        self.assertNotIn('Co., Ltd.', dev)
+        self.assertIn('Konami Computer Entertainment Japan', dev)
+        self.assertIn('Winky Soft', dev)
