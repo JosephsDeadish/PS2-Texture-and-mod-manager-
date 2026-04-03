@@ -19651,3 +19651,103 @@ class TestWave103DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('The Simpsons Game')
         self.assertEqual(gi.developer, 'EA Redwood Shores')
         self.assertEqual(gi.publisher, 'Electronic Arts')
+
+
+class TestWave104DbAuditFixes(unittest.TestCase):
+    """Wave 104: 14 dev/pub attribution errors — Monolith/Sierra, Angel Studios/
+    Infogrames, Mucky Foot/Activision, Shaba/Activision, Illusion Softworks/Take-Two,
+    Syscom/Take-Two, and 8 THQ-as-dev swaps (Eutechnyx, Metro, PCPL×3, BigSky,
+    Taito, Pai)."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    def test_no_one_lives_forever_devpub(self):
+        """The Operative: No One Lives Forever: dev=Monolith Productions, pub=Sierra Entertainment."""
+        gi = self._ntsc('The Operative: No One Lives Forever')
+        self.assertEqual(gi.developer, 'Monolith Productions')
+        self.assertEqual(gi.publisher, 'Sierra Entertainment')
+
+    def test_test_drive_off_road_devpub(self):
+        """Test Drive - Off-Road - Wide Open: dev=Angel Studios, pub=Infogrames."""
+        gi = self._ntsc('Test Drive - Off-Road - Wide Open')
+        self.assertEqual(gi.developer, 'Angel Studios')
+        self.assertEqual(gi.publisher, 'Infogrames')
+
+    def test_blade_ii_devpub(self):
+        """Blade II: dev=Mucky Foot Productions, pub=Activision."""
+        gi = self._ntsc('Blade II')
+        self.assertEqual(gi.developer, 'Mucky Foot Productions')
+        self.assertEqual(gi.publisher, 'Activision')
+
+    def test_shaun_palmer_devpub(self):
+        """Shaun Palmer's Pro Snowboarder: dev=Shaba Games, pub=Activision."""
+        gi = self._ntsc("Shaun Palmer's Pro Snowboarder")
+        self.assertEqual(gi.developer, 'Shaba Games')
+        self.assertEqual(gi.publisher, 'Activision')
+
+    def test_mafia_devpub(self):
+        """Mafia: dev=Illusion Softworks, pub=Take 2 Interactive."""
+        gi = self._ntsc('Mafia')
+        self.assertEqual(gi.developer, 'Illusion Softworks')
+        self.assertEqual(gi.publisher, 'Take 2 Interactive')
+
+    def test_city_crisis_devpub(self):
+        """City Crisis: dev=Syscom Entertainment, Inc., pub=Take 2 Interactive."""
+        gi = self._ntsc('City Crisis')
+        self.assertEqual(gi.developer, 'Syscom Entertainment, Inc.')
+        self.assertEqual(gi.publisher, 'Take 2 Interactive')
+
+    def test_big_mutha_truckers_2_devpub(self):
+        """Big Mutha Truckers 2: dev=Eutechnyx, Limited, pub=THQ."""
+        gi = self._ntsc('Big Mutha Truckers 2')
+        self.assertEqual(gi.developer, 'Eutechnyx, Limited')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_britneys_dance_beat_devpub(self):
+        """Britney's Dance Beat: dev=Metro, pub=THQ."""
+        gi = self._ntsc("Britney's Dance Beat")
+        self.assertEqual(gi.developer, 'Metro')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_mx_2002_devpub(self):
+        """MX 2002 Featuring Ricky Carmichael: dev=Pacific Coast Power & Light Co., pub=THQ."""
+        gi = self._ntsc('MX 2002 Featuring Ricky Carmichael')
+        self.assertEqual(gi.developer, 'Pacific Coast Power & Light Co.')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_mx_superfly_devpub(self):
+        """MX Superfly: dev=Pacific Coast Power & Light Co., pub=THQ."""
+        gi = self._ntsc('MX Superfly')
+        self.assertEqual(gi.developer, 'Pacific Coast Power & Light Co.')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_jimmy_neutron_devpub(self):
+        """Nickelodeon Jimmy Neutron: Boy Genius: dev=BigSky Interactive, Inc., pub=THQ."""
+        gi = self._ntsc('Nickelodeon Jimmy Neutron: Boy Genius')
+        self.assertEqual(gi.developer, 'BigSky Interactive, Inc.')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_power_rangers_dino_thunder_devpub(self):
+        """Power Rangers - Dino Thunder: dev=Pacific Coast Power & Light Co., pub=THQ."""
+        gi = self._ntsc('Power Rangers - Dino Thunder')
+        self.assertEqual(gi.developer, 'Pacific Coast Power & Light Co.')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_pride_fc_devpub(self):
+        """Pride FC: Fighting Championships: dev=Taito Corporation, pub=THQ."""
+        gi = self._ntsc('Pride FC: Fighting Championships')
+        self.assertEqual(gi.developer, 'Taito Corporation')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_bass_strike_devpub(self):
+        """Bass Strike: dev=Pai Corporation, Ltd., pub=THQ."""
+        gi = self._ntsc('Bass Strike')
+        self.assertEqual(gi.developer, 'Pai Corporation, Ltd.')
+        self.assertEqual(gi.publisher, 'THQ')
