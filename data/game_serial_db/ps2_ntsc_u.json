@@ -99,8 +99,8 @@
         "D2C31B25"
       ],
       "release_date": "2001-11-01",
-      "developer": "Namco Bandai",
-      "publisher": "Namco Bandai",
+      "developer": "Project Aces",
+      "publisher": "Namco",
       "genre": "Action, Shooter, Flight Simulator",
       "crc_labels": {
         "9420D4F1": "v1.00",
@@ -167,8 +167,8 @@
         "CE44FD7A"
       ],
       "release_date": "2006-01-17",
-      "developer": "Sony",
-      "publisher": "Sony",
+      "developer": "Sony Computer Entertainment Japan",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Action, Platform"
     },
     "Ar tonelico II: Melody of Metafalica": {
@@ -617,7 +617,7 @@
         "BB3D833A"
       ],
       "release_date": "2002-10-23",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Action, Platformer, Shooter"
     },
@@ -1365,8 +1365,8 @@
         "44A8A22A"
       ],
       "release_date": "2007-03-13",
-      "developer": "Sony",
-      "publisher": "Sony",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Action, Adventure, Beat'em Up",
       "crc_labels": {
         "0B29B9B6": "v1.00",
@@ -2002,8 +2002,8 @@
         "AE3EAA05"
       ],
       "release_date": "2002-09-16",
-      "developer": "Square Enix",
-      "publisher": "Square Co. Ltd",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
       "genre": "Action, RPG",
       "crc_labels": {
         "39BB7DF5": "v1.00",
@@ -3409,7 +3409,7 @@
         "FE06A030"
       ],
       "release_date": "2001-09-24",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Action, Adventure, Survival Horror",
       "crc_labels": {
@@ -3435,7 +3435,7 @@
         "FFAAC65B"
       ],
       "release_date": "2003-08-08",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Action, Adventure, Survival Horror",
       "crc_labels": {
@@ -3460,7 +3460,7 @@
         "E360416A"
       ],
       "release_date": "2004-09-07",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Survival Horror, Action, Shooter",
       "crc_labels": {
@@ -4762,8 +4762,8 @@
         "DC0109F4"
       ],
       "release_date": "2000-10-26",
-      "developer": "EA",
-      "publisher": "EA Square L.L.C.",
+      "developer": "EA Square",
+      "publisher": "Electronic Arts",
       "genre": "Action"
     },
     "Silent Scope": {
@@ -4961,7 +4961,7 @@
         "A0ED2D23"
       ],
       "release_date": "2002-06-12",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "EA UK",
       "genre": "Racing"
     },
@@ -5030,7 +5030,7 @@
         "C5473413"
       ],
       "release_date": "2002-11-06",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "Electronic Arts Europe",
       "genre": "Action-Adventure"
     },
@@ -5053,7 +5053,7 @@
         "3DF10389"
       ],
       "release_date": "2002-11-13",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "EA UK",
       "genre": "Racing"
     },
@@ -5120,7 +5120,7 @@
         "2C1173B0"
       ],
       "release_date": "2003-06-23",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "EA UK",
       "genre": "Racing"
     },
@@ -5210,7 +5210,7 @@
         "51E019BC"
       ],
       "release_date": "2004-06-02",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "EA UK",
       "genre": "Action-Adventure"
     },
@@ -5221,7 +5221,7 @@
         "EEE2F6A3"
       ],
       "release_date": "2004-10-19",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Action, Platformer, Shooter"
     },
@@ -5593,7 +5593,7 @@
         "3D563C06"
       ],
       "release_date": "2000-11-08",
-      "developer": "EA",
+      "developer": "EA Tiburon",
       "publisher": "EA Sports",
       "genre": "Racing"
     },
@@ -5604,7 +5604,7 @@
         "5232E8D8"
       ],
       "release_date": "2001-02-26",
-      "developer": "EA",
+      "developer": "EA Sports",
       "publisher": "EA Sports",
       "genre": "Sports"
     },
@@ -5942,8 +5942,8 @@
         "6436665F"
       ],
       "release_date": "2001-10-17",
-      "developer": "EA",
-      "publisher": "Tiburon Entertainment, Inc.",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Racing"
     },
     "Eve Of Extinction": {
@@ -5986,7 +5986,7 @@
         "3E59A196"
       ],
       "release_date": "2001-11-09",
-      "developer": "EA",
+      "developer": "EA Canada",
       "publisher": "EA Sports",
       "genre": "Sports"
     },
@@ -6312,8 +6312,8 @@
         "8B6DFE0D"
       ],
       "release_date": "2002-06-25",
-      "developer": "EA",
-      "publisher": "Silicon Dreams Studio Ltd.",
+      "developer": "Silicon Dreams Studio Ltd.",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Super Bust-A-Move 2": {
@@ -6579,7 +6579,7 @@
         "E14ADB65"
       ],
       "release_date": "2002-10-29",
-      "developer": "EA",
+      "developer": "EA Sports",
       "publisher": "Electronic Arts",
       "genre": "Sports"
     },
@@ -6601,8 +6601,8 @@
         "037181FF"
       ],
       "release_date": "2002-11-19",
-      "developer": "EA",
-      "publisher": "Attention To Detail Limited",
+      "developer": "Attention To Detail Limited",
+      "publisher": "Electronic Arts",
       "genre": "Racing"
     },
     "Activision Anthology": {
@@ -7005,8 +7005,8 @@
         "64F9781E"
       ],
       "release_date": "2003-09-22",
-      "developer": "EA",
-      "publisher": "EA Pacific",
+      "developer": "EA Pacific",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Dynasty Tactics 2": {
@@ -7129,8 +7129,8 @@
         "03C2C5B1"
       ],
       "release_date": "2004-01-15",
-      "developer": "EA",
-      "publisher": "Electronic Arts Tiburon",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Blowout": {
@@ -7393,8 +7393,8 @@
         "88A808FA"
       ],
       "release_date": "2004-09-21",
-      "developer": "EA",
-      "publisher": "EA Games",
+      "developer": "EA Sports",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Crash 'N' Burn": {
@@ -7591,8 +7591,8 @@
         "7F366F16"
       ],
       "release_date": "2004-12-29",
-      "developer": "EA",
-      "publisher": "Electronic Arts Tiburon",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Graffiti Kingdom": {
@@ -7806,8 +7806,8 @@
         "40F3E75D"
       ],
       "release_date": "2005-09-20",
-      "developer": "EA",
-      "publisher": "EA Redwood Shores",
+      "developer": "EA Redwood Shores",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Ford Vs. Chevy": {
@@ -8257,7 +8257,7 @@
         "36FEEE3A"
       ],
       "release_date": "2002-03-06",
-      "developer": "EA",
+      "developer": "EA Canada",
       "publisher": "Electronic Arts",
       "genre": "Sports"
     },
@@ -9827,7 +9827,7 @@
         "EB6C8519"
       ],
       "release_date": "2006-11-14",
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "publisher": "Eidos Interactive",
       "genre": "Action"
     },
@@ -10209,7 +10209,7 @@
         "E43E46E6"
       ],
       "release_date": "2008-05-15",
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "publisher": "Disney Interactive Studios",
       "genre": "Action-Adventure"
     },
@@ -12171,8 +12171,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2000-12-06",
-      "developer": "EA",
-      "publisher": "Bullfrog Productions",
+      "developer": "Bullfrog Productions",
+      "publisher": "Electronic Arts",
       "genre": "Simulation"
     },
     "F1 Championship Season 2000": {
@@ -12180,7 +12180,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2000-12-20",
-      "developer": "EA",
+      "developer": "EA Sports",
       "publisher": "EA Sports",
       "genre": "Racing"
     },
@@ -12333,8 +12333,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2001-03-14",
-      "developer": "EA",
-      "publisher": "Treyarch Invention, LLC",
+      "developer": "EA Canada",
+      "publisher": "EA Sports",
       "genre": "Sports"
     },
     "The Adventures of Cookie & Cream": {
@@ -12550,7 +12550,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2001-09-18",
-      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "developer": "Konami Computer Entertainment Tokyo",
       "publisher": "Konami",
       "genre": "Gun"
     },
@@ -12977,7 +12977,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-02-27",
-      "developer": "EA",
+      "developer": "EA Sports",
       "publisher": "Electronic Arts",
       "genre": "Sports"
     },
@@ -12986,8 +12986,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-03-13",
-      "developer": "EA",
-      "publisher": "Pandemic Studios",
+      "developer": "EA Canada",
+      "publisher": "EA Sports",
       "genre": "Sports"
     },
     "Mad Maestro!": {
@@ -13704,7 +13704,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-11-21",
-      "developer": "EA",
+      "developer": "EA Sports",
       "publisher": "EA Sports",
       "genre": "Sports"
     },
@@ -13893,7 +13893,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-05-12",
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "publisher": "THQ",
       "genre": "Action-Adventure"
     },
@@ -14260,8 +14260,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-09-16",
-      "developer": "EA",
-      "publisher": "HB Studios",
+      "developer": "HB Studios",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Madden NFL 2004": {
@@ -14319,7 +14319,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-10-28",
-      "developer": "EA",
+      "developer": "EA UK",
       "publisher": "EA UK",
       "genre": "Sports"
     },
@@ -14546,8 +14546,8 @@
         "612542D0"
       ],
       "release_date": "2003-09-16",
-      "developer": "EA",
-      "publisher": "Electronic Arts Tiburon",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Racing"
     },
     "Intellivision Lives!": {
@@ -15155,7 +15155,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-09-21",
-      "developer": "EA",
+      "developer": "EA Canada",
       "publisher": "EA Sports",
       "genre": "Sports"
     },
@@ -15390,7 +15390,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-09-21",
-      "developer": "Sony",
+      "developer": "Square PDD 3",
       "publisher": "Square Enix",
       "genre": "MMORPG"
     },
@@ -15924,8 +15924,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2005-07-05",
-      "developer": "EA",
-      "publisher": "Electronic Arts Tiburon",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Sports"
     },
     "Disney/Pixar The Incredibles: Rise of the Underminer": {
@@ -16073,8 +16073,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2005-09-01",
-      "developer": "EA",
-      "publisher": "Electronic Arts Tiburon",
+      "developer": "EA Tiburon",
+      "publisher": "Electronic Arts",
       "genre": "Racing"
     },
     "MS Saga: A New Dawn": {

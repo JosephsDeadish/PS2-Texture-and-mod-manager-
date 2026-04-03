@@ -1733,42 +1733,66 @@
       ],
       "aliases": [
         "Tales of Legendia Japan"
-      ]
+      ],
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG",
+      "release_date": "2005-08-25"
     },
     "Grandia III (JP)": {
       "serial": "SLPM-65976",
       "crcs": [
         "5B659BED"
       ],
-      "aliases": []
+      "aliases": [],
+      "developer": "Game Arts",
+      "publisher": "Square Enix",
+      "genre": "RPG",
+      "release_date": "2005-08-04"
     },
     "Viewtiful Joe (JP)": {
       "serial": "SLPM-65699",
       "crcs": [
         "634947D7"
       ],
-      "aliases": []
+      "aliases": [],
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Action, Platformer",
+      "release_date": "2003-10-09"
     },
     "Silent Hill 3 (JP)": {
       "serial": "SLPM-65257",
       "crcs": [
         "8CFE667F"
       ],
-      "aliases": []
+      "aliases": [],
+      "developer": "Konami Computer Entertainment Tokyo",
+      "publisher": "Konami",
+      "genre": "Survival Horror",
+      "release_date": "2003-07-03"
     },
     "Armored Core 3 (JP)": {
       "serial": "SLPS-25112",
       "crcs": [
         "F49E991D"
       ],
-      "aliases": []
+      "aliases": [],
+      "developer": "From Software",
+      "publisher": "From Software",
+      "genre": "Action",
+      "release_date": "2002-07-04"
     },
     "Viewtiful Joe 2 (JP)": {
       "serial": "SLPM-65824",
       "crcs": [
         "F977249C"
       ],
-      "aliases": []
+      "aliases": [],
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Action, Platformer",
+      "release_date": "2004-10-14"
     },
     "Forbidden Siren 2 (JP)": {
       "serial": "SCPS-15106",

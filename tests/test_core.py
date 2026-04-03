@@ -18951,3 +18951,94 @@ class TestWave97GameIdentity(unittest.TestCase):
             entries = scan_library(tmp)
             self.assertEqual(len(entries), 1)
             self.assertEqual(entries[0].crcs, [])
+
+
+class TestWave99DbMetadataFixes(unittest.TestCase):
+    """Wave 99: verify corrected developer/publisher metadata in NTSC-U DB."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _info(self, title):
+        gi = self.sdb._games.get(title)
+        if gi is None:
+            return {}
+        return {'developer': gi.developer, 'publisher': gi.publisher,
+                'genre': gi.genre, 'release_date': gi.release_date}
+
+    def test_god_of_war_ii_developer(self):
+        """God of War II dev must be SCE Studio Santa Monica, not 'Sony'."""
+        info = self._info('God of War II')
+        self.assertEqual(info.get('developer'), 'SCE Studio Santa Monica')
+
+    def test_kingdom_hearts_developer(self):
+        """Kingdom Hearts dev must be 'Square' (pre-merger release, not Square Enix)."""
+        info = self._info('Kingdom Hearts')
+        self.assertEqual(info.get('developer'), 'Square')
+
+    def test_kingdom_hearts_publisher(self):
+        """Kingdom Hearts NTSC-U was published by Square Electronic Arts."""
+        info = self._info('Kingdom Hearts')
+        self.assertEqual(info.get('publisher'), 'Square Electronic Arts')
+
+    def test_ape_escape_3_developer(self):
+        """Ape Escape 3 dev must be Sony Computer Entertainment Japan, not generic 'Sony'."""
+        info = self._info('Ape Escape 3')
+        self.assertEqual(info.get('developer'), 'Sony Computer Entertainment Japan')
+
+    def test_ace_combat_04_developer(self):
+        """Ace Combat 04 dev must be Project Aces (not Namco Bandai)."""
+        info = self._info('Ace Combat 04: Shattered Skies')
+        self.assertEqual(info.get('developer'), 'Project Aces')
+
+    def test_ace_combat_04_publisher(self):
+        """Ace Combat 04 pub must be Namco (pre-merger, not Namco Bandai)."""
+        info = self._info('Ace Combat 04: Shattered Skies')
+        self.assertEqual(info.get('publisher'), 'Namco')
+
+    def test_theme_park_developer(self):
+        """Theme Park Roller Coaster dev must be Bullfrog (was swapped with EA)."""
+        info = self._info('Theme Park Roller Coaster')
+        self.assertEqual(info.get('developer'), 'Bullfrog Productions')
+        self.assertEqual(info.get('publisher'), 'Electronic Arts')
+
+    def test_drome_racers_developer(self):
+        """Drome Racers dev must be Attention To Detail (was swapped with EA)."""
+        info = self._info('Drome Racers')
+        self.assertEqual(info.get('developer'), 'Attention To Detail Limited')
+        self.assertEqual(info.get('publisher'), 'Electronic Arts')
+
+    def test_rugby_2004_developer(self):
+        """Rugby 2004 dev must be HB Studios (was swapped with EA)."""
+        info = self._info('Rugby 2004')
+        self.assertEqual(info.get('developer'), 'HB Studios')
+
+    def test_triple_play_publisher_not_treyarch(self):
+        """Triple Play Baseball publisher must be EA Sports (was incorrectly Treyarch)."""
+        info = self._info('Triple Play Baseball')
+        self.assertEqual(info.get('publisher'), 'EA Sports')
+        self.assertNotIn('Treyarch', info.get('publisher', ''))
+
+    def test_triple_play_2002_publisher_not_pandemic(self):
+        """Triple Play 2002 publisher must be EA Sports (was incorrectly Pandemic Studios)."""
+        info = self._info('Triple Play 2002')
+        self.assertEqual(info.get('developer'), 'EA Canada')
+        self.assertNotIn('Pandemic', info.get('publisher', ''))
+
+    def test_travellers_tales_no_double_space(self):
+        """Traveller's Tales must not have a double-space in the name."""
+        for title, gi in self.sdb._games.items():
+            dev = gi.developer or ''
+            if "Traveller" in dev:
+                self.assertNotIn("  ", dev,
+                                 f"{title!r}: double-space in developer {dev!r}")
+
+    def test_silent_hill_no_kcet_suffix(self):
+        """Silent Hill developer names must not include the (KCET) suffix."""
+        for title in ['Silent Hill 2', 'Silent Hill 3', 'Silent Hill 4: The Room']:
+            info = self._info(title)
+            dev = info.get('developer', '')
+            self.assertNotIn('(KCET)', dev,
+                             f"{title!r}: (KCET) suffix should be removed, got {dev!r}")
+            self.assertEqual(dev, 'Konami Computer Entertainment Tokyo')
