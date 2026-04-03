@@ -19248,3 +19248,207 @@ class TestWave101DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('NHL Hitz Pro')
         self.assertEqual(gi.developer, 'Next Level Games')
         self.assertEqual(gi.publisher, 'Midway')
+
+
+class TestWave102DbAuditFixes(unittest.TestCase):
+    """Wave 102: 32 dev/pub corrections — Acclaim studio swaps, WWE, 2K Sports,
+    NHL 2K3, ESPN 2K5, WWE All Stars, Madden 2002, NCAA GameBreaker, MLB 2K,
+    Crazy Taxi, Kessen, Mary-Kate Sweet 16."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── Acclaim studio swaps ─────────────────────────────────────────────────
+    def test_all_star_baseball_2002_devpub(self):
+        """All-Star Baseball 2002: dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('All-Star Baseball 2002')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_all_star_baseball_2003_devpub(self):
+        """All-Star Baseball 2003: dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('All-Star Baseball 2003 featuring Derek Jeter')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_all_star_baseball_2004_devpub(self):
+        """All-Star Baseball 2004: dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('All-Star Baseball 2004 featuring Derek Jeter')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_all_star_baseball_2005_devpub(self):
+        """All-Star Baseball 2005: dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('All-Star Baseball 2005 featuring Derek Jeter')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_dave_mirra_bmx2_devpub(self):
+        """Dave Mirra Freestyle BMX 2: dev=Z-AXIS, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Dave Mirra Freestyle BMX 2')
+        self.assertEqual(gi.developer, 'Z-AXIS, Ltd.')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_gladiator_sword_devpub(self):
+        """Gladiator - Sword of Vengeance: dev=Acclaim Studios Manchester, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Gladiator - Sword of Vengeance')
+        self.assertEqual(gi.developer, 'Acclaim Studios Manchester')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_legends_of_wrestling_devpub(self):
+        """Legends Of Wrestling: dev=Acclaim Studios Salt Lake City, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Legends Of Wrestling')
+        self.assertEqual(gi.developer, 'Acclaim Studios Salt Lake City, Inc.')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_legends_of_wrestling_ii_devpub(self):
+        """Legends Of Wrestling II: dev=Acclaim Studios Salt Lake City, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Legends Of Wrestling II')
+        self.assertEqual(gi.developer, 'Acclaim Studios Salt Lake City, Inc.')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_nba_jam_acclaim_devpub(self):
+        """NBA Jam (Acclaim): dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('NBA Jam')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_vexx_devpub(self):
+        """Vexx: dev=Acclaim Studios Austin, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Vexx')
+        self.assertEqual(gi.developer, 'Acclaim Studios Austin')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_xgiii_devpub(self):
+        """XGIII: dev=Acclaim Studios Cheltenham, pub=Acclaim Entertainment."""
+        gi = self._ntsc('XGIII: Extreme G Racing')
+        self.assertEqual(gi.developer, 'Acclaim Studios Cheltenham')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_xgra_devpub(self):
+        """XGRA: dev=Acclaim Studios Cheltenham, pub=Acclaim Entertainment."""
+        gi = self._ntsc('XGRA - Extreme G Racing Association')
+        self.assertEqual(gi.developer, 'Acclaim Studios Cheltenham')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    # ── WWE / WWF dev-pub swaps ──────────────────────────────────────────────
+    def test_wwf_smackdown_just_bring_it_devpub(self):
+        """WWF SmackDown! Just Bring It: dev=Yuke's, pub=THQ."""
+        gi = self._ntsc("WWF SmackDown! Just Bring It")
+        self.assertEqual(gi.developer, "Yuke's")
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_wwe_crush_hour_devpub(self):
+        """WWE Crush Hour: dev=Pacific Coast Power & Light Co., pub=THQ."""
+        gi = self._ntsc('WWE Crush Hour')
+        self.assertEqual(gi.developer, 'Pacific Coast Power & Light Co.')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    # ── Sega-label dev-pub swaps ─────────────────────────────────────────────
+    def test_nba_2k2_devpub(self):
+        """NBA 2K2: dev=Visual Concepts, pub=Sega."""
+        gi = self._ntsc('NBA 2K2')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_nba_2k3_devpub(self):
+        """NBA 2K3: dev=Visual Concepts, pub=Sega."""
+        gi = self._ntsc('NBA 2K3')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_nfl_2k2_devpub(self):
+        """NFL 2K2: dev=Visual Concepts, pub=Sega."""
+        gi = self._ntsc('NFL 2K2')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_wsb_2k3_devpub(self):
+        """World Series Baseball 2K3: dev=Blue Shift, pub=Sega."""
+        gi = self._ntsc('World Series Baseball 2K3')
+        self.assertEqual(gi.developer, 'Blue Shift, Inc.')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    def test_sega_sports_tennis_devpub(self):
+        """Sega Sports Tennis: dev=Hitmaker, pub=Sega."""
+        gi = self._ntsc('Sega Sports Tennis')
+        self.assertEqual(gi.developer, 'Hitmaker Co., Ltd.')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    # ── NHL 2K3 ──────────────────────────────────────────────────────────────
+    def test_nhl_2k3_devpub(self):
+        """NHL 2K3: dev=Kush Games, pub=Sega (not Treyarch)."""
+        gi = self._ntsc('NHL 2K3')
+        self.assertEqual(gi.developer, 'Kush Games')
+        self.assertEqual(gi.publisher, 'Sega')
+
+    # ── ESPN 2K5 era ─────────────────────────────────────────────────────────
+    def test_espn_nhl_2k5_devpub(self):
+        """ESPN NHL 2K5: dev=Kush Games, pub=ESPN Video Games."""
+        gi = self._ntsc('ESPN NHL 2K5')
+        self.assertEqual(gi.developer, 'Kush Games')
+        self.assertEqual(gi.publisher, 'ESPN Video Games')
+
+    def test_espn_college_hoops_2k5_devpub(self):
+        """ESPN College Hoops 2K5: dev=Visual Concepts, pub=ESPN Video Games."""
+        gi = self._ntsc('ESPN College Hoops 2K5')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+        self.assertEqual(gi.publisher, 'ESPN Video Games')
+
+    def test_espn_nba_2k5_publisher(self):
+        """ESPN NBA 2K5: pub=ESPN Video Games (not Sega)."""
+        gi = self._ntsc('ESPN NBA 2K5')
+        self.assertEqual(gi.publisher, 'ESPN Video Games')
+
+    # ── Miscellaneous wrong dev/pub ───────────────────────────────────────────
+    def test_wwe_all_stars_developer(self):
+        """WWE All Stars: dev=THQ San Diego (not Subdued Software LLC)."""
+        gi = self._ntsc('WWE All Stars')
+        self.assertEqual(gi.developer, 'THQ San Diego')
+
+    def test_madden_nfl_2002_developer(self):
+        """Madden NFL 2002: dev=EA Tiburon (not EA Sports)."""
+        gi = self._ntsc('Madden NFL 2002')
+        self.assertEqual(gi.developer, 'EA Tiburon')
+
+    def test_ncaa_gamebreaker_2004_publisher(self):
+        """NCAA GameBreaker 2004: pub=SCEA (not Red Zone Interactive)."""
+        gi = self._ntsc('NCAA GameBreaker 2004')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    def test_mlb_2k9_developer(self):
+        """MLB 2K9: dev=Visual Concepts (not Take-Two Interactive)."""
+        gi = self._ntsc('Major League Baseball 2K9')
+        self.assertEqual(gi.developer, 'Visual Concepts')
+
+    def test_mlb_2k10_publisher(self):
+        """MLB 2K10: pub=2K Sports (not Take-Two Interactive)."""
+        gi = self._ntsc('Major League Baseball 2K10')
+        self.assertEqual(gi.publisher, '2K Sports')
+
+    def test_mlb_2k12_publisher(self):
+        """MLB 2K12: pub=2K Sports (not Take-Two Interactive)."""
+        gi = self._ntsc('Major League Baseball 2K12')
+        self.assertEqual(gi.publisher, '2K Sports')
+
+    def test_crazy_taxi_publisher(self):
+        """Crazy Taxi (NTSC-U): pub=Acclaim Entertainment (not Sega, Acclaim)."""
+        gi = self._ntsc('Crazy Taxi')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_kessen_publisher(self):
+        """Kessen: pub=Electronic Arts (not Koei, Electronic Arts)."""
+        gi = self._ntsc('Kessen')
+        self.assertEqual(gi.publisher, 'Electronic Arts')
+
+    def test_mary_kate_sweet16_devpub(self):
+        """Mary-Kate Sweet 16: dev=n-Space, pub=Club Acclaim."""
+        gi = self._ntsc('Mary-Kate and Ashley: Sweet 16: Licensed to Drive')
+        self.assertEqual(gi.developer, 'n-Space, Inc.')
+        self.assertEqual(gi.publisher, 'Club Acclaim')
