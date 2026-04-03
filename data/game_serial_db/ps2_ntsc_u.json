@@ -3167,7 +3167,8 @@
       "genre": "Action",
       "aliases": [
         "SOCOM 2"
-      ]
+      ],
+      "publisher": "Sony Computer Entertainment America"
     },
     "SOCOM: U.S. Navy SEALs": {
       "serial": "SCUS-97134",
@@ -10908,8 +10909,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-10-28",
-      "developer": "989 Sports",
-      "publisher": "Killer Game",
+      "developer": "Killer Game",
+      "publisher": "989 Sports",
       "genre": "Sports"
     },
     "EyeToy: Play": {
@@ -10970,8 +10971,9 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-04-20",
-      "developer": "Sony Computer Entertainment Europe",
-      "genre": "Rhythm"
+      "developer": "SCE London Studio",
+      "genre": "Rhythm",
+      "publisher": "Sony Computer Entertainment America"
     },
     "MLB 2006": {
       "serial": "SCUS-97347",
@@ -10988,7 +10990,7 @@
       "crcs": [],
       "release_date": "2005-11-01",
       "developer": "SCEA Sports Studio",
-      "publisher": "SCEA Sports Studio",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Sports"
     },
     "Syphon Filter: Dark Mirror": {
@@ -11092,8 +11094,9 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003",
-      "developer": "Sony Computer Entertainment Europe",
-      "genre": "Rhythm"
+      "developer": "SCE London Studio",
+      "genre": "Rhythm",
+      "publisher": "Sony Computer Entertainment America"
     },
     "Athens 2004 (SCUS-97403)": {
       "serial": "SCUS-97403",
@@ -11457,7 +11460,8 @@
       "crcs": [],
       "release_date": "2009-11-03",
       "developer": "High Impact Games",
-      "genre": "Platformer"
+      "genre": "Platformer",
+      "publisher": "Sony Computer Entertainment America"
     },
     "SOCOM: U.S. Navy SEALs: Combined Assault": {
       "serial": "SCUS-97560",
@@ -11625,7 +11629,8 @@
       "alt_serials": [],
       "crcs": [],
       "developer": "SCEE London Studio",
-      "genre": "Rhythm"
+      "genre": "Rhythm",
+      "publisher": "Sony Computer Entertainment America"
     },
     "SingStar Amped (SCUS-97612)": {
       "serial": "SCUS-97612",
@@ -11646,8 +11651,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2007-09-18",
-      "developer": "SCEE Studio London",
-      "publisher": "Sony",
+      "developer": "SCEE London Studio",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Sing"
     },
     "Hot Shots Tennis (SCUS-97619)": {
@@ -11674,8 +11679,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2007-09-18",
-      "developer": "SCEE Studio London",
-      "publisher": "Sony",
+      "developer": "SCEE London Studio",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Sing"
     },
     "Secret Agent Clank": {
@@ -11723,7 +11728,7 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2008-03-18",
-      "developer": "SCEE",
+      "developer": "SCEE London Studio",
       "publisher": "Sony Computer Entertainment America",
       "genre": "Rhythm"
     },
@@ -11797,8 +11802,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2011-03-08",
-      "developer": "Sony Computer Entertainment America",
-      "publisher": "Sony Computer Entertainment",
+      "developer": "SCE Studios San Diego",
+      "publisher": "Sony Computer Entertainment America",
       "genre": "Sports"
     },
     "SingStar Latino": {

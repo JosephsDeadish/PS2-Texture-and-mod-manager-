@@ -19947,3 +19947,101 @@ class TestWave106DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('World Tour Soccer 2006')
         self.assertEqual(gi.developer, 'SCEE London Studio')
         self.assertEqual(gi.publisher, '989 Sports')
+
+
+class TestWave107DbAuditFixes(unittest.TestCase):
+    """Wave 107: 11 dev/pub attribution errors fixed across 11 game entries.
+
+    Corrections applied (verified against series context and known studio facts):
+      NBA ShootOut 2004  dev/pub swap: Killer Game↔989 Sports
+      MLB 11: The Show   dev=Sony Computer Entertainment America→SCE Studios San Diego;
+                         pub=Sony Computer Entertainment→Sony Computer Entertainment America
+      SOCOM II: U.S. Navy SEALs  pub ''→Sony Computer Entertainment America
+      NBA 06             pub=SCEA Sports Studio→Sony Computer Entertainment America
+      EyeToy: Groove (×2 entries)  dev=Sony Computer Entertainment Europe→SCE London Studio;
+                                   pub ''→Sony Computer Entertainment America
+      SingStar '90s (SCUS-97636)  dev=SCEE→SCEE London Studio
+      SingStar '80s (×2 entries)  dev=SCEE Studio London→SCEE London Studio;
+                                  pub=Sony→Sony Computer Entertainment America
+      SingStar Amped     pub ''→Sony Computer Entertainment America
+      Jak and Daxter: The Lost Frontier  pub ''→Sony Computer Entertainment America
+    """
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── NBA ShootOut 2004 dev/pub swap ────────────────────────────────────────
+    def test_nba_shootout_2004_devpub(self):
+        """NBA ShootOut 2004: dev=Killer Game, pub=989 Sports (were swapped)."""
+        gi = self._ntsc('NBA ShootOut 2004')
+        self.assertEqual(gi.developer, 'Killer Game')
+        self.assertEqual(gi.publisher, '989 Sports')
+
+    # ── MLB 11: The Show dev/pub fix ──────────────────────────────────────────
+    def test_mlb_11_the_show_devpub(self):
+        """MLB 11: The Show: dev=SCE Studios San Diego, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('MLB 11: The Show')
+        self.assertEqual(gi.developer, 'SCE Studios San Diego')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── SOCOM II publisher ────────────────────────────────────────────────────
+    def test_socom_ii_publisher(self):
+        """SOCOM II: U.S. Navy SEALs: pub=Sony Computer Entertainment America (was empty)."""
+        gi = self._ntsc('SOCOM II: U.S. Navy SEALs')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── NBA 06 publisher ──────────────────────────────────────────────────────
+    def test_nba_06_publisher(self):
+        """NBA 06: pub=Sony Computer Entertainment America (was SCEA Sports Studio)."""
+        gi = self._ntsc('NBA 06')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── EyeToy: Groove dev/pub ────────────────────────────────────────────────
+    def test_eyetoy_groove_devpub(self):
+        """EyeToy: Groove: dev=SCE London Studio, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('EyeToy: Groove')
+        self.assertEqual(gi.developer, 'SCE London Studio')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    def test_eyetoy_groove_scus97400_devpub(self):
+        """EyeToy: Groove (SCUS-97400): dev=SCE London Studio, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('EyeToy: Groove (SCUS-97400)')
+        self.assertEqual(gi.developer, 'SCE London Studio')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── SingStar '90s developer ───────────────────────────────────────────────
+    def test_singstar_90s_developer(self):
+        """SingStar '90s (SCUS-97636): dev=SCEE London Studio (was bare SCEE)."""
+        gi = self._ntsc("SingStar '90s (SCUS-97636)")
+        self.assertEqual(gi.developer, 'SCEE London Studio')
+
+    # ── SingStar '80s dev/pub ─────────────────────────────────────────────────
+    def test_singstar_80s_devpub(self):
+        """SingStar '80s: dev=SCEE London Studio, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc("SingStar '80s")
+        self.assertEqual(gi.developer, 'SCEE London Studio')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    def test_singstar_80s_with_microphones_devpub(self):
+        """SingStar '80s [with Microphones]: dev=SCEE London Studio, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc("SingStar '80s [with Microphones]")
+        self.assertEqual(gi.developer, 'SCEE London Studio')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── SingStar Amped publisher ──────────────────────────────────────────────
+    def test_singstar_amped_publisher(self):
+        """SingStar Amped: pub=Sony Computer Entertainment America (was empty)."""
+        gi = self._ntsc('SingStar Amped')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── Jak and Daxter: The Lost Frontier publisher ───────────────────────────
+    def test_jak_lost_frontier_publisher(self):
+        """Jak and Daxter: The Lost Frontier: pub=Sony Computer Entertainment America (was empty)."""
+        gi = self._ntsc('Jak and Daxter: The Lost Frontier')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
