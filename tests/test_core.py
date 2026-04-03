@@ -19751,3 +19751,111 @@ class TestWave104DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('Bass Strike')
         self.assertEqual(gi.developer, 'Pai Corporation, Ltd.')
         self.assertEqual(gi.publisher, 'THQ')
+
+
+class TestWave105DbAuditFixes(unittest.TestCase):
+    """Wave 105: 15 dev/pub attribution errors — 3 Omega Force/Koei swaps, Eutechnyx/2K,
+    Argonaut/Sierra, Equinoxe/Universal, PoV/Universal, Core Design/Eidos, Epic/Infogrames,
+    Beyond Games/Infogrames, Blitz/Infogrames, Mass Media/Namco, Taito/Acclaim,
+    Micro Cabin/Koei ×2."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── Omega Force / Koei swaps ──────────────────────────────────────────────
+    def test_dynasty_warriors_4_empires_devpub(self):
+        """Dynasty Warriors 4: Empires: dev=Omega Force, pub=Koei."""
+        gi = self._ntsc('Dynasty Warriors 4: Empires')
+        self.assertEqual(gi.developer, 'Omega Force')
+        self.assertEqual(gi.publisher, 'Koei')
+
+    def test_dynasty_warriors_5_devpub(self):
+        """Dynasty Warriors 5: dev=Omega Force, pub=Koei."""
+        gi = self._ntsc('Dynasty Warriors 5')
+        self.assertEqual(gi.developer, 'Omega Force')
+        self.assertEqual(gi.publisher, 'Koei')
+
+    def test_samurai_warriors_xtreme_legends_devpub(self):
+        """Samurai Warriors: Xtreme Legends: dev=Omega Force, pub=Koei."""
+        gi = self._ntsc('Samurai Warriors: Xtreme Legends')
+        self.assertEqual(gi.developer, 'Omega Force')
+        self.assertEqual(gi.publisher, 'Koei')
+
+    # ── Other dev/pub swaps ───────────────────────────────────────────────────
+    def test_ford_mustang_devpub(self):
+        """Ford Mustang: The Legend Lives: dev=Eutechnyx, Limited, pub=2K Games."""
+        gi = self._ntsc('Ford Mustang: The Legend Lives')
+        self.assertEqual(gi.developer, 'Eutechnyx, Limited')
+        self.assertEqual(gi.publisher, '2K Games')
+
+    def test_swat_global_strike_team_devpub(self):
+        """SWAT: Global Strike Team: dev=Argonaut Software Ltd., pub=Sierra Entertainment."""
+        gi = self._ntsc('SWAT: Global Strike Team')
+        self.assertEqual(gi.developer, 'Argonaut Software Ltd.')
+        self.assertEqual(gi.publisher, 'Sierra Entertainment')
+
+    def test_spyro_enter_dragonfly_devpub(self):
+        """Spyro: Enter the Dragonfly: dev=Equinoxe Digital Entertainment, pub=Universal Interactive."""
+        gi = self._ntsc('Spyro: Enter the Dragonfly')
+        self.assertEqual(gi.developer, 'Equinoxe Digital Entertainment')
+        self.assertEqual(gi.publisher, 'Universal Interactive')
+
+    def test_scorpion_king_devpub(self):
+        """The Scorpion King: Rise of the Akkadian: dev=Point of View, Inc., pub=Universal Interactive."""
+        gi = self._ntsc('The Scorpion King: Rise of the Akkadian')
+        self.assertEqual(gi.developer, 'Point of View, Inc.')
+        self.assertEqual(gi.publisher, 'Universal Interactive')
+
+    def test_thunderstrike_devpub(self):
+        """Thunderstrike: Operation Phoenix: dev=Core Design, pub=Eidos Interactive."""
+        gi = self._ntsc('Thunderstrike: Operation Phoenix')
+        self.assertEqual(gi.developer, 'Core Design')
+        self.assertEqual(gi.publisher, 'Eidos Interactive')
+
+    def test_unreal_tournament_devpub(self):
+        """Unreal Tournament: dev=Epic Games, pub=Infogrames."""
+        gi = self._ntsc('Unreal Tournament')
+        self.assertEqual(gi.developer, 'Epic Games')
+        self.assertEqual(gi.publisher, 'Infogrames')
+
+    def test_motor_mayhem_devpub(self):
+        """Vehicular Combat League Presents: Motor Mayhem: dev=Beyond Games, pub=Infogrames."""
+        gi = self._ntsc('Vehicular Combat League Presents: Motor Mayhem')
+        self.assertEqual(gi.developer, 'Beyond Games')
+        self.assertEqual(gi.publisher, 'Infogrames')
+
+    def test_zapper_devpub(self):
+        """Zapper: One Wicked Cricket: dev=Blitz Games, pub=Infogrames."""
+        gi = self._ntsc('Zapper: One Wicked Cricket')
+        self.assertEqual(gi.developer, 'Blitz Games')
+        self.assertEqual(gi.publisher, 'Infogrames')
+
+    def test_pacman_fever_devpub(self):
+        """Pac-Man Fever: dev=Mass Media Inc., pub=Namco."""
+        gi = self._ntsc('Pac-Man Fever')
+        self.assertEqual(gi.developer, 'Mass Media Inc.')
+        self.assertEqual(gi.publisher, 'Namco')
+
+    def test_super_bust_a_move_devpub(self):
+        """Super Bust-A-Move: dev=Taito Corporation, pub=Acclaim Entertainment."""
+        gi = self._ntsc('Super Bust-A-Move')
+        self.assertEqual(gi.developer, 'Taito Corporation')
+        self.assertEqual(gi.publisher, 'Acclaim Entertainment')
+
+    def test_naval_ops_commander_devpub(self):
+        """Naval Ops: Commander: dev=Micro Cabin Corporation, pub=Koei."""
+        gi = self._ntsc('Naval Ops: Commander')
+        self.assertEqual(gi.developer, 'Micro Cabin Corporation')
+        self.assertEqual(gi.publisher, 'Koei')
+
+    def test_naval_ops_warship_gunner_devpub(self):
+        """Naval Ops: Warship Gunner: dev=Micro Cabin Corporation, pub=Koei."""
+        gi = self._ntsc('Naval Ops: Warship Gunner')
+        self.assertEqual(gi.developer, 'Micro Cabin Corporation')
+        self.assertEqual(gi.publisher, 'Koei')
