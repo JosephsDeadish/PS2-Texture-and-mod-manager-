@@ -19859,3 +19859,91 @@ class TestWave105DbAuditFixes(unittest.TestCase):
         gi = self._ntsc('Naval Ops: Warship Gunner')
         self.assertEqual(gi.developer, 'Micro Cabin Corporation')
         self.assertEqual(gi.publisher, 'Koei')
+
+
+class TestWave106DbAuditFixes(unittest.TestCase):
+    """Wave 106: CRC duplicate fix (D6F4BE78 removed from Ape Escape 2) and 8 Sony
+    developer attribution errors — Ape Escape 2, Flipnic, Hot Shots Golf 3 (dev/pub
+    swap), MLB 2005, Rise To Honor, Siren, World Tour Soccer 2005/2006."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+        with open(os.path.join(os.path.dirname(__file__),
+                               '..', 'data', 'game_serial_db', 'ps2_ntsc_u.json')) as f:
+            import json as _json
+            self.ntsc_db = _json.load(f)
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── CRC fix ──────────────────────────────────────────────────────────────
+    def test_ape_escape_2_does_not_have_d6f4be78(self):
+        """D6F4BE78 belongs to Samurai Warriors (SLUS-20878), not Ape Escape 2 (SLUS-20685)."""
+        g = self.ntsc_db['games'].get('Ape Escape 2', {})
+        self.assertNotIn('D6F4BE78', g.get('crcs', []),
+                         "D6F4BE78 must be removed from Ape Escape 2")
+
+    def test_ape_escape_2_valid_crcs_retained(self):
+        """Ape Escape 2 must retain its three verified CRCs."""
+        g = self.ntsc_db['games'].get('Ape Escape 2', {})
+        for crc in ('8B7C6617', 'B5B7C4AF', 'BDD9F5E1'):
+            self.assertIn(crc, g.get('crcs', []),
+                          f"CRC {crc} must remain in Ape Escape 2")
+
+    # ── Ape Escape 2 developer ────────────────────────────────────────────────
+    def test_ape_escape_2_developer(self):
+        """Ape Escape 2: dev=Sony Computer Entertainment Japan, pub=Ubisoft."""
+        gi = self._ntsc('Ape Escape 2')
+        self.assertEqual(gi.developer, 'Sony Computer Entertainment Japan')
+        self.assertEqual(gi.publisher, 'Ubisoft')
+
+    # ── Hot Shots Golf 3 dev/pub swap ─────────────────────────────────────────
+    def test_hot_shots_golf_3_devpub(self):
+        """Hot Shots Golf 3: dev=Clap Hanz, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('Hot Shots Golf 3')
+        self.assertEqual(gi.developer, 'Clap Hanz')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── MLB 2005 developer ────────────────────────────────────────────────────
+    def test_mlb_2005_developer(self):
+        """MLB 2005: dev=989 Sports, pub=989 Sports."""
+        gi = self._ntsc('MLB 2005')
+        self.assertEqual(gi.developer, '989 Sports')
+        self.assertEqual(gi.publisher, '989 Sports')
+
+    # ── Rise to Honor dev/pub ─────────────────────────────────────────────────
+    def test_rise_to_honor_devpub(self):
+        """Rise To Honor: dev=SCE Studio Shanghai, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('Rise To Honor')
+        self.assertEqual(gi.developer, 'SCE Studio Shanghai')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── Siren dev/pub ─────────────────────────────────────────────────────────
+    def test_siren_devpub(self):
+        """Siren: dev=Sony Computer Entertainment Japan, pub=Sony Computer Entertainment America."""
+        gi = self._ntsc('Siren')
+        self.assertEqual(gi.developer, 'Sony Computer Entertainment Japan')
+        self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+    # ── Flipnic developer ─────────────────────────────────────────────────────
+    def test_flipnic_developer(self):
+        """Flipnic: Ultimate Pinball: dev=Sony Computer Entertainment Japan, pub=Capcom."""
+        gi = self._ntsc('Flipnic: Ultimate Pinball')
+        self.assertEqual(gi.developer, 'Sony Computer Entertainment Japan')
+        self.assertEqual(gi.publisher, 'Capcom')
+
+    # ── World Tour Soccer 2005/2006 dev/pub ──────────────────────────────────
+    def test_world_tour_soccer_2005_devpub(self):
+        """World Tour Soccer 2005: dev=SCEE London Studio, pub=989 Sports."""
+        gi = self._ntsc('World Tour Soccer 2005')
+        self.assertEqual(gi.developer, 'SCEE London Studio')
+        self.assertEqual(gi.publisher, '989 Sports')
+
+    def test_world_tour_soccer_2006_devpub(self):
+        """World Tour Soccer 2006: dev=SCEE London Studio, pub=989 Sports."""
+        gi = self._ntsc('World Tour Soccer 2006')
+        self.assertEqual(gi.developer, 'SCEE London Studio')
+        self.assertEqual(gi.publisher, '989 Sports')
