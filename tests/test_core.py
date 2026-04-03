@@ -8682,8 +8682,10 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         )
 
     def test_gran_turismo_4_prologue_has_metadata(self):
-        """Wave 46: Gran Turismo 4 Prologue should have developer Polyphony Digital."""
-        self._assert_metadata("Gran Turismo 4 Prologue", "developer", "Polyphony Digital")
+        """Wave 46: Gran Turismo 4 Prologue (PAL) should have developer Polyphony Digital."""
+        # Wave 101: GT4 Prologue is PAL-only; the NTSC-U entry was removed.
+        self._assert_metadata("Gran Turismo 4: Prologue (PAL)", "developer", "Polyphony Digital",
+                              db=self.pal_data)
 
     def test_incredibles_has_release_date(self):
         """Wave 46: Incredibles (PAL) should have release_date from PS2.data.json."""
@@ -8726,8 +8728,8 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("ESPN NBA 2Night (PAL)", "release_date", "2001", db=self.pal_data)
 
     def test_serial_db_wave46_game_count(self):
-        """Wave 46: serial DB should have at least 2206 games (Wave 95 cleanup; was 2288)."""
-        self.assertGreaterEqual(len(self.data), 2206)
+        """Wave 46: serial DB should have at least 2204 games (Wave 101: removed 2 misplaced PAL entries)."""
+        self.assertGreaterEqual(len(self.data), 2204)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8815,8 +8817,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2206 games (Wave 95 cleanup; was 2291)."""
-        self.assertGreaterEqual(len(self.games), 2206)
+        """Wave 47: serial DB should have at least 2204 games (Wave 101: removed 2 misplaced PAL entries)."""
+        self.assertGreaterEqual(len(self.games), 2204)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9154,9 +9156,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
+        """Wave 49: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
         self.assertEqual(
-            len(self.games), 2206,
+            len(self.games), 2204,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9377,8 +9379,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2206)
+        """Wave 50: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
+        self.assertEqual(len(self.raw_games), 2204)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9582,8 +9584,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2206)
+        """Wave 51: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
+        self.assertEqual(len(self.raw_games), 2204)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9770,8 +9772,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2206 (Wave 95 cleanup; was 2292)."""
-        self.assertEqual(len(self.raw_games), 2206)
+        """Wave 52: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
+        self.assertEqual(len(self.raw_games), 2204)
 
 
 # ===========================================================================
@@ -19151,3 +19153,98 @@ class TestWave100DbMetadataFixes(unittest.TestCase):
         self.assertNotIn('Co., Ltd.', dev)
         self.assertIn('Konami Computer Entertainment Japan', dev)
         self.assertIn('Winky Soft', dev)
+
+
+class TestWave101DbAuditFixes(unittest.TestCase):
+    """Wave 101: Killer 7 misplaced entry, GT4 Prologue DB fix, ~34 dev/pub swaps."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+        import json, os
+        pal_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'game_serial_db', 'ps2_pal.json')
+        with open(pal_path) as f:
+            self.pal_games = json.load(f)['games']
+
+    def _ntsc(self, title):
+        gi = self.sdb._games.get(title)
+        self.assertIsNotNone(gi, f"{title!r} not found in NTSC-U DB")
+        return gi
+
+    # ── Killer 7 ─────────────────────────────────────────────────────────────
+    def test_killer7_not_in_ntsc_u(self):
+        """Killer 7 PS2 CRC/serial is PAL-only (SLES-53366); wrong PAL-serial entry removed from NTSC-U."""
+        # The entry with SCES-53366 (wrong PAL prefix) was removed; PAL DB has the correct entry.
+        self.assertNotIn('Killer 7', self.sdb._games)
+
+    def test_killer7_pal_entry_correct(self):
+        """PAL DB 'Killer 7 (PAL)' must have serial SLES-53366."""
+        entry = self.pal_games.get('Killer 7 (PAL)', {})
+        self.assertEqual(entry.get('serial'), 'SLES-53366')
+
+    # ── GT4 Prologue removed from NTSC-U ─────────────────────────────────────
+    def test_gt4_prologue_not_in_ntsc_u(self):
+        """Gran Turismo 4 Prologue was never released in NA; must not be in NTSC-U DB."""
+        self.assertNotIn('Gran Turismo 4 Prologue', self.sdb._games)
+
+    def test_gt4_prologue_pal_alt_serial(self):
+        """PAL DB GT4 Prologue entry must include SCES-52438 as alt_serial."""
+        entry = self.pal_games.get('Gran Turismo 4: Prologue (PAL)', {})
+        alts = entry.get('alt_serials', [])
+        self.assertIn('SCES-52438', alts, "SCES-52438 must be an alt_serial for GT4 Prologue PAL")
+
+    # ── Tony Hawk dev/pub swaps ───────────────────────────────────────────────
+    def test_thps3_developer(self):
+        """THPS3: developer must be Neversoft Entertainment (not Activision)."""
+        gi = self._ntsc("Tony Hawk's Pro Skater 3")
+        self.assertEqual(gi.developer, 'Neversoft Entertainment')
+        self.assertEqual(gi.publisher, 'Activision')
+
+    def test_thps4_developer(self):
+        """THPS4: developer must be Neversoft Entertainment (not Activision)."""
+        gi = self._ntsc("Tony Hawk's Pro Skater 4")
+        self.assertEqual(gi.developer, 'Neversoft Entertainment')
+        self.assertEqual(gi.publisher, 'Activision')
+
+    # ── Other dev/pub swaps ───────────────────────────────────────────────────
+    def test_star_wars_battlefront_ii_devpub(self):
+        """Star Wars: Battlefront II dev=Pandemic, pub=LucasArts."""
+        gi = self._ntsc('Star Wars: Battlefront II')
+        self.assertEqual(gi.developer, 'Pandemic Studios')
+        self.assertEqual(gi.publisher, 'LucasArts')
+
+    def test_dark_summit_devpub(self):
+        """Dark Summit dev=Radical Entertainment, pub=THQ."""
+        gi = self._ntsc('Dark Summit')
+        self.assertEqual(gi.developer, 'Radical Entertainment')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_alter_echo_devpub(self):
+        """Alter Echo dev=Outrage Games, pub=THQ."""
+        gi = self._ntsc('Alter Echo')
+        self.assertEqual(gi.developer, 'Outrage Games')
+        self.assertEqual(gi.publisher, 'THQ')
+
+    def test_atari_anthology_devpub(self):
+        """Atari Anthology dev=Digital Eclipse, pub=Atari."""
+        gi = self._ntsc('Atari Anthology')
+        self.assertEqual(gi.developer, 'Digital Eclipse Software, Inc.')
+        self.assertEqual(gi.publisher, 'Atari')
+
+    def test_cabelas_bgh_devpub(self):
+        """Cabela's Big Game Hunter dev=Sand Grain, pub=Activision."""
+        gi = self._ntsc("Cabela's Big Game Hunter")
+        self.assertEqual(gi.developer, 'Sand Grain Studios')
+        self.assertEqual(gi.publisher, 'Activision')
+
+    def test_nhl_hitz_2002_devpub(self):
+        """NHL Hitz 2002 dev=Black Box Games, pub=Midway."""
+        gi = self._ntsc('NHL Hitz 2002')
+        self.assertEqual(gi.developer, 'Black Box Games Ltd.')
+        self.assertEqual(gi.publisher, 'Midway')
+
+    def test_nhl_hitz_pro_devpub(self):
+        """NHL Hitz Pro dev=Next Level Games, pub=Midway."""
+        gi = self._ntsc('NHL Hitz Pro')
+        self.assertEqual(gi.developer, 'Next Level Games')
+        self.assertEqual(gi.publisher, 'Midway')

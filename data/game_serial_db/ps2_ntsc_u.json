@@ -1444,14 +1444,6 @@
         "GT4"
       ]
     },
-    "Gran Turismo 4 Prologue": {
-      "serial": "SCES-52438",
-      "alt_serials": [],
-      "release_date": "2004-05-26",
-      "developer": "Polyphony Digital",
-      "publisher": "Sony Computer Entertainment Europe",
-      "genre": "Racing"
-    },
     "Grand Theft Auto III": {
       "serial": "SLUS-20062",
       "alt_serials": [],
@@ -3716,8 +3708,8 @@
         "249540F3"
       ],
       "release_date": "2005-11-01",
-      "developer": "LucasArts",
-      "publisher": "Pandemic Studios",
+      "developer": "Pandemic Studios",
+      "publisher": "LucasArts",
       "genre": "Third-person Shooter",
       "aliases": [
         "BF2",
@@ -4078,8 +4070,8 @@
         "77DEA027"
       ],
       "release_date": "2001-10-31",
-      "developer": "Activision",
-      "publisher": "Neversoft Entertainment",
+      "developer": "Neversoft Entertainment",
+      "publisher": "Activision",
       "genre": "Sports",
       "crc_labels": {
         "20E7CC63": "v1.00",
@@ -4091,8 +4083,8 @@
       "serial": "SLUS-20504",
       "alt_serials": [],
       "release_date": "2002-10-24",
-      "developer": "Activision",
-      "publisher": "Neversoft Entertainment",
+      "developer": "Neversoft Entertainment",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Tony Hawk's Project 8": {
@@ -5323,13 +5315,6 @@
       "publisher": "Atlus USA",
       "genre": "Action, Beat'em Up"
     },
-    "Killer 7": {
-      "serial": "SCES-53366",
-      "alt_serials": [],
-      "crcs": [
-        "54EF429A"
-      ]
-    },
     "Zathura": {
       "serial": "SLUS-21336",
       "alt_serials": [],
@@ -5648,8 +5633,8 @@
         "E2CC1613"
       ],
       "release_date": "2001-09-27",
-      "developer": "Midway",
-      "publisher": "Black Box Games Ltd.",
+      "developer": "Black Box Games Ltd.",
+      "publisher": "Midway",
       "genre": "Sports"
     },
     "Cart Fury Championship Racing": {
@@ -5758,8 +5743,8 @@
         "10BB2872"
       ],
       "release_date": "2002-10-23",
-      "developer": "Midway",
-      "publisher": "7 Studios",
+      "developer": "7 Studios",
+      "publisher": "Midway",
       "genre": "Action"
     },
     "Dragon Rage": {
@@ -5842,8 +5827,8 @@
         "7FBCDA34"
       ],
       "release_date": "2001-11-14",
-      "developer": "Namco",
-      "publisher": "WOW Entertainment",
+      "developer": "WOW Entertainment",
+      "publisher": "Namco",
       "genre": "Light Gun Shooter"
     },
     "Splashdown": {
@@ -6019,8 +6004,8 @@
         "F26B83E0"
       ],
       "release_date": "2001-11-29",
-      "developer": "THQ",
-      "publisher": "Radical Entertainment",
+      "developer": "Radical Entertainment",
+      "publisher": "THQ",
       "genre": "Sports"
     },
     "Hidden Invasion": {
@@ -6334,8 +6319,8 @@
         "7CDC2C16"
       ],
       "release_date": "2003-08-12",
-      "developer": "THQ",
-      "publisher": "Outrage Games",
+      "developer": "Outrage Games",
+      "publisher": "THQ",
       "genre": "Action-Adventure"
     },
     "Dual Hearts": {
@@ -6400,8 +6385,8 @@
         "946C6967"
       ],
       "release_date": "2003-06-26",
-      "developer": "Midway",
-      "publisher": "Deibus Studios",
+      "developer": "Deibus Studios",
+      "publisher": "Midway",
       "genre": "Racing"
     },
     "Battle Engine Aquila": {
@@ -7459,8 +7444,8 @@
         "DF6BC54F"
       ],
       "release_date": "2004-08-31",
-      "developer": "Activision",
-      "publisher": "Sand Grain Studios",
+      "developer": "Sand Grain Studios",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Outlaw Golf 2": {
@@ -7558,8 +7543,8 @@
         "95BB1901"
       ],
       "release_date": "2005-03-16",
-      "developer": "THQ",
-      "publisher": "Rainbow Studios",
+      "developer": "Rainbow Studios",
+      "publisher": "THQ",
       "genre": "Racing"
     },
     "Tom Clancy's Ghost Recon 2": {
@@ -8309,8 +8294,8 @@
         "E32DCF24"
       ],
       "release_date": "2003-12-02",
-      "developer": "Atari",
-      "publisher": "Artech Studios",
+      "developer": "Artech Studios",
+      "publisher": "Atari",
       "genre": "Adventure"
     },
     "Worms 3D": {
@@ -8639,8 +8624,8 @@
         "80E9B7EF"
       ],
       "release_date": "2001-10-24",
-      "developer": "Activision",
-      "publisher": "EXAKT Entertainment, LLC.",
+      "developer": "EXAKT Entertainment, LLC.",
+      "publisher": "Activision",
       "genre": "Racing"
     },
     "Red Faction": {
@@ -8877,8 +8862,8 @@
         "66B7B74E"
       ],
       "release_date": "2002-05-03",
-      "developer": "Atari",
-      "publisher": "Angel Studios",
+      "developer": "Angel Studios",
+      "publisher": "Atari",
       "genre": "Sports"
     },
     "Blade II": {
@@ -9237,8 +9222,8 @@
         "B993C212"
       ],
       "release_date": "2004-09-02",
-      "developer": "Atari",
-      "publisher": "Paradigm Entertainment, Inc.",
+      "developer": "Paradigm Entertainment, Inc.",
+      "publisher": "Atari",
       "genre": "Action"
     },
     "BloodRayne 2": {
@@ -12922,8 +12907,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-04-14",
-      "developer": "Activision",
-      "publisher": "Gene Pool Software",
+      "developer": "Gene Pool Software",
+      "publisher": "Activision",
       "genre": "Action"
     },
     "Sega Bass Fishing Duel": {
@@ -13045,8 +13030,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-11-04",
-      "developer": "Atari",
-      "publisher": "Cyberlore Studios, Inc.",
+      "developer": "Cyberlore Studios, Inc.",
+      "publisher": "Atari",
       "genre": "Adventure"
     },
     "Antz Extreme Racing": {
@@ -13135,8 +13120,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-10-01",
-      "developer": "THQ",
-      "publisher": "Beyond Games",
+      "developer": "Beyond Games",
+      "publisher": "THQ",
       "genre": "Racing"
     },
     "BMX XXX": {
@@ -13153,8 +13138,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-06-05",
-      "developer": "Activision",
-      "publisher": "Shaba Games, Inc.",
+      "developer": "Shaba Games, Inc.",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Star Wars: Bounty Hunter": {
@@ -13421,8 +13406,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-10-23",
-      "developer": "Atari",
-      "publisher": "Eden Studios",
+      "developer": "Eden Studios",
+      "publisher": "Atari",
       "genre": "Racing"
     },
     "Auto Modellista (SLUS-20498)": {
@@ -13555,8 +13540,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2002-11-21",
-      "developer": "Activision",
-      "publisher": "Sand Grain Studios",
+      "developer": "Sand Grain Studios",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "NBA Live 2003": {
@@ -13995,8 +13980,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-08-27",
-      "developer": "Activision",
-      "publisher": "Sand Grain Studios",
+      "developer": "Sand Grain Studios",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Cyber Troopers: Virtual-On Marz": {
@@ -14039,8 +14024,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-08-05",
-      "developer": "THQ",
-      "publisher": "Rainbow Studios",
+      "developer": "Rainbow Studios",
+      "publisher": "THQ",
       "genre": "Racing"
     },
     "NHL Hitz Pro": {
@@ -14048,8 +14033,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-09-23",
-      "developer": "Midway",
-      "publisher": "Next Level Games",
+      "developer": "Next Level Games",
+      "publisher": "Midway",
       "genre": "Sports"
     },
     "Nickelodeon Jimmy Neutron: Boy Genius: Jet Fusion": {
@@ -14057,8 +14042,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-09-15",
-      "developer": "THQ",
-      "publisher": "Krome Studios",
+      "developer": "Krome Studios",
+      "publisher": "THQ",
       "genre": "Action"
     },
     "SD Gundam Force: Showdown!": {
@@ -14206,8 +14191,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-11-11",
-      "developer": "Activision",
-      "publisher": "Sand Grain Studios",
+      "developer": "Sand Grain Studios",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Hot Wheels: World Race": {
@@ -14364,8 +14349,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2003-10-28",
-      "developer": "Atari",
-      "publisher": "Artech Studios",
+      "developer": "Artech Studios",
+      "publisher": "Atari",
       "genre": "Adventure"
     },
     "Trivial Pursuit: Unhinged": {
@@ -14685,8 +14670,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-03-23",
-      "developer": "Atari",
-      "publisher": "Humongous Entertainment",
+      "developer": "Humongous Entertainment",
+      "publisher": "Atari",
       "genre": "Sports"
     },
     "Asterix & Obelix: Kick Buttix": {
@@ -14825,8 +14810,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-08-24",
-      "developer": "Atari",
-      "publisher": "Monster Games, Inc.",
+      "developer": "Monster Games, Inc.",
+      "publisher": "Atari",
       "genre": "Racing"
     },
     "Suzuki TT Superbikes: Real Road Racing": {
@@ -14906,8 +14891,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-02",
-      "developer": "Atari",
-      "publisher": "High Voltage Software, Inc.",
+      "developer": "High Voltage Software, Inc.",
+      "publisher": "Atari",
       "genre": "Adventure"
     },
     "Time Crisis: Crisis Zone": {
@@ -15210,8 +15195,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-09",
-      "developer": "Activision",
-      "publisher": "Sand Grain Studios",
+      "developer": "Sand Grain Studios",
+      "publisher": "Activision",
       "genre": "Sports"
     },
     "Madden NFL 2005 (SLUS-21025)": {
@@ -15381,8 +15366,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-23",
-      "developer": "Activision",
-      "publisher": "Creat Studio, LLC",
+      "developer": "Creat Studio, LLC",
+      "publisher": "Activision",
       "genre": "Racing"
     },
     "Final Fantasy XI: Online: Chains of Promathia": {
@@ -15426,8 +15411,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-30",
-      "developer": "Atari",
-      "publisher": "Digital Eclipse Software, Inc."
+      "developer": "Digital Eclipse Software, Inc.",
+      "publisher": "Atari"
     },
     "Samurai Warriors: Xtreme Legends": {
       "serial": "SLUS-21080",
@@ -15888,8 +15873,8 @@
       "alt_serials": [],
       "crcs": [],
       "release_date": "2005-11-01",
-      "developer": "Activision",
-      "publisher": "Shaba Games, Inc.",
+      "developer": "Shaba Games, Inc.",
+      "publisher": "Activision",
       "genre": "Action"
     },
     "Victorious Boxers 2: Fighting Spirit": {

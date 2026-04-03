@@ -544,7 +544,9 @@
       "serial": "SCES-51719"
     },
     "Gran Turismo 4: Prologue (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SCES-52438"
+      ],
       "crcs": [],
       "developer": "Polyphony Digital",
       "genre": "Racing",
