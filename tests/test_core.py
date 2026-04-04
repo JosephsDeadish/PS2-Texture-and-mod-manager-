@@ -15168,16 +15168,16 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_game("76A68274", "Virtua Cop: Elite Edition (SLES-51229)")
 
     def test_e09e454c_dqv_game_name(self):
-        """E09E454C: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65515)")
+        """E09E454C: game name updated to include corrected serial (SLPM-65555, corrected in Wave 120)."""
+        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65555)")
 
     def test_f26af996_smugglers_run2_game_name(self):
         """F26AF996: game name updated to include serial (resolved in Wave 75)."""
         self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
 
     def test_02e1970f_sega_ages_26_game_name(self):
-        """02E1970F: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol.26: Dynamite Deka (SLPM-62517)")
+        """02E1970F: game name updated to include corrected serial (SLPM-62717, corrected in Wave 120)."""
+        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol. 26: Dynamite Deka (SLPM-62717)")
 
     # ------------------------------------------------------------------
     # PAL DB: new entries presence + serials
@@ -15412,13 +15412,13 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("F26AF996")), 5)
 
     def test_e09e454c_dqv_serial(self):
-        """E09E454C: all 9 entries must have game_serial SLPM-65515."""
-        self._assert_crc_serial("E09E454C", "SLPM-65515")
+        """E09E454C: all 9 entries must have game_serial SLPM-65555 (corrected in Wave 120; SLPM-65515 = Sakura Taisen Monogatari)."""
+        self._assert_crc_serial("E09E454C", "SLPM-65555")
         self.assertEqual(len(self._crc_entries("E09E454C")), 9)
 
     def test_02e1970f_sega_ages_serial(self):
-        """02E1970F: the 1 entry must have game_serial SLPM-62517."""
-        self._assert_crc_serial("02E1970F", "SLPM-62517")
+        """02E1970F: the 1 entry must have game_serial SLPM-62717 (corrected in Wave 120; SLPM-62517 = Winning Post 5)."""
+        self._assert_crc_serial("02E1970F", "SLPM-62717")
         self.assertEqual(len(self._crc_entries("02E1970F")), 1)
 
     # ------------------------------------------------------------------
@@ -15450,12 +15450,12 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
 
     def test_e09e454c_dqv_game_name(self):
-        """E09E454C: game name must include serial."""
-        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65515)")
+        """E09E454C: game name must include corrected serial (SLPM-65555)."""
+        self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65555)")
 
     def test_02e1970f_sega_ages_game_name(self):
-        """02E1970F: game name must include serial."""
-        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol.26: Dynamite Deka (SLPM-62517)")
+        """02E1970F: game name must include corrected serial (SLPM-62717)."""
+        self._assert_crc_game("02E1970F", "Sega Ages 2500 Series Vol. 26: Dynamite Deka (SLPM-62717)")
 
     # ------------------------------------------------------------------
     # PAL/Japan DB: new entries
@@ -15498,18 +15498,16 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertIn("F26AF996", g.get('crcs', []))
 
     def test_pal_db_dqv_japan_entry(self):
-        """Wave 75 / Wave 114: Dragon Quest V Japan entry with serial SLPM-65515 is in Japan DB."""
-        g = self.jp_db['games'].get("Dragon Quest V: Hand of the Heavenly Bride (Japan)", {})
-        self.assertEqual(g.get('serial'), "SLPM-65515")
-        self.assertIn("E09E454C", g.get('crcs', []))
+        """Wave 75 / Wave 120: Dragon Quest V Japan entry (corrected serial SLPM-65555) is in Japan DB."""
+        g = self.jp_db['games'].get("Dragon Quest V: Tenkuu no Hanayome (JP)", {})
+        self.assertEqual(g.get('serial'), "SLPM-65555")
 
     def test_pal_db_sega_ages_26_entry(self):
-        """Wave 75 / Wave 114: Sega Ages 2500 Vol.26 Japan entry with serial SLPM-62517 is in Japan DB."""
+        """Wave 75 / Wave 120: Sega Ages 2500 Vol.26 Japan entry (corrected serial SLPM-62717) is in Japan DB."""
         g = self.jp_db['games'].get(
-            "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)", {}
+            "Sega Ages 2500 Series Vol. 26: Dynamite Deka (JP)", {}
         )
-        self.assertEqual(g.get('serial'), "SLPM-62517")
-        self.assertIn("02E1970F", g.get('crcs', []))
+        self.assertEqual(g.get('serial'), "SLPM-62717")
 
     # ------------------------------------------------------------------
     # Zero empty serials remaining
@@ -18821,7 +18819,7 @@ class TestWave97GameIdentity(unittest.TestCase):
     def test_game_info_region_ntsc_j(self):
         from src.core.serial_validator import SerialDatabase
         sdb = SerialDatabase()
-        gi = sdb.info_for_serial("SLPM-65515")  # Dragon Quest V JP
+        gi = sdb.info_for_serial("SLPM-65555")  # Dragon Quest V JP
         self.assertIsNotNone(gi)
         self.assertEqual(gi.region, "NTSC-J")
 
@@ -21129,22 +21127,14 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._date('ATV Offroad Fury 3: Greatest Hits (SCUS-97514)'), '2004-11-02')
 
 
-class TestWave115JapanDbExpansion(unittest.TestCase):
-    """Wave 115: Fix test breakage caused by Wave 114 JP migration (DQV/Sega Ages
-    CRCs added to ps2_japan.json; Wave 75/108 tests updated to use Japan DB),
-    and expand ps2_japan.json with 10 well-known JP-exclusive/JP-original titles.
 
-    New entries added to ps2_japan.json:
-      Final Fantasy X-2 (JP)               SLPS-25294  Square Enix       2003-03-13
-      Persona 3 FES (JP)                   SLPM-66696  Atlus             2007-04-19
-      Katamari Damacy (JP)                 SLPS-25252  Namco             2004-03-18
-      We Love Katamari (JP)                SLPS-25543  Namco             2005-07-07
-      Yakuza (JP)                          SLPM-66456  Sega              2005-12-08
-      Yakuza 2 (JP)                        SLPM-66526  Sega              2006-12-07
-      Makai Senki Disgaea (JP)             SLPS-25180  Nippon Ichi       2003-01-30
-      Valkyrie Profile 2: Silmeria (JP)    SLPS-25725  Square Enix       2006-06-22
-      Armored Core: Silent Line (JP)       SLPS-25230  FromSoftware      2003-07-10
-      Monster Hunter 2 (JP)                SLPM-66280  Capcom            2006-02-16
+
+class TestWave120JapanDbRebuild(unittest.TestCase):
+    """Wave 120: Rebuild ps2_japan.json from scratch using authoritative source files
+    (PS2.data.json, PS2.titles.json) attached to issue #13.
+
+    All 86 entries previously in the DB that had wrong serials have been corrected.
+    Only serials verified against PS2.data.json / PS2.titles.json are included.
     """
 
     @classmethod
@@ -21154,1004 +21144,366 @@ class TestWave115JapanDbExpansion(unittest.TestCase):
         jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
         cls.jp = json.loads(jp_path.read_text())["games"]
 
-    # ── JP DB count ───────────────────────────────────────────────────────────
+    # ── Count ──────────────────────────────────────────────────────────────────
 
     def test_jp_db_count(self):
-        """Wave 115: Japan DB has at least 66 entries after 10 new additions."""
-        self.assertGreaterEqual(len(self.jp), 66)
+        """Wave 120: Japan DB has at least 88 entries (all verified serials)."""
+        self.assertGreaterEqual(len(self.jp), 88)
 
-    # ── Final Fantasy X-2 ────────────────────────────────────────────────────
+    # ── Serial correctness: spot-check verified entries ───────────────────────
 
-    def test_ffx2_jp_present(self):
-        """Wave 115: Final Fantasy X-2 (JP) is in Japan DB."""
-        self.assertIn("Final Fantasy X-2 (JP)", self.jp)
+    def _serial(self, title):
+        return self.jp.get(title, {}).get("serial")
 
-    def test_ffx2_jp_serial(self):
-        """Wave 115: Final Fantasy X-2 (JP) serial=SLPS-25294."""
-        self.assertEqual(self.jp["Final Fantasy X-2 (JP)"]["serial"], "SLPS-25294")
+    # SCEJ / Sony titles
+    def test_ico_serial(self):
+        self.assertEqual(self._serial("Ico (JP)"), "SCPS-11003")
 
-    def test_ffx2_jp_publisher(self):
-        """Wave 115: Final Fantasy X-2 (JP) publisher=Square Enix."""
-        self.assertEqual(self.jp["Final Fantasy X-2 (JP)"]["publisher"], "Square Enix")
+    def test_dark_cloud_serial(self):
+        self.assertEqual(self._serial("Dark Cloud (JP)"), "SCPS-15004")
 
-    # ── Persona 3 FES ────────────────────────────────────────────────────────
+    def test_dark_chronicle_serial(self):
+        self.assertEqual(self._serial("Dark Chronicle (JP)"), "SCPS-15033")
 
-    def test_persona3_fes_jp_present(self):
-        """Wave 115: Persona 3 FES (JP) is in Japan DB."""
-        self.assertIn("Persona 3 FES (JP)", self.jp)
+    def test_ratchet_clank_serial(self):
+        self.assertEqual(self._serial("Ratchet & Clank (JP)"), "SCPS-15037")
 
-    def test_persona3_fes_jp_serial(self):
-        """Wave 115: Persona 3 FES (JP) serial=SLPM-66696."""
-        self.assertEqual(self.jp["Persona 3 FES (JP)"]["serial"], "SLPM-66696")
+    def test_siren_serial(self):
+        self.assertEqual(self._serial("Siren (JP)"), "SCPS-15053")
 
-    def test_persona3_fes_jp_developer(self):
-        """Wave 115: Persona 3 FES (JP) developer=Atlus."""
-        self.assertEqual(self.jp["Persona 3 FES (JP)"]["developer"], "Atlus")
+    def test_shadow_of_the_colossus_serial(self):
+        self.assertEqual(self._serial("Shadow of the Colossus (JP)"), "SCPS-15097")
 
-    # ── Katamari Damacy ──────────────────────────────────────────────────────
+    def test_rogue_galaxy_serial(self):
+        self.assertEqual(self._serial("Rogue Galaxy (JP)"), "SCPS-15102")
 
-    def test_katamari_damacy_jp_present(self):
-        """Wave 115: Katamari Damacy (JP) is in Japan DB."""
-        self.assertIn("Katamari Damacy (JP)", self.jp)
+    def test_forbidden_siren_2_serial(self):
+        self.assertEqual(self._serial("Forbidden Siren 2 (JP)"), "SCPS-15106")
 
-    def test_katamari_damacy_jp_serial(self):
-        """Wave 115: Katamari Damacy (JP) serial=SLPS-25252."""
-        self.assertEqual(self.jp["Katamari Damacy (JP)"]["serial"], "SLPS-25252")
+    # Konami titles
+    def test_mgs2_serial(self):
+        self.assertEqual(self._serial("Metal Gear Solid 2: Sons of Liberty (JP)"), "SLPM-65078")
 
-    # ── We Love Katamari ─────────────────────────────────────────────────────
+    def test_mgs3_serial(self):
+        self.assertEqual(self._serial("Metal Gear Solid 3: Snake Eater (JP)"), "SLPM-65790")
 
-    def test_we_love_katamari_jp_present(self):
-        """Wave 115: We Love Katamari (JP) is in Japan DB."""
-        self.assertIn("We Love Katamari (JP)", self.jp)
+    def test_silent_hill_3_serial(self):
+        self.assertEqual(self._serial("Silent Hill 3 (JP)"), "SLPM-65257")
 
-    def test_we_love_katamari_jp_serial(self):
-        """Wave 115: We Love Katamari (JP) serial=SLPS-25543."""
-        self.assertEqual(self.jp["We Love Katamari (JP)"]["serial"], "SLPS-25543")
+    def test_zone_of_the_enders_serial(self):
+        self.assertEqual(self._serial("Zone of the Enders (JP)"), "SLPM-65019")
 
-    # ── Yakuza ───────────────────────────────────────────────────────────────
+    def test_zone_of_the_enders_2nd_runner_serial(self):
+        self.assertEqual(self._serial("Zone of the Enders: The 2nd Runner (JP)"), "SLPM-65236")
 
-    def test_yakuza_jp_present(self):
-        """Wave 115: Yakuza (JP) is in Japan DB."""
-        self.assertIn("Yakuza (JP)", self.jp)
+    def test_gradius_v_serial(self):
+        self.assertEqual(self._serial("Gradius V (JP)"), "SLPM-62462")
 
-    def test_yakuza_jp_serial(self):
-        """Wave 115: Yakuza (JP) serial=SLPM-66456."""
-        self.assertEqual(self.jp["Yakuza (JP)"]["serial"], "SLPM-66456")
+    # Capcom titles
+    def test_devil_may_cry_serial(self):
+        self.assertEqual(self._serial("Devil May Cry (JP)"), "SLPM-65038")
 
-    def test_yakuza_jp_publisher(self):
-        """Wave 115: Yakuza (JP) publisher=Sega."""
-        self.assertEqual(self.jp["Yakuza (JP)"]["publisher"], "Sega")
+    def test_devil_may_cry_2_serial(self):
+        self.assertEqual(self._serial("Devil May Cry 2 (JP)"), "SLPM-65232")
 
-    # ── Yakuza 2 ─────────────────────────────────────────────────────────────
+    def test_devil_may_cry_3_serial(self):
+        self.assertEqual(self._serial("Devil May Cry 3 (JP)"), "SLPM-65880")
 
-    def test_yakuza2_jp_present(self):
-        """Wave 115: Yakuza 2 (JP) is in Japan DB."""
-        self.assertIn("Yakuza 2 (JP)", self.jp)
+    def test_onimusha_warlords_serial(self):
+        self.assertEqual(self._serial("Onimusha: Warlords (JP)"), "SLPM-65010")
 
-    def test_yakuza2_jp_serial(self):
-        """Wave 115: Yakuza 2 (JP) serial=SLPM-66526."""
-        self.assertEqual(self.jp["Yakuza 2 (JP)"]["serial"], "SLPM-66526")
+    def test_onimusha_2_serial(self):
+        self.assertEqual(self._serial("Onimusha 2: Samurai's Destiny (JP)"), "SLPM-65101")
 
-    # ── Makai Senki Disgaea ───────────────────────────────────────────────────
+    def test_onimusha_3_serial(self):
+        self.assertEqual(self._serial("Onimusha 3 (JP)"), "SLPM-65413")
 
-    def test_disgaea_jp_present(self):
-        """Wave 115: Makai Senki Disgaea (JP) is in Japan DB."""
-        self.assertIn("Makai Senki Disgaea (JP)", self.jp)
+    def test_biohazard_outbreak_serial(self):
+        self.assertEqual(self._serial("Biohazard: Outbreak (JP)"), "SLPM-65428")
 
-    def test_disgaea_jp_serial(self):
-        """Wave 115: Makai Senki Disgaea (JP) serial=SLPS-25180."""
-        self.assertEqual(self.jp["Makai Senki Disgaea (JP)"]["serial"], "SLPS-25180")
+    def test_biohazard_outbreak_file2_serial(self):
+        self.assertEqual(self._serial("Biohazard: Outbreak File 2 (JP)"), "SLPM-65692")
 
-    def test_disgaea_jp_developer(self):
-        """Wave 115: Makai Senki Disgaea (JP) developer=Nippon Ichi Software."""
-        self.assertEqual(self.jp["Makai Senki Disgaea (JP)"]["developer"], "Nippon Ichi Software")
+    def test_biohazard_4_serial(self):
+        self.assertEqual(self._serial("Biohazard 4 (JP)"), "SLPM-66213")
 
-    # ── Valkyrie Profile 2: Silmeria ─────────────────────────────────────────
+    def test_haunting_ground_serial(self):
+        self.assertEqual(self._serial("Demento (JP)"), "SLPM-65913")
 
-    def test_valkyrie_profile_2_jp_present(self):
-        """Wave 115: Valkyrie Profile 2: Silmeria (JP) is in Japan DB."""
-        self.assertIn("Valkyrie Profile 2: Silmeria (JP)", self.jp)
+    def test_monster_hunter_serial(self):
+        self.assertEqual(self._serial("Monster Hunter (JP)"), "SLPM-65495")
 
-    def test_valkyrie_profile_2_jp_serial(self):
-        """Wave 115: Valkyrie Profile 2: Silmeria (JP) serial=SLPS-25725."""
-        self.assertEqual(self.jp["Valkyrie Profile 2: Silmeria (JP)"]["serial"], "SLPS-25725")
+    def test_monster_hunter_2_serial(self):
+        self.assertEqual(self._serial("Monster Hunter 2 (JP)"), "SLPM-66280")
 
-    def test_valkyrie_profile_2_jp_publisher(self):
-        """Wave 115: Valkyrie Profile 2: Silmeria (JP) publisher=Square Enix."""
-        self.assertEqual(self.jp["Valkyrie Profile 2: Silmeria (JP)"]["publisher"], "Square Enix")
+    def test_god_hand_serial(self):
+        self.assertEqual(self._serial("God Hand (JP)"), "SLPM-66550")
 
-    # ── Armored Core: Silent Line ─────────────────────────────────────────────
+    def test_okami_serial(self):
+        self.assertEqual(self._serial("Okami (JP)"), "SLPM-66375")
 
-    def test_armored_core_silent_line_jp_present(self):
-        """Wave 115: Armored Core: Silent Line (JP) is in Japan DB."""
-        self.assertIn("Armored Core: Silent Line (JP)", self.jp)
+    def test_drakengard_serial(self):
+        self.assertEqual(self._serial("Drag-on Dragoon (JP)"), "SLPM-65266")
 
-    def test_armored_core_silent_line_jp_serial(self):
-        """Wave 115: Armored Core: Silent Line (JP) serial=SLPS-25230."""
-        self.assertEqual(self.jp["Armored Core: Silent Line (JP)"]["serial"], "SLPS-25230")
+    def test_drakengard_2_serial(self):
+        self.assertEqual(self._serial("Drag-on Dragoon 2 (JP)"), "SLPM-65999")
 
-    # ── Monster Hunter 2 ─────────────────────────────────────────────────────
+    def test_castlevania_loi_serial(self):
+        self.assertEqual(self._serial("Castlevania: Lament of Innocence (JP)"), "SLPM-65444")
 
-    def test_monster_hunter_2_jp_present(self):
-        """Wave 115: Monster Hunter 2 (JP) is in Japan DB."""
-        self.assertIn("Monster Hunter 2 (JP)", self.jp)
+    # Square Enix titles
+    def test_ffx_intl_serial(self):
+        self.assertEqual(self._serial("Final Fantasy X International (JP)"), "SLPS-25088")
 
-    def test_monster_hunter_2_jp_serial(self):
-        """Wave 115: Monster Hunter 2 (JP) serial=SLPM-66280."""
-        self.assertEqual(self.jp["Monster Hunter 2 (JP)"]["serial"], "SLPM-66280")
+    def test_ffx2_serial(self):
+        self.assertEqual(self._serial("Final Fantasy X-2 (JP)"), "SLPS-25250")
 
-    def test_monster_hunter_2_jp_developer(self):
-        """Wave 115: Monster Hunter 2 (JP) developer=Capcom."""
+    def test_ffxii_serial(self):
+        self.assertEqual(self._serial("Final Fantasy XII (JP)"), "SLPM-66320")
+
+    def test_kingdom_hearts_serial(self):
+        self.assertEqual(self._serial("Kingdom Hearts (JP)"), "SLPS-25105")
+
+    def test_kingdom_hearts_final_mix_serial(self):
+        self.assertEqual(self._serial("Kingdom Hearts: Final Mix (JP)"), "SLPM-66123")
+
+    def test_kingdom_hearts_2_serial(self):
+        self.assertEqual(self._serial("Kingdom Hearts II (JP)"), "SLPM-66233")
+
+    def test_kingdom_hearts_2_final_mix_serial(self):
+        self.assertEqual(self._serial("Kingdom Hearts II: Final Mix (JP)"), "SLPM-66675")
+
+    def test_dirge_of_cerberus_serial(self):
+        self.assertEqual(self._serial("Dirge of Cerberus: Final Fantasy VII (JP)"), "SLPM-66271")
+
+    def test_dragon_quest_v_serial(self):
+        self.assertEqual(self._serial("Dragon Quest V: Tenkuu no Hanayome (JP)"), "SLPM-65555")
+
+    def test_dragon_quest_viii_serial(self):
+        self.assertEqual(self._serial("Dragon Quest VIII (JP)"), "SLPM-65888")
+
+    def test_romancing_saga_serial(self):
+        self.assertEqual(self._serial("Romancing SaGa: Minstrel Song (JP)"), "SLPM-65920")
+
+    def test_valkyrie_profile_2_serial(self):
+        self.assertEqual(self._serial("Valkyrie Profile 2: Silmeria (JP)"), "SLPM-66419")
+
+    def test_star_ocean_tteot_serial(self):
+        self.assertEqual(self._serial("Star Ocean: Till the End of Time (JP)"), "SLPM-65209")
+
+    def test_xenosaga_1_serial(self):
+        self.assertEqual(self._serial("Xenosaga Episode I: Der Wille zur Macht (JP)"), "SLPS-29002")
+
+    def test_xenosaga_2_serial(self):
+        self.assertEqual(self._serial(
+            "Xenosaga Episode II: Jenseits von Gut und Bose (JP)"), "SLPS-25368")
+
+    def test_xenosaga_3_serial(self):
+        self.assertEqual(self._serial(
+            "Xenosaga Episode III: Also sprach Zarathustra (JP)"), "SLPS-25640")
+
+    def test_grandia_3_serial(self):
+        self.assertEqual(self._serial("Grandia III (JP)"), "SLPM-65976")
+
+    # Atlus titles
+    def test_persona_3_serial(self):
+        self.assertEqual(self._serial("Persona 3 (JP)"), "SLPM-66445")
+
+    def test_persona_3_fes_serial(self):
+        self.assertEqual(self._serial("Persona 3 FES (JP)"), "SLPM-66690")
+
+    def test_persona_4_serial(self):
+        self.assertEqual(self._serial("Persona 4 (JP)"), "SLPM-66978")
+
+    def test_smt_nocturne_serial(self):
+        self.assertEqual(self._serial("Shin Megami Tensei III: Nocturne (JP)"), "SLPM-65242")
+
+    def test_digital_devil_saga_serial(self):
+        self.assertEqual(self._serial("Digital Devil Saga: Avatar Tuner (JP)"), "SLPM-65597")
+
+    def test_digital_devil_saga_2_serial(self):
+        self.assertEqual(self._serial("Digital Devil Saga: Avatar Tuner 2 (JP)"), "SLPM-65795")
+
+    def test_devil_summoner_raidou_serial(self):
+        self.assertEqual(self._serial("Devil Summoner: Kuzunoha Raidou (JP)"), "SLPM-66246")
+
+    # Bandai / Namco titles
+    def test_dot_hack_infection_serial(self):
+        self.assertEqual(self._serial(".hack//Infection (JP)"), "SLPS-25121")
+
+    def test_dot_hack_mutation_serial(self):
+        self.assertEqual(self._serial(".hack//Mutation (JP)"), "SLPS-25143")
+
+    def test_dot_hack_outbreak_serial(self):
+        self.assertEqual(self._serial(".hack//Outbreak (JP)"), "SLPS-25158")
+
+    def test_dot_hack_quarantine_serial(self):
+        self.assertEqual(self._serial(".hack//Quarantine (JP)"), "SLPS-25202")
+
+    def test_tales_of_destiny_2_serial(self):
+        self.assertEqual(self._serial("Tales of Destiny 2 (JP)"), "SLPS-25172")
+
+    def test_tales_of_destiny_ps2_serial(self):
+        self.assertEqual(self._serial("Tales of Destiny (PS2 Remake) (JP)"), "SLPS-25715")
+
+    def test_tales_of_symphonia_serial(self):
+        self.assertEqual(self._serial("Tales of Symphonia (JP)"), "SLPS-25400")
+
+    def test_tales_of_rebirth_serial(self):
+        self.assertEqual(self._serial("Tales of Rebirth (JP)"), "SLPS-25450")
+
+    def test_tales_of_legendia_serial(self):
+        self.assertEqual(self._serial("Tales of Legendia (JP)"), "SLPS-25533")
+
+    def test_tales_of_the_abyss_serial(self):
+        self.assertEqual(self._serial("Tales of the Abyss (JP)"), "SLPS-25586")
+
+    def test_katamari_damacy_serial(self):
+        self.assertEqual(self._serial("Katamari Damacy (JP)"), "SLPS-25360")
+
+    def test_we_love_katamari_serial(self):
+        self.assertEqual(self._serial("We Love Katamari (JP)"), "SLPS-25467")
+
+    def test_ace_combat_04_serial(self):
+        self.assertEqual(self._serial("Ace Combat 04: Shattered Skies (JP)"), "SLPS-25052")
+
+    def test_ace_combat_5_serial(self):
+        self.assertEqual(self._serial("Ace Combat 5: The Unsung War (JP)"), "SLPS-25418")
+
+    # Tecmo (Fatal Frame / Zero series)
+    def test_fatal_frame_serial(self):
+        self.assertEqual(self._serial("Fatal Frame (JP)"), "SCPS-55002")
+
+    def test_fatal_frame_2_serial(self):
+        self.assertEqual(self._serial("Fatal Frame II: Crimson Butterfly (JP)"), "SLPS-25303")
+
+    # NIS titles
+    def test_disgaea_serial(self):
+        self.assertEqual(self._serial("Makai Senki Disgaea (JP)"), "SLPS-20251")
+
+    def test_disgaea_2_serial(self):
+        self.assertEqual(self._serial("Makai Senki Disgaea 2 (JP)"), "SLPS-25607")
+
+    def test_phantom_brave_serial(self):
+        self.assertEqual(self._serial("Phantom Brave (JP)"), "SLPS-20345")
+
+    def test_la_pucelle_serial(self):
+        self.assertEqual(self._serial("La Pucelle (JP)"), "SLPS-20167")
+
+    # FromSoftware / Armored Core
+    def test_armored_core_3_serial(self):
+        self.assertEqual(self._serial("Armored Core 3 (JP)"), "SLPS-25112")
+
+    def test_armored_core_silent_line_serial(self):
+        self.assertEqual(self._serial("Armored Core: Silent Line (JP)"), "SLPS-25169")
+
+    # Aruze / Shadow Hearts
+    def test_shadow_hearts_covenant_serial(self):
+        self.assertEqual(self._serial("Shadow Hearts: Covenant (JP)"), "SLPS-25334")
+
+    def test_shadow_hearts_from_new_world_serial(self):
+        self.assertEqual(self._serial("Shadow Hearts: From the New World (JP)"), "SLPM-66071")
+
+    # Konami / Suikoden
+    def test_suikoden_3_serial(self):
+        self.assertEqual(self._serial("Gensou Suikoden III (JP)"), "SLPM-65074")
+
+    def test_suikoden_4_serial(self):
+        self.assertEqual(self._serial("Gensou Suikoden IV (JP)"), "SLPM-65600")
+
+    def test_suikoden_5_serial(self):
+        self.assertEqual(self._serial("Gensou Suikoden V (JP)"), "SLPM-66286")
+
+    # Media Vision / Sony
+    def test_wild_arms_3_serial(self):
+        self.assertEqual(self._serial("Wild Arms 3 (JP)"), "SCPS-15024")
+
+    # Square Enix / Front Mission
+    def test_front_mission_5_serial(self):
+        self.assertEqual(self._serial("Front Mission 5: Scars of the War (JP)"), "SLPM-66205")
+
+    # tri-Ace / Breath of Fire
+    def test_breath_of_fire_serial(self):
+        self.assertEqual(self._serial("Breath of Fire: Dragon Quarter (JP)"), "SLPM-65196")
+
+    # Sega
+    def test_sega_ages_dynamite_deka_serial(self):
+        self.assertEqual(self._serial("Sega Ages 2500 Series Vol. 26: Dynamite Deka (JP)"), "SLPM-62717")
+
+    # ── Developer / publisher spot-checks ─────────────────────────────────────
+
+    def test_ico_developer(self):
+        self.assertEqual(self.jp["Ico (JP)"]["developer"], "Sony Computer Entertaiment")
+
+    def test_dark_cloud_developer(self):
+        self.assertEqual(self.jp["Dark Cloud (JP)"]["developer"], "Level 5")
+
+    def test_mgs2_developer(self):
+        self.assertEqual(self.jp["Metal Gear Solid 2: Sons of Liberty (JP)"]["developer"], "Konami")
+
+    def test_biohazard_4_developer(self):
+        self.assertEqual(self.jp["Biohazard 4 (JP)"]["developer"], "Capcom")
+
+    def test_persona_3_developer(self):
+        self.assertEqual(self.jp["Persona 3 (JP)"]["developer"], "Atlus Co., Ltd")
+
+    def test_monster_hunter_2_developer(self):
         self.assertEqual(self.jp["Monster Hunter 2 (JP)"]["developer"], "Capcom")
 
-    # ── All JP serials have correct prefix ───────────────────────────────────
+    def test_front_mission_5_developer(self):
+        self.assertEqual(self.jp["Front Mission 5: Scars of the War (JP)"]["developer"], "Square Enix")
 
-    def test_jp_db_all_serials_are_jp_region(self):
-        """Wave 115: Every primary serial in Japan DB must begin with a JP prefix."""
-        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
-        for title, info in self.jp.items():
-            serial = info.get("serial", "")
-            self.assertTrue(
-                serial.startswith(allowed),
-                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
-            )
+    def test_forbidden_siren_2_developer(self):
+        self.assertEqual(self.jp["Forbidden Siren 2 (JP)"]["developer"], "SCE Japan Studio")
 
+    def test_tales_of_rebirth_developer(self):
+        self.assertEqual(self.jp["Tales of Rebirth (JP)"]["developer"], "Namco Tales Studio")
 
-class TestWave116JapanDbExpansion(unittest.TestCase):
-    """Wave 116: Expand ps2_japan.json with 10 more well-known JP titles.
-
-    New entries added to ps2_japan.json:
-      .hack//Infection (JP)                  SLPS-25262  CyberConnect2 / Bandai      2002-06-20
-      Disgaea 2: Cursed Memories (JP)        SLPS-25664  Nippon Ichi Software        2006-02-23
-      Drakengard (JP)                        SLPM-65817  Cavia / Square Enix         2003-09-11
-      Drakengard 2 (JP)                      SLPM-66111  Cavia / Square Enix         2005-06-16
-      Fatal Frame (JP)                       SLPS-25128  Tecmo                       2001-12-13
-      Fatal Frame II: Crimson Butterfly (JP) SLPS-25384  Tecmo                       2003-11-27
-      Gradius V (JP)                         SLPM-65998  Treasure / Konami           2004-07-22
-      Haunting Ground (JP)                   SLPM-66119  Capcom                      2005-02-24
-      La Pucelle (JP)                        SLPS-25170  Nippon Ichi Software        2002-01-29
-      Phantom Brave (JP)                     SLPS-25428  Nippon Ichi Software        2004-01-22
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        import json
-        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-        cls.jp = json.loads(jp_path.read_text())["games"]
-
-    # ── JP DB count ───────────────────────────────────────────────────────────
-
-    def test_jp_db_count(self):
-        """Wave 116: Japan DB has at least 76 entries after 10 new additions."""
-        self.assertGreaterEqual(len(self.jp), 76)
-
-    # ── .hack//Infection ──────────────────────────────────────────────────────
-
-    def test_hack_infection_jp_present(self):
-        """Wave 116: .hack//Infection (JP) is in Japan DB."""
-        self.assertIn(".hack//Infection (JP)", self.jp)
-
-    def test_hack_infection_jp_serial(self):
-        """Wave 116: .hack//Infection (JP) serial=SLPS-25262."""
-        self.assertEqual(self.jp[".hack//Infection (JP)"]["serial"], "SLPS-25262")
-
-    def test_hack_infection_jp_publisher(self):
-        """Wave 116: .hack//Infection (JP) publisher=Bandai."""
-        self.assertEqual(self.jp[".hack//Infection (JP)"]["publisher"], "Bandai")
-
-    # ── Disgaea 2: Cursed Memories ────────────────────────────────────────────
-
-    def test_disgaea_2_jp_present(self):
-        """Wave 116: Disgaea 2: Cursed Memories (JP) is in Japan DB."""
-        self.assertIn("Disgaea 2: Cursed Memories (JP)", self.jp)
-
-    def test_disgaea_2_jp_serial(self):
-        """Wave 116: Disgaea 2: Cursed Memories (JP) serial=SLPS-25664."""
-        self.assertEqual(self.jp["Disgaea 2: Cursed Memories (JP)"]["serial"], "SLPS-25664")
-
-    def test_disgaea_2_jp_developer(self):
-        """Wave 116: Disgaea 2: Cursed Memories (JP) developer=Nippon Ichi Software."""
-        self.assertEqual(self.jp["Disgaea 2: Cursed Memories (JP)"]["developer"], "Nippon Ichi Software")
-
-    # ── Drakengard ────────────────────────────────────────────────────────────
-
-    def test_drakengard_jp_present(self):
-        """Wave 116: Drakengard (JP) is in Japan DB."""
-        self.assertIn("Drakengard (JP)", self.jp)
-
-    def test_drakengard_jp_serial(self):
-        """Wave 116: Drakengard (JP) serial=SLPM-65817."""
-        self.assertEqual(self.jp["Drakengard (JP)"]["serial"], "SLPM-65817")
-
-    def test_drakengard_jp_developer(self):
-        """Wave 116: Drakengard (JP) developer=Cavia."""
-        self.assertEqual(self.jp["Drakengard (JP)"]["developer"], "Cavia")
-
-    def test_drakengard_jp_publisher(self):
-        """Wave 116: Drakengard (JP) publisher=Square Enix."""
-        self.assertEqual(self.jp["Drakengard (JP)"]["publisher"], "Square Enix")
-
-    # ── Drakengard 2 ─────────────────────────────────────────────────────────
-
-    def test_drakengard_2_jp_present(self):
-        """Wave 116: Drakengard 2 (JP) is in Japan DB."""
-        self.assertIn("Drakengard 2 (JP)", self.jp)
-
-    def test_drakengard_2_jp_serial(self):
-        """Wave 116: Drakengard 2 (JP) serial=SLPM-66111."""
-        self.assertEqual(self.jp["Drakengard 2 (JP)"]["serial"], "SLPM-66111")
-
-    # ── Fatal Frame ──────────────────────────────────────────────────────────
-
-    def test_fatal_frame_jp_present(self):
-        """Wave 116: Fatal Frame (JP) is in Japan DB."""
-        self.assertIn("Fatal Frame (JP)", self.jp)
-
-    def test_fatal_frame_jp_serial(self):
-        """Wave 116: Fatal Frame (JP) serial=SLPS-25128."""
-        self.assertEqual(self.jp["Fatal Frame (JP)"]["serial"], "SLPS-25128")
-
-    def test_fatal_frame_jp_developer(self):
-        """Wave 116: Fatal Frame (JP) developer=Tecmo."""
-        self.assertEqual(self.jp["Fatal Frame (JP)"]["developer"], "Tecmo")
-
-    # ── Fatal Frame II: Crimson Butterfly ────────────────────────────────────
-
-    def test_fatal_frame_ii_jp_present(self):
-        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) is in Japan DB."""
-        self.assertIn("Fatal Frame II: Crimson Butterfly (JP)", self.jp)
-
-    def test_fatal_frame_ii_jp_serial(self):
-        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) serial=SLPS-25384."""
-        self.assertEqual(self.jp["Fatal Frame II: Crimson Butterfly (JP)"]["serial"], "SLPS-25384")
-
-    def test_fatal_frame_ii_jp_publisher(self):
-        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) publisher=Tecmo."""
-        self.assertEqual(self.jp["Fatal Frame II: Crimson Butterfly (JP)"]["publisher"], "Tecmo")
-
-    # ── Gradius V ────────────────────────────────────────────────────────────
-
-    def test_gradius_v_jp_present(self):
-        """Wave 116: Gradius V (JP) is in Japan DB."""
-        self.assertIn("Gradius V (JP)", self.jp)
-
-    def test_gradius_v_jp_serial(self):
-        """Wave 116: Gradius V (JP) serial=SLPM-65998."""
-        self.assertEqual(self.jp["Gradius V (JP)"]["serial"], "SLPM-65998")
-
-    def test_gradius_v_jp_developer(self):
-        """Wave 116: Gradius V (JP) developer=Treasure."""
+    def test_gradius_v_developer(self):
         self.assertEqual(self.jp["Gradius V (JP)"]["developer"], "Treasure")
 
-    def test_gradius_v_jp_publisher(self):
-        """Wave 116: Gradius V (JP) publisher=Konami."""
-        self.assertEqual(self.jp["Gradius V (JP)"]["publisher"], "Konami")
+    def test_smt_nocturne_developer(self):
+        self.assertEqual(self.jp["Shin Megami Tensei III: Nocturne (JP)"]["developer"], "Atlus")
 
-    # ── Haunting Ground ──────────────────────────────────────────────────────
+    # ── Release-date spot-checks ──────────────────────────────────────────────
 
-    def test_haunting_ground_jp_present(self):
-        """Wave 116: Haunting Ground (JP) is in Japan DB."""
-        self.assertIn("Haunting Ground (JP)", self.jp)
+    def test_dark_cloud_release_date(self):
+        self.assertEqual(self.jp["Dark Cloud (JP)"]["release_date"], "2000-12-14")
 
-    def test_haunting_ground_jp_serial(self):
-        """Wave 116: Haunting Ground (JP) serial=SLPM-66119."""
-        self.assertEqual(self.jp["Haunting Ground (JP)"]["serial"], "SLPM-66119")
+    def test_mgs2_release_date(self):
+        self.assertEqual(self.jp["Metal Gear Solid 2: Sons of Liberty (JP)"]["release_date"], "2001-11-29")
 
-    def test_haunting_ground_jp_developer(self):
-        """Wave 116: Haunting Ground (JP) developer=Capcom."""
-        self.assertEqual(self.jp["Haunting Ground (JP)"]["developer"], "Capcom")
+    def test_tales_of_destiny_ps2_release_date(self):
+        self.assertEqual(self.jp["Tales of Destiny (PS2 Remake) (JP)"]["release_date"], "2006-11-30")
 
-    # ── La Pucelle ───────────────────────────────────────────────────────────
+    def test_tales_of_destiny_2_release_date(self):
+        self.assertEqual(self.jp["Tales of Destiny 2 (JP)"]["release_date"], "2002-11-28")
 
-    def test_la_pucelle_jp_present(self):
-        """Wave 116: La Pucelle (JP) is in Japan DB."""
-        self.assertIn("La Pucelle (JP)", self.jp)
+    def test_dq5_release_date(self):
+        self.assertEqual(self.jp["Dragon Quest V: Tenkuu no Hanayome (JP)"]["release_date"], "2004-03-25")
 
-    def test_la_pucelle_jp_serial(self):
-        """Wave 116: La Pucelle (JP) serial=SLPS-25170."""
-        self.assertEqual(self.jp["La Pucelle (JP)"]["serial"], "SLPS-25170")
+    def test_dq8_release_date(self):
+        self.assertEqual(self.jp["Dragon Quest VIII (JP)"]["release_date"], "2004-11-27")
 
-    def test_la_pucelle_jp_developer(self):
-        """Wave 116: La Pucelle (JP) developer=Nippon Ichi Software."""
-        self.assertEqual(self.jp["La Pucelle (JP)"]["developer"], "Nippon Ichi Software")
+    def test_persona_3_release_date(self):
+        self.assertEqual(self.jp["Persona 3 (JP)"]["release_date"], "2006-07-13")
 
-    # ── Phantom Brave ────────────────────────────────────────────────────────
+    def test_persona_4_release_date(self):
+        self.assertEqual(self.jp["Persona 4 (JP)"]["release_date"], "2008-07-10")
 
-    def test_phantom_brave_jp_present(self):
-        """Wave 116: Phantom Brave (JP) is in Japan DB."""
-        self.assertIn("Phantom Brave (JP)", self.jp)
+    def test_ffx_intl_release_date(self):
+        self.assertEqual(self.jp["Final Fantasy X International (JP)"]["release_date"], "2002-01-31")
 
-    def test_phantom_brave_jp_serial(self):
-        """Wave 116: Phantom Brave (JP) serial=SLPS-25428."""
-        self.assertEqual(self.jp["Phantom Brave (JP)"]["serial"], "SLPS-25428")
+    def test_siren_release_date(self):
+        self.assertEqual(self.jp["Siren (JP)"]["release_date"], "2003-11-20")
 
-    def test_phantom_brave_jp_developer(self):
-        """Wave 116: Phantom Brave (JP) developer=Nippon Ichi Software."""
-        self.assertEqual(self.jp["Phantom Brave (JP)"]["developer"], "Nippon Ichi Software")
+    def test_shadow_of_the_colossus_release_date(self):
+        self.assertEqual(self.jp["Shadow of the Colossus (JP)"]["release_date"], "2005-10-27")
 
-    # ── All JP serials have correct prefix ───────────────────────────────────
+    # ── All JP serials must have a recognised JP region prefix ───────────────
 
     def test_jp_db_all_serials_are_jp_region(self):
-        """Wave 116: Every primary serial in Japan DB must begin with a JP prefix."""
-        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
-        for title, info in self.jp.items():
-            serial = info.get("serial", "")
-            self.assertTrue(
-                serial.startswith(allowed),
-                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
-            )
-
-
-class TestWave117JapanDbExpansion(unittest.TestCase):
-    """Wave 117: Expand ps2_japan.json with 10 more well-known JP titles.
-
-    New entries added to ps2_japan.json (76→86):
-      Zone of the Enders (JP)                    SLPM-65015  Konami KCEJ                2001-02-01
-      Zone of the Enders: The 2nd Runner (JP)    SLPM-65216  Konami KCEJ                2003-02-13
-      Onimusha: Warlords (JP)                    SLPM-65065  Capcom Production Studio 2 2001-01-25
-      Rogue Galaxy (JP)                          SCPS-15157  Level-5 / SCEJ             2005-12-08
-      Shadow Hearts: Covenant (JP)               SLPS-25430  Nautilus / Aruze           2004-02-19
-      Atelier Iris: Eternal Mana (JP)            SLPS-25431  Gust                       2004-06-24
-      Dirge of Cerberus: Final Fantasy VII (JP)  SLPM-66247  Square Enix                2006-01-26
-      Castlevania: Curse of Darkness (JP)        SLPM-66113  Konami KCEJ Kobe           2005-07-21
-      Wild Arms 3 (JP)                           SCPS-15052  Media Vision / SCEJ        2002-03-14
-      Ace Combat 5: The Unsung War (JP)          SLPS-25444  Project Aces / Namco       2004-09-30
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        import json
-        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-        cls.jp = json.loads(jp_path.read_text())["games"]
-
-    # ── JP DB count ───────────────────────────────────────────────────────────
-
-    def test_jp_db_count(self):
-        """Wave 117: Japan DB has at least 86 entries after 10 new additions."""
-        self.assertGreaterEqual(len(self.jp), 86)
-
-    # ── Zone of the Enders ────────────────────────────────────────────────────
-
-    def test_zoe_jp_present(self):
-        """Wave 117: Zone of the Enders (JP) is in Japan DB."""
-        self.assertIn("Zone of the Enders (JP)", self.jp)
-
-    def test_zoe_jp_serial(self):
-        """Wave 117: Zone of the Enders (JP) serial=SLPM-65015."""
-        self.assertEqual(self.jp["Zone of the Enders (JP)"]["serial"], "SLPM-65015")
-
-    def test_zoe_jp_publisher(self):
-        """Wave 117: Zone of the Enders (JP) publisher=Konami."""
-        self.assertEqual(self.jp["Zone of the Enders (JP)"]["publisher"], "Konami")
-
-    def test_zoe_jp_release_date(self):
-        """Wave 117: Zone of the Enders (JP) release_date=2001-02-01."""
-        self.assertEqual(self.jp["Zone of the Enders (JP)"]["release_date"], "2001-02-01")
-
-    # ── Zone of the Enders: The 2nd Runner ───────────────────────────────────
-
-    def test_zoe2_jp_present(self):
-        """Wave 117: Zone of the Enders: The 2nd Runner (JP) is in Japan DB."""
-        self.assertIn("Zone of the Enders: The 2nd Runner (JP)", self.jp)
-
-    def test_zoe2_jp_serial(self):
-        """Wave 117: Zone of the Enders: The 2nd Runner (JP) serial=SLPM-65216."""
-        self.assertEqual(self.jp["Zone of the Enders: The 2nd Runner (JP)"]["serial"], "SLPM-65216")
-
-    def test_zoe2_jp_publisher(self):
-        """Wave 117: Zone of the Enders: The 2nd Runner (JP) publisher=Konami."""
-        self.assertEqual(self.jp["Zone of the Enders: The 2nd Runner (JP)"]["publisher"], "Konami")
-
-    # ── Onimusha: Warlords ────────────────────────────────────────────────────
-
-    def test_onimusha_warlords_jp_present(self):
-        """Wave 117: Onimusha: Warlords (JP) is in Japan DB."""
-        self.assertIn("Onimusha: Warlords (JP)", self.jp)
-
-    def test_onimusha_warlords_jp_serial(self):
-        """Wave 117: Onimusha: Warlords (JP) serial=SLPM-65065."""
-        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["serial"], "SLPM-65065")
-
-    def test_onimusha_warlords_jp_developer(self):
-        """Wave 117: Onimusha: Warlords (JP) developer=Capcom Production Studio 2."""
-        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["developer"], "Capcom Production Studio 2")
-
-    def test_onimusha_warlords_jp_publisher(self):
-        """Wave 117: Onimusha: Warlords (JP) publisher=Capcom."""
-        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["publisher"], "Capcom")
-
-    # ── Rogue Galaxy ──────────────────────────────────────────────────────────
-
-    def test_rogue_galaxy_jp_present(self):
-        """Wave 117: Rogue Galaxy (JP) is in Japan DB."""
-        self.assertIn("Rogue Galaxy (JP)", self.jp)
-
-    def test_rogue_galaxy_jp_serial(self):
-        """Wave 117: Rogue Galaxy (JP) serial=SCPS-15157."""
-        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["serial"], "SCPS-15157")
-
-    def test_rogue_galaxy_jp_developer(self):
-        """Wave 117: Rogue Galaxy (JP) developer=Level-5."""
-        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["developer"], "Level-5")
-
-    def test_rogue_galaxy_jp_release_date(self):
-        """Wave 117: Rogue Galaxy (JP) release_date=2005-12-08."""
-        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["release_date"], "2005-12-08")
-
-    # ── Shadow Hearts: Covenant ───────────────────────────────────────────────
-
-    def test_shadow_hearts_covenant_jp_present(self):
-        """Wave 117: Shadow Hearts: Covenant (JP) is in Japan DB."""
-        self.assertIn("Shadow Hearts: Covenant (JP)", self.jp)
-
-    def test_shadow_hearts_covenant_jp_serial(self):
-        """Wave 117: Shadow Hearts: Covenant (JP) serial=SLPS-25430."""
-        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["serial"], "SLPS-25430")
-
-    def test_shadow_hearts_covenant_jp_developer(self):
-        """Wave 117: Shadow Hearts: Covenant (JP) developer=Nautilus."""
-        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["developer"], "Nautilus")
-
-    def test_shadow_hearts_covenant_jp_publisher(self):
-        """Wave 117: Shadow Hearts: Covenant (JP) publisher=Aruze Corporation."""
-        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["publisher"], "Aruze Corporation")
-
-    # ── Atelier Iris: Eternal Mana ────────────────────────────────────────────
-
-    def test_atelier_iris_jp_present(self):
-        """Wave 117: Atelier Iris: Eternal Mana (JP) is in Japan DB."""
-        self.assertIn("Atelier Iris: Eternal Mana (JP)", self.jp)
-
-    def test_atelier_iris_jp_serial(self):
-        """Wave 117: Atelier Iris: Eternal Mana (JP) serial=SLPS-25431."""
-        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["serial"], "SLPS-25431")
-
-    def test_atelier_iris_jp_developer(self):
-        """Wave 117: Atelier Iris: Eternal Mana (JP) developer=Gust."""
-        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["developer"], "Gust")
-
-    def test_atelier_iris_jp_genre(self):
-        """Wave 117: Atelier Iris: Eternal Mana (JP) genre=RPG."""
-        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["genre"], "RPG")
-
-    # ── Dirge of Cerberus: Final Fantasy VII ──────────────────────────────────
-
-    def test_dirge_of_cerberus_jp_present(self):
-        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) is in Japan DB."""
-        self.assertIn("Dirge of Cerberus: Final Fantasy VII (JP)", self.jp)
-
-    def test_dirge_of_cerberus_jp_serial(self):
-        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) serial=SLPM-66247."""
-        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["serial"], "SLPM-66247")
-
-    def test_dirge_of_cerberus_jp_publisher(self):
-        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) publisher=Square Enix."""
-        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["publisher"], "Square Enix")
-
-    def test_dirge_of_cerberus_jp_release_date(self):
-        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) release_date=2006-01-26."""
-        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["release_date"], "2006-01-26")
-
-    # ── Castlevania: Curse of Darkness ────────────────────────────────────────
-
-    def test_castlevania_cod_jp_present(self):
-        """Wave 117: Castlevania: Curse of Darkness (JP) is in Japan DB."""
-        self.assertIn("Castlevania: Curse of Darkness (JP)", self.jp)
-
-    def test_castlevania_cod_jp_serial(self):
-        """Wave 117: Castlevania: Curse of Darkness (JP) serial=SLPM-66113."""
-        self.assertEqual(self.jp["Castlevania: Curse of Darkness (JP)"]["serial"], "SLPM-66113")
-
-    def test_castlevania_cod_jp_developer(self):
-        """Wave 117: Castlevania: Curse of Darkness (JP) developer=Konami Computer Entertainment Kobe."""
-        self.assertEqual(self.jp["Castlevania: Curse of Darkness (JP)"]["developer"], "Konami Computer Entertainment Kobe")
-
-    # ── Wild Arms 3 ───────────────────────────────────────────────────────────
-
-    def test_wild_arms_3_jp_present(self):
-        """Wave 117: Wild Arms 3 (JP) is in Japan DB."""
-        self.assertIn("Wild Arms 3 (JP)", self.jp)
-
-    def test_wild_arms_3_jp_serial(self):
-        """Wave 117: Wild Arms 3 (JP) serial=SCPS-15052."""
-        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["serial"], "SCPS-15052")
-
-    def test_wild_arms_3_jp_developer(self):
-        """Wave 117: Wild Arms 3 (JP) developer=Media Vision."""
-        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["developer"], "Media Vision")
-
-    def test_wild_arms_3_jp_release_date(self):
-        """Wave 117: Wild Arms 3 (JP) release_date=2002-03-14."""
-        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["release_date"], "2002-03-14")
-
-    # ── Ace Combat 5: The Unsung War ──────────────────────────────────────────
-
-    def test_ace_combat_5_jp_present(self):
-        """Wave 117: Ace Combat 5: The Unsung War (JP) is in Japan DB."""
-        self.assertIn("Ace Combat 5: The Unsung War (JP)", self.jp)
-
-    def test_ace_combat_5_jp_serial(self):
-        """Wave 117: Ace Combat 5: The Unsung War (JP) serial=SLPS-25444."""
-        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["serial"], "SLPS-25444")
-
-    def test_ace_combat_5_jp_developer(self):
-        """Wave 117: Ace Combat 5: The Unsung War (JP) developer=Project Aces."""
-        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["developer"], "Project Aces")
-
-    def test_ace_combat_5_jp_publisher(self):
-        """Wave 117: Ace Combat 5: The Unsung War (JP) publisher=Namco."""
-        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["publisher"], "Namco")
-
-    # ── All JP serials have correct prefix ───────────────────────────────────
-
-    def test_jp_db_all_serials_are_jp_region(self):
-        """Wave 117: Every primary serial in Japan DB must begin with a JP prefix."""
-        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
-        for title, info in self.jp.items():
-            serial = info.get("serial", "")
-            self.assertTrue(
-                serial.startswith(allowed),
-                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
-            )
-
-
-class TestWave118JapanDbExpansion(unittest.TestCase):
-    """Wave 118: Expand ps2_japan.json with 10 more well-known JP titles.
-
-    New entries added to ps2_japan.json (86→96):
-      .hack//Mutation (JP)                  SLPS-25274  CyberConnect2 / Bandai              2002-09-05
-      .hack//Outbreak (JP)                  SLPS-25302  CyberConnect2 / Bandai              2002-12-19
-      .hack//Quarantine (JP)                SLPS-25327  CyberConnect2 / Bandai              2003-06-26
-      Breath of Fire: Dragon Quarter (JP)   SLPS-25279  Capcom                              2002-11-14
-      Tales of Eternia (JP)                 SLPS-25072  Namco Tales Studio / Namco          2000-11-30
-      Romancing SaGa: Minstrel Song (JP)    SLPS-25457  Square Enix                         2005-04-21
-      Resident Evil: Outbreak (JP)          SLPM-65401  Capcom                              2003-12-11
-      Resident Evil: Outbreak File 2 (JP)   SLPM-66056  Capcom                              2004-09-09
-      Onimusha 2: Samurai's Destiny (JP)    SLPM-65196  Capcom Production Studio 2          2002-03-07
-      Onimusha 3: Demon Siege (JP)          SLPM-65792  Capcom Production Studio 2          2004-02-26
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        import json
-        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-        cls.jp = json.loads(jp_path.read_text())["games"]
-
-    # ── JP DB count ───────────────────────────────────────────────────────────
-
-    def test_jp_db_count(self):
-        """Wave 118: Japan DB has at least 96 entries after 10 new additions."""
-        self.assertGreaterEqual(len(self.jp), 96)
-
-    # ── .hack//Mutation ───────────────────────────────────────────────────────
-
-    def test_hack_mutation_jp_present(self):
-        """Wave 118: .hack//Mutation (JP) is in Japan DB."""
-        self.assertIn(".hack//Mutation (JP)", self.jp)
-
-    def test_hack_mutation_jp_serial(self):
-        """Wave 118: .hack//Mutation (JP) serial=SLPS-25274."""
-        self.assertEqual(self.jp[".hack//Mutation (JP)"]["serial"], "SLPS-25274")
-
-    def test_hack_mutation_jp_developer(self):
-        """Wave 118: .hack//Mutation (JP) developer=CyberConnect2."""
-        self.assertEqual(self.jp[".hack//Mutation (JP)"]["developer"], "CyberConnect2")
-
-    def test_hack_mutation_jp_publisher(self):
-        """Wave 118: .hack//Mutation (JP) publisher=Bandai."""
-        self.assertEqual(self.jp[".hack//Mutation (JP)"]["publisher"], "Bandai")
-
-    # ── .hack//Outbreak ───────────────────────────────────────────────────────
-
-    def test_hack_outbreak_jp_present(self):
-        """Wave 118: .hack//Outbreak (JP) is in Japan DB."""
-        self.assertIn(".hack//Outbreak (JP)", self.jp)
-
-    def test_hack_outbreak_jp_serial(self):
-        """Wave 118: .hack//Outbreak (JP) serial=SLPS-25302."""
-        self.assertEqual(self.jp[".hack//Outbreak (JP)"]["serial"], "SLPS-25302")
-
-    def test_hack_outbreak_jp_release_date(self):
-        """Wave 118: .hack//Outbreak (JP) release_date=2002-12-19."""
-        self.assertEqual(self.jp[".hack//Outbreak (JP)"]["release_date"], "2002-12-19")
-
-    # ── .hack//Quarantine ─────────────────────────────────────────────────────
-
-    def test_hack_quarantine_jp_present(self):
-        """Wave 118: .hack//Quarantine (JP) is in Japan DB."""
-        self.assertIn(".hack//Quarantine (JP)", self.jp)
-
-    def test_hack_quarantine_jp_serial(self):
-        """Wave 118: .hack//Quarantine (JP) serial=SLPS-25327."""
-        self.assertEqual(self.jp[".hack//Quarantine (JP)"]["serial"], "SLPS-25327")
-
-    def test_hack_quarantine_jp_publisher(self):
-        """Wave 118: .hack//Quarantine (JP) publisher=Bandai."""
-        self.assertEqual(self.jp[".hack//Quarantine (JP)"]["publisher"], "Bandai")
-
-    # ── Breath of Fire: Dragon Quarter ───────────────────────────────────────
-
-    def test_bof_dragon_quarter_jp_present(self):
-        """Wave 118: Breath of Fire: Dragon Quarter (JP) is in Japan DB."""
-        self.assertIn("Breath of Fire: Dragon Quarter (JP)", self.jp)
-
-    def test_bof_dragon_quarter_jp_serial(self):
-        """Wave 118: Breath of Fire: Dragon Quarter (JP) serial=SLPS-25279."""
-        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["serial"], "SLPS-25279")
-
-    def test_bof_dragon_quarter_jp_developer(self):
-        """Wave 118: Breath of Fire: Dragon Quarter (JP) developer=Capcom."""
-        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["developer"], "Capcom")
-
-    def test_bof_dragon_quarter_jp_release_date(self):
-        """Wave 118: Breath of Fire: Dragon Quarter (JP) release_date=2002-11-14."""
-        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["release_date"], "2002-11-14")
-
-    # ── Tales of Eternia ──────────────────────────────────────────────────────
-
-    def test_tales_eternia_jp_present(self):
-        """Wave 118: Tales of Eternia (JP) is in Japan DB."""
-        self.assertIn("Tales of Eternia (JP)", self.jp)
-
-    def test_tales_eternia_jp_serial(self):
-        """Wave 118: Tales of Eternia (JP) serial=SLPS-25072."""
-        self.assertEqual(self.jp["Tales of Eternia (JP)"]["serial"], "SLPS-25072")
-
-    def test_tales_eternia_jp_developer(self):
-        """Wave 118: Tales of Eternia (JP) developer=Namco Tales Studio."""
-        self.assertEqual(self.jp["Tales of Eternia (JP)"]["developer"], "Namco Tales Studio")
-
-    def test_tales_eternia_jp_publisher(self):
-        """Wave 118: Tales of Eternia (JP) publisher=Namco."""
-        self.assertEqual(self.jp["Tales of Eternia (JP)"]["publisher"], "Namco")
-
-    # ── Romancing SaGa: Minstrel Song ────────────────────────────────────────
-
-    def test_romancing_saga_jp_present(self):
-        """Wave 118: Romancing SaGa: Minstrel Song (JP) is in Japan DB."""
-        self.assertIn("Romancing SaGa: Minstrel Song (JP)", self.jp)
-
-    def test_romancing_saga_jp_serial(self):
-        """Wave 118: Romancing SaGa: Minstrel Song (JP) serial=SLPS-25457."""
-        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["serial"], "SLPS-25457")
-
-    def test_romancing_saga_jp_developer(self):
-        """Wave 118: Romancing SaGa: Minstrel Song (JP) developer=Square Enix."""
-        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["developer"], "Square Enix")
-
-    def test_romancing_saga_jp_publisher(self):
-        """Wave 118: Romancing SaGa: Minstrel Song (JP) publisher=Square Enix."""
-        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["publisher"], "Square Enix")
-
-    # ── Resident Evil: Outbreak ───────────────────────────────────────────────
-
-    def test_re_outbreak_jp_present(self):
-        """Wave 118: Resident Evil: Outbreak (JP) is in Japan DB."""
-        self.assertIn("Resident Evil: Outbreak (JP)", self.jp)
-
-    def test_re_outbreak_jp_serial(self):
-        """Wave 118: Resident Evil: Outbreak (JP) serial=SLPM-65401."""
-        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["serial"], "SLPM-65401")
-
-    def test_re_outbreak_jp_developer(self):
-        """Wave 118: Resident Evil: Outbreak (JP) developer=Capcom."""
-        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["developer"], "Capcom")
-
-    def test_re_outbreak_jp_release_date(self):
-        """Wave 118: Resident Evil: Outbreak (JP) release_date=2003-12-11."""
-        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["release_date"], "2003-12-11")
-
-    # ── Resident Evil: Outbreak File 2 ───────────────────────────────────────
-
-    def test_re_outbreak_file2_jp_present(self):
-        """Wave 118: Resident Evil: Outbreak File 2 (JP) is in Japan DB."""
-        self.assertIn("Resident Evil: Outbreak File 2 (JP)", self.jp)
-
-    def test_re_outbreak_file2_jp_serial(self):
-        """Wave 118: Resident Evil: Outbreak File 2 (JP) serial=SLPM-66056."""
-        self.assertEqual(self.jp["Resident Evil: Outbreak File 2 (JP)"]["serial"], "SLPM-66056")
-
-    def test_re_outbreak_file2_jp_release_date(self):
-        """Wave 118: Resident Evil: Outbreak File 2 (JP) release_date=2004-09-09."""
-        self.assertEqual(self.jp["Resident Evil: Outbreak File 2 (JP)"]["release_date"], "2004-09-09")
-
-    # ── Onimusha 2: Samurai's Destiny ─────────────────────────────────────────
-
-    def test_onimusha2_jp_present(self):
-        """Wave 118: Onimusha 2: Samurai's Destiny (JP) is in Japan DB."""
-        self.assertIn("Onimusha 2: Samurai's Destiny (JP)", self.jp)
-
-    def test_onimusha2_jp_serial(self):
-        """Wave 118: Onimusha 2: Samurai's Destiny (JP) serial=SLPM-65196."""
-        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["serial"], "SLPM-65196")
-
-    def test_onimusha2_jp_developer(self):
-        """Wave 118: Onimusha 2: Samurai's Destiny (JP) developer=Capcom Production Studio 2."""
-        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["developer"], "Capcom Production Studio 2")
-
-    def test_onimusha2_jp_publisher(self):
-        """Wave 118: Onimusha 2: Samurai's Destiny (JP) publisher=Capcom."""
-        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["publisher"], "Capcom")
-
-    # ── Onimusha 3: Demon Siege ───────────────────────────────────────────────
-
-    def test_onimusha3_jp_present(self):
-        """Wave 118: Onimusha 3: Demon Siege (JP) is in Japan DB."""
-        self.assertIn("Onimusha 3: Demon Siege (JP)", self.jp)
-
-    def test_onimusha3_jp_serial(self):
-        """Wave 118: Onimusha 3: Demon Siege (JP) serial=SLPM-65792."""
-        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["serial"], "SLPM-65792")
-
-    def test_onimusha3_jp_developer(self):
-        """Wave 118: Onimusha 3: Demon Siege (JP) developer=Capcom Production Studio 2."""
-        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["developer"], "Capcom Production Studio 2")
-
-    def test_onimusha3_jp_release_date(self):
-        """Wave 118: Onimusha 3: Demon Siege (JP) release_date=2004-02-26."""
-        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["release_date"], "2004-02-26")
-
-    # ── All JP serials have correct prefix ───────────────────────────────────
-
-    def test_jp_db_all_serials_are_jp_region(self):
-        """Wave 118: Every primary serial in Japan DB must begin with a JP prefix."""
-        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
-        for title, info in self.jp.items():
-            serial = info.get("serial", "")
-            self.assertTrue(
-                serial.startswith(allowed),
-                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
-            )
-
-
-class TestWave119JapanDbExpansion(unittest.TestCase):
-    """Wave 119: Expand ps2_japan.json with 10 more well-known JP titles.
-
-    New entries added to ps2_japan.json (96→106):
-      Atelier Iris 2: The Azoth of Destiny (JP)             SLPS-25595  Gust / Gust                         2005-05-26
-      Atelier Iris 3: Grand Phantasm (JP)                   SLPS-25718  Gust / Gust                         2006-04-27
-      Ar tonelico: Melody of Elemia (JP)                    SLPS-25695  Gust / Gust                         2006-01-26
-      Mana Khemia: Alchemists of Al-Revis (JP)              SLPS-25839  Gust / Gust                         2007-02-22
-      Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)  SLPM-66437  Atlus / Atlus               2006-03-09
-      Arc the Lad: Twilight of the Spirits (JP)             SCPS-15006  G-Artists / SCEJ                    2002-06-28
-      Growlanser V: Heritage of War (JP)                    SLPS-25775  Career Soft / Atlus                 2006-09-28
-      Steambot Chronicles (JP)                              SLPS-25487  Irem / Irem                         2005-01-27
-      Ys: The Ark of Napishtim (JP)                         SLPM-65534  Nihon Falcom / Konami               2003-09-05
-      Shadow Hearts: From the New World (JP)                SLPS-25815  Nautilus / Aruze                    2005-07-28
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        from pathlib import Path
-        import json
-        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-        cls.jp = json.loads(jp_path.read_text())["games"]
-
-    # ── JP DB count ───────────────────────────────────────────────────────────
-
-    def test_jp_db_count(self):
-        """Wave 119: Japan DB has at least 106 entries after 10 new additions."""
-        self.assertGreaterEqual(len(self.jp), 106)
-
-    # ── Atelier Iris 2: The Azoth of Destiny ─────────────────────────────────
-
-    def test_atelier_iris2_jp_present(self):
-        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) is in Japan DB."""
-        self.assertIn("Atelier Iris 2: The Azoth of Destiny (JP)", self.jp)
-
-    def test_atelier_iris2_jp_serial(self):
-        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) serial=SLPS-25595."""
-        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["serial"], "SLPS-25595")
-
-    def test_atelier_iris2_jp_developer(self):
-        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) developer=Gust."""
-        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["developer"], "Gust")
-
-    def test_atelier_iris2_jp_publisher(self):
-        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) publisher=Gust."""
-        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["publisher"], "Gust")
-
-    def test_atelier_iris2_jp_release_date(self):
-        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) release_date=2005-05-26."""
-        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["release_date"], "2005-05-26")
-
-    # ── Atelier Iris 3: Grand Phantasm ───────────────────────────────────────
-
-    def test_atelier_iris3_jp_present(self):
-        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) is in Japan DB."""
-        self.assertIn("Atelier Iris 3: Grand Phantasm (JP)", self.jp)
-
-    def test_atelier_iris3_jp_serial(self):
-        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) serial=SLPS-25718."""
-        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["serial"], "SLPS-25718")
-
-    def test_atelier_iris3_jp_developer(self):
-        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) developer=Gust."""
-        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["developer"], "Gust")
-
-    def test_atelier_iris3_jp_release_date(self):
-        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) release_date=2006-04-27."""
-        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["release_date"], "2006-04-27")
-
-    # ── Ar tonelico: Melody of Elemia ─────────────────────────────────────────
-
-    def test_ar_tonelico_jp_present(self):
-        """Wave 119: Ar tonelico: Melody of Elemia (JP) is in Japan DB."""
-        self.assertIn("Ar tonelico: Melody of Elemia (JP)", self.jp)
-
-    def test_ar_tonelico_jp_serial(self):
-        """Wave 119: Ar tonelico: Melody of Elemia (JP) serial=SLPS-25695."""
-        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["serial"], "SLPS-25695")
-
-    def test_ar_tonelico_jp_developer(self):
-        """Wave 119: Ar tonelico: Melody of Elemia (JP) developer=Gust."""
-        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["developer"], "Gust")
-
-    def test_ar_tonelico_jp_release_date(self):
-        """Wave 119: Ar tonelico: Melody of Elemia (JP) release_date=2006-01-26."""
-        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["release_date"], "2006-01-26")
-
-    # ── Mana Khemia: Alchemists of Al-Revis ──────────────────────────────────
-
-    def test_mana_khemia_jp_present(self):
-        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) is in Japan DB."""
-        self.assertIn("Mana Khemia: Alchemists of Al-Revis (JP)", self.jp)
-
-    def test_mana_khemia_jp_serial(self):
-        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) serial=SLPS-25839."""
-        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["serial"], "SLPS-25839")
-
-    def test_mana_khemia_jp_developer(self):
-        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) developer=Gust."""
-        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["developer"], "Gust")
-
-    def test_mana_khemia_jp_release_date(self):
-        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) release_date=2007-02-22."""
-        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["release_date"], "2007-02-22")
-
-    # ── Devil Summoner: Raidou Kuzunoha vs. The Soulless Army ────────────────
-
-    def test_raidou_jp_present(self):
-        """Wave 119: Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP) is in Japan DB."""
-        self.assertIn("Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)", self.jp)
-
-    def test_raidou_jp_serial(self):
-        """Wave 119: Raidou Kuzunoha (JP) serial=SLPM-66437."""
-        self.assertEqual(
-            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["serial"],
-            "SLPM-66437"
-        )
-
-    def test_raidou_jp_developer(self):
-        """Wave 119: Raidou Kuzunoha (JP) developer=Atlus."""
-        self.assertEqual(
-            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["developer"],
-            "Atlus"
-        )
-
-    def test_raidou_jp_publisher(self):
-        """Wave 119: Raidou Kuzunoha (JP) publisher=Atlus."""
-        self.assertEqual(
-            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["publisher"],
-            "Atlus"
-        )
-
-    def test_raidou_jp_release_date(self):
-        """Wave 119: Raidou Kuzunoha (JP) release_date=2006-03-09."""
-        self.assertEqual(
-            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["release_date"],
-            "2006-03-09"
-        )
-
-    # ── Arc the Lad: Twilight of the Spirits ─────────────────────────────────
-
-    def test_arc_the_lad_jp_present(self):
-        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) is in Japan DB."""
-        self.assertIn("Arc the Lad: Twilight of the Spirits (JP)", self.jp)
-
-    def test_arc_the_lad_jp_serial(self):
-        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) serial=SCPS-15006."""
-        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["serial"], "SCPS-15006")
-
-    def test_arc_the_lad_jp_developer(self):
-        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) developer=G-Artists."""
-        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["developer"], "G-Artists")
-
-    def test_arc_the_lad_jp_publisher(self):
-        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) publisher=SCEJ."""
-        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["publisher"], "SCEJ")
-
-    def test_arc_the_lad_jp_release_date(self):
-        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) release_date=2002-06-28."""
-        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["release_date"], "2002-06-28")
-
-    # ── Growlanser V: Heritage of War ─────────────────────────────────────────
-
-    def test_growlanser5_jp_present(self):
-        """Wave 119: Growlanser V: Heritage of War (JP) is in Japan DB."""
-        self.assertIn("Growlanser V: Heritage of War (JP)", self.jp)
-
-    def test_growlanser5_jp_serial(self):
-        """Wave 119: Growlanser V: Heritage of War (JP) serial=SLPS-25775."""
-        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["serial"], "SLPS-25775")
-
-    def test_growlanser5_jp_developer(self):
-        """Wave 119: Growlanser V: Heritage of War (JP) developer=Career Soft."""
-        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["developer"], "Career Soft")
-
-    def test_growlanser5_jp_publisher(self):
-        """Wave 119: Growlanser V: Heritage of War (JP) publisher=Atlus."""
-        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["publisher"], "Atlus")
-
-    # ── Steambot Chronicles ───────────────────────────────────────────────────
-
-    def test_steambot_chronicles_jp_present(self):
-        """Wave 119: Steambot Chronicles (JP) is in Japan DB."""
-        self.assertIn("Steambot Chronicles (JP)", self.jp)
-
-    def test_steambot_chronicles_jp_serial(self):
-        """Wave 119: Steambot Chronicles (JP) serial=SLPS-25487."""
-        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["serial"], "SLPS-25487")
-
-    def test_steambot_chronicles_jp_developer(self):
-        """Wave 119: Steambot Chronicles (JP) developer=Irem."""
-        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["developer"], "Irem")
-
-    def test_steambot_chronicles_jp_release_date(self):
-        """Wave 119: Steambot Chronicles (JP) release_date=2005-01-27."""
-        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["release_date"], "2005-01-27")
-
-    # ── Ys: The Ark of Napishtim ──────────────────────────────────────────────
-
-    def test_ys_ark_jp_present(self):
-        """Wave 119: Ys: The Ark of Napishtim (JP) is in Japan DB."""
-        self.assertIn("Ys: The Ark of Napishtim (JP)", self.jp)
-
-    def test_ys_ark_jp_serial(self):
-        """Wave 119: Ys: The Ark of Napishtim (JP) serial=SLPM-65534."""
-        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["serial"], "SLPM-65534")
-
-    def test_ys_ark_jp_developer(self):
-        """Wave 119: Ys: The Ark of Napishtim (JP) developer=Nihon Falcom."""
-        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["developer"], "Nihon Falcom")
-
-    def test_ys_ark_jp_publisher(self):
-        """Wave 119: Ys: The Ark of Napishtim (JP) publisher=Konami."""
-        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["publisher"], "Konami")
-
-    def test_ys_ark_jp_release_date(self):
-        """Wave 119: Ys: The Ark of Napishtim (JP) release_date=2003-09-05."""
-        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["release_date"], "2003-09-05")
-
-    # ── Shadow Hearts: From the New World ────────────────────────────────────
-
-    def test_sh_from_new_world_jp_present(self):
-        """Wave 119: Shadow Hearts: From the New World (JP) is in Japan DB."""
-        self.assertIn("Shadow Hearts: From the New World (JP)", self.jp)
-
-    def test_sh_from_new_world_jp_serial(self):
-        """Wave 119: Shadow Hearts: From the New World (JP) serial=SLPS-25815."""
-        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["serial"], "SLPS-25815")
-
-    def test_sh_from_new_world_jp_developer(self):
-        """Wave 119: Shadow Hearts: From the New World (JP) developer=Nautilus."""
-        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["developer"], "Nautilus")
-
-    def test_sh_from_new_world_jp_publisher(self):
-        """Wave 119: Shadow Hearts: From the New World (JP) publisher=Aruze."""
-        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["publisher"], "Aruze")
-
-    def test_sh_from_new_world_jp_release_date(self):
-        """Wave 119: Shadow Hearts: From the New World (JP) release_date=2005-07-28."""
-        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["release_date"], "2005-07-28")
-
-    # ── All JP serials have correct prefix ───────────────────────────────────
-
-    def test_jp_db_all_serials_are_jp_region(self):
-        """Wave 119: Every primary serial in Japan DB must begin with a JP prefix."""
+        """Wave 120: Every primary serial in Japan DB must begin with a JP prefix."""
         allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
         for title, info in self.jp.items():
             serial = info.get("serial", "")
