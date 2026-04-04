@@ -20871,3 +20871,253 @@ class TestWave112DbAuditFixes(unittest.TestCase):
         all_missing = [t for t, gi in sdb._games.items()
                        if gi.region in ('NTSC-U', 'NTSC-J') and not gi.publisher and gi.disc_type == 'retail']
         self.assertEqual(all_missing, [], f"Entries missing publisher: {all_missing}")
+
+
+class TestWave113DbGenreDateFills(unittest.TestCase):
+    """Wave 113: Filled genre + release_date for all 2200 NTSC-U entries.
+    Phase 1: 251 base titles filled directly.
+    Phase 2: 44 titles with genre-but-no-date filled; World Series of Poker 2008 genre fixed (Classic→Casino).
+    Phase 3: 233 alt-serial variants inherited genre/date from base titles.
+    Phase 4: 5 orphan alt-serials filled directly.
+    All 2200 NTSC-U entries now have non-empty genre and release_date."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _game(self, title):
+        return self.sdb._games.get(title)
+
+    def _genre(self, title):
+        g = self._game(title)
+        return g.genre if g else None
+
+    def _date(self, title):
+        g = self._game(title)
+        return g.release_date if g else None
+
+    # ── completeness guarantees ──────────────────────────────────────────────
+    def test_all_ntsc_u_have_genre(self):
+        """Wave 113: Every NTSC-U entry has a non-empty genre."""
+        missing = [t for t, gi in self.sdb._games.items()
+                   if gi.region == 'NTSC-U' and not gi.genre]
+        self.assertEqual(missing, [], f"Entries missing genre: {missing[:10]}")
+
+    def test_all_ntsc_u_have_release_date(self):
+        """Wave 113: Every NTSC-U entry has a non-empty release_date."""
+        missing = [t for t, gi in self.sdb._games.items()
+                   if gi.region == 'NTSC-U' and not gi.release_date]
+        self.assertEqual(missing, [], f"Entries missing release_date: {missing[:10]}")
+
+    # ── Phase-1 spot-checks (base titles filled) ─────────────────────────────
+    def test_007_everything_or_nothing_genre_date(self):
+        """Wave 113: 007: Everything or Nothing genre=Action, date=2004-02-17."""
+        self.assertEqual(self._genre('007: Everything or Nothing'), 'Action')
+        self.assertEqual(self._date('007: Everything or Nothing'), '2004-02-17')
+
+    def test_battlefield2_modern_combat_genre_date(self):
+        """Wave 113: Battlefield 2: Modern Combat genre=First-person Shooter."""
+        self.assertEqual(self._genre('Battlefield 2: Modern Combat'), 'First-person Shooter')
+        self.assertEqual(self._date('Battlefield 2: Modern Combat'), '2005-11-01')
+
+    def test_def_jam_vendetta_genre_date(self):
+        """Wave 113: Def Jam: Vendetta genre=Fighting, date=2003-03-18."""
+        self.assertEqual(self._genre('Def Jam: Vendetta'), 'Fighting')
+        self.assertEqual(self._date('Def Jam: Vendetta'), '2003-03-18')
+
+    def test_dmc3_special_edition_genre_date(self):
+        """Wave 113: Devil May Cry 3: Special Edition genre=Action, date=2006-02-22."""
+        self.assertEqual(self._genre('Devil May Cry 3: Special Edition'), 'Action')
+        self.assertEqual(self._date('Devil May Cry 3: Special Edition'), '2006-02-22')
+
+    def test_final_fantasy_xi_genre_date(self):
+        """Wave 113: Final Fantasy XI Online genre=MMORPG, date=2004-03-23."""
+        self.assertEqual(self._genre('Final Fantasy XI Online'), 'MMORPG')
+        self.assertEqual(self._date('Final Fantasy XI Online'), '2004-03-23')
+
+    def test_persona_4_genre_date(self):
+        """Wave 113: Persona 4 genre=RPG, date=2008-12-09."""
+        self.assertEqual(self._genre('Persona 4'), 'RPG')
+        self.assertEqual(self._date('Persona 4'), '2008-12-09')
+
+    def test_smt_persona3_genre_date(self):
+        """Wave 113: Shin Megami Tensei: Persona 3 genre=RPG, date=2007-08-14."""
+        self.assertEqual(self._genre('Shin Megami Tensei: Persona 3'), 'RPG')
+        self.assertEqual(self._date('Shin Megami Tensei: Persona 3'), '2007-08-14')
+
+    def test_smt_persona3_fes_genre_date(self):
+        """Wave 113: Shin Megami Tensei: Persona 3 FES genre=RPG, date=2008-04-22."""
+        self.assertEqual(self._genre('Shin Megami Tensei: Persona 3 FES'), 'RPG')
+        self.assertEqual(self._date('Shin Megami Tensei: Persona 3 FES'), '2008-04-22')
+
+    def test_smt_persona4_genre_date(self):
+        """Wave 113: Shin Megami Tensei: Persona 4 genre=RPG, date=2008-12-09."""
+        self.assertEqual(self._genre('Shin Megami Tensei: Persona 4'), 'RPG')
+        self.assertEqual(self._date('Shin Megami Tensei: Persona 4'), '2008-12-09')
+
+    def test_smt_devil_summoner_genre_date(self):
+        """Wave 113: SMT: Devil Summoner: Raidou Kuzunoha genre=RPG."""
+        title = 'Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army'
+        self.assertEqual(self._genre(title), 'RPG')
+        self.assertEqual(self._date(title), '2006-10-10')
+
+    def test_dot_hack_infection_genre_date(self):
+        """Wave 113: Dot Hack Part 1: Infection genre=Action-RPG, date=2003-02-11."""
+        self.assertEqual(self._genre('Dot Hack Part 1: Infection'), 'Action-RPG')
+        self.assertEqual(self._date('Dot Hack Part 1: Infection'), '2003-02-11')
+
+    def test_dot_hack_mutation_genre_date(self):
+        """Wave 113: Dot Hack Part 2: Mutation genre=Action-RPG, date=2003-06-03."""
+        self.assertEqual(self._genre('Dot Hack Part 2: Mutation'), 'Action-RPG')
+        self.assertEqual(self._date('Dot Hack Part 2: Mutation'), '2003-06-03')
+
+    def test_dbz_budokai_tenkaichi2_genre_date(self):
+        """Wave 113: Dragon Ball Z: Budokai Tenkaichi 2 genre=Fighting, date=2006-11-15."""
+        self.assertEqual(self._genre('Dragon Ball Z: Budokai Tenkaichi 2'), 'Fighting')
+        self.assertEqual(self._date('Dragon Ball Z: Budokai Tenkaichi 2'), '2006-11-15')
+
+    def test_nfl_gameday_2003_genre_date(self):
+        """Wave 113: NFL GameDay 2003 genre=Sports, date=2002-08-01."""
+        self.assertEqual(self._genre('NFL GameDay 2003'), 'Sports')
+        self.assertEqual(self._date('NFL GameDay 2003'), '2002-08-01')
+
+    def test_nba_street_vol2_genre_date(self):
+        """Wave 113: NBA Street Vol. 2 genre=Sports, date=2003-08-19."""
+        self.assertEqual(self._genre('NBA Street Vol. 2'), 'Sports')
+        self.assertEqual(self._date('NBA Street Vol. 2'), '2003-08-19')
+
+    def test_nhl_hitz_2003_genre_date(self):
+        """Wave 113: NHL Hitz 2003 genre=Sports, date=2002-09-12."""
+        self.assertEqual(self._genre('NHL Hitz 2003'), 'Sports')
+        self.assertEqual(self._date('NHL Hitz 2003'), '2002-09-12')
+
+    def test_soulcalibur_ii_genre_date(self):
+        """Wave 113: Soulcalibur II genre=Fighting, date=2003-08-27."""
+        self.assertEqual(self._genre('Soulcalibur II'), 'Fighting')
+        self.assertEqual(self._date('Soulcalibur II'), '2003-08-27')
+
+    def test_socom_combined_assault_genre_date(self):
+        """Wave 113: SOCOM: U.S. Navy SEALs: Combined Assault genre=Action, Shooter."""
+        self.assertEqual(self._genre('SOCOM: U.S. Navy SEALs: Combined Assault'), 'Action, Shooter')
+        self.assertEqual(self._date('SOCOM: U.S. Navy SEALs: Combined Assault'), '2006-11-07')
+
+    def test_rumble_racing_genre_date(self):
+        """Wave 113: Rumble Racing genre=Racing, date=2001-04-17."""
+        self.assertEqual(self._genre('Rumble Racing'), 'Racing')
+        self.assertEqual(self._date('Rumble Racing'), '2001-04-17')
+
+    def test_mark_of_kri_genre_date(self):
+        """Wave 113: The Mark of Kri genre=Action, date=2002-07-16."""
+        self.assertEqual(self._genre('The Mark of Kri'), 'Action')
+        self.assertEqual(self._date('The Mark of Kri'), '2002-07-16')
+
+    def test_mx_vs_atv_unleashed_genre_date(self):
+        """Wave 113: MX vs. ATV Unleashed genre=Racing, date=2005-02-15."""
+        self.assertEqual(self._genre('MX vs. ATV Unleashed'), 'Racing')
+        self.assertEqual(self._date('MX vs. ATV Unleashed'), '2005-02-15')
+
+    def test_naruto_ultimate_ninja_genre_date(self):
+        """Wave 113: Naruto: Ultimate Ninja genre=Fighting, date=2006-06-26."""
+        self.assertEqual(self._genre('Naruto: Ultimate Ninja'), 'Fighting')
+        self.assertEqual(self._date('Naruto: Ultimate Ninja'), '2006-06-26')
+
+    def test_neopets_darkest_faerie_genre_date(self):
+        """Wave 113: Neopets: The Darkest Faerie genre=Action-RPG, date=2005-11-02."""
+        self.assertEqual(self._genre('Neopets: The Darkest Faerie'), 'Action-RPG')
+        self.assertEqual(self._date('Neopets: The Darkest Faerie'), '2005-11-02')
+
+    # ── Phase-2 spot-checks (date-only fills + genre fix) ────────────────────
+    def test_world_series_poker_2008_genre_fixed(self):
+        """Wave 113: World Series of Poker 2008 genre corrected from Classic to Casino."""
+        self.assertEqual(self._genre('World Series of Poker 2008: Battle for the Bracelets'), 'Casino')
+        self.assertEqual(self._date('World Series of Poker 2008: Battle for the Bracelets'), '2008-09-09')
+
+    def test_shadow_of_colossus_gh_date(self):
+        """Wave 113: Shadow of the Colossus: Greatest Hits date=2005-10-18."""
+        self.assertEqual(self._date('Shadow of the Colossus: Greatest Hits'), '2005-10-18')
+
+    def test_mega_man_x_collection_date(self):
+        """Wave 113: Mega Man X Collection date=2006-01-10."""
+        self.assertEqual(self._date('Mega Man X Collection'), '2006-01-10')
+
+    def test_mvp_baseball_2005_date(self):
+        """Wave 113: MVP Baseball 2005 date=2005-03-08."""
+        self.assertEqual(self._date('MVP Baseball 2005'), '2005-03-08')
+
+    def test_shrek2_date(self):
+        """Wave 113: Shrek 2 date=2004-04-20."""
+        self.assertEqual(self._date('Shrek 2'), '2004-04-20')
+
+    def test_atv_offroad_fury4_date(self):
+        """Wave 113: ATV Offroad Fury 4 (base) date=2006-10-18."""
+        self.assertEqual(self._date('ATV Offroad Fury 4'), '2006-10-18')
+
+    # ── Phase-3 spot-checks (alt-serial propagation) ─────────────────────────
+    def test_battlefield2_alt_serials_genre_propagated(self):
+        """Wave 113: Battlefield 2 alt-serial variants inherited genre from base."""
+        for title in ('Battlefield 2: Modern Combat (SLUS-29152)',
+                      'Battlefield 2: Modern Combat (SLUS-29172)'):
+            self.assertEqual(self._genre(title), 'First-person Shooter', title)
+            self.assertEqual(self._date(title), '2005-11-01', title)
+
+    def test_dot_hack_infection_alt_serial_propagated(self):
+        """Wave 113: Dot Hack Part 1: Infection alt-serial inherited genre."""
+        self.assertEqual(self._genre('Dot Hack Part 1: Infection (SLUS-29042)'), 'Action-RPG')
+
+    def test_eyetoy_alt_serial_propagated(self):
+        """Wave 113: EyeToy alt-serial (SCUS-97600) inherited genre=Party."""
+        self.assertEqual(self._genre('EyeToy (SCUS-97600)'), 'Party')
+
+    def test_nfl_gameday_2003_alt_serial_propagated(self):
+        """Wave 113: NFL GameDay 2003 alt-serial inherited genre=Sports."""
+        self.assertEqual(self._genre('NFL GameDay 2003 (SCUS-97223)'), 'Sports')
+
+    def test_nba_shootout_2003_alt_serial_propagated(self):
+        """Wave 113: NBA ShootOut 2003 alt-serial inherited genre=Sports."""
+        self.assertEqual(self._genre('NBA ShootOut 2003 (SCUS-97253)'), 'Sports')
+
+    def test_mark_of_kri_alt_serial_propagated(self):
+        """Wave 113: The Mark of Kri alt-serial inherited genre=Action."""
+        self.assertEqual(self._genre('The Mark of Kri (SCUS-97222)'), 'Action')
+
+    def test_syphon_filter_omega_strain_alt_serial_propagated(self):
+        """Wave 113: Syphon Filter: The Omega Strain alt-serial inherited genre."""
+        self.assertEqual(self._genre('Syphon Filter: The Omega Strain (SCUS-97397)'), 'Action, Shooter')
+
+    def test_ufc_throwdown_alt_serial_propagated(self):
+        """Wave 113: UFC: Throwdown alt-serial inherited genre=Fighting."""
+        self.assertEqual(self._genre('UFC: Throwdown (SLUS-29022)'), 'Fighting')
+
+    def test_transformers_alt_serial_propagated(self):
+        """Wave 113: Transformers alt-serial inherited genre=Action."""
+        self.assertEqual(self._genre('Transformers (SLUS-29107)'), 'Action')
+
+    def test_dance_factory_alt_serial_propagated(self):
+        """Wave 113: Dance Factory alt-serial inherited genre=Rhythm."""
+        self.assertEqual(self._genre('Dance Factory (SLUS-28062)'), 'Rhythm')
+
+    # ── Phase-4 spot-checks (orphan alt-serial direct fills) ─────────────────
+    def test_atv_offroad_fury2_orphan_genre_date(self):
+        """Wave 113: ATV Offroad Fury 2 (SCUS-97238) orphan alt-serial filled directly."""
+        self.assertEqual(self._genre('ATV Offroad Fury 2 (SCUS-97238)'), 'Racing')
+        self.assertEqual(self._date('ATV Offroad Fury 2 (SCUS-97238)'), '2002-11-12')
+
+    def test_champions_of_norrath_orphan_genre_date(self):
+        """Wave 113: Champions of Norrath (SLUS-29088) orphan alt-serial filled directly."""
+        self.assertEqual(self._genre('Champions of Norrath (SLUS-29088)'), 'Action-RPG')
+        self.assertEqual(self._date('Champions of Norrath (SLUS-29088)'), '2004-01-27')
+
+    def test_espn_nba_2night_orphan_genre_date(self):
+        """Wave 113: ESPN NBA 2Night (SLUS-20143) orphan alt-serial filled directly."""
+        self.assertEqual(self._genre('ESPN NBA 2Night (SLUS-20143)'), 'Sports')
+        self.assertEqual(self._date('ESPN NBA 2Night (SLUS-20143)'), '2001-02-28')
+
+    def test_wild_arms_3_orphan_genre_date(self):
+        """Wave 113: Wild Arms 3 (SCUS-97224) orphan alt-serial filled directly."""
+        self.assertEqual(self._genre('Wild Arms 3 (SCUS-97224)'), 'RPG')
+        self.assertEqual(self._date('Wild Arms 3 (SCUS-97224)'), '2002-11-19')
+
+    def test_atv_offroad_fury3_greatest_hits_orphan_genre_date(self):
+        """Wave 113: ATV Offroad Fury 3: Greatest Hits (SCUS-97514) filled directly."""
+        self.assertEqual(self._genre('ATV Offroad Fury 3: Greatest Hits (SCUS-97514)'), 'Racing')
+        self.assertEqual(self._date('ATV Offroad Fury 3: Greatest Hits (SCUS-97514)'), '2004-11-02')
