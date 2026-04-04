@@ -20690,3 +20690,184 @@ class TestWave111DemoDbExpansion(unittest.TestCase):
         retail_set = set(self.sdb.retail_titles())
         for title in new_demo_titles:
             self.assertNotIn(title, retail_set, f"Demo title leaked into retail: {title}")
+
+
+class TestWave112DbAuditFixes(unittest.TestCase):
+    """Wave 112: Propagated dev/pub to 213 alt-serial variants; filled 305+
+    well-known missing entries; fixed NHL FaceOff 2003 publisher (SolWorks→989
+    Sports); filled Gretzky NHL 06 missing developer; all 2200 NTSC-U entries
+    now have non-empty developer and publisher."""
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    def _info(self, title):
+        gi = self.sdb._games.get(title)
+        if gi is None:
+            return {}
+        return {'developer': gi.developer, 'publisher': gi.publisher}
+
+    # ── Phase-1 propagation examples ─────────────────────────────────────────
+    def test_jak_jd_alt_serial_propagated(self):
+        """Wave 112: Jak and Daxter alt-serial variants inherit Naughty Dog dev."""
+        for title in ('Jak and Daxter: The Precursor Legacy (SCUS-97170)',
+                      'Jak and Daxter: The Precursor Legacy (SCUS-97171)'):
+            info = self._info(title)
+            self.assertEqual(info.get('developer'), 'Naughty Dog', title)
+
+    def test_jak2_alt_serial_propagated(self):
+        """Wave 112: Jak II alt-serial variants inherit Naughty Dog dev."""
+        for title in ('Jak II (SCUS-97273)', 'Jak II (SCUS-97274)'):
+            info = self._info(title)
+            self.assertEqual(info.get('developer'), 'Naughty Dog', title)
+
+    def test_killzone_alt_serial_propagated(self):
+        """Wave 112: Killzone alt-serial variants inherit Guerrilla dev."""
+        for title in ('Killzone (SCUS-97431)', 'Killzone (SCUS-97432)'):
+            info = self._info(title)
+            self.assertEqual(info.get('developer'), 'Guerrilla', title)
+
+    def test_gt3_alt_serials_propagated(self):
+        """Wave 112: Gran Turismo 3 alt-serial variants inherit Polyphony Digital dev."""
+        for title in ('Gran Turismo 3: A-Spec (SCUS-97115)',
+                      'Gran Turismo 3: A-Spec (SCUS-97512)'):
+            info = self._info(title)
+            self.assertEqual(info.get('developer'), 'Polyphony Digital', title)
+
+    def test_burnout_alt_serial_propagated(self):
+        """Wave 112: Burnout alt-serial inherits Criterion Games dev."""
+        info = self._info('Burnout (SLUS-28006)')
+        self.assertEqual(info.get('developer'), 'Criterion Games')
+
+    # ── Phase-2 known-wrong fixes ─────────────────────────────────────────────
+    def test_nhl_faceooff_2003_publisher_fixed(self):
+        """Wave 112: NHL FaceOff 2003 publisher corrected from SolWorks to 989 Sports."""
+        info = self._info('NHL FaceOff 2003')
+        self.assertEqual(info.get('publisher'), '989 Sports')
+        self.assertNotEqual(info.get('publisher'), 'SolWorks')
+
+    def test_gretzky_nhl_06_developer_filled(self):
+        """Wave 112: Gretzky NHL 06 missing developer filled as 989 Sports."""
+        info = self._info('Gretzky NHL 06')
+        self.assertEqual(info.get('developer'), '989 Sports')
+
+    # ── Phase-3 notable entries ───────────────────────────────────────────────
+    def test_dmc3_special_edition_dev_pub(self):
+        """Wave 112: Devil May Cry 3: Special Edition has Capcom dev and pub."""
+        info = self._info('Devil May Cry 3: Special Edition')
+        self.assertEqual(info.get('developer'), 'Capcom')
+        self.assertEqual(info.get('publisher'), 'Capcom')
+
+    def test_persona_4_dev_pub(self):
+        """Wave 112: Persona 4 has Atlus dev and pub."""
+        info = self._info('Persona 4')
+        self.assertEqual(info.get('developer'), 'Atlus')
+        self.assertEqual(info.get('publisher'), 'Atlus')
+
+    def test_naruto_ultimate_ninja_dev_pub(self):
+        """Wave 112: Naruto: Ultimate Ninja has CyberConnect2 dev."""
+        info = self._info('Naruto: Ultimate Ninja')
+        self.assertEqual(info.get('developer'), 'CyberConnect2')
+        self.assertEqual(info.get('publisher'), 'Namco Bandai Games America')
+
+    def test_vf4_evolution_dev_pub(self):
+        """Wave 112: Virtua Fighter 4: Evolution has Sega AM2 dev."""
+        info = self._info('Virtua Fighter 4: Evolution')
+        self.assertEqual(info.get('developer'), 'Sega AM2')
+        self.assertEqual(info.get('publisher'), 'Sega')
+
+    def test_nba_street_v2_dev_pub(self):
+        """Wave 112: NBA Street Vol. 2 has EA Canada dev and EA Sports BIG pub."""
+        info = self._info('NBA Street Vol. 2')
+        self.assertEqual(info.get('developer'), 'EA Canada')
+        self.assertEqual(info.get('publisher'), 'EA Sports BIG')
+
+    def test_nfs_prostreet_dev_pub(self):
+        """Wave 112: Need for Speed: ProStreet has EA Black Box dev."""
+        info = self._info('Need for Speed: ProStreet')
+        self.assertEqual(info.get('developer'), 'EA Black Box')
+
+    def test_jak3_greatest_hits_dev_pub(self):
+        """Wave 112: Jak 3 (Greatest Hits) has Naughty Dog dev."""
+        info = self._info('Jak 3 (Greatest Hits)')
+        self.assertEqual(info.get('developer'), 'Naughty Dog')
+
+    def test_mark_of_kri_dev_pub(self):
+        """Wave 112: The Mark of Kri has SCE Studios San Diego dev."""
+        info = self._info('The Mark of Kri')
+        self.assertEqual(info.get('developer'), 'SCE Studios San Diego')
+        self.assertEqual(info.get('publisher'), 'Sony Computer Entertainment America')
+
+    def test_dbz_budokai_tenkaichi_2_dev_pub(self):
+        """Wave 112: Dragon Ball Z: Budokai Tenkaichi 2 has Spike dev and Atari pub."""
+        info = self._info('Dragon Ball Z: Budokai Tenkaichi 2')
+        self.assertEqual(info.get('developer'), 'Spike')
+        self.assertEqual(info.get('publisher'), 'Atari')
+
+    def test_nhl_faceooff_2001_dev_pub(self):
+        """Wave 112: NHL FaceOff 2001 has 989 Sports dev and pub."""
+        info = self._info('NHL FaceOff 2001')
+        self.assertEqual(info.get('developer'), '989 Sports')
+        self.assertEqual(info.get('publisher'), '989 Sports')
+
+    def test_nfl_gameday_dev_pub(self):
+        """Wave 112: NFL GameDay has 989 Sports dev."""
+        info = self._info('NFL GameDay')
+        self.assertEqual(info.get('developer'), '989 Sports')
+
+    def test_nba_shootout_2001_dev_pub(self):
+        """Wave 112: NBA ShootOut 2001 has Killer Game dev and 989 Sports pub."""
+        info = self._info('NBA ShootOut 2001')
+        self.assertEqual(info.get('developer'), 'Killer Game')
+        self.assertEqual(info.get('publisher'), '989 Sports')
+
+    def test_eyetoy_dev_pub(self):
+        """Wave 112: EyeToy has SCE London Studio dev."""
+        info = self._info('EyeToy')
+        self.assertEqual(info.get('developer'), 'SCE London Studio')
+
+    def test_dot_hack_infection_dev_pub(self):
+        """Wave 112: Dot Hack Part 1: Infection has CyberConnect2 dev."""
+        info = self._info('Dot Hack Part 1: Infection')
+        self.assertEqual(info.get('developer'), 'CyberConnect2')
+        self.assertEqual(info.get('publisher'), 'Bandai')
+
+    def test_pes_2008_dev_pub(self):
+        """Wave 112: PES 2008 has Konami dev and pub."""
+        info = self._info('PES 2008: Pro Evolution Soccer')
+        self.assertEqual(info.get('developer'), 'Konami')
+        self.assertEqual(info.get('publisher'), 'Konami')
+
+    def test_nba_2k8_dev_pub(self):
+        """Wave 112: NBA 2K8 has Visual Concepts dev and 2K Sports pub."""
+        info = self._info('NBA 2K8')
+        self.assertEqual(info.get('developer'), 'Visual Concepts')
+        self.assertEqual(info.get('publisher'), '2K Sports')
+
+    def test_rock_band_2_dev_pub(self):
+        """Wave 112: Rock Band 2 has Harmonix dev and MTV Games pub."""
+        info = self._info('Rock Band 2')
+        self.assertEqual(info.get('developer'), 'Harmonix')
+        self.assertEqual(info.get('publisher'), 'MTV Games')
+
+    # ── Completeness guarantee ────────────────────────────────────────────────
+    def test_all_ntsc_u_entries_have_developer(self):
+        """Wave 112: Every NTSC-U entry has a non-empty developer field."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        missing = [t for t in sdb.retail_titles()
+                   if not (sdb._games.get(t) or type('', (), {'developer': ''})()).developer
+                   if sdb._games.get(t) and not sdb._games[t].developer]
+        # Also check demo-excluded titles
+        all_missing = [t for t, gi in sdb._games.items()
+                       if gi.region in ('NTSC-U', 'NTSC-J') and not gi.developer and gi.disc_type == 'retail']
+        self.assertEqual(all_missing, [], f"Entries missing developer: {all_missing}")
+
+    def test_all_ntsc_u_entries_have_publisher(self):
+        """Wave 112: Every NTSC-U entry has a non-empty publisher field."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        all_missing = [t for t, gi in sdb._games.items()
+                       if gi.region in ('NTSC-U', 'NTSC-J') and not gi.publisher and gi.disc_type == 'retail']
+        self.assertEqual(all_missing, [], f"Entries missing publisher: {all_missing}")
