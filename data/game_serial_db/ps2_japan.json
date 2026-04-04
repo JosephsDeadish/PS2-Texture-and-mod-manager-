@@ -985,6 +985,106 @@
       "developer": "Capcom Production Studio 2",
       "publisher": "Capcom",
       "genre": "Action Adventure"
+    },
+    "Atelier Iris 2: The Azoth of Destiny (JP)": {
+      "serial": "SLPS-25595",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-05-26",
+      "developer": "Gust",
+      "publisher": "Gust",
+      "genre": "RPG"
+    },
+    "Atelier Iris 3: Grand Phantasm (JP)": {
+      "serial": "SLPS-25718",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-04-27",
+      "developer": "Gust",
+      "publisher": "Gust",
+      "genre": "RPG"
+    },
+    "Ar tonelico: Melody of Elemia (JP)": {
+      "serial": "SLPS-25695",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-01-26",
+      "developer": "Gust",
+      "publisher": "Gust",
+      "genre": "RPG"
+    },
+    "Mana Khemia: Alchemists of Al-Revis (JP)": {
+      "serial": "SLPS-25839",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2007-02-22",
+      "developer": "Gust",
+      "publisher": "Gust",
+      "genre": "RPG"
+    },
+    "Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)": {
+      "serial": "SLPM-66437",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-03-09",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "Action RPG"
+    },
+    "Arc the Lad: Twilight of the Spirits (JP)": {
+      "serial": "SCPS-15006",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-06-28",
+      "developer": "G-Artists",
+      "publisher": "SCEJ",
+      "genre": "Action RPG"
+    },
+    "Growlanser V: Heritage of War (JP)": {
+      "serial": "SLPS-25775",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-09-28",
+      "developer": "Career Soft",
+      "publisher": "Atlus",
+      "genre": "Strategy RPG"
+    },
+    "Steambot Chronicles (JP)": {
+      "serial": "SLPS-25487",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-01-27",
+      "developer": "Irem",
+      "publisher": "Irem",
+      "genre": "Action RPG"
+    },
+    "Ys: The Ark of Napishtim (JP)": {
+      "serial": "SLPM-65534",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-09-05",
+      "developer": "Nihon Falcom",
+      "publisher": "Konami",
+      "genre": "Action RPG"
+    },
+    "Shadow Hearts: From the New World (JP)": {
+      "serial": "SLPS-25815",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-07-28",
+      "developer": "Nautilus",
+      "publisher": "Aruze",
+      "genre": "RPG"
     }
   }
 }

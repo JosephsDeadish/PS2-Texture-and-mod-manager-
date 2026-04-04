@@ -21905,3 +21905,257 @@ class TestWave118JapanDbExpansion(unittest.TestCase):
                 serial.startswith(allowed),
                 f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
             )
+
+
+class TestWave119JapanDbExpansion(unittest.TestCase):
+    """Wave 119: Expand ps2_japan.json with 10 more well-known JP titles.
+
+    New entries added to ps2_japan.json (96→106):
+      Atelier Iris 2: The Azoth of Destiny (JP)             SLPS-25595  Gust / Gust                         2005-05-26
+      Atelier Iris 3: Grand Phantasm (JP)                   SLPS-25718  Gust / Gust                         2006-04-27
+      Ar tonelico: Melody of Elemia (JP)                    SLPS-25695  Gust / Gust                         2006-01-26
+      Mana Khemia: Alchemists of Al-Revis (JP)              SLPS-25839  Gust / Gust                         2007-02-22
+      Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)  SLPM-66437  Atlus / Atlus               2006-03-09
+      Arc the Lad: Twilight of the Spirits (JP)             SCPS-15006  G-Artists / SCEJ                    2002-06-28
+      Growlanser V: Heritage of War (JP)                    SLPS-25775  Career Soft / Atlus                 2006-09-28
+      Steambot Chronicles (JP)                              SLPS-25487  Irem / Irem                         2005-01-27
+      Ys: The Ark of Napishtim (JP)                         SLPM-65534  Nihon Falcom / Konami               2003-09-05
+      Shadow Hearts: From the New World (JP)                SLPS-25815  Nautilus / Aruze                    2005-07-28
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+        cls.jp = json.loads(jp_path.read_text())["games"]
+
+    # ── JP DB count ───────────────────────────────────────────────────────────
+
+    def test_jp_db_count(self):
+        """Wave 119: Japan DB has at least 106 entries after 10 new additions."""
+        self.assertGreaterEqual(len(self.jp), 106)
+
+    # ── Atelier Iris 2: The Azoth of Destiny ─────────────────────────────────
+
+    def test_atelier_iris2_jp_present(self):
+        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) is in Japan DB."""
+        self.assertIn("Atelier Iris 2: The Azoth of Destiny (JP)", self.jp)
+
+    def test_atelier_iris2_jp_serial(self):
+        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) serial=SLPS-25595."""
+        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["serial"], "SLPS-25595")
+
+    def test_atelier_iris2_jp_developer(self):
+        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) developer=Gust."""
+        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["developer"], "Gust")
+
+    def test_atelier_iris2_jp_publisher(self):
+        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) publisher=Gust."""
+        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["publisher"], "Gust")
+
+    def test_atelier_iris2_jp_release_date(self):
+        """Wave 119: Atelier Iris 2: The Azoth of Destiny (JP) release_date=2005-05-26."""
+        self.assertEqual(self.jp["Atelier Iris 2: The Azoth of Destiny (JP)"]["release_date"], "2005-05-26")
+
+    # ── Atelier Iris 3: Grand Phantasm ───────────────────────────────────────
+
+    def test_atelier_iris3_jp_present(self):
+        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) is in Japan DB."""
+        self.assertIn("Atelier Iris 3: Grand Phantasm (JP)", self.jp)
+
+    def test_atelier_iris3_jp_serial(self):
+        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) serial=SLPS-25718."""
+        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["serial"], "SLPS-25718")
+
+    def test_atelier_iris3_jp_developer(self):
+        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) developer=Gust."""
+        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["developer"], "Gust")
+
+    def test_atelier_iris3_jp_release_date(self):
+        """Wave 119: Atelier Iris 3: Grand Phantasm (JP) release_date=2006-04-27."""
+        self.assertEqual(self.jp["Atelier Iris 3: Grand Phantasm (JP)"]["release_date"], "2006-04-27")
+
+    # ── Ar tonelico: Melody of Elemia ─────────────────────────────────────────
+
+    def test_ar_tonelico_jp_present(self):
+        """Wave 119: Ar tonelico: Melody of Elemia (JP) is in Japan DB."""
+        self.assertIn("Ar tonelico: Melody of Elemia (JP)", self.jp)
+
+    def test_ar_tonelico_jp_serial(self):
+        """Wave 119: Ar tonelico: Melody of Elemia (JP) serial=SLPS-25695."""
+        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["serial"], "SLPS-25695")
+
+    def test_ar_tonelico_jp_developer(self):
+        """Wave 119: Ar tonelico: Melody of Elemia (JP) developer=Gust."""
+        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["developer"], "Gust")
+
+    def test_ar_tonelico_jp_release_date(self):
+        """Wave 119: Ar tonelico: Melody of Elemia (JP) release_date=2006-01-26."""
+        self.assertEqual(self.jp["Ar tonelico: Melody of Elemia (JP)"]["release_date"], "2006-01-26")
+
+    # ── Mana Khemia: Alchemists of Al-Revis ──────────────────────────────────
+
+    def test_mana_khemia_jp_present(self):
+        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) is in Japan DB."""
+        self.assertIn("Mana Khemia: Alchemists of Al-Revis (JP)", self.jp)
+
+    def test_mana_khemia_jp_serial(self):
+        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) serial=SLPS-25839."""
+        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["serial"], "SLPS-25839")
+
+    def test_mana_khemia_jp_developer(self):
+        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) developer=Gust."""
+        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["developer"], "Gust")
+
+    def test_mana_khemia_jp_release_date(self):
+        """Wave 119: Mana Khemia: Alchemists of Al-Revis (JP) release_date=2007-02-22."""
+        self.assertEqual(self.jp["Mana Khemia: Alchemists of Al-Revis (JP)"]["release_date"], "2007-02-22")
+
+    # ── Devil Summoner: Raidou Kuzunoha vs. The Soulless Army ────────────────
+
+    def test_raidou_jp_present(self):
+        """Wave 119: Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP) is in Japan DB."""
+        self.assertIn("Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)", self.jp)
+
+    def test_raidou_jp_serial(self):
+        """Wave 119: Raidou Kuzunoha (JP) serial=SLPM-66437."""
+        self.assertEqual(
+            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["serial"],
+            "SLPM-66437"
+        )
+
+    def test_raidou_jp_developer(self):
+        """Wave 119: Raidou Kuzunoha (JP) developer=Atlus."""
+        self.assertEqual(
+            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["developer"],
+            "Atlus"
+        )
+
+    def test_raidou_jp_publisher(self):
+        """Wave 119: Raidou Kuzunoha (JP) publisher=Atlus."""
+        self.assertEqual(
+            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["publisher"],
+            "Atlus"
+        )
+
+    def test_raidou_jp_release_date(self):
+        """Wave 119: Raidou Kuzunoha (JP) release_date=2006-03-09."""
+        self.assertEqual(
+            self.jp["Devil Summoner: Raidou Kuzunoha vs. The Soulless Army (JP)"]["release_date"],
+            "2006-03-09"
+        )
+
+    # ── Arc the Lad: Twilight of the Spirits ─────────────────────────────────
+
+    def test_arc_the_lad_jp_present(self):
+        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) is in Japan DB."""
+        self.assertIn("Arc the Lad: Twilight of the Spirits (JP)", self.jp)
+
+    def test_arc_the_lad_jp_serial(self):
+        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) serial=SCPS-15006."""
+        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["serial"], "SCPS-15006")
+
+    def test_arc_the_lad_jp_developer(self):
+        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) developer=G-Artists."""
+        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["developer"], "G-Artists")
+
+    def test_arc_the_lad_jp_publisher(self):
+        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) publisher=SCEJ."""
+        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["publisher"], "SCEJ")
+
+    def test_arc_the_lad_jp_release_date(self):
+        """Wave 119: Arc the Lad: Twilight of the Spirits (JP) release_date=2002-06-28."""
+        self.assertEqual(self.jp["Arc the Lad: Twilight of the Spirits (JP)"]["release_date"], "2002-06-28")
+
+    # ── Growlanser V: Heritage of War ─────────────────────────────────────────
+
+    def test_growlanser5_jp_present(self):
+        """Wave 119: Growlanser V: Heritage of War (JP) is in Japan DB."""
+        self.assertIn("Growlanser V: Heritage of War (JP)", self.jp)
+
+    def test_growlanser5_jp_serial(self):
+        """Wave 119: Growlanser V: Heritage of War (JP) serial=SLPS-25775."""
+        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["serial"], "SLPS-25775")
+
+    def test_growlanser5_jp_developer(self):
+        """Wave 119: Growlanser V: Heritage of War (JP) developer=Career Soft."""
+        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["developer"], "Career Soft")
+
+    def test_growlanser5_jp_publisher(self):
+        """Wave 119: Growlanser V: Heritage of War (JP) publisher=Atlus."""
+        self.assertEqual(self.jp["Growlanser V: Heritage of War (JP)"]["publisher"], "Atlus")
+
+    # ── Steambot Chronicles ───────────────────────────────────────────────────
+
+    def test_steambot_chronicles_jp_present(self):
+        """Wave 119: Steambot Chronicles (JP) is in Japan DB."""
+        self.assertIn("Steambot Chronicles (JP)", self.jp)
+
+    def test_steambot_chronicles_jp_serial(self):
+        """Wave 119: Steambot Chronicles (JP) serial=SLPS-25487."""
+        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["serial"], "SLPS-25487")
+
+    def test_steambot_chronicles_jp_developer(self):
+        """Wave 119: Steambot Chronicles (JP) developer=Irem."""
+        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["developer"], "Irem")
+
+    def test_steambot_chronicles_jp_release_date(self):
+        """Wave 119: Steambot Chronicles (JP) release_date=2005-01-27."""
+        self.assertEqual(self.jp["Steambot Chronicles (JP)"]["release_date"], "2005-01-27")
+
+    # ── Ys: The Ark of Napishtim ──────────────────────────────────────────────
+
+    def test_ys_ark_jp_present(self):
+        """Wave 119: Ys: The Ark of Napishtim (JP) is in Japan DB."""
+        self.assertIn("Ys: The Ark of Napishtim (JP)", self.jp)
+
+    def test_ys_ark_jp_serial(self):
+        """Wave 119: Ys: The Ark of Napishtim (JP) serial=SLPM-65534."""
+        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["serial"], "SLPM-65534")
+
+    def test_ys_ark_jp_developer(self):
+        """Wave 119: Ys: The Ark of Napishtim (JP) developer=Nihon Falcom."""
+        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["developer"], "Nihon Falcom")
+
+    def test_ys_ark_jp_publisher(self):
+        """Wave 119: Ys: The Ark of Napishtim (JP) publisher=Konami."""
+        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["publisher"], "Konami")
+
+    def test_ys_ark_jp_release_date(self):
+        """Wave 119: Ys: The Ark of Napishtim (JP) release_date=2003-09-05."""
+        self.assertEqual(self.jp["Ys: The Ark of Napishtim (JP)"]["release_date"], "2003-09-05")
+
+    # ── Shadow Hearts: From the New World ────────────────────────────────────
+
+    def test_sh_from_new_world_jp_present(self):
+        """Wave 119: Shadow Hearts: From the New World (JP) is in Japan DB."""
+        self.assertIn("Shadow Hearts: From the New World (JP)", self.jp)
+
+    def test_sh_from_new_world_jp_serial(self):
+        """Wave 119: Shadow Hearts: From the New World (JP) serial=SLPS-25815."""
+        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["serial"], "SLPS-25815")
+
+    def test_sh_from_new_world_jp_developer(self):
+        """Wave 119: Shadow Hearts: From the New World (JP) developer=Nautilus."""
+        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["developer"], "Nautilus")
+
+    def test_sh_from_new_world_jp_publisher(self):
+        """Wave 119: Shadow Hearts: From the New World (JP) publisher=Aruze."""
+        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["publisher"], "Aruze")
+
+    def test_sh_from_new_world_jp_release_date(self):
+        """Wave 119: Shadow Hearts: From the New World (JP) release_date=2005-07-28."""
+        self.assertEqual(self.jp["Shadow Hearts: From the New World (JP)"]["release_date"], "2005-07-28")
+
+    # ── All JP serials have correct prefix ───────────────────────────────────
+
+    def test_jp_db_all_serials_are_jp_region(self):
+        """Wave 119: Every primary serial in Japan DB must begin with a JP prefix."""
+        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
+        for title, info in self.jp.items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(allowed),
+                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
+            )
