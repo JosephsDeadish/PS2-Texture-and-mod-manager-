@@ -1292,14 +1292,6 @@
       "publisher": "Square Enix",
       "genre": "Tactical RPG"
     },
-    "Front Mission 5: Scars of the War": {
-      "serial": "SLPM-66205",
-      "alt_serials": [],
-      "release_date": "2005-12-29",
-      "developer": "Square Enix",
-      "publisher": "Square Enix",
-      "genre": "Strategy"
-    },
     "GUN": {
       "serial": "SLUS-21139",
       "alt_serials": [],
@@ -3785,18 +3777,6 @@
         "Suikoden 5"
       ]
     },
-    "Tales of Destiny (PS2 remake)": {
-      "serial": "SLPS-25715",
-      "alt_serials": [],
-      "release_date": "2006-11-30",
-      "genre": "RPG"
-    },
-    "Tales of Destiny 2": {
-      "serial": "SLPS-25172",
-      "alt_serials": [],
-      "release_date": "2002-11-28",
-      "genre": "RPG"
-    },
     "Tales of Legendia": {
       "serial": "SLUS-21201",
       "alt_serials": [
@@ -3812,14 +3792,6 @@
       "aliases": [
         "ToL"
       ]
-    },
-    "Tales of Rebirth": {
-      "serial": "SLPS-25450",
-      "alt_serials": [],
-      "release_date": "2004-12-16",
-      "developer": "Namco Bandai",
-      "publisher": "Namco Bandai",
-      "genre": "Action, RPG"
     },
     "Tales of the Abyss": {
       "serial": "SLUS-21386",

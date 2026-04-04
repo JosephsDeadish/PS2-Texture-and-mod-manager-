@@ -1806,6 +1806,42 @@
       "developer": "SCE Japan Studio",
       "publisher": "Sony Computer Entertainment Inc.",
       "genre": "Survival Horror"
+    },
+    "Front Mission 5: Scars of the War (JP)": {
+      "serial": "SLPM-66205",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2005-12-29",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Strategy"
+    },
+    "Tales of Destiny (PS2 Remake) (JP)": {
+      "serial": "SLPS-25715",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2006-11-30",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Tales of Destiny 2 (JP)": {
+      "serial": "SLPS-25172",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2002-11-28",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Tales of Rebirth (JP)": {
+      "serial": "SLPS-25450",
+      "alt_serials": [],
+      "crcs": [],
+      "release_date": "2004-12-16",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "Action RPG"
     }
   },
   "version": "1.0"

@@ -8696,28 +8696,33 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("The Incredibles (PAL)", "developer", "Heavy Iron Studios", db=self.pal_data)
 
     def test_tales_of_destiny_ps2_has_release_date(self):
-        """Wave 46: Tales of Destiny (PS2 remake) should have release_date."""
-        self._assert_metadata("Tales of Destiny (PS2 remake)", "release_date", "2006-11-30")
+        """Wave 46 / Wave 108: Tales of Destiny (PS2 Remake) (JP) should have release_date."""
+        self._assert_metadata("Tales of Destiny (PS2 Remake) (JP)", "release_date", "2006-11-30",
+                              db=self.pal_data)
 
     def test_tales_of_destiny_ps2_has_genre(self):
-        """Wave 46: Tales of Destiny (PS2 remake) should have genre RPG."""
-        self._assert_metadata("Tales of Destiny (PS2 remake)", "genre", "RPG")
+        """Wave 46 / Wave 108: Tales of Destiny (PS2 Remake) (JP) should have genre RPG."""
+        self._assert_metadata("Tales of Destiny (PS2 Remake) (JP)", "genre", "RPG",
+                              db=self.pal_data)
 
     def test_tales_of_destiny_2_has_release_date(self):
-        """Wave 46: Tales of Destiny 2 should have release_date."""
-        self._assert_metadata("Tales of Destiny 2", "release_date", "2002-11-28")
+        """Wave 46 / Wave 108: Tales of Destiny 2 (JP) should have release_date."""
+        self._assert_metadata("Tales of Destiny 2 (JP)", "release_date", "2002-11-28",
+                              db=self.pal_data)
 
     def test_tales_of_rebirth_has_developer(self):
-        """Wave 46: Tales of Rebirth should have developer Namco Bandai."""
-        self._assert_metadata("Tales of Rebirth", "developer", "Namco Bandai")
+        """Wave 46 / Wave 108: Tales of Rebirth (JP) should have developer Namco Tales Studio."""
+        self._assert_metadata("Tales of Rebirth (JP)", "developer", "Namco Tales Studio",
+                              db=self.pal_data)
 
     def test_forbidden_siren_2_has_developer(self):
         """Wave 46: Forbidden Siren 2 (JP) should have developer SCE Japan Studio (Japan-only title)."""
         self._assert_metadata("Forbidden Siren 2 (JP)", "developer", "SCE Japan Studio", db=self.pal_data)
 
     def test_front_mission_5_has_developer(self):
-        """Wave 46: Front Mission 5: Scars of the War should have developer Square Enix."""
-        self._assert_metadata("Front Mission 5: Scars of the War", "developer", "Square Enix")
+        """Wave 46 / Wave 108: Front Mission 5: Scars of the War (JP) should have developer Square Enix."""
+        self._assert_metadata("Front Mission 5: Scars of the War (JP)", "developer", "Square Enix",
+                              db=self.pal_data)
 
     def test_gtc_africa_has_developer(self):
         """Wave 46: GTC Africa (PAL) should have developer Rage Software."""
@@ -8728,8 +8733,8 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("ESPN NBA 2Night (PAL)", "release_date", "2001", db=self.pal_data)
 
     def test_serial_db_wave46_game_count(self):
-        """Wave 46: serial DB should have at least 2204 games (Wave 101: removed 2 misplaced PAL entries)."""
-        self.assertGreaterEqual(len(self.data), 2204)
+        """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
+        self.assertGreaterEqual(len(self.data), 2200)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8817,8 +8822,8 @@ class TestWave47NewGames(unittest.TestCase):
     # ── thresholds ─────────────────────────────────────────────────────────────
 
     def test_serial_db_wave47_game_count(self):
-        """Wave 47: serial DB should have at least 2204 games (Wave 101: removed 2 misplaced PAL entries)."""
-        self.assertGreaterEqual(len(self.games), 2204)
+        """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
+        self.assertGreaterEqual(len(self.games), 2200)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9156,9 +9161,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
+        """Wave 49: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
         self.assertEqual(
-            len(self.games), 2204,
+            len(self.games), 2200,
             f"Serial DB game count changed unexpectedly: {len(self.games)}"
         )
 
@@ -9379,8 +9384,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
-        self.assertEqual(len(self.raw_games), 2204)
+        """Wave 50: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
+        self.assertEqual(len(self.raw_games), 2200)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9584,8 +9589,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
-        self.assertEqual(len(self.raw_games), 2204)
+        """Wave 51: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
+        self.assertEqual(len(self.raw_games), 2200)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9772,8 +9777,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2204 (Wave 101: removed 2 misplaced PAL entries)."""
-        self.assertEqual(len(self.raw_games), 2204)
+        """Wave 52: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
+        self.assertEqual(len(self.raw_games), 2200)
 
 
 # ===========================================================================
@@ -20045,3 +20050,118 @@ class TestWave107DbAuditFixes(unittest.TestCase):
         """Jak and Daxter: The Lost Frontier: pub=Sony Computer Entertainment America (was empty)."""
         gi = self._ntsc('Jak and Daxter: The Lost Frontier')
         self.assertEqual(gi.publisher, 'Sony Computer Entertainment America')
+
+
+# ===========================================================================
+# Wave 108 — Fix wrong-region main serials: JP-only games moved from NTSC-U DB
+# ===========================================================================
+
+class TestWave108DbSerialFixes(unittest.TestCase):
+    """Wave 108: 4 Japan-only games with SLPM/SLPS main serials removed from
+    NTSC-U DB and added to PAL DB as '(JP)' entries, following the existing
+    pattern for Japanese regional titles.
+
+    Games moved (NTSC-U → PAL DB):
+      Front Mission 5: Scars of the War    SLPM-66205  (JP-only, Square Enix 2005)
+      Tales of Destiny (PS2 Remake)        SLPS-25715  (JP-only, Namco 2006)
+      Tales of Destiny 2                   SLPS-25172  (JP-only, Namco 2002)
+      Tales of Rebirth                     SLPS-25450  (JP-only, Namco 2004)
+
+    NTSC-U DB count: 2204 → 2200.
+    PAL DB count:    151  → 155.
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        ntsc_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+        pal_path  = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
+        self.ntsc = json.loads(ntsc_path.read_text())["games"]
+        self.pal  = json.loads(pal_path.read_text())["games"]
+
+    # ── NTSC-U DB no longer contains the JP-only entries ─────────────────────
+
+    def test_front_mission_5_not_in_ntsc_db(self):
+        """Wave 108: Front Mission 5 (SLPM-66205) removed from NTSC-U DB."""
+        self.assertNotIn("Front Mission 5: Scars of the War", self.ntsc)
+
+    def test_tales_of_destiny_ps2_not_in_ntsc_db(self):
+        """Wave 108: Tales of Destiny (PS2 remake) removed from NTSC-U DB."""
+        self.assertNotIn("Tales of Destiny (PS2 remake)", self.ntsc)
+
+    def test_tales_of_destiny_2_not_in_ntsc_db(self):
+        """Wave 108: Tales of Destiny 2 (SLPS-25172) removed from NTSC-U DB."""
+        self.assertNotIn("Tales of Destiny 2", self.ntsc)
+
+    def test_tales_of_rebirth_not_in_ntsc_db(self):
+        """Wave 108: Tales of Rebirth (SLPS-25450) removed from NTSC-U DB."""
+        self.assertNotIn("Tales of Rebirth", self.ntsc)
+
+    # ── PAL DB now contains the JP entries ───────────────────────────────────
+
+    def test_front_mission_5_jp_in_pal_db(self):
+        """Wave 108: Front Mission 5: Scars of the War (JP) added to PAL DB."""
+        self.assertIn("Front Mission 5: Scars of the War (JP)", self.pal)
+
+    def test_front_mission_5_jp_serial(self):
+        """Wave 108: Front Mission 5 (JP) serial=SLPM-66205."""
+        entry = self.pal.get("Front Mission 5: Scars of the War (JP)", {})
+        self.assertEqual(entry.get("serial"), "SLPM-66205")
+
+    def test_front_mission_5_jp_developer(self):
+        """Wave 108: Front Mission 5 (JP) developer=Square Enix."""
+        entry = self.pal.get("Front Mission 5: Scars of the War (JP)", {})
+        self.assertEqual(entry.get("developer"), "Square Enix")
+
+    def test_tales_of_destiny_ps2_jp_in_pal_db(self):
+        """Wave 108: Tales of Destiny (PS2 Remake) (JP) added to PAL DB."""
+        self.assertIn("Tales of Destiny (PS2 Remake) (JP)", self.pal)
+
+    def test_tales_of_destiny_ps2_jp_serial(self):
+        """Wave 108: Tales of Destiny (PS2 Remake) (JP) serial=SLPS-25715."""
+        entry = self.pal.get("Tales of Destiny (PS2 Remake) (JP)", {})
+        self.assertEqual(entry.get("serial"), "SLPS-25715")
+
+    def test_tales_of_destiny_2_jp_in_pal_db(self):
+        """Wave 108: Tales of Destiny 2 (JP) added to PAL DB."""
+        self.assertIn("Tales of Destiny 2 (JP)", self.pal)
+
+    def test_tales_of_destiny_2_jp_serial(self):
+        """Wave 108: Tales of Destiny 2 (JP) serial=SLPS-25172."""
+        entry = self.pal.get("Tales of Destiny 2 (JP)", {})
+        self.assertEqual(entry.get("serial"), "SLPS-25172")
+
+    def test_tales_of_rebirth_jp_in_pal_db(self):
+        """Wave 108: Tales of Rebirth (JP) added to PAL DB."""
+        self.assertIn("Tales of Rebirth (JP)", self.pal)
+
+    def test_tales_of_rebirth_jp_serial(self):
+        """Wave 108: Tales of Rebirth (JP) serial=SLPS-25450."""
+        entry = self.pal.get("Tales of Rebirth (JP)", {})
+        self.assertEqual(entry.get("serial"), "SLPS-25450")
+
+    def test_tales_of_rebirth_jp_developer(self):
+        """Wave 108: Tales of Rebirth (JP) developer=Namco Tales Studio."""
+        entry = self.pal.get("Tales of Rebirth (JP)", {})
+        self.assertEqual(entry.get("developer"), "Namco Tales Studio")
+
+    # ── NTSC-U DB count reduced by 4 ─────────────────────────────────────────
+
+    def test_ntsc_db_count(self):
+        """Wave 108: NTSC-U DB has exactly 2200 entries (4 JP-only games moved to PAL DB)."""
+        self.assertEqual(len(self.ntsc), 2200)
+
+    # ── PAL DB count increased by 4 ───────────────────────────────────────────
+
+    def test_pal_db_count(self):
+        """Wave 108: PAL DB has at least 155 entries after adding 4 JP games."""
+        self.assertGreaterEqual(len(self.pal), 155)
+
+    # ── No SLPM/SLPS main serials remain in NTSC-U DB ────────────────────────
+
+    def test_no_jp_only_main_serials_in_ntsc_db(self):
+        """Wave 108: NTSC-U DB should have no SLPM/SLPS main serials."""
+        bad = {t: e["serial"] for t, e in self.ntsc.items()
+               if e.get("serial", "").startswith(("SLPM-", "SLPS-"))}
+        self.assertEqual(bad, {},
+                         f"Found JP-only main serials in NTSC-U DB: {bad}")
