@@ -8543,25 +8543,10 @@ class TestWave45AltSerials(unittest.TestCase):
         """Wave 45: SCUS-94346 should be alt_serial for SingStar Latino."""
         self._assert_alt_serial("SingStar Latino", "SCUS-94346")
 
-    def test_jak_daxter_slus_97124_alt_serial(self):
-        """Wave 45: SLUS-97124 (GH) should be alt_serial for Jak and Daxter: The Precursor Legacy."""
-        self._assert_alt_serial("Jak and Daxter: The Precursor Legacy", "SLUS-97124")
-
-    def test_primal_slus_97142_alt_serial(self):
-        """Wave 45: SLUS-97142 should be alt_serial for Primal."""
-        self._assert_alt_serial("Primal", "SLUS-97142")
-
-    def test_wild_arms_3_slus_97203_alt_serial(self):
-        """Wave 45: SLUS-97203 (GH) should be alt_serial for Wild ARMs 3."""
-        self._assert_alt_serial("Wild ARMs 3", "SLUS-97203")
-
-    def test_atv_offroad_fury3_slus_97405_alt_serial(self):
-        """Wave 45: SLUS-97405 should be alt_serial for ATV Offroad Fury 3."""
-        self._assert_alt_serial("ATV Offroad Fury 3", "SLUS-97405")
-
-    def test_eyetoy_antigrav_slus_97414_alt_serial(self):
-        """Wave 45: SLUS-97414 should be alt_serial for EyeToy: Antigrav."""
-        self._assert_alt_serial("EyeToy: Antigrav", "SLUS-97414")
+    # Wave 45 originally added SLUS-97124/97142/97203/97405/97414 as alt_serials.
+    # Wave 109 removed them: SLUS-97XXX is not a valid PS2 serial range — SCUS-
+    # prefix (not SLUS-) is correct for Sony first-party 97XXX serials.
+    # Those bogus alt_serials are now covered by TestWave109DbAltSerialFixes.
 
     # --- Multi-disc alt_serials (Disc 2 / Disc 3 / Bonus Disc) ---
 
@@ -20165,3 +20150,107 @@ class TestWave108DbSerialFixes(unittest.TestCase):
                if e.get("serial", "").startswith(("SLPM-", "SLPS-"))}
         self.assertEqual(bad, {},
                          f"Found JP-only main serials in NTSC-U DB: {bad}")
+
+
+class TestWave109DbAltSerialFixes(unittest.TestCase):
+    """Wave 109: Removed 6 bogus alt_serials with wrong serial prefixes.
+
+    NTSC-U fixes (5): SCUS-97XXX serials stored with wrong SLUS- prefix:
+      Jak and Daxter: The Precursor Legacy  removed alt SLUS-97124 (main is SCUS-97124)
+      Primal                                removed alt SLUS-97142 (main is SCUS-97142)
+      Wild ARMs 3                           removed alt SLUS-97203 (main is SCUS-97203)
+      ATV Offroad Fury 3                    removed alt SLUS-97405 (main is SCUS-97405)
+      EyeToy: Antigrav                      removed alt SLUS-97414 (main is SCUS-97414)
+
+    PAL fix (1): Wrong serial number in Burnout 3 alt_serials:
+      Burnout 3: Takedown (PAL)             removed alt SLES-51719 (is GT4 PAL number range)
+    """
+
+    def setUp(self):
+        from pathlib import Path
+        import json
+        base = Path(__file__).parent.parent / "data" / "game_serial_db"
+        with open(base / "ps2_ntsc_u.json") as f:
+            self.ntsc = json.load(f)["games"]
+        with open(base / "ps2_pal.json") as f:
+            self.pal = json.load(f)["games"]
+
+    # ── NTSC-U: no bogus SLUS-97XXX alt_serials ──────────────────────────────
+
+    def test_jak_daxter_no_slus_alt(self):
+        """Wave 109: Jak and Daxter alt_serials must not contain SLUS-97124."""
+        alts = self.ntsc.get("Jak and Daxter: The Precursor Legacy", {}).get("alt_serials", [])
+        self.assertNotIn("SLUS-97124", alts)
+
+    def test_jak_daxter_main_serial_unchanged(self):
+        """Wave 109: Jak and Daxter main serial remains SCUS-97124."""
+        entry = self.ntsc.get("Jak and Daxter: The Precursor Legacy", {})
+        self.assertEqual(entry.get("serial"), "SCUS-97124")
+
+    def test_primal_no_slus_alt(self):
+        """Wave 109: Primal alt_serials must not contain SLUS-97142."""
+        alts = self.ntsc.get("Primal", {}).get("alt_serials", [])
+        self.assertNotIn("SLUS-97142", alts)
+
+    def test_primal_main_serial_unchanged(self):
+        """Wave 109: Primal main serial remains SCUS-97142."""
+        entry = self.ntsc.get("Primal", {})
+        self.assertEqual(entry.get("serial"), "SCUS-97142")
+
+    def test_wild_arms_3_no_slus_alt(self):
+        """Wave 109: Wild ARMs 3 alt_serials must not contain SLUS-97203."""
+        alts = self.ntsc.get("Wild ARMs 3", {}).get("alt_serials", [])
+        self.assertNotIn("SLUS-97203", alts)
+
+    def test_wild_arms_3_main_serial_unchanged(self):
+        """Wave 109: Wild ARMs 3 main serial remains SCUS-97203."""
+        entry = self.ntsc.get("Wild ARMs 3", {})
+        self.assertEqual(entry.get("serial"), "SCUS-97203")
+
+    def test_atv_offroad_fury_3_no_slus_alt(self):
+        """Wave 109: ATV Offroad Fury 3 alt_serials must not contain SLUS-97405."""
+        alts = self.ntsc.get("ATV Offroad Fury 3", {}).get("alt_serials", [])
+        self.assertNotIn("SLUS-97405", alts)
+
+    def test_atv_offroad_fury_3_main_serial_unchanged(self):
+        """Wave 109: ATV Offroad Fury 3 main serial remains SCUS-97405."""
+        entry = self.ntsc.get("ATV Offroad Fury 3", {})
+        self.assertEqual(entry.get("serial"), "SCUS-97405")
+
+    def test_eyetoy_antigrav_no_slus_alt(self):
+        """Wave 109: EyeToy: Antigrav alt_serials must not contain SLUS-97414."""
+        alts = self.ntsc.get("EyeToy: Antigrav", {}).get("alt_serials", [])
+        self.assertNotIn("SLUS-97414", alts)
+
+    def test_eyetoy_antigrav_main_serial_unchanged(self):
+        """Wave 109: EyeToy: Antigrav main serial remains SCUS-97414."""
+        entry = self.ntsc.get("EyeToy: Antigrav", {})
+        self.assertEqual(entry.get("serial"), "SCUS-97414")
+
+    # ── PAL: Burnout 3 Takedown bogus alt_serial removed ─────────────────────
+
+    def test_burnout3_pal_no_sles51719_alt(self):
+        """Wave 109: Burnout 3: Takedown (PAL) alt_serials must not contain SLES-51719."""
+        alts = self.pal.get("Burnout 3: Takedown (PAL)", {}).get("alt_serials", [])
+        self.assertNotIn("SLES-51719", alts)
+
+    def test_burnout3_pal_main_serial_unchanged(self):
+        """Wave 109: Burnout 3: Takedown (PAL) main serial remains SLES-54586."""
+        entry = self.pal.get("Burnout 3: Takedown (PAL)", {})
+        self.assertEqual(entry.get("serial"), "SLES-54586")
+
+    def test_burnout3_pal_valid_alt_serial_kept(self):
+        """Wave 109: Burnout 3: Takedown (PAL) still has valid alt SLES-53353."""
+        alts = self.pal.get("Burnout 3: Takedown (PAL)", {}).get("alt_serials", [])
+        self.assertIn("SLES-53353", alts)
+
+    # ── No SLUS-97XXX alt_serials remain anywhere in NTSC-U DB ───────────────
+
+    def test_no_slus_97xxx_alt_serials_in_ntsc_db(self):
+        """Wave 109: NTSC-U DB has no alt_serials with SLUS-97XXX pattern."""
+        bad = {}
+        for title, entry in self.ntsc.items():
+            for alt in entry.get("alt_serials", []):
+                if alt.startswith("SLUS-") and int(alt.split("-")[1]) >= 97000:
+                    bad.setdefault(title, []).append(alt)
+        self.assertEqual(bad, {}, f"Found bogus SLUS-97XXX alt_serials: {bad}")

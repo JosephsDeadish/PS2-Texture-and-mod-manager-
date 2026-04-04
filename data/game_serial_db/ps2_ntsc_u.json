@@ -1907,9 +1907,7 @@
     },
     "Jak and Daxter: The Precursor Legacy": {
       "serial": "SCUS-97124",
-      "alt_serials": [
-        "SLUS-97124"
-      ],
+      "alt_serials": [],
       "crcs": [
         "2B2570A0",
         "4D33E38A",
@@ -2783,9 +2781,7 @@
     },
     "Primal": {
       "serial": "SCUS-97142",
-      "alt_serials": [
-        "SLUS-97142"
-      ],
+      "alt_serials": [],
       "crcs": [
         "FCD89DC3"
       ],
@@ -4289,9 +4285,7 @@
     },
     "Wild ARMs 3": {
       "serial": "SCUS-97203",
-      "alt_serials": [
-        "SLUS-97203"
-      ],
+      "alt_serials": [],
       "crcs": [
         "A53C9EC5",
         "B5B09F5D",
@@ -11077,9 +11071,7 @@
     },
     "ATV Offroad Fury 3": {
       "serial": "SCUS-97405",
-      "alt_serials": [
-        "SLUS-97405"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-02",
       "developer": "Climax Group",
@@ -11129,9 +11121,7 @@
     },
     "EyeToy: Antigrav": {
       "serial": "SCUS-97414",
-      "alt_serials": [
-        "SLUS-97414"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "release_date": "2004-11-09",
       "developer": "Harmonix",
