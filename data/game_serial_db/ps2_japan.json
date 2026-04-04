@@ -1,0 +1,586 @@
+{
+  "version": "1.0",
+  "description": "PS2 Japan (NTSC-J) authoritative serial database. Maps SLPS/SLPM/SCPS/SCPM game titles to their canonical serials with CRC associations.",
+  "games": {
+    "Ace Combat 04: Shattered Skies (JP)": {
+      "serial": "SLPS-20020",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-07-12",
+      "developer": "Project Aces",
+      "publisher": "Namco",
+      "genre": "Flight Simulator"
+    },
+    "Armored Core 3 (JP)": {
+      "serial": "SLPS-25112",
+      "alt_serials": [],
+      "crcs": [
+        "F49E991D"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2002-07-04",
+      "developer": "From Software",
+      "publisher": "From Software",
+      "genre": "Action"
+    },
+    "Armored Core: Last Raven (JP)": {
+      "serial": "SLPS-25519",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-01-06",
+      "developer": "From Software",
+      "publisher": "From Software",
+      "genre": "Action"
+    },
+    "Castlevania: Lament of Innocence (JP)": {
+      "serial": "SLPM-65369",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-06-26",
+      "developer": "Konami Computer Entertainment Nagoya",
+      "publisher": "Konami",
+      "genre": "Action"
+    },
+    "Dark Chronicle (JP)": {
+      "serial": "SCPS-15070",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-11-28",
+      "developer": "Level-5",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Action RPG"
+    },
+    "Dark Cloud (JP)": {
+      "serial": "SCPS-15004",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2000-12-14",
+      "developer": "Level-5",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Action RPG"
+    },
+    "Devil May Cry (JP)": {
+      "serial": "SLPM-65033",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-08-23",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action"
+    },
+    "Devil May Cry 2 (JP)": {
+      "serial": "SLPM-65375",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-01-17",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action"
+    },
+    "Devil May Cry 3 (JP)": {
+      "serial": "SLPM-66117",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-02-17",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action"
+    },
+    "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
+      "serial": "SLPM-65515",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-07-22",
+      "developer": "ArtePiazza",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
+    "Dragon Quest VIII: Journey of the Cursed King (JP)": {
+      "serial": "SLPM-66096",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-11-27",
+      "developer": "Level-5",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
+    "Final Fantasy X (JP)": {
+      "serial": "SCPS-15008",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-07-19",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "RPG"
+    },
+    "Final Fantasy X International (JP)": {
+      "serial": "SLPS-25088",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-01-31",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "RPG"
+    },
+    "Final Fantasy XI Online (JP)": {
+      "serial": "SLPM-65037",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-05-16",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "MMORPG"
+    },
+    "Final Fantasy XII (JP)": {
+      "serial": "SLPM-66059",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-03-16",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
+    "Forbidden Siren 2 (JP)": {
+      "serial": "SCPS-15106",
+      "alt_serials": [],
+      "crcs": [],
+      "aliases": [
+        "Siren 2 (JP)"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2006-02-09",
+      "developer": "SCE Japan Studio",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Survival Horror"
+    },
+    "Front Mission 5: Scars of the War (JP)": {
+      "serial": "SLPM-66205",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-29",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Strategy"
+    },
+    "God Hand (JP)": {
+      "serial": "SLPM-66488",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-07-06",
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Beat 'em up"
+    },
+    "Grandia III (JP)": {
+      "serial": "SLPM-65976",
+      "alt_serials": [],
+      "crcs": [
+        "5B659BED"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2005-08-04",
+      "developer": "Game Arts",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
+    "Ico (JP)": {
+      "serial": "SCPS-10126",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-09-06",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Action Adventure"
+    },
+    "Kingdom Hearts (JP)": {
+      "serial": "SLPS-25098",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-03-28",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "Action RPG"
+    },
+    "Kingdom Hearts Final Mix (JP)": {
+      "serial": "SLPS-25182",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-12-26",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "Action RPG"
+    },
+    "Kingdom Hearts II (JP)": {
+      "serial": "SLPM-66605",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-22",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Action RPG"
+    },
+    "Kingdom Hearts II Final Mix+ (JP)": {
+      "serial": "SLPM-66675",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2007-03-29",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Action RPG"
+    },
+    "Metal Gear Solid 2: Sons of Liberty (JP)": {
+      "serial": "SLPM-65078",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-11-29",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Stealth Action"
+    },
+    "Metal Gear Solid 2: Substance (JP)": {
+      "serial": "SLPM-65551",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-12-19",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Stealth Action"
+    },
+    "Metal Gear Solid 3: Snake Eater (JP)": {
+      "serial": "SLPM-65726",
+      "alt_serials": [
+        "SLPM-65792"
+      ],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-11-17",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Stealth Action"
+    },
+    "Metal Gear Solid 3: Subsistence (JP)": {
+      "serial": "SLPM-66200",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-22",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Stealth Action"
+    },
+    "Monster Hunter (JP)": {
+      "serial": "SLPS-25235",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-03-11",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action RPG"
+    },
+    "Okami (JP)": {
+      "serial": "SCPS-15119",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-04-20",
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Action Adventure"
+    },
+    "Persona 3 (JP)": {
+      "serial": "SLPM-66592",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-07-13",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Persona 4 (JP)": {
+      "serial": "SLPS-25888",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2008-07-10",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Ratchet & Clank (JP)": {
+      "serial": "SCPS-15015",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-01-30",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Platformer"
+    },
+    "Resident Evil 4 (JP)": {
+      "serial": "SLPM-66090",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-01-27",
+      "developer": "Capcom Production Studio 4",
+      "publisher": "Capcom",
+      "genre": "Survival Horror"
+    },
+    "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)": {
+      "serial": "SLPM-62517",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-09-09",
+      "developer": "Sega",
+      "publisher": "Sega",
+      "genre": "Beat 'em up"
+    },
+    "Shadow of the Colossus (JP)": {
+      "serial": "SCPS-15125",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-10-27",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Action Adventure"
+    },
+    "Shin Megami Tensei: Digital Devil Saga (JP)": {
+      "serial": "SLPM-66100",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-07-15",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Shin Megami Tensei: Digital Devil Saga 2 (JP)": {
+      "serial": "SLPM-66240",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-01-27",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Shin Megami Tensei: Nocturne (JP)": {
+      "serial": "SLPS-25361",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-02-20",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Silent Hill 3 (JP)": {
+      "serial": "SLPM-65257",
+      "alt_serials": [],
+      "crcs": [
+        "8CFE667F"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2003-07-03",
+      "developer": "Konami Computer Entertainment Tokyo",
+      "publisher": "Konami",
+      "genre": "Survival Horror"
+    },
+    "Siren (JP)": {
+      "serial": "SCPS-15017",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-11-06",
+      "developer": "SCE Japan Studio",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Survival Horror"
+    },
+    "Star Ocean: Till the End of Time (JP)": {
+      "serial": "SLPS-25314",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-02-27",
+      "developer": "tri-Ace",
+      "publisher": "Enix",
+      "genre": "Action RPG"
+    },
+    "Suikoden III (JP)": {
+      "serial": "SLPS-25162",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-07-11",
+      "developer": "Konami Computer Entertainment Tokyo",
+      "publisher": "Konami",
+      "genre": "RPG"
+    },
+    "Suikoden IV (JP)": {
+      "serial": "SLPM-66037",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-08-19",
+      "developer": "Konami Computer Entertainment Tokyo",
+      "publisher": "Konami",
+      "genre": "RPG"
+    },
+    "Suikoden V (JP)": {
+      "serial": "SLPS-25704",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-02-23",
+      "developer": "Konami Computer Entertainment Tokyo",
+      "publisher": "Konami",
+      "genre": "RPG"
+    },
+    "Tales of Destiny (PS2 Remake) (JP)": {
+      "serial": "SLPS-25715",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-11-30",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Tales of Destiny 2 (JP)": {
+      "serial": "SLPS-25172",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-11-28",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Tales of Legendia (JP)": {
+      "serial": "SLPS-25533",
+      "alt_serials": [],
+      "crcs": [
+        "1F8640E0"
+      ],
+      "aliases": [
+        "Tales of Legendia Japan"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2005-08-25",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Tales of Rebirth (JP)": {
+      "serial": "SLPS-25450",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-12-16",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "Action RPG"
+    },
+    "Tales of Symphonia (JP)": {
+      "serial": "SLPM-66019",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-08-29",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "Action RPG"
+    },
+    "Tales of the Abyss (JP)": {
+      "serial": "SLPS-25790",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-15",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "Action RPG"
+    },
+    "Viewtiful Joe (JP)": {
+      "serial": "SLPM-65699",
+      "alt_serials": [],
+      "crcs": [
+        "634947D7"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2003-10-09",
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Action, Platformer"
+    },
+    "Viewtiful Joe 2 (JP)": {
+      "serial": "SLPM-65824",
+      "alt_serials": [],
+      "crcs": [
+        "F977249C"
+      ],
+      "region": "NTSC-J",
+      "release_date": "2004-10-14",
+      "developer": "Clover Studio",
+      "publisher": "Capcom",
+      "genre": "Action, Platformer"
+    },
+    "Xenosaga Episode I: Der Wille zur Macht (JP)": {
+      "serial": "SLPS-25260",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-02-28",
+      "developer": "Monolith Soft",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Xenosaga Episode II: Jenseits von Gut und Bose (JP)": {
+      "serial": "SLPS-25413",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-06-24",
+      "developer": "Monolith Soft",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Xenosaga Episode III: Also Sprach Zarathustra (JP)": {
+      "serial": "SLPS-25644",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-07-06",
+      "developer": "Monolith Soft",
+      "publisher": "Namco",
+      "genre": "RPG"
+    }
+  }
+}

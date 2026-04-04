@@ -38,6 +38,7 @@ from typing import Dict, List, Optional, Set, Tuple
 _REPO_ROOT    = Path(__file__).parent.parent.parent
 _DB_FILE      = _REPO_ROOT / "data" / "game_serial_db" / "ps2_ntsc_u.json"
 _PAL_DB_FILE  = _REPO_ROOT / "data" / "game_serial_db" / "ps2_pal.json"
+_JP_DB_FILE   = _REPO_ROOT / "data" / "game_serial_db" / "ps2_japan.json"
 _DEMO_DB_FILE = _REPO_ROOT / "data" / "game_serial_db" / "ps2_demos.json"
 _CAT_DIR      = _REPO_ROOT / "data" / "catalogue"
 
@@ -132,6 +133,8 @@ class SerialDatabase:
         Override the default path to ``ps2_ntsc_u.json`` (useful in tests).
     pal_db_path:
         Override the default path to ``ps2_pal.json`` (useful in tests).
+    jp_db_path:
+        Override the default path to ``ps2_japan.json`` (useful in tests).
     demo_db_path:
         Override the default path to ``ps2_demos.json`` (useful in tests).
         Demo entries are loaded with ``disc_type`` set to the value stored in
@@ -143,10 +146,12 @@ class SerialDatabase:
         self,
         db_path: Optional[Path] = None,
         pal_db_path: Optional[Path] = None,
+        jp_db_path: Optional[Path] = None,
         demo_db_path: Optional[Path] = None,
     ) -> None:
         self._path      = Path(db_path)      if db_path      else _DB_FILE
         self._pal_path  = Path(pal_db_path)  if pal_db_path  else _PAL_DB_FILE
+        self._jp_path   = Path(jp_db_path)   if jp_db_path   else _JP_DB_FILE
         self._demo_path = Path(demo_db_path) if demo_db_path else _DEMO_DB_FILE
         self._games: Dict[str, GameInfo] = {}
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
@@ -160,15 +165,16 @@ class SerialDatabase:
     # ------------------------------------------------------------------
 
     def _load(self) -> None:
-        """Load the NTSC-U, PAL, and demo databases from disk.
+        """Load the NTSC-U, PAL, Japan, and demo databases from disk.
 
-        ``ps2_ntsc_u.json`` and ``ps2_pal.json`` are loaded first (retail
-        entries, ``disc_type="retail"``).  ``ps2_demos.json`` is loaded last
-        with each entry's ``disc_type`` taken directly from the JSON (defaults
-        to ``"demo"``).  Demo titles carry a ``(Demo)`` or similar suffix in
-        the JSON so there are no duplicate keys with retail entries.
-        Serial-to-title and CRC-to-title indices merge transparently across
-        all three files; ``_demo_serials`` is rebuilt on every load for fast
+        ``ps2_ntsc_u.json``, ``ps2_pal.json``, and ``ps2_japan.json`` are
+        loaded first (retail entries, ``disc_type="retail"``).
+        ``ps2_demos.json`` is loaded last with each entry's ``disc_type``
+        taken directly from the JSON (defaults to ``"demo"``).  Demo titles
+        carry a ``(Demo)`` or similar suffix in the JSON so there are no
+        duplicate keys with retail entries.  Serial-to-title and
+        CRC-to-title indices merge transparently across all files;
+        ``_demo_serials`` is rebuilt on every load for fast
         ``is_demo_serial()`` queries.
         """
         self._games = {}
@@ -176,8 +182,8 @@ class SerialDatabase:
         self._crc_to_title = {}
         self._alias_to_titles = {}
         self._demo_serials = set()
-        # Retail databases first, then demos
-        retail_paths = (self._path, self._pal_path)
+        # Retail databases first (NTSC-U, PAL, Japan), then demos
+        retail_paths = (self._path, self._pal_path, self._jp_path)
         for path in retail_paths:
             if not path.is_file():
                 continue

@@ -330,18 +330,6 @@
         "DBZ BT3"
       ]
     },
-    "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
-      "alt_serials": [],
-      "crcs": [
-        "E09E454C"
-      ],
-      "developer": "ArtePiazza",
-      "genre": "RPG",
-      "publisher": "Square Enix",
-      "region": "Japan",
-      "release_date": "2004-07-22",
-      "serial": "SLPM-65515"
-    },
     "Dragon Quest VIII: Journey of the Cursed King (PAL)": {
       "alt_serials": [],
       "crcs": [],
@@ -1153,18 +1141,6 @@
       "release_date": "2006-09-01",
       "serial": "SLES-54218"
     },
-    "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)": {
-      "alt_serials": [],
-      "crcs": [
-        "02E1970F"
-      ],
-      "developer": "Sega",
-      "genre": "Action",
-      "publisher": "Sega",
-      "region": "Japan",
-      "release_date": "2006-08-10",
-      "serial": "SLPM-62517"
-    },
     "Shadow of the Colossus (PAL)": {
       "alt_serials": [
         "SCES-53005"
@@ -1726,121 +1702,6 @@
       "publisher": "D3 Publisher",
       "region": "PAL",
       "release_date": "2007-10-26"
-    },
-    "Tales of Legendia (JP)": {
-      "serial": "SLPS-25533",
-      "crcs": [
-        "1F8640E0"
-      ],
-      "aliases": [
-        "Tales of Legendia Japan"
-      ],
-      "developer": "Namco Tales Studio",
-      "publisher": "Namco",
-      "genre": "RPG",
-      "release_date": "2005-08-25"
-    },
-    "Grandia III (JP)": {
-      "serial": "SLPM-65976",
-      "crcs": [
-        "5B659BED"
-      ],
-      "aliases": [],
-      "developer": "Game Arts",
-      "publisher": "Square Enix",
-      "genre": "RPG",
-      "release_date": "2005-08-04"
-    },
-    "Viewtiful Joe (JP)": {
-      "serial": "SLPM-65699",
-      "crcs": [
-        "634947D7"
-      ],
-      "aliases": [],
-      "developer": "Clover Studio",
-      "publisher": "Capcom",
-      "genre": "Action, Platformer",
-      "release_date": "2003-10-09"
-    },
-    "Silent Hill 3 (JP)": {
-      "serial": "SLPM-65257",
-      "crcs": [
-        "8CFE667F"
-      ],
-      "aliases": [],
-      "developer": "Konami Computer Entertainment Tokyo",
-      "publisher": "Konami",
-      "genre": "Survival Horror",
-      "release_date": "2003-07-03"
-    },
-    "Armored Core 3 (JP)": {
-      "serial": "SLPS-25112",
-      "crcs": [
-        "F49E991D"
-      ],
-      "aliases": [],
-      "developer": "From Software",
-      "publisher": "From Software",
-      "genre": "Action",
-      "release_date": "2002-07-04"
-    },
-    "Viewtiful Joe 2 (JP)": {
-      "serial": "SLPM-65824",
-      "crcs": [
-        "F977249C"
-      ],
-      "aliases": [],
-      "developer": "Clover Studio",
-      "publisher": "Capcom",
-      "genre": "Action, Platformer",
-      "release_date": "2004-10-14"
-    },
-    "Forbidden Siren 2 (JP)": {
-      "serial": "SCPS-15106",
-      "crcs": [],
-      "aliases": [
-        "Siren 2 (JP)"
-      ],
-      "release_date": "2006-02-09",
-      "developer": "SCE Japan Studio",
-      "publisher": "Sony Computer Entertainment Inc.",
-      "genre": "Survival Horror"
-    },
-    "Front Mission 5: Scars of the War (JP)": {
-      "serial": "SLPM-66205",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2005-12-29",
-      "developer": "Square Enix",
-      "publisher": "Square Enix",
-      "genre": "Strategy"
-    },
-    "Tales of Destiny (PS2 Remake) (JP)": {
-      "serial": "SLPS-25715",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2006-11-30",
-      "developer": "Namco Tales Studio",
-      "publisher": "Namco",
-      "genre": "RPG"
-    },
-    "Tales of Destiny 2 (JP)": {
-      "serial": "SLPS-25172",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2002-11-28",
-      "developer": "Namco Tales Studio",
-      "publisher": "Namco",
-      "genre": "RPG"
-    },
-    "Tales of Rebirth (JP)": {
-      "serial": "SLPS-25450",
-      "alt_serials": [],
-      "crcs": [],
-      "release_date": "2004-12-16",
-      "developer": "Namco Tales Studio",
-      "publisher": "Namco",
-      "genre": "Action RPG"
     }
   },
   "version": "1.0"

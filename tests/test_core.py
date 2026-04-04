@@ -8621,8 +8621,10 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         import json
         db_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
         pal_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
         self.data = json.loads(db_path.read_text())["games"]
         self.pal_data = json.loads(pal_path.read_text())["games"]
+        self.japan_data = json.loads(jp_path.read_text())["games"]
 
     def _assert_metadata(self, title, field, expected=None, db=None):
         source = db if db is not None else self.data
@@ -8690,33 +8692,33 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
         self._assert_metadata("The Incredibles (PAL)", "developer", "Heavy Iron Studios", db=self.pal_data)
 
     def test_tales_of_destiny_ps2_has_release_date(self):
-        """Wave 46 / Wave 108: Tales of Destiny (PS2 Remake) (JP) should have release_date."""
+        """Wave 46 / Wave 108 / Wave 114: Tales of Destiny (PS2 Remake) (JP) should have release_date."""
         self._assert_metadata("Tales of Destiny (PS2 Remake) (JP)", "release_date", "2006-11-30",
-                              db=self.pal_data)
+                              db=self.japan_data)
 
     def test_tales_of_destiny_ps2_has_genre(self):
-        """Wave 46 / Wave 108: Tales of Destiny (PS2 Remake) (JP) should have genre RPG."""
+        """Wave 46 / Wave 108 / Wave 114: Tales of Destiny (PS2 Remake) (JP) should have genre RPG."""
         self._assert_metadata("Tales of Destiny (PS2 Remake) (JP)", "genre", "RPG",
-                              db=self.pal_data)
+                              db=self.japan_data)
 
     def test_tales_of_destiny_2_has_release_date(self):
-        """Wave 46 / Wave 108: Tales of Destiny 2 (JP) should have release_date."""
+        """Wave 46 / Wave 108 / Wave 114: Tales of Destiny 2 (JP) should have release_date."""
         self._assert_metadata("Tales of Destiny 2 (JP)", "release_date", "2002-11-28",
-                              db=self.pal_data)
+                              db=self.japan_data)
 
     def test_tales_of_rebirth_has_developer(self):
-        """Wave 46 / Wave 108: Tales of Rebirth (JP) should have developer Namco Tales Studio."""
+        """Wave 46 / Wave 108 / Wave 114: Tales of Rebirth (JP) should have developer Namco Tales Studio."""
         self._assert_metadata("Tales of Rebirth (JP)", "developer", "Namco Tales Studio",
-                              db=self.pal_data)
+                              db=self.japan_data)
 
     def test_forbidden_siren_2_has_developer(self):
-        """Wave 46: Forbidden Siren 2 (JP) should have developer SCE Japan Studio (Japan-only title)."""
-        self._assert_metadata("Forbidden Siren 2 (JP)", "developer", "SCE Japan Studio", db=self.pal_data)
+        """Wave 46 / Wave 114: Forbidden Siren 2 (JP) should have developer SCE Japan Studio."""
+        self._assert_metadata("Forbidden Siren 2 (JP)", "developer", "SCE Japan Studio", db=self.japan_data)
 
     def test_front_mission_5_has_developer(self):
-        """Wave 46 / Wave 108: Front Mission 5: Scars of the War (JP) should have developer Square Enix."""
+        """Wave 46 / Wave 108 / Wave 114: Front Mission 5: Scars of the War (JP) should have developer Square Enix."""
         self._assert_metadata("Front Mission 5: Scars of the War (JP)", "developer", "Square Enix",
-                              db=self.pal_data)
+                              db=self.japan_data)
 
     def test_gtc_africa_has_developer(self):
         """Wave 46: GTC Africa (PAL) should have developer Rage Software."""
@@ -14461,17 +14463,16 @@ class TestWave72PalSerialDb(unittest.TestCase):
                              f"Bad serial for '{title}': {serial!r}")
 
     def test_pal_db_all_serials_are_pal_region(self):
-        """Every primary serial in the PAL DB must begin with a PAL or Japan prefix.
+        """Every primary serial in the PAL DB must begin with a PAL prefix.
 
-        Japan (SLPM/SLPS/SCPS) entries are permitted in this file because no
-        separate Japan DB exists; they are flagged as region='Japan'.
+        Japan entries have been moved to ps2_japan.json (Wave 114).
         """
-        allowed_prefixes = ("SLES", "SCES", "SLEH", "SCEH", "SLPM", "SLPS", "SCPS")
+        allowed_prefixes = ("SLES", "SCES", "SLEH", "SCEH")
         for title, info in self.pal_db["games"].items():
             serial = info.get("serial", "")
             self.assertTrue(
                 serial.startswith(allowed_prefixes),
-                f"Unexpected serial prefix {serial!r} in PAL/JP DB for '{title}'"
+                f"Unexpected serial prefix {serial!r} in PAL DB for '{title}'"
             )
 
     def test_pal_db_all_crcs_valid_format(self):

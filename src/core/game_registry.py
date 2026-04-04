@@ -832,7 +832,29 @@ def _load_pal_serials() -> dict[str, str]:
     return result
 
 
+def _load_japan_serials() -> dict[str, str]:
+    """Load Japan (NTSC-J) serial → title mappings from ps2_japan.json."""
+    import json as _json
+    _jp_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+    if not _jp_db.is_file():
+        return {}
+    try:
+        raw = _json.loads(_jp_db.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, str] = {}
+    for title, info in raw.get("games", {}).items():
+        serial = info.get("serial", "")
+        if serial:
+            result[serial] = title
+        for alt in info.get("alt_serials", []):
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
+
 _KNOWN_SERIALS.update(_load_pal_serials())
+_KNOWN_SERIALS.update(_load_japan_serials())
 
 
 def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> str:
