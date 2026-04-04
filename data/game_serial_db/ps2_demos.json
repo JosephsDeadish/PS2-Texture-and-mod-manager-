@@ -151,9 +151,7 @@
     },
     "Metal Gear Solid 2: Sons of Liberty (Demo)": {
       "serial": "",
-      "alt_serials": [
-        "SLUS-29000"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "disc_type": "demo",
       "region": "NTSC-U",
@@ -1401,6 +1399,315 @@
       "aliases": [
         "KH JP Demo",
         "Kingdom Hearts JP Demo"
+      ]
+    },
+    "Devil May Cry 2 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC2 Demo",
+        "Devil May Cry 2 Demo"
+      ]
+    },
+    "Grand Theft Auto III (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "DMA Design",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GTA III Demo",
+        "Grand Theft Auto 3 Demo"
+      ]
+    },
+    "Grand Theft Auto: Vice City (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Rockstar North",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GTA Vice City Demo",
+        "Vice City Demo"
+      ]
+    },
+    "Jak II: Renegade (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak II Demo",
+        "Jak 2 Demo"
+      ]
+    },
+    "Kingdom Hearts II (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH2 Demo",
+        "Kingdom Hearts 2 Demo"
+      ]
+    },
+    "Sly Cooper and the Thievius Raccoonus (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sucker Punch Productions",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Sly Cooper Demo",
+        "Sly Raccoon Demo"
+      ]
+    },
+    "SOCOM: U.S. Navy SEALs (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Zipper Interactive",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Tactical Shooter",
+      "aliases": [
+        "SOCOM Demo",
+        "Socom Navy SEALs Demo"
+      ]
+    },
+    "God of War (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW Demo",
+        "God of War 1 Demo"
+      ]
+    },
+    "Shadow of the Colossus (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "SotC Demo",
+        "Wander and the Colossus Demo"
+      ]
+    },
+    "God of War II (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW2 Demo",
+        "God of War 2 Demo"
+      ]
+    },
+    "Jak 3 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak III Demo"
+      ]
+    },
+    "Sly 2: Band of Thieves (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sucker Punch Productions",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Sly 2 Demo"
+      ]
+    },
+    "Ratchet & Clank: Going Commando (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "R&C Going Commando Demo",
+        "Ratchet & Clank 2 Demo"
+      ]
+    },
+    "Jak and Daxter: The Precursor Legacy (PAL Demo)": {
+      "serial": "SCES-50361",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2002",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak and Daxter PAL Demo",
+        "JakDax PAL Demo"
+      ]
+    },
+    "Killzone (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2004",
+      "developer": "Guerrilla Games",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "First-Person Shooter",
+      "aliases": [
+        "Killzone Demo PAL"
+      ]
+    },
+    "Shadow of the Colossus (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "SotC PAL Demo",
+        "Wander and the Colossus PAL Demo"
+      ]
+    },
+    "God of War (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2005",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW PAL Demo"
+      ]
+    },
+    "Gran Turismo 4 (PAL Prologue)": {
+      "serial": "SCED-52246",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 PAL Prologue",
+        "Gran Turismo 4 PAL Demo"
+      ]
+    },
+    "Ico (JP Demo)": {
+      "serial": "SCPD-10002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "Ico Japan Demo"
+      ]
+    },
+    "Dark Cloud (JP Demo)": {
+      "serial": "SLPD-00009",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2000",
+      "developer": "Level-5",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-RPG",
+      "aliases": [
+        "Dark Cloud Japan Demo"
+      ]
+    },
+    "Shadow of the Colossus (JP Demo)": {
+      "serial": "SLPD-00025",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "Wanda to Kyozou Demo",
+        "SotC JP Demo"
       ]
     }
   }

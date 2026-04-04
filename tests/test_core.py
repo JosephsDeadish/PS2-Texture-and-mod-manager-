@@ -20434,3 +20434,259 @@ class TestWave110DemoDatabase(unittest.TestCase):
         demo = len(self.sdb.demo_titles())
         self.assertEqual(total, retail + demo,
                          "game_count should equal retail + demo count")
+
+
+class TestWave111DemoDbExpansion(unittest.TestCase):
+    """Wave 111: Demo DB expansion — 21 new demo entries across NTSC-U/PAL/JP.
+
+    Note: GameInfo.region is derived from the primary serial prefix.  Demo
+    entries whose serial is not yet confirmed have an empty serial and therefore
+    region == "".  Tests for those entries check disc_type / developer instead.
+    Region is only asserted for entries that carry a real, confirmed serial.
+
+    Changes:
+    - 21 new demo entries added (NTSC-U game demos, PAL demos, JP demos)
+    - is_demo_serial() and info_for_serial() work for entries with serials
+    - MGS2 Demo NTSC-U serial intentionally left empty (SLUS-29001 is retail)
+    """
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    # ── MGS2 Demo entry still present but serial unconfirmed ─────────────────
+
+    def test_mgs2_demo_entry_exists(self):
+        """Wave 111: MGS2 Demo NTSC-U entry exists in demo DB."""
+        gi = self.sdb.get_info("Metal Gear Solid 2: Sons of Liberty (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_mgs2_retail_not_demo(self):
+        """Wave 111: The retail MGS2 serial SLUS-20210 is NOT a demo serial."""
+        self.assertFalse(self.sdb.is_demo_serial("SLUS-20210"))
+
+    # ── New NTSC-U game demo entries (empty serials → region == "") ───────────
+
+    def test_devil_may_cry_2_demo_present(self):
+        """Wave 111: Devil May Cry 2 Demo entry exists."""
+        gi = self.sdb.get_info("Devil May Cry 2 (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.publisher, "Capcom")
+
+    def test_gta3_demo_present(self):
+        """Wave 111: Grand Theft Auto III Demo entry exists."""
+        gi = self.sdb.get_info("Grand Theft Auto III (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "DMA Design")
+
+    def test_vice_city_demo_present(self):
+        """Wave 111: Grand Theft Auto: Vice City Demo entry exists."""
+        gi = self.sdb.get_info("Grand Theft Auto: Vice City (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Rockstar North")
+
+    def test_jak2_demo_present(self):
+        """Wave 111: Jak II: Renegade Demo entry exists."""
+        gi = self.sdb.get_info("Jak II: Renegade (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Naughty Dog")
+
+    def test_kh2_demo_present(self):
+        """Wave 111: Kingdom Hearts II Demo entry exists."""
+        gi = self.sdb.get_info("Kingdom Hearts II (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.publisher, "Square Enix")
+
+    def test_sly_cooper_demo_present(self):
+        """Wave 111: Sly Cooper Demo entry exists."""
+        gi = self.sdb.get_info("Sly Cooper and the Thievius Raccoonus (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Sucker Punch Productions")
+
+    def test_socom_demo_present(self):
+        """Wave 111: SOCOM: U.S. Navy SEALs Demo entry exists."""
+        gi = self.sdb.get_info("SOCOM: U.S. Navy SEALs (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Zipper Interactive")
+
+    def test_god_of_war_demo_present(self):
+        """Wave 111: God of War Demo entry exists."""
+        gi = self.sdb.get_info("God of War (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "SCE Studio Santa Monica")
+
+    def test_sotc_demo_present(self):
+        """Wave 111: Shadow of the Colossus Demo NTSC-U entry exists."""
+        gi = self.sdb.get_info("Shadow of the Colossus (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Team Ico")
+
+    def test_gow2_demo_present(self):
+        """Wave 111: God of War II Demo entry exists."""
+        gi = self.sdb.get_info("God of War II (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "SCE Studio Santa Monica")
+
+    def test_jak3_demo_present(self):
+        """Wave 111: Jak 3 Demo entry exists."""
+        gi = self.sdb.get_info("Jak 3 (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Naughty Dog")
+
+    def test_sly2_demo_present(self):
+        """Wave 111: Sly 2: Band of Thieves Demo entry exists."""
+        gi = self.sdb.get_info("Sly 2: Band of Thieves (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Sucker Punch Productions")
+
+    def test_ratchet_going_commando_demo_present(self):
+        """Wave 111: Ratchet & Clank: Going Commando Demo entry exists."""
+        gi = self.sdb.get_info("Ratchet & Clank: Going Commando (Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Insomniac Games")
+
+    # ── New PAL demo entries ──────────────────────────────────────────────────
+
+    def test_jak_daxter_pal_demo_serial(self):
+        """Wave 111: Jak and Daxter PAL Demo serial is SCES-50361."""
+        gi = self.sdb.get_info("Jak and Daxter: The Precursor Legacy (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.serial, "SCES-50361")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_jak_daxter_pal_demo_region(self):
+        """Wave 111: Jak and Daxter PAL Demo region is PAL (derived from SCES serial)."""
+        gi = self.sdb.get_info("Jak and Daxter: The Precursor Legacy (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "PAL")
+
+    def test_sces50361_is_demo_serial(self):
+        """Wave 111: SCES-50361 recognised as a demo serial."""
+        self.assertTrue(self.sdb.is_demo_serial("SCES-50361"))
+
+    def test_killzone_pal_demo_present(self):
+        """Wave 111: Killzone PAL Demo entry exists."""
+        gi = self.sdb.get_info("Killzone (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Guerrilla Games")
+
+    def test_sotc_pal_demo_present(self):
+        """Wave 111: Shadow of the Colossus PAL Demo entry exists."""
+        gi = self.sdb.get_info("Shadow of the Colossus (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "Team Ico")
+
+    def test_gow_pal_demo_present(self):
+        """Wave 111: God of War PAL Demo entry exists."""
+        gi = self.sdb.get_info("God of War (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+        self.assertEqual(gi.developer, "SCE Studio Santa Monica")
+
+    def test_gt4_pal_prologue_serial(self):
+        """Wave 111: Gran Turismo 4 PAL Prologue serial is SCED-52246."""
+        gi = self.sdb.get_info("Gran Turismo 4 (PAL Prologue)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.serial, "SCED-52246")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_gt4_pal_prologue_region(self):
+        """Wave 111: Gran Turismo 4 PAL Prologue region is PAL (derived from SCED serial)."""
+        gi = self.sdb.get_info("Gran Turismo 4 (PAL Prologue)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "PAL")
+
+    def test_sced52246_is_demo_serial(self):
+        """Wave 111: SCED-52246 recognised as a demo serial."""
+        self.assertTrue(self.sdb.is_demo_serial("SCED-52246"))
+
+    # ── New Japan demo entries ────────────────────────────────────────────────
+
+    def test_ico_jp_demo_serial(self):
+        """Wave 111: Ico JP Demo serial is SCPD-10002."""
+        gi = self.sdb.get_info("Ico (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.serial, "SCPD-10002")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_ico_jp_demo_region(self):
+        """Wave 111: Ico JP Demo region is NTSC-J (derived from SCPD serial)."""
+        gi = self.sdb.get_info("Ico (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "NTSC-J")
+
+    def test_scpd10002_is_demo_serial(self):
+        """Wave 111: SCPD-10002 recognised as a demo serial."""
+        self.assertTrue(self.sdb.is_demo_serial("SCPD-10002"))
+
+    def test_dark_cloud_jp_demo_serial(self):
+        """Wave 111: Dark Cloud JP Demo serial is SLPD-00009."""
+        gi = self.sdb.get_info("Dark Cloud (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.serial, "SLPD-00009")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_dark_cloud_jp_demo_region(self):
+        """Wave 111: Dark Cloud JP Demo region is NTSC-J (derived from SLPD serial)."""
+        gi = self.sdb.get_info("Dark Cloud (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "NTSC-J")
+
+    def test_sotc_jp_demo_serial(self):
+        """Wave 111: Shadow of the Colossus JP Demo serial is SLPD-00025."""
+        gi = self.sdb.get_info("Shadow of the Colossus (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.serial, "SLPD-00025")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_sotc_jp_demo_region(self):
+        """Wave 111: Shadow of the Colossus JP Demo region is NTSC-J (derived from SLPD serial)."""
+        gi = self.sdb.get_info("Shadow of the Colossus (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.region, "NTSC-J")
+
+    # ── Demo count has grown ──────────────────────────────────────────────────
+
+    def test_demo_count_at_least_115(self):
+        """Wave 111: demo_titles() has at least 115 entries after expansion."""
+        self.assertGreaterEqual(len(self.sdb.demo_titles()), 115)
+
+    # ── Demo/retail separation still holds ───────────────────────────────────
+
+    def test_new_demo_entries_not_in_retail_titles(self):
+        """Wave 111: None of the new Wave 111 demo titles appear in retail_titles()."""
+        new_demo_titles = [
+            "Devil May Cry 2 (Demo)",
+            "Grand Theft Auto III (Demo)",
+            "Grand Theft Auto: Vice City (Demo)",
+            "Jak II: Renegade (Demo)",
+            "Kingdom Hearts II (Demo)",
+            "SOCOM: U.S. Navy SEALs (Demo)",
+            "God of War (Demo)",
+            "Shadow of the Colossus (Demo)",
+            "God of War II (Demo)",
+            "Jak and Daxter: The Precursor Legacy (PAL Demo)",
+            "Gran Turismo 4 (PAL Prologue)",
+            "Ico (JP Demo)",
+            "Dark Cloud (JP Demo)",
+            "Shadow of the Colossus (JP Demo)",
+        ]
+        retail_set = set(self.sdb.retail_titles())
+        for title in new_demo_titles:
+            self.assertNotIn(title, retail_set, f"Demo title leaked into retail: {title}")
