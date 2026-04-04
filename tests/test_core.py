@@ -21295,3 +21295,189 @@ class TestWave115JapanDbExpansion(unittest.TestCase):
                 serial.startswith(allowed),
                 f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
             )
+
+
+class TestWave116JapanDbExpansion(unittest.TestCase):
+    """Wave 116: Expand ps2_japan.json with 10 more well-known JP titles.
+
+    New entries added to ps2_japan.json:
+      .hack//Infection (JP)                  SLPS-25262  CyberConnect2 / Bandai      2002-06-20
+      Disgaea 2: Cursed Memories (JP)        SLPS-25664  Nippon Ichi Software        2006-02-23
+      Drakengard (JP)                        SLPM-65817  Cavia / Square Enix         2003-09-11
+      Drakengard 2 (JP)                      SLPM-66111  Cavia / Square Enix         2005-06-16
+      Fatal Frame (JP)                       SLPS-25128  Tecmo                       2001-12-13
+      Fatal Frame II: Crimson Butterfly (JP) SLPS-25384  Tecmo                       2003-11-27
+      Gradius V (JP)                         SLPM-65998  Treasure / Konami           2004-07-22
+      Haunting Ground (JP)                   SLPM-66119  Capcom                      2005-02-24
+      La Pucelle (JP)                        SLPS-25170  Nippon Ichi Software        2002-01-29
+      Phantom Brave (JP)                     SLPS-25428  Nippon Ichi Software        2004-01-22
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+        cls.jp = json.loads(jp_path.read_text())["games"]
+
+    # ── JP DB count ───────────────────────────────────────────────────────────
+
+    def test_jp_db_count(self):
+        """Wave 116: Japan DB has at least 76 entries after 10 new additions."""
+        self.assertGreaterEqual(len(self.jp), 76)
+
+    # ── .hack//Infection ──────────────────────────────────────────────────────
+
+    def test_hack_infection_jp_present(self):
+        """Wave 116: .hack//Infection (JP) is in Japan DB."""
+        self.assertIn(".hack//Infection (JP)", self.jp)
+
+    def test_hack_infection_jp_serial(self):
+        """Wave 116: .hack//Infection (JP) serial=SLPS-25262."""
+        self.assertEqual(self.jp[".hack//Infection (JP)"]["serial"], "SLPS-25262")
+
+    def test_hack_infection_jp_publisher(self):
+        """Wave 116: .hack//Infection (JP) publisher=Bandai."""
+        self.assertEqual(self.jp[".hack//Infection (JP)"]["publisher"], "Bandai")
+
+    # ── Disgaea 2: Cursed Memories ────────────────────────────────────────────
+
+    def test_disgaea_2_jp_present(self):
+        """Wave 116: Disgaea 2: Cursed Memories (JP) is in Japan DB."""
+        self.assertIn("Disgaea 2: Cursed Memories (JP)", self.jp)
+
+    def test_disgaea_2_jp_serial(self):
+        """Wave 116: Disgaea 2: Cursed Memories (JP) serial=SLPS-25664."""
+        self.assertEqual(self.jp["Disgaea 2: Cursed Memories (JP)"]["serial"], "SLPS-25664")
+
+    def test_disgaea_2_jp_developer(self):
+        """Wave 116: Disgaea 2: Cursed Memories (JP) developer=Nippon Ichi Software."""
+        self.assertEqual(self.jp["Disgaea 2: Cursed Memories (JP)"]["developer"], "Nippon Ichi Software")
+
+    # ── Drakengard ────────────────────────────────────────────────────────────
+
+    def test_drakengard_jp_present(self):
+        """Wave 116: Drakengard (JP) is in Japan DB."""
+        self.assertIn("Drakengard (JP)", self.jp)
+
+    def test_drakengard_jp_serial(self):
+        """Wave 116: Drakengard (JP) serial=SLPM-65817."""
+        self.assertEqual(self.jp["Drakengard (JP)"]["serial"], "SLPM-65817")
+
+    def test_drakengard_jp_developer(self):
+        """Wave 116: Drakengard (JP) developer=Cavia."""
+        self.assertEqual(self.jp["Drakengard (JP)"]["developer"], "Cavia")
+
+    def test_drakengard_jp_publisher(self):
+        """Wave 116: Drakengard (JP) publisher=Square Enix."""
+        self.assertEqual(self.jp["Drakengard (JP)"]["publisher"], "Square Enix")
+
+    # ── Drakengard 2 ─────────────────────────────────────────────────────────
+
+    def test_drakengard_2_jp_present(self):
+        """Wave 116: Drakengard 2 (JP) is in Japan DB."""
+        self.assertIn("Drakengard 2 (JP)", self.jp)
+
+    def test_drakengard_2_jp_serial(self):
+        """Wave 116: Drakengard 2 (JP) serial=SLPM-66111."""
+        self.assertEqual(self.jp["Drakengard 2 (JP)"]["serial"], "SLPM-66111")
+
+    # ── Fatal Frame ──────────────────────────────────────────────────────────
+
+    def test_fatal_frame_jp_present(self):
+        """Wave 116: Fatal Frame (JP) is in Japan DB."""
+        self.assertIn("Fatal Frame (JP)", self.jp)
+
+    def test_fatal_frame_jp_serial(self):
+        """Wave 116: Fatal Frame (JP) serial=SLPS-25128."""
+        self.assertEqual(self.jp["Fatal Frame (JP)"]["serial"], "SLPS-25128")
+
+    def test_fatal_frame_jp_developer(self):
+        """Wave 116: Fatal Frame (JP) developer=Tecmo."""
+        self.assertEqual(self.jp["Fatal Frame (JP)"]["developer"], "Tecmo")
+
+    # ── Fatal Frame II: Crimson Butterfly ────────────────────────────────────
+
+    def test_fatal_frame_ii_jp_present(self):
+        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) is in Japan DB."""
+        self.assertIn("Fatal Frame II: Crimson Butterfly (JP)", self.jp)
+
+    def test_fatal_frame_ii_jp_serial(self):
+        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) serial=SLPS-25384."""
+        self.assertEqual(self.jp["Fatal Frame II: Crimson Butterfly (JP)"]["serial"], "SLPS-25384")
+
+    def test_fatal_frame_ii_jp_publisher(self):
+        """Wave 116: Fatal Frame II: Crimson Butterfly (JP) publisher=Tecmo."""
+        self.assertEqual(self.jp["Fatal Frame II: Crimson Butterfly (JP)"]["publisher"], "Tecmo")
+
+    # ── Gradius V ────────────────────────────────────────────────────────────
+
+    def test_gradius_v_jp_present(self):
+        """Wave 116: Gradius V (JP) is in Japan DB."""
+        self.assertIn("Gradius V (JP)", self.jp)
+
+    def test_gradius_v_jp_serial(self):
+        """Wave 116: Gradius V (JP) serial=SLPM-65998."""
+        self.assertEqual(self.jp["Gradius V (JP)"]["serial"], "SLPM-65998")
+
+    def test_gradius_v_jp_developer(self):
+        """Wave 116: Gradius V (JP) developer=Treasure."""
+        self.assertEqual(self.jp["Gradius V (JP)"]["developer"], "Treasure")
+
+    def test_gradius_v_jp_publisher(self):
+        """Wave 116: Gradius V (JP) publisher=Konami."""
+        self.assertEqual(self.jp["Gradius V (JP)"]["publisher"], "Konami")
+
+    # ── Haunting Ground ──────────────────────────────────────────────────────
+
+    def test_haunting_ground_jp_present(self):
+        """Wave 116: Haunting Ground (JP) is in Japan DB."""
+        self.assertIn("Haunting Ground (JP)", self.jp)
+
+    def test_haunting_ground_jp_serial(self):
+        """Wave 116: Haunting Ground (JP) serial=SLPM-66119."""
+        self.assertEqual(self.jp["Haunting Ground (JP)"]["serial"], "SLPM-66119")
+
+    def test_haunting_ground_jp_developer(self):
+        """Wave 116: Haunting Ground (JP) developer=Capcom."""
+        self.assertEqual(self.jp["Haunting Ground (JP)"]["developer"], "Capcom")
+
+    # ── La Pucelle ───────────────────────────────────────────────────────────
+
+    def test_la_pucelle_jp_present(self):
+        """Wave 116: La Pucelle (JP) is in Japan DB."""
+        self.assertIn("La Pucelle (JP)", self.jp)
+
+    def test_la_pucelle_jp_serial(self):
+        """Wave 116: La Pucelle (JP) serial=SLPS-25170."""
+        self.assertEqual(self.jp["La Pucelle (JP)"]["serial"], "SLPS-25170")
+
+    def test_la_pucelle_jp_developer(self):
+        """Wave 116: La Pucelle (JP) developer=Nippon Ichi Software."""
+        self.assertEqual(self.jp["La Pucelle (JP)"]["developer"], "Nippon Ichi Software")
+
+    # ── Phantom Brave ────────────────────────────────────────────────────────
+
+    def test_phantom_brave_jp_present(self):
+        """Wave 116: Phantom Brave (JP) is in Japan DB."""
+        self.assertIn("Phantom Brave (JP)", self.jp)
+
+    def test_phantom_brave_jp_serial(self):
+        """Wave 116: Phantom Brave (JP) serial=SLPS-25428."""
+        self.assertEqual(self.jp["Phantom Brave (JP)"]["serial"], "SLPS-25428")
+
+    def test_phantom_brave_jp_developer(self):
+        """Wave 116: Phantom Brave (JP) developer=Nippon Ichi Software."""
+        self.assertEqual(self.jp["Phantom Brave (JP)"]["developer"], "Nippon Ichi Software")
+
+    # ── All JP serials have correct prefix ───────────────────────────────────
+
+    def test_jp_db_all_serials_are_jp_region(self):
+        """Wave 116: Every primary serial in Japan DB must begin with a JP prefix."""
+        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
+        for title, info in self.jp.items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(allowed),
+                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
+            )

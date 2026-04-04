@@ -2,6 +2,16 @@
   "version": "1.0",
   "description": "PS2 Japan (NTSC-J) authoritative serial database. Maps SLPS/SLPM/SCPS/SCPM game titles to their canonical serials with CRC associations.",
   "games": {
+    ".hack//Infection (JP)": {
+      "serial": "SLPS-25262",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-06-20",
+      "developer": "CyberConnect2",
+      "publisher": "Bandai",
+      "genre": "Action RPG"
+    },
     "Ace Combat 04: Shattered Skies (JP)": {
       "serial": "SLPS-20020",
       "alt_serials": [],
@@ -104,6 +114,16 @@
       "publisher": "Capcom",
       "genre": "Action"
     },
+    "Disgaea 2: Cursed Memories (JP)": {
+      "serial": "SLPS-25664",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-02-23",
+      "developer": "Nippon Ichi Software",
+      "publisher": "Nippon Ichi Software",
+      "genre": "Strategy RPG"
+    },
     "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
       "serial": "SLPM-65515",
       "alt_serials": [],
@@ -125,6 +145,46 @@
       "developer": "Level-5",
       "publisher": "Square Enix",
       "genre": "RPG"
+    },
+    "Drakengard (JP)": {
+      "serial": "SLPM-65817",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-09-11",
+      "developer": "Cavia",
+      "publisher": "Square Enix",
+      "genre": "Action RPG"
+    },
+    "Drakengard 2 (JP)": {
+      "serial": "SLPM-66111",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-06-16",
+      "developer": "Cavia",
+      "publisher": "Square Enix",
+      "genre": "Action RPG"
+    },
+    "Fatal Frame (JP)": {
+      "serial": "SLPS-25128",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-12-13",
+      "developer": "Tecmo",
+      "publisher": "Tecmo",
+      "genre": "Survival Horror"
+    },
+    "Fatal Frame II: Crimson Butterfly (JP)": {
+      "serial": "SLPS-25384",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-11-27",
+      "developer": "Tecmo",
+      "publisher": "Tecmo",
+      "genre": "Survival Horror"
     },
     "Final Fantasy X (JP)": {
       "serial": "SCPS-15008",
@@ -209,6 +269,16 @@
       "publisher": "Capcom",
       "genre": "Beat 'em up"
     },
+    "Gradius V (JP)": {
+      "serial": "SLPM-65998",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-07-22",
+      "developer": "Treasure",
+      "publisher": "Konami",
+      "genre": "Shoot 'em Up"
+    },
     "Grandia III (JP)": {
       "serial": "SLPM-65976",
       "alt_serials": [],
@@ -220,6 +290,16 @@
       "developer": "Game Arts",
       "publisher": "Square Enix",
       "genre": "RPG"
+    },
+    "Haunting Ground (JP)": {
+      "serial": "SLPM-66119",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-02-24",
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Survival Horror"
     },
     "Ico (JP)": {
       "serial": "SCPS-10126",
@@ -280,6 +360,16 @@
       "developer": "Square Enix",
       "publisher": "Square Enix",
       "genre": "Action RPG"
+    },
+    "La Pucelle (JP)": {
+      "serial": "SLPS-25170",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-01-29",
+      "developer": "Nippon Ichi Software",
+      "publisher": "Nippon Ichi Software",
+      "genre": "Strategy RPG"
     },
     "Makai Senki Disgaea (JP)": {
       "serial": "SLPS-25180",
@@ -392,6 +482,16 @@
       "developer": "Atlus",
       "publisher": "Atlus",
       "genre": "RPG"
+    },
+    "Phantom Brave (JP)": {
+      "serial": "SLPS-25428",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-01-22",
+      "developer": "Nippon Ichi Software",
+      "publisher": "Nippon Ichi Software",
+      "genre": "Strategy RPG"
     },
     "Ratchet & Clank (JP)": {
       "serial": "SCPS-15015",
