@@ -885,6 +885,106 @@
       "developer": "Project Aces",
       "publisher": "Namco",
       "genre": "Flight Simulator"
+    },
+    ".hack//Mutation (JP)": {
+      "serial": "SLPS-25274",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-09-05",
+      "developer": "CyberConnect2",
+      "publisher": "Bandai",
+      "genre": "Action RPG"
+    },
+    ".hack//Outbreak (JP)": {
+      "serial": "SLPS-25302",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-12-19",
+      "developer": "CyberConnect2",
+      "publisher": "Bandai",
+      "genre": "Action RPG"
+    },
+    ".hack//Quarantine (JP)": {
+      "serial": "SLPS-25327",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-06-26",
+      "developer": "CyberConnect2",
+      "publisher": "Bandai",
+      "genre": "Action RPG"
+    },
+    "Breath of Fire: Dragon Quarter (JP)": {
+      "serial": "SLPS-25279",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-11-14",
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "RPG"
+    },
+    "Tales of Eternia (JP)": {
+      "serial": "SLPS-25072",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2000-11-30",
+      "developer": "Namco Tales Studio",
+      "publisher": "Namco",
+      "genre": "RPG"
+    },
+    "Romancing SaGa: Minstrel Song (JP)": {
+      "serial": "SLPS-25457",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-04-21",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
+    "Resident Evil: Outbreak (JP)": {
+      "serial": "SLPM-65401",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-12-11",
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Survival Horror"
+    },
+    "Resident Evil: Outbreak File 2 (JP)": {
+      "serial": "SLPM-66056",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-09-09",
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Survival Horror"
+    },
+    "Onimusha 2: Samurai's Destiny (JP)": {
+      "serial": "SLPM-65196",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-03-07",
+      "developer": "Capcom Production Studio 2",
+      "publisher": "Capcom",
+      "genre": "Action Adventure"
+    },
+    "Onimusha 3: Demon Siege (JP)": {
+      "serial": "SLPM-65792",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-02-26",
+      "developer": "Capcom Production Studio 2",
+      "publisher": "Capcom",
+      "genre": "Action Adventure"
     }
   }
 }

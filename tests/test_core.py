@@ -21695,3 +21695,213 @@ class TestWave117JapanDbExpansion(unittest.TestCase):
                 serial.startswith(allowed),
                 f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
             )
+
+
+class TestWave118JapanDbExpansion(unittest.TestCase):
+    """Wave 118: Expand ps2_japan.json with 10 more well-known JP titles.
+
+    New entries added to ps2_japan.json (86→96):
+      .hack//Mutation (JP)                  SLPS-25274  CyberConnect2 / Bandai              2002-09-05
+      .hack//Outbreak (JP)                  SLPS-25302  CyberConnect2 / Bandai              2002-12-19
+      .hack//Quarantine (JP)                SLPS-25327  CyberConnect2 / Bandai              2003-06-26
+      Breath of Fire: Dragon Quarter (JP)   SLPS-25279  Capcom                              2002-11-14
+      Tales of Eternia (JP)                 SLPS-25072  Namco Tales Studio / Namco          2000-11-30
+      Romancing SaGa: Minstrel Song (JP)    SLPS-25457  Square Enix                         2005-04-21
+      Resident Evil: Outbreak (JP)          SLPM-65401  Capcom                              2003-12-11
+      Resident Evil: Outbreak File 2 (JP)   SLPM-66056  Capcom                              2004-09-09
+      Onimusha 2: Samurai's Destiny (JP)    SLPM-65196  Capcom Production Studio 2          2002-03-07
+      Onimusha 3: Demon Siege (JP)          SLPM-65792  Capcom Production Studio 2          2004-02-26
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+        cls.jp = json.loads(jp_path.read_text())["games"]
+
+    # ── JP DB count ───────────────────────────────────────────────────────────
+
+    def test_jp_db_count(self):
+        """Wave 118: Japan DB has at least 96 entries after 10 new additions."""
+        self.assertGreaterEqual(len(self.jp), 96)
+
+    # ── .hack//Mutation ───────────────────────────────────────────────────────
+
+    def test_hack_mutation_jp_present(self):
+        """Wave 118: .hack//Mutation (JP) is in Japan DB."""
+        self.assertIn(".hack//Mutation (JP)", self.jp)
+
+    def test_hack_mutation_jp_serial(self):
+        """Wave 118: .hack//Mutation (JP) serial=SLPS-25274."""
+        self.assertEqual(self.jp[".hack//Mutation (JP)"]["serial"], "SLPS-25274")
+
+    def test_hack_mutation_jp_developer(self):
+        """Wave 118: .hack//Mutation (JP) developer=CyberConnect2."""
+        self.assertEqual(self.jp[".hack//Mutation (JP)"]["developer"], "CyberConnect2")
+
+    def test_hack_mutation_jp_publisher(self):
+        """Wave 118: .hack//Mutation (JP) publisher=Bandai."""
+        self.assertEqual(self.jp[".hack//Mutation (JP)"]["publisher"], "Bandai")
+
+    # ── .hack//Outbreak ───────────────────────────────────────────────────────
+
+    def test_hack_outbreak_jp_present(self):
+        """Wave 118: .hack//Outbreak (JP) is in Japan DB."""
+        self.assertIn(".hack//Outbreak (JP)", self.jp)
+
+    def test_hack_outbreak_jp_serial(self):
+        """Wave 118: .hack//Outbreak (JP) serial=SLPS-25302."""
+        self.assertEqual(self.jp[".hack//Outbreak (JP)"]["serial"], "SLPS-25302")
+
+    def test_hack_outbreak_jp_release_date(self):
+        """Wave 118: .hack//Outbreak (JP) release_date=2002-12-19."""
+        self.assertEqual(self.jp[".hack//Outbreak (JP)"]["release_date"], "2002-12-19")
+
+    # ── .hack//Quarantine ─────────────────────────────────────────────────────
+
+    def test_hack_quarantine_jp_present(self):
+        """Wave 118: .hack//Quarantine (JP) is in Japan DB."""
+        self.assertIn(".hack//Quarantine (JP)", self.jp)
+
+    def test_hack_quarantine_jp_serial(self):
+        """Wave 118: .hack//Quarantine (JP) serial=SLPS-25327."""
+        self.assertEqual(self.jp[".hack//Quarantine (JP)"]["serial"], "SLPS-25327")
+
+    def test_hack_quarantine_jp_publisher(self):
+        """Wave 118: .hack//Quarantine (JP) publisher=Bandai."""
+        self.assertEqual(self.jp[".hack//Quarantine (JP)"]["publisher"], "Bandai")
+
+    # ── Breath of Fire: Dragon Quarter ───────────────────────────────────────
+
+    def test_bof_dragon_quarter_jp_present(self):
+        """Wave 118: Breath of Fire: Dragon Quarter (JP) is in Japan DB."""
+        self.assertIn("Breath of Fire: Dragon Quarter (JP)", self.jp)
+
+    def test_bof_dragon_quarter_jp_serial(self):
+        """Wave 118: Breath of Fire: Dragon Quarter (JP) serial=SLPS-25279."""
+        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["serial"], "SLPS-25279")
+
+    def test_bof_dragon_quarter_jp_developer(self):
+        """Wave 118: Breath of Fire: Dragon Quarter (JP) developer=Capcom."""
+        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["developer"], "Capcom")
+
+    def test_bof_dragon_quarter_jp_release_date(self):
+        """Wave 118: Breath of Fire: Dragon Quarter (JP) release_date=2002-11-14."""
+        self.assertEqual(self.jp["Breath of Fire: Dragon Quarter (JP)"]["release_date"], "2002-11-14")
+
+    # ── Tales of Eternia ──────────────────────────────────────────────────────
+
+    def test_tales_eternia_jp_present(self):
+        """Wave 118: Tales of Eternia (JP) is in Japan DB."""
+        self.assertIn("Tales of Eternia (JP)", self.jp)
+
+    def test_tales_eternia_jp_serial(self):
+        """Wave 118: Tales of Eternia (JP) serial=SLPS-25072."""
+        self.assertEqual(self.jp["Tales of Eternia (JP)"]["serial"], "SLPS-25072")
+
+    def test_tales_eternia_jp_developer(self):
+        """Wave 118: Tales of Eternia (JP) developer=Namco Tales Studio."""
+        self.assertEqual(self.jp["Tales of Eternia (JP)"]["developer"], "Namco Tales Studio")
+
+    def test_tales_eternia_jp_publisher(self):
+        """Wave 118: Tales of Eternia (JP) publisher=Namco."""
+        self.assertEqual(self.jp["Tales of Eternia (JP)"]["publisher"], "Namco")
+
+    # ── Romancing SaGa: Minstrel Song ────────────────────────────────────────
+
+    def test_romancing_saga_jp_present(self):
+        """Wave 118: Romancing SaGa: Minstrel Song (JP) is in Japan DB."""
+        self.assertIn("Romancing SaGa: Minstrel Song (JP)", self.jp)
+
+    def test_romancing_saga_jp_serial(self):
+        """Wave 118: Romancing SaGa: Minstrel Song (JP) serial=SLPS-25457."""
+        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["serial"], "SLPS-25457")
+
+    def test_romancing_saga_jp_developer(self):
+        """Wave 118: Romancing SaGa: Minstrel Song (JP) developer=Square Enix."""
+        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["developer"], "Square Enix")
+
+    def test_romancing_saga_jp_publisher(self):
+        """Wave 118: Romancing SaGa: Minstrel Song (JP) publisher=Square Enix."""
+        self.assertEqual(self.jp["Romancing SaGa: Minstrel Song (JP)"]["publisher"], "Square Enix")
+
+    # ── Resident Evil: Outbreak ───────────────────────────────────────────────
+
+    def test_re_outbreak_jp_present(self):
+        """Wave 118: Resident Evil: Outbreak (JP) is in Japan DB."""
+        self.assertIn("Resident Evil: Outbreak (JP)", self.jp)
+
+    def test_re_outbreak_jp_serial(self):
+        """Wave 118: Resident Evil: Outbreak (JP) serial=SLPM-65401."""
+        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["serial"], "SLPM-65401")
+
+    def test_re_outbreak_jp_developer(self):
+        """Wave 118: Resident Evil: Outbreak (JP) developer=Capcom."""
+        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["developer"], "Capcom")
+
+    def test_re_outbreak_jp_release_date(self):
+        """Wave 118: Resident Evil: Outbreak (JP) release_date=2003-12-11."""
+        self.assertEqual(self.jp["Resident Evil: Outbreak (JP)"]["release_date"], "2003-12-11")
+
+    # ── Resident Evil: Outbreak File 2 ───────────────────────────────────────
+
+    def test_re_outbreak_file2_jp_present(self):
+        """Wave 118: Resident Evil: Outbreak File 2 (JP) is in Japan DB."""
+        self.assertIn("Resident Evil: Outbreak File 2 (JP)", self.jp)
+
+    def test_re_outbreak_file2_jp_serial(self):
+        """Wave 118: Resident Evil: Outbreak File 2 (JP) serial=SLPM-66056."""
+        self.assertEqual(self.jp["Resident Evil: Outbreak File 2 (JP)"]["serial"], "SLPM-66056")
+
+    def test_re_outbreak_file2_jp_release_date(self):
+        """Wave 118: Resident Evil: Outbreak File 2 (JP) release_date=2004-09-09."""
+        self.assertEqual(self.jp["Resident Evil: Outbreak File 2 (JP)"]["release_date"], "2004-09-09")
+
+    # ── Onimusha 2: Samurai's Destiny ─────────────────────────────────────────
+
+    def test_onimusha2_jp_present(self):
+        """Wave 118: Onimusha 2: Samurai's Destiny (JP) is in Japan DB."""
+        self.assertIn("Onimusha 2: Samurai's Destiny (JP)", self.jp)
+
+    def test_onimusha2_jp_serial(self):
+        """Wave 118: Onimusha 2: Samurai's Destiny (JP) serial=SLPM-65196."""
+        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["serial"], "SLPM-65196")
+
+    def test_onimusha2_jp_developer(self):
+        """Wave 118: Onimusha 2: Samurai's Destiny (JP) developer=Capcom Production Studio 2."""
+        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["developer"], "Capcom Production Studio 2")
+
+    def test_onimusha2_jp_publisher(self):
+        """Wave 118: Onimusha 2: Samurai's Destiny (JP) publisher=Capcom."""
+        self.assertEqual(self.jp["Onimusha 2: Samurai's Destiny (JP)"]["publisher"], "Capcom")
+
+    # ── Onimusha 3: Demon Siege ───────────────────────────────────────────────
+
+    def test_onimusha3_jp_present(self):
+        """Wave 118: Onimusha 3: Demon Siege (JP) is in Japan DB."""
+        self.assertIn("Onimusha 3: Demon Siege (JP)", self.jp)
+
+    def test_onimusha3_jp_serial(self):
+        """Wave 118: Onimusha 3: Demon Siege (JP) serial=SLPM-65792."""
+        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["serial"], "SLPM-65792")
+
+    def test_onimusha3_jp_developer(self):
+        """Wave 118: Onimusha 3: Demon Siege (JP) developer=Capcom Production Studio 2."""
+        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["developer"], "Capcom Production Studio 2")
+
+    def test_onimusha3_jp_release_date(self):
+        """Wave 118: Onimusha 3: Demon Siege (JP) release_date=2004-02-26."""
+        self.assertEqual(self.jp["Onimusha 3: Demon Siege (JP)"]["release_date"], "2004-02-26")
+
+    # ── All JP serials have correct prefix ───────────────────────────────────
+
+    def test_jp_db_all_serials_are_jp_region(self):
+        """Wave 118: Every primary serial in Japan DB must begin with a JP prefix."""
+        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
+        for title, info in self.jp.items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(allowed),
+                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
+            )
