@@ -7691,11 +7691,15 @@ class TestSerialDatabase(unittest.TestCase):
         self.assertGreater(self.sdb.game_count(), 300)
 
     def test_serial_db_all_serials_valid_format(self):
-        """Every primary serial must match the SLUS/SCUS/SLES/SCES-NNNNN pattern."""
+        """Every primary serial must match the XXXX-NNNNN pattern (or be empty for
+        demo/kiosk entries whose serial has not yet been verified)."""
         import re
         pat = re.compile(r'^[A-Z]{4}-\d{5}$')
         for title in self.sdb.all_titles():
             info = self.sdb.get_info(title)
+            # Demo/kiosk entries may have an empty serial (unverified); skip those.
+            if not info.serial and info.disc_type in ("demo", "kiosk", "promo"):
+                continue
             self.assertRegex(info.serial, pat,
                              f"Bad serial format for '{title}': {info.serial!r}")
 
@@ -7707,6 +7711,11 @@ class TestSerialDatabase(unittest.TestCase):
         to share a serial because they refer to the same disc.  Only entries where
         neither title is a case-normalised substring of the other, and neither
         carries a save-variant suffix, are treated as distinct games.
+
+        Demo and kiosk entries (disc_type != 'retail') are excluded from this
+        check because some demos legitimately share a serial with the corresponding
+        retail release (e.g. a same-serial prologue disc or a demo that is
+        distributed on the retail disc).
         """
         import re
         VARIANT_SUFFIXES = re.compile(
@@ -7727,7 +7736,7 @@ class TestSerialDatabase(unittest.TestCase):
             return t2
 
         seen: dict = {}  # serial → first title seen
-        for title in self.sdb.all_titles():
+        for title in self.sdb.retail_titles():
             serial = self.sdb.get_serial(title)
             if serial not in seen:
                 seen[serial] = title
@@ -20254,3 +20263,174 @@ class TestWave109DbAltSerialFixes(unittest.TestCase):
                 if alt.startswith("SLUS-") and int(alt.split("-")[1]) >= 97000:
                     bad.setdefault(title, []).append(alt)
         self.assertEqual(bad, {}, f"Found bogus SLUS-97XXX alt_serials: {bad}")
+
+
+class TestWave110DemoDatabase(unittest.TestCase):
+    """Wave 110: Dedicated PS2 demo/kiosk disc database (ps2_demos.json).
+
+    Verifies that:
+    - ps2_demos.json loads correctly via SerialDatabase
+    - Demo entries carry disc_type="demo" (or "kiosk"), NOT "retail"
+    - Retail entries still carry disc_type="retail"
+    - SerialDatabase.is_demo_serial() correctly identifies demo serials
+    - SerialDatabase.demo_titles() returns only non-retail entries
+    - SerialDatabase.retail_titles() excludes demo/kiosk entries
+    - No demo serial conflicts with a genuinely different retail serial
+    - GameInfo.disc_type defaults to "retail" for retail DBs
+    """
+
+    def setUp(self):
+        from src.core.serial_validator import SerialDatabase
+        self.sdb = SerialDatabase()
+
+    # ── Demo DB loads non-empty ───────────────────────────────────────────────
+
+    def test_demo_titles_non_empty(self):
+        """Wave 110: demo_titles() returns at least one entry."""
+        self.assertGreater(len(self.sdb.demo_titles()), 0)
+
+    def test_retail_titles_non_empty(self):
+        """Wave 110: retail_titles() returns a large set of retail games."""
+        self.assertGreater(len(self.sdb.retail_titles()), 2000)
+
+    def test_demo_titles_not_in_retail_titles(self):
+        """Wave 110: demo_titles() and retail_titles() are disjoint."""
+        demo_set = set(self.sdb.demo_titles())
+        retail_set = set(self.sdb.retail_titles())
+        overlap = demo_set & retail_set
+        self.assertEqual(overlap, set(), f"Overlap between demo and retail titles: {overlap}")
+
+    # ── disc_type on demo entries ─────────────────────────────────────────────
+
+    def test_opm_demo_disc_type_is_demo(self):
+        """Wave 110: OPM Demo Vol. 1 carries disc_type='demo'."""
+        gi = self.sdb.get_info("Official PlayStation 2 Magazine Demo Vol. 1")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_jampack_disc_type_is_demo(self):
+        """Wave 110: PlayStation Underground Jampack Vol. 1 carries disc_type='demo'."""
+        gi = self.sdb.get_info("PlayStation Underground Jampack Vol. 1")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_kiosk_disc_type_is_kiosk(self):
+        """Wave 110: Kiosk Demo Disc (2000 Launch) carries disc_type='kiosk'."""
+        gi = self.sdb.get_info("Kiosk Demo Disc (2000 Launch)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "kiosk")
+
+    def test_pal_demo_disc_type_is_demo(self):
+        """Wave 110: PAL demo entry carries disc_type='demo'."""
+        gi = self.sdb.get_info("Metal Gear Solid 2: Sons of Liberty (PAL Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_jp_demo_disc_type_is_demo(self):
+        """Wave 110: JP demo entry carries disc_type='demo'."""
+        gi = self.sdb.get_info("Final Fantasy X (JP Demo)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "demo")
+
+    # ── disc_type on retail entries ───────────────────────────────────────────
+
+    def test_retail_game_disc_type_is_retail(self):
+        """Wave 110: Retail game entry carries disc_type='retail'."""
+        gi = self.sdb.get_info("God of War")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "retail")
+
+    def test_retail_pal_game_disc_type_is_retail(self):
+        """Wave 110: Retail PAL entry also carries disc_type='retail'."""
+        gi = self.sdb.get_info("God of War (PAL)")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.disc_type, "retail")
+
+    # ── is_demo_serial() ─────────────────────────────────────────────────────
+
+    def test_is_demo_serial_opm_vol1(self):
+        """Wave 110: OPM Demo Vol. 1 serial SCUS-97018 recognised as demo."""
+        self.assertTrue(self.sdb.is_demo_serial("SCUS-97018"))
+
+    def test_is_demo_serial_jampack(self):
+        """Wave 110: Jampack Vol. 1 serial SCUS-97100 recognised as demo."""
+        self.assertTrue(self.sdb.is_demo_serial("SCUS-97100"))
+
+    def test_is_demo_serial_pal_demo(self):
+        """Wave 110: PAL demo serial SLED-50397 recognised as demo."""
+        self.assertTrue(self.sdb.is_demo_serial("SLED-50397"))
+
+    def test_is_demo_serial_jp_demo(self):
+        """Wave 110: JP demo serial SLPD-00001 recognised as demo."""
+        self.assertTrue(self.sdb.is_demo_serial("SLPD-00001"))
+
+    def test_is_demo_serial_kiosk(self):
+        """Wave 110: Kiosk disc PBPX-95500 recognised as demo (kiosk is non-retail)."""
+        self.assertTrue(self.sdb.is_demo_serial("PBPX-95500"))
+
+    def test_is_demo_serial_retail_gow(self):
+        """Wave 110: God of War retail serial SCUS-97399 NOT a demo serial."""
+        self.assertFalse(self.sdb.is_demo_serial("SCUS-97399"))
+
+    def test_is_demo_serial_retail_kh(self):
+        """Wave 110: Kingdom Hearts retail serial SLUS-20370 NOT a demo serial."""
+        self.assertFalse(self.sdb.is_demo_serial("SLUS-20370"))
+
+    def test_is_demo_serial_unknown(self):
+        """Wave 110: Unknown serial returns False from is_demo_serial()."""
+        self.assertFalse(self.sdb.is_demo_serial("SLUS-99999"))
+
+    # ── info_for_serial() works for demo serials ──────────────────────────────
+
+    def test_info_for_demo_serial(self):
+        """Wave 110: info_for_serial() returns GameInfo for a demo serial."""
+        gi = self.sdb.info_for_serial("SCUS-97018")
+        self.assertIsNotNone(gi)
+        self.assertEqual(gi.title, "Official PlayStation 2 Magazine Demo Vol. 1")
+        self.assertEqual(gi.disc_type, "demo")
+
+    def test_info_for_pal_demo_serial(self):
+        """Wave 110: info_for_serial() returns GameInfo for a PAL demo serial."""
+        gi = self.sdb.info_for_serial("SCED-50093")
+        self.assertIsNotNone(gi)
+        self.assertIn("Gran Turismo", gi.title)
+        self.assertEqual(gi.disc_type, "demo")
+
+    # ── No demo/retail serial conflicts with different games ──────────────────
+
+    def test_no_demo_serial_conflicts_different_retail(self):
+        """Wave 110: No demo entry has a non-empty serial that belongs to a
+        genuinely different retail game."""
+        import re
+        retail_by_serial = {}
+        for t in self.sdb.retail_titles():
+            s = self.sdb.get_serial(t)
+            if s:
+                retail_by_serial[s] = t
+
+        conflicts = []
+        for demo_title in self.sdb.demo_titles():
+            s = self.sdb.get_serial(demo_title)
+            if not s:
+                continue
+            if s not in retail_by_serial:
+                continue
+            retail_title = retail_by_serial[s]
+            demo_base = re.sub(r'\s*\((?:demo|kiosk|pal demo|jp demo|prologue)[^)]*\)',
+                                '', demo_title, flags=re.I).strip().lower()
+            retail_base = retail_title.lower()
+            if demo_base not in retail_base and retail_base not in demo_base:
+                conflicts.append((demo_title, s, retail_title))
+
+        self.assertEqual(conflicts, [],
+                         f"Demo serial conflicts with different retail games: {conflicts}")
+
+    # ── game_count includes demo entries ─────────────────────────────────────
+
+    def test_game_count_includes_demos(self):
+        """Wave 110: game_count() covers retail + demo entries."""
+        total = self.sdb.game_count()
+        retail = len(self.sdb.retail_titles())
+        demo = len(self.sdb.demo_titles())
+        self.assertEqual(total, retail + demo,
+                         "game_count should equal retail + demo count")

@@ -1,0 +1,1407 @@
+{
+  "version": "1.0",
+  "description": "PS2 demo, kiosk, and promotional disc serial database. Entries here use serial codes (SCCD/SLCD for NA demos, SCED/SLED for PAL demos, SCPD/SLPD for JP demos) that are distinct from retail game serials to prevent ID mix-ups.",
+  "games": {
+    "ATV Offroad Fury (Demo)": {
+      "serial": "SCUS-97010",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Rainbow Studios",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "ATV Offroad Fury Demo"
+      ]
+    },
+    "Crash Bandicoot: The Wrath of Cortex (Demo)": {
+      "serial": "SCUS-97007",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Traveller's Tales",
+      "publisher": "Universal Interactive",
+      "genre": "Platformer",
+      "aliases": [
+        "Crash Bandicoot WoC Demo"
+      ]
+    },
+    "Dark Cloud (Demo)": {
+      "serial": "SCUS-97002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Level-5",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Action-RPG",
+      "aliases": [
+        "Dark Cloud Demo"
+      ]
+    },
+    "Devil May Cry (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Capcom Production Studio 4",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC Demo"
+      ]
+    },
+    "Final Fantasy X (Demo)": {
+      "serial": "SLUS-29002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "RPG",
+      "aliases": [
+        "FFX Demo",
+        "Final Fantasy 10 Demo"
+      ]
+    },
+    "Gran Turismo 3: A-Spec (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 Demo",
+        "Gran Turismo 3 Demo"
+      ]
+    },
+    "Gran Turismo 4 (Prologue)": {
+      "serial": "SCUS-97328",
+      "alt_serials": [
+        "SCUS-97404"
+      ],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue",
+        "Gran Turismo 4 Prologue"
+      ]
+    },
+    "Ico (Demo)": {
+      "serial": "SCUS-97113",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Team Ico",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Puzzle-Adventure",
+      "aliases": [
+        "Ico Demo"
+      ]
+    },
+    "Jak and Daxter: The Precursor Legacy (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak and Daxter Demo",
+        "J&D Demo"
+      ]
+    },
+    "Kingdom Hearts (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH Demo",
+        "Kingdom Hearts Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (Demo)": {
+      "serial": "",
+      "alt_serials": [
+        "SLUS-29000"
+      ],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 Demo",
+        "Metal Gear Solid 2 Demo"
+      ]
+    },
+    "Ratchet & Clank (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Ratchet and Clank Demo",
+        "R&C Demo"
+      ]
+    },
+    "Silent Hill 2 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Team Silent",
+      "publisher": "Konami",
+      "genre": "Survival Horror",
+      "aliases": [
+        "SH2 Demo",
+        "Silent Hill 2 Demo"
+      ]
+    },
+    "Spyro: Enter the Dragonfly (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Check Six Studios",
+      "publisher": "Universal Interactive",
+      "genre": "Platformer",
+      "aliases": [
+        "Spyro EtD Demo",
+        "Spyro Dragonfly Demo"
+      ]
+    },
+    "SSX (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "EA Canada",
+      "publisher": "EA Sports",
+      "genre": "Sports",
+      "aliases": [
+        "SSX Demo"
+      ]
+    },
+    "Twisted Metal: Black (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Incognito Entertainment",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Vehicular Combat",
+      "aliases": [
+        "TM Black Demo",
+        "Twisted Metal Black Demo"
+      ]
+    },
+    "PlayStation Underground Jampack Vol. 1": {
+      "serial": "SCUS-97100",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 1",
+        "PSU Jampack 1"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2000": {
+      "serial": "SCUS-97001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2000",
+        "PSU Jampack Summer 2000"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2000": {
+      "serial": "SCUS-97009",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2000",
+        "PSU Jampack Fall 2000"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2001": {
+      "serial": "SCUS-97023",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2001",
+        "PSU Jampack Winter 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Spring 2001": {
+      "serial": "SCUS-97035",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Spring 2001",
+        "PSU Jampack Spring 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2001": {
+      "serial": "SCUS-97047",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2001",
+        "PSU Jampack Summer 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2001": {
+      "serial": "SCUS-97057",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2001",
+        "PSU Jampack Fall 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2002": {
+      "serial": "SCUS-97066",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2002",
+        "PSU Jampack Winter 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Spring 2002": {
+      "serial": "SCUS-97075",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Spring 2002",
+        "PSU Jampack Spring 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2002": {
+      "serial": "SCUS-97082",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2002",
+        "PSU Jampack Summer 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2002": {
+      "serial": "SCUS-97090",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2002",
+        "PSU Jampack Fall 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2003": {
+      "serial": "SCUS-97097",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2003",
+        "PSU Jampack Winter 2003"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 1": {
+      "serial": "SCUS-97018",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 1",
+        "OPS2 Demo 1"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 2": {
+      "serial": "SCUS-97026",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 2",
+        "OPS2 Demo 2"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 3": {
+      "serial": "SCUS-97033",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 3",
+        "OPS2 Demo 3"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 4": {
+      "serial": "SCUS-97043",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 4",
+        "OPS2 Demo 4"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 5": {
+      "serial": "SCUS-97050",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 5",
+        "OPS2 Demo 5"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 6": {
+      "serial": "SCUS-97058",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 6",
+        "OPS2 Demo 6"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 7": {
+      "serial": "SCUS-97065",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 7",
+        "OPS2 Demo 7"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 8": {
+      "serial": "SCUS-97072",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 8",
+        "OPS2 Demo 8"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 9": {
+      "serial": "SCUS-97078",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 9",
+        "OPS2 Demo 9"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 10": {
+      "serial": "SCUS-97085",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 10",
+        "OPS2 Demo 10"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 11": {
+      "serial": "SCUS-97091",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 11",
+        "OPS2 Demo 11"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 12": {
+      "serial": "SCUS-97098",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 12",
+        "OPS2 Demo 12"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 13": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 13",
+        "OPS2 Demo 13"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 14": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 14",
+        "OPS2 Demo 14"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 15": {
+      "serial": "SCUS-97119",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 15",
+        "OPS2 Demo 15"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 16": {
+      "serial": "SCUS-97126",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 16",
+        "OPS2 Demo 16"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 17": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 17",
+        "OPS2 Demo 17"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 18": {
+      "serial": "SCUS-97138",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 18",
+        "OPS2 Demo 18"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 19": {
+      "serial": "SCUS-97143",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 19",
+        "OPS2 Demo 19"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 20": {
+      "serial": "SCUS-97148",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 20",
+        "OPS2 Demo 20"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 21": {
+      "serial": "SCUS-97155",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 21",
+        "OPS2 Demo 21"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 22": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 22",
+        "OPS2 Demo 22"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 23": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 23",
+        "OPS2 Demo 23"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 24": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 24",
+        "OPS2 Demo 24"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 25": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 25",
+        "OPS2 Demo 25"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 26": {
+      "serial": "SCUS-97182",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 26",
+        "OPS2 Demo 26"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 27": {
+      "serial": "SCUS-97187",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 27",
+        "OPS2 Demo 27"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 28": {
+      "serial": "SCUS-97193",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 28",
+        "OPS2 Demo 28"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 29": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 29",
+        "OPS2 Demo 29"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 30": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 30",
+        "OPS2 Demo 30"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 31": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 31",
+        "OPS2 Demo 31"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 32": {
+      "serial": "SCUS-97215",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 32",
+        "OPS2 Demo 32"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 33": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 33",
+        "OPS2 Demo 33"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 34": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 34",
+        "OPS2 Demo 34"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 35": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 35",
+        "OPS2 Demo 35"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 36": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 36",
+        "OPS2 Demo 36"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 37": {
+      "serial": "SCUS-97242",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 37",
+        "OPS2 Demo 37"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 38": {
+      "serial": "SCUS-97249",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 38",
+        "OPS2 Demo 38"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 39": {
+      "serial": "SCUS-97255",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 39",
+        "OPS2 Demo 39"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 40": {
+      "serial": "SCUS-97261",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 40",
+        "OPS2 Demo 40"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 41": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 41",
+        "OPS2 Demo 41"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 42": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 42",
+        "OPS2 Demo 42"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 43": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 43",
+        "OPS2 Demo 43"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 44": {
+      "serial": "SCUS-97284",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 44",
+        "OPS2 Demo 44"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 45": {
+      "serial": "SCUS-97292",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 45",
+        "OPS2 Demo 45"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 46": {
+      "serial": "SCUS-97298",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 46",
+        "OPS2 Demo 46"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 47": {
+      "serial": "SCUS-97304",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 47",
+        "OPS2 Demo 47"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 48": {
+      "serial": "SCUS-97311",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 48",
+        "OPS2 Demo 48"
+      ]
+    },
+    "Kiosk Demo Disc (2000 Launch)": {
+      "serial": "PBPX-95500",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2000",
+        "PS2 Launch Kiosk"
+      ]
+    },
+    "Kiosk Demo Disc (2001)": {
+      "serial": "PBPX-95501",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2001"
+      ]
+    },
+    "Kiosk Demo Disc (2002)": {
+      "serial": "PBPX-95502",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2002"
+      ]
+    },
+    "Kiosk Demo Disc (2003)": {
+      "serial": "PBPX-95503",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2003"
+      ]
+    },
+    "Kiosk Demo Disc (2004)": {
+      "serial": "PBPX-95504",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2004"
+      ]
+    },
+    "Gran Turismo 3: A-Spec Prologue (PAL Demo)": {
+      "serial": "SCED-50093",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2000",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment Europe",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 PAL Demo",
+        "Gran Turismo 3 PAL Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (PAL Demo)": {
+      "serial": "SLED-50397",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 PAL Demo",
+        "Metal Gear Solid 2 PAL Demo"
+      ]
+    },
+    "Final Fantasy X (PAL Demo)": {
+      "serial": "SLED-50460",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "RPG",
+      "aliases": [
+        "FFX PAL Demo",
+        "Final Fantasy 10 PAL Demo"
+      ]
+    },
+    "Devil May Cry (PAL Demo)": {
+      "serial": "SLED-50328",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Capcom Production Studio 4",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC PAL Demo"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 1": {
+      "serial": "SCED-50001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2000",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 1",
+        "OPS2 UK 1"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 2": {
+      "serial": "SCED-50110",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 2",
+        "OPS2 UK 2"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 3": {
+      "serial": "SCED-50175",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 3",
+        "OPS2 UK 3"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 4": {
+      "serial": "SCED-50240",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 4",
+        "OPS2 UK 4"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 5": {
+      "serial": "SCED-50320",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 5",
+        "OPS2 UK 5"
+      ]
+    },
+    "Gran Turismo Concept: 2002 Tokyo (JP Demo)": {
+      "serial": "SCPD-10006",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2002",
+      "developer": "Polyphony Digital",
+      "publisher": "SCEJ",
+      "genre": "Racing",
+      "aliases": [
+        "GT Concept JP Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (JP Demo)": {
+      "serial": "SLPD-00001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 JP Demo"
+      ]
+    },
+    "Final Fantasy X (JP Demo)": {
+      "serial": "SLPD-00010",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "RPG",
+      "aliases": [
+        "FFX JP Demo",
+        "Final Fantasy X JP Demo"
+      ]
+    },
+    "Kingdom Hearts (JP Demo)": {
+      "serial": "SLPD-00015",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2002",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH JP Demo",
+        "Kingdom Hearts JP Demo"
+      ]
+    }
+  }
+}

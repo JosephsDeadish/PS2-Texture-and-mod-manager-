@@ -35,10 +35,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 
-_REPO_ROOT   = Path(__file__).parent.parent.parent
-_DB_FILE     = _REPO_ROOT / "data" / "game_serial_db" / "ps2_ntsc_u.json"
-_PAL_DB_FILE = _REPO_ROOT / "data" / "game_serial_db" / "ps2_pal.json"
-_CAT_DIR     = _REPO_ROOT / "data" / "catalogue"
+_REPO_ROOT    = Path(__file__).parent.parent.parent
+_DB_FILE      = _REPO_ROOT / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+_PAL_DB_FILE  = _REPO_ROOT / "data" / "game_serial_db" / "ps2_pal.json"
+_DEMO_DB_FILE = _REPO_ROOT / "data" / "game_serial_db" / "ps2_demos.json"
+_CAT_DIR      = _REPO_ROOT / "data" / "catalogue"
 
 _SERIAL_RE = re.compile(r'^[A-Z]{4}-\d{5}$')
 
@@ -74,6 +75,10 @@ class GameInfo:
     # Pre-computed lowercase aliases for fast case-insensitive substring search.
     # Populated automatically by SerialDatabase._load(); not stored in JSON.
     _aliases_lower: List[str] = field(default_factory=list, compare=False, repr=False)
+    # Disc classification: "retail" for commercial releases, "demo" for demo/
+    # promo discs (SCCD/SLCD, SCED/SLED, SCPD/SLPD, etc.), "kiosk" for store
+    # kiosk discs.  Sourced from ps2_demos.json; retail DBs default to "retail".
+    disc_type: str = "retail"
 
     def all_serials(self) -> Set[str]:
         """Return the primary serial plus all known alt serials."""
@@ -125,19 +130,29 @@ class SerialDatabase:
     ----------
     db_path:
         Override the default path to ``ps2_ntsc_u.json`` (useful in tests).
+    pal_db_path:
+        Override the default path to ``ps2_pal.json`` (useful in tests).
+    demo_db_path:
+        Override the default path to ``ps2_demos.json`` (useful in tests).
+        Demo entries are loaded with ``disc_type`` set to the value stored in
+        the JSON (``"demo"`` or ``"kiosk"``), keeping them separated from
+        retail game entries in all lookup results.
     """
 
     def __init__(
         self,
         db_path: Optional[Path] = None,
         pal_db_path: Optional[Path] = None,
+        demo_db_path: Optional[Path] = None,
     ) -> None:
-        self._path     = Path(db_path)     if db_path     else _DB_FILE
-        self._pal_path = Path(pal_db_path) if pal_db_path else _PAL_DB_FILE
+        self._path      = Path(db_path)      if db_path      else _DB_FILE
+        self._pal_path  = Path(pal_db_path)  if pal_db_path  else _PAL_DB_FILE
+        self._demo_path = Path(demo_db_path) if demo_db_path else _DEMO_DB_FILE
         self._games: Dict[str, GameInfo] = {}
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
         self._crc_to_title: Dict[str, str] = {}            # CRC (upper) → game title
         self._alias_to_titles: Dict[str, List[str]] = {}   # alias lower → game titles
+        self._demo_serials: Set[str] = set()               # serials that belong to demo/kiosk discs
         self._load()
 
     # ------------------------------------------------------------------
@@ -145,19 +160,25 @@ class SerialDatabase:
     # ------------------------------------------------------------------
 
     def _load(self) -> None:
-        """Load the NTSC-U and PAL databases from disk.
+        """Load the NTSC-U, PAL, and demo databases from disk.
 
-        Both ``ps2_ntsc_u.json`` and ``ps2_pal.json`` are loaded in order.
-        NTSC-U titles carry a plain name (e.g. ``"God of War"``) while PAL
-        titles carry a ``(PAL)`` suffix (e.g. ``"God of War (PAL)"``) so
-        there are no duplicate keys in ``self._games``.  Serial-to-title and
-        CRC-to-title indices merge transparently across both files.
+        ``ps2_ntsc_u.json`` and ``ps2_pal.json`` are loaded first (retail
+        entries, ``disc_type="retail"``).  ``ps2_demos.json`` is loaded last
+        with each entry's ``disc_type`` taken directly from the JSON (defaults
+        to ``"demo"``).  Demo titles carry a ``(Demo)`` or similar suffix in
+        the JSON so there are no duplicate keys with retail entries.
+        Serial-to-title and CRC-to-title indices merge transparently across
+        all three files; ``_demo_serials`` is rebuilt on every load for fast
+        ``is_demo_serial()`` queries.
         """
         self._games = {}
         self._serial_to_titles = {}
         self._crc_to_title = {}
         self._alias_to_titles = {}
-        for path in (self._path, self._pal_path):
+        self._demo_serials = set()
+        # Retail databases first, then demos
+        retail_paths = (self._path, self._pal_path)
+        for path in retail_paths:
             if not path.is_file():
                 continue
             try:
@@ -176,11 +197,42 @@ class SerialDatabase:
                     genre=info.get("genre") or None,
                     crc_labels=info.get("crc_labels") or {},
                     aliases=info.get("aliases") or [],
+                    disc_type="retail",
                 )
                 gi._aliases_lower = [a.lower() for a in gi.aliases]
                 self._games[title] = gi
                 for s in gi.all_serials():
                     self._serial_to_titles.setdefault(s, []).append(title)
+                for crc in gi.crcs:
+                    self._crc_to_title[crc.upper()] = title
+                for alias in gi.aliases:
+                    self._alias_to_titles.setdefault(alias.lower(), []).append(title)
+        # Demo / kiosk / promo database
+        if self._demo_path.is_file():
+            try:
+                raw = json.loads(self._demo_path.read_text(encoding="utf-8"))
+            except Exception:
+                raw = {}
+            for title, info in raw.get("games", {}).items():
+                disc_type = info.get("disc_type") or "demo"
+                gi = GameInfo(
+                    title=title,
+                    serial=info.get("serial", ""),
+                    alt_serials=info.get("alt_serials", []),
+                    crcs=info.get("crcs", []),
+                    release_date=info.get("release_date") or None,
+                    developer=info.get("developer") or None,
+                    publisher=info.get("publisher") or None,
+                    genre=info.get("genre") or None,
+                    crc_labels=info.get("crc_labels") or {},
+                    aliases=info.get("aliases") or [],
+                    disc_type=disc_type,
+                )
+                gi._aliases_lower = [a.lower() for a in gi.aliases]
+                self._games[title] = gi
+                for s in gi.all_serials():
+                    self._serial_to_titles.setdefault(s, []).append(title)
+                    self._demo_serials.add(s)
                 for crc in gi.crcs:
                     self._crc_to_title[crc.upper()] = title
                 for alias in gi.aliases:
@@ -202,6 +254,7 @@ class SerialDatabase:
         """Return the primary canonical serial for *title*, or ``None``."""
         gi = self._games.get(title)
         return gi.serial if gi else None
+
 
     def get_alt_serials(self, title: str) -> List[str]:
         """Return the list of known alt/legacy serials for *title*."""
@@ -379,6 +432,49 @@ class SerialDatabase:
             (crc, gi.crc_labels.get(crc.upper()) or None)
             for crc in gi.crcs
         ]
+
+    def is_demo_serial(self, serial: str) -> bool:
+        """Return ``True`` if *serial* belongs to a demo, kiosk, or promo disc.
+
+        Checks the ``_demo_serials`` index built from ``ps2_demos.json``.
+        Returns ``False`` for retail serials and for serials not present in
+        any loaded database.
+
+        Examples::
+
+            sdb.is_demo_serial("SLUS-29001")  # True  — MGS2 demo
+            sdb.is_demo_serial("SLUS-20210")  # False — retail Metal Gear Solid 2
+        """
+        return serial in self._demo_serials
+
+    def demo_titles(self) -> List[str]:
+        """Return all demo/kiosk/promo titles loaded from ``ps2_demos.json`` (sorted).
+
+        Retail titles are excluded.  Useful for populating a dedicated demo
+        browser in the UI.
+
+        Example::
+
+            sdb.demo_titles()
+            # ["Dark Cloud (Demo)", "Final Fantasy X (Demo)", ...]
+        """
+        return sorted(
+            title for title, gi in self._games.items()
+            if gi.disc_type in ("demo", "kiosk", "promo")
+        )
+
+    def retail_titles(self) -> List[str]:
+        """Return all retail game titles (sorted), excluding demos and kiosk discs.
+
+        Example::
+
+            sdb.retail_titles()
+            # ["007: Agent Under Fire", ".hack//G.U. Vol.1//Rebirth", ...]
+        """
+        return sorted(
+            title for title, gi in self._games.items()
+            if gi.disc_type == "retail"
+        )
 
     # ------------------------------------------------------------------
     # Validation
