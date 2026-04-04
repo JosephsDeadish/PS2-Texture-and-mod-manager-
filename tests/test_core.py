@@ -15354,6 +15354,9 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         cls.pal_db = json.loads(
             pathlib.Path("data/game_serial_db/ps2_pal.json").read_text()
         )
+        cls.jp_db = json.loads(
+            pathlib.Path("data/game_serial_db/ps2_japan.json").read_text()
+        )
 
     def _crc_entries(self, crc):
         return {k: v for k, v in self.pnach_db.items() if k.startswith(f"{crc}:")}
@@ -15495,14 +15498,14 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertIn("F26AF996", g.get('crcs', []))
 
     def test_pal_db_dqv_japan_entry(self):
-        """PAL DB must have Dragon Quest V Japan entry with serial SLPM-65515."""
-        g = self.pal_db['games'].get("Dragon Quest V: Hand of the Heavenly Bride (Japan)", {})
+        """Wave 75 / Wave 114: Dragon Quest V Japan entry with serial SLPM-65515 is in Japan DB."""
+        g = self.jp_db['games'].get("Dragon Quest V: Hand of the Heavenly Bride (Japan)", {})
         self.assertEqual(g.get('serial'), "SLPM-65515")
         self.assertIn("E09E454C", g.get('crcs', []))
 
     def test_pal_db_sega_ages_26_entry(self):
-        """PAL DB must have Sega Ages 2500 Vol.26 Japan entry with serial SLPM-62517."""
-        g = self.pal_db['games'].get(
+        """Wave 75 / Wave 114: Sega Ages 2500 Vol.26 Japan entry with serial SLPM-62517 is in Japan DB."""
+        g = self.jp_db['games'].get(
             "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)", {}
         )
         self.assertEqual(g.get('serial'), "SLPM-62517")
@@ -20071,8 +20074,10 @@ class TestWave108DbSerialFixes(unittest.TestCase):
         import json
         ntsc_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
         pal_path  = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
+        jp_path   = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
         self.ntsc = json.loads(ntsc_path.read_text())["games"]
         self.pal  = json.loads(pal_path.read_text())["games"]
+        self.jp   = json.loads(jp_path.read_text())["games"]
 
     # ── NTSC-U DB no longer contains the JP-only entries ─────────────────────
 
@@ -20092,52 +20097,52 @@ class TestWave108DbSerialFixes(unittest.TestCase):
         """Wave 108: Tales of Rebirth (SLPS-25450) removed from NTSC-U DB."""
         self.assertNotIn("Tales of Rebirth", self.ntsc)
 
-    # ── PAL DB now contains the JP entries ───────────────────────────────────
+    # ── Japan DB now contains the JP entries (moved from PAL DB in Wave 114) ──
 
     def test_front_mission_5_jp_in_pal_db(self):
-        """Wave 108: Front Mission 5: Scars of the War (JP) added to PAL DB."""
-        self.assertIn("Front Mission 5: Scars of the War (JP)", self.pal)
+        """Wave 108 / Wave 114: Front Mission 5: Scars of the War (JP) in Japan DB."""
+        self.assertIn("Front Mission 5: Scars of the War (JP)", self.jp)
 
     def test_front_mission_5_jp_serial(self):
         """Wave 108: Front Mission 5 (JP) serial=SLPM-66205."""
-        entry = self.pal.get("Front Mission 5: Scars of the War (JP)", {})
+        entry = self.jp.get("Front Mission 5: Scars of the War (JP)", {})
         self.assertEqual(entry.get("serial"), "SLPM-66205")
 
     def test_front_mission_5_jp_developer(self):
         """Wave 108: Front Mission 5 (JP) developer=Square Enix."""
-        entry = self.pal.get("Front Mission 5: Scars of the War (JP)", {})
+        entry = self.jp.get("Front Mission 5: Scars of the War (JP)", {})
         self.assertEqual(entry.get("developer"), "Square Enix")
 
     def test_tales_of_destiny_ps2_jp_in_pal_db(self):
-        """Wave 108: Tales of Destiny (PS2 Remake) (JP) added to PAL DB."""
-        self.assertIn("Tales of Destiny (PS2 Remake) (JP)", self.pal)
+        """Wave 108 / Wave 114: Tales of Destiny (PS2 Remake) (JP) in Japan DB."""
+        self.assertIn("Tales of Destiny (PS2 Remake) (JP)", self.jp)
 
     def test_tales_of_destiny_ps2_jp_serial(self):
         """Wave 108: Tales of Destiny (PS2 Remake) (JP) serial=SLPS-25715."""
-        entry = self.pal.get("Tales of Destiny (PS2 Remake) (JP)", {})
+        entry = self.jp.get("Tales of Destiny (PS2 Remake) (JP)", {})
         self.assertEqual(entry.get("serial"), "SLPS-25715")
 
     def test_tales_of_destiny_2_jp_in_pal_db(self):
-        """Wave 108: Tales of Destiny 2 (JP) added to PAL DB."""
-        self.assertIn("Tales of Destiny 2 (JP)", self.pal)
+        """Wave 108 / Wave 114: Tales of Destiny 2 (JP) in Japan DB."""
+        self.assertIn("Tales of Destiny 2 (JP)", self.jp)
 
     def test_tales_of_destiny_2_jp_serial(self):
         """Wave 108: Tales of Destiny 2 (JP) serial=SLPS-25172."""
-        entry = self.pal.get("Tales of Destiny 2 (JP)", {})
+        entry = self.jp.get("Tales of Destiny 2 (JP)", {})
         self.assertEqual(entry.get("serial"), "SLPS-25172")
 
     def test_tales_of_rebirth_jp_in_pal_db(self):
-        """Wave 108: Tales of Rebirth (JP) added to PAL DB."""
-        self.assertIn("Tales of Rebirth (JP)", self.pal)
+        """Wave 108 / Wave 114: Tales of Rebirth (JP) in Japan DB."""
+        self.assertIn("Tales of Rebirth (JP)", self.jp)
 
     def test_tales_of_rebirth_jp_serial(self):
         """Wave 108: Tales of Rebirth (JP) serial=SLPS-25450."""
-        entry = self.pal.get("Tales of Rebirth (JP)", {})
+        entry = self.jp.get("Tales of Rebirth (JP)", {})
         self.assertEqual(entry.get("serial"), "SLPS-25450")
 
     def test_tales_of_rebirth_jp_developer(self):
         """Wave 108: Tales of Rebirth (JP) developer=Namco Tales Studio."""
-        entry = self.pal.get("Tales of Rebirth (JP)", {})
+        entry = self.jp.get("Tales of Rebirth (JP)", {})
         self.assertEqual(entry.get("developer"), "Namco Tales Studio")
 
     # ── NTSC-U DB count reduced by 4 ─────────────────────────────────────────
@@ -20149,8 +20154,8 @@ class TestWave108DbSerialFixes(unittest.TestCase):
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
     def test_pal_db_count(self):
-        """Wave 108: PAL DB has at least 155 entries after adding 4 JP games."""
-        self.assertGreaterEqual(len(self.pal), 155)
+        """Wave 108 / Wave 114: PAL DB has at least 142 entries (13 JP games moved to Japan DB in Wave 114)."""
+        self.assertGreaterEqual(len(self.pal), 142)
 
     # ── No SLPM/SLPS main serials remain in NTSC-U DB ────────────────────────
 
@@ -21122,3 +21127,171 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         """Wave 113: ATV Offroad Fury 3: Greatest Hits (SCUS-97514) filled directly."""
         self.assertEqual(self._genre('ATV Offroad Fury 3: Greatest Hits (SCUS-97514)'), 'Racing')
         self.assertEqual(self._date('ATV Offroad Fury 3: Greatest Hits (SCUS-97514)'), '2004-11-02')
+
+
+class TestWave115JapanDbExpansion(unittest.TestCase):
+    """Wave 115: Fix test breakage caused by Wave 114 JP migration (DQV/Sega Ages
+    CRCs added to ps2_japan.json; Wave 75/108 tests updated to use Japan DB),
+    and expand ps2_japan.json with 10 well-known JP-exclusive/JP-original titles.
+
+    New entries added to ps2_japan.json:
+      Final Fantasy X-2 (JP)               SLPS-25294  Square Enix       2003-03-13
+      Persona 3 FES (JP)                   SLPM-66696  Atlus             2007-04-19
+      Katamari Damacy (JP)                 SLPS-25252  Namco             2004-03-18
+      We Love Katamari (JP)                SLPS-25543  Namco             2005-07-07
+      Yakuza (JP)                          SLPM-66456  Sega              2005-12-08
+      Yakuza 2 (JP)                        SLPM-66526  Sega              2006-12-07
+      Makai Senki Disgaea (JP)             SLPS-25180  Nippon Ichi       2003-01-30
+      Valkyrie Profile 2: Silmeria (JP)    SLPS-25725  Square Enix       2006-06-22
+      Armored Core: Silent Line (JP)       SLPS-25230  FromSoftware      2003-07-10
+      Monster Hunter 2 (JP)                SLPM-66280  Capcom            2006-02-16
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+        cls.jp = json.loads(jp_path.read_text())["games"]
+
+    # ── JP DB count ───────────────────────────────────────────────────────────
+
+    def test_jp_db_count(self):
+        """Wave 115: Japan DB has at least 66 entries after 10 new additions."""
+        self.assertGreaterEqual(len(self.jp), 66)
+
+    # ── Final Fantasy X-2 ────────────────────────────────────────────────────
+
+    def test_ffx2_jp_present(self):
+        """Wave 115: Final Fantasy X-2 (JP) is in Japan DB."""
+        self.assertIn("Final Fantasy X-2 (JP)", self.jp)
+
+    def test_ffx2_jp_serial(self):
+        """Wave 115: Final Fantasy X-2 (JP) serial=SLPS-25294."""
+        self.assertEqual(self.jp["Final Fantasy X-2 (JP)"]["serial"], "SLPS-25294")
+
+    def test_ffx2_jp_publisher(self):
+        """Wave 115: Final Fantasy X-2 (JP) publisher=Square Enix."""
+        self.assertEqual(self.jp["Final Fantasy X-2 (JP)"]["publisher"], "Square Enix")
+
+    # ── Persona 3 FES ────────────────────────────────────────────────────────
+
+    def test_persona3_fes_jp_present(self):
+        """Wave 115: Persona 3 FES (JP) is in Japan DB."""
+        self.assertIn("Persona 3 FES (JP)", self.jp)
+
+    def test_persona3_fes_jp_serial(self):
+        """Wave 115: Persona 3 FES (JP) serial=SLPM-66696."""
+        self.assertEqual(self.jp["Persona 3 FES (JP)"]["serial"], "SLPM-66696")
+
+    def test_persona3_fes_jp_developer(self):
+        """Wave 115: Persona 3 FES (JP) developer=Atlus."""
+        self.assertEqual(self.jp["Persona 3 FES (JP)"]["developer"], "Atlus")
+
+    # ── Katamari Damacy ──────────────────────────────────────────────────────
+
+    def test_katamari_damacy_jp_present(self):
+        """Wave 115: Katamari Damacy (JP) is in Japan DB."""
+        self.assertIn("Katamari Damacy (JP)", self.jp)
+
+    def test_katamari_damacy_jp_serial(self):
+        """Wave 115: Katamari Damacy (JP) serial=SLPS-25252."""
+        self.assertEqual(self.jp["Katamari Damacy (JP)"]["serial"], "SLPS-25252")
+
+    # ── We Love Katamari ─────────────────────────────────────────────────────
+
+    def test_we_love_katamari_jp_present(self):
+        """Wave 115: We Love Katamari (JP) is in Japan DB."""
+        self.assertIn("We Love Katamari (JP)", self.jp)
+
+    def test_we_love_katamari_jp_serial(self):
+        """Wave 115: We Love Katamari (JP) serial=SLPS-25543."""
+        self.assertEqual(self.jp["We Love Katamari (JP)"]["serial"], "SLPS-25543")
+
+    # ── Yakuza ───────────────────────────────────────────────────────────────
+
+    def test_yakuza_jp_present(self):
+        """Wave 115: Yakuza (JP) is in Japan DB."""
+        self.assertIn("Yakuza (JP)", self.jp)
+
+    def test_yakuza_jp_serial(self):
+        """Wave 115: Yakuza (JP) serial=SLPM-66456."""
+        self.assertEqual(self.jp["Yakuza (JP)"]["serial"], "SLPM-66456")
+
+    def test_yakuza_jp_publisher(self):
+        """Wave 115: Yakuza (JP) publisher=Sega."""
+        self.assertEqual(self.jp["Yakuza (JP)"]["publisher"], "Sega")
+
+    # ── Yakuza 2 ─────────────────────────────────────────────────────────────
+
+    def test_yakuza2_jp_present(self):
+        """Wave 115: Yakuza 2 (JP) is in Japan DB."""
+        self.assertIn("Yakuza 2 (JP)", self.jp)
+
+    def test_yakuza2_jp_serial(self):
+        """Wave 115: Yakuza 2 (JP) serial=SLPM-66526."""
+        self.assertEqual(self.jp["Yakuza 2 (JP)"]["serial"], "SLPM-66526")
+
+    # ── Makai Senki Disgaea ───────────────────────────────────────────────────
+
+    def test_disgaea_jp_present(self):
+        """Wave 115: Makai Senki Disgaea (JP) is in Japan DB."""
+        self.assertIn("Makai Senki Disgaea (JP)", self.jp)
+
+    def test_disgaea_jp_serial(self):
+        """Wave 115: Makai Senki Disgaea (JP) serial=SLPS-25180."""
+        self.assertEqual(self.jp["Makai Senki Disgaea (JP)"]["serial"], "SLPS-25180")
+
+    def test_disgaea_jp_developer(self):
+        """Wave 115: Makai Senki Disgaea (JP) developer=Nippon Ichi Software."""
+        self.assertEqual(self.jp["Makai Senki Disgaea (JP)"]["developer"], "Nippon Ichi Software")
+
+    # ── Valkyrie Profile 2: Silmeria ─────────────────────────────────────────
+
+    def test_valkyrie_profile_2_jp_present(self):
+        """Wave 115: Valkyrie Profile 2: Silmeria (JP) is in Japan DB."""
+        self.assertIn("Valkyrie Profile 2: Silmeria (JP)", self.jp)
+
+    def test_valkyrie_profile_2_jp_serial(self):
+        """Wave 115: Valkyrie Profile 2: Silmeria (JP) serial=SLPS-25725."""
+        self.assertEqual(self.jp["Valkyrie Profile 2: Silmeria (JP)"]["serial"], "SLPS-25725")
+
+    def test_valkyrie_profile_2_jp_publisher(self):
+        """Wave 115: Valkyrie Profile 2: Silmeria (JP) publisher=Square Enix."""
+        self.assertEqual(self.jp["Valkyrie Profile 2: Silmeria (JP)"]["publisher"], "Square Enix")
+
+    # ── Armored Core: Silent Line ─────────────────────────────────────────────
+
+    def test_armored_core_silent_line_jp_present(self):
+        """Wave 115: Armored Core: Silent Line (JP) is in Japan DB."""
+        self.assertIn("Armored Core: Silent Line (JP)", self.jp)
+
+    def test_armored_core_silent_line_jp_serial(self):
+        """Wave 115: Armored Core: Silent Line (JP) serial=SLPS-25230."""
+        self.assertEqual(self.jp["Armored Core: Silent Line (JP)"]["serial"], "SLPS-25230")
+
+    # ── Monster Hunter 2 ─────────────────────────────────────────────────────
+
+    def test_monster_hunter_2_jp_present(self):
+        """Wave 115: Monster Hunter 2 (JP) is in Japan DB."""
+        self.assertIn("Monster Hunter 2 (JP)", self.jp)
+
+    def test_monster_hunter_2_jp_serial(self):
+        """Wave 115: Monster Hunter 2 (JP) serial=SLPM-66280."""
+        self.assertEqual(self.jp["Monster Hunter 2 (JP)"]["serial"], "SLPM-66280")
+
+    def test_monster_hunter_2_jp_developer(self):
+        """Wave 115: Monster Hunter 2 (JP) developer=Capcom."""
+        self.assertEqual(self.jp["Monster Hunter 2 (JP)"]["developer"], "Capcom")
+
+    # ── All JP serials have correct prefix ───────────────────────────────────
+
+    def test_jp_db_all_serials_are_jp_region(self):
+        """Wave 115: Every primary serial in Japan DB must begin with a JP prefix."""
+        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
+        for title, info in self.jp.items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(allowed),
+                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
+            )

@@ -34,6 +34,16 @@
       "publisher": "From Software",
       "genre": "Action"
     },
+    "Armored Core: Silent Line (JP)": {
+      "serial": "SLPS-25230",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-07-10",
+      "developer": "FromSoftware",
+      "publisher": "FromSoftware",
+      "genre": "Action"
+    },
     "Castlevania: Lament of Innocence (JP)": {
       "serial": "SLPM-65369",
       "alt_serials": [],
@@ -97,7 +107,9 @@
     "Dragon Quest V: Hand of the Heavenly Bride (Japan)": {
       "serial": "SLPM-65515",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "E09E454C"
+      ],
       "region": "NTSC-J",
       "release_date": "2004-07-22",
       "developer": "ArtePiazza",
@@ -132,6 +144,16 @@
       "release_date": "2002-01-31",
       "developer": "Square",
       "publisher": "Square",
+      "genre": "RPG"
+    },
+    "Final Fantasy X-2 (JP)": {
+      "serial": "SLPS-25294",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-03-13",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
       "genre": "RPG"
     },
     "Final Fantasy XI Online (JP)": {
@@ -209,6 +231,16 @@
       "publisher": "Sony Computer Entertainment Inc.",
       "genre": "Action Adventure"
     },
+    "Katamari Damacy (JP)": {
+      "serial": "SLPS-25252",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-03-18",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Puzzle"
+    },
     "Kingdom Hearts (JP)": {
       "serial": "SLPS-25098",
       "alt_serials": [],
@@ -248,6 +280,16 @@
       "developer": "Square Enix",
       "publisher": "Square Enix",
       "genre": "Action RPG"
+    },
+    "Makai Senki Disgaea (JP)": {
+      "serial": "SLPS-25180",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-01-30",
+      "developer": "Nippon Ichi Software",
+      "publisher": "Nippon Ichi Software",
+      "genre": "Strategy RPG"
     },
     "Metal Gear Solid 2: Sons of Liberty (JP)": {
       "serial": "SLPM-65078",
@@ -301,6 +343,16 @@
       "publisher": "Capcom",
       "genre": "Action RPG"
     },
+    "Monster Hunter 2 (JP)": {
+      "serial": "SLPM-66280",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-02-16",
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Action"
+    },
     "Okami (JP)": {
       "serial": "SCPS-15119",
       "alt_serials": [],
@@ -317,6 +369,16 @@
       "crcs": [],
       "region": "NTSC-J",
       "release_date": "2006-07-13",
+      "developer": "Atlus",
+      "publisher": "Atlus",
+      "genre": "RPG"
+    },
+    "Persona 3 FES (JP)": {
+      "serial": "SLPM-66696",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2007-04-19",
       "developer": "Atlus",
       "publisher": "Atlus",
       "genre": "RPG"
@@ -354,7 +416,9 @@
     "Sega Ages 2500 Series Vol.26: Dynamite Deka (Japan)": {
       "serial": "SLPM-62517",
       "alt_serials": [],
-      "crcs": [],
+      "crcs": [
+        "02E1970F"
+      ],
       "region": "NTSC-J",
       "release_date": "2004-09-09",
       "developer": "Sega",
@@ -528,6 +592,16 @@
       "publisher": "Namco",
       "genre": "Action RPG"
     },
+    "Valkyrie Profile 2: Silmeria (JP)": {
+      "serial": "SLPS-25725",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-06-22",
+      "developer": "tri-Ace",
+      "publisher": "Square Enix",
+      "genre": "RPG"
+    },
     "Viewtiful Joe (JP)": {
       "serial": "SLPM-65699",
       "alt_serials": [],
@@ -551,6 +625,16 @@
       "developer": "Clover Studio",
       "publisher": "Capcom",
       "genre": "Action, Platformer"
+    },
+    "We Love Katamari (JP)": {
+      "serial": "SLPS-25543",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-07-07",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Puzzle"
     },
     "Xenosaga Episode I: Der Wille zur Macht (JP)": {
       "serial": "SLPS-25260",
@@ -581,6 +665,26 @@
       "developer": "Monolith Soft",
       "publisher": "Namco",
       "genre": "RPG"
+    },
+    "Yakuza (JP)": {
+      "serial": "SLPM-66456",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-08",
+      "developer": "Sega CS1",
+      "publisher": "Sega",
+      "genre": "Action-Adventure"
+    },
+    "Yakuza 2 (JP)": {
+      "serial": "SLPM-66526",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-12-07",
+      "developer": "Sega CS1",
+      "publisher": "Sega",
+      "genre": "Action-Adventure"
     }
   }
 }
