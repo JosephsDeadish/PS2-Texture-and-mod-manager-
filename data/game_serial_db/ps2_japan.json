@@ -785,6 +785,106 @@
       "developer": "Sega CS1",
       "publisher": "Sega",
       "genre": "Action-Adventure"
+    },
+    "Zone of the Enders (JP)": {
+      "serial": "SLPM-65015",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-02-01",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Action"
+    },
+    "Zone of the Enders: The 2nd Runner (JP)": {
+      "serial": "SLPM-65216",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2003-02-13",
+      "developer": "Konami Computer Entertainment Japan",
+      "publisher": "Konami",
+      "genre": "Action"
+    },
+    "Onimusha: Warlords (JP)": {
+      "serial": "SLPM-65065",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2001-01-25",
+      "developer": "Capcom Production Studio 2",
+      "publisher": "Capcom",
+      "genre": "Action"
+    },
+    "Rogue Galaxy (JP)": {
+      "serial": "SCPS-15157",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-12-08",
+      "developer": "Level-5",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "Action RPG"
+    },
+    "Shadow Hearts: Covenant (JP)": {
+      "serial": "SLPS-25430",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-02-19",
+      "developer": "Nautilus",
+      "publisher": "Aruze Corporation",
+      "genre": "Action RPG"
+    },
+    "Atelier Iris: Eternal Mana (JP)": {
+      "serial": "SLPS-25431",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-06-24",
+      "developer": "Gust",
+      "publisher": "Gust",
+      "genre": "RPG"
+    },
+    "Dirge of Cerberus: Final Fantasy VII (JP)": {
+      "serial": "SLPM-66247",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2006-01-26",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Action RPG"
+    },
+    "Castlevania: Curse of Darkness (JP)": {
+      "serial": "SLPM-66113",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2005-07-21",
+      "developer": "Konami Computer Entertainment Kobe",
+      "publisher": "Konami",
+      "genre": "Action"
+    },
+    "Wild Arms 3 (JP)": {
+      "serial": "SCPS-15052",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2002-03-14",
+      "developer": "Media Vision",
+      "publisher": "Sony Computer Entertainment Inc.",
+      "genre": "RPG"
+    },
+    "Ace Combat 5: The Unsung War (JP)": {
+      "serial": "SLPS-25444",
+      "alt_serials": [],
+      "crcs": [],
+      "region": "NTSC-J",
+      "release_date": "2004-09-30",
+      "developer": "Project Aces",
+      "publisher": "Namco",
+      "genre": "Flight Simulator"
     }
   }
 }

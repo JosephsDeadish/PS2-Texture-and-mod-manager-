@@ -21481,3 +21481,217 @@ class TestWave116JapanDbExpansion(unittest.TestCase):
                 serial.startswith(allowed),
                 f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
             )
+
+
+class TestWave117JapanDbExpansion(unittest.TestCase):
+    """Wave 117: Expand ps2_japan.json with 10 more well-known JP titles.
+
+    New entries added to ps2_japan.json (76→86):
+      Zone of the Enders (JP)                    SLPM-65015  Konami KCEJ                2001-02-01
+      Zone of the Enders: The 2nd Runner (JP)    SLPM-65216  Konami KCEJ                2003-02-13
+      Onimusha: Warlords (JP)                    SLPM-65065  Capcom Production Studio 2 2001-01-25
+      Rogue Galaxy (JP)                          SCPS-15157  Level-5 / SCEJ             2005-12-08
+      Shadow Hearts: Covenant (JP)               SLPS-25430  Nautilus / Aruze           2004-02-19
+      Atelier Iris: Eternal Mana (JP)            SLPS-25431  Gust                       2004-06-24
+      Dirge of Cerberus: Final Fantasy VII (JP)  SLPM-66247  Square Enix                2006-01-26
+      Castlevania: Curse of Darkness (JP)        SLPM-66113  Konami KCEJ Kobe           2005-07-21
+      Wild Arms 3 (JP)                           SCPS-15052  Media Vision / SCEJ        2002-03-14
+      Ace Combat 5: The Unsung War (JP)          SLPS-25444  Project Aces / Namco       2004-09-30
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        jp_path = Path(__file__).parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+        cls.jp = json.loads(jp_path.read_text())["games"]
+
+    # ── JP DB count ───────────────────────────────────────────────────────────
+
+    def test_jp_db_count(self):
+        """Wave 117: Japan DB has at least 86 entries after 10 new additions."""
+        self.assertGreaterEqual(len(self.jp), 86)
+
+    # ── Zone of the Enders ────────────────────────────────────────────────────
+
+    def test_zoe_jp_present(self):
+        """Wave 117: Zone of the Enders (JP) is in Japan DB."""
+        self.assertIn("Zone of the Enders (JP)", self.jp)
+
+    def test_zoe_jp_serial(self):
+        """Wave 117: Zone of the Enders (JP) serial=SLPM-65015."""
+        self.assertEqual(self.jp["Zone of the Enders (JP)"]["serial"], "SLPM-65015")
+
+    def test_zoe_jp_publisher(self):
+        """Wave 117: Zone of the Enders (JP) publisher=Konami."""
+        self.assertEqual(self.jp["Zone of the Enders (JP)"]["publisher"], "Konami")
+
+    def test_zoe_jp_release_date(self):
+        """Wave 117: Zone of the Enders (JP) release_date=2001-02-01."""
+        self.assertEqual(self.jp["Zone of the Enders (JP)"]["release_date"], "2001-02-01")
+
+    # ── Zone of the Enders: The 2nd Runner ───────────────────────────────────
+
+    def test_zoe2_jp_present(self):
+        """Wave 117: Zone of the Enders: The 2nd Runner (JP) is in Japan DB."""
+        self.assertIn("Zone of the Enders: The 2nd Runner (JP)", self.jp)
+
+    def test_zoe2_jp_serial(self):
+        """Wave 117: Zone of the Enders: The 2nd Runner (JP) serial=SLPM-65216."""
+        self.assertEqual(self.jp["Zone of the Enders: The 2nd Runner (JP)"]["serial"], "SLPM-65216")
+
+    def test_zoe2_jp_publisher(self):
+        """Wave 117: Zone of the Enders: The 2nd Runner (JP) publisher=Konami."""
+        self.assertEqual(self.jp["Zone of the Enders: The 2nd Runner (JP)"]["publisher"], "Konami")
+
+    # ── Onimusha: Warlords ────────────────────────────────────────────────────
+
+    def test_onimusha_warlords_jp_present(self):
+        """Wave 117: Onimusha: Warlords (JP) is in Japan DB."""
+        self.assertIn("Onimusha: Warlords (JP)", self.jp)
+
+    def test_onimusha_warlords_jp_serial(self):
+        """Wave 117: Onimusha: Warlords (JP) serial=SLPM-65065."""
+        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["serial"], "SLPM-65065")
+
+    def test_onimusha_warlords_jp_developer(self):
+        """Wave 117: Onimusha: Warlords (JP) developer=Capcom Production Studio 2."""
+        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["developer"], "Capcom Production Studio 2")
+
+    def test_onimusha_warlords_jp_publisher(self):
+        """Wave 117: Onimusha: Warlords (JP) publisher=Capcom."""
+        self.assertEqual(self.jp["Onimusha: Warlords (JP)"]["publisher"], "Capcom")
+
+    # ── Rogue Galaxy ──────────────────────────────────────────────────────────
+
+    def test_rogue_galaxy_jp_present(self):
+        """Wave 117: Rogue Galaxy (JP) is in Japan DB."""
+        self.assertIn("Rogue Galaxy (JP)", self.jp)
+
+    def test_rogue_galaxy_jp_serial(self):
+        """Wave 117: Rogue Galaxy (JP) serial=SCPS-15157."""
+        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["serial"], "SCPS-15157")
+
+    def test_rogue_galaxy_jp_developer(self):
+        """Wave 117: Rogue Galaxy (JP) developer=Level-5."""
+        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["developer"], "Level-5")
+
+    def test_rogue_galaxy_jp_release_date(self):
+        """Wave 117: Rogue Galaxy (JP) release_date=2005-12-08."""
+        self.assertEqual(self.jp["Rogue Galaxy (JP)"]["release_date"], "2005-12-08")
+
+    # ── Shadow Hearts: Covenant ───────────────────────────────────────────────
+
+    def test_shadow_hearts_covenant_jp_present(self):
+        """Wave 117: Shadow Hearts: Covenant (JP) is in Japan DB."""
+        self.assertIn("Shadow Hearts: Covenant (JP)", self.jp)
+
+    def test_shadow_hearts_covenant_jp_serial(self):
+        """Wave 117: Shadow Hearts: Covenant (JP) serial=SLPS-25430."""
+        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["serial"], "SLPS-25430")
+
+    def test_shadow_hearts_covenant_jp_developer(self):
+        """Wave 117: Shadow Hearts: Covenant (JP) developer=Nautilus."""
+        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["developer"], "Nautilus")
+
+    def test_shadow_hearts_covenant_jp_publisher(self):
+        """Wave 117: Shadow Hearts: Covenant (JP) publisher=Aruze Corporation."""
+        self.assertEqual(self.jp["Shadow Hearts: Covenant (JP)"]["publisher"], "Aruze Corporation")
+
+    # ── Atelier Iris: Eternal Mana ────────────────────────────────────────────
+
+    def test_atelier_iris_jp_present(self):
+        """Wave 117: Atelier Iris: Eternal Mana (JP) is in Japan DB."""
+        self.assertIn("Atelier Iris: Eternal Mana (JP)", self.jp)
+
+    def test_atelier_iris_jp_serial(self):
+        """Wave 117: Atelier Iris: Eternal Mana (JP) serial=SLPS-25431."""
+        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["serial"], "SLPS-25431")
+
+    def test_atelier_iris_jp_developer(self):
+        """Wave 117: Atelier Iris: Eternal Mana (JP) developer=Gust."""
+        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["developer"], "Gust")
+
+    def test_atelier_iris_jp_genre(self):
+        """Wave 117: Atelier Iris: Eternal Mana (JP) genre=RPG."""
+        self.assertEqual(self.jp["Atelier Iris: Eternal Mana (JP)"]["genre"], "RPG")
+
+    # ── Dirge of Cerberus: Final Fantasy VII ──────────────────────────────────
+
+    def test_dirge_of_cerberus_jp_present(self):
+        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) is in Japan DB."""
+        self.assertIn("Dirge of Cerberus: Final Fantasy VII (JP)", self.jp)
+
+    def test_dirge_of_cerberus_jp_serial(self):
+        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) serial=SLPM-66247."""
+        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["serial"], "SLPM-66247")
+
+    def test_dirge_of_cerberus_jp_publisher(self):
+        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) publisher=Square Enix."""
+        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["publisher"], "Square Enix")
+
+    def test_dirge_of_cerberus_jp_release_date(self):
+        """Wave 117: Dirge of Cerberus: Final Fantasy VII (JP) release_date=2006-01-26."""
+        self.assertEqual(self.jp["Dirge of Cerberus: Final Fantasy VII (JP)"]["release_date"], "2006-01-26")
+
+    # ── Castlevania: Curse of Darkness ────────────────────────────────────────
+
+    def test_castlevania_cod_jp_present(self):
+        """Wave 117: Castlevania: Curse of Darkness (JP) is in Japan DB."""
+        self.assertIn("Castlevania: Curse of Darkness (JP)", self.jp)
+
+    def test_castlevania_cod_jp_serial(self):
+        """Wave 117: Castlevania: Curse of Darkness (JP) serial=SLPM-66113."""
+        self.assertEqual(self.jp["Castlevania: Curse of Darkness (JP)"]["serial"], "SLPM-66113")
+
+    def test_castlevania_cod_jp_developer(self):
+        """Wave 117: Castlevania: Curse of Darkness (JP) developer=Konami Computer Entertainment Kobe."""
+        self.assertEqual(self.jp["Castlevania: Curse of Darkness (JP)"]["developer"], "Konami Computer Entertainment Kobe")
+
+    # ── Wild Arms 3 ───────────────────────────────────────────────────────────
+
+    def test_wild_arms_3_jp_present(self):
+        """Wave 117: Wild Arms 3 (JP) is in Japan DB."""
+        self.assertIn("Wild Arms 3 (JP)", self.jp)
+
+    def test_wild_arms_3_jp_serial(self):
+        """Wave 117: Wild Arms 3 (JP) serial=SCPS-15052."""
+        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["serial"], "SCPS-15052")
+
+    def test_wild_arms_3_jp_developer(self):
+        """Wave 117: Wild Arms 3 (JP) developer=Media Vision."""
+        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["developer"], "Media Vision")
+
+    def test_wild_arms_3_jp_release_date(self):
+        """Wave 117: Wild Arms 3 (JP) release_date=2002-03-14."""
+        self.assertEqual(self.jp["Wild Arms 3 (JP)"]["release_date"], "2002-03-14")
+
+    # ── Ace Combat 5: The Unsung War ──────────────────────────────────────────
+
+    def test_ace_combat_5_jp_present(self):
+        """Wave 117: Ace Combat 5: The Unsung War (JP) is in Japan DB."""
+        self.assertIn("Ace Combat 5: The Unsung War (JP)", self.jp)
+
+    def test_ace_combat_5_jp_serial(self):
+        """Wave 117: Ace Combat 5: The Unsung War (JP) serial=SLPS-25444."""
+        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["serial"], "SLPS-25444")
+
+    def test_ace_combat_5_jp_developer(self):
+        """Wave 117: Ace Combat 5: The Unsung War (JP) developer=Project Aces."""
+        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["developer"], "Project Aces")
+
+    def test_ace_combat_5_jp_publisher(self):
+        """Wave 117: Ace Combat 5: The Unsung War (JP) publisher=Namco."""
+        self.assertEqual(self.jp["Ace Combat 5: The Unsung War (JP)"]["publisher"], "Namco")
+
+    # ── All JP serials have correct prefix ───────────────────────────────────
+
+    def test_jp_db_all_serials_are_jp_region(self):
+        """Wave 117: Every primary serial in Japan DB must begin with a JP prefix."""
+        allowed = ("SLPM", "SLPS", "SCPS", "SLPD", "SCPD")
+        for title, info in self.jp.items():
+            serial = info.get("serial", "")
+            self.assertTrue(
+                serial.startswith(allowed),
+                f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
+            )
