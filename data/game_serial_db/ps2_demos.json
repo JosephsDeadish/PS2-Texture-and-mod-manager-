@@ -1153,48 +1153,6 @@
         "PS2 Launch Kiosk"
       ]
     },
-    "Kiosk Demo Disc (2001)": {
-      "serial": "PBPX-95501",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "kiosk",
-      "region": "NTSC-U",
-      "release_date": "2001",
-      "developer": "Sony Interactive Entertainment America",
-      "publisher": "Sony Interactive Entertainment America",
-      "genre": "Compilation",
-      "aliases": [
-        "PS2 Kiosk Demo 2001"
-      ]
-    },
-    "Kiosk Demo Disc (2002)": {
-      "serial": "PBPX-95502",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "kiosk",
-      "region": "NTSC-U",
-      "release_date": "2002",
-      "developer": "Sony Interactive Entertainment America",
-      "publisher": "Sony Interactive Entertainment America",
-      "genre": "Compilation",
-      "aliases": [
-        "PS2 Kiosk Demo 2002"
-      ]
-    },
-    "Kiosk Demo Disc (2003)": {
-      "serial": "PBPX-95503",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "kiosk",
-      "region": "NTSC-U",
-      "release_date": "2003",
-      "developer": "Sony Interactive Entertainment America",
-      "publisher": "Sony Interactive Entertainment America",
-      "genre": "Compilation",
-      "aliases": [
-        "PS2 Kiosk Demo 2003"
-      ]
-    },
     "Kiosk Demo Disc (2004)": {
       "serial": "PBPX-95504",
       "alt_serials": [],
@@ -5510,6 +5468,700 @@
       "aliases": [],
       "disc_type": "utility",
       "region": "NTSC-U"
+    },
+    "Linux for PlayStation 2 Beta 1.0": {
+      "serial": "PBPX-95501",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "Linux Beta 1.0",
+        "PS2 Linux Beta"
+      ]
+    },
+    "Gran Turismo 3: A-spec (PS2 Bundle)": {
+      "serial": "PBPX-95502",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 PS2 Bundle",
+        "Gran Turismo 3 Bundle"
+      ]
+    },
+    "Gran Turismo 3: GT3 Racing Pack": {
+      "serial": "PBPX-95503",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 Racing Pack"
+      ]
+    },
+    "Kiosk Demo Disc 2.01": {
+      "serial": "SCUS-97116",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.01",
+        "PS2 Store Kiosk Disc 2.01"
+      ]
+    },
+    "Kiosk Demo Disc 2.02": {
+      "serial": "SCUS-97127",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.02"
+      ]
+    },
+    "Kiosk Demo Disc 2.03": {
+      "serial": "SCUS-97156",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.03"
+      ]
+    },
+    "Kiosk Demo Disc 2.04": {
+      "serial": "SCUS-97174",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.04"
+      ]
+    },
+    "Kiosk Demo Disc 2.05": {
+      "serial": "SCUS-97200",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.05"
+      ]
+    },
+    "Kiosk Demo Disc 2.06": {
+      "serial": "SCUS-97218",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.06"
+      ]
+    },
+    "Kiosk Demo Disc 2.07": {
+      "serial": "SCUS-97227",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.07"
+      ]
+    },
+    "Kiosk Demo Disc 2.09": {
+      "serial": "SCUS-97270",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.09"
+      ]
+    },
+    "Kiosk Demo Disc Q4-2004/Q1-2005": {
+      "serial": "SCUS-97421",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q4-2004/Q1-2005"
+      ]
+    },
+    "Kiosk Demo Disc Q1-Q2 2005": {
+      "serial": "SCUS-97422",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q1-Q2 2005"
+      ]
+    },
+    "Kiosk Demo Disc Q2-Q3 2005": {
+      "serial": "SCUS-97423",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q2-Q3 2005"
+      ]
+    },
+    "Kiosk Demo Disc Q3-Q4 2004": {
+      "serial": "SCUS-97428",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q3-Q4 2004"
+      ]
+    },
+    "Kiosk Disc 2.23": {
+      "serial": "SCUS-97582",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.23"
+      ]
+    },
+    "Jampack Demo Disc - Summer 2001": {
+      "serial": "SCUS-97149",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2001"
+      ]
+    },
+    "Jampack Demo Disc - Winter 2001": {
+      "serial": "SCUS-97163",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2001"
+      ]
+    },
+    "Jampack Demo Disc Vol. 10 Summer 2004 (M-Rated)": {
+      "serial": "SCUS-97406",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 10 M",
+        "Jampack Summer 2004 M-Rated"
+      ]
+    },
+    "Jampack Demo Disc Vol. 10 (T-Rated)": {
+      "serial": "SCUS-97410",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 10 T",
+        "Jampack Summer 2004 T-Rated"
+      ]
+    },
+    "Jampack Demo Disc Vol. 11 (M-Rated)": {
+      "serial": "SCUS-97417",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 11 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 11 (T-Rated)": {
+      "serial": "SCUS-97418",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 11 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 12 (M-Rated)": {
+      "serial": "SCUS-97420",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 12 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 13 (T-Rated)": {
+      "serial": "SCUS-97491",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 13 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 13 (M-Rated)": {
+      "serial": "SCUS-97492",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 13 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 14 (T-Rated)": {
+      "serial": "SCUS-97493",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 14 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 14 (M-Rated)": {
+      "serial": "SCUS-97494",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 14 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 15 (T-Rated)": {
+      "serial": "SCUS-97564",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 15 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 15 (M-Rated)": {
+      "serial": "SCUS-97565",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 15 M"
+      ]
+    },
+    "Dead or Alive 2 (PS2 Kiosk)": {
+      "serial": "PBPX-95201",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Tecmo",
+      "publisher": "Tecmo",
+      "genre": "Fighting",
+      "aliases": [
+        "DoA2 Kiosk",
+        "Dead or Alive 2 Kiosk Demo"
+      ]
+    },
+    "PS2 Demo Disc (PBPX-95204)": {
+      "serial": "PBPX-95204",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 Early Demo Disc"
+      ]
+    },
+    "PlayStation 2 Demo Disc 2000": {
+      "serial": "PBPX-95205",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Demo Disc 2000"
+      ]
+    },
+    "Ape Escape 3 (PS2 Kiosk Demo)": {
+      "serial": "PBPX-95235",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment Japan",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platform",
+      "aliases": [
+        "Ape Escape 3 Kiosk"
+      ]
+    },
+    "Ratchet & Clank (PS2 Kiosk Demo)": {
+      "serial": "PBPX-95516",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action",
+      "aliases": [
+        "R&C Kiosk",
+        "Ratchet and Clank Kiosk"
+      ]
+    },
+    "Gran Turismo 4: Prologue (PS2 Kiosk v1)": {
+      "serial": "PBPX-95523",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue Kiosk",
+        "Gran Turismo 4 Prologue Kiosk"
+      ]
+    },
+    "Gran Turismo 4: Prologue (PS2 Kiosk v2)": {
+      "serial": "PBPX-95524",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue Kiosk v2"
+      ]
+    },
+    "Gran Turismo 4 (PS2 Kiosk)": {
+      "serial": "PBPX-95601",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Kiosk"
+      ]
+    },
+    "PS2 Utility Disc Version 1.01 (PBPX-95202)": {
+      "serial": "PBPX-95202",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 Utility 1.01"
+      ]
+    },
+    "DVD Player Version 2.01 (PBPX-95206)": {
+      "serial": "PBPX-95206",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 DVD Player 2.01"
+      ]
+    },
+    "DVD Player Version 2.10 (PBPX-95207)": {
+      "serial": "PBPX-95207",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 DVD Player 2.10"
+      ]
+    },
+    "HDD Utility Disc v1.00 (PBPX-95211)": {
+      "serial": "PBPX-95211",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 HDD Utility v1.00"
+      ]
+    },
+    "HDD Utility Disc Beta (PBPX-95237)": {
+      "serial": "PBPX-95237",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 HDD Utility Beta"
+      ]
+    },
+    "Online Start-Up Disc V3.0 (PBPX-95239)": {
+      "serial": "PBPX-95239",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Online Start-Up V3"
+      ]
+    },
+    "Network Adapter Start-Up Disc v2.0 (PBPX-95517)": {
+      "serial": "PBPX-95517",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter v2.0 PBPX"
+      ]
+    },
+    "Network Adaptor Start-Up Disc v2.0 (SCUS-97095)": {
+      "serial": "SCUS-97095",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adaptor v2.0"
+      ]
+    },
+    "Network Adapter Start-Up Disc Ver.2.5": {
+      "serial": "SCUS-97356",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter 2.5"
+      ]
+    },
+    "Network Adapter Start-Up Disc Ver.3.0": {
+      "serial": "SCUS-97425",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter 3.0"
+      ]
+    },
+    "989 Sports 2003 Demo Disc": {
+      "serial": "SCUS-94677",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "989 Sports",
+      "publisher": "989 Sports",
+      "genre": "Compilation",
+      "aliases": [
+        "989 Sports Demo 2003"
+      ]
+    },
+    "989 Sports 2004 Demo Disc": {
+      "serial": "SCUS-97373",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "989 Sports",
+      "publisher": "989 Sports",
+      "genre": "Compilation",
+      "aliases": [
+        "989 Sports Demo 2004"
+      ]
     }
   }
 }

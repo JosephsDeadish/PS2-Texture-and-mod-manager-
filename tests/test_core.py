@@ -22171,3 +22171,191 @@ class TestWave124DemoKioskDbExpansion(unittest.TestCase):
         self.assertIsNotNone(gi, "Demo entry 'Ace Combat: Squadron Leader (PAL)' not in SerialDatabase")
         self.assertNotEqual(gi.disc_type, "retail",
             f"Demo entry 'Ace Combat: Squadron Leader (PAL)' should not be retail, got: {gi.disc_type}")
+
+
+class TestWave125KioskDbExpansion(unittest.TestCase):
+    """Wave 125: Expanded ps2_demos.json with verified kiosk/demo/utility disc entries.
+
+    Changes:
+    - Fixed 3 incorrect PBPX-95501/502/503 titles (per PS2 ID List 02/13/20):
+      PBPX-95501: 'Kiosk Demo Disc (2001)' → 'Linux for PlayStation 2 Beta 1.0'
+      PBPX-95502: 'Kiosk Demo Disc (2002)' → 'Gran Turismo 3: A-spec (PS2 Bundle)'
+      PBPX-95503: 'Kiosk Demo Disc (2003)' → 'Gran Turismo 3: GT3 Racing Pack'
+    - Added 13 new quarterly SCUS-97XXX kiosk disc entries (2.01–2.09 + Q-series gaps)
+    - Added 13 new Jampack demo disc entries (Summer/Winter 2001, Vols 10–15 M/T-rated)
+    - Added 8 new PBPX kiosk/demo entries (GT4 Prologue, GT4, DoA2, Ape Escape 3, R&C)
+    - Added 7 new PBPX utility disc entries (DVD Player, HDD Utility, Online/Network Start-Up)
+    - Added 3 SCUS-97XXX Network Adapter Start-Up disc utility entries
+    - Added 2 other demo entries (989 Sports 2003/2004)
+      Note: EyeToy Demo Disc 2005 (SCUS-97600) skipped — serial already in retail DB
+    - Total demos DB: 412 → 458 entries; kiosk: 15→33, utility: 2→13
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.demos = json.loads((root / "ps2_demos.json").read_text())["games"]
+
+    # ── DB size checks ────────────────────────────────────────────────────────
+
+    def test_demos_db_minimum_entries_wave125(self):
+        """Wave 125: Demos DB must have at least 458 entries after Wave 125 expansion."""
+        self.assertGreaterEqual(len(self.demos), 458,
+            f"Demos DB has only {len(self.demos)} entries, expected >= 458")
+
+    def test_demos_db_kiosk_count(self):
+        """Wave 125: Demos DB must have at least 30 kiosk entries."""
+        kiosk = [k for k, v in self.demos.items() if v.get("disc_type") == "kiosk"]
+        self.assertGreaterEqual(len(kiosk), 30,
+            f"Only {len(kiosk)} kiosk entries, expected >= 30")
+
+    def test_demos_db_utility_count(self):
+        """Wave 125: Demos DB must have at least 10 utility entries."""
+        utility = [k for k, v in self.demos.items() if v.get("disc_type") == "utility"]
+        self.assertGreaterEqual(len(utility), 10,
+            f"Only {len(utility)} utility entries, expected >= 10")
+
+    # ── Fixed PBPX-95501/502/503 entries ──────────────────────────────────────
+
+    def test_linux_beta_replaces_kiosk_2001(self):
+        """Wave 125: PBPX-95501 correctly labeled as Linux Beta (not Kiosk 2001)."""
+        self.assertNotIn("Kiosk Demo Disc (2001)", self.demos,
+            "Incorrect 'Kiosk Demo Disc (2001)' entry still present")
+        self.assertIn("Linux for PlayStation 2 Beta 1.0", self.demos,
+            "Corrected 'Linux for PlayStation 2 Beta 1.0' entry missing")
+        self.assertEqual(self.demos["Linux for PlayStation 2 Beta 1.0"]["serial"], "PBPX-95501")
+
+    def test_gt3_bundle_replaces_kiosk_2002(self):
+        """Wave 125: PBPX-95502 correctly labeled as GT3 A-spec Bundle (not Kiosk 2002)."""
+        self.assertNotIn("Kiosk Demo Disc (2002)", self.demos,
+            "Incorrect 'Kiosk Demo Disc (2002)' entry still present")
+        self.assertIn("Gran Turismo 3: A-spec (PS2 Bundle)", self.demos,
+            "Corrected 'Gran Turismo 3: A-spec (PS2 Bundle)' entry missing")
+        self.assertEqual(self.demos["Gran Turismo 3: A-spec (PS2 Bundle)"]["serial"], "PBPX-95502")
+
+    def test_gt3_racing_pack_replaces_kiosk_2003(self):
+        """Wave 125: PBPX-95503 correctly labeled as GT3 Racing Pack (not Kiosk 2003)."""
+        self.assertNotIn("Kiosk Demo Disc (2003)", self.demos,
+            "Incorrect 'Kiosk Demo Disc (2003)' entry still present")
+        self.assertIn("Gran Turismo 3: GT3 Racing Pack", self.demos,
+            "Corrected 'Gran Turismo 3: GT3 Racing Pack' entry missing")
+        self.assertEqual(self.demos["Gran Turismo 3: GT3 Racing Pack"]["serial"], "PBPX-95503")
+
+    # ── New quarterly kiosk disc entries ──────────────────────────────────────
+
+    def test_kiosk_2_01_present(self):
+        """Wave 125: Kiosk Demo Disc 2.01 (SCUS-97116) in demos DB."""
+        self.assertIn("Kiosk Demo Disc 2.01", self.demos)
+        self.assertEqual(self.demos["Kiosk Demo Disc 2.01"]["serial"], "SCUS-97116")
+        self.assertEqual(self.demos["Kiosk Demo Disc 2.01"]["disc_type"], "kiosk")
+
+    def test_kiosk_2_07_present(self):
+        """Wave 125: Kiosk Demo Disc 2.07 (SCUS-97227) in demos DB."""
+        self.assertIn("Kiosk Demo Disc 2.07", self.demos)
+        self.assertEqual(self.demos["Kiosk Demo Disc 2.07"]["serial"], "SCUS-97227")
+
+    def test_kiosk_q3_q4_2004_present(self):
+        """Wave 125: Kiosk Demo Disc Q3-Q4 2004 (SCUS-97428) in demos DB."""
+        self.assertIn("Kiosk Demo Disc Q3-Q4 2004", self.demos)
+        self.assertEqual(self.demos["Kiosk Demo Disc Q3-Q4 2004"]["serial"], "SCUS-97428")
+
+    def test_kiosk_q1_q2_2005_present(self):
+        """Wave 125: Kiosk Demo Disc Q1-Q2 2005 (SCUS-97422) in demos DB."""
+        self.assertIn("Kiosk Demo Disc Q1-Q2 2005", self.demos)
+        self.assertEqual(self.demos["Kiosk Demo Disc Q1-Q2 2005"]["serial"], "SCUS-97422")
+
+    def test_kiosk_disc_2_23_present(self):
+        """Wave 125: Kiosk Disc 2.23 (SCUS-97582) in demos DB."""
+        self.assertIn("Kiosk Disc 2.23", self.demos)
+        self.assertEqual(self.demos["Kiosk Disc 2.23"]["serial"], "SCUS-97582")
+
+    # ── New Jampack entries ───────────────────────────────────────────────────
+
+    def test_jampack_summer_2001_present(self):
+        """Wave 125: Jampack Demo Disc Summer 2001 (SCUS-97149) in demos DB."""
+        self.assertIn("Jampack Demo Disc - Summer 2001", self.demos)
+        self.assertEqual(self.demos["Jampack Demo Disc - Summer 2001"]["serial"], "SCUS-97149")
+
+    def test_jampack_winter_2001_present(self):
+        """Wave 125: Jampack Demo Disc Winter 2001 (SCUS-97163) in demos DB."""
+        self.assertIn("Jampack Demo Disc - Winter 2001", self.demos)
+        self.assertEqual(self.demos["Jampack Demo Disc - Winter 2001"]["serial"], "SCUS-97163")
+
+    def test_jampack_vol13_m_rated_present(self):
+        """Wave 125: Jampack Demo Disc Vol.13 M-Rated (SCUS-97492) in demos DB."""
+        self.assertIn("Jampack Demo Disc Vol. 13 (M-Rated)", self.demos)
+        self.assertEqual(self.demos["Jampack Demo Disc Vol. 13 (M-Rated)"]["serial"], "SCUS-97492")
+
+    def test_jampack_vol15_t_rated_present(self):
+        """Wave 125: Jampack Demo Disc Vol.15 T-Rated (SCUS-97564) in demos DB."""
+        self.assertIn("Jampack Demo Disc Vol. 15 (T-Rated)", self.demos)
+        self.assertEqual(self.demos["Jampack Demo Disc Vol. 15 (T-Rated)"]["serial"], "SCUS-97564")
+
+    # ── New PBPX kiosk entries ────────────────────────────────────────────────
+
+    def test_gt4_kiosk_present(self):
+        """Wave 125: Gran Turismo 4 PS2 Kiosk (PBPX-95601) in demos DB."""
+        self.assertIn("Gran Turismo 4 (PS2 Kiosk)", self.demos)
+        self.assertEqual(self.demos["Gran Turismo 4 (PS2 Kiosk)"]["serial"], "PBPX-95601")
+        self.assertEqual(self.demos["Gran Turismo 4 (PS2 Kiosk)"]["disc_type"], "kiosk")
+
+    def test_gt4_prologue_kiosk_v1_present(self):
+        """Wave 125: Gran Turismo 4 Prologue PS2 Kiosk v1 (PBPX-95523) in demos DB."""
+        self.assertIn("Gran Turismo 4: Prologue (PS2 Kiosk v1)", self.demos)
+        self.assertEqual(self.demos["Gran Turismo 4: Prologue (PS2 Kiosk v1)"]["serial"], "PBPX-95523")
+
+    def test_doa2_kiosk_present(self):
+        """Wave 125: Dead or Alive 2 PS2 Kiosk (PBPX-95201) in demos DB."""
+        self.assertIn("Dead or Alive 2 (PS2 Kiosk)", self.demos)
+        self.assertEqual(self.demos["Dead or Alive 2 (PS2 Kiosk)"]["serial"], "PBPX-95201")
+
+    def test_ratchet_clank_kiosk_present(self):
+        """Wave 125: Ratchet & Clank PS2 Kiosk (PBPX-95516) in demos DB."""
+        self.assertIn("Ratchet & Clank (PS2 Kiosk Demo)", self.demos)
+        self.assertEqual(self.demos["Ratchet & Clank (PS2 Kiosk Demo)"]["serial"], "PBPX-95516")
+
+    # ── New utility entries ───────────────────────────────────────────────────
+
+    def test_hdd_utility_v1_present(self):
+        """Wave 125: HDD Utility Disc v1.00 (PBPX-95211) in demos DB as utility."""
+        self.assertIn("HDD Utility Disc v1.00 (PBPX-95211)", self.demos)
+        self.assertEqual(self.demos["HDD Utility Disc v1.00 (PBPX-95211)"]["serial"], "PBPX-95211")
+        self.assertEqual(self.demos["HDD Utility Disc v1.00 (PBPX-95211)"]["disc_type"], "utility")
+
+    def test_network_adapter_v3_present(self):
+        """Wave 125: Network Adapter Start-Up Disc Ver.3.0 (SCUS-97425) in demos DB."""
+        self.assertIn("Network Adapter Start-Up Disc Ver.3.0", self.demos)
+        self.assertEqual(self.demos["Network Adapter Start-Up Disc Ver.3.0"]["serial"], "SCUS-97425")
+        self.assertEqual(self.demos["Network Adapter Start-Up Disc Ver.3.0"]["disc_type"], "utility")
+
+    # ── New misc demo entries ─────────────────────────────────────────────────
+
+    def test_989_sports_2004_demo_present(self):
+        """Wave 125: 989 Sports 2004 Demo Disc (SCUS-97373) in demos DB."""
+        self.assertIn("989 Sports 2004 Demo Disc", self.demos)
+        self.assertEqual(self.demos["989 Sports 2004 Demo Disc"]["serial"], "SCUS-97373")
+
+    def test_eyetoy_scus97600_not_in_demos_db(self):
+        """Wave 125: EyeToy Demo Disc 2005 (SCUS-97600) NOT in demos DB (serial is retail EyeToy)."""
+        self.assertNotIn("EyeToy Demo Disc 2005", self.demos,
+            "SCUS-97600 belongs to retail 'EyeToy (SCUS-97600)'; should not be in demos DB")
+
+    # ── SerialDatabase integration ────────────────────────────────────────────
+
+    def test_serial_db_kiosk_count_wave125(self):
+        """Wave 125: SerialDatabase must have at least 30 kiosk-type entries."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        kiosk_titles = [t for t in sdb.demo_titles()
+                        if sdb.get_info(t) and sdb.get_info(t).disc_type == "kiosk"]
+        self.assertGreaterEqual(len(kiosk_titles), 30,
+            f"Only {len(kiosk_titles)} kiosk titles in SerialDatabase, expected >= 30")
+
+    def test_serial_db_demo_count_wave125(self):
+        """Wave 125: SerialDatabase.demo_titles() must return at least 448 entries."""
+        from src.core.serial_validator import SerialDatabase
+        sdb = SerialDatabase()
+        demo_count = len(sdb.demo_titles())
+        self.assertGreaterEqual(demo_count, 448,
+            f"SerialDatabase has only {demo_count} demo titles, expected >= 448")
