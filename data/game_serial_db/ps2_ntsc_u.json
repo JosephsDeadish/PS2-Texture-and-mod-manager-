@@ -251,16 +251,6 @@
       "release_date": "2007-11-20",
       "serial": "SLUS-21693"
     },
-    "989 Sports (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97373"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-94677"
-    },
     "AC/DC Live: Rock Band Track Pack": {
       "alt_serials": [],
       "crcs": [],
@@ -3823,22 +3813,6 @@
       "release_date": "2004-02-24",
       "serial": "SLUS-21414"
     },
-    "Demo Disc Version 2.1 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97117"
-    },
-    "Demo Disc Version 2.2 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97126"
-    },
     "Despicable Me - The Game": {
       "alt_serials": [],
       "crcs": [
@@ -5289,14 +5263,6 @@
       "release_date": "2009-04-21",
       "serial": "SLUS-21873"
     },
-    "EA Demo Disc: From Russia with Love + Need for Speed: Most Wanted + SSX on Tour (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-29167"
-    },
     "ESPN - NFL Football": {
       "alt_serials": [],
       "crcs": [
@@ -5540,14 +5506,6 @@
       "publisher": "Kemco",
       "release_date": "2002-09-12",
       "serial": "SLUS-29032"
-    },
-    "Eidos Demo Disc (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-29035"
     },
     "Endgame": {
       "alt_serials": [],
@@ -7587,14 +7545,6 @@
       "release_date": "2005-02-22",
       "serial": "SCUS-97483"
     },
-    "Gran Turismo Special Edition 2004 Toyota Demo (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97384"
-    },
     "Grand Prix Challenge": {
       "alt_serials": [],
       "crcs": [
@@ -8621,26 +8571,6 @@
       "release_date": "2003-11-11",
       "serial": "SLUS-20655"
     },
-    "Holiday 2004 Demo Disc (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97456"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97455"
-    },
-    "Holiday 2005 Demo Disc (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97529"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97528"
-    },
     "Horsez": {
       "alt_serials": [],
       "crcs": [
@@ -9257,26 +9187,6 @@
       "release_date": "2002-11-18",
       "serial": "SLUS-20379"
     },
-    "Jampack Demo Disc Volume 10 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97410"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97406"
-    },
-    "Jampack Demo Disc Volume 11 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97418"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97417"
-    },
     "Jampack Demo Disc Volume 12 (NTSC-U)": {
       "alt_serials": [
         "SCUS-97420"
@@ -9286,36 +9196,6 @@
       "publisher": "Sony Computer Entertainment America",
       "release_date": "2005-05-03",
       "serial": "SCUS-97419"
-    },
-    "Jampack Demo Disc Volume 13 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97492"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97491"
-    },
-    "Jampack Demo Disc Volume 14 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97494"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97493"
-    },
-    "Jampack Demo Disc Volume 15 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97565"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97564"
     },
     "Jampack: Summer 2003": {
       "alt_serials": [],
@@ -9581,14 +9461,6 @@
       "publisher": "SNK Playmore",
       "release_date": "2004-10-12",
       "serial": "SLUS-20923"
-    },
-    "Kane & Lynch: Dead Men (Sneak Preview) (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-21654"
     },
     "Kao the Kangaroo: Round 2": {
       "alt_serials": [],
@@ -9902,110 +9774,6 @@
       "release_date": "2004-03-01",
       "serial": "SCUS-97383"
     },
-    "Kiosk Demo Disc 2.3 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97156"
-    },
-    "Kiosk Demo Disc 2.4 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97174"
-    },
-    "Kiosk Demo Disc 2.5 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97200"
-    },
-    "Kiosk Demo Disc 2.6 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97218"
-    },
-    "Kiosk Demo Disc 2.8 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97261"
-    },
-    "Kiosk Demo Disc 2.9 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97270"
-    },
-    "Kiosk Demo Disc Q1-Q2 2005 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97422"
-    },
-    "Kiosk Demo Disc Q2-Q3 2005 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97423"
-    },
-    "Kiosk Demo Disc Q3-Q4 2004 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97428"
-    },
-    "Kiosk Demo Disc Q4 2004-Q1 2005 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97421"
-    },
-    "Kiosk Disc 2.1 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97116"
-    },
-    "Kiosk Disc 2.2 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97127"
-    },
-    "Kiosk Disc 2.23 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97582"
-    },
     "Kiosk June-July-August 2003": {
       "alt_serials": [],
       "crcs": [],
@@ -10110,14 +9878,6 @@
       "publisher": "Konami",
       "release_date": "2004-09-28",
       "serial": "SLUS-21558"
-    },
-    "Konami Preview Disc (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-29125"
     },
     "Kuon": {
       "alt_serials": [],
@@ -14117,30 +13877,6 @@
       "release_date": "2010-01-01",
       "serial": "SLUS-21949"
     },
-    "Network Adaptor Start-Up Disc (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "Other",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97097"
-    },
-    "Network Adaptor Start-Up Disc v2.0 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97095"
-    },
-    "Network Adaptor Start-Up Disc v2.5 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "Other",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97356"
-    },
     "Nick Jr. Dora the Explorer: Journey to the Purple Planet": {
       "alt_serials": [],
       "crcs": [],
@@ -14491,494 +14227,6 @@
       "release_date": "2007-05-22",
       "serial": "SLUS-28065"
     },
-    "Official U.S. PlayStation Magazine Demo Disc 100 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97452"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 101 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97453"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 102 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97454"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 103 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97531"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 104 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97532"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 105 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97533"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 106 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97534"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 107 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97535"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 108 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97536"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 109 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97537"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 110 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97538"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 111 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97539"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 112 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97540"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 49 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97158"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 51 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97165"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 53 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97176"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 55 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97181"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 56 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97182"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 57 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97183"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 58 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97184"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 59 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97185"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 60 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97186"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 61 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97187"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 62 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97188"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 63 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97189"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 64 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97190"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 65 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97191"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 66 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97241"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 67 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97242"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 68 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97243"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 69 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97244"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 70 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97245"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 71 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97246"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 72 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97247"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 73 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97248"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 74 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97249"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 75 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97250"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 76 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97251"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 77 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97252"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 78 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97331"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 79 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97332"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 80 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97333"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 81 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97334"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 82 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97335"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 83 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97336"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 84 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97337"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 85 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97338"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 86 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97339"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 87 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97340"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 88 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97341"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 89 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97342"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 90 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97442"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 91 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97443"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 92 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97444"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 93 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97445"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 94 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97446"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 95 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97447"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 96 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97448"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 97 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97449"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 98 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97450"
-    },
-    "Official U.S. PlayStation Magazine Demo Disc 99 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97451"
-    },
     "Okage: Shadow King": {
       "alt_serials": [
         "SCUS-91129"
@@ -15084,22 +14332,6 @@
       "publisher": "Capcom",
       "release_date": "2001-03-13",
       "serial": "SLUS-20018"
-    },
-    "Online Start-Up Disc 4.0 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "",
-      "serial": "SCUS-97357"
-    },
-    "Online Start-Up Disc v3.0 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "Other",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "",
-      "serial": "SCUS-97425"
     },
     "Open Season": {
       "alt_serials": [],
@@ -15534,62 +14766,6 @@
       "publisher": "Sony Computer Entertainment",
       "release_date": "2006-06-15",
       "serial": "SCUS-97272"
-    },
-    "PlayStation 2 Demo Disc Version 2.3 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97155"
-    },
-    "PlayStation Underground 4.4 (Disc 2) (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97121"
-    },
-    "PlayStation Underground Jampack: Summer 2001 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97149"
-    },
-    "PlayStation Underground Jampack: Summer 2002 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97206"
-    },
-    "PlayStation Underground Jampack: Winter 2001 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97163"
-    },
-    "PlayStation Underground Mag Issue 5.1 (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97144"
-    },
-    "PlayStation Underground Summer Sampler (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCUS-97216"
     },
     "PlayStation Underground: Holiday 2001": {
       "alt_serials": [],
@@ -19287,22 +18463,6 @@
       "publisher": "Universal Interactive",
       "release_date": "2002-11-13",
       "serial": "SLUS-20315"
-    },
-    "Square Enix Sampler Disc Volume One: Drakengard Playable Demo (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-29087"
-    },
-    "Square Enix Sampler Disc Volume Two: Front Mission 4 Playable Demo (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLUS-29098"
     },
     "Stacked with Daniel Negreanu": {
       "alt_serials": [],

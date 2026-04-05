@@ -774,7 +774,7 @@
       "alt_serials": [],
       "developer": "Creat Studios",
       "genre": "Racing",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2005-09-23",
       "serial": "SLES-53108"
     },
@@ -1325,7 +1325,7 @@
       "alt_serials": [],
       "developer": "Now Production",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2009-10-23",
       "serial": "SLES-55579"
     },
@@ -1381,7 +1381,7 @@
       "alt_serials": [],
       "developer": "Pixel Tales",
       "genre": "Sports",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55371"
     },
@@ -1397,7 +1397,7 @@
       "alt_serials": [],
       "developer": "ivolgamus",
       "genre": "Adventure",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55015"
     },
@@ -2730,7 +2730,7 @@
       "alt_serials": [],
       "developer": "Sand Grain Studios",
       "genre": "Adventure",
-      "publisher": "Activision Value Publishing",
+      "publisher": "Activision Value",
       "release_date": "2002-11-19",
       "serial": "SLES-51590"
     },
@@ -2746,7 +2746,7 @@
       "alt_serials": [],
       "developer": "Sand Grain Studios",
       "genre": "Adventure",
-      "publisher": "Activision Value Publishing",
+      "publisher": "Activision Value",
       "release_date": "2008-05-02",
       "serial": "SLES-55103"
     },
@@ -2762,7 +2762,7 @@
       "alt_serials": [],
       "developer": "Sand Grain Studios",
       "genre": "Sports",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2003-11-11",
       "serial": "SLES-52106"
     },
@@ -2822,7 +2822,7 @@
       ],
       "developer": "Rebellion Developments",
       "genre": "First-person Shooter",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2008-11-14",
       "serial": "SLES-55367"
     },
@@ -5214,7 +5214,7 @@
       ],
       "developer": "Toys for Bob",
       "genre": "Sports/Skateboard",
-      "publisher": "Activision, Inc",
+      "publisher": "Activision",
       "release_date": "2003-09-05",
       "serial": "SLES-51720"
     },
@@ -5400,7 +5400,7 @@
     },
     "Disney/Pixar Alla Ricerca di Nemo (PAL)": {
       "alt_serials": [],
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "genre": "",
       "publisher": "THQ",
       "release_date": "",
@@ -5480,7 +5480,7 @@
         "SLES-51870",
         "SLES-51872"
       ],
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "genre": "Adventure",
       "publisher": "THQ",
       "release_date": "2003-09-26",
@@ -6052,7 +6052,7 @@
       "alt_serials": [],
       "developer": "Edge of Reality",
       "genre": "",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-53986"
     },
@@ -6114,7 +6114,7 @@
       ],
       "developer": "Edge of Reality",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2004-10-01",
       "serial": "SLES-52536"
     },
@@ -6162,7 +6162,7 @@
       ],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2005",
       "serial": "SLES-53657"
     },
@@ -8893,7 +8893,7 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2003-05-09",
-      "serial": "SLES-51999"
+      "serial": "SLES-51061"
     },
     "Grand Theft Auto: Vice City Stories (PAL)": {
       "alt_serials": [
@@ -9097,7 +9097,7 @@
       "alt_serials": [],
       "developer": "Beenox",
       "genre": "Rhythm",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2009",
       "serial": "SLES-55544"
     },
@@ -11622,7 +11622,7 @@
       ],
       "developer": "Left Field Productions",
       "genre": "Racing",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2004-03",
       "serial": "SLES-52289"
     },
@@ -16579,7 +16579,7 @@
       ],
       "developer": "Edge of Reality",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2004-02-20",
       "serial": "SLES-51686"
     },
@@ -17474,7 +17474,7 @@
       "alt_serials": [],
       "developer": "Climax Group",
       "genre": "Racing",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2002-11-22",
       "serial": "SLES-50997"
     },
@@ -17490,7 +17490,7 @@
       "alt_serials": [],
       "developer": "Sand Grain Studios",
       "genre": "Sports",
-      "publisher": "Activision Value Publishing",
+      "publisher": "Activision Value",
       "release_date": "2004",
       "serial": "SLES-52900"
     },
@@ -20889,7 +20889,7 @@
       ],
       "developer": "Vicarious Visions",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2007",
       "serial": "SLES-54723"
     },
@@ -21118,7 +21118,7 @@
       "alt_serials": [],
       "developer": "Raven Software",
       "genre": "First-person Shooter",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2001",
       "serial": "SLES-50738"
     },
@@ -21714,7 +21714,7 @@
       ],
       "developer": "Exakt Entertainment",
       "genre": "Racing",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2001-11-29",
       "serial": "SLES-50419"
     },
@@ -22773,7 +22773,7 @@
       "alt_serials": [],
       "developer": "FUN Labs",
       "genre": "First-person Shooter",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2008",
       "serial": "SLES-55328"
     },
@@ -23721,7 +23721,7 @@
       ],
       "developer": "Neversoft Entertainment",
       "genre": "Sports",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2001",
       "serial": "SLES-50435"
     },
@@ -23758,7 +23758,7 @@
       "alt_serials": [],
       "developer": "Neversoft Entertainment",
       "genre": "Sports",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2006-11-11",
       "serial": "SLES-61021"
     },
@@ -23795,7 +23795,7 @@
       ],
       "developer": "Neversoft Entertainment",
       "genre": "Sports",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2004-10-04",
       "serial": "SLES-52621"
     },
@@ -24002,7 +24002,7 @@
       "alt_serials": [],
       "developer": "Krome Studios",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2009-06-23",
       "serial": "SLES-55520"
     },
@@ -24011,9 +24011,9 @@
         "SLES-54756",
         "SLES-54757"
       ],
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2007",
       "serial": "SLES-54755"
     },
@@ -25430,7 +25430,7 @@
       "alt_serials": [],
       "developer": "Left Field Productions",
       "genre": "Casino",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2007",
       "serial": "SLES-54961"
     },
@@ -25602,7 +25602,7 @@
       ],
       "developer": "Amaze Entertainment",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2009-05-01",
       "serial": "SLES-55494"
     },
@@ -25621,7 +25621,7 @@
       "alt_serials": [],
       "developer": "Z-Axis",
       "genre": "Action",
-      "publisher": "Activision Publishing, Inc.",
+      "publisher": "Activision",
       "release_date": "2006",
       "serial": "SLES-54066"
     },
