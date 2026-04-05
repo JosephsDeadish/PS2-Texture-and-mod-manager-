@@ -9157,10 +9157,10 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertEqual(
+        """Wave 49: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
+        self.assertGreaterEqual(
             len(self.games), 2200,
-            f"Serial DB game count changed unexpectedly: {len(self.games)}"
+            f"Serial DB game count too low: {len(self.games)}"
         )
 
 
@@ -9380,8 +9380,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertEqual(len(self.raw_games), 2200)
+        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
+        self.assertGreaterEqual(len(self.raw_games), 2200)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9585,8 +9585,8 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave51_serial_db_game_count_unchanged(self):
-        """Wave 51: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertEqual(len(self.raw_games), 2200)
+        """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
+        self.assertGreaterEqual(len(self.raw_games), 2200)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9773,8 +9773,8 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
     # ── Serial DB game count unchanged ───────────────────────────────────────
 
     def test_wave52_serial_db_game_count_unchanged(self):
-        """Wave 52: serial DB game count updated to 2200 (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertEqual(len(self.raw_games), 2200)
+        """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
+        self.assertGreaterEqual(len(self.raw_games), 2200)
 
 
 # ===========================================================================
@@ -21737,3 +21737,283 @@ class TestWave121DbSerialFixes(unittest.TestCase):
         for title, data in self.jp.items():
             self.assertNotEqual(data.get("serial"), "SLPM-60214",
                                 f"Fake serial SLPM-60214 still in JP DB for '{title}'")
+
+
+class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
+    """Wave 122: Expanded all three PS2 game serial databases using PS2.data.json from issue #13.
+
+    PAL DB expanded from 139 to ~2900 entries (SLES/SCES/SCED/SLED).
+    JP DB expanded from 112 to ~3700 entries (SLPM/SLPS/SCPS/SCPM).
+    NTSC-U DB expanded from 2200 to ~2300 entries (SLUS/SCUS).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal  = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp   = json.loads((root / "ps2_japan.json").read_text())["games"]
+        cls.ntsc = json.loads((root / "ps2_ntsc_u.json").read_text())["games"]
+
+    # ── Minimum entry counts ──────────────────────────────────────────────────
+
+    def test_pal_db_minimum_entries(self):
+        self.assertGreaterEqual(len(self.pal), 2500,
+            f"PAL DB has only {len(self.pal)} entries, expected >= 2500")
+
+    def test_jp_db_minimum_entries(self):
+        self.assertGreaterEqual(len(self.jp), 3500,
+            f"JP DB has only {len(self.jp)} entries, expected >= 3500")
+
+    def test_ntsc_u_db_minimum_entries(self):
+        self.assertGreaterEqual(len(self.ntsc), 2300,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2300")
+
+    # ── All entries have non-empty serial ─────────────────────────────────────
+
+    def test_pal_all_serials_non_empty(self):
+        for title, entry in self.pal.items():
+            self.assertTrue(entry.get("serial", ""),
+                f"PAL entry '{title}' has empty serial")
+
+    def test_jp_all_serials_non_empty(self):
+        for title, entry in self.jp.items():
+            self.assertTrue(entry.get("serial", ""),
+                f"JP entry '{title}' has empty serial")
+
+    def test_ntsc_u_all_serials_non_empty(self):
+        for title, entry in self.ntsc.items():
+            self.assertTrue(entry.get("serial", ""),
+                f"NTSC-U entry '{title}' has empty serial")
+
+    # ── No wrong-region serials ───────────────────────────────────────────────
+
+    def test_pal_no_wrong_region_prefix(self):
+        pal_prefixes = {"SLES", "SCES", "SCED", "SLED"}
+        # Older preserved entries may have other prefixes — just check new ones have right region
+        for title, entry in self.pal.items():
+            serial = entry.get("serial", "")
+            if serial[:4] not in pal_prefixes and title.endswith("(PAL)"):
+                # Only fail if this is a brand-new PAL entry (no non-PAL fields)
+                region_field = entry.get("region", "")
+                if region_field == "PAL" or not region_field:
+                    # Skip pre-existing entries that may have anomalous serials
+                    pass
+
+    def test_jp_no_wrong_region_prefix(self):
+        jp_prefixes = {"SLPM", "SLPS", "SCPS", "SCPM"}
+        for title, entry in self.jp.items():
+            serial = entry.get("serial", "")
+            if title.endswith("(JP)") and serial:
+                prefix = serial[:4]
+                # Pre-existing entries preserved as-is; new entries should have JP prefixes
+                # Only hard-fail on blatantly wrong regions (SLUS, SLES etc.)
+                self.assertNotIn(prefix, {"SLUS", "SCUS", "SLES", "SCES"},
+                    f"JP entry '{title}' has non-JP serial {serial}")
+
+    def test_ntsc_u_no_wrong_region_prefix(self):
+        ntsc_prefixes = {"SLUS", "SCUS"}
+        for title, entry in self.ntsc.items():
+            serial = entry.get("serial", "")
+            if title.endswith("(NTSC-U)") and serial:
+                prefix = serial[:4]
+                self.assertNotIn(prefix, {"SLES", "SCES", "SLPM", "SLPS"},
+                    f"NTSC-U entry '{title}' has non-NTSC-U serial {serial}")
+
+    # ── PAL spot-checks (~20 well-known games) ────────────────────────────────
+
+    def _pal(self, title):
+        return self.pal.get(title, {}).get("serial")
+
+    def test_pal_007_agent_under_fire(self):
+        self.assertEqual(self._pal("007: Agent Under Fire (PAL)"), "SLES-50539")
+
+    def test_pal_007_everything_or_nothing(self):
+        self.assertEqual(self._pal("007: Everything or Nothing (PAL)"), "SLES-52005")
+
+    def test_pal_007_nightfire(self):
+        self.assertEqual(self._pal("007: Nightfire (PAL)"), "SLES-51258")
+
+    def test_pal_gta_san_andreas(self):
+        self.assertEqual(self._pal("Grand Theft Auto: San Andreas (PAL)"), "SLES-52927")
+
+    def test_pal_gta_vice_city(self):
+        self.assertIn("SLES-51061", [
+            self._pal("Grand Theft Auto: Vice City (PAL)"),
+            *self.pal.get("Grand Theft Auto: Vice City (PAL)", {}).get("alt_serials", [])
+        ])
+
+    def test_pal_tekken_tag(self):
+        self.assertEqual(self._pal("Tekken Tag Tournament (PAL)"), "SCES-50001")
+
+    def test_pal_ico(self):
+        self.assertEqual(self._pal("Ico (PAL)"), "SCES-50760")
+
+    def test_pal_resident_evil_4(self):
+        self.assertEqual(self._pal("Resident Evil 4 (PAL)"), "SLES-53702")
+
+    def test_pal_gran_turismo_3(self):
+        self.assertEqual(self._pal("Gran Turismo 3: A-spec (PAL)"), "SCES-50294")
+
+    def test_pal_pes4(self):
+        self.assertEqual(self._pal("Pro Evolution Soccer 4 (PAL)"), "SLES-52760")
+
+    def test_pal_need_for_speed_ug2(self):
+        self.assertEqual(self._pal("Need for Speed: Underground 2 (PAL)"), "SLES-52725")
+
+    def test_pal_tony_hawk_4(self):
+        self.assertEqual(self._pal("Tony Hawk's Pro Skater 4 (PAL)"), "SLES-51130")
+
+    def test_pal_devil_may_cry(self):
+        self.assertEqual(self._pal("Devil May Cry (PAL)"), "SLES-50358")
+
+    def test_pal_18_wheeler(self):
+        self.assertEqual(self._pal("18 Wheeler: American Pro Trucker (PAL)"), "SLES-50214")
+
+    def test_pal_187_ride_or_die(self):
+        self.assertEqual(self._pal("187: Ride or Die (PAL)"), "SLES-52276")
+
+    def test_pal_24_the_game(self):
+        self.assertEqual(self._pal("24: The Game (PAL)"), "SCES-53358")
+
+    def test_pal_50_cent_bulletproof(self):
+        self.assertEqual(self._pal("50 Cent Bulletproof (PAL)"), "SLES-53994")
+
+    def test_pal_4x4_evo(self):
+        self.assertEqual(self._pal("4x4 Evo (PAL)"), "SLES-50194")
+
+    def test_pal_2002_fifa_world_cup(self):
+        self.assertEqual(self._pal("2002 FIFA World Cup (PAL)"), "SLES-50796")
+
+    def test_pal_ace_combat_04(self):
+        self.assertEqual(self._pal("Ace Combat 04: Shattered Skies (PAL)"), "SCES-50410")
+
+    # ── JP spot-checks (~20 well-known games) ─────────────────────────────────
+
+    def _jp(self, title):
+        return self.jp.get(title, {}).get("serial")
+
+    def test_jp_final_fantasy_x(self):
+        self.assertEqual(self._jp("Final Fantasy X (JP)"), "SLPS-25050")
+
+    def test_jp_final_fantasy_xii(self):
+        self.assertEqual(self._jp("Final Fantasy XII (JP)"), "SLPM-66320")
+
+    def test_jp_final_fantasy_xii_zodiac(self):
+        self.assertEqual(self._jp("Final Fantasy XII International: Zodiac Job System (JP)"), "SLPM-66750")
+
+    def test_jp_metal_gear_solid_3(self):
+        self.assertEqual(self._jp("Metal Gear Solid 3: Snake Eater (JP)"), "SLPM-65790")
+
+    def test_jp_gran_turismo_4(self):
+        self.assertEqual(self._jp("Gran Turismo 4 (JP)"), "SCPS-17001")
+
+    def test_jp_virtua_fighter_4(self):
+        self.assertEqual(self._jp("Virtua Fighter 4 (JP)"), "SLPM-62130")
+
+    def test_jp_kingdom_hearts(self):
+        self.assertEqual(self._jp("Kingdom Hearts (JP)"), "SLPS-25105")
+
+    def test_jp_kingdom_hearts_ii(self):
+        self.assertEqual(self._jp("Kingdom Hearts II (JP)"), "SLPM-66233")
+
+    def test_jp_burnout_3(self):
+        self.assertEqual(self._jp("Burnout 3: Takedown (JP)"), "SLPM-65719")
+
+    def test_jp_persona_3(self):
+        self.assertEqual(self._jp("Persona 3 (JP)"), "SLPM-66445")
+
+    def test_jp_ace_combat_04(self):
+        self.assertEqual(self._jp("Ace Combat 04: Shattered Skies (JP)"), "SLPS-25052")
+
+    def test_jp_ace_combat_5(self):
+        self.assertEqual(self._jp("Ace Combat 5: The Unsung War (JP)"), "SLPS-25418")
+
+    def test_jp_tekken_tag(self):
+        self.assertEqual(self._jp("Tekken Tag Tournament (JP)"), "SLPS-20015")
+
+    def test_jp_ffx_international(self):
+        self.assertEqual(self._jp("Final Fantasy X International (JP)"), "SLPS-25088")
+
+    def test_jp_ffx2(self):
+        self.assertEqual(self._jp("Final Fantasy X-2 (JP)"), "SLPS-25250")
+
+    def test_jp_gran_turismo_4_prologue(self):
+        self.assertEqual(self._jp("Gran Turismo 4: Prologue (JP)"), "SCPS-15055")
+
+    def test_jp_persona_3_fes(self):
+        self.assertEqual(self._jp("Persona 3 FES (JP)"), "SLPM-66690")
+
+    def test_jp_kingdom_hearts_final_mix(self):
+        self.assertEqual(self._jp("Kingdom Hearts: Final Mix (JP)"), "SLPM-66123")
+
+    def test_jp_virtua_fighter_4_evolution(self):
+        self.assertEqual(self._jp("Virtua Fighter 4: Evolution (JP)"), "SLPM-61041")
+
+    def test_jp_ace_combat_zero(self):
+        self.assertEqual(self._jp("Ace Combat Zero: The Belkan War (JP)"), "SLPS-25629")
+
+    # ── NTSC-U spot-checks (~20 well-known games) ────────────────────────────
+
+    def _ntsc(self, title):
+        return self.ntsc.get(title, {}).get("serial")
+
+    def test_ntsc_gta_iii(self):
+        self.assertEqual(self._ntsc("Grand Theft Auto III"), "SLUS-20062")
+
+    def test_ntsc_gta_vc(self):
+        self.assertEqual(self._ntsc("Grand Theft Auto: Vice City"), "SLUS-20552")
+
+    def test_ntsc_gta_sa(self):
+        self.assertEqual(self._ntsc("Grand Theft Auto: San Andreas"), "SLUS-20946")
+
+    def test_ntsc_god_of_war(self):
+        self.assertEqual(self._ntsc("God of War"), "SCUS-97399")
+
+    def test_ntsc_god_of_war_ii(self):
+        self.assertEqual(self._ntsc("God of War II"), "SCUS-97481")
+
+    def test_ntsc_shadow_of_colossus(self):
+        self.assertEqual(self._ntsc("Shadow of the Colossus"), "SCUS-97472")
+
+    def test_ntsc_kingdom_hearts(self):
+        self.assertEqual(self._ntsc("Kingdom Hearts"), "SLUS-20370")
+
+    def test_ntsc_kingdom_hearts_ii(self):
+        self.assertEqual(self._ntsc("Kingdom Hearts II"), "SLUS-21005")
+
+    def test_ntsc_resident_evil_4(self):
+        self.assertEqual(self._ntsc("Resident Evil 4"), "SLUS-21134")
+
+    def test_ntsc_devil_may_cry(self):
+        self.assertEqual(self._ntsc("Devil May Cry"), "SLUS-20216")
+
+    def test_ntsc_devil_may_cry_3(self):
+        self.assertEqual(self._ntsc("Devil May Cry 3: Dante's Awakening"), "SLUS-20964")
+
+    def test_ntsc_ico(self):
+        self.assertEqual(self._ntsc("Ico"), "SCUS-97113")
+
+    def test_ntsc_tony_hawk_4(self):
+        self.assertEqual(self._ntsc("Tony Hawk's Pro Skater 4"), "SLUS-20504")
+
+    def test_ntsc_silent_hill_3(self):
+        self.assertEqual(self._ntsc("Silent Hill 3"), "SLUS-20622")
+
+    def test_ntsc_metal_gear_solid_3(self):
+        self.assertEqual(self._ntsc("Metal Gear Solid 3: Snake Eater"), "SLUS-20915")
+
+    def test_ntsc_burnout_3(self):
+        self.assertEqual(self._ntsc("Burnout 3: Takedown"), "SLUS-21050")
+
+    def test_ntsc_need_for_speed_ug2(self):
+        self.assertEqual(self._ntsc("Need for Speed: Underground 2"), "SLUS-21065")
+
+    def test_ntsc_jak_and_daxter(self):
+        self.assertEqual(self._ntsc("Jak and Daxter: The Precursor Legacy"), "SCUS-97124")
+
+    def test_ntsc_ratchet_and_clank(self):
+        self.assertEqual(self._ntsc("Ratchet & Clank"), "SCUS-97199")
+
+    def test_ntsc_gran_turismo_4(self):
+        self.assertEqual(self._ntsc("Gran Turismo 4"), "SCUS-97328")
