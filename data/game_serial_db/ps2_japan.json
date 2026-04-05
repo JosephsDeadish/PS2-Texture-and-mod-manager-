@@ -8729,14 +8729,6 @@
       "release_date": "2004",
       "serial": "SCPS-17008"
     },
-    "Gran Turismo 4: First Preview (JP)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCPM-85304"
-    },
     "Gran Turismo 4: Prologue (JP)": {
       "alt_serials": [
         "SCPS-19304"
@@ -8782,14 +8774,6 @@
       "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "2002-05-16",
       "serial": "SCPS-56005"
-    },
-    "Gran Turismo Concept: Copen Special Edition (JP)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCPM-85301"
     },
     "Grand Prix Challenge (JP)": {
       "alt_serials": [],
@@ -15670,14 +15654,6 @@
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-60165"
-    },
-    "McDonald's Original Happy Disc (JP)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCPM-85101"
     },
     "Medal of Honor: Europa Kyoushuu [EA:SY! 1980] (JP)": {
       "alt_serials": [],
@@ -26606,14 +26582,6 @@
       "release_date": "",
       "serial": "SLPS-25370"
     },
-    "SpeSaru Disc 2003 (JP)": {
-      "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SCPM-85303"
-    },
     "Spectral Force Chronicle (JP)": {
       "alt_serials": [
         "SLPM-65967",
@@ -30104,7 +30072,7 @@
     },
     "Transformers: The Game (JP)": {
       "alt_serials": [],
-      "developer": "Traveller's  Tales",
+      "developer": "Traveller's Tales",
       "genre": "Action-Adventure",
       "publisher": "Activision",
       "release_date": "2008-02-07",

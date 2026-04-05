@@ -454,7 +454,7 @@ class SerialDatabase:
         return serial in self._demo_serials
 
     def demo_titles(self) -> List[str]:
-        """Return all demo/kiosk/promo titles loaded from ``ps2_demos.json`` (sorted).
+        """Return all demo/kiosk/promo/utility titles loaded from ``ps2_demos.json`` (sorted).
 
         Retail titles are excluded.  Useful for populating a dedicated demo
         browser in the UI.
@@ -466,7 +466,7 @@ class SerialDatabase:
         """
         return sorted(
             title for title, gi in self._games.items()
-            if gi.disc_type in ("demo", "kiosk", "promo")
+            if gi.disc_type in ("demo", "kiosk", "promo", "utility")
         )
 
     def retail_titles(self) -> List[str]:

@@ -8093,14 +8093,6 @@
       "release_date": "2004-08-31",
       "serial": "SLUS-21074"
     },
-    "HDD Utility Disc (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "Square PDD 3",
-      "genre": "MMORPG",
-      "publisher": "Sony Computer Entertainment",
-      "release_date": "2006-06-15",
-      "serial": "SCUS-97395"
-    },
     "HSX: HyperSonic.Xtreme": {
       "alt_serials": [],
       "crcs": [],
@@ -9187,70 +9179,6 @@
       "release_date": "2002-11-18",
       "serial": "SLUS-20379"
     },
-    "Jampack Demo Disc Volume 12 (NTSC-U)": {
-      "alt_serials": [
-        "SCUS-97420"
-      ],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2005-05-03",
-      "serial": "SCUS-97419"
-    },
-    "Jampack: Summer 2003": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-07-01",
-      "serial": "SCUS-97280"
-    },
-    "Jampack: Summer 2003 (SCUS-97281)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-07-01",
-      "serial": "SCUS-97281"
-    },
-    "Jampack: Winter 2002": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2002-11-01",
-      "serial": "SCUS-97234"
-    },
-    "Jampack: Winter 2002 (SCUS-97235)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2002-11-01",
-      "serial": "SCUS-97235"
-    },
-    "Jampack: Winter 2003": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-11-01",
-      "serial": "SCUS-97312"
-    },
-    "Jampack: Winter 2003 (SCUS-97313)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-11-01",
-      "serial": "SCUS-97313"
-    },
     "Jaws Unleashed": {
       "alt_serials": [],
       "crcs": [],
@@ -9755,42 +9683,6 @@
       "publisher": "Square Enix",
       "release_date": "2008-12-02",
       "serial": "SLUS-21799"
-    },
-    "Kiosk 2-11 Winter 2003": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-12-01",
-      "serial": "SCUS-97324"
-    },
-    "Kiosk 2-12 Spring 2004": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2004-03-01",
-      "serial": "SCUS-97383"
-    },
-    "Kiosk June-July-August 2003": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-06-01",
-      "serial": "SCUS-97321"
-    },
-    "Kiosk Q2-Q3 2006": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2006-06-01",
-      "serial": "SCUS-97557"
     },
     "Klonoa 2: Lunatea's Veil": {
       "alt_serials": [],
@@ -13439,51 +13331,6 @@
       "release_date": "2005-09-20",
       "serial": "SLUS-21164"
     },
-    "Namco Transmission Vol. 2": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Demo",
-      "publisher": "Namco",
-      "release_date": "2004-01-01",
-      "serial": "SLUS-29134"
-    },
-    "Namco Transmission v1.03": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Demo",
-      "publisher": "Namco",
-      "release_date": "2002-01-01",
-      "serial": "SLUS-29071"
-    },
-    "Namco Transmission v2": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Demo",
-      "publisher": "Namco",
-      "release_date": "2003-01-01",
-      "serial": "SLUS-29133"
-    },
-    "Namco Transmission v3.1": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Demo",
-      "publisher": "Namco",
-      "release_date": "2005-01-01",
-      "serial": "SLUS-29174"
-    },
-    "Namco Transmission v3.2": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Demo",
-      "publisher": "Namco",
-      "release_date": "2005-06-01",
-      "serial": "SLUS-29175"
-    },
     "Nanobreaker": {
       "alt_serials": [],
       "crcs": [],
@@ -14483,24 +14330,6 @@
       "release_date": "2012-11-05",
       "serial": "SLUS-21955"
     },
-    "PS2 Kiosk Q2-Q3 2004: Summer 2004": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2004-06-01",
-      "serial": "SCUS-97407"
-    },
-    "PS2 Kiosk Q3-Q4 2005": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2005-09-01",
-      "serial": "SCUS-97424"
-    },
     "Pac-Man Fever": {
       "alt_serials": [],
       "crcs": [],
@@ -14766,15 +14595,6 @@
       "publisher": "Sony Computer Entertainment",
       "release_date": "2006-06-15",
       "serial": "SCUS-97272"
-    },
-    "PlayStation Underground: Holiday 2001": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2001-12-01",
-      "serial": "SCUS-97166"
     },
     "Playboy: The Mansion": {
       "alt_serials": [],
@@ -21841,15 +21661,6 @@
       "publisher": "Namco",
       "release_date": "2005-09-20",
       "serial": "SLUS-21230"
-    },
-    "Welcome to the World of Online Gaming for Your PlayStation 2": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment America",
-      "genre": "Demo",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-01-01",
-      "serial": "SCUS-97394"
     },
     "Wheel of Fortune": {
       "alt_serials": [],
