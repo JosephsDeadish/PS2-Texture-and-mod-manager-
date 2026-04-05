@@ -20152,8 +20152,8 @@ class TestWave108DbSerialFixes(unittest.TestCase):
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
     def test_pal_db_count(self):
-        """Wave 108 / Wave 114: PAL DB has at least 142 entries (13 JP games moved to Japan DB in Wave 114)."""
-        self.assertGreaterEqual(len(self.pal), 142)
+        """Wave 108 / Wave 114 / Wave 121: PAL DB has at least 139 entries (3 non-PAL entries removed in Wave 121)."""
+        self.assertGreaterEqual(len(self.pal), 139)
 
     # ── No SLPM/SLPS main serials remain in NTSC-U DB ────────────────────────
 
@@ -21511,3 +21511,229 @@ class TestWave120JapanDbRebuild(unittest.TestCase):
                 serial.startswith(allowed),
                 f"Unexpected serial prefix {serial!r} in Japan DB for '{title}'"
             )
+
+
+class TestWave121DbSerialFixes(unittest.TestCase):
+    """Wave 121: Corrected wrong serials in PAL and Japan DBs using PS2.txt from issue #13.
+
+    PAL DB: 34 wrong serials corrected, 3 non-PAL entries removed (Katamari Damacy,
+    Neopets: The Darkest Fairy, Tales of the Abyss), Jak II fixed (SCES-51607→SCES-51608),
+    ZoE 2nd Runner fixed (SLES-51434→SLES-51113). We Love Katamari re-added (SLES-53828).
+
+    Japan DB: Shadow Hearts II (SLPM-60214, fake serial) removed as duplicate of
+    Shadow Hearts: Covenant entry. 24 new verified JP games added (Gran Turismo 3/4,
+    Tekken 4/5, God of War 1/2, Jak II, Ratchet 2/3, Ryu ga Gotoku 1/2, Ar Tonelico,
+    Radiata Stories, Burnout 3, Wild ARMs 3/4, Growlanser III, SMT Nocturne Maniacs,
+    Virtua Fighter 4, FFXII International, Marvel vs Capcom 2, KoF 2002).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    def _pal_serial(self, title):
+        return self.pal.get(title, {}).get("serial")
+
+    def _jp_serial(self, title):
+        return self.jp.get(title, {}).get("serial")
+
+    # ── PAL serial corrections ────────────────────────────────────────────────
+
+    def test_jak_daxter_pal_serial(self):
+        self.assertEqual(self._pal_serial("Jak and Daxter: The Precursor Legacy (PAL)"), "SCES-50361")
+
+    def test_jak_ii_pal_serial(self):
+        self.assertEqual(self._pal_serial("Jak II (PAL)"), "SCES-51608")
+
+    def test_sly_raccoon_pal_serial(self):
+        self.assertEqual(self._pal_serial("Sly Raccoon (PAL)"), "SCES-50917")
+
+    def test_sly_2_pal_serial(self):
+        self.assertEqual(self._pal_serial("Sly 2: Band of Thieves (PAL)"), "SCES-52529")
+
+    def test_sly_3_pal_serial(self):
+        self.assertEqual(self._pal_serial("Sly 3: Honour Among Thieves (PAL)"), "SCES-53409")
+
+    def test_ratchet_clank_2_pal_serial(self):
+        self.assertEqual(self._pal_serial("Ratchet & Clank 2: Going Commando (PAL)"), "SCES-51607")
+
+    def test_kingdom_hearts_pal_serial(self):
+        self.assertEqual(self._pal_serial("Kingdom Hearts (PAL)"), "SCES-50967")
+
+    def test_tekken_tag_pal_serial(self):
+        self.assertEqual(self._pal_serial("Tekken Tag Tournament (PAL)"), "SCES-50001")
+
+    def test_timesplitters_2_pal_serial(self):
+        self.assertEqual(self._pal_serial("TimeSplitters 2 (PAL)"), "SLES-50877")
+
+    def test_timesplitters_fp_pal_serial(self):
+        self.assertEqual(self._pal_serial("TimeSplitters: Future Perfect (PAL)"), "SLES-52993")
+
+    def test_silent_hill_3_pal_serial(self):
+        self.assertEqual(self._pal_serial("Silent Hill 3 (PAL)"), "SLES-51434")
+
+    def test_silent_hill_4_pal_serial(self):
+        self.assertEqual(self._pal_serial("Silent Hill 4: The Room (PAL)"), "SLES-52445")
+
+    def test_re_code_veronica_pal_serial(self):
+        self.assertEqual(self._pal_serial("Resident Evil Code: Veronica X (PAL)"), "SLES-50306")
+
+    def test_dmc3_pal_serial(self):
+        self.assertEqual(self._pal_serial("Devil May Cry 3: Dante's Awakening (PAL)"), "SLES-53038")
+
+    def test_dmc3_se_pal_serial(self):
+        self.assertEqual(self._pal_serial("Devil May Cry 3: Special Edition (PAL)"), "SLES-54186")
+
+    def test_burnout_revenge_pal_serial(self):
+        self.assertEqual(self._pal_serial("Burnout Revenge (PAL)"), "SLES-53506")
+
+    def test_star_wars_bf2_pal_serial(self):
+        self.assertEqual(self._pal_serial("Star Wars: Battlefront II (PAL)"), "SLES-53501")
+
+    def test_dbz_budokai3_pal_serial(self):
+        self.assertEqual(self._pal_serial("Dragon Ball Z: Budokai 3 (PAL)"), "SLES-52730")
+
+    def test_castlevania_cod_pal_serial(self):
+        self.assertEqual(self._pal_serial("Castlevania: Curse of Darkness (PAL)"), "SLES-53755")
+
+    def test_suikoden_v_pal_serial(self):
+        self.assertEqual(self._pal_serial("Suikoden V (PAL)"), "SLES-54087")
+
+    def test_baldurs_gate_pal_serial(self):
+        self.assertEqual(self._pal_serial("Baldur's Gate: Dark Alliance (PAL)"), "SLES-50672")
+
+    def test_baldurs_gate_ii_pal_serial(self):
+        self.assertEqual(self._pal_serial("Baldur's Gate: Dark Alliance II (PAL)"), "SLES-52187")
+
+    def test_mortal_kombat_da_pal_serial(self):
+        self.assertEqual(self._pal_serial("Mortal Kombat: Deadly Alliance (PAL)"), "SLES-50717")
+
+    def test_okami_pal_serial(self):
+        self.assertEqual(self._pal_serial("Okami (PAL)"), "SLES-54439")
+
+    def test_persona3fes_pal_serial(self):
+        self.assertEqual(self._pal_serial("Persona 3 FES (PAL)"), "SLES-55354")
+
+    def test_persona4_pal_serial(self):
+        self.assertEqual(self._pal_serial("Persona 4 (PAL)"), "SLES-55474")
+
+    def test_god_of_war_ii_pal_serial(self):
+        self.assertEqual(self._pal_serial("God of War II (PAL)"), "SCES-54206")
+
+    def test_gt4_prologue_pal_serial(self):
+        self.assertEqual(self._pal_serial("Gran Turismo 4: Prologue (PAL)"), "SCES-52438")
+
+    def test_eyetoy_play_pal_serial(self):
+        self.assertEqual(self._pal_serial("EyeToy: Play (PAL)"), "SCES-51513")
+
+    def test_soulcalibur_iii_pal_serial(self):
+        self.assertEqual(self._pal_serial("SoulCalibur III (PAL)"), "SCES-53312")
+
+    def test_mgs3_subsistence_pal_serial(self):
+        self.assertEqual(self._pal_serial("Metal Gear Solid 3: Subsistence (PAL)"), "SLES-82042")
+
+    def test_bully_pal_serial(self):
+        self.assertEqual(self._pal_serial("Bully (PAL)"), "SLES-53561")
+
+    def test_we_love_katamari_pal_serial(self):
+        self.assertEqual(self._pal_serial("We Love Katamari (PAL)"), "SLES-53828")
+
+    def test_zoe2_pal_serial(self):
+        self.assertEqual(self._pal_serial("Zone of the Enders: The 2nd Runner (PAL)"), "SLES-51113")
+
+    # ── PAL non-PAL entries removed ───────────────────────────────────────────
+
+    def test_katamari_damacy_pal_removed(self):
+        """Wave 121: Katamari Damacy had no PAL release and was removed."""
+        self.assertNotIn("Katamari Damacy (PAL)", self.pal)
+
+    def test_neopets_pal_removed(self):
+        """Wave 121: Neopets: The Darkest Fairy had no PAL release and was removed."""
+        self.assertNotIn("Neopets: The Darkest Fairy (PAL)", self.pal)
+
+    def test_tales_of_the_abyss_pal_removed(self):
+        """Wave 121: Tales of the Abyss had no PAL PS2 release and was removed."""
+        self.assertNotIn("Tales of the Abyss (PAL)", self.pal)
+
+    # ── JP DB additions ───────────────────────────────────────────────────────
+
+    def test_gran_turismo_3_jp_serial(self):
+        self.assertEqual(self._jp_serial("Gran Turismo 3: A-Spec (JP)"), "SCPS-15009")
+
+    def test_gran_turismo_4_jp_serial(self):
+        self.assertEqual(self._jp_serial("Gran Turismo 4 (JP)"), "SCPS-17001")
+
+    def test_tekken_4_jp_serial(self):
+        self.assertEqual(self._jp_serial("Tekken 4 (JP)"), "SCPS-55017")
+
+    def test_tekken_5_jp_serial(self):
+        self.assertEqual(self._jp_serial("Tekken 5 (JP)"), "SLPS-25406")
+
+    def test_god_of_war_jp_serial(self):
+        self.assertEqual(self._jp_serial("God of War (JP)"), "SLPM-66167")
+
+    def test_god_of_war_ii_jp_serial(self):
+        self.assertEqual(self._jp_serial("God of War II (JP)"), "SLPM-67013")
+
+    def test_jak_daxter_jp_serial(self):
+        self.assertEqual(self._jp_serial("Jak & Daxter: The Precursor Legacy (JP)"), "SCPS-56003")
+
+    def test_jak_ii_jp_serial(self):
+        self.assertEqual(self._jp_serial("Jak II: Renegade (JP)"), "SCPS-15021")
+
+    def test_ratchet_clank_2_jp_serial(self):
+        self.assertEqual(self._jp_serial("Ratchet & Clank 2 (JP)"), "SCPS-15056")
+
+    def test_ratchet_clank_3_jp_serial(self):
+        self.assertEqual(self._jp_serial("Ratchet & Clank 3 (JP)"), "SCPS-15084")
+
+    def test_ryu_ga_gotoku_jp_serial(self):
+        self.assertEqual(self._jp_serial("Ryu ga Gotoku (JP)"), "SLPM-66168")
+
+    def test_ryu_ga_gotoku_2_jp_serial(self):
+        self.assertEqual(self._jp_serial("Ryu ga Gotoku 2 (JP)"), "SLPM-66602")
+
+    def test_ar_tonelico_jp_serial(self):
+        self.assertEqual(self._jp_serial("Ar Tonelico: Melody of Elemia (JP)"), "SLPS-25604")
+
+    def test_radiata_stories_jp_serial(self):
+        self.assertEqual(self._jp_serial("Radiata Stories (JP)"), "SLPM-65800")
+
+    def test_burnout_3_jp_serial(self):
+        self.assertEqual(self._jp_serial("Burnout 3: Takedown (JP)"), "SLPM-65719")
+
+    def test_wild_arms_3_jp_serial(self):
+        self.assertEqual(self._jp_serial("Wild ARMs: Advanced 3rd (JP)"), "SCPS-15023")
+
+    def test_wild_arms_4_jp_serial(self):
+        self.assertEqual(self._jp_serial("Wild ARMs: The 4th Detonator (JP)"), "SCPS-15091")
+
+    def test_growlanser_iii_jp_serial(self):
+        self.assertEqual(self._jp_serial("Growlanser III: The Dual Darkness (JP)"), "SLPM-62107")
+
+    def test_smt_nocturne_maniacs_jp_serial(self):
+        self.assertEqual(self._jp_serial("Shin Megami Tensei III: Nocturne - Maniacs (JP)"), "SLPM-65461")
+
+    def test_vf4_jp_serial(self):
+        self.assertEqual(self._jp_serial("Virtua Fighter 4 (JP)"), "SLPM-62130")
+
+    def test_ffxii_zodiac_jp_serial(self):
+        self.assertEqual(self._jp_serial("Final Fantasy XII International: Zodiac Job System (JP)"), "SLPM-66750")
+
+    def test_marvel_vs_capcom_2_jp_serial(self):
+        self.assertEqual(self._jp_serial("Marvel vs. Capcom 2 (JP)"), "SLPM-62227")
+
+    def test_kof_2002_jp_serial(self):
+        self.assertEqual(self._jp_serial("King of Fighters 2002, The (JP)"), "SLPS-25347")
+
+    # ── JP fake serial removed ────────────────────────────────────────────────
+
+    def test_shadow_hearts_ii_duplicate_removed(self):
+        """Wave 121: Shadow Hearts II (JP) with fake SLPM-60214 removed (duplicate of Covenant entry)."""
+        for title, data in self.jp.items():
+            self.assertNotEqual(data.get("serial"), "SLPM-60214",
+                                f"Fake serial SLPM-60214 still in JP DB for '{title}'")
