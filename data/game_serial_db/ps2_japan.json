@@ -28400,7 +28400,6 @@
     },
     "Tekken 5 (JP)": {
       "alt_serials": [
-        "SLPS-25510",
         "SLPS-73223"
       ],
       "crcs": [],
@@ -28409,7 +28408,7 @@
       "publisher": "Namco",
       "region": "JP",
       "release_date": "2004-12-30",
-      "serial": "SLPS-25406"
+      "serial": "SLPS-25510"
     },
     "Tekken Tag Tournament (JP)": {
       "alt_serials": [

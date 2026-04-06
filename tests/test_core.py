@@ -14934,9 +14934,10 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
             )
 
     def test_nfs_series_progression_pal(self):
-        """PAL DB must have NFS Underground, Underground 2, Most Wanted, and Carbon."""
+        """PAL DB must have NFS Underground, Underground 2, Most Wanted, and Carbon.
+        Wave 127: NFS Underground serial corrected from SLES-50978 to SLES-51967."""
         serials = {info["serial"] for info in self.games.values()}
-        self.assertIn("SLES-50978", serials, "NFS Underground (SLES-50978) must be present")
+        self.assertIn("SLES-51967", serials, "NFS Underground (SLES-51967) must be present")
         self.assertIn("SLES-52725", serials, "NFS Underground 2 (SLES-52725) must be present")
         self.assertIn("SLES-53557", serials, "NFS Most Wanted (SLES-53557) must be present")
         self.assertIn("SLES-54493", serials, "NFS Carbon (SLES-54493) must be present")
@@ -15182,8 +15183,8 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self._assert_crc_game("E09E454C", "Dragon Quest V (SLPM-65555)")
 
     def test_f26af996_smugglers_run2_game_name(self):
-        """F26AF996: game name updated to include serial (resolved in Wave 75)."""
-        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
+        """F26AF996: game name updated to include serial (resolved in Wave 75; serial corrected to SLES-50341 in Wave 127)."""
+        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50341)")
 
     def test_02e1970f_sega_ages_26_game_name(self):
         """02E1970F: game name updated to include corrected serial (SLPM-62717, corrected in Wave 120)."""
@@ -15419,8 +15420,8 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertEqual(len(self._crc_entries("EF97EC8F")), 6)
 
     def test_f26af996_smugglers_run2_serial(self):
-        """F26AF996: all 5 entries must have game_serial SLES-50477."""
-        self._assert_crc_serial("F26AF996", "SLES-50477")
+        """F26AF996: all 5 entries must have game_serial SLES-50341 (corrected in Wave 127; SLES-50477 = WWF SmackDown! Just Bring It)."""
+        self._assert_crc_serial("F26AF996", "SLES-50341")
         self.assertEqual(len(self._crc_entries("F26AF996")), 5)
 
     def test_e09e454c_dqv_serial(self):
@@ -15458,8 +15459,8 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self._assert_crc_game("EF97EC8F", "10,000 Bullets (SLES-53481)")
 
     def test_f26af996_smugglers_run2_game_name(self):
-        """F26AF996: game name must include serial."""
-        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50477)")
+        """F26AF996: game name must include serial (corrected to SLES-50341 in Wave 127)."""
+        self._assert_crc_game("F26AF996", "Smuggler's Run 2: Hostile Territory (SLES-50341)")
 
     def test_e09e454c_dqv_game_name(self):
         """E09E454C: game name must include corrected serial (SLPM-65555)."""
@@ -15504,9 +15505,9 @@ class TestWave75EmptySerialFix(unittest.TestCase):
         self.assertIn("EF97EC8F", g.get('crcs', []))
 
     def test_pal_db_smugglers_run2_entry(self):
-        """PAL DB must have Smuggler's Run 2: Hostile Territory (PAL) with serial SLES-50477."""
+        """PAL DB must have Smuggler's Run 2: Hostile Territory (PAL) with serial SLES-50341 (corrected from SLES-50477 in Wave 127; SLES-50477 = WWF SmackDown! Just Bring It)."""
         g = self.pal_db['games'].get("Smuggler's Run 2: Hostile Territory (PAL)", {})
-        self.assertEqual(g.get('serial'), "SLES-50477")
+        self.assertEqual(g.get('serial'), "SLES-50341")
         self.assertIn("F26AF996", g.get('crcs', []))
 
     def test_pal_db_dqv_japan_entry(self):
@@ -17708,12 +17709,12 @@ class TestWave87ConnectivityAndDbFixes(unittest.TestCase):
     # PAL DB: God Hand added
     # ------------------------------------------------------------------
     def test_god_hand_pal_serial_in_db(self):
-        """SLES-53091 (God Hand PAL) must be in SerialDatabase."""
-        titles = self.sdb.titles_for_serial("SLES-53091")
-        self.assertTrue(len(titles) > 0, "SLES-53091 (God Hand PAL) must be in SerialDatabase")
+        """SLES-54490 (God Hand PAL) must be in SerialDatabase (corrected from SLES-53091 in Wave 127)."""
+        titles = self.sdb.titles_for_serial("SLES-54490")
+        self.assertTrue(len(titles) > 0, "SLES-54490 (God Hand PAL) must be in SerialDatabase")
         self.assertTrue(
             any("god hand" in t.lower() for t in titles),
-            f"SLES-53091 should map to God Hand, got: {titles}"
+            f"SLES-54490 should map to God Hand, got: {titles}"
         )
 
     # ------------------------------------------------------------------
@@ -20270,9 +20271,9 @@ class TestWave109DbAltSerialFixes(unittest.TestCase):
         self.assertNotIn("SLES-51719", alts)
 
     def test_burnout3_pal_main_serial_unchanged(self):
-        """Wave 109: Burnout 3: Takedown (PAL) main serial remains SLES-54586."""
+        """Wave 109/127: Burnout 3: Takedown (PAL) main serial corrected to SLES-52584 (was SLES-54586 before Wave 127)."""
         entry = self.pal.get("Burnout 3: Takedown (PAL)", {})
-        self.assertEqual(entry.get("serial"), "SLES-54586")
+        self.assertEqual(entry.get("serial"), "SLES-52584")
 
     def test_burnout3_pal_valid_alt_serial_kept(self):
         """Wave 109/126: Burnout 3: Takedown (PAL) must NOT have SLES-53353 as alt.
@@ -21691,7 +21692,8 @@ class TestWave121DbSerialFixes(unittest.TestCase):
         self.assertEqual(self._jp_serial("Tekken 4 (JP)"), "SCPS-55017")
 
     def test_tekken_5_jp_serial(self):
-        self.assertEqual(self._jp_serial("Tekken 5 (JP)"), "SLPS-25406")
+        """Wave 121/127: Tekken 5 (JP) serial corrected to SLPS-25510 (was SLPS-25406 which is Hitman: Contracts)."""
+        self.assertEqual(self._jp_serial("Tekken 5 (JP)"), "SLPS-25510")
 
     def test_god_of_war_jp_serial(self):
         self.assertEqual(self._jp_serial("God of War (JP)"), "SLPM-66167")
@@ -22516,3 +22518,287 @@ class TestWave126DuplicateSerialFixes(unittest.TestCase):
         alts = g.get("alt_serials", [])
         self.assertNotIn("SCPS-19320", alts, "SCPS-19320 is Wander to Kyozou main serial")
         self.assertNotIn("SCPS-19335", alts, "SCPS-19335 is Wander to Kyozou alt serial")
+
+
+class TestWave127SerialFixes(unittest.TestCase):
+    """Wave 127: Fix wrong main serials in PAL and JP databases.
+
+    PAL fixes: 25 entries corrected — 6 removed (correct entries already existed
+    under different titles), 11 swapped (wrong main serial promoted from alt_serials),
+    and 8 simple serial updates. JP fix: Tekken 5 (JP) main serial corrected from
+    SLPS-25406 (Hitman: Contracts) to SLPS-25510 (actual Tekken 5 JP serial).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    # ── PAL count regression ──────────────────────────────────────────────────
+
+    def test_pal_game_count_wave127(self):
+        """Wave 127: PAL DB must have at least 2647 entries after 6 removals."""
+        self.assertGreaterEqual(len(self.pal_games), 2647,
+            f"PAL DB has only {len(self.pal_games)} entries, expected >= 2647")
+
+    # ── Removed entries no longer exist with wrong serials ────────────────────
+
+    def test_dmc2_wrong_entry_removed(self):
+        """Wave 127: 'Devil May Cry 2 (PAL)' with wrong serial SLES-51265 removed."""
+        g = self.pal_games.get("Devil May Cry 2 (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SLES-51265",
+            "SLES-51265 does not belong to DMC2; entry should be removed")
+
+    def test_dq8_wrong_entry_removed(self):
+        """Wave 127: 'Dragon Quest VIII: Journey of the Cursed King (PAL)' wrong entry removed."""
+        g = self.pal_games.get("Dragon Quest VIII: Journey of the Cursed King (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SLES-53831",
+            "SLES-53831 is wrong; correct entry is 'Dragon Quest: The Journey of the Cursed King (PAL)'")
+
+    def test_singstar_wrong_entry_removed(self):
+        """Wave 127: 'SingStar (PAL)' with wrong serial SCES-53372 removed."""
+        g = self.pal_games.get("SingStar (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SCES-53372",
+            "SCES-53372 is wrong; correct entry is 'Singstar (PAL)' with SCES-52565")
+
+    def test_soulcalibur2_wrong_entry_removed(self):
+        """Wave 127: 'SoulCalibur II (PAL)' with wrong serial SCES-52423 removed."""
+        g = self.pal_games.get("SoulCalibur II (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SCES-52423",
+            "SCES-52423 is wrong; correct entry is 'Soulcalibur II (PAL)' with SLES-51799")
+
+    def test_star_ocean_wrong_entry_removed(self):
+        """Wave 127: 'Star Ocean: Till the End of Time (PAL)' wrong entry removed."""
+        g = self.pal_games.get("Star Ocean: Till the End of Time (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SLES-52959",
+            "SLES-52959 is wrong; correct entries are the Disc 1/2 entries")
+
+    def test_wwe_hctp_wrong_entry_removed(self):
+        """Wave 127: 'WWE SmackDown!: Here Comes the Pain (PAL)' wrong entry removed."""
+        g = self.pal_games.get("WWE SmackDown!: Here Comes the Pain (PAL)", {})
+        self.assertNotEqual(g.get("serial"), "SLES-51717",
+            "SLES-51717 is wrong; correct entry is 'WWE SmackDown! Here Comes the Pain (PAL)' with SLES-52036")
+
+    # ── Simple serial updates ─────────────────────────────────────────────────
+
+    def test_burnout3_serial_corrected(self):
+        """Wave 127: Burnout 3: Takedown (PAL) serial corrected to SLES-52584."""
+        g = self.pal_games.get("Burnout 3: Takedown (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-52584",
+            f"Expected SLES-52584, got {g.get('serial')}")
+        self.assertNotIn("SLES-54586", g.get("alt_serials", []),
+            "Wrong serial SLES-54586 should not remain as alt")
+
+    def test_dbz_budokai_tenkaichi_serial_corrected(self):
+        """Wave 127: Dragon Ball Z: Budokai Tenkaichi (PAL) serial corrected to SLES-53200."""
+        g = self.pal_games.get("Dragon Ball Z: Budokai Tenkaichi (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-53200",
+            f"Expected SLES-53200, got {g.get('serial')}")
+
+    def test_dbz_budokai_tenkaichi3_serial_corrected(self):
+        """Wave 127: Dragon Ball Z: Budokai Tenkaichi 3 (PAL) serial corrected to SLES-54945."""
+        g = self.pal_games.get("Dragon Ball Z: Budokai Tenkaichi 3 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-54945",
+            f"Expected SLES-54945, got {g.get('serial')}")
+
+    def test_forbidden_siren2_serial_corrected(self):
+        """Wave 127: Forbidden Siren 2 (PAL) serial corrected to SCES-53851."""
+        g = self.pal_games.get("Forbidden Siren 2 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SCES-53851",
+            f"Expected SCES-53851, got {g.get('serial')}")
+
+    def test_nfs_underground_serial_corrected(self):
+        """Wave 127: Need for Speed: Underground (PAL) serial corrected to SLES-51967."""
+        g = self.pal_games.get("Need for Speed: Underground (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-51967",
+            f"Expected SLES-51967, got {g.get('serial')}")
+
+    def test_pop_warrior_within_serial_corrected(self):
+        """Wave 127: Prince of Persia: Warrior Within (PAL) serial corrected to SLES-52822."""
+        g = self.pal_games.get("Prince of Persia: Warrior Within (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-52822",
+            f"Expected SLES-52822, got {g.get('serial')}")
+
+    def test_tekken5_pal_serial_corrected(self):
+        """Wave 127: Tekken 5 (PAL) serial corrected to SCES-53202."""
+        g = self.pal_games.get("Tekken 5 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SCES-53202",
+            f"Expected SCES-53202, got {g.get('serial')}")
+        self.assertNotIn("SLES-53014", g.get("alt_serials", []),
+            "Wrong serial SLES-53014 should not remain as alt")
+
+    def test_zoe1_pal_serial_corrected(self):
+        """Wave 127: Zone of the Enders (PAL) serial corrected to SLES-50111."""
+        g = self.pal_games.get("Zone of the Enders (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-50111",
+            f"Expected SLES-50111, got {g.get('serial')}")
+
+    # ── Swap (main serial was wrong; correct was already an alt) ─────────────
+
+    def test_god_hand_pal_serial_swapped(self):
+        """Wave 127: God Hand (PAL) main serial swapped to SLES-54490."""
+        g = self.pal_games.get("God Hand (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-54490",
+            f"Expected SLES-54490, got {g.get('serial')}")
+        self.assertNotIn("SLES-53091", g.get("alt_serials", []),
+            "Wrong serial SLES-53091 should not remain")
+
+    def test_jak3_pal_serial_swapped(self):
+        """Wave 127: Jak 3 (PAL) main serial swapped to SCES-52460."""
+        g = self.pal_games.get("Jak 3 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SCES-52460",
+            f"Expected SCES-52460, got {g.get('serial')}")
+        self.assertNotIn("SCES-52456", g.get("alt_serials", []),
+            "Wrong serial SCES-52456 should not remain")
+
+    def test_mgs2_substance_pal_serial_swapped(self):
+        """Wave 127: Metal Gear Solid 2: Substance (PAL) main serial swapped to SLES-82009."""
+        g = self.pal_games.get("Metal Gear Solid 2: Substance (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-82009",
+            f"Expected SLES-82009, got {g.get('serial')}")
+        self.assertNotIn("SLES-51290", g.get("alt_serials", []),
+            "Wrong serial SLES-51290 should not remain")
+
+    def test_mgs3_pal_serial_swapped(self):
+        """Wave 127: Metal Gear Solid 3: Snake Eater (PAL) main serial swapped to SLES-82013."""
+        g = self.pal_games.get("Metal Gear Solid 3: Snake Eater (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-82013",
+            f"Expected SLES-82013, got {g.get('serial')}")
+        self.assertNotIn("SLES-52557", g.get("alt_serials", []),
+            "Wrong serial SLES-52557 should not remain")
+
+    def test_pop_two_thrones_pal_serial_swapped(self):
+        """Wave 127: Prince of Persia: The Two Thrones (PAL) main serial swapped to SLES-53777."""
+        g = self.pal_games.get("Prince of Persia: The Two Thrones (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-53777",
+            f"Expected SLES-53777, got {g.get('serial')}")
+        self.assertNotIn("SLES-53741", g.get("alt_serials", []),
+            "Wrong serial SLES-53741 should not remain")
+
+    def test_silent_hill2_pal_serial_swapped(self):
+        """Wave 127: Silent Hill 2 (PAL) main serial swapped to SLES-50382."""
+        g = self.pal_games.get("Silent Hill 2 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-50382",
+            f"Expected SLES-50382, got {g.get('serial')}")
+        self.assertNotIn("SLES-50356", g.get("alt_serials", []),
+            "Wrong serial SLES-50356 should not remain")
+
+    def test_smugglers_run2_pal_serial_swapped(self):
+        """Wave 127: Smuggler's Run 2 (PAL) main serial swapped to SLES-50341."""
+        g = self.pal_games.get("Smuggler's Run 2: Hostile Territory (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-50341",
+            f"Expected SLES-50341, got {g.get('serial')}")
+        self.assertNotIn("SLES-50477", g.get("alt_serials", []),
+            "Wrong serial SLES-50477 should not remain")
+
+    def test_star_wars_battlefront_pal_serial_swapped(self):
+        """Wave 127: Star Wars: Battlefront (PAL) main serial swapped to SLES-52545."""
+        g = self.pal_games.get("Star Wars: Battlefront (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-52545",
+            f"Expected SLES-52545, got {g.get('serial')}")
+        self.assertNotIn("SLES-51450", g.get("alt_serials", []),
+            "Wrong serial SLES-51450 should not remain")
+
+    def test_wwe_svr_pal_serial_swapped(self):
+        """Wave 127: WWE SmackDown! vs. Raw (PAL) main serial swapped to SLES-52781."""
+        g = self.pal_games.get("WWE SmackDown! vs. Raw (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-52781",
+            f"Expected SLES-52781, got {g.get('serial')}")
+        self.assertNotIn("SLES-51459", g.get("alt_serials", []),
+            "Wrong serial SLES-51459 should not remain")
+
+    def test_wwe_svr2006_pal_serial_swapped(self):
+        """Wave 127: WWE SmackDown! vs. Raw 2006 (PAL) main serial swapped to SLES-53676."""
+        g = self.pal_games.get("WWE SmackDown! vs. Raw 2006 (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-53676",
+            f"Expected SLES-53676, got {g.get('serial')}")
+        self.assertNotIn("SLES-52546", g.get("alt_serials", []),
+            "Wrong serial SLES-52546 should not remain")
+
+    def test_yakuza_pal_serial_swapped(self):
+        """Wave 127: Yakuza (PAL) main serial swapped to SLES-54171."""
+        g = self.pal_games.get("Yakuza (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-54171",
+            f"Expected SLES-54171, got {g.get('serial')}")
+        self.assertNotIn("SLES-54169", g.get("alt_serials", []),
+            "Wrong serial SLES-54169 should not remain")
+
+    # ── Replaced entries still exist in DB ───────────────────────────────────
+
+    def test_dmc2_correct_entries_present(self):
+        """Wave 127: Correct DMC2 disc entries exist in PAL DB."""
+        all_serials = {}
+        for t, g in self.pal_games.items():
+            if g.get("serial"): all_serials[g["serial"]] = t
+            for a in g.get("alt_serials", []): all_serials[a] = t
+        self.assertIn("SLES-82011", all_serials,
+            "SLES-82011 (DMC2 Disc 1) should exist in PAL DB")
+        self.assertIn("SLES-82012", all_serials,
+            "SLES-82012 (DMC2 Disc 2) should exist in PAL DB")
+
+    def test_dq8_correct_entry_present(self):
+        """Wave 127: Correct DQ8 entry (SLES-53974) exists in PAL DB."""
+        all_serials = {g["serial"]: t for t, g in self.pal_games.items() if g.get("serial")}
+        self.assertIn("SLES-53974", all_serials,
+            "SLES-53974 (DQ: Journey of the Cursed King) should exist in PAL DB")
+
+    def test_soulcalibur2_correct_entry_present(self):
+        """Wave 127: Correct SoulCalibur II entry (SLES-51799) exists in PAL DB."""
+        all_serials = {g["serial"]: t for t, g in self.pal_games.items() if g.get("serial")}
+        self.assertIn("SLES-51799", all_serials,
+            "SLES-51799 (Soulcalibur II PAL) should exist in PAL DB")
+
+    # ── No duplicate serials ──────────────────────────────────────────────────
+
+    def test_pal_no_duplicate_serials_wave127(self):
+        """Wave 127: PAL DB must have zero serials appearing in more than one entry."""
+        from collections import defaultdict
+        serial_to_titles = defaultdict(list)
+        for title, g in self.pal_games.items():
+            s = g.get("serial", "")
+            if s:
+                serial_to_titles[s].append(title)
+            for alt in g.get("alt_serials", []):
+                serial_to_titles[alt].append(title)
+        dups = {s: ts for s, ts in serial_to_titles.items() if len(ts) > 1}
+        self.assertEqual(len(dups), 0,
+            f"PAL DB has {len(dups)} duplicate serials: {list(dups.items())[:3]}")
+
+    # ── JP Tekken 5 fix ───────────────────────────────────────────────────────
+
+    def test_tekken5_jp_serial_corrected(self):
+        """Wave 127: Tekken 5 (JP) main serial corrected to SLPS-25510."""
+        g = self.jp_games.get("Tekken 5 (JP)", {})
+        self.assertEqual(g.get("serial"), "SLPS-25510",
+            f"Expected SLPS-25510 (Tekken 5 JP), got {g.get('serial')}")
+
+    def test_tekken5_jp_wrong_serial_removed(self):
+        """Wave 127: Tekken 5 (JP) wrong serial SLPS-25406 (Hitman: Contracts) not present."""
+        g = self.jp_games.get("Tekken 5 (JP)", {})
+        self.assertNotEqual(g.get("serial"), "SLPS-25406",
+            "SLPS-25406 is Hitman: Contracts, not Tekken 5 JP")
+        self.assertNotIn("SLPS-25406", g.get("alt_serials", []),
+            "Wrong serial SLPS-25406 should not be in alt_serials")
+
+    def test_tekken5_jp_alt_serial_retained(self):
+        """Wave 127: Tekken 5 (JP) retains SLPS-73223 (PS2 The Best edition) as alt."""
+        g = self.jp_games.get("Tekken 5 (JP)", {})
+        self.assertIn("SLPS-73223", g.get("alt_serials", []),
+            "SLPS-73223 (Tekken 5 PS2 The Best) should remain as alt serial")
+
+    def test_jp_no_duplicate_serials_wave127(self):
+        """Wave 127: JP DB must have zero serials appearing in more than one entry."""
+        from collections import defaultdict
+        serial_to_titles = defaultdict(list)
+        for title, g in self.jp_games.items():
+            s = g.get("serial", "")
+            if s:
+                serial_to_titles[s].append(title)
+            for alt in g.get("alt_serials", []):
+                serial_to_titles[alt].append(title)
+        dups = {s: ts for s, ts in serial_to_titles.items() if len(ts) > 1}
+        self.assertEqual(len(dups), 0,
+            f"JP DB has {len(dups)} duplicate serials: {list(dups.items())[:3]}")

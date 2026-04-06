@@ -2033,7 +2033,7 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2004-09-10",
-      "serial": "SLES-54586"
+      "serial": "SLES-52584"
     },
     "Burnout 3: Takedown: Platinum (Most Wanted) (PAL)": {
       "alt_serials": [],
@@ -4564,19 +4564,6 @@
       "release_date": "2003-01-29",
       "serial": "SLES-82012"
     },
-    "Devil May Cry 2 (PAL)": {
-      "aliases": [
-        "DMC2"
-      ],
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom",
-      "genre": "Action",
-      "publisher": "Capcom",
-      "region": "PAL",
-      "release_date": "2003-07-11",
-      "serial": "SLES-51265"
-    },
     "Devil May Cry 3: Dante's Awakening (PAL)": {
       "aliases": [
         "DMC 3",
@@ -5667,7 +5654,7 @@
       "publisher": "Atari",
       "region": "PAL",
       "release_date": "2005-11-25",
-      "serial": "SLES-53713"
+      "serial": "SLES-53200"
     },
     "Dragon Ball Z: Budokai Tenkaichi 2 (PAL)": {
       "aliases": [
@@ -5695,7 +5682,7 @@
       "publisher": "Namco Bandai Games",
       "region": "PAL",
       "release_date": "2007-11-09",
-      "serial": "SLES-54994"
+      "serial": "SLES-54945"
     },
     "Dragon Ball Z: Infinite World (PAL)": {
       "alt_serials": [],
@@ -5712,16 +5699,6 @@
       "publisher": "505 Game Street",
       "release_date": "2006",
       "serial": "SLES-53874"
-    },
-    "Dragon Quest VIII: Journey of the Cursed King (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Level-5",
-      "genre": "RPG",
-      "publisher": "Square Enix",
-      "region": "PAL",
-      "release_date": "2006-11-24",
-      "serial": "SLES-53831"
     },
     "Dragon Quest: The Journey of the Cursed King (PAL)": {
       "alt_serials": [
@@ -7480,7 +7457,7 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2006-09-06",
-      "serial": "SLES-53853"
+      "serial": "SCES-53851"
     },
     "Forbidden Siren [CZ][HU][PL][SK] (PAL)": {
       "alt_serials": [],
@@ -8295,16 +8272,14 @@
       "serial": "SLES-52433"
     },
     "God Hand (PAL)": {
-      "alt_serials": [
-        "SLES-54490"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Clover Studio",
       "genre": "Action",
       "publisher": "Capcom",
       "region": "PAL",
       "release_date": "2007-04-06",
-      "serial": "SLES-53091"
+      "serial": "SLES-54490"
     },
     "God of War (PAL)": {
       "aliases": [
@@ -9874,8 +9849,7 @@
     },
     "Jak 3 (PAL)": {
       "alt_serials": [
-        "SCED-52952",
-        "SCES-52460"
+        "SCED-52952"
       ],
       "crcs": [],
       "developer": "Naughty Dog",
@@ -9883,7 +9857,7 @@
       "publisher": "Sony Computer Entertainment",
       "region": "PAL",
       "release_date": "2004-12-10",
-      "serial": "SCES-52456"
+      "serial": "SCES-52460"
     },
     "Jak II (PAL)": {
       "alt_serials": [
@@ -11923,23 +11897,20 @@
       "serial": "SLES-50383"
     },
     "Metal Gear Solid 2: Substance (PAL)": {
-      "alt_serials": [
-        "SLES-82009"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Konami",
       "genre": "Action",
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2003-04-11",
-      "serial": "SLES-51290"
+      "serial": "SLES-82009"
     },
     "Metal Gear Solid 3: Snake Eater (PAL)": {
       "aliases": [
         "MGS3"
       ],
       "alt_serials": [
-        "SLES-82013",
         "SLES-82024",
         "SLES-82026",
         "SLES-82032"
@@ -11950,7 +11921,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2004-12-10",
-      "serial": "SLES-52557"
+      "serial": "SLES-82013"
     },
     "Metal Gear Solid 3: Subsistence (Disc 1) (Subsistence) (PAL)": {
       "alt_serials": [
@@ -13346,7 +13317,7 @@
       "publisher": "Electronic Arts",
       "region": "PAL",
       "release_date": "2003-11-21",
-      "serial": "SLES-50978"
+      "serial": "SLES-51967"
     },
     "Need for Speed: Underground 2 (PAL)": {
       "aliases": [
@@ -14773,16 +14744,14 @@
       "serial": "SLES-51918"
     },
     "Prince of Persia: The Two Thrones (PAL)": {
-      "alt_serials": [
-        "SLES-53777"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Ubisoft Montreal",
       "genre": "Action-Adventure",
       "publisher": "Ubisoft",
       "region": "PAL",
       "release_date": "2005-12-02",
-      "serial": "SLES-53741"
+      "serial": "SLES-53777"
     },
     "Prince of Persia: Warrior Within (PAL)": {
       "alt_serials": [],
@@ -14792,7 +14761,7 @@
       "publisher": "Ubisoft",
       "region": "PAL",
       "release_date": "2004-12-10",
-      "serial": "SLES-52726"
+      "serial": "SLES-52822"
     },
     "Prisoner of War (PAL)": {
       "alt_serials": [],
@@ -17055,7 +17024,6 @@
         "SH2"
       ],
       "alt_serials": [
-        "SLES-50382",
         "SLES-50966"
       ],
       "crcs": [],
@@ -17064,7 +17032,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2002-02-22",
-      "serial": "SLES-50356"
+      "serial": "SLES-50382"
     },
     "Silent Hill 2: Director's Cut (PAL)": {
       "alt_serials": [],
@@ -17184,16 +17152,6 @@
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2007-08-03",
       "serial": "SCES-54599"
-    },
-    "SingStar (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "SCE London Studio",
-      "genre": "Music",
-      "publisher": "Sony Computer Entertainment",
-      "region": "PAL",
-      "release_date": "2004-10-01",
-      "serial": "SCES-53372"
     },
     "SingStar ABBA (PAL)": {
       "alt_serials": [
@@ -18188,9 +18146,7 @@
       "serial": "SLES-50055"
     },
     "Smuggler's Run 2: Hostile Territory (PAL)": {
-      "alt_serials": [
-        "SLES-50341"
-      ],
+      "alt_serials": [],
       "crcs": [
         "F26AF996"
       ],
@@ -18199,7 +18155,7 @@
       "publisher": "Rockstar Games",
       "region": "PAL",
       "release_date": "2002-02-22",
-      "serial": "SLES-50477"
+      "serial": "SLES-50341"
     },
     "Sniper Assault (PAL)": {
       "alt_serials": [],
@@ -18360,19 +18316,6 @@
       "publisher": "Koei",
       "release_date": "2008-06-27",
       "serial": "SLES-55167"
-    },
-    "SoulCalibur II (PAL)": {
-      "alt_serials": [
-        "SCED-52423",
-        "SCED-52618"
-      ],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Fighting",
-      "publisher": "Namco",
-      "region": "PAL",
-      "release_date": "2003-06-27",
-      "serial": "SCES-52423"
     },
     "SoulCalibur III (PAL)": {
       "alt_serials": [
@@ -18765,16 +18708,6 @@
       "release_date": "2004-10-01",
       "serial": "SLES-82029"
     },
-    "Star Ocean: Till the End of Time (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "tri-Ace",
-      "genre": "Action-RPG",
-      "publisher": "Ubisoft",
-      "region": "PAL",
-      "release_date": "2004-10-22",
-      "serial": "SLES-52959"
-    },
     "Star Trek: Conquest (PAL)": {
       "alt_serials": [],
       "developer": "4J Studios",
@@ -18809,7 +18742,6 @@
     },
     "Star Wars: Battlefront (PAL)": {
       "alt_serials": [
-        "SLES-52545",
         "SLES-52547"
       ],
       "crcs": [],
@@ -18818,7 +18750,7 @@
       "publisher": "LucasArts",
       "region": "PAL",
       "release_date": "2004-09-24",
-      "serial": "SLES-51450"
+      "serial": "SLES-52545"
     },
     "Star Wars: Battlefront II (PAL)": {
       "alt_serials": [
@@ -19781,7 +19713,7 @@
       "publisher": "Namco",
       "region": "PAL",
       "release_date": "2005-02-25",
-      "serial": "SLES-53014"
+      "serial": "SCES-53202"
     },
     "Tekken Tag Tournament (PAL)": {
       "alt_serials": [
@@ -22388,20 +22320,17 @@
       "serial": "SLES-51283"
     },
     "WWE SmackDown! vs. Raw (PAL)": {
-      "alt_serials": [
-        "SLES-52781"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Yuke's",
       "genre": "Sports",
       "publisher": "THQ",
       "region": "PAL",
       "release_date": "2004-12-03",
-      "serial": "SLES-51459"
+      "serial": "SLES-52781"
     },
     "WWE SmackDown! vs. Raw 2006 (PAL)": {
       "alt_serials": [
-        "SLES-53676",
         "SLES-53677"
       ],
       "crcs": [],
@@ -22410,17 +22339,7 @@
       "publisher": "THQ",
       "region": "PAL",
       "release_date": "2005-11-04",
-      "serial": "SLES-52546"
-    },
-    "WWE SmackDown!: Here Comes the Pain (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Yuke's",
-      "genre": "Wrestling",
-      "publisher": "THQ",
-      "region": "PAL",
-      "release_date": "2003-11-07",
-      "serial": "SLES-51717"
+      "serial": "SLES-53676"
     },
     "WWI: Aces of the Sky (PAL)": {
       "alt_serials": [],
@@ -23266,16 +23185,14 @@
       "serial": "SLES-54784"
     },
     "Yakuza (PAL)": {
-      "alt_serials": [
-        "SLES-54171"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Ryu Ga Gotoku Studio",
       "genre": "Action-Adventure",
       "publisher": "Sega",
       "region": "PAL",
       "release_date": "2006-11-17",
-      "serial": "SLES-54169"
+      "serial": "SLES-54171"
     },
     "Yakuza 2 (PAL)": {
       "alt_serials": [],
@@ -23415,7 +23332,7 @@
       "publisher": "Konami",
       "region": "PAL",
       "release_date": "2001-11-23",
-      "serial": "SLES-50552"
+      "serial": "SLES-50111"
     },
     "Zone of the Enders: The 2nd Runner (PAL)": {
       "alt_serials": [
