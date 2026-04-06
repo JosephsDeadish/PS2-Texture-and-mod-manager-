@@ -2581,9 +2581,9 @@
         "SLPM-65378",
         "SLPM-65876"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Racjin",
+      "genre": "RPG",
+      "publisher": "Atlus",
       "release_date": "",
       "serial": "SLPM-61060"
     },
@@ -4754,8 +4754,8 @@
     },
     "Devil May Cry 3: Trial Version (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Capcom Production Studio 1",
+      "genre": "Action",
       "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-60251"
@@ -4780,8 +4780,8 @@
       "alt_serials": [
         "SLPM-61010"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Capcom",
+      "genre": "Action",
       "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-61008"
@@ -5365,9 +5365,9 @@
     },
     "Dragon Quest Characters: Torneko no Daiboiken 3: Fushigi no Dungeon (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Matrix Software",
+      "genre": "RPG",
+      "publisher": "Enix Corporation",
       "release_date": "",
       "serial": "SCPS-51013"
     },
@@ -5399,9 +5399,9 @@
     },
     "Dragon Quest VIII Premium Eizou Disc (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Level 5",
+      "genre": "RPG.",
+      "publisher": "Square Enix",
       "release_date": "",
       "serial": "SLPM-62490"
     },
@@ -6646,9 +6646,9 @@
     },
     "Fight Night Round (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Sports",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLPM-66072"
     },
@@ -7328,9 +7328,9 @@
     },
     "Fushigi no Umi no Nadia: Dennou Battle: Miss Nautilus Contest (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jinx",
+      "genre": "Adventure/Simulation",
+      "publisher": "Gen-X",
       "release_date": "",
       "serial": "SLPM-66111"
     },
@@ -7496,7 +7496,7 @@
       "alt_serials": [
         "SLPM-62018"
       ],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Horse Racing",
       "publisher": "Koei",
       "release_date": "",
@@ -8516,9 +8516,9 @@
     },
     "God of War II: The End Begins (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony",
+      "genre": "Action/Adventure/Beat'em Up",
+      "publisher": "Capcom, Sony",
       "release_date": "",
       "serial": "SLPM-61161"
     },
@@ -9405,7 +9405,7 @@
         "SLPM-65747"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-61087"
@@ -12356,7 +12356,7 @@
       "alt_serials": [],
       "developer": "ChunSoft",
       "genre": "Adventure/Visual Novel",
-      "publisher": "",
+      "publisher": "ChunSoft",
       "release_date": "",
       "serial": "SLPS-73007"
     },
@@ -13109,7 +13109,7 @@
     },
     "Kidou Senshi Gundam Seed: Owaranai Ashita e (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Strategy",
       "publisher": "Bandai",
       "release_date": "",
@@ -13159,17 +13159,17 @@
     },
     "Kidou Senshi Gundam: Gihren no Yabou: Zeon Dokuritsu Sensouki (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bec",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25120"
     },
     "Kidou Senshi Gundam: Gihren no Yabou: Zeon Dokuritsu Sensouki: Kouryaku Shireisho (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bec",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25212"
     },
@@ -13183,9 +13183,9 @@
     },
     "Kidou Senshi Gundam: Ichinen Sensou (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25478"
     },
@@ -13214,32 +13214,32 @@
       "alt_serials": [
         "SLPS-25485"
       ],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25061"
     },
     "Kidou Senshi Z Gundam: A.E.U.G. vs. Titans (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2003-12-04",
       "serial": "SLPS-25305"
     },
     "Kidou Senshi Z Gundam: AEUG Vs. Titans (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Capcom",
+      "genre": "Action",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPM-73234"
     },
     "Kidou Senshi Z Gundam: AEUG vs. Titans: PlayStation 2 the Best (JP)": {
       "alt_serials": [],
       "developer": "Capcom",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Bandai",
       "release_date": "2006-03-02",
       "serial": "SLPS-73234"
@@ -13881,7 +13881,7 @@
     },
     "Konjiki no Gashbell!! Gekitou! Saikyou no Mamono-tachi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eighting",
       "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "2004-12-02",
@@ -13892,7 +13892,7 @@
         "SLPS-25595",
         "SLPS-25596"
       ],
-      "developer": "",
+      "developer": "Eighting",
       "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "",
@@ -13902,7 +13902,7 @@
       "alt_serials": [
         "SLPM-61074"
       ],
-      "developer": "",
+      "developer": "Eighting",
       "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "2004-03-25",
@@ -13910,7 +13910,7 @@
     },
     "Konjiki no Gashbell!! Yuujou Tag Battle 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eighting",
       "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "2005-03-24",
@@ -16876,7 +16876,7 @@
     },
     "My Home o Tsukurou 2: Juujitsu! Kantan Sekkei!! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Office Create",
       "genre": "Strategy",
       "publisher": "Marvelous Interactive",
       "release_date": "2006-02-23",
@@ -16884,7 +16884,7 @@
     },
     "My Home o Tsukurou 2: Juujitsu! Kantan Sekkei!!: Best Collection (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Office Create",
       "genre": "Strategy",
       "publisher": "Marvelous Interactive",
       "release_date": "2007-10-18",
@@ -17541,9 +17541,9 @@
     },
     "Need for Speed: Most Wanted (EA-SY! 1980) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Black Box",
+      "genre": "Racing",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-55003"
     },
@@ -17575,9 +17575,9 @@
     },
     "Need for Speed: Undercover (EA-SY! 1980) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Exient Entertainment",
+      "genre": "Racing",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-55244"
     },
@@ -18357,7 +18357,7 @@
     },
     "One Piece: Grand Battle! 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Ganbarion Co. Ltd",
       "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "2003-12-11",
@@ -24421,8 +24421,8 @@
     },
     "Silent Hill 2: Tentou Houei-you Movie-ban (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Konami Computer Entertainment Tokyo (KCET)",
+      "genre": "Action/Adventure/Survival Horror",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-61011"
@@ -26862,7 +26862,7 @@
     },
     "Street Fighter Zero: Fighter's Generation (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Fighting",
       "publisher": "Capcom",
       "release_date": "2006-05-25",
@@ -29056,7 +29056,7 @@
       ],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "SNK Playmore",
       "release_date": "",
       "serial": "SLPS-25448"
     },
@@ -29098,7 +29098,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "SNK Playmore",
       "release_date": "2010-06-24",
       "serial": "SLPS-25983"
     },
@@ -29132,7 +29132,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Ignition Entertainment",
       "release_date": "",
       "serial": "SLPS-25968"
     },
@@ -29694,24 +29694,24 @@
     "Tom Clancy's Splinter Cell: Chaos Theory (UbiSoft Best) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
-      "publisher": "",
+      "genre": "Action",
+      "publisher": "Ubisoft",
       "release_date": "",
       "serial": "SLPM-66496"
     },
     "Tom Clancy's Splinter Cell: Nijuu Spy (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
-      "publisher": "",
+      "genre": "Action",
+      "publisher": "Ubisoft",
       "release_date": "",
       "serial": "SLPM-66672"
     },
     "Tom Clancy's Splinter Cell: Nijuu Spy (UbiSoft Best) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
-      "publisher": "",
+      "genre": "Action",
+      "publisher": "Ubisoft",
       "release_date": "",
       "serial": "SLPM-66868"
     },
@@ -30680,9 +30680,9 @@
     },
     "Velvet File Plus (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Seta Corporation",
       "release_date": "2002-03-07",
       "serial": "SLPS-25097"
     },
@@ -31202,9 +31202,9 @@
       "alt_serials": [
         "SCPS-19333"
       ],
-      "developer": "",
+      "developer": "Media Vision",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SCPS-15118"
     },
@@ -31464,7 +31464,7 @@
       "alt_serials": [
         "SLPM-62550"
       ],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "RPG",
       "publisher": "",
       "release_date": "2003-12-25",
@@ -31472,7 +31472,7 @@
     },
     "Wizardry Empire III: Haou no Keifu: Good Price: Suuryou Genteiban (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "RPG",
       "publisher": "",
       "release_date": "2004-11-25",
