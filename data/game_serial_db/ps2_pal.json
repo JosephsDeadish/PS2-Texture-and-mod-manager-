@@ -252,9 +252,9 @@
     },
     "AFL Live 2004 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "IR Gurus Interactive Ltd.",
+      "genre": "Sports",
+      "publisher": "Acclaim",
       "release_date": "",
       "serial": "SLES-51826"
     },
@@ -268,9 +268,9 @@
     },
     "AFL Live Premiership Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "IR Gurus Interactive Ltd.",
+      "genre": "Sports",
+      "publisher": "Acclaim",
       "release_date": "",
       "serial": "SLES-52368"
     },
@@ -294,9 +294,9 @@
     },
     "AFL Premiership 2007 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "IR Gurus Interactive Ltd.",
+      "genre": "Sports",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-54639"
     },
@@ -2576,9 +2576,9 @@
     },
     "Cabela's Dangerous Adventures (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55331"
     },
@@ -4085,7 +4085,7 @@
     },
     "Dance Europe (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broadsword Interactive",
       "genre": "Rhythm",
       "publisher": "",
       "release_date": "2003-10-03",
@@ -4109,8 +4109,8 @@
     },
     "Dance Party Pop Hits (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Broadsword Interactive",
+      "genre": "Rhythm",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-55461"
@@ -4125,7 +4125,7 @@
     },
     "Dance:UK (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broadsword Interactive",
       "genre": "Rhythm",
       "publisher": "",
       "release_date": "2003-10-03",
@@ -4133,7 +4133,7 @@
     },
     "Dance:UK XL (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broadsword Interactive",
       "genre": "Rhythm",
       "publisher": "",
       "release_date": "2004",
@@ -4149,7 +4149,7 @@
     },
     "Dance:UK XL Party (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broadsword Interactive",
       "genre": "Rhythm",
       "publisher": "Jester Interactive",
       "release_date": "2005-09-16",
@@ -14163,9 +14163,9 @@
         "SLES-55675",
         "SLES-55676"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-55673"
     },
@@ -15616,9 +15616,9 @@
     },
     "Resident Evil Survivor 2: Code: Veronica (0920312) (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "Light Gun Shooter",
-      "publisher": "",
+      "developer": "Capcom",
+      "genre": "Survival Horror",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLES-00560"
     },
@@ -15895,9 +15895,9 @@
     },
     "Rock Band: Song Pack 1 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Harmonix Music Systems",
+      "genre": "Rhythm",
+      "publisher": "MTV Games",
       "release_date": "",
       "serial": "SLES-55344"
     },
@@ -19601,9 +19601,9 @@
     },
     "Tak: The Great Juju Challenge (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Avalanche Software",
+      "genre": "Action/Platformer",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-53418"
     },

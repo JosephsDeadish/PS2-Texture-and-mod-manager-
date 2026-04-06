@@ -23347,3 +23347,205 @@ class TestWave131PatternBasedPalFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 228,
             f"PAL still has {len(empty)} entries without genre, expected <= 228")
+
+
+class TestWave132PalSeriesPatternFills(unittest.TestCase):
+    """Wave 132: Fill PAL metadata from additional series patterns.
+
+    Dance:UK series: 5 entries (Broadsword Interactive / Rhythm).
+    AFL series:      3 entries (IR Gurus Interactive Ltd. / Sports).
+    Rock Band SP1, PES 2014, Resident Evil Survivor 2, Cabela's Dangerous, Tak fills.
+    PAL remaining after wave: dev=288, pub=260, genre=220.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    def test_dance_uk_dev_filled(self):
+        """Wave 132: Dance:UK (PAL) developer filled."""
+        g = self.pal_games.get("Dance:UK (PAL)", {})
+        self.assertEqual(g.get("developer"), "Broadsword Interactive",
+            f"Expected 'Broadsword Interactive', got {g.get('developer')!r}")
+
+    def test_dance_uk_genre_filled(self):
+        """Wave 132: Dance:UK (PAL) genre filled."""
+        g = self.pal_games.get("Dance:UK (PAL)", {})
+        self.assertEqual(g.get("genre"), "Rhythm",
+            f"Expected 'Rhythm', got {g.get('genre')!r}")
+
+    def test_dance_europe_dev_filled(self):
+        """Wave 132: Dance Europe (PAL) developer filled."""
+        g = self.pal_games.get("Dance Europe (PAL)", {})
+        self.assertEqual(g.get("developer"), "Broadsword Interactive",
+            f"Expected 'Broadsword Interactive', got {g.get('developer')!r}")
+
+    def test_afl_live_2004_dev_filled(self):
+        """Wave 132: AFL Live 2004 (PAL) developer filled."""
+        g = self.pal_games.get("AFL Live 2004 (PAL)", {})
+        self.assertEqual(g.get("developer"), "IR Gurus Interactive Ltd.",
+            f"Expected 'IR Gurus Interactive Ltd.', got {g.get('developer')!r}")
+
+    def test_afl_premiership_2007_dev_filled(self):
+        """Wave 132: AFL Premiership 2007 (PAL) developer filled."""
+        g = self.pal_games.get("AFL Premiership 2007 (PAL)", {})
+        self.assertEqual(g.get("developer"), "IR Gurus Interactive Ltd.",
+            f"Expected 'IR Gurus Interactive Ltd.', got {g.get('developer')!r}")
+
+    def test_afl_premiership_2007_pub_filled(self):
+        """Wave 132: AFL Premiership 2007 (PAL) publisher filled."""
+        g = self.pal_games.get("AFL Premiership 2007 (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Sony Computer Entertainment Europe",
+            f"Expected 'Sony Computer Entertainment Europe', got {g.get('publisher')!r}")
+
+    def test_rock_band_sp1_dev_filled(self):
+        """Wave 132: Rock Band: Song Pack 1 (PAL) developer filled."""
+        g = self.pal_games.get("Rock Band: Song Pack 1 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Harmonix Music Systems",
+            f"Expected 'Harmonix Music Systems', got {g.get('developer')!r}")
+
+    def test_pes2014_dev_filled(self):
+        """Wave 132: PES 2014: Pro Evolution Soccer (PAL) developer filled."""
+        g = self.pal_games.get("PES 2014: Pro Evolution Soccer (PAL)", {})
+        self.assertEqual(g.get("developer"), "Konami",
+            f"Expected 'Konami', got {g.get('developer')!r}")
+
+    def test_resident_evil_survivor2_dev_filled(self):
+        """Wave 132: Resident Evil Survivor 2: Code: Veronica (PAL) developer filled."""
+        g = self.pal_games.get("Resident Evil Survivor 2: Code: Veronica (0920312) (PAL)", {})
+        self.assertEqual(g.get("developer"), "Capcom",
+            f"Expected 'Capcom', got {g.get('developer')!r}")
+
+    def test_tak_great_juju_dev_filled(self):
+        """Wave 132: Tak: The Great Juju Challenge (PAL) developer filled."""
+        g = self.pal_games.get("Tak: The Great Juju Challenge (PAL)", {})
+        self.assertEqual(g.get("developer"), "Avalanche Software",
+            f"Expected 'Avalanche Software', got {g.get('developer')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_pal_dev_count_wave132(self):
+        """Wave 132: PAL DB must have at most 288 entries without developer (was 301)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 288,
+            f"PAL still has {len(empty)} entries without developer, expected <= 288")
+
+    def test_pal_genre_count_wave132(self):
+        """Wave 132: PAL DB must have at most 220 entries without genre (was 228)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 220,
+            f"PAL still has {len(empty)} entries without genre, expected <= 220")
+
+
+class TestWave132JpSeriesPatternFills(unittest.TestCase):
+    """Wave 132 (JP): Fill JP metadata from series-name patterns.
+
+    Shin Sangoku Musou (Dynasty Warriors): 15 fills (Omega Force / Koei / Action).
+    Winning Post 6+: 12 fills (Koei, Inis / Koei / Simulation).
+    Nobunaga no Yabou + Sangokushi: 13 fills (Koei / Koei / Strategy).
+    Sengoku Musou (Samurai Warriors): 8 fills (Omega Force / Koei / Action).
+    Harukanaru Toki: 6 fills (Ruby Party / Koei / Adventure/RPG).
+    J.League Winning Eleven: 6 fills (Konami / Konami / Sports).
+    .hack/Dot Hack: 6 fills (CyberConnect2 / Bandai / Action/RPG).
+    Plus: Momotarou, GuitarFreaks, Densha de Go!, Kessen, NBA Live, Formula, Armored Core, Ratchet.
+    JP remaining after wave: dev=1202, pub=1034, genre=834.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    def test_ssm_1_dev_filled(self):
+        """Wave 132: Shin Sangoku Musou (JP) developer filled."""
+        g = self.jp_games.get("Shin Sangoku Musou (JP)", {})
+        self.assertEqual(g.get("developer"), "Omega Force",
+            f"Expected 'Omega Force', got {g.get('developer')!r}")
+
+    def test_ssm_4_pub_filled(self):
+        """Wave 132: Shin Sangoku Musou 4 (JP) publisher filled."""
+        g = self.jp_games.get("Shin Sangoku Musou 4 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Koei",
+            f"Expected 'Koei', got {g.get('publisher')!r}")
+
+    def test_sengoku_musou_dev_filled(self):
+        """Wave 132: Sengoku Musou (JP) developer filled."""
+        g = self.jp_games.get("Sengoku Musou (JP)", {})
+        self.assertEqual(g.get("developer"), "Omega Force",
+            f"Expected 'Omega Force', got {g.get('developer')!r}")
+
+    def test_harukanaru_3_dev_filled(self):
+        """Wave 132: Harukanaru Toki no Naka de 3 (JP) developer filled."""
+        g = self.jp_games.get("Harukanaru Toki no Naka de 3 (JP)", {})
+        self.assertEqual(g.get("developer"), "Ruby Party",
+            f"Expected 'Ruby Party', got {g.get('developer')!r}")
+
+    def test_jleague_we_dev_filled(self):
+        """Wave 132: J.League Winning Eleven 10 (JP) developer filled."""
+        g = self.jp_games.get("J.League Winning Eleven 10 + Europe League '06-'07 (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami",
+            f"Expected 'Konami', got {g.get('developer')!r}")
+
+    def test_momotarou_15_dev_filled(self):
+        """Wave 132: Momotarou Dentetsu 15 (JP) developer filled."""
+        g = self.jp_games.get("Momotarou Dentetsu 15 (JP)", {})
+        self.assertEqual(g.get("developer"), "Hudson Soft",
+            f"Expected 'Hudson Soft', got {g.get('developer')!r}")
+
+    def test_guitarfreaks_dev_filled(self):
+        """Wave 132: GuitarFreaks & DrumMania Masterpiece Gold (JP) developer filled."""
+        g = self.jp_games.get("GuitarFreaks & DrumMania Masterpiece Gold (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami",
+            f"Expected 'Konami', got {g.get('developer')!r}")
+
+    def test_densha_final_dev_filled(self):
+        """Wave 132: Densha de Go! Final (JP) developer filled."""
+        g = self.jp_games.get("Densha de Go! Final (JP)", {})
+        self.assertEqual(g.get("developer"), "Taito",
+            f"Expected 'Taito', got {g.get('developer')!r}")
+
+    def test_kessen_dev_filled(self):
+        """Wave 132: Kessen (JP) developer filled."""
+        g = self.jp_games.get("Kessen (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei",
+            f"Expected 'Koei', got {g.get('developer')!r}")
+
+    def test_armored_core_dev_filled(self):
+        """Wave 132: Armored Core 2 (JP) developer filled."""
+        g = self.jp_games.get("Armored Core 2 (JP)", {})
+        self.assertEqual(g.get("developer"), "FromSoftware",
+            f"Expected 'FromSoftware', got {g.get('developer')!r}")
+
+    def test_winning_post_7_dev_filled(self):
+        """Wave 132: Winning Post 7 (JP) developer filled."""
+        g = self.jp_games.get("Winning Post 7 (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei, Inis",
+            f"Expected 'Koei, Inis', got {g.get('developer')!r}")
+
+    def test_sangokushi_dev_filled(self):
+        """Wave 132: Sangokushi (first) entry developer filled."""
+        # Find first Sangokushi entry
+        found = next((k for k in sorted(self.jp_games.keys()) if k.startswith('Sangokushi')), None)
+        self.assertIsNotNone(found, "No Sangokushi entry found")
+        g = self.jp_games[found]
+        self.assertEqual(g.get("developer"), "Koei",
+            f"Expected 'Koei', got {g.get('developer')!r} for {found}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave132(self):
+        """Wave 132: JP DB must have at most 1202 entries without developer (was 1296)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 1202,
+            f"JP still has {len(empty)} entries without developer, expected <= 1202")
+
+    def test_jp_genre_count_wave132(self):
+        """Wave 132: JP DB must have at most 834 entries without genre (was 901)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 834,
+            f"JP still has {len(empty)} entries without genre, expected <= 834")

@@ -3,9 +3,9 @@
   "games": {
     ".Hack Akunshou Heni Vol.2 (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "CyberConnect2",
+      "genre": "Action/RPG",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-72231"
     },
@@ -1224,9 +1224,9 @@
     },
     "Armored Core: Formula Front (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "FromSoftware",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "FromSoftware",
       "release_date": "2004-12-12",
       "serial": "SLPS-25461"
     },
@@ -4588,9 +4588,9 @@
       "alt_serials": [
         "SLPM-62049"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Simulation",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-60142"
     },
@@ -4600,9 +4600,9 @@
         "SLPM-66772",
         "SLPM-74214"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Simulation",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-60237"
     },
@@ -4621,9 +4621,9 @@
         "SLPM-65148",
         "SLPM-65810"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Simulation",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-60179"
     },
@@ -5149,9 +5149,9 @@
       "alt_serials": [
         "SLPS-25756"
       ],
-      "developer": "",
+      "developer": "CyberConnect2",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2006-05-18",
       "serial": "SLPS-25652"
     },
@@ -5160,9 +5160,9 @@
         "SLPS-25755",
         "SLPS-73259"
       ],
-      "developer": "",
+      "developer": "CyberConnect2",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2006-05-18",
       "serial": "SLPS-25651"
     },
@@ -5170,7 +5170,7 @@
       "alt_serials": [
         "SLPS-73266"
       ],
-      "developer": "",
+      "developer": "CyberConnect2",
       "genre": "RPG",
       "publisher": "Bandai",
       "release_date": "",
@@ -5196,17 +5196,17 @@
     },
     "Dot Hack Shinshoku Osen Vol. 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "CyberConnect2",
+      "genre": "Action/RPG",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-73232"
     },
     "Dot Hack Zettai Houi Vol. 4 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "CyberConnect2",
+      "genre": "Action/RPG",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-73233"
     },
@@ -5467,17 +5467,17 @@
     },
     "Dream Audition Super Hit Disc 1 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jaleco",
+      "genre": "Rhythm/Sing",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SLPS-20140"
     },
     "Dream Audition Super Hit Disc 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jaleco",
+      "genre": "Rhythm/Sing",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SLPS-20141"
     },
@@ -7060,17 +7060,17 @@
       "alt_serials": [
         "SCPS-55047"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony Studio Liverpool",
+      "genre": "Racing",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SCPS-15032"
     },
     "Formula Suzuki Hayabusa Time Attack (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony Studio Liverpool",
+      "genre": "Racing",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SLPM-68003"
     },
@@ -9118,9 +9118,9 @@
     },
     "GuitarFreaks & DrumMania Masterpiece Silver (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2006-08-31",
       "serial": "SLPM-66484"
     },
@@ -9134,17 +9134,17 @@
     },
     "GuitarFreaks 3rd Mix & DrumMania 2nd Mix (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2000-12-07",
       "serial": "SLPM-65011"
     },
     "GuitarFreaks V & DrumMania V (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2006-03-16",
       "serial": "SLPM-66313"
     },
@@ -9818,7 +9818,7 @@
         "SLPM-66346",
         "SLPM-66759"
       ],
-      "developer": "",
+      "developer": "Ruby Party",
       "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
@@ -9829,9 +9829,9 @@
         "SLPM-66348",
         "SLPM-66887"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ruby Party",
+      "genre": "Adventure/RPG",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66344"
     },
@@ -9839,9 +9839,9 @@
       "alt_serials": [
         "SLPM-66952"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ruby Party",
+      "genre": "Adventure/RPG",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66951"
     },
@@ -9855,8 +9855,8 @@
     },
     "Harukanaru Toki no Naka de 4: Koei the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Ruby Party",
+      "genre": "Adventure/RPG",
       "publisher": "Koei",
       "release_date": "2011-09-29",
       "serial": "SLPM-55926"
@@ -9866,9 +9866,9 @@
         "SLPM-66003",
         "SLPM-66655"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ruby Party",
+      "genre": "Adventure/RPG",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65957"
     },
@@ -9894,9 +9894,9 @@
       "alt_serials": [
         "SLPM-55138"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ruby Party",
+      "genre": "Adventure/RPG",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55137"
     },
@@ -11243,9 +11243,9 @@
     },
     "J.League Winning Eleven 10 + Europe League '06-'07 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-66595"
     },
@@ -11283,41 +11283,41 @@
     },
     "J.League Winning Eleven 5 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62088"
     },
     "J.League Winning Eleven 6 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62217"
     },
     "J.League Winning Eleven 8: Asia Championship (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65740"
     },
     "J.League Winning Eleven 9: Asia Championship (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-66169"
     },
     "J.League Winning Eleven Tactics (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65432"
     },
@@ -13001,17 +13001,17 @@
     },
     "Kessen III (Treasure Box) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65780"
     },
     "Kessen III: Enjoy Disc (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62573"
     },
@@ -16524,7 +16524,7 @@
     },
     "Momotarou Dentetsu 15 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson Soft",
       "genre": "Party",
       "publisher": "Hudson",
       "release_date": "2005-12-08",
@@ -16532,7 +16532,7 @@
     },
     "Momotarou Dentetsu 15: Godai Bombee Toujou! no Maki (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson Soft",
       "genre": "Party",
       "publisher": "Hudson",
       "release_date": "2008-02-07",
@@ -16542,7 +16542,7 @@
       "alt_serials": [
         "SLPM-74105"
       ],
-      "developer": "",
+      "developer": "Hudson Soft",
       "genre": "Party",
       "publisher": "Hudson",
       "release_date": "2006-12-07",
@@ -16558,15 +16558,15 @@
     },
     "Momotarou Dentetsu USA (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson Soft",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Hudson Soft",
       "release_date": "",
       "serial": "SLPM-62555"
     },
     "Momotarou Dentetsu USA: PlayStation 2 the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson Soft",
       "genre": "Party",
       "publisher": "Hudson",
       "release_date": "2006-07-06",
@@ -17026,9 +17026,9 @@
     },
     "NBA Live '08 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-66884"
     },
@@ -17086,9 +17086,9 @@
     },
     "NBA Live 2003 (EA Best Hits) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-65192"
     },
@@ -18072,49 +18072,49 @@
       "alt_serials": [
         "SLPM-65197"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62208"
     },
     "Nobunaga no Yabou Online: Haten no Shou (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66539"
     },
     "Nobunaga no Yabou Online: Hiryuu no Shou (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65783"
     },
     "Nobunaga no Yabou Online: Souha no Shou (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66954"
     },
     "Nobunaga no Yabou:  Ranseiki (with Power-Up Kit)(Koei Teiban Series) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62748"
     },
     "Nobunaga no Yabou:  Tenka Sousei (with Power-Up Kit)(Koei Teiban Series) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55232"
     },
@@ -18123,33 +18123,33 @@
         "SLPM-74265",
         "SLPM-74281"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66279"
     },
     "Nobunaga no Yabou: Kakushin (with Power-Up Kit and Sangokushi XI) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66948"
     },
     "Nobunaga no Yabou: Kakushin (with Power-Up Kit) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66947"
     },
     "Nobunaga no Yabou: Kakushin with Power-Up Kit (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55268"
     },
@@ -18196,7 +18196,7 @@
       "alt_serials": [
         "SLPM-66760"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "2006-03-30",
@@ -18215,9 +18215,9 @@
         "SLPM-74225",
         "SLPM-74263"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65556"
     },
@@ -18225,9 +18225,9 @@
       "alt_serials": [
         "SLPM-66528"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65864"
     },
@@ -20768,9 +20768,9 @@
     },
     "Ratchet & Clank 5: Gekitotsu! Dodeka Ginga no Miri Miri Gundan (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Insomniac Games",
+      "genre": "Platformer",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SCPS-15120"
     },
@@ -22066,9 +22066,9 @@
     },
     "Sangokushi 11 with Power-Up Kit (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55112"
     },
@@ -22113,8 +22113,8 @@
       "alt_serials": [
         "SLPM-65403"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Koei",
+      "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65093"
@@ -22123,8 +22123,8 @@
       "alt_serials": [
         "SLPM-65354"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Koei",
+      "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65247"
@@ -22159,7 +22159,7 @@
         "SLPM-62546",
         "SLPM-74005"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "",
@@ -22172,7 +22172,7 @@
         "SLPM-62519",
         "SLPM-62710"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "",
@@ -22180,17 +22180,17 @@
     },
     "Sangokushi VIII With Power-Up Kit (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62319"
     },
     "Sangokushi VIII with Power-Up Kit (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62762"
     },
@@ -22214,17 +22214,17 @@
     },
     "Sangokushi XI With Power-Up Kit (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66701"
     },
     "Sangokushi XI With Power-Up Kit (Koei Teiban Series) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55272"
     },
@@ -23012,9 +23012,9 @@
         "SLPM-74212",
         "SLPM-74235"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2004-02-11",
       "serial": "SLPM-65517"
     },
@@ -23022,33 +23022,33 @@
       "alt_serials": [
         "SLPM-65516"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62716"
     },
     "Sengoku Musou 2 & Sengoku Musou 2: Empires Saikyou Data (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62768"
     },
     "Sengoku Musou 2 (JP)": {
       "alt_serials": [],
       "developer": "Omega Force",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66307"
     },
     "Sengoku Musou 2 Mushouden (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66821"
     },
@@ -23065,9 +23065,9 @@
     },
     "Sengoku Musou 2: Moushouden (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-67014"
     },
@@ -23089,9 +23089,9 @@
     },
     "Sengoku Musou Mushouden (Treasure Box) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65713"
     },
@@ -23101,7 +23101,7 @@
         "SLPM-74249"
       ],
       "developer": "Omega Force",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65718"
@@ -23641,9 +23641,9 @@
         "SLPM-62714",
         "SLPM-74002"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-60117"
     },
@@ -23677,17 +23677,17 @@
         "SLPM-66096",
         "SLPM-66304"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65170"
     },
     "Shin Sangoku Musou 2: Mushouden (Koei The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65720"
     },
@@ -23717,9 +23717,9 @@
     },
     "Shin Sangoku Musou 3 : Mushouden (Koei Teiban Series) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66657"
     },
@@ -23738,9 +23738,9 @@
     },
     "Shin Sangoku Musou 3: Empires (Super Premium Box) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65561"
     },
@@ -23752,17 +23752,17 @@
         "SLPM-66306",
         "SLPM-74216"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65376"
     },
     "Shin Sangoku Musou 4 & Shin Sangoku Musou 4: Moushouden Saikyou Data (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62728"
     },
@@ -23772,25 +23772,25 @@
         "SLPM-74236",
         "SLPM-74272"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Omega Force",
+      "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-65890"
     },
     "Shin Sangoku Musou 4 (Treasure Box) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62592"
     },
     "Shin Sangoku Musou 4 Empires (Super Premium Pack) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66365"
     },
@@ -23801,9 +23801,9 @@
         "SLPM-66581",
         "SLPM-74283"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55048"
     },
@@ -23824,9 +23824,9 @@
       "alt_serials": [
         "SLPM-74286"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55082"
     },
@@ -23834,25 +23834,25 @@
       "alt_serials": [
         "SLPM-74287"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55083"
     },
     "Shin Sangoku Musou Series Collection Gekan Saikyou Data (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62751"
     },
     "Shin Sangoku Musou Series Collection Joukan Saikyou Data (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62715"
     },
@@ -31354,7 +31354,7 @@
       "alt_serials": [
         "SLPM-65385"
       ],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "",
@@ -31362,7 +31362,7 @@
     },
     "Winning Post 6 Maximum 2004 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2004-05-20",
@@ -31370,7 +31370,7 @@
     },
     "Winning Post 6: 2005-nendoban (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2005-02-24",
@@ -31378,7 +31378,7 @@
     },
     "Winning Post 6: Koei Teiban Series (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2006-09-14",
@@ -31386,7 +31386,7 @@
     },
     "Winning Post 6: Koei the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2005-10-06",
@@ -31396,7 +31396,7 @@
       "alt_serials": [
         "SLPM-66811"
       ],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2005-08-25",
@@ -31404,15 +31404,15 @@
     },
     "Winning Post 7 Max 08 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei, Inis",
+      "genre": "Simulation",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55073"
     },
     "Winning Post 7 Maximum 2006 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2006-03-16",
@@ -31422,7 +31422,7 @@
       "alt_serials": [
         "SLPM-66904"
       ],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2007-03-29",
@@ -31430,7 +31430,7 @@
     },
     "Winning Post 7 Maximum 2008 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2008-03-13",
@@ -31438,7 +31438,7 @@
     },
     "Winning Post World (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2009-04-02",
@@ -31446,7 +31446,7 @@
     },
     "Winning Post World 2010 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2010-04-02",
