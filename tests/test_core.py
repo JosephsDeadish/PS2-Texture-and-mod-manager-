@@ -22977,3 +22977,128 @@ class TestWave128MetadataFillsFromNtscU(unittest.TestCase):
         empty_genre = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty_genre), 935,
             f"JP still has {len(empty_genre)} entries without genre, expected <= 935")
+
+
+class TestWave129ReleaseDateFillsFromNtscU(unittest.TestCase):
+    """Wave 129: Fill empty release_date for PAL and JP games via NTSC-U cross-reference.
+
+    PAL: 141 release_date fields filled from NTSC-U by normalized title match.
+    JP:  152 release_date fields filled from NTSC-U by normalized title match.
+    Normalization strips regional suffix (PAL), (JP) etc. before comparing titles.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    # ── PAL release_date fills ────────────────────────────────────────────────
+
+    def test_pal_allstar_baseball_2003_date_filled(self):
+        """Wave 129: All-Star Baseball 2003 (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("All-Star Baseball 2003 featuring Derek Jeter (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2002-02-28",
+            f"Expected '2002-02-28', got {g.get('release_date')!r}")
+
+    def test_pal_alvin_chipmunks_date_filled(self):
+        """Wave 129: Alvin and the Chipmunks (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Alvin and the Chipmunks (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2007-12-04",
+            f"Expected '2007-12-04', got {g.get('release_date')!r}")
+
+    def test_pal_bionicle_date_filled(self):
+        """Wave 129: Bionicle (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Bionicle (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2003-10-21",
+            f"Expected '2003-10-21', got {g.get('release_date')!r}")
+
+    def test_pal_bloodrayne2_date_filled(self):
+        """Wave 129: BloodRayne 2 (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("BloodRayne 2 (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2004-10-14",
+            f"Expected '2004-10-14', got {g.get('release_date')!r}")
+
+    def test_pal_big_mutha_truckers_date_filled(self):
+        """Wave 129: Big Mutha Truckers (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Big Mutha Truckers (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2003-06-16",
+            f"Expected '2003-06-16', got {g.get('release_date')!r}")
+
+    def test_pal_antz_extreme_racing_date_filled(self):
+        """Wave 129: Antz Extreme Racing (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Antz Extreme Racing (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2002-09-12",
+            f"Expected '2002-09-12', got {g.get('release_date')!r}")
+
+    def test_pal_bass_strike_date_filled(self):
+        """Wave 129: Bass Strike (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Bass Strike (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2001-10-08",
+            f"Expected '2001-10-08', got {g.get('release_date')!r}")
+
+    def test_pal_ben10_ultimate_alien_date_filled(self):
+        """Wave 129: Ben 10: Ultimate Alien: Cosmic Destruction (PAL) release_date filled."""
+        g = self.pal_games.get("Ben 10: Ultimate Alien: Cosmic Destruction (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2010-10-05",
+            f"Expected '2010-10-05', got {g.get('release_date')!r}")
+
+    def test_pal_barbie_horse_adventures_date_filled(self):
+        """Wave 129: Barbie Horse Adventures: Riding Camp (PAL) release_date filled."""
+        g = self.pal_games.get("Barbie Horse Adventures: Riding Camp (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2008-10-21",
+            f"Expected '2008-10-21', got {g.get('release_date')!r}")
+
+    def test_pal_barbie_island_princess_date_filled(self):
+        """Wave 129: Barbie as the Island Princess (PAL) release_date filled from NTSC-U."""
+        g = self.pal_games.get("Barbie as the Island Princess (PAL)", {})
+        self.assertEqual(g.get("release_date"), "2007-10-30",
+            f"Expected '2007-10-30', got {g.get('release_date')!r}")
+
+    # ── JP release_date fills ─────────────────────────────────────────────────
+
+    def test_jp_allstar_baseball_2002_date_filled(self):
+        """Wave 129: All-Star Baseball 2002 (JP) release_date filled from NTSC-U."""
+        g = self.jp_games.get("All-Star Baseball 2002 (JP)", {})
+        self.assertEqual(g.get("release_date"), "2001-03-17",
+            f"Expected '2001-03-17', got {g.get('release_date')!r}")
+
+    def test_jp_bass_strike_date_filled(self):
+        """Wave 129: Bass Strike (JP) release_date filled from NTSC-U."""
+        g = self.jp_games.get("Bass Strike (JP)", {})
+        self.assertEqual(g.get("release_date"), "2001-10-08",
+            f"Expected '2001-10-08', got {g.get('release_date')!r}")
+
+    def test_jp_bionicle_heroes_date_filled(self):
+        """Wave 129: Bionicle Heroes (JP) release_date filled from NTSC-U."""
+        g = self.jp_games.get("Bionicle Heroes (JP)", {})
+        self.assertEqual(g.get("release_date"), "2006-11-14",
+            f"Expected '2006-11-14', got {g.get('release_date')!r}")
+
+    def test_jp_bloodrayne_date_filled(self):
+        """Wave 129: BloodRayne (JP) release_date filled from NTSC-U."""
+        g = self.jp_games.get("BloodRayne (JP)", {})
+        self.assertEqual(g.get("release_date"), "2002-10-15",
+            f"Expected '2002-10-15', got {g.get('release_date')!r}")
+
+    def test_jp_alone_in_dark_date_filled(self):
+        """Wave 129: Alone in the Dark (JP) release_date filled from NTSC-U."""
+        g = self.jp_games.get("Alone in the Dark (JP)", {})
+        self.assertEqual(g.get("release_date"), "2008-06-23",
+            f"Expected '2008-06-23', got {g.get('release_date')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_pal_date_filled_count(self):
+        """Wave 129: PAL DB must have at most 392 entries without release_date (was 533)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("release_date", "").strip()]
+        self.assertLessEqual(len(empty), 392,
+            f"PAL still has {len(empty)} entries without release_date, expected <= 392")
+
+    def test_jp_date_filled_count(self):
+        """Wave 129: JP DB must have at most 973 entries without release_date (was 1125)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("release_date", "").strip()]
+        self.assertLessEqual(len(empty), 973,
+            f"JP still has {len(empty)} entries without release_date, expected <= 973")
