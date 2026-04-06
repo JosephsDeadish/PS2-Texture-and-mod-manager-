@@ -15212,10 +15212,12 @@ class TestWave74PnachSerialFixes(unittest.TestCase):
         self.assertIn("07608CA2", g.get('crcs', []))
 
     def test_pal_db_crash_woc_fixed_serial(self):
-        """PAL DB: Crash Bandicoot WoC must use SLES-50386 (primary) with SLES-51176 as alt."""
+        """PAL DB: Crash Bandicoot WoC must use SLES-50386 (primary); SLES-51176 removed
+        in Wave 126 (it is Disney's Piratenplaneet de Schat van Kapitein Flint's serial)."""
         g = self.pal_db['games'].get("Crash Bandicoot: The Wrath of Cortex (PAL)", {})
         self.assertEqual(g.get('serial'), "SLES-50386")
-        self.assertIn("SLES-51176", g.get('alt_serials', []))
+        self.assertNotIn("SLES-51176", g.get('alt_serials', []),
+            "SLES-51176 belongs to Disney's Piratenplaneet, not Crash WoC")
         self.assertIn("35D70452", g.get('crcs', []))
 
     def test_pal_db_mercenaries_entry(self):
@@ -19206,10 +19208,13 @@ class TestWave101DbAuditFixes(unittest.TestCase):
         self.assertNotIn('Gran Turismo 4 Prologue', self.sdb._games)
 
     def test_gt4_prologue_pal_alt_serial(self):
-        """PAL DB GT4 Prologue entry must include SCES-52438 as alt_serial."""
+        """PAL DB GT4 Prologue entry: SCES-52438 is the main serial; Wave 126 removed
+        the self-duplicate where it also appeared in alt_serials."""
         entry = self.pal_games.get('Gran Turismo 4: Prologue (PAL)', {})
-        alts = entry.get('alt_serials', [])
-        self.assertIn('SCES-52438', alts, "SCES-52438 must be an alt_serial for GT4 Prologue PAL")
+        self.assertEqual(entry.get('serial'), 'SCES-52438',
+            "SCES-52438 must be the main serial of GT4 Prologue PAL")
+        self.assertNotIn('SCES-52438', entry.get('alt_serials', []),
+            "SCES-52438 should not appear as an alt_serial (self-duplicate, removed in Wave 126)")
 
     # ── Tony Hawk dev/pub swaps ───────────────────────────────────────────────
     def test_thps3_developer(self):
@@ -20270,9 +20275,11 @@ class TestWave109DbAltSerialFixes(unittest.TestCase):
         self.assertEqual(entry.get("serial"), "SLES-54586")
 
     def test_burnout3_pal_valid_alt_serial_kept(self):
-        """Wave 109: Burnout 3: Takedown (PAL) still has valid alt SLES-53353."""
+        """Wave 109/126: Burnout 3: Takedown (PAL) must NOT have SLES-53353 as alt.
+        SLES-53353 belongs to Shonen Jump's Shaman King: Power of Spirit; removed in Wave 126."""
         alts = self.pal.get("Burnout 3: Takedown (PAL)", {}).get("alt_serials", [])
-        self.assertIn("SLES-53353", alts)
+        self.assertNotIn("SLES-53353", alts,
+            "SLES-53353 is Shaman King's serial, not a valid Burnout 3 alt")
 
     # ── No SLUS-97XXX alt_serials remain anywhere in NTSC-U DB ───────────────
 
@@ -22359,3 +22366,153 @@ class TestWave125KioskDbExpansion(unittest.TestCase):
         demo_count = len(sdb.demo_titles())
         self.assertGreaterEqual(demo_count, 448,
             f"SerialDatabase has only {demo_count} demo titles, expected >= 448")
+
+
+class TestWave126DuplicateSerialFixes(unittest.TestCase):
+    """Wave 126: Remove duplicate/wrong alt_serials from PAL and JP databases.
+
+    PAL fixes: 30 wrong alt_serials removed from 19 entries (serials that
+    belonged to different games were incorrectly imported as alt_serials).
+    JP fixes: 44 wrong alt_serials removed from 27 entries (same issue, plus
+    English vs Japanese duplicate title entries sharing the same serials).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    # ── No duplicate serials ──────────────────────────────────────────────────
+
+    def _collect_all_serials(self, games):
+        from collections import defaultdict
+        serial_to_titles = defaultdict(list)
+        for title, g in games.items():
+            s = g.get("serial", "")
+            if s:
+                serial_to_titles[s].append(title)
+            for alt in g.get("alt_serials", []):
+                serial_to_titles[alt].append(title)
+        return serial_to_titles
+
+    def test_pal_no_duplicate_serials(self):
+        """Wave 126: PAL DB must have zero serials appearing in more than one entry."""
+        serials = self._collect_all_serials(self.pal_games)
+        dups = {s: ts for s, ts in serials.items() if len(ts) > 1}
+        self.assertEqual(len(dups), 0,
+            f"PAL DB has {len(dups)} duplicate serials: {list(dups.items())[:3]}")
+
+    def test_jp_no_duplicate_serials(self):
+        """Wave 126: JP DB must have zero serials appearing in more than one entry."""
+        serials = self._collect_all_serials(self.jp_games)
+        dups = {s: ts for s, ts in serials.items() if len(ts) > 1}
+        self.assertEqual(len(dups), 0,
+            f"JP DB has {len(dups)} duplicate serials: {list(dups.items())[:3]}")
+
+    # ── Key PAL fixes verified ────────────────────────────────────────────────
+
+    def test_jak_daxter_pal_no_sly_serial(self):
+        """Wave 126: Jak & Daxter (PAL) must NOT have SCES-50917 (Sly Raccoon's serial) as alt."""
+        g = self.pal_games.get("Jak and Daxter: The Precursor Legacy (PAL)", {})
+        self.assertNotIn("SCES-50917", g.get("alt_serials", []),
+            "SCES-50917 is Sly Raccoon's main serial, not a Jak&Daxter alt")
+
+    def test_sly_raccoon_pal_serial_correct(self):
+        """Wave 126: Sly Raccoon (PAL) must have SCES-50917 as main serial."""
+        g = self.pal_games.get("Sly Raccoon (PAL)", {})
+        self.assertEqual(g.get("serial"), "SCES-50917")
+
+    def test_dq8_pal_no_bloodrayne2_serial(self):
+        """Wave 126: DQ8 (PAL) must NOT have SLES-53832 (BloodRayne 2) as alt."""
+        g = self.pal_games.get("Dragon Quest VIII: Journey of the Cursed King (PAL)", {})
+        self.assertNotIn("SLES-53832", g.get("alt_serials", []),
+            "SLES-53832 is BloodRayne 2's serial")
+
+    def test_burnout3_pal_no_shaman_serial(self):
+        """Wave 126: Burnout 3 (PAL) must NOT have SLES-53353 (Shaman King) as alt."""
+        g = self.pal_games.get("Burnout 3: Takedown (PAL)", {})
+        self.assertNotIn("SLES-53353", g.get("alt_serials", []),
+            "SLES-53353 is Shaman King's serial")
+
+    def test_kh2_pal_no_d_unit_serial(self):
+        """Wave 126: Kingdom Hearts II (PAL) must NOT have SLES-54154 (D-Unit) as alt."""
+        g = self.pal_games.get("Kingdom Hearts II (PAL)", {})
+        self.assertNotIn("SLES-54154", g.get("alt_serials", []),
+            "SLES-54154 is D-Unit Drift Racing's serial")
+
+    def test_dmc2_pal_no_dynasty_tactics_serials(self):
+        """Wave 126: Devil May Cry 2 (PAL) must NOT have SLES-51266/51267 (Dynasty Tactics) as alts."""
+        g = self.pal_games.get("Devil May Cry 2 (PAL)", {})
+        alts = g.get("alt_serials", [])
+        self.assertNotIn("SLES-51266", alts, "SLES-51266 is Dynasty Tactics' serial")
+        self.assertNotIn("SLES-51267", alts, "SLES-51267 is Dynasty Tactics' serial")
+
+    def test_tekken5_pal_no_tenchu_serials(self):
+        """Wave 126: Tekken 5 (PAL) must NOT have Tenchu: Fatal Shadows serials as alts."""
+        g = self.pal_games.get("Tekken 5 (PAL)", {})
+        alts = g.get("alt_serials", [])
+        for s in ["SLES-53012", "SLES-53013", "SLES-53015", "SLES-53016"]:
+            self.assertNotIn(s, alts, f"{s} is Tenchu: Fatal Shadows' serial")
+
+    def test_gt4_prologue_no_self_dup(self):
+        """Wave 126: GT4 Prologue (PAL) must NOT have its own main serial as alt."""
+        g = self.pal_games.get("Gran Turismo 4: Prologue (PAL)", {})
+        self.assertNotIn("SCES-52438", g.get("alt_serials", []),
+            "SCES-52438 is GT4 Prologue's main serial, not an alt")
+
+    def test_true_crime_la_single_entry(self):
+        """Wave 126: Only 'True Crime: Streets of L.A. (PAL)' entry exists (no LA duplicate)."""
+        self.assertIn("True Crime: Streets of L.A. (PAL)", self.pal_games)
+        self.assertNotIn("True Crime: Streets of LA (PAL)", self.pal_games,
+            "Duplicate entry without period in 'L.A.' should have been removed")
+
+    def test_true_crime_la_has_both_skus(self):
+        """Wave 126: True Crime: Streets of L.A. (PAL) covers both SLES-51753 and SLES-51754."""
+        g = self.pal_games.get("True Crime: Streets of L.A. (PAL)", {})
+        self.assertEqual(g.get("serial"), "SLES-51753")
+        self.assertIn("SLES-51754", g.get("alt_serials", []))
+
+    # ── Key JP fixes verified ─────────────────────────────────────────────────
+
+    def test_jak2_jp_no_jak1_serial(self):
+        """Wave 126: Jak II (JP) must NOT have SCPS-55004 (Jak 1 JP) as alt."""
+        g = self.jp_games.get("Jak II: Renegade (JP)", {})
+        self.assertNotIn("SCPS-55004", g.get("alt_serials", []),
+            "SCPS-55004 is Jak x Daxter: Kyuu Sekai no Isan (Jak 1 JP)")
+
+    def test_fatal_frame2_jp_no_zero_serials(self):
+        """Wave 126: Fatal Frame II (JP) must NOT have Zero: Akai Chou serials as alts."""
+        g = self.jp_games.get("Fatal Frame II: Crimson Butterfly (JP)", {})
+        alts = g.get("alt_serials", [])
+        self.assertNotIn("SLPS-73201", alts, "SLPS-73201 is Zero: Akai Chou's main serial")
+        self.assertNotIn("SLPS-73256", alts, "SLPS-73256 is Zero: Akai Chou's alt serial")
+
+    def test_shadow_hearts_covenant_jp_no_sh2_disc1(self):
+        """Wave 126: Shadow Hearts: Covenant (JP) must NOT have Shadow Hearts II Disc 1 serial."""
+        g = self.jp_games.get("Shadow Hearts: Covenant (JP)", {})
+        self.assertNotIn("SLPS-25317", g.get("alt_serials", []),
+            "SLPS-25317 is Shadow Hearts II (Disc 1) JP main serial")
+
+    def test_zoe2_jp_no_anubis_serials(self):
+        """Wave 126: ZoE 2nd Runner (JP) must NOT have Anubis JP serials as alts."""
+        g = self.jp_games.get("Zone of the Enders: The 2nd Runner (JP)", {})
+        alts = g.get("alt_serials", [])
+        self.assertNotIn("SLPM-60200", alts, "SLPM-60200 is Anubis: ZoE main serial")
+        self.assertNotIn("SLPM-61035", alts, "SLPM-61035 is Anubis: ZoE alt serial")
+
+    def test_castlevania_loi_jp_no_castlevania_serials(self):
+        """Wave 126: Castlevania: LoI (JP) must NOT have Castlevania JP entry serials as alts."""
+        g = self.jp_games.get("Castlevania: Lament of Innocence (JP)", {})
+        alts = g.get("alt_serials", [])
+        self.assertNotIn("SLPM-61062", alts, "SLPM-61062 is Castlevania (JP) main serial")
+        self.assertNotIn("SLPM-65406", alts, "SLPM-65406 is Castlevania (JP) alt serial")
+
+    def test_shadow_of_colossus_jp_no_wander_serials(self):
+        """Wave 126: Shadow of the Colossus (JP) must NOT have Wander to Kyozou serials as alts."""
+        g = self.jp_games.get("Shadow of the Colossus (JP)", {})
+        alts = g.get("alt_serials", [])
+        self.assertNotIn("SCPS-19320", alts, "SCPS-19320 is Wander to Kyozou main serial")
+        self.assertNotIn("SCPS-19335", alts, "SCPS-19335 is Wander to Kyozou alt serial")

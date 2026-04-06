@@ -2026,9 +2026,7 @@
         "BO3",
         "Burnout 3"
       ],
-      "alt_serials": [
-        "SLES-53353"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Criterion Games",
       "genre": "Racing",
@@ -3690,9 +3688,7 @@
       "serial": "SLES-52339"
     },
     "Crash Bandicoot: The Wrath of Cortex (PAL)": {
-      "alt_serials": [
-        "SLES-51176"
-      ],
+      "alt_serials": [],
       "crcs": [
         "35D70452"
       ],
@@ -4572,10 +4568,7 @@
       "aliases": [
         "DMC2"
       ],
-      "alt_serials": [
-        "SLES-51266",
-        "SLES-51267"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Capcom",
       "genre": "Action",
@@ -4589,9 +4582,7 @@
         "DMC 3",
         "DMC3"
       ],
-      "alt_serials": [
-        "SLES-52286"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Capcom",
       "genre": "Action",
@@ -5254,10 +5245,7 @@
       "serial": "SLES-52815"
     },
     "Disney/Pixar Finding Nemo (PAL)": {
-      "alt_serials": [
-        "SLES-51870",
-        "SLES-51872"
-      ],
+      "alt_serials": [],
       "developer": "Traveller's Tales",
       "genre": "Adventure",
       "publisher": "THQ",
@@ -5726,9 +5714,7 @@
       "serial": "SLES-53874"
     },
     "Dragon Quest VIII: Journey of the Cursed King (PAL)": {
-      "alt_serials": [
-        "SLES-53832"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Level-5",
       "genre": "RPG",
@@ -7300,7 +7286,6 @@
     },
     "Finding Nemo (PAL)": {
       "alt_serials": [
-        "SLES-51755",
         "SLES-51870",
         "SLES-51872"
       ],
@@ -8463,9 +8448,7 @@
       "serial": "SCES-51719"
     },
     "Gran Turismo 4: Prologue (PAL)": {
-      "alt_serials": [
-        "SCES-52438"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Polyphony Digital",
       "genre": "Racing",
@@ -9940,8 +9923,7 @@
     },
     "Jak and Daxter: The Precursor Legacy (PAL)": {
       "alt_serials": [
-        "SCED-50614",
-        "SCES-50917"
+        "SCED-50614"
       ],
       "crcs": [],
       "developer": "Naughty Dog",
@@ -10395,8 +10377,7 @@
         "SCES-50968",
         "SCES-50969",
         "SCES-50970",
-        "SCES-50971",
-        "SLES-52537"
+        "SCES-50971"
       ],
       "crcs": [],
       "developer": "Square",
@@ -10411,7 +10392,6 @@
         "KH2"
       ],
       "alt_serials": [
-        "SLES-54154",
         "SLES-54232",
         "SLES-54233",
         "SLES-54234",
@@ -11860,11 +11840,7 @@
       "serial": "SLES-50789"
     },
     "Mercenaries (PAL)": {
-      "alt_serials": [
-        "SLED-52979",
-        "SLES-52590",
-        "SLES-53008"
-      ],
+      "alt_serials": [],
       "developer": "Pandemic Studio Pty. Ltd",
       "genre": "Action/Shooter",
       "publisher": "Lucasarts",
@@ -11901,7 +11877,6 @@
     "Mercenaries: Playground of Destruction (PAL)": {
       "alt_serials": [
         "SLED-52979",
-        "SLES-52588",
         "SLES-52590",
         "SLES-53008"
       ],
@@ -12013,11 +11988,7 @@
       "serial": "SLES-82050"
     },
     "Metal Gear Solid 3: Subsistence (PAL)": {
-      "alt_serials": [
-        "SLES-82044",
-        "SLES-82046",
-        "SLES-82048"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Konami",
       "genre": "Action",
@@ -14396,10 +14367,7 @@
       "serial": "SLES-55474"
     },
     "Peter Jackson's King Kong (PAL)": {
-      "alt_serials": [
-        "SLES-53704",
-        "SLES-53705"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Ubisoft Montpellier",
       "genre": "Action",
@@ -14817,10 +14785,7 @@
       "serial": "SLES-53741"
     },
     "Prince of Persia: Warrior Within (PAL)": {
-      "alt_serials": [
-        "SLES-52713",
-        "SLES-52727"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Ubisoft Montreal",
       "genre": "Action-Adventure",
@@ -14874,10 +14839,7 @@
       "serial": "SLES-51114"
     },
     "Pro Evolution Soccer 2011 (PAL)": {
-      "alt_serials": [
-        "SLES-55637",
-        "SLES-55638"
-      ],
+      "alt_serials": [],
       "crcs": [
         "DBAAB66D"
       ],
@@ -18804,11 +18766,7 @@
       "serial": "SLES-82029"
     },
     "Star Ocean: Till the End of Time (PAL)": {
-      "alt_serials": [
-        "SLES-52958",
-        "SLES-52960",
-        "SLES-52961"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "tri-Ace",
       "genre": "Action-RPG",
@@ -19815,11 +19773,7 @@
     },
     "Tekken 5 (PAL)": {
       "alt_serials": [
-        "SCES-52878",
-        "SLES-53012",
-        "SLES-53013",
-        "SLES-53015",
-        "SLES-53016"
+        "SCES-52878"
       ],
       "crcs": [],
       "developer": "Namco",
@@ -20264,9 +20218,7 @@
       "serial": "SLES-53430"
     },
     "The Incredibles (PAL)": {
-      "alt_serials": [
-        "SLES-52820"
-      ],
+      "alt_serials": [],
       "crcs": [
         "EBDB6E4B"
       ],
@@ -21753,16 +21705,6 @@
       "region": "PAL",
       "release_date": "2003-11-28",
       "serial": "SLES-51753"
-    },
-    "True Crime: Streets of LA (PAL)": {
-      "alt_serials": [
-        "SLED-51902"
-      ],
-      "developer": "Luxoflux",
-      "genre": "Action",
-      "publisher": "Activision",
-      "release_date": "2003-11-07",
-      "serial": "SLES-51754"
     },
     "Tube Mania (PAL)": {
       "alt_serials": [

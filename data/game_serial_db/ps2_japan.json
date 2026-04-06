@@ -10,9 +10,7 @@
       "serial": "SLPS-72231"
     },
     ".hack//Infection (JP)": {
-      "alt_serials": [
-        "SLPS-73230"
-      ],
+      "alt_serials": [],
       "developer": "CyberConnect2",
       "genre": "Action-RPG",
       "publisher": "Bandai",
@@ -20,9 +18,7 @@
       "serial": "SLPS-25121"
     },
     ".hack//Mutation (JP)": {
-      "alt_serials": [
-        "SLPS-73231"
-      ],
+      "alt_serials": [],
       "developer": "CyberConnect2",
       "genre": "Action-RPG",
       "publisher": "Bandai",
@@ -30,9 +26,7 @@
       "serial": "SLPS-25143"
     },
     ".hack//Outbreak (JP)": {
-      "alt_serials": [
-        "SLPS-73232"
-      ],
+      "alt_serials": [],
       "developer": "CyberConnect2",
       "genre": "Action-RPG",
       "publisher": "Bandai",
@@ -40,9 +34,7 @@
       "serial": "SLPS-25158"
     },
     ".hack//Quarantine (JP)": {
-      "alt_serials": [
-        "SLPS-73233"
-      ],
+      "alt_serials": [],
       "developer": "Bandai",
       "genre": "Action-RPG",
       "publisher": "CyberConnect2",
@@ -1049,9 +1041,7 @@
       "serial": "SLPS-20027"
     },
     "Ar Tonelico: Melody of Elemia (JP)": {
-      "alt_serials": [
-        "SLPS-73249"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Gust",
       "genre": "RPG",
@@ -1295,9 +1285,7 @@
       "serial": "SLPS-25408"
     },
     "Armored Core: Silent Line (JP)": {
-      "alt_serials": [
-        "SLPS-73420"
-      ],
+      "alt_serials": [],
       "developer": "FromSoftware",
       "genre": "Third-person Shooter",
       "publisher": "FromSoftware",
@@ -2449,9 +2437,7 @@
       "serial": "SLPM-74410"
     },
     "Breath of Fire: Dragon Quarter (JP)": {
-      "alt_serials": [
-        "SLPM-74410"
-      ],
+      "alt_serials": [],
       "developer": "Capcom Co., Ltd",
       "genre": "RPG",
       "publisher": "Capcom",
@@ -2863,10 +2849,7 @@
       "serial": "SLPM-61062"
     },
     "Castlevania: Lament of Innocence (JP)": {
-      "alt_serials": [
-        "SLPM-61062",
-        "SLPM-65406"
-      ],
+      "alt_serials": [],
       "developer": "KCET",
       "genre": "Action",
       "publisher": "Konami",
@@ -5280,9 +5263,7 @@
       "serial": "SLPM-65266"
     },
     "Drag-on Dragoon 2 (JP)": {
-      "alt_serials": [
-        "SLPM-61120"
-      ],
+      "alt_serials": [],
       "developer": "Cavia Inc",
       "genre": "Action",
       "publisher": "Square Enix",
@@ -5409,9 +5390,7 @@
       "serial": "SLPM-65555"
     },
     "Dragon Quest VIII (JP)": {
-      "alt_serials": [
-        "SLPM-66481"
-      ],
+      "alt_serials": [],
       "developer": "Level 5",
       "genre": "RPG.",
       "publisher": "Square Enix",
@@ -6563,10 +6542,7 @@
       "serial": "SCPS-55002"
     },
     "Fatal Frame II: Crimson Butterfly (JP)": {
-      "alt_serials": [
-        "SLPS-73201",
-        "SLPS-73256"
-      ],
+      "alt_serials": [],
       "developer": "Tecmo",
       "genre": "Survival Horror",
       "publisher": "Tecmo",
@@ -7033,9 +7009,7 @@
       "serial": "SLPS-25506"
     },
     "Forbidden Siren 2 (JP)": {
-      "alt_serials": [
-        "SCPS-19326"
-      ],
+      "alt_serials": [],
       "developer": "SCE Japan Studio",
       "genre": "Survival Horror",
       "publisher": "Sony Computer Entertainment Inc.",
@@ -11366,9 +11340,7 @@
       "serial": "SCPS-15057"
     },
     "Jak II: Renegade (JP)": {
-      "alt_serials": [
-        "SCPS-55004"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Naughty Dog",
       "genre": "Action",
@@ -13556,9 +13528,7 @@
       "serial": "SLPS-25266"
     },
     "King of Fighters 2002, The (JP)": {
-      "alt_serials": [
-        "SLPS-25573"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Eolith",
       "genre": "Fighting",
@@ -14349,9 +14319,7 @@
       "serial": "SLPS-20423"
     },
     "La Pucelle (JP)": {
-      "alt_serials": [
-        "SLPS-20165"
-      ],
+      "alt_serials": [],
       "developer": "Nippon Ichi",
       "genre": "RPG",
       "publisher": "Nippon Ichi",
@@ -15581,10 +15549,7 @@
       "serial": "SLPS-20284"
     },
     "Marvel vs. Capcom 2 (JP)": {
-      "alt_serials": [
-        "SLPM-60188",
-        "SLPM-64523"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Capcom",
       "genre": "Fighting",
@@ -18357,9 +18322,7 @@
       "serial": "SLPM-66726"
     },
     "Okami (JP)": {
-      "alt_serials": [
-        "SLPM-74239"
-      ],
+      "alt_serials": [],
       "developer": "Clover Studio",
       "genre": "Action",
       "publisher": "Capcom",
@@ -18438,9 +18401,7 @@
       "serial": "SLPM-61001"
     },
     "Onimusha 2 (JP)": {
-      "alt_serials": [
-        "SLPM-66504"
-      ],
+      "alt_serials": [],
       "developer": "Capcom",
       "genre": "Action/Adventure/Beat'em Up",
       "publisher": "Capcom",
@@ -18448,10 +18409,7 @@
       "serial": "SLPM-65100"
     },
     "Onimusha 2: Samurai's Destiny (JP)": {
-      "alt_serials": [
-        "SLPM-65100",
-        "SLPM-66504"
-      ],
+      "alt_serials": [],
       "developer": "Capcom",
       "genre": "Action-Adventure",
       "publisher": "Capcom",
@@ -20754,9 +20712,7 @@
       "serial": "SCPS-15037"
     },
     "Ratchet & Clank 2 (JP)": {
-      "alt_serials": [
-        "SCPS-19317"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Insomniac Games",
       "genre": "Platformer",
@@ -20774,9 +20730,7 @@
       "serial": "SCPS-19317"
     },
     "Ratchet & Clank 3 (JP)": {
-      "alt_serials": [
-        "SCPS-19309"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Insomniac Games",
       "genre": "Platformer",
@@ -21390,12 +21344,7 @@
       "serial": "SLPS-25685"
     },
     "Ryu ga Gotoku (JP)": {
-      "alt_serials": [
-        "SLPM-61140",
-        "SLPM-74234",
-        "SLPM-74253",
-        "SLPM-74269"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "CS1 Team",
       "genre": "Action",
@@ -23303,9 +23252,7 @@
       "serial": "SLPM-73215"
     },
     "Shadow Hearts: Covenant (JP)": {
-      "alt_serials": [
-        "SLPS-25317"
-      ],
+      "alt_serials": [],
       "developer": "Aruze Corp",
       "genre": "RPG",
       "publisher": "Aruze Corp",
@@ -23370,10 +23317,7 @@
       "serial": "SLPM-61109"
     },
     "Shadow of the Colossus (JP)": {
-      "alt_serials": [
-        "SCPS-19320",
-        "SCPS-19335"
-      ],
+      "alt_serials": [],
       "developer": "Sony",
       "genre": "Action-Adventure",
       "publisher": "Sony",
@@ -30787,9 +30731,7 @@
       "serial": "SLPM-65699"
     },
     "Viewtiful Joe 2 (JP)": {
-      "alt_serials": [
-        "SLPM-61094"
-      ],
+      "alt_serials": [],
       "developer": "Capcom",
       "genre": "Action",
       "publisher": "Capcom",
@@ -31115,10 +31057,7 @@
       "serial": "SLPM-66448"
     },
     "We Love Katamari (JP)": {
-      "alt_serials": [
-        "SLPM-60268",
-        "SLPS-73241"
-      ],
+      "alt_serials": [],
       "developer": "Namco",
       "genre": "Action",
       "publisher": "Namco",
@@ -31192,10 +31131,7 @@
       "serial": "SLPM-66078"
     },
     "Wild ARMs: Advanced 3rd (JP)": {
-      "alt_serials": [
-        "SCPS-19205",
-        "SCPS-55006"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Media Vision",
       "genre": "RPG",
@@ -31217,10 +31153,7 @@
       "serial": "SCPS-15091"
     },
     "Wild Arms 3 (JP)": {
-      "alt_serials": [
-        "SCPS-19205",
-        "SCPS-55006"
-      ],
+      "alt_serials": [],
       "developer": "Media Vision (Sony)",
       "genre": "RPG",
       "publisher": "Sony",
@@ -31920,10 +31853,7 @@
       "serial": "SLPS-25367"
     },
     "Xenosaga Episode II: Jenseits von Gut und Bose (JP)": {
-      "alt_serials": [
-        "SLPS-25366",
-        "SLPS-73224"
-      ],
+      "alt_serials": [],
       "developer": "Monolith Soft",
       "genre": "RPG",
       "publisher": "Namco",
@@ -32688,9 +32618,7 @@
       "serial": "SLPM-60182"
     },
     "Zone of the Enders (JP)": {
-      "alt_serials": [
-        "SLPM-65237"
-      ],
+      "alt_serials": [],
       "developer": "Konami",
       "genre": "Action",
       "publisher": "Konami",
@@ -32698,10 +32626,7 @@
       "serial": "SLPM-65019"
     },
     "Zone of the Enders: The 2nd Runner (JP)": {
-      "alt_serials": [
-        "SLPM-60200",
-        "SLPM-61035"
-      ],
+      "alt_serials": [],
       "developer": "Konami",
       "genre": "Action",
       "publisher": "Konami",
