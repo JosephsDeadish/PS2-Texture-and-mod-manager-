@@ -23102,3 +23102,248 @@ class TestWave129ReleaseDateFillsFromNtscU(unittest.TestCase):
         empty = [t for t, i in self.jp_games.items() if not i.get("release_date", "").strip()]
         self.assertLessEqual(len(empty), 973,
             f"JP still has {len(empty)} entries without release_date, expected <= 973")
+
+
+class TestWave130CrossDbMetadataFills(unittest.TestCase):
+    """Wave 130: Fill empty metadata for PAL and JP by cross-referencing each other.
+
+    PAL filled from JP: 3 dev, 3 pub, 0 genre, 2 date.
+    JP filled from PAL: 35 dev, 33 pub, 30 genre, 29 date.
+    Normalization strips regional suffix before comparing.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    # ── PAL filled from JP ────────────────────────────────────────────────────
+
+    def test_pal_bomberman_kart_dev_from_jp(self):
+        """Wave 130: Bomberman Kart (PAL) developer filled from JP entry."""
+        g = self.pal_games.get("Bomberman Kart (PAL)", {})
+        self.assertEqual(g.get("developer"), "Racjin",
+            f"Expected 'Racjin', got {g.get('developer')!r}")
+
+    def test_pal_ghost_vibration_dev_from_jp(self):
+        """Wave 130: Ghost Vibration (PAL) developer filled from JP entry."""
+        g = self.pal_games.get("Ghost Vibration (PAL)", {})
+        self.assertEqual(g.get("developer"), "Artoon",
+            f"Expected 'Artoon', got {g.get('developer')!r}")
+
+    def test_pal_everblue_dev_from_jp(self):
+        """Wave 130: Everblue (PAL) developer filled from JP entry."""
+        g = self.pal_games.get("Everblue (PAL)", {})
+        self.assertEqual(g.get("developer"), "Arika",
+            f"Expected 'Arika', got {g.get('developer')!r}")
+
+    # ── JP filled from PAL ────────────────────────────────────────────────────
+
+    def test_jp_bomberman_kart_dev_from_pal(self):
+        """Wave 130: Bomberman Kart (JP) developer filled from PAL entry."""
+        g = self.jp_games.get("Bomberman Kart (JP)", {})
+        self.assertEqual(g.get("developer"), "Racjin",
+            f"Expected 'Racjin', got {g.get('developer')!r}")
+
+    def test_jp_bomberman_kart_pub_from_pal(self):
+        """Wave 130: Bomberman Kart (JP) publisher filled from PAL entry."""
+        g = self.jp_games.get("Bomberman Kart (JP)", {})
+        self.assertEqual(g.get("publisher"), "Hudson Soft",
+            f"Expected 'Hudson Soft', got {g.get('publisher')!r}")
+
+    def test_jp_brothers_in_arms_dev_from_pal(self):
+        """Wave 130: Brothers in Arms: Road to Hill 30 (JP) developer filled from PAL."""
+        g = self.jp_games.get("Brothers in Arms: Road to Hill 30 (JP)", {})
+        self.assertEqual(g.get("developer"), "Gearbox Software",
+            f"Expected 'Gearbox Software', got {g.get('developer')!r}")
+
+    def test_jp_capcom_classics_dev_from_pal(self):
+        """Wave 130: Capcom Classics Collection (JP) developer filled from PAL."""
+        g = self.jp_games.get("Capcom Classics Collection (JP)", {})
+        self.assertEqual(g.get("developer"), "Capcom",
+            f"Expected 'Capcom', got {g.get('developer')!r}")
+
+    def test_jp_sonic_gems_dev_from_pal(self):
+        """Wave 130: Sonic Gems Collection (JP) developer filled from PAL."""
+        g = self.jp_games.get("Sonic Gems Collection (JP)", {})
+        self.assertEqual(g.get("developer"), "Sonic Team",
+            f"Expected 'Sonic Team', got {g.get('developer')!r}")
+
+    def test_jp_shadow_of_memories_dev_from_pal(self):
+        """Wave 130: Shadow of Memories (JP) developer filled from PAL."""
+        g = self.jp_games.get("Shadow of Memories (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami",
+            f"Expected 'Konami', got {g.get('developer')!r}")
+
+    def test_jp_rayman_revolution_genre_from_pal(self):
+        """Wave 130: Rayman Revolution (JP) genre filled from PAL."""
+        g = self.jp_games.get("Rayman Revolution (JP)", {})
+        self.assertEqual(g.get("genre"), "Platformer",
+            f"Expected 'Platformer', got {g.get('genre')!r}")
+
+    def test_jp_lotr_two_towers_dev_from_pal(self):
+        """Wave 130: The Lord of the Rings: The Two Towers (JP) developer filled from PAL."""
+        g = self.jp_games.get("The Lord of the Rings: The Two Towers (JP)", {})
+        self.assertEqual(g.get("developer"), "Stormfront Studios",
+            f"Expected 'Stormfront Studios', got {g.get('developer')!r}")
+
+    def test_jp_lotr_two_towers_date_from_pal(self):
+        """Wave 130: The Lord of the Rings: The Two Towers (JP) release_date filled from PAL."""
+        g = self.jp_games.get("The Lord of the Rings: The Two Towers (JP)", {})
+        self.assertEqual(g.get("release_date"), "2002-11-08",
+            f"Expected '2002-11-08', got {g.get('release_date')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_pal_dev_count_wave130(self):
+        """Wave 130: PAL DB must have at most 393 entries without developer (was 396)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 393,
+            f"PAL still has {len(empty)} entries without developer, expected <= 393")
+
+    def test_jp_dev_count_wave130(self):
+        """Wave 130: JP DB must have at most 1296 entries without developer (was 1331)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 1296,
+            f"JP still has {len(empty)} entries without developer, expected <= 1296")
+
+    def test_jp_genre_count_wave130(self):
+        """Wave 130: JP DB must have at most 901 entries without genre (was 931)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 901,
+            f"JP still has {len(empty)} entries without genre, expected <= 901")
+
+
+class TestWave131PatternBasedPalFills(unittest.TestCase):
+    """Wave 131: Fill PAL metadata using series-name patterns.
+
+    SingStar: 59 dev, 60 pub, 48 genre filled (SCEE London Studio / SCE Europe / Party).
+    Buzz!:    13 dev, 13 pub, 12 genre filled (Relentless Software / SCE Europe / Party).
+    EyeToy:    2 dev,  2 pub filled (SCEE London Studio / SCE Europe).
+    Club Football 2005: 13 dev, 13 pub, 13 genre (Codemasters / Codemasters / Sports).
+    WRC II: EXTREME, Premier Manager 2003-06-07, FIFA 10: 5 more fills.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    # ── SingStar pattern ──────────────────────────────────────────────────────
+
+    def test_singstar_afrikaanse_dev_filled(self):
+        """Wave 131: SingStar Afrikaanse Treffers (PAL) developer filled."""
+        g = self.pal_games.get("SingStar Afrikaanse Treffers (PAL)", {})
+        self.assertEqual(g.get("developer"), "SCEE London Studio",
+            f"Expected 'SCEE London Studio', got {g.get('developer')!r}")
+
+    def test_singstar_afrikaanse_pub_filled(self):
+        """Wave 131: SingStar Afrikaanse Treffers (PAL) publisher filled."""
+        g = self.pal_games.get("SingStar Afrikaanse Treffers (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Sony Computer Entertainment Europe",
+            f"Expected 'Sony Computer Entertainment Europe', got {g.get('publisher')!r}")
+
+    def test_singstar_best_disney_genre_filled(self):
+        """Wave 131: SingStar Best of Disney (PAL) genre filled."""
+        g = self.pal_games.get("SingStar Best of Disney (PAL)", {})
+        self.assertEqual(g.get("genre"), "Party",
+            f"Expected 'Party', got {g.get('genre')!r}")
+
+    def test_singstar_bollywood_dev_filled(self):
+        """Wave 131: SingStar Bollywood (PAL) developer filled."""
+        g = self.pal_games.get("SingStar Bollywood (PAL)", {})
+        self.assertEqual(g.get("developer"), "SCEE London Studio",
+            f"Expected 'SCEE London Studio', got {g.get('developer')!r}")
+
+    # ── Buzz! pattern ─────────────────────────────────────────────────────────
+
+    def test_buzz_brain_switzerland_dev_filled(self):
+        """Wave 131: Buzz! Brain of Switzerland (PAL) developer filled."""
+        g = self.pal_games.get("Buzz! Brain of Switzerland (PAL)", {})
+        self.assertEqual(g.get("developer"), "Relentless Software",
+            f"Expected 'Relentless Software', got {g.get('developer')!r}")
+
+    def test_buzz_brain_world_pub_filled(self):
+        """Wave 131: Buzz! Brain of the World (PAL) publisher filled."""
+        g = self.pal_games.get("Buzz! Brain of the World (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Sony Computer Entertainment Europe",
+            f"Expected 'Sony Computer Entertainment Europe', got {g.get('publisher')!r}")
+
+    def test_buzz_hollywood_genre_filled(self):
+        """Wave 131: Buzz! Hollywood (PAL) genre filled."""
+        g = self.pal_games.get("Buzz! Hollywood (PAL)", {})
+        self.assertEqual(g.get("genre"), "Party",
+            f"Expected 'Party', got {g.get('genre')!r}")
+
+    # ── EyeToy pattern ────────────────────────────────────────────────────────
+
+    def test_eyetoy_astro_zoo_dev_filled(self):
+        """Wave 131: EyeToy Play: Astro Zoo (PAL) developer filled."""
+        g = self.pal_games.get("EyeToy Play: Astro Zoo (PAL)", {})
+        self.assertEqual(g.get("developer"), "SCEE London Studio",
+            f"Expected 'SCEE London Studio', got {g.get('developer')!r}")
+
+    # ── Club Football 2005 pattern ────────────────────────────────────────────
+
+    def test_cf2005_arsenal_dev_filled(self):
+        """Wave 131: Club Football 2005: Arsenal (PAL) developer filled."""
+        g = self.pal_games.get("Club Football 2005: Arsenal (PAL)", {})
+        self.assertEqual(g.get("developer"), "Codemasters",
+            f"Expected 'Codemasters', got {g.get('developer')!r}")
+
+    def test_cf2005_chelsea_pub_filled(self):
+        """Wave 131: Club Football 2005: Chelsea FC (PAL) publisher filled."""
+        g = self.pal_games.get("Club Football 2005: Chelsea FC (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Codemasters",
+            f"Expected 'Codemasters', got {g.get('publisher')!r}")
+
+    def test_cf2005_liverpool_genre_filled(self):
+        """Wave 131: Club Football 2005: Liverpool FC (PAL) genre filled."""
+        g = self.pal_games.get("Club Football 2005: Liverpool FC (PAL)", {})
+        self.assertEqual(g.get("genre"), "Sports",
+            f"Expected 'Sports', got {g.get('genre')!r}")
+
+    # ── Other fills ───────────────────────────────────────────────────────────
+
+    def test_wrc2_extreme_dev_filled(self):
+        """Wave 131: WRC II: EXTREME (PAL) developer filled."""
+        g = self.pal_games.get("WRC II: EXTREME (PAL)", {})
+        self.assertEqual(g.get("developer"), "Evolution Studios",
+            f"Expected 'Evolution Studios', got {g.get('developer')!r}")
+
+    def test_premier_manager_2003_dev_filled(self):
+        """Wave 131: Premier Manager 2003-04 (PAL) developer filled."""
+        g = self.pal_games.get("Premier Manager 2003-04 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Zoo Games",
+            f"Expected 'Zoo Games', got {g.get('developer')!r}")
+
+    def test_fifa10_dev_filled(self):
+        """Wave 131: FIFA 10 (PAL) developer filled."""
+        g = self.pal_games.get("FIFA 10 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Canada",
+            f"Expected 'EA Canada', got {g.get('developer')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_pal_dev_count_wave131(self):
+        """Wave 131: PAL DB must have at most 301 entries without developer (was 393)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 301,
+            f"PAL still has {len(empty)} entries without developer, expected <= 301")
+
+    def test_pal_pub_count_wave131(self):
+        """Wave 131: PAL DB must have at most 268 entries without publisher (was 357)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 268,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 268")
+
+    def test_pal_genre_count_wave131(self):
+        """Wave 131: PAL DB must have at most 228 entries without genre (was 302)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 228,
+            f"PAL still has {len(empty)} entries without genre, expected <= 228")
