@@ -910,9 +910,9 @@
     },
     "Another Century's Episode 2: Special Vocal Version (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "FromSoftware",
       "genre": "Third-person Shooter",
-      "publisher": "",
+      "publisher": "Banpresto",
       "release_date": "2006-03-30",
       "serial": "SLPS-25829"
     },
@@ -2562,9 +2562,9 @@
     },
     "Burnout Revenge (EA Best Hits) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Criterion Games",
+      "genre": "Racing",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-66652"
     },
@@ -4788,9 +4788,9 @@
     },
     "Devil Summoner: Kuzunoha Raidou (Atlus Best Collection) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Atlus",
+      "genre": "Action-RPG",
+      "publisher": "Atlus",
       "release_date": "",
       "serial": "SLPM-66634"
     },
@@ -6009,9 +6009,9 @@
       "alt_serials": [
         "SLPS-25706"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Bandai Entertainment Company",
+      "genre": "Action",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25646"
     },
@@ -7198,9 +7198,9 @@
       "alt_serials": [
         "SLPM-68514"
       ],
-      "developer": "",
+      "developer": "Square Enix",
       "genre": "Third-person Shooter",
-      "publisher": "",
+      "publisher": "Square Enix",
       "release_date": "",
       "serial": "SLPM-65981"
     },
@@ -7950,7 +7950,7 @@
       "alt_serials": [
         "SLPS-73004"
       ],
-      "developer": "",
+      "developer": "Athena",
       "genre": "Strategy",
       "publisher": "Athena",
       "release_date": "2001-06-21",
@@ -9015,9 +9015,9 @@
     },
     "Guilty Gear XX #Reload: The Midnight Carnival (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Arc System Works",
+      "genre": "Fighting",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPS-25261"
     },
@@ -16309,9 +16309,9 @@
         "SCPM-85302",
         "SCPS-15071"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Clap Hanz",
+      "genre": "Sports",
+      "publisher": "Sony",
       "release_date": "",
       "serial": "SCPS-15049"
     },
@@ -16652,9 +16652,9 @@
     },
     "Monster Farm 5: Circus Caravan (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Tecmo",
+      "genre": "Simulation",
+      "publisher": "Tecmo",
       "release_date": "",
       "serial": "SLPS-25585"
     },
@@ -21483,9 +21483,9 @@
     },
     "SD Gundam: GGeneration Spirits: G-Spirits (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Tom Create",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2007-11-29",
       "serial": "SLPS-25832"
     },
@@ -21841,7 +21841,7 @@
         "SLPM-65906",
         "SLPM-67906"
       ],
-      "developer": "",
+      "developer": "Overworks",
       "genre": "Adventure",
       "publisher": "Sega",
       "release_date": "2005-02-24",
@@ -21849,17 +21849,17 @@
     },
     "Sakura Taisen 3: Paris wa Moeteiru ka (Limited Edition) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Overworks",
+      "genre": "Adventure",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-67900"
     },
     "Sakura Taisen 3: Paris wa Moeteiru ka: Sega The Best (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Overworks",
+      "genre": "Adventure",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-55043"
     },
@@ -21885,9 +21885,9 @@
       "alt_serials": [
         "SLPM-67009"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Overworks",
+      "genre": "Adventure",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-62598"
     },
@@ -23463,9 +23463,9 @@
     },
     "Shikigami no Shiro: Nanayozuki Gensoukyoku (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Alfa System",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Taito",
       "release_date": "2005-08-18",
       "serial": "SLPM-66069"
     },
@@ -23589,9 +23589,9 @@
     },
     "Shin Megami Tensei III: Nocturne Maniax: Chronicle Edition (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Atlus",
+      "genre": "Action",
+      "publisher": "Atlus",
       "release_date": "",
       "serial": "SLPM-66681"
     },
@@ -31292,9 +31292,9 @@
     },
     "Winning Post 4 Maximum (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei, Inis",
+      "genre": "Simulation",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62019"
     },
@@ -31302,7 +31302,7 @@
       "alt_serials": [
         "SLPM-62060"
       ],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2001-03-22",
@@ -31310,7 +31310,7 @@
     },
     "Winning Post 4 Maximum 2001: Koei Summer Chance 2002 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei, Inis",
       "genre": "Sports",
       "publisher": "Koei",
       "release_date": "2002-07-05",

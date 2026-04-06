@@ -23549,3 +23549,83 @@ class TestWave132JpSeriesPatternFills(unittest.TestCase):
         empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 834,
             f"JP still has {len(empty)} entries without genre, expected <= 834")
+
+
+class TestWave133JpMoreSeriesPatternFills(unittest.TestCase):
+    """Wave 133: Fill JP metadata from additional series patterns.
+
+    Sakura Taisen: 4, Winning Post 4: 3, Shin Megami Tensei: 1, Devil Summoner: 1,
+    Another Century's Episode: 1, Guilty Gear XX: 1, Burnout: 1, Front Mission Online: 1,
+    Minna no Golf Online: 1, SD Gundam GGeneration: 1, Monster Farm 5: 1,
+    Shikigami: 1, Gambler Densetsu: 1, Eureka: 1.
+    JP remaining: dev=1183, genre=823.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    def test_sakura_taisen_3_dev_filled(self):
+        """Wave 133: Sakura Taisen 3 (JP) developer filled."""
+        g = self.jp_games.get("Sakura Taisen 3: Paris wa Moeteiru ka (JP)", {})
+        self.assertEqual(g.get("developer"), "Overworks",
+            f"Expected 'Overworks', got {g.get('developer')!r}")
+
+    def test_sakura_taisen_v_pub_filled(self):
+        """Wave 133: Sakura Taisen V (JP) publisher filled."""
+        g = self.jp_games.get("Sakura Taisen V: Saraba Itoshiki Hito yo (JP)", {})
+        self.assertEqual(g.get("publisher"), "Sega",
+            f"Expected 'Sega', got {g.get('publisher')!r}")
+
+    def test_winning_post_4_dev_filled(self):
+        """Wave 133: Winning Post 4 Maximum (JP) developer filled."""
+        g = self.jp_games.get("Winning Post 4 Maximum (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei, Inis",
+            f"Expected 'Koei, Inis', got {g.get('developer')!r}")
+
+    def test_guilty_gear_xx_dev_filled(self):
+        """Wave 133: Guilty Gear XX #Reload (JP) developer filled."""
+        g = self.jp_games.get("Guilty Gear XX #Reload: The Midnight Carnival (JP)", {})
+        self.assertEqual(g.get("developer"), "Arc System Works",
+            f"Expected 'Arc System Works', got {g.get('developer')!r}")
+
+    def test_burnout_revenge_dev_filled(self):
+        """Wave 133: Burnout Revenge (EA Best Hits) (JP) developer filled."""
+        g = self.jp_games.get("Burnout Revenge (EA Best Hits) (JP)", {})
+        self.assertEqual(g.get("developer"), "Criterion Games",
+            f"Expected 'Criterion Games', got {g.get('developer')!r}")
+
+    def test_front_mission_online_dev_filled(self):
+        """Wave 133: Front Mission Online (JP) developer filled."""
+        g = self.jp_games.get("Front Mission Online (JP)", {})
+        self.assertEqual(g.get("developer"), "Square Enix",
+            f"Expected 'Square Enix', got {g.get('developer')!r}")
+
+    def test_monster_farm_5_dev_filled(self):
+        """Wave 133: Monster Farm 5: Circus Caravan (JP) developer filled."""
+        g = self.jp_games.get("Monster Farm 5: Circus Caravan (JP)", {})
+        self.assertEqual(g.get("developer"), "Tecmo",
+            f"Expected 'Tecmo', got {g.get('developer')!r}")
+
+    def test_minna_no_golf_online_dev_filled(self):
+        """Wave 133: Minna no Golf Online (JP) developer filled."""
+        g = self.jp_games.get("Minna no Golf Online (JP)", {})
+        self.assertEqual(g.get("developer"), "Clap Hanz",
+            f"Expected 'Clap Hanz', got {g.get('developer')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave133(self):
+        """Wave 133: JP DB must have at most 1183 entries without developer (was 1202)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 1183,
+            f"JP still has {len(empty)} entries without developer, expected <= 1183")
+
+    def test_jp_genre_count_wave133(self):
+        """Wave 133: JP DB must have at most 823 entries without genre (was 834)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 823,
+            f"JP still has {len(empty)} entries without genre, expected <= 823")
