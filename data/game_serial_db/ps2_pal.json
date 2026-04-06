@@ -5175,7 +5175,7 @@
     "Disney/Pixar Cars: Hook International (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-55027"
@@ -5183,7 +5183,7 @@
     "Disney/Pixar Cars: La Copa Internacional de Mate (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-55029"
@@ -5282,7 +5282,7 @@
     "Disney/Pixar Monsters, Inc.: Monstros e Companhia: Ilha Assustadora (PAL)": {
       "alt_serials": [],
       "developer": "Artificial Mind and Movement",
-      "genre": "",
+      "genre": "Action/Platformer",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-50605"
@@ -7916,7 +7916,7 @@
     "Gaelic Games: Football (PAL)": {
       "alt_serials": [],
       "developer": "IR Gurus Interactive Ltd.",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-53450"
@@ -10738,7 +10738,7 @@
         "SCED-51166"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-51040"
@@ -11824,7 +11824,7 @@
     "Mercenaries 2: Inferno di Fuoco (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-54999"
@@ -12771,7 +12771,7 @@
     "NBA Live '06 (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-53547"
@@ -13514,7 +13514,7 @@
     "Nickelodeon Jimmy Neutron: Der mutige Erfinder (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-51300"
@@ -14611,7 +14611,7 @@
     "Power Rangers: Dino Tonnerre (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-52887"
@@ -14667,7 +14667,7 @@
     "Premier Manager 2002/2003 Season (PAL)": {
       "alt_serials": [],
       "developer": "Zoo Games",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "ZOO Digital Publishing",
       "release_date": "",
       "serial": "SLES-50722"
@@ -15184,7 +15184,7 @@
     "RTL Skispringen 2004 (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "RTL Enterprises",
       "release_date": "",
       "serial": "SLES-51888"
@@ -20667,7 +20667,7 @@
     "The Ultimate Film Quiz (PAL)": {
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
-      "genre": "",
+      "genre": "Party",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-53596"
@@ -20691,7 +20691,7 @@
     "The Ultimate Trivia Quiz (PAL)": {
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
-      "genre": "",
+      "genre": "Party",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-53598"
@@ -20858,7 +20858,7 @@
         "SCES-52936"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SCES-52425"
@@ -21035,7 +21035,7 @@
     "Tiger Woods USA Tour 2001 (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-50119"
@@ -21043,7 +21043,7 @@
     "Tiger Woods USA Tour 2002 (PAL)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-50729"
@@ -22675,7 +22675,7 @@
         "SLES-55411"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-55379"

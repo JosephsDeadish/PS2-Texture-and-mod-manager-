@@ -23748,3 +23748,104 @@ class TestWave134JpSeriesFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
         self.assertLessEqual(len(empty), 281,
             f"PAL still has {len(empty)} entries without developer, expected <= 281")
+
+
+class TestWave135JpMetadataFills(unittest.TestCase):
+    """Wave 135: Fill JP metadata for Dengeki PS2, FFXI expansions, Kidou Senshi
+    Gundam genres, GI Jockey genre, Gallop Racer genre, Rakushou! Pachi-Slot,
+    Mahjong Haou genre, Uchuu Senkan Yamato genre, Madden NFL genre,
+    Bomberman Kart genre, Fish Eyes genre, Idol Janshi genre, Hisshou Pachinko
+    (D3 Publisher), Pachitte Chonmage (Moeha), NeoGeo Online Collection
+    (SNK Playmore), Pop'n Music (Konami), Beatmania (Konami), and PAL genre fills.
+
+    JP: dev=904, pub=773, genre=599. PAL: genre=203.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    def test_dengeki_ps2_dev_filled(self):
+        """Wave 135: Dengeki PS2 D46 developer filled."""
+        g = self.jp_games.get("Dengeki PS2 PlayStation D46 (JP)", {})
+        self.assertEqual(g.get("developer"), "ASCII Media Works",
+            f"Expected 'ASCII Media Works', got {g.get('developer')!r}")
+
+    def test_dengeki_ps2_genre_filled(self):
+        """Wave 135: Dengeki PS2 D46 genre filled as Compilation."""
+        g = self.jp_games.get("Dengeki PS2 PlayStation D46 (JP)", {})
+        self.assertEqual(g.get("genre"), "Compilation",
+            f"Expected 'Compilation', got {g.get('genre')!r}")
+
+    def test_ffxi_expansion_dev_filled(self):
+        """Wave 135: Final Fantasy XI expansion developer filled."""
+        g = self.jp_games.get("Final Fantasy XI: Adoulin no Makyou (JP)", {})
+        self.assertEqual(g.get("developer"), "Square Enix",
+            f"Expected 'Square Enix', got {g.get('developer')!r}")
+
+    def test_ffxi_all_in_one_genre_filled(self):
+        """Wave 135: Final Fantasy XI All in One Pack genre filled."""
+        g = self.jp_games.get("Final Fantasy XI: All in One Pack 2006 (JP)", {})
+        self.assertEqual(g.get("genre"), "MMORPG",
+            f"Expected 'MMORPG', got {g.get('genre')!r}")
+
+    def test_gundam_00_genre_filled(self):
+        """Wave 135: Kidou Senshi Gundam 00 Gundam Meisters genre filled."""
+        g = self.jp_games.get("Kidou Senshi Gundam 00: Gundam Meisters (JP)", {})
+        self.assertEqual(g.get("genre"), "Action",
+            f"Expected 'Action', got {g.get('genre')!r}")
+
+    def test_gundam_giren_genre_filled(self):
+        """Wave 135: Kidou Senshi Gundam Giren genre filled as Strategy."""
+        g = self.jp_games.get("Kidou Senshi Gundam Giren no Yabou: Axis no Kyoui V (JP)", {})
+        self.assertEqual(g.get("genre"), "Strategy",
+            f"Expected 'Strategy', got {g.get('genre')!r}")
+
+    def test_gi_jockey4_genre_filled(self):
+        """Wave 135: GI Jockey 4 genre filled as Horse Racing."""
+        g = self.jp_games.get("GI Jockey 4 (JP)", {})
+        self.assertEqual(g.get("genre"), "Horse Racing",
+            f"Expected 'Horse Racing', got {g.get('genre')!r}")
+
+    def test_gallop_racer_genre_filled(self):
+        """Wave 135: Gallop Racer series genre filled as Horse Racing."""
+        g = self.jp_games.get("Gallop Racer 5 (JP)", {})
+        self.assertEqual(g.get("genre"), "Horse Racing",
+            f"Expected 'Horse Racing', got {g.get('genre')!r}")
+
+    def test_rakushou_dev_filled(self):
+        """Wave 135: Rakushou! Pachi-Slot Sengen developer filled."""
+        g = self.jp_games.get("Rakushou! Pachi-Slot Sengen (JP)", {})
+        self.assertEqual(g.get("developer"), "Jaleco",
+            f"Expected 'Jaleco', got {g.get('developer')!r}")
+
+    def test_hisshou_pachinko_pub_filled(self):
+        """Wave 135: Hisshou Pachinko Pachi-Slot Series publisher filled."""
+        g = self.jp_games.get(
+            "Hisshou Pachinko Pachi-Slot Kouryaku Series Vol. 12: CR Shin Seiki Evangelion: Shito, Futatabi (JP)", {})
+        self.assertEqual(g.get("publisher"), "D3 Publisher",
+            f"Expected 'D3 Publisher', got {g.get('publisher')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave135(self):
+        """Wave 135: JP DB must have at most 904 entries without developer (was 1030)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 904,
+            f"JP still has {len(empty)} entries without developer, expected <= 904")
+
+    def test_jp_genre_count_wave135(self):
+        """Wave 135: JP DB must have at most 599 entries without genre (was 689)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 599,
+            f"JP still has {len(empty)} entries without genre, expected <= 599")
+
+    def test_pal_genre_count_wave135(self):
+        """Wave 135: PAL DB must have at most 203 entries without genre (was 220)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 203,
+            f"PAL still has {len(empty)} entries without genre, expected <= 203")
