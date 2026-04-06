@@ -23629,3 +23629,122 @@ class TestWave133JpMoreSeriesPatternFills(unittest.TestCase):
         empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 823,
             f"JP still has {len(empty)} entries without genre, expected <= 823")
+
+
+class TestWave134JpSeriesFills(unittest.TestCase):
+    """Wave 134: Fill JP metadata for Karaoke Revolution, Oretachi Geesen Zoku,
+    World Soccer Winning Eleven, Sega Ages 2500, GI Jockey, Jissen Pachi-Slot,
+    Yamasa Digi World, and 2-word prefix pattern fills.
+
+    KarRev: 18 dev/pub, OGZ: 17 dev/pub, WE: 12 dev/pub, SegaAges: 19 dev/pub,
+    GIJockey: 7 dev/pub, ExcitingPro: 4 dev/pub, JissenPachi: 6 dev/pub,
+    HissatsuPachinko: 10 dev/pub, 2-word prefix: 46 dev + 90 pub + 68 genre.
+    PAL 2-word prefix: 7 dev + 11 pub.
+    JP remaining: dev=1030, genre=689.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    def test_karaoke_revolution_dev_filled(self):
+        """Wave 134: Karaoke Revolution J-Pop Vol.1 developer filled."""
+        g = self.jp_games.get("Karaoke Revolution: J-Pop Best Vol. 1 (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami",
+            f"Expected 'Konami', got {g.get('developer')!r}")
+
+    def test_karaoke_revolution_pub_filled(self):
+        """Wave 134: Karaoke Revolution J-Pop Vol.1 publisher filled."""
+        g = self.jp_games.get("Karaoke Revolution: J-Pop Best Vol. 1 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Konami",
+            f"Expected 'Konami', got {g.get('publisher')!r}")
+
+    def test_karaoke_revolution_genre_filled(self):
+        """Wave 134: Karaoke Revolution genre filled as Music."""
+        g = self.jp_games.get("Karaoke Revolution: J-Pop Best Vol. 1 (JP)", {})
+        self.assertEqual(g.get("genre"), "Music",
+            f"Expected 'Music', got {g.get('genre')!r}")
+
+    def test_ogz_scramble_dev_filled(self):
+        """Wave 134: Oretachi Geesen Zoku: Scramble developer filled."""
+        g = self.jp_games.get("Oretachi Geesen Zoku: Scramble (JP)", {})
+        self.assertEqual(g.get("developer"), "Hamster",
+            f"Expected 'Hamster', got {g.get('developer')!r}")
+
+    def test_ogz_contra_pub_filled(self):
+        """Wave 134: Oretachi Geesen Zoku: Contra publisher filled."""
+        g = self.jp_games.get("Oretachi Geesen Zoku: Contra (JP)", {})
+        self.assertEqual(g.get("publisher"), "Hamster",
+            f"Expected 'Hamster', got {g.get('publisher')!r}")
+
+    def test_we8_dev_filled(self):
+        """Wave 134: World Soccer Winning Eleven 8 developer filled."""
+        g = self.jp_games.get("World Soccer Winning Eleven 8 (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami Computer Entertainment Tokyo",
+            f"Expected 'Konami Computer Entertainment Tokyo', got {g.get('developer')!r}")
+
+    def test_we2010_pub_filled(self):
+        """Wave 134: World Soccer Winning Eleven 2010 publisher filled."""
+        g = self.jp_games.get("World Soccer Winning Eleven 2010 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Konami",
+            f"Expected 'Konami', got {g.get('publisher')!r}")
+
+    def test_sega_ages_vol9_dev_filled(self):
+        """Wave 134: Sega Ages 2500 Vol. 9 developer filled."""
+        g = self.jp_games.get("Sega Ages 2500 Series Vol. 9: Gain Ground (JP)", {})
+        self.assertEqual(g.get("developer"), "Sega",
+            f"Expected 'Sega', got {g.get('developer')!r}")
+
+    def test_sega_ages_vol15_pub_filled(self):
+        """Wave 134: Sega Ages 2500 Vol. 15 publisher filled."""
+        g = self.jp_games.get("Sega Ages 2500 Series Vol. 15: DecAthlete Collection (JP)", {})
+        self.assertEqual(g.get("publisher"), "Sega",
+            f"Expected 'Sega', got {g.get('publisher')!r}")
+
+    def test_gi_jockey2_dev_filled(self):
+        """Wave 134: GI Jockey 2 developer filled."""
+        g = self.jp_games.get("GI Jockey 2 (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei",
+            f"Expected 'Koei', got {g.get('developer')!r}")
+
+    def test_gi_jockey2_pub_filled(self):
+        """Wave 134: GI Jockey 2 publisher filled."""
+        g = self.jp_games.get("GI Jockey 2 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Koei",
+            f"Expected 'Koei', got {g.get('publisher')!r}")
+
+    def test_yamasa_dw2_dev_filled(self):
+        """Wave 134: Yamasa Digi World 2 LCD Edition developer filled."""
+        g = self.jp_games.get("Yamasa Digi World 2 LCD Edition: Time Cross, Qlogos, Trigger Zone (JP)", {})
+        self.assertEqual(g.get("developer"), "Yamasa Entertainment",
+            f"Expected 'Yamasa Entertainment', got {g.get('developer')!r}")
+
+    # ── count regression ──────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave134(self):
+        """Wave 134: JP DB must have at most 1030 entries without developer (was 1183)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 1030,
+            f"JP still has {len(empty)} entries without developer, expected <= 1030")
+
+    def test_jp_genre_count_wave134(self):
+        """Wave 134: JP DB must have at most 689 entries without genre (was 823)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 689,
+            f"JP still has {len(empty)} entries without genre, expected <= 689")
+
+    def test_jp_pub_count_wave134(self):
+        """Wave 134: JP DB must have at most 857 entries without publisher (was 1019)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 857,
+            f"JP still has {len(empty)} entries without publisher, expected <= 857")
+
+    def test_pal_dev_count_wave134(self):
+        """Wave 134: PAL DB must have at most 281 entries without developer (was 288)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 281,
+            f"PAL still has {len(empty)} entries without developer, expected <= 281")
