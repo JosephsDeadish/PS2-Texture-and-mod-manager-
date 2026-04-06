@@ -5786,7 +5786,7 @@
         "SLPS-20274"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-20184"
@@ -5794,7 +5794,7 @@
     "Eikan wa Kimi ni 2004: Koushien no Kodou (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-20379"
@@ -5802,7 +5802,7 @@
     "Eikan wa Kimi ni: Koushien e no Michi (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-25006"
@@ -5810,7 +5810,7 @@
     "Eikan wa Kimi ni: Koushien no Hasha (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-25053"
@@ -9727,7 +9727,7 @@
     "Harry Potter to Azkaban no Shuujin (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Action/Adventure",
       "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-65612"
@@ -9746,7 +9746,7 @@
         "SLPM-68005"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action/Adventure",
       "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPS-20234"
@@ -10482,7 +10482,7 @@
     "Horse Breaker (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Horse Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-62072"
@@ -10490,7 +10490,7 @@
     "Horse Breaker (Koei Summer Chance) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Horse Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-62200"
@@ -10498,7 +10498,7 @@
     "Horse Breaker (Koei Teiban) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Horse Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-62614"
@@ -10506,7 +10506,7 @@
     "Horse Breaker (Koei The Best) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Horse Racing",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-62300"
@@ -13061,7 +13061,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25914"
     },
@@ -13069,7 +13069,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SCPS-55026"
     },
@@ -13077,7 +13077,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2010-06-03",
       "serial": "SLPS-73269"
     },
@@ -13085,7 +13085,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2003-07-31",
       "serial": "SLPS-20300"
     },
@@ -13093,7 +13093,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25549"
     },
@@ -13103,7 +13103,7 @@
       ],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2006-12-07",
       "serial": "SLPS-25718"
     },
@@ -13111,7 +13111,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25389"
     },
@@ -21618,25 +21618,25 @@
     },
     "Saikyou Toudai Shogi 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20082"
     },
     "Saikyou Toudai Shogi 4 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20201"
     },
     "Saikyou Toudai Shogi Special II (Mycom Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPM-62783"
     },
@@ -21644,9 +21644,9 @@
       "alt_serials": [
         "SLPS-20389"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20288"
     },
@@ -21654,41 +21654,41 @@
       "alt_serials": [
         "SLPM-62756"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20347"
     },
     "Saikyou Toudai Shougi 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20237"
     },
     "Saikyou Toudai Shougi 4 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20332"
     },
     "Saikyou Toudai Shougi Special (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPS-20161"
     },
     "Saikyou Toudai Shougi Special II (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board",
+      "publisher": "Mycom",
       "release_date": "",
       "serial": "SLPM-62610"
     },
@@ -23213,7 +23213,7 @@
       "alt_serials": [
         "SLPM-60226"
       ],
-      "developer": "",
+      "developer": "Aruze Corp",
       "genre": "RPG",
       "publisher": "Aruze Corp",
       "release_date": "",
@@ -23221,7 +23221,7 @@
     },
     "Shadow Hearts II: Director's Cut (Disc 1) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Aruze Corp",
       "genre": "RPG",
       "publisher": "Aruze Corp",
       "release_date": "",
@@ -23229,7 +23229,7 @@
     },
     "Shadow Hearts II: Director's Cut (Disc 2) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Aruze Corp",
       "genre": "RPG",
       "publisher": "Aruze Corp",
       "release_date": "",
@@ -23290,9 +23290,9 @@
     },
     "Shadow of Memories / Zone of the Enders: Z.O.E: Tentou Houei-you Movie-ban (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Action/Adventure",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-61004"
     },
@@ -24587,7 +24587,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPM-62396"
     },
@@ -24707,7 +24707,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-11-11",
       "serial": "SLPM-62558"
     },
@@ -24825,7 +24825,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2002-09-26",
       "serial": "SLPM-62224"
     },
@@ -24865,7 +24865,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2003-04-24",
       "serial": "SLPM-62324"
     },
@@ -24881,7 +24881,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-06-29",
       "serial": "SLPS-20465"
     },
@@ -24897,7 +24897,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-08-03",
       "serial": "SLPS-20467"
     },
@@ -24905,7 +24905,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-07-27",
       "serial": "SLPS-20470"
     },
@@ -24921,7 +24921,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-08-10",
       "serial": "SLPS-20464"
     },
@@ -24937,7 +24937,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-09-14",
       "serial": "SLPS-20474"
     },
@@ -24945,7 +24945,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-09-14",
       "serial": "SLPS-20476"
     },
@@ -24977,7 +24977,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2006-10-26",
       "serial": "SLPS-25703"
     },
@@ -24985,7 +24985,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPS-20481"
     },
@@ -24993,7 +24993,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Survival Horror",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2007-02-22",
       "serial": "SLPS-20488"
     },
@@ -25001,7 +25001,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2007-02-22",
       "serial": "SLPS-20489"
     },
@@ -25017,7 +25017,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPS-20493"
     },
@@ -25025,7 +25025,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPS-20494"
     },
@@ -25033,7 +25033,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2007-05-31",
       "serial": "SLPS-20491"
     },
@@ -25123,7 +25123,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "First-person Shooter",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2002-11-28",
       "serial": "SLPM-62253"
     },
@@ -25255,7 +25255,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPM-62337"
     },
@@ -25263,7 +25263,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Third-person Shooter",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2003-06-26",
       "serial": "SLPM-62344"
     },
@@ -25271,7 +25271,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Simulation",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2003-06-26",
       "serial": "SLPM-62345"
     },
@@ -25315,7 +25315,7 @@
       ],
       "developer": "",
       "genre": "Shoot 'Em Up",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2003",
       "serial": "SLPM-62395"
     },
@@ -25323,7 +25323,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPM-65393"
     },
@@ -25439,7 +25439,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-05-20",
       "serial": "SLPM-62484"
     },
@@ -25463,7 +25463,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPM-62495"
     },
@@ -25471,7 +25471,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-06-24",
       "serial": "SLPM-62493"
     },
@@ -25527,7 +25527,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-09-02",
       "serial": "SLPM-62510"
     },
@@ -25535,7 +25535,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-08-26",
       "serial": "SLPM-62525"
     },
@@ -25551,7 +25551,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-11-30",
       "serial": "SLPM-62534"
     },
@@ -25559,7 +25559,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2004-10-14",
       "serial": "SLPM-62545"
     },
@@ -25633,7 +25633,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Beat 'Em Up",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2005-02-17",
       "serial": "SLPM-62589"
     },
@@ -25681,7 +25681,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2005-05-26",
       "serial": "SLPM-62618"
     },
@@ -25763,7 +25763,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2005-11-10",
       "serial": "SLPS-20441"
     },
@@ -25771,7 +25771,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "2005-11-10",
       "serial": "SLPS-20440"
     },
@@ -25837,7 +25837,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPS-20456"
     },
@@ -25873,7 +25873,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLPS-20461"
     },
@@ -27298,7 +27298,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62389"
     },
@@ -27306,7 +27306,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62387"
     },
@@ -27314,7 +27314,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Puzzle",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "2003",
       "serial": "SLPM-62423"
     },
@@ -27322,7 +27322,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62448"
     },
@@ -27374,7 +27374,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62316"
     },
@@ -27424,7 +27424,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62548"
     },
@@ -27432,7 +27432,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62539"
     },
@@ -27440,7 +27440,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62540"
     },
@@ -27448,7 +27448,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62541"
     },
@@ -27464,7 +27464,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62306"
     },
@@ -27522,7 +27522,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62711"
     },
@@ -27556,7 +27556,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62317"
     },
@@ -27590,7 +27590,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62305"
     },
@@ -27606,7 +27606,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62372"
     },
@@ -27622,7 +27622,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "",
-      "publisher": "",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62388"
     },
@@ -32432,7 +32432,7 @@
     "Zero no Tsukaima: Fantasy Force (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-20502"
@@ -32440,7 +32440,7 @@
     "Zero no Tsukaima: Fantasy Force 2nd Impact (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-20507"
@@ -32461,7 +32461,7 @@
         "SLPS-25898"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2008-11-06",
       "serial": "SLPS-25897"
@@ -32469,7 +32469,7 @@
     "Zero no Tsukaima: Maigo no Period to Ikusen no Symphony: Best Collection (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2009-09-17",
       "serial": "SLPS-25948"
@@ -32479,7 +32479,7 @@
         "SLPS-25831"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2007-11-29",
       "serial": "SLPS-25830"
@@ -32487,7 +32487,7 @@
     "Zero no Tsukaima: Muma ga Tsumugu Yokaze no Nocturne: Best Collection (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2008-09-04",
       "serial": "SLPS-25893"
