@@ -22802,3 +22802,178 @@ class TestWave127SerialFixes(unittest.TestCase):
         dups = {s: ts for s, ts in serial_to_titles.items() if len(ts) > 1}
         self.assertEqual(len(dups), 0,
             f"JP DB has {len(dups)} duplicate serials: {list(dups.items())[:3]}")
+
+
+class TestWave128MetadataFillsFromNtscU(unittest.TestCase):
+    """Wave 128: Fill empty dev/pub/genre for PAL and JP games via NTSC-U cross-reference.
+
+    PAL: 146 dev, 119 pub, 100 genre filled from NTSC-U by normalized title match.
+    JP:  168 dev, 167 pub, 147 genre filled from NTSC-U by normalized title match.
+    Normalization strips regional suffix (PAL), (JP) etc. before comparing titles.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+
+    # ── PAL metadata fills ────────────────────────────────────────────────────
+
+    def test_pal_007_agent_under_fire_dev_filled(self):
+        """Wave 128: 007: Agent Under Fire (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("007: Agent Under Fire (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Redwood Shores",
+            f"Expected 'EA Redwood Shores', got {g.get('developer')!r}")
+
+    def test_pal_007_agent_under_fire_pub_filled(self):
+        """Wave 128: 007: Agent Under Fire (PAL) publisher filled from NTSC-U."""
+        g = self.pal_games.get("007: Agent Under Fire (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Electronic Arts",
+            f"Expected 'Electronic Arts', got {g.get('publisher')!r}")
+
+    def test_pal_007_agent_under_fire_genre_filled(self):
+        """Wave 128: 007: Agent Under Fire (PAL) genre filled from NTSC-U."""
+        g = self.pal_games.get("007: Agent Under Fire (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action/Gun",
+            f"Expected 'Action/Gun', got {g.get('genre')!r}")
+
+    def test_pal_atv_offroad_fury4_dev_filled(self):
+        """Wave 128: ATV Offroad Fury 4 (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("ATV Offroad Fury 4 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Climax Racing",
+            f"Expected 'Climax Racing', got {g.get('developer')!r}")
+
+    def test_pal_50cent_bulletproof_genre_filled(self):
+        """Wave 128: 50 Cent: Bulletproof (PAL) genre filled from NTSC-U."""
+        g = self.pal_games.get("50 Cent: Bulletproof (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action/Shooter",
+            f"Expected 'Action/Shooter', got {g.get('genre')!r}")
+
+    def test_pal_50cent_bulletproof_pub_filled(self):
+        """Wave 128: 50 Cent: Bulletproof (PAL) publisher filled from NTSC-U."""
+        g = self.pal_games.get("50 Cent: Bulletproof (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Vivendi Universal Games",
+            f"Expected 'Vivendi Universal Games', got {g.get('publisher')!r}")
+
+    def test_pal_7wonders_dev_filled(self):
+        """Wave 128: 7 Wonders of the Ancient World (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("7 Wonders of the Ancient World (PAL)", {})
+        self.assertEqual(g.get("developer"), "MumboJumbo",
+            f"Expected 'MumboJumbo', got {g.get('developer')!r}")
+
+    def test_pal_airblade_dev_filled(self):
+        """Wave 128: AirBlade (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("AirBlade (PAL)", {})
+        self.assertEqual(g.get("developer"), "Criterion Games",
+            f"Expected 'Criterion Games', got {g.get('developer')!r}")
+
+    def test_pal_aggressive_inline_genre_filled(self):
+        """Wave 128: Aggressive Inline (PAL) genre filled from NTSC-U."""
+        g = self.pal_games.get("Aggressive Inline (PAL)", {})
+        self.assertEqual(g.get("genre"), "Skateboarding",
+            f"Expected 'Skateboarding', got {g.get('genre')!r}")
+
+    def test_pal_4x4_evo_dev_filled(self):
+        """Wave 128: 4x4 Evo (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("4x4 Evo (PAL)", {})
+        self.assertEqual(g.get("developer"), "Terminal Reality",
+            f"Expected 'Terminal Reality', got {g.get('developer')!r}")
+
+    def test_pal_and1_streetball_pub_filled(self):
+        """Wave 128: AND 1 Streetball (PAL) publisher filled from NTSC-U."""
+        g = self.pal_games.get("AND 1 Streetball (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Ubisoft Entertainment",
+            f"Expected 'Ubisoft Entertainment', got {g.get('publisher')!r}")
+
+    def test_pal_airborne_troops_dev_filled(self):
+        """Wave 128: Airborne Troops: Countdown to D-Day (PAL) developer filled from NTSC-U."""
+        g = self.pal_games.get("Airborne Troops: Countdown to D-Day (PAL)", {})
+        self.assertEqual(g.get("developer"), "Widescreen Games",
+            f"Expected 'Widescreen Games', got {g.get('developer')!r}")
+
+    # ── PAL fill count regression ──────────────────────────────────────────────
+
+    def test_pal_dev_filled_count(self):
+        """Wave 128: PAL DB must have at most 400 entries without developer (was 542)."""
+        empty_dev = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty_dev), 400,
+            f"PAL still has {len(empty_dev)} entries without developer, expected <= 400")
+
+    def test_pal_pub_filled_count(self):
+        """Wave 128: PAL DB must have at most 365 entries without publisher (was 479)."""
+        empty_pub = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty_pub), 365,
+            f"PAL still has {len(empty_pub)} entries without publisher, expected <= 365")
+
+    def test_pal_genre_filled_count(self):
+        """Wave 128: PAL DB must have at most 305 entries without genre (was 402)."""
+        empty_genre = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty_genre), 305,
+            f"PAL still has {len(empty_genre)} entries without genre, expected <= 305")
+
+    # ── JP metadata fills ──────────────────────────────────────────────────────
+
+    def test_jp_007_agent_under_fire_dev_filled(self):
+        """Wave 128: 007: Agent Under Fire (JP) developer filled from NTSC-U."""
+        g = self.jp_games.get("007: Agent Under Fire (JP)", {})
+        self.assertEqual(g.get("developer"), "EA Redwood Shores",
+            f"Expected 'EA Redwood Shores', got {g.get('developer')!r}")
+
+    def test_jp_007_agent_under_fire_genre_filled(self):
+        """Wave 128: 007: Agent Under Fire (JP) genre filled from NTSC-U."""
+        g = self.jp_games.get("007: Agent Under Fire (JP)", {})
+        self.assertEqual(g.get("genre"), "Action/Gun",
+            f"Expected 'Action/Gun', got {g.get('genre')!r}")
+
+    def test_jp_hack_infection_dev_unchanged(self):
+        """Wave 128: .hack//Infection (JP) developer already populated, not overwritten."""
+        g = self.jp_games.get(".hack//Infection (JP)", {})
+        self.assertEqual(g.get("developer"), "CyberConnect2",
+            f"Expected 'CyberConnect2', got {g.get('developer')!r}")
+
+    def test_jp_18wheeler_dev_filled(self):
+        """Wave 128: 18 Wheeler: American Pro Trucker (JP) developer filled from NTSC-U."""
+        g = self.jp_games.get("18 Wheeler: American Pro Trucker (JP)", {})
+        self.assertEqual(g.get("developer"), "Acclaim Studios Cheltenham",
+            f"Expected 'Acclaim Studios Cheltenham', got {g.get('developer')!r}")
+
+    def test_jp_18wheeler_genre_filled(self):
+        """Wave 128: 18 Wheeler: American Pro Trucker (JP) genre filled from NTSC-U."""
+        g = self.jp_games.get("18 Wheeler: American Pro Trucker (JP)", {})
+        self.assertEqual(g.get("genre"), "Driving/Racing",
+            f"Expected 'Driving/Racing', got {g.get('genre')!r}")
+
+    def test_jp_ace_combat5_dev_filled(self):
+        """Wave 128: Ace Combat 5: The Unsung War (JP) developer filled from NTSC-U."""
+        g = self.jp_games.get("Ace Combat 5: The Unsung War (JP)", {})
+        self.assertEqual(g.get("developer"), "Project Aces",
+            f"Expected 'Project Aces', got {g.get('developer')!r}")
+
+    def test_jp_007_everything_or_nothing_pub_filled(self):
+        """Wave 128: 007: Everything or Nothing (JP) publisher filled from NTSC-U."""
+        g = self.jp_games.get("007: Everything or Nothing (JP)", {})
+        self.assertEqual(g.get("publisher"), "Electronic Arts",
+            f"Expected 'Electronic Arts', got {g.get('publisher')!r}")
+
+    # ── JP fill count regression ───────────────────────────────────────────────
+
+    def test_jp_dev_filled_count(self):
+        """Wave 128: JP DB must have at most 1340 entries without developer (was 1499)."""
+        empty_dev = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty_dev), 1340,
+            f"JP still has {len(empty_dev)} entries without developer, expected <= 1340")
+
+    def test_jp_pub_filled_count(self):
+        """Wave 128: JP DB must have at most 1145 entries without publisher (was 1304)."""
+        empty_pub = [t for t, i in self.jp_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty_pub), 1145,
+            f"JP still has {len(empty_pub)} entries without publisher, expected <= 1145")
+
+    def test_jp_genre_filled_count(self):
+        """Wave 128: JP DB must have at most 935 entries without genre (was 1078)."""
+        empty_genre = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty_genre), 935,
+            f"JP still has {len(empty_genre)} entries without genre, expected <= 935")

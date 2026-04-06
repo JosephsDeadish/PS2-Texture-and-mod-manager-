@@ -334,7 +334,7 @@
     },
     "ATV Offroad Fury 4 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Climax Racing",
       "genre": "Racing",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2008",
@@ -352,7 +352,7 @@
       "alt_serials": [
         "SLED-51364"
       ],
-      "developer": "",
+      "developer": "Climax Group",
       "genre": "Racing",
       "publisher": "Acclaim Entertainment",
       "release_date": "2003-02-28",
@@ -1116,8 +1116,8 @@
     },
     "Atari Anthology (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Digital Eclipse Software, Inc.",
+      "genre": "Compilation",
       "publisher": "Atari",
       "release_date": "2005-02-18",
       "serial": "SLES-53061"
@@ -1294,7 +1294,7 @@
     },
     "Backyard Wrestling: Don't Try This at Home (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Paradox Development",
       "genre": "Sports",
       "publisher": "Eidos",
       "release_date": "2003-11-07",
@@ -1427,8 +1427,8 @@
     },
     "Bass Strike (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Pai Corporation, Ltd.",
+      "genre": "Sports",
       "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-50512"
@@ -1534,9 +1534,9 @@
     },
     "Ben 10: Ultimate Alien: Cosmic Destruction (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Papaya Studio",
+      "genre": "Action",
+      "publisher": "D3Publisher",
       "release_date": "",
       "serial": "SLES-55639"
     },
@@ -1839,9 +1839,9 @@
         "SLES-55358",
         "SLES-55359"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Blitz Games",
+      "genre": "Action",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55356"
     },
@@ -2414,9 +2414,9 @@
       "alt_serials": [
         "SCES-54851"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Relentless Software",
+      "genre": "Party",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "",
       "serial": "SCES-54844"
     },
@@ -2544,9 +2544,9 @@
     },
     "Cabela's African Safari (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sand Grain Studios",
+      "genre": "Action",
+      "publisher": "Activision Value",
       "release_date": "",
       "serial": "SLES-54655"
     },
@@ -2560,9 +2560,9 @@
     },
     "Cabela's Big Game Hunter 2005 Adventures (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-53107"
     },
@@ -2592,17 +2592,17 @@
     },
     "Cabela's Dangerous Hunts 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-53885"
     },
     "Cabela's Outdoor Adventures (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-53749"
     },
@@ -2676,9 +2676,9 @@
     },
     "Capcom vs. SNK 2: Mark of the Millennium 2001 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Capcom",
       "release_date": "2001-11-30",
       "serial": "SLES-50541"
     },
@@ -2744,7 +2744,7 @@
     },
     "Cartoon Network Racing (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eutechnyx",
       "genre": "Racing",
       "publisher": "The Game Factory",
       "release_date": "",
@@ -3524,9 +3524,9 @@
     },
     "Combat Elite: WWII Paratroopers (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "BattleBorne",
+      "genre": "Action",
+      "publisher": "SouthPeak Games",
       "release_date": "",
       "serial": "SLES-52392"
     },
@@ -3569,9 +3569,9 @@
       "alt_serials": [
         "SLES-50902"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Gotham Games",
+      "genre": "Action",
+      "publisher": "Pivotal Games Ltd.",
       "release_date": "",
       "serial": "SLES-50901"
     },
@@ -3867,7 +3867,7 @@
     },
     "Crimson Tears (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "RPG",
       "publisher": "Capcom",
       "release_date": "2004-10-15",
@@ -3910,7 +3910,7 @@
         "SLES-54474"
       ],
       "developer": "Namco Bandai Games",
-      "genre": "",
+      "genre": "Platformer",
       "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-54364"
@@ -3971,9 +3971,9 @@
     },
     "DJ Hero (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "FreeStyleGames",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55577"
     },
@@ -4035,9 +4035,9 @@
     },
     "DT Racer (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Axis Entertainment",
+      "genre": "Racing",
+      "publisher": "XS Games",
       "release_date": "",
       "serial": "SLES-53904"
     },
@@ -4932,9 +4932,9 @@
     },
     "Disney's Chicken Little: Ace in Action (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Avalanche Software",
+      "genre": "Action",
+      "publisher": "Buena Vista Games",
       "release_date": "",
       "serial": "SLES-54449"
     },
@@ -5106,9 +5106,9 @@
       "alt_serials": [
         "SCES-50966"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "High Voltage Software",
+      "genre": "Action",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCES-50959"
     },
@@ -5149,7 +5149,7 @@
     "Disney's Winnie the Pooh's Rumbly Tumbly Adventure (PAL)": {
       "alt_serials": [],
       "developer": "Phoenix Games Ltd.",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Ubisoft Entertainment",
       "release_date": "",
       "serial": "SLES-52889"
@@ -5375,7 +5375,7 @@
         "SLES-55531"
       ],
       "developer": "Asobo Studio",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Disney Interactive Studios",
       "release_date": "",
       "serial": "SLES-55522"
@@ -5715,9 +5715,9 @@
         "SLES-50631",
         "SLES-50632"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "3DO",
+      "genre": "Action",
+      "publisher": "3DO",
       "release_date": "",
       "serial": "SLES-50630"
     },
@@ -5771,9 +5771,9 @@
     },
     "DreamWorks Bee Movie Game (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Beenox Studios",
       "genre": "Platformer",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55016"
     },
@@ -5831,9 +5831,9 @@
     },
     "DreamWorks Monsters vs. Aliens (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Beenox",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "2009-03-26",
       "serial": "SLES-55486"
     },
@@ -5882,9 +5882,9 @@
       "alt_serials": [
         "SLES-55460"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Torus Games",
+      "genre": "Party",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55329"
     },
@@ -5901,7 +5901,7 @@
         "SLES-53751",
         "SLES-53752"
       ],
-      "developer": "",
+      "developer": "Shaba Games, Inc.",
       "genre": "Fighting",
       "publisher": "Activision",
       "release_date": "2005",
@@ -5962,9 +5962,9 @@
         "SLED-53954",
         "SLES-54027"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Reflections Interactive",
+      "genre": "Racing",
+      "publisher": "Atari",
       "release_date": "",
       "serial": "SLES-53556"
     },
@@ -6014,9 +6014,9 @@
       "alt_serials": [
         "SLES-51267"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLES-51266"
     },
@@ -6057,7 +6057,7 @@
         "SLES-51442",
         "SLES-51443"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Beat 'Em Up",
       "publisher": "Koei",
       "release_date": "",
@@ -6081,7 +6081,7 @@
         "SLES-52592",
         "SLES-52593"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
       "release_date": "2004-09-17",
@@ -6127,7 +6127,7 @@
         "SLES-53861",
         "SLES-53862"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Beat 'Em Up",
       "publisher": "Koei",
       "release_date": "2006-02-17",
@@ -6143,9 +6143,9 @@
     },
     "EJay Clubworld: The Music Making Experience (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Unique Development Studios AB",
+      "genre": "Other",
+      "publisher": "Crave Entertainment",
       "release_date": "",
       "serial": "SCES-50933"
     },
@@ -6235,9 +6235,9 @@
     },
     "ESPN National Hockey Night (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-50171"
     },
@@ -6452,9 +6452,9 @@
         "SCED-51728",
         "SCES-51725"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony Online Entertainment",
+      "genre": "MMORPG",
+      "publisher": "Sony Online Entertainment",
       "release_date": "",
       "serial": "SCES-51648"
     },
@@ -6468,9 +6468,9 @@
     },
     "Everblue 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Arika",
+      "genre": "Adventure",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLES-51381"
     },
@@ -6536,17 +6536,17 @@
     },
     "Evolution Skateboarding (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-51349"
     },
     "Evolution Snowboarding (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-51392"
     },
@@ -6637,9 +6637,9 @@
         "SCED-53522",
         "SLES-52883"
       ],
-      "developer": "",
+      "developer": "Sony Computer Entertainment London Studio",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "2005",
       "serial": "SCES-52883"
     },
@@ -6836,9 +6836,9 @@
     },
     "FIFA 13 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Soccer",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-55665"
     },
@@ -6846,9 +6846,9 @@
       "alt_serials": [
         "SLES-55672"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-55671"
     },
@@ -6942,7 +6942,7 @@
         "SLES-54064",
         "SLES-54081"
       ],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
       "publisher": "Electronic Arts",
       "release_date": "2006-04-28",
@@ -6970,7 +6970,7 @@
       "alt_serials": [],
       "developer": "ivolgamus",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Agetec",
       "release_date": "2007-08-31",
       "serial": "SLES-54795"
     },
@@ -7294,7 +7294,7 @@
     },
     "Fire Pro Wrestling Returns (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Spike",
       "genre": "Sports",
       "publisher": "505 Games",
       "release_date": "",
@@ -7321,9 +7321,9 @@
     },
     "Fisherman's Challenge (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-51418"
     },
@@ -7469,9 +7469,9 @@
     },
     "Ford Mustang: The Legend Lives (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Eutechnyx, Limited",
+      "genre": "Racing",
+      "publisher": "2K Games",
       "release_date": "",
       "serial": "SLES-53296"
     },
@@ -7677,9 +7677,9 @@
     },
     "Freestyle Metal X (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Deibus Studios",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Midway",
       "release_date": "2003-06-27",
       "serial": "SLES-50720"
     },
@@ -8258,16 +8258,16 @@
         "SLES-50705"
       ],
       "developer": "The 3DO Company",
-      "genre": "",
+      "genre": "Action",
       "publisher": "The 3DO Company",
       "release_date": "2002-03",
       "serial": "SLES-50433"
     },
     "Goblin Commander: Unleash the Horde (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jaleco",
+      "genre": "Strategy",
+      "publisher": "Jaleco Entertainment",
       "release_date": "",
       "serial": "SLES-52433"
     },
@@ -8442,9 +8442,9 @@
     },
     "Grand Prix Challenge (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Atari",
+      "genre": "Racing",
+      "publisher": "Infogrames Melbourne House",
       "release_date": "",
       "serial": "SLES-51296"
     },
@@ -8595,9 +8595,9 @@
       "alt_serials": [
         "SLES-53284"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sammy Studios",
+      "genre": "Fighting",
+      "publisher": "Arc System Works",
       "release_date": "",
       "serial": "SLES-52934"
     },
@@ -8627,9 +8627,9 @@
     },
     "Guilty Gear XX Accent Core Plus (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Arc System Works",
+      "genre": "Fighting",
+      "publisher": "Aksys Games",
       "release_date": "",
       "serial": "SLES-55483"
     },
@@ -8735,9 +8735,9 @@
     },
     "Guitar Hero: Van Halen (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Underground Development",
+      "genre": "Rhythm",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55518"
     },
@@ -8905,7 +8905,7 @@
       ],
       "developer": "Farsight Studios",
       "genre": "Casino",
-      "publisher": "",
+      "publisher": "Majesco",
       "release_date": "2007",
       "serial": "SLES-54143"
     },
@@ -8955,9 +8955,9 @@
       "alt_serials": [
         "SLES-55249"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Bright Light",
+      "genre": "Action-Adventure",
+      "publisher": "EA Games",
       "release_date": "",
       "serial": "SLES-55248"
     },
@@ -9101,9 +9101,9 @@
       "alt_serials": [
         "SLES-55342"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Bright Light",
+      "genre": "Other",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-55219"
     },
@@ -9749,9 +9749,9 @@
     },
     "Iridium Runners (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Playstos",
+      "genre": "Racing",
+      "publisher": "Southpeak Games",
       "release_date": "",
       "serial": "SLES-55013"
     },
@@ -9933,9 +9933,9 @@
     },
     "Jeep Thrills (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Gamesauce",
+      "genre": "Racing",
+      "publisher": "DSI Games",
       "release_date": "",
       "serial": "SLES-55275"
     },
@@ -9949,9 +9949,9 @@
     },
     "Jelly Belly: Ballistic Beans (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Asobo Studio",
+      "genre": "Puzzle",
+      "publisher": "Crave Entertainment",
       "release_date": "",
       "serial": "SLES-55459"
     },
@@ -11002,9 +11002,9 @@
     },
     "Lethal Skies II (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Sammy Studios",
       "genre": "Flight Simulator",
-      "publisher": "",
+      "publisher": "Asmik Ace Entertainment, Inc.",
       "release_date": "2004-02-27",
       "serial": "SLES-51886"
     },
@@ -11106,7 +11106,7 @@
     },
     "Lucinda Green's Equestrian Challenge (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bit Managers",
       "genre": "Sports",
       "publisher": "Empire Interactive",
       "release_date": "2007-06-01",
@@ -11132,9 +11132,9 @@
       "alt_serials": [
         "SLES-50765"
       ],
-      "developer": "",
+      "developer": "MAGIX Entertainment",
       "genre": "Simulation",
-      "publisher": "",
+      "publisher": "MAGIX Entertainment Corp.",
       "release_date": "",
       "serial": "SLES-50590"
     },
@@ -11202,17 +11202,17 @@
       "alt_serials": [
         "SLED-50439"
       ],
-      "developer": "",
+      "developer": "Rainbow Studios",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "2001",
       "serial": "SLES-50428"
     },
     "MX Rider (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Climax Group",
+      "genre": "Racing",
+      "publisher": "Infogrames",
       "release_date": "",
       "serial": "SLES-50132"
     },
@@ -11220,17 +11220,17 @@
       "alt_serials": [
         "SLED-51127"
       ],
-      "developer": "",
+      "developer": "Pacific Coast Power & Light Co.",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "2002",
       "serial": "SLES-51038"
     },
     "MX Unleashed (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Rainbow Studios",
+      "genre": "Racing",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-52043"
     },
@@ -11294,7 +11294,7 @@
     },
     "Madden NFL 07 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Sports",
       "genre": "Sports",
       "publisher": "Electronic Arts",
       "release_date": "2006-08-25",
@@ -11310,9 +11310,9 @@
     },
     "Madden NFL 09 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Tiburon",
+      "genre": "Sports",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-55238"
     },
@@ -11334,7 +11334,7 @@
     },
     "Madden NFL 2003 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Tiburon",
       "genre": "Sports",
       "publisher": "Electronic Arts",
       "release_date": "",
@@ -11421,9 +11421,9 @@
     },
     "Malice (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Argonaut Games",
+      "genre": "Platformer",
+      "publisher": "Mud Duck Games",
       "release_date": "",
       "serial": "SLES-52413"
     },
@@ -11501,9 +11501,9 @@
     },
     "Mark Davis Pro Bass Challenge (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "SIMS Co",
       "genre": "Simulation",
-      "publisher": "",
+      "publisher": "Natsume",
       "release_date": "2003-08-27",
       "serial": "SLES-51749"
     },
@@ -11541,9 +11541,9 @@
     },
     "Marvel: Ultimate Alliance 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "n-Space",
+      "genre": "Action-RPG",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-55493"
     },
@@ -12099,7 +12099,7 @@
     "Midway Arcade Treasures 2 (PAL)": {
       "alt_serials": [],
       "developer": "Digital Eclipse",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Midway",
       "release_date": "2004-10-29",
       "serial": "SLES-52844"
@@ -12164,15 +12164,15 @@
     },
     "Mobile Light Force 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Alfa System",
+      "genre": "Action, Shooter",
+      "publisher": "XS Games",
       "release_date": "",
       "serial": "SLES-51698"
     },
     "Mobile Suit Gundam: Federation vs. Zeon (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bandai America, Inc.",
       "genre": "Action",
       "publisher": "Bandai",
       "release_date": "2002-11-29",
@@ -12267,9 +12267,9 @@
     },
     "Monster Jam: Urban Assault (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Torus Games",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "2008-10-28",
       "serial": "SLES-55332"
     },
@@ -12425,9 +12425,9 @@
     },
     "MotoGP 4 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Namco",
+      "genre": "Racing",
+      "publisher": "Namco Bandai Games",
       "release_date": "",
       "serial": "SCES-52892"
     },
@@ -12658,9 +12658,9 @@
     },
     "NASCAR 09 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Tiburon",
+      "genre": "Racing",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-55199"
     },
@@ -12674,17 +12674,17 @@
     },
     "NBA 2K10 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Visual Concepts",
+      "genre": "Sports",
+      "publisher": "2K Sports",
       "release_date": "",
       "serial": "SLES-55576"
     },
     "NBA 2K11 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Visual Concepts",
+      "genre": "Sports",
+      "publisher": "2K Sports",
       "release_date": "",
       "serial": "SLES-55645"
     },
@@ -12698,15 +12698,15 @@
     },
     "NBA 2K3 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Visual Concepts",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLES-51340"
     },
     "NBA 2K6 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Visual Concepts",
       "genre": "Sports",
       "publisher": "2K Games",
       "release_date": "2005",
@@ -12793,9 +12793,9 @@
         "SLES-54251",
         "SLES-54252"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-54250"
     },
@@ -12885,7 +12885,7 @@
     },
     "NBA Street V3 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
       "publisher": "EA Sports Big",
       "release_date": "2005-02-18",
@@ -12909,7 +12909,7 @@
     },
     "NFL QB Club 2002 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Acclaim Studios Austin",
       "genre": "Sports",
       "publisher": "Acclaim Sports",
       "release_date": "2001-10-12",
@@ -12977,9 +12977,9 @@
     },
     "NHL 09 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-55338"
     },
@@ -13015,9 +13015,9 @@
     },
     "NHL 2004 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Black Box",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "EA Sports",
       "release_date": "2003-10-10",
       "serial": "SLES-51798"
     },
@@ -13031,9 +13031,9 @@
     },
     "NHL 2K3 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Kush Games",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sega",
       "release_date": "2003-03-28",
       "serial": "SLES-51341"
     },
@@ -13049,9 +13049,9 @@
       "alt_serials": [
         "SLES-54211"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Kush Games",
+      "genre": "Sports",
+      "publisher": "2K Sports",
       "release_date": "",
       "serial": "SLES-54207"
     },
@@ -13073,17 +13073,17 @@
     },
     "NHL Hitz 2002 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Black Box Games Ltd.",
+      "genre": "Sports",
+      "publisher": "Midway",
       "release_date": "",
       "serial": "SLES-50451"
     },
     "NHL Hitz 2003 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Black Box Games",
+      "genre": "Sports",
+      "publisher": "Midway Home Entertainment",
       "release_date": "",
       "serial": "SLES-50712"
     },
@@ -13287,9 +13287,9 @@
         "SLES-55005",
         "SLES-55006"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Black Box",
+      "genre": "Racing",
+      "publisher": "EA Games",
       "release_date": "",
       "serial": "SLES-55002"
     },
@@ -13300,9 +13300,9 @@
         "SLES-55352",
         "SLES-55353"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Exient Entertainment",
+      "genre": "Racing",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-55349"
     },
@@ -13489,9 +13489,9 @@
     },
     "Nickelodeon Go Diego Go! Great Dinosaur Rescue (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "High Voltage Software",
+      "genre": "Edutainment",
+      "publisher": "2K Play",
       "release_date": "",
       "serial": "SLES-55284"
     },
@@ -13620,9 +13620,9 @@
     },
     "Nickelodeon SpongeBob SquarePants: Lights, Camera, Pants! (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "THQ Australia",
+      "genre": "Party",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-53494"
     },
@@ -13672,9 +13672,9 @@
     },
     "Nickelodeon SpongeBob's Atlantis SquarePantis (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "THQ Studio Australia",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "2007",
       "serial": "SLES-55024"
     },
@@ -13738,17 +13738,17 @@
     },
     "Nickelodeon The Naked Brothers Band: The Video Game (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Barking Lizards Technologies, LLC",
+      "genre": "Rhythm",
       "publisher": "Play THQ",
       "release_date": "",
       "serial": "SLES-55404"
     },
     "Nicktoons Unite! (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Blue Tongue Entertainment Limited",
+      "genre": "Action",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-53634"
     },
@@ -13756,9 +13756,9 @@
       "alt_serials": [
         "SLES-54990"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Altron",
+      "genre": "Action, Platformer",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-51990"
     },
@@ -14105,9 +14105,9 @@
         "SLES-55406",
         "SLES-55450"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-55405"
     },
@@ -14128,9 +14128,9 @@
       "alt_serials": [
         "SLES-55638"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-55637"
     },
@@ -14447,9 +14447,9 @@
     },
     "Pipe Mania (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Empire Interactive",
+      "genre": "Puzzle",
+      "publisher": "Razorworks",
       "release_date": "",
       "serial": "SLES-55240"
     },
@@ -15017,9 +15017,9 @@
     },
     "Puzzle Quest: Challenge of the Warlords (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Infinite Interactive",
+      "genre": "Puzzle",
+      "publisher": "D3 Publisher of America",
       "release_date": "",
       "serial": "SLES-54995"
     },
@@ -15141,9 +15141,9 @@
       "alt_serials": [
         "SLES-54938"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "49Games",
+      "genre": "Sports",
+      "publisher": "Conspiracy Entertainment",
       "release_date": "",
       "serial": "SLES-54937"
     },
@@ -15276,9 +15276,9 @@
     },
     "Raiden III (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Moss",
+      "genre": "Shoot 'Em Up",
+      "publisher": "UFO Interactive Games",
       "release_date": "",
       "serial": "SLES-53829"
     },
@@ -15346,9 +15346,9 @@
     },
     "Ratchet & Clank: Size Matters (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "High Impact Games",
+      "genre": "Action",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCES-55019"
     },
@@ -15432,9 +15432,9 @@
       "alt_serials": [
         "SLES-53371"
       ],
-      "developer": "",
+      "developer": "Gusto Games",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "2005-08-26",
       "serial": "SLES-53370"
     },
@@ -15732,9 +15732,9 @@
       "alt_serials": [
         "SLES-55202"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Soft Game",
+      "genre": "Sports",
+      "publisher": "Ubisoft",
       "release_date": "",
       "serial": "SLES-55201"
     },
@@ -15788,9 +15788,9 @@
     },
     "RoadKill (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Midway",
+      "genre": "Racing",
+      "publisher": "Midway Home Entertainment",
       "release_date": "",
       "serial": "SLES-51842"
     },
@@ -15855,9 +15855,9 @@
     },
     "Robotech: Invasion (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Vicious Cycle Software",
+      "genre": "Action",
+      "publisher": "Global Star",
       "release_date": "",
       "serial": "SLES-52944"
     },
@@ -16231,9 +16231,9 @@
     },
     "SNK Arcade Classics Vol. 1 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SNK Playmore",
+      "genre": "Other",
+      "publisher": "SNK Playmore",
       "release_date": "2008-11",
       "serial": "SLES-55232"
     },
@@ -16308,9 +16308,9 @@
     },
     "SSX Tricky (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Electronic Arts",
       "release_date": "2001",
       "serial": "SLES-50545"
     },
@@ -16385,9 +16385,9 @@
     },
     "Salt Lake 2002 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ubisoft Montreal",
+      "genre": "Sports",
+      "publisher": "Ubisoft",
       "release_date": "",
       "serial": "SLES-50640"
     },
@@ -16438,7 +16438,7 @@
     },
     "Samurai Warriors 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Beat 'Em Up",
       "publisher": "Koei",
       "release_date": "2006",
@@ -16454,9 +16454,9 @@
     },
     "Samurai Warriors 2: Xtreme Legends (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2008-03-28",
       "serial": "SLES-55108"
     },
@@ -16466,7 +16466,7 @@
         "SLES-53004"
       ],
       "developer": "Koei",
-      "genre": "",
+      "genre": "Action",
       "publisher": "KOEI Corporation",
       "release_date": "",
       "serial": "SLES-53002"
@@ -16481,7 +16481,7 @@
     },
     "Savage Skies (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "BAM! Entertainment",
       "genre": "Action",
       "publisher": "BigBen Interactive",
       "release_date": "2004-03-12",
@@ -16599,9 +16599,9 @@
     },
     "Sea Monsters: A Prehistoric Adventure (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Atomic Planet",
+      "genre": "Adventure",
+      "publisher": "DSI Games",
       "release_date": "",
       "serial": "SLES-55046"
     },
@@ -16971,7 +16971,7 @@
     },
     "Showdown: Legends of Wrestling (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Acclaim Studios Austin",
       "genre": "Sports",
       "publisher": "Acclaim Entertainment",
       "release_date": "",
@@ -17110,9 +17110,9 @@
     },
     "Silent Scope 3 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Action",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-51157"
     },
@@ -17162,7 +17162,7 @@
       ],
       "developer": "Sony Computer Entertainment London",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "2008-11-14",
       "serial": "SCES-55435"
     },
@@ -17178,9 +17178,9 @@
       "alt_serials": [
         "SCES-55176"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEE London Studio",
+      "genre": "Rhythm",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCES-55159"
     },
@@ -17385,9 +17385,9 @@
       "alt_serials": [
         "SCES-54769"
       ],
-      "developer": "",
+      "developer": "SCEE London Studio",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "2007-11-21",
       "serial": "SCES-54768"
     },
@@ -17645,7 +17645,7 @@
       ],
       "developer": "London Studios",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCES-55453"
     },
@@ -18452,7 +18452,7 @@
     },
     "Speed Kings (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Climax Group",
       "genre": "Racing",
       "publisher": "Acclaim Entertainment",
       "release_date": "2003-05-28",
@@ -18535,7 +18535,7 @@
     },
     "Spider-Man: Web of Shadows: Amazing Allies Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Shaba Games/Treyarch",
       "genre": "Action",
       "publisher": "Activision",
       "release_date": "2008-10-24",
@@ -19111,9 +19111,9 @@
     },
     "Stunt GP (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Titus Software",
+      "genre": "Racing",
+      "publisher": "Team17",
       "release_date": "",
       "serial": "SLES-50064"
     },
@@ -19286,9 +19286,9 @@
     },
     "Super PickUps (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Seed Software",
+      "genre": "Racing",
+      "publisher": "Zoo Digital",
       "release_date": "",
       "serial": "SLES-54818"
     },
@@ -19466,7 +19466,7 @@
     },
     "TNA Impact! Total Nonstop Action Wrestling (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Midway",
       "genre": "Sports",
       "publisher": "Midway Games",
       "release_date": "",
@@ -19535,7 +19535,7 @@
     },
     "TY the Tasmanian Tiger 2: Bush Rescue (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Krome Studios",
       "genre": "Action",
       "publisher": "Electronic Arts",
       "release_date": "2004-11-05",
@@ -20133,9 +20133,9 @@
       "alt_serials": [
         "SLES-55254"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Edge of Reality",
+      "genre": "Action",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLES-55208"
     },
@@ -20179,9 +20179,9 @@
     },
     "The King of Fighters '98: Ultimate Match (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SNK Playmore",
+      "genre": "Fighting",
+      "publisher": "Ignition Entertainment",
       "release_date": "",
       "serial": "SLES-55280"
     },
@@ -20251,9 +20251,9 @@
     },
     "The Legend of Spyro: A New Beginning (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Krome Studios",
       "genre": "Action-Adventure",
-      "publisher": "",
+      "publisher": "Sierra Entertainment",
       "release_date": "",
       "serial": "SLES-54359"
     },
@@ -20264,7 +20264,7 @@
       ],
       "developer": "Étranges Libellules",
       "genre": "Action-Adventure",
-      "publisher": "",
+      "publisher": "Sierra Entertainment",
       "release_date": "2008",
       "serial": "SLES-55163"
     },
@@ -20439,9 +20439,9 @@
       "alt_serials": [
         "SLES-54581"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Acclaim Studios",
+      "genre": "Action",
+      "publisher": "XS Games",
       "release_date": "",
       "serial": "SLES-52741"
     },
@@ -20455,9 +20455,9 @@
     },
     "The Secret Saturdays: Beasts of the 5th Sun (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "High Voltage Software",
+      "genre": "Action",
+      "publisher": "D3 Publisher",
       "release_date": "",
       "serial": "SLES-55546"
     },
@@ -20532,7 +20532,7 @@
     },
     "The Sims (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Maxis",
       "genre": "Simulation",
       "publisher": "Electronic Arts",
       "release_date": "",
@@ -20994,9 +20994,9 @@
     },
     "Tiger Woods PGA Tour 2001 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Sports",
+      "genre": "Sports",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-50118"
     },
@@ -21271,7 +21271,7 @@
       "alt_serials": [
         "SLES-54715"
       ],
-      "developer": "",
+      "developer": "Supervillain Studios",
       "genre": "Sports",
       "publisher": "Activision",
       "release_date": "",
@@ -21372,9 +21372,9 @@
     },
     "Top Gear Dare Devil (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Kemko",
+      "genre": "Racing",
+      "publisher": "Papaya Studio",
       "release_date": "",
       "serial": "SLES-50069"
     },
@@ -21566,9 +21566,9 @@
     },
     "Trigger Man (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Crave Entertainment",
+      "genre": "Action",
+      "publisher": "Point of View, Inc.",
       "release_date": "",
       "serial": "SLES-53076"
     },
@@ -22012,9 +22012,9 @@
     },
     "Vehicular Combat League Presents: Motor Mayhem (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Beyond Games",
+      "genre": "Racing",
+      "publisher": "Infogrames",
       "release_date": "",
       "serial": "SLES-50438"
     },
@@ -22261,9 +22261,9 @@
       "alt_serials": [
         "SLES-54489"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Yuke's",
+      "genre": "Sports",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-54488"
     },
@@ -22281,17 +22281,17 @@
       "alt_serials": [
         "SLES-55251"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Yuke's",
+      "genre": "Sports",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55250"
     },
     "WWE SmackDown vs. Raw 2010 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Yuke's",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "2009",
       "serial": "SLES-55545"
     },
@@ -22470,9 +22470,9 @@
     },
     "War of the Monsters (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Incognito Entertainment",
+      "genre": "Fighting",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "",
       "serial": "SCES-51224"
     },
@@ -22491,9 +22491,9 @@
         "SLES-54876",
         "SLES-54877"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Action, Beat'em Up",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLES-54875"
     },
@@ -22502,9 +22502,9 @@
         "SLES-55383",
         "SLES-55384"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Omega Force",
+      "genre": "Beat 'Em Up",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLES-55382"
     },
@@ -22576,9 +22576,9 @@
     },
     "Whirl Tour (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Vivendi Universal",
+      "genre": "Racing",
+      "publisher": "Papaya Studio",
       "release_date": "",
       "serial": "SLES-51126"
     },
@@ -22592,9 +22592,9 @@
     },
     "Whiteout (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Racing",
+      "publisher": "Vicarious Visions, Inc.",
       "release_date": "",
       "serial": "SLES-51451"
     },
@@ -22648,7 +22648,7 @@
     },
     "Wild Wild Racing (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Rage Software",
       "genre": "Racing",
       "publisher": "Empire Interactive",
       "release_date": "2000-10-26",
@@ -22772,9 +22772,9 @@
     },
     "World Championship Poker featuring Howard Lederer: All In (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Coresoft",
+      "genre": "Other",
+      "publisher": "Crave Entertainment",
       "release_date": "",
       "serial": "SLES-54547"
     },
@@ -22844,9 +22844,9 @@
     },
     "World Poker Tour (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Coresoft",
       "genre": "Casino",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "2006-03-10",
       "serial": "SLES-53689"
     },
@@ -22978,9 +22978,9 @@
     },
     "Wrath Unleashed (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "LucasArts",
+      "genre": "Strategy",
+      "publisher": "LucasArts Entertainment Company",
       "release_date": "",
       "serial": "SLES-52101"
     },
@@ -23093,7 +23093,7 @@
     },
     "XGIII: Extreme G Racing (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Acclaim Studios Cheltenham",
       "genre": "Racing",
       "publisher": "Acclaim",
       "release_date": "",
@@ -23237,7 +23237,7 @@
     "Yu-Gi-Oh! Capsule Monster Coliseum (PAL)": {
       "alt_serials": [],
       "developer": "Konami Computer Entertainment Japan",
-      "genre": "",
+      "genre": "Strategy",
       "publisher": "Konami of Europe",
       "release_date": "2004",
       "serial": "SLES-52576"
