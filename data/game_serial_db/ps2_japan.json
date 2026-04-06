@@ -178,8 +178,8 @@
     },
     "3-nen B-gumi Kinpachi Sensei: Densetsu no Kyoudan ni Tate! Kanzenban (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Chunsoft",
+      "genre": "RPG",
       "publisher": "Chunsoft",
       "release_date": "2005-07-28",
       "serial": "SLPM-66089"
@@ -535,7 +535,7 @@
       "alt_serials": [
         "SLPM-65325"
       ],
-      "developer": "",
+      "developer": "Ask Co., Ltd.",
       "genre": "Flight Simulator",
       "publisher": "ASK",
       "release_date": "2002-03-28",
@@ -551,7 +551,7 @@
     },
     "Air Ranger: Rescue Helicopter: Wakuwaku Price (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Ask Co., Ltd.",
       "genre": "Flight Simulator",
       "publisher": "ASK",
       "release_date": "2002-07-11",
@@ -928,9 +928,9 @@
       "alt_serials": [
         "SLPM-61035"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Action",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-60200"
     },
@@ -939,17 +939,17 @@
         "SLPM-65500",
         "SLPM-65991"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Action",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65361"
     },
     "Anubis: Zone of the Enders: Special Edition: Konami Dendou Selection (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Action",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-84075"
     },
@@ -1080,7 +1080,7 @@
       "alt_serials": [],
       "developer": "Cattle Call",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Sony",
       "release_date": "2004-11-03",
       "serial": "SCPS-15058"
     },
@@ -2114,8 +2114,8 @@
       "alt_serials": [
         "SLPM-62572"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Hudson Soft",
+      "genre": "Action",
       "publisher": "Hudson",
       "release_date": "2004-12-16",
       "serial": "SLPM-62565"
@@ -2221,9 +2221,9 @@
     },
     "Bomberman Kart (Hudson the Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Hudson Soft",
       "release_date": "",
       "serial": "SLPS-62311"
     },
@@ -2239,9 +2239,9 @@
     },
     "Bomberman Kart DX (Hudson the Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Hudson Soft",
       "release_date": "",
       "serial": "SLPS-62599"
     },
@@ -2250,9 +2250,9 @@
         "SLPM-62478",
         "SLPM-62599"
       ],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Hudson Soft",
       "release_date": "",
       "serial": "SLPS-62478"
     },
@@ -2597,9 +2597,9 @@
     },
     "Busin: Wizardry Alternative (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Racjin",
+      "genre": "RPG",
+      "publisher": "Atlus",
       "release_date": "",
       "serial": "SLPM-74007"
     },
@@ -3623,7 +3623,7 @@
     "D-A: Black (Best Prize) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-25618"
@@ -3812,9 +3812,9 @@
     },
     "Dabi Tsuku 4: Derby-ba o Tsukurou! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Smilebit",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-65808"
     },
@@ -3832,9 +3832,9 @@
     },
     "Dai-3-Ji Super Robot Taisen Alpha: Shuuen no Ginga e (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Banpresto",
+      "genre": "Strategy",
+      "publisher": "Banpresto",
       "release_date": "",
       "serial": "SLPS-25537"
     },
@@ -3882,9 +3882,9 @@
     },
     "Daisenryaku 1941: Gyakuten no Taiheiyou: Sega the Best 2800 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SystemSoft",
+      "genre": "Strategy",
+      "publisher": "Sammy Studios",
       "release_date": "2003-11-13",
       "serial": "SLPM-62657"
     },
@@ -5026,9 +5026,9 @@
     },
     "Dog of Bay (Reprint) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Marvelous Entertainment",
+      "genre": "Rhythm",
+      "publisher": "Marvelous Entertainment",
       "release_date": "",
       "serial": "SLPM-62203"
     },
@@ -5078,9 +5078,9 @@
     },
     "Doko Demo Issho: Toro to Ippai (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony",
+      "genre": "Adventure",
+      "publisher": "Sony",
       "release_date": "",
       "serial": "SCPS-15081"
     },
@@ -5094,9 +5094,9 @@
     },
     "Doko Demo Issho: Watashi na Ehon (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony",
+      "genre": "Adventure",
+      "publisher": "Sony",
       "release_date": "",
       "serial": "SCPS-15047"
     },
@@ -5669,9 +5669,9 @@
     },
     "ESPN Winter X Games Snowboarding 2002 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65072"
     },
@@ -5892,17 +5892,17 @@
         "SLPM-65177",
         "SLPM-74414"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Action/Shooter",
+      "publisher": "Taito Corporation",
       "release_date": "",
       "serial": "SLPM-60183"
     },
     "Energy Airforce (Taito Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Action/Shooter",
+      "publisher": "Taito Corporation",
       "release_date": "",
       "serial": "SLPM-64774"
     },
@@ -6353,41 +6353,41 @@
     },
     "FIFA 09: World Class Soccer (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-55134"
     },
     "FIFA 10: World Class Soccer (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-55226"
     },
     "FIFA 2001: World Championship (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Software Creations",
+      "genre": "Sports",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLPS-20054"
     },
     "FIFA 2002: Road to FIFA World Cup (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPS-25069"
     },
     "FIFA 2003: Europe Soccer (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPS-25179"
     },
@@ -6435,17 +6435,17 @@
     },
     "FIFA Total Football (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-65527"
     },
     "FIFA Total Football 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLPM-65746"
     },
@@ -6915,7 +6915,7 @@
       "alt_serials": [
         "SLPM-62342"
       ],
-      "developer": "",
+      "developer": "Spike",
       "genre": "Sports",
       "publisher": "Spike",
       "release_date": "2003-06-05",
@@ -7274,9 +7274,9 @@
     },
     "Full Spectrum Warrior 2: Ten Hammers (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Pandemic Studio Pty. Ltd",
+      "genre": "Simulation/Strategy",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-66427"
     },
@@ -7752,7 +7752,7 @@
     "Gakuen Toshi Vara Noir: Genteiban (JP)": {
       "alt_serials": [],
       "developer": "Idea Factory",
-      "genre": "",
+      "genre": "Strategy",
       "publisher": "Idea Factory",
       "release_date": "2002-10-31",
       "serial": "SLPM-62237"
@@ -7777,7 +7777,7 @@
     },
     "Galaxy Angel (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2003-04-17",
@@ -7793,9 +7793,9 @@
     },
     "Galaxy Angel II: Eigou Kaiki no Toki (Disc 2) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Broccoli",
       "release_date": "",
       "serial": "SLPM-55119"
     },
@@ -7803,7 +7803,7 @@
       "alt_serials": [
         "SLPM-66779"
       ],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2008-12-11",
@@ -7813,7 +7813,7 @@
       "alt_serials": [
         "SLPM-66780"
       ],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2008-12-11",
@@ -7823,7 +7823,7 @@
       "alt_serials": [
         "SLPM-66243"
       ],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2008-07-31",
@@ -7831,7 +7831,7 @@
     },
     "Galaxy Angel: Broccoli Best Quality (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2006-02-23",
@@ -7847,7 +7847,7 @@
     },
     "Galaxy Angel: Eternal Lovers: Broccoli Best Quality (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2007-07-26",
@@ -7855,7 +7855,7 @@
     },
     "Galaxy Angel: Eternal Lovers: Special Package (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2005-02-24",
@@ -7866,15 +7866,15 @@
         "SLPM-65429",
         "SLPM-65540"
       ],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Broccoli",
       "release_date": "",
       "serial": "SLPM-61073"
     },
     "Galaxy Angel: Moonlit Lovers: Broccoli Best Quality (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
       "release_date": "2006-11-22",
@@ -7916,25 +7916,25 @@
       "alt_serials": [
         "SLPS-73415"
       ],
-      "developer": "",
+      "developer": "Tecmo",
       "genre": "Horse Racing",
-      "publisher": "",
+      "publisher": "Tecmo",
       "release_date": "",
       "serial": "SLPS-25177"
     },
     "Gallop Racer 8: Live Horse Racing (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Tecmo",
       "genre": "Horse Racing",
-      "publisher": "",
+      "publisher": "Tecmo",
       "release_date": "",
       "serial": "SLPS-25564"
     },
     "Gallop Racer Inbreed (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Tecmo",
       "genre": "Horse Racing",
-      "publisher": "",
+      "publisher": "Tecmo",
       "release_date": "",
       "serial": "SLPS-25701"
     },
@@ -9078,9 +9078,9 @@
     },
     "Guitar Hero III: Legend of Rock (With Guitar) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Neversoft",
+      "genre": "Rhythm",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLPS-25890"
     },
@@ -9162,9 +9162,9 @@
         "SLPM-65060",
         "SLPM-74409"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Capcom",
+      "genre": "Light Gun Shooter",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-61020"
     },
@@ -9173,9 +9173,9 @@
         "SLPM-65139",
         "SLPM-67529"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Capcom",
+      "genre": "Light Gun Shooter",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-61026"
     },
@@ -9183,9 +9183,9 @@
       "alt_serials": [
         "SLPM-65245"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Capcom",
+      "genre": "Light Gun Shooter",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-61039"
     },
@@ -9261,9 +9261,9 @@
     },
     "Gungriffon Blaze & Silpheed: The Lost Planet (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Game Arts",
+      "genre": "Simulation",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-60121"
     },
@@ -9446,9 +9446,9 @@
       "alt_serials": [
         "SLPM-60220"
       ],
-      "developer": "",
+      "developer": "New Corporation",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "ESP",
       "release_date": "2004-01-29",
       "serial": "SLPS-25287"
     },
@@ -9466,9 +9466,9 @@
       "alt_serials": [
         "SLPM-60126"
       ],
-      "developer": "",
+      "developer": "New Corporation",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "ESP",
       "release_date": "2000-12-14",
       "serial": "SLPS-25012"
     },
@@ -9477,17 +9477,17 @@
         "SCPS-55030",
         "SLPS-73401"
       ],
-      "developer": "",
+      "developer": "New Corporation",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "ESP",
       "release_date": "",
       "serial": "SLPS-25129"
     },
     "Hajime no Ippo: Victorious Boxers: Championship Version (Limited Edition) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "New Corporation",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "ESP",
       "release_date": "",
       "serial": "SLPS-25128"
     },
@@ -9634,9 +9634,9 @@
         "SLPM-65314",
         "SLPM-65315"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Square Enix",
+      "genre": "Strategy",
+      "publisher": "Square Enix",
       "release_date": "",
       "serial": "SLPM-61050"
     },
@@ -10847,33 +10847,33 @@
     },
     "Idol Janshi R: Jan-Guru Project (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Mahjong",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SCPS-25183"
     },
     "Idol Janshi R: Jan-Guru Project (Limited Edition) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Mahjong",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SCPS-25182"
     },
     "Idol Janshi R: Janguru Project (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Mahjong",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SLPS-25182"
     },
     "Idol Janshi Suchie-Pai III Remix (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Mahjong",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "",
       "serial": "SLPM-66784"
     },
@@ -11175,8 +11175,8 @@
     },
     "Izumo 2: Gakuen Kyousoukyoku Double Tact (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Studio e.go!",
+      "genre": "Adventure/RPG",
       "publisher": "GN Software",
       "release_date": "2008-01-31",
       "serial": "SLPM-66908"
@@ -11659,25 +11659,25 @@
     },
     "Jikkyou World Soccer 2000: Final Edition (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Major A",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62040"
     },
     "Jikkyou World Soccer 2001 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Major A",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62075"
     },
     "Jikkyou World Soccer 2002 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Major A",
       "genre": "",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62169"
     },
@@ -11912,7 +11912,7 @@
     "Jissen Pachinko Hisshouhou! CR Hokuto no Ken (JP)": {
       "alt_serials": [],
       "developer": "Sammy",
-      "genre": "",
+      "genre": "Gambling",
       "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-66241"
@@ -11920,7 +11920,7 @@
     "Jissen Pachinko Hisshouhou! CR Sakura Taisen (JP)": {
       "alt_serials": [],
       "developer": "Sammy",
-      "genre": "",
+      "genre": "Gambling",
       "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-66820"
@@ -11928,7 +11928,7 @@
     "Jissen Pachinko Hisshouhou! CR Salaryman Kintarou (JP)": {
       "alt_serials": [],
       "developer": "Sammy",
-      "genre": "",
+      "genre": "Gambling",
       "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-66476"
@@ -11972,7 +11972,7 @@
         "SLPM-65140"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-61030"
@@ -12139,7 +12139,7 @@
     },
     "K-1 World Max 2005 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
@@ -12948,9 +12948,9 @@
     },
     "Keroro Gunsou: Mero Mero Battle Royale Z (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2005-11-17",
       "serial": "SLPS-25575"
     },
@@ -13264,17 +13264,17 @@
     },
     "Kikou Busou G-Breaker: Dai-3-Ji Cloudia Taisen (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Atelier-Sai",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Sunrise Interactive",
       "release_date": "2002-04-25",
       "serial": "SLPS-25114"
     },
     "Kikou Busou G-Breaker: Legend of Cloudia (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Atelier-Sai",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Sunrise Interactive",
       "release_date": "2002-11-07",
       "serial": "SLPS-25059"
     },
@@ -13282,17 +13282,17 @@
       "alt_serials": [
         "SLPM-65117"
       ],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Takara",
       "release_date": "2001-06-28",
       "serial": "SLPM-65033"
     },
     "Kikou Heidan J-Phoenix 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Takara",
       "release_date": "2004-02-26",
       "serial": "SLPM-65343"
     },
@@ -13306,7 +13306,7 @@
     },
     "Kikou Heidan J-Phoenix: Burst Tactics (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
       "publisher": "Takara",
       "release_date": "2002-04-25",
@@ -13314,7 +13314,7 @@
     },
     "Kikou Heidan J-Phoenix: Burst Tactics: Limited Edition (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
       "publisher": "Takara",
       "release_date": "2002-04-25",
@@ -13322,17 +13322,17 @@
     },
     "Kikou Heidan J-Phoenix: Cobalt Shoutai-hen (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Takara",
       "release_date": "2002-12-05",
       "serial": "SLPM-65199"
     },
     "Kikou Heidan J-Phoenix: Joshou-hen (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Takara",
       "release_date": "2001-02-15",
       "serial": "SLPS-20075"
     },
@@ -13718,9 +13718,9 @@
       "alt_serials": [
         "SLPM-65734"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Red 5 Software",
+      "genre": "Adventure",
+      "publisher": "Hudson",
       "release_date": "",
       "serial": "SLPM-65404"
     },
@@ -13883,7 +13883,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2004-12-02",
       "serial": "SLPS-25440"
     },
@@ -13894,7 +13894,7 @@
       ],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25594"
     },
@@ -13912,7 +13912,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2005-03-24",
       "serial": "SLPS-25479"
     },
@@ -14124,14 +14124,14 @@
     "Kurenai no Umi 2: Crimson Sea (JP)": {
       "alt_serials": [],
       "developer": "Koei",
-      "genre": "",
+      "genre": "Action-Adventure",
       "publisher": "Koei",
       "release_date": "2004-04-15",
       "serial": "SLPM-65477"
     },
     "Kurenai no Umi 2: Koei the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Action-Adventure",
       "publisher": "Koei",
       "release_date": "",
@@ -14771,9 +14771,9 @@
     },
     "Lucky Star: RAvish Romance (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Vridge",
+      "genre": "Adventure",
+      "publisher": "Kadokawa Shoten",
       "release_date": "",
       "serial": "SLPM-60282"
     },
@@ -14989,9 +14989,9 @@
       "alt_serials": [
         "SLPM-60114"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Magical Company",
+      "genre": "Golf",
+      "publisher": "Magical Company (Mahou)",
       "release_date": "",
       "serial": "SLPS-20036"
     },
@@ -14999,17 +14999,17 @@
       "alt_serials": [
         "SLPS-20204"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Magical Company",
+      "genre": "Golf",
+      "publisher": "Magical Company (Mahou)",
       "release_date": "",
       "serial": "SLPS-20097"
     },
     "Magical Sports 2001 Pro Yakyuu (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Magical Company",
+      "genre": "Golf",
+      "publisher": "Magical Company (Mahou)",
       "release_date": "",
       "serial": "SLPS-20111"
     },
@@ -15026,9 +15026,9 @@
     },
     "Magical Sports: 2000 Koushien (NewPrice) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Magical Company",
+      "genre": "Tennis",
+      "publisher": "Magical Company",
       "release_date": "",
       "serial": "SLPS-20244"
     },
@@ -16442,8 +16442,8 @@
         "SLPS-25123",
         "SLPS-25486"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "Bandai",
+      "genre": "Action",
       "publisher": "Bandai",
       "release_date": "2002-08-01",
       "serial": "SLPS-25122"
@@ -16698,7 +16698,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SLPS-25242"
     },
@@ -16842,9 +16842,9 @@
     },
     "Musou Orochi (Playstation 2 The Best Reprint) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-74285"
     },
@@ -17132,9 +17132,9 @@
     },
     "NBA Starting Five 2005 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65767"
     },
@@ -18001,9 +18001,9 @@
     },
     "Nihon Sumou Kyoukai Kounin: Nihon Oozumou: Gekitou Honbasho-hen (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Action/Wrestling",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62194"
     },
@@ -18568,9 +18568,9 @@
     },
     "Ore ga Kantoku da! Gekitou Pennant Race (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Tamsoft Corporation",
+      "genre": "Baseball Simulation",
+      "publisher": "Enix Corporation",
       "release_date": "",
       "serial": "SLPM-65005"
     },
@@ -18992,17 +18992,17 @@
     },
     "Pachi-Slot Kanzen Kouryaku: Gigazone: The Meteor Strike (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Syscom, Abilit",
+      "genre": "Gambling",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62220"
     },
     "Pachi-Slot Kanzen Kouryaku: Onihama Bakusou Gurentai: Gekitou-hen (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Syscom, Abilit",
+      "genre": "Gambling",
+      "publisher": "Success",
       "release_date": "",
       "serial": "SLPM-62625"
     },
@@ -19345,9 +19345,9 @@
     },
     "Petit Copter 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Aqua Systems",
       "genre": "Flight Simulator",
-      "publisher": "",
+      "publisher": "Aqua Systems",
       "release_date": "2005-07-14",
       "serial": "SLPM-62624"
     },
@@ -19373,17 +19373,17 @@
     },
     "Phantasy Star Universe (Premiere Disc) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sonic Team",
+      "genre": "Action/RPG",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-68523"
     },
     "Phantasy Star Universe: Illuminus no Yabou (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sonic Team",
+      "genre": "Action/RPG",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-66663"
     },
@@ -19505,7 +19505,7 @@
     "PictureParadise Club Vol. 2 (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Other",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-69006"
@@ -20173,9 +20173,9 @@
         "SLPM-60271",
         "SLPM-66144"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Yuke's Co. Ltd",
+      "genre": "Driving, Racing",
+      "publisher": "Yuke's Company of America",
       "release_date": "",
       "serial": "SLPM-60270"
     },
@@ -20233,7 +20233,7 @@
       "alt_serials": [],
       "developer": "Psikyo",
       "genre": "",
-      "publisher": "",
+      "publisher": "Taito Corporation",
       "release_date": "2004-08-05",
       "serial": "SLPM-62515"
     },
@@ -20259,7 +20259,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Shoot 'Em Up",
-      "publisher": "",
+      "publisher": "Taito Corporation",
       "release_date": "2005",
       "serial": "SLPM-62593"
     },
@@ -20328,9 +20328,9 @@
         "SLPM-65532",
         "SLPM-74210"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sonic Team",
+      "genre": "Puzzle",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-61072"
     },
@@ -20338,9 +20338,9 @@
       "alt_serials": [
         "SLPM-66104"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sonic Team",
+      "genre": "Puzzle",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-61139"
     },
@@ -20362,7 +20362,7 @@
     },
     "Pyuu to Fuku! Jaguar: Ashita no Jump (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "",
       "publisher": "Konami",
       "release_date": "2004-03-18",
@@ -20587,7 +20587,7 @@
     "Raging Bless: Hangma Muksirok (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Beat 'Em Up",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-64521"
@@ -21056,9 +21056,9 @@
     },
     "Ring of Red (Konami The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Japan",
+      "genre": "Strategy",
+      "publisher": "KCE Studios",
       "release_date": "",
       "serial": "SLPS-62091"
     },
@@ -21387,15 +21387,15 @@
         "SLPM-74253",
         "SLPM-74269"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sega CS1",
+      "genre": "Action-Adventure",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-61140"
     },
     "Ryuu ga Gotoku 2 (Disc 2) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Sega CS1",
       "genre": "Action-Adventure",
       "publisher": "Sega",
       "release_date": "2006-12-07",
@@ -21405,9 +21405,9 @@
       "alt_serials": [
         "SLPM-74301"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sega CS1",
+      "genre": "Action-Adventure",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-61154"
     },
@@ -21783,7 +21783,7 @@
     "Saiyuuki Reload (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Fighting",
       "publisher": "Bandai",
       "release_date": "2004-03-18",
       "serial": "SLPS-25344"
@@ -21792,7 +21792,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2004-08-05",
       "serial": "SLPS-20391"
     },
@@ -22008,7 +22008,7 @@
     },
     "Samurai Spirits: Tenkaichi Kenkakuden (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "SNK Playmore",
       "genre": "Fighting",
       "publisher": "SNK Playmore",
       "release_date": "2006-01-26",
@@ -22034,7 +22034,7 @@
     },
     "Samurai-dou 2: Way of the Samurai 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Acquire",
       "genre": "Action",
       "publisher": "Spike",
       "release_date": "2003",
@@ -22230,17 +22230,17 @@
     },
     "Sanyo Pachinko Paradise 10: Gen-san Okaeri! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Irem",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Irem",
       "release_date": "",
       "serial": "SLPS-20375"
     },
     "Sanyo Pachinko Paradise 11: Shin Umi to Saraba Gintama no Ookami (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Irem",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Irem",
       "release_date": "",
       "serial": "SLPS-25455"
     },
@@ -22256,25 +22256,25 @@
       "alt_serials": [
         "SLPS-20206"
       ],
-      "developer": "",
+      "developer": "Irem",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Irem",
       "release_date": "",
       "serial": "SLPS-20203"
     },
     "Sanyo Pachinko Paradise 8: Shin Umi Monogatari (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Irem",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Irem",
       "release_date": "",
       "serial": "SLPS-20261"
     },
     "Sanyo Pachinko Paradise 9: Shin Umi Okawari! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Irem",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Irem",
       "release_date": "",
       "serial": "SLPS-25249"
     },
@@ -22457,7 +22457,7 @@
     "Seaman: Kindan no Pet: Kanzenban (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Strategy",
       "publisher": "",
       "release_date": "",
       "serial": "SLPM-65217"
@@ -22844,9 +22844,9 @@
       "alt_serials": [
         "SLPM-66212"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sega",
+      "genre": "Racing/Driving",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-61137"
     },
@@ -23961,9 +23961,9 @@
         "SLPM-65391",
         "SLPM-65931"
       ],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Idea Factory",
       "release_date": "",
       "serial": "SLPM-65390"
     },
@@ -23977,7 +23977,7 @@
     },
     "Shinki Gensou: Spectral Souls II: Genteiban (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
       "release_date": "2005-01-27",
@@ -23985,7 +23985,7 @@
     },
     "Shinki Gensou: Spectral Souls II: Idea Factory Collection (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
       "release_date": "2007-03-21",
@@ -24294,17 +24294,17 @@
         "SLPM-74211",
         "SLPS-73402"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Genki",
+      "genre": "Racing",
+      "publisher": "Genki Co. Ltd.",
       "release_date": "",
       "serial": "SLPS-25028"
     },
     "Shutokou Battle 0 (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Genki",
+      "genre": "Racing",
+      "publisher": "Genki Co. Ltd.",
       "release_date": "",
       "serial": "SLPM-73402"
     },
@@ -24312,9 +24312,9 @@
       "alt_serials": [
         "SLPM-65308"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Genki",
+      "genre": "Racing",
+      "publisher": "Genki Co. Ltd.",
       "release_date": "",
       "serial": "SLPM-60206"
     },
@@ -26531,7 +26531,7 @@
         "SLPM-65967",
         "SLPM-66349"
       ],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
       "release_date": "2005-04-28",
@@ -26541,7 +26541,7 @@
       "alt_serials": [
         "SLPM-65669"
       ],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
       "release_date": "2004-09-16",
@@ -26549,7 +26549,7 @@
     },
     "Spectral Force: Radical Elements: Idea Factory Collection (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
       "release_date": "2006-07-20",
@@ -26565,8 +26565,8 @@
     },
     "Spectral Gene: Genteiban Box Set (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Idea Factory",
+      "genre": "Strategy RPG",
       "publisher": "Idea Factory",
       "release_date": "2007-12-13",
       "serial": "SLPM-66898"
@@ -26581,9 +26581,9 @@
     },
     "Spectral vs. Generation (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Idea Factory",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Idea Factory",
       "release_date": "2007-07",
       "serial": "SLPM-62727"
     },
@@ -26651,7 +26651,7 @@
       ],
       "developer": "",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Sammy",
       "release_date": "",
       "serial": "SLPM-65959"
     },
@@ -27078,17 +27078,17 @@
     },
     "Sunrise Eiyuutan 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Atelier-Sai",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Sunrise Interactive",
       "release_date": "",
       "serial": "SLPS-25592"
     },
     "Sunrise Eiyuutan R (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Atelier-Sai",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Sunrise Interactive",
       "release_date": "",
       "serial": "SLPS-25011"
     },
@@ -27145,9 +27145,9 @@
         "SLPM-62016",
         "SLPM-64512"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Puzzle",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-60115"
     },
@@ -27156,9 +27156,9 @@
         "SCPS-51015",
         "SLPM-64550"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Taito",
+      "genre": "Puzzle",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-62229"
     },
@@ -27675,9 +27675,9 @@
     },
     "Suzumiya Haruhi no Tomadoi: Uchuu-hatsu! Full CG: Odoru SOS-dan (Chou Eizou-ban) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Banpresto",
+      "genre": "Simulation",
+      "publisher": "Banpresto",
       "release_date": "",
       "serial": "SLPM-68020"
     },
@@ -27895,7 +27895,7 @@
       "alt_serials": [
         "SLPS-20321"
       ],
-      "developer": "",
+      "developer": "Namco",
       "genre": "Rhythm",
       "publisher": "Namco",
       "release_date": "2003-10-30",
@@ -27903,9 +27903,9 @@
     },
     "Taiko no Tatsujin: Appare Sandaime (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Namco",
+      "genre": "Rhythm",
+      "publisher": "Namco",
       "release_date": "",
       "serial": "SLPS-73110"
     },
@@ -27913,7 +27913,7 @@
       "alt_serials": [
         "SLPS-20383"
       ],
-      "developer": "",
+      "developer": "Namco",
       "genre": "Rhythm",
       "publisher": "Namco",
       "release_date": "2004-07-22",
@@ -27931,9 +27931,9 @@
     },
     "Taiko no Tatsujin: Doki! Shinkyoku Darake no Haru Matsuri (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Namco",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Namco",
       "release_date": "2003-03-27",
       "serial": "SLPS-20272"
     },
@@ -27960,9 +27960,9 @@
     },
     "Taiko no Tatsujin: TataKon de Dodon ga Don (SLPS-20282) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Namco",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Namco",
       "release_date": "2003-03-27",
       "serial": "SLPS-20282"
     },
@@ -28008,17 +28008,17 @@
       "alt_serials": [
         "SLPM-62405"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62105"
     },
     "Taikou Risshiden IV (Koei Teiban Series) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-62640"
     },
@@ -28027,9 +28027,9 @@
         "SLPM-65674",
         "SLPM-66267"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-55251"
     },
@@ -28090,7 +28090,7 @@
       ],
       "developer": "Psikyo",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "X-Nauts",
       "release_date": "2004-04-29",
       "serial": "SLPM-62480"
     },
@@ -28457,21 +28457,21 @@
       ],
       "developer": "Hudson",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Hudson",
       "release_date": "",
       "serial": "SLPM-65401"
     },
     "Tengai Makyou II: Manji Maru: PlayStation 2 the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Hudson",
       "release_date": "2004-09-16",
       "serial": "SLPM-74208"
     },
     "Tengai Makyou III: Namida (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson",
       "genre": "RPG",
       "publisher": "Hudson",
       "release_date": "2005-04-14",
@@ -28479,9 +28479,9 @@
     },
     "Tengai Makyou III: Namida: PlayStation 2 the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hudson",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Hudson",
       "release_date": "2007-04-26",
       "serial": "SLPM-74240"
     },
@@ -29407,9 +29407,9 @@
         "SLPM-65739",
         "SLPM-66131"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Capcom Co., Ltd",
+      "genre": "Action/Beat'em Up",
+      "publisher": "Capcom",
       "release_date": "",
       "serial": "SLPM-61090"
     },
@@ -29503,8 +29503,8 @@
     },
     "Togainu no Chi: True Blood: Limited Edition (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Nitro+CHiRAL",
+      "genre": "Adventure",
       "publisher": "Kadokawa",
       "release_date": "",
       "serial": "SLPM-66855"
@@ -29847,7 +29847,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "2001-11-29",
       "serial": "SCPS-15015"
     },
@@ -29855,7 +29855,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Inc.",
       "release_date": "",
       "serial": "SCPS-19212"
     },
@@ -29989,17 +29989,17 @@
     },
     "Train Simulator: Kyushu Shinkansen (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ongakukan",
+      "genre": "Simulation",
+      "publisher": "Ongakukan",
       "release_date": "",
       "serial": "SLPM-67006"
     },
     "Train Simulator: Midousuji-Sen (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ongakukan",
+      "genre": "Simulation",
+      "publisher": "Ongakukan",
       "release_date": "",
       "serial": "SLPM-65386"
     },
@@ -30183,9 +30183,9 @@
       "alt_serials": [
         "SLPM-65826"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Blue Moon",
+      "genre": "Action/Shooter",
+      "publisher": "Taito",
       "release_date": "",
       "serial": "SLPM-61102"
     },
@@ -30412,9 +30412,9 @@
     },
     "Ultraman Fighting Evolution 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Banpresto",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Banpresto",
       "release_date": "",
       "serial": "SCPS-55046"
     },
@@ -30428,9 +30428,9 @@
     },
     "Ultraman Fighting Evolution Rebirth: Banpresto Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Banpresto",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Banpresto",
       "release_date": "2007-07-19",
       "serial": "SLPS-25800"
     },
@@ -30447,9 +30447,9 @@
         "SLPM-60190",
         "SLPS-73422"
       ],
-      "developer": "",
+      "developer": "Banpresto",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Banpresto",
       "release_date": "2002-10-31",
       "serial": "SLPS-25155"
     },
@@ -30457,7 +30457,7 @@
       "alt_serials": [
         "SLPM-61093"
       ],
-      "developer": "",
+      "developer": "Banpresto",
       "genre": "Fighting",
       "publisher": "Banpresto",
       "release_date": "2007-07-19",
@@ -30800,9 +30800,9 @@
         "SLPM-60245",
         "SLPM-65632"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sega AM2",
+      "genre": "Fighting",
+      "publisher": "Sega",
       "release_date": "",
       "serial": "SLPM-60242"
     },
@@ -31222,9 +31222,9 @@
       "alt_serials": [
         "SLPM-66842"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Design Factory",
+      "genre": "Adventure/Mini Games",
+      "publisher": "Idea Factory",
       "release_date": "",
       "serial": "SLPM-66841"
     },
@@ -31718,7 +31718,7 @@
     },
     "Wrestle Angels Survivor (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Success",
       "genre": "Strategy",
       "publisher": "Success",
       "release_date": "2008-02-14",
@@ -31734,9 +31734,9 @@
     },
     "Wrestle Angels: Survivor (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Success",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Tryfirst",
       "release_date": "",
       "serial": "SLPM-66239"
     },
@@ -31752,9 +31752,9 @@
       "alt_serials": [
         "SLPM-66401"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Yuke's",
+      "genre": "Sports",
+      "publisher": "Yuke's",
       "release_date": "",
       "serial": "SLPM-60278"
     },
@@ -32431,7 +32431,7 @@
     },
     "Zero no Tsukaima: Fantasy Force (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "",
       "release_date": "",
@@ -32439,7 +32439,7 @@
     },
     "Zero no Tsukaima: Fantasy Force 2nd Impact (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "",
       "release_date": "",
@@ -32460,7 +32460,7 @@
       "alt_serials": [
         "SLPS-25898"
       ],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2008-11-06",
@@ -32468,7 +32468,7 @@
     },
     "Zero no Tsukaima: Maigo no Period to Ikusen no Symphony: Best Collection (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2009-09-17",
@@ -32478,7 +32478,7 @@
       "alt_serials": [
         "SLPS-25831"
       ],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2007-11-29",
@@ -32486,7 +32486,7 @@
     },
     "Zero no Tsukaima: Muma ga Tsumugu Yokaze no Nocturne: Best Collection (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "RPG",
       "publisher": "Marvelous Entertainment",
       "release_date": "2008-09-04",

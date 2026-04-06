@@ -23849,3 +23849,335 @@ class TestWave135JpMetadataFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 203,
             f"PAL still has {len(empty)} entries without genre, expected <= 203")
+
+
+class TestWave136TwoWordPrefixFills(unittest.TestCase):
+    """Wave 136: 2-word prefix series fills for JP (120 dev/102 pub/62 genre)
+    and PAL (39 dev/45 pub/30 genre).
+
+    Key series filled in JP: Galaxy Angel (Seta/Broccoli), Gallop Racer
+    (Tecmo), Ultraman Fighting Evolution (Banpresto), Zero no Tsukaima
+    (Marvelous), Bomberman Kart (Racjin/Hudson), Puyo Puyo (Sonic Team/Sega),
+    Sanyo Pachinko Paradise (Irem), Kikou Heidan J-Phoenix (Takara), Hajime no
+    Ippo (New Corporation), Shutokou Battle (Genki), Shinki Gensou (Idea
+    Factory), Train Simulator (Ongakukan), Energy Airforce (Taito), Phantasy
+    Star Universe (Sonic Team/Sega), and more.
+
+    JP: dev=770, pub=602, genre=510. PAL: dev=242, pub=204, genre=173.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    # ── JP fills ─────────────────────────────────────────────────────────────
+
+    def test_galaxy_angel_dev_filled(self):
+        """Wave 136: Galaxy Angel developer filled as Seta Corporation."""
+        g = self.jp_games.get("Galaxy Angel (JP)", {})
+        self.assertEqual(g.get("developer"), "Seta Corporation")
+
+    def test_gallop_racer_6_dev_filled(self):
+        """Wave 136: Gallop Racer 6 developer filled as Tecmo."""
+        g = self.jp_games.get("Gallop Racer 6: Revolution (JP)", {})
+        self.assertEqual(g.get("developer"), "Tecmo")
+
+    def test_ultraman_fe2_dev_filled(self):
+        """Wave 136: Ultraman Fighting Evolution 2 developer filled as Banpresto."""
+        g = self.jp_games.get("Ultraman Fighting Evolution 2 (JP)", {})
+        self.assertEqual(g.get("developer"), "Banpresto")
+
+    def test_zero_no_tsukaima_dev_filled(self):
+        """Wave 136: Zero no Tsukaima series developer filled as Marvelous."""
+        g = self.jp_games.get("Zero no Tsukaima: Fantasy Force (JP)", {})
+        self.assertEqual(g.get("developer"), "Marvelous")
+
+    def test_bomberman_kart_dx_dev_filled(self):
+        """Wave 136: Bomberman Kart DX developer filled as Racjin."""
+        g = self.jp_games.get("Bomberman Kart DX (JP)", {})
+        self.assertEqual(g.get("developer"), "Racjin")
+
+    def test_puyo_puyo_fever_dev_filled(self):
+        """Wave 136: Puyo Puyo Fever developer filled as Sonic Team."""
+        g = self.jp_games.get("Puyo Puyo Fever (JP)", {})
+        self.assertEqual(g.get("developer"), "Sonic Team")
+
+    def test_puyo_puyo_fever_pub_filled(self):
+        """Wave 136: Puyo Puyo Fever publisher filled as Sega."""
+        g = self.jp_games.get("Puyo Puyo Fever (JP)", {})
+        self.assertEqual(g.get("publisher"), "Sega")
+
+    def test_sanyo_pachinko_7_dev_filled(self):
+        """Wave 136: Sanyo Pachinko Paradise 7 developer filled as Irem."""
+        g = self.jp_games.get("Sanyo Pachinko Paradise 7: Edokko Gen-san (JP)", {})
+        self.assertEqual(g.get("developer"), "Irem")
+
+    def test_kikou_heidan_jphoenix_dev_filled(self):
+        """Wave 136: Kikou Heidan J-Phoenix developer filled as Takara."""
+        g = self.jp_games.get("Kikou Heidan J-Phoenix (JP)", {})
+        self.assertEqual(g.get("developer"), "Takara")
+
+    def test_hajime_no_ippo_dev_filled(self):
+        """Wave 136: Hajime no Ippo developer filled as New Corporation."""
+        g = self.jp_games.get("Hajime no Ippo: Victorious Boxers (JP)", {})
+        self.assertEqual(g.get("developer"), "New Corporation")
+
+    def test_shutokou_battle_dev_filled(self):
+        """Wave 136: Shutokou Battle 0 developer filled as Genki."""
+        g = self.jp_games.get("Shutokou Battle 0 (JP)", {})
+        self.assertEqual(g.get("developer"), "Genki")
+
+    def test_energy_airforce_dev_filled(self):
+        """Wave 136: Energy Airforce developer filled as Taito."""
+        g = self.jp_games.get("Energy Airforce (JP)", {})
+        self.assertEqual(g.get("developer"), "Taito")
+
+    def test_energy_airforce_pub_filled(self):
+        """Wave 136: Energy Airforce publisher filled as Taito Corporation."""
+        g = self.jp_games.get("Energy Airforce (JP)", {})
+        self.assertEqual(g.get("publisher"), "Taito Corporation")
+
+    def test_phantasy_star_universe_dev_filled(self):
+        """Wave 136: Phantasy Star Universe Illuminus developer filled as Sonic Team."""
+        g = self.jp_games.get("Phantasy Star Universe: Illuminus no Yabou (JP)", {})
+        self.assertEqual(g.get("developer"), "Sonic Team")
+
+    def test_ultraman_fe3_pub_filled(self):
+        """Wave 136: Ultraman FE3 publisher filled as Banpresto."""
+        g = self.jp_games.get("Ultraman: Fighting Evolution 3 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Banpresto")
+
+    # ── PAL fills ────────────────────────────────────────────────────────────
+
+    def test_pal_v8_supercars_dev_filled(self):
+        """Wave 136: V8 Supercars Australia 3 PAL developer filled."""
+        g = self.pal_games.get("V8 Supercars Australia 3 (PAL)", {})
+        self.assertIn(g.get("developer"), ["Codemasters Software Compant Ltd", "Codemasters"])
+
+    def test_pal_v8_supercars_genre_filled(self):
+        """Wave 136: V8 Supercars Australia 3 PAL genre filled as Racing."""
+        g = self.pal_games.get("V8 Supercars Australia 3 (PAL)", {})
+        self.assertEqual(g.get("genre"), "Racing")
+
+    def test_pal_chronicles_dev_filled(self):
+        """Wave 136: Chronicles of Narnia PAL developer filled."""
+        g = self.pal_games.get("The Chronicles of Narnia: The Lion, the Witch and the Wardrobe (PAL)", {})
+        self.assertIsNotNone(g.get("developer"))
+
+    def test_pal_football_manager_dev_filled(self):
+        """Wave 136: Football Manager Campionato series PAL developer filled."""
+        g = self.pal_games.get("Football Manager Campionato 2005 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Hoodoo Studios")
+
+    # ── count regressions ─────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave136(self):
+        """Wave 136: JP DB must have at most 770 entries without developer (was 904)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 770,
+            f"JP still has {len(empty)} entries without developer, expected <= 770")
+
+    def test_jp_pub_count_wave136(self):
+        """Wave 136: JP DB must have at most 602 entries without publisher (was 704)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 602,
+            f"JP still has {len(empty)} entries without publisher, expected <= 602")
+
+    def test_jp_genre_count_wave136(self):
+        """Wave 136: JP DB must have at most 510 entries without genre (was 572)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 510,
+            f"JP still has {len(empty)} entries without genre, expected <= 510")
+
+    def test_pal_dev_count_wave136(self):
+        """Wave 136: PAL DB must have at most 242 entries without developer (was 281)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 242,
+            f"PAL still has {len(empty)} entries without developer, expected <= 242")
+
+    def test_pal_pub_count_wave136(self):
+        """Wave 136: PAL DB must have at most 204 entries without publisher (was 249)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 204,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 204")
+
+    def test_pal_genre_count_wave136(self):
+        """Wave 136: PAL DB must have at most 173 entries without genre (was 203)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 173,
+            f"PAL still has {len(empty)} entries without genre, expected <= 173")
+
+
+class TestWave137TargetedSeriesFills(unittest.TestCase):
+    """Wave 137: Targeted series fills for JP and PAL.
+
+    JP: Taikou Risshiden (Koei), Taiko no Tatsujin (Namco), Anubis ZoE
+    (Konami), Spectral Force (Idea Factory), Gun Survivor (Capcom),
+    K-1 World Max 2005 (Konami), Ryuu ga Gotoku (Sega CS1), FIFA JP (EA).
+
+    PAL: Harry Potter language variants, This is Football series (SCEE),
+    Fifa lowercase variants (EA Canada).
+
+    JP: dev=740, pub=582, genre=493. PAL: dev=226, pub=192, genre=161.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from pathlib import Path
+        import json
+        root = Path(__file__).parent.parent / "data" / "game_serial_db"
+        cls.jp_games = json.loads((root / "ps2_japan.json").read_text())["games"]
+        cls.pal_games = json.loads((root / "ps2_pal.json").read_text())["games"]
+
+    # ── JP ───────────────────────────────────────────────────────────────────
+
+    def test_taikou_risshiden_iv_dev(self):
+        """Wave 137: Taikou Risshiden IV developer filled as Koei."""
+        g = self.jp_games.get("Taikou Risshiden IV (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei")
+
+    def test_taikou_risshiden_iv_genre(self):
+        """Wave 137: Taikou Risshiden IV genre filled as Strategy."""
+        g = self.jp_games.get("Taikou Risshiden IV (JP)", {})
+        self.assertEqual(g.get("genre"), "Strategy")
+
+    def test_taikou_risshiden_v_dev(self):
+        """Wave 137: Taikou Risshiden V developer filled as Koei."""
+        g = self.jp_games.get("Taikou Risshiden V (JP)", {})
+        self.assertEqual(g.get("developer"), "Koei")
+
+    def test_taiko_appare_dev(self):
+        """Wave 137: Taiko no Tatsujin Appare Sandaime developer filled as Namco."""
+        g = self.jp_games.get("Taiko no Tatsujin: Appare Sandaime (JP)", {})
+        self.assertEqual(g.get("developer"), "Namco")
+
+    def test_taiko_best_dev_genre(self):
+        """Wave 137: Taiko no Tatsujin Best edition developer and genre filled."""
+        g = self.jp_games.get("Taiko no Tatsujin: Appare Sandaime (Playstation 2 The Best) (JP)", {})
+        self.assertEqual(g.get("developer"), "Namco")
+        self.assertEqual(g.get("genre"), "Rhythm")
+
+    def test_anubis_zoe_dev(self):
+        """Wave 137: Anubis Zone of the Enders developer filled."""
+        g = self.jp_games.get("Anubis: Zone of the Enders (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami Computer Entertainment Japan")
+
+    def test_anubis_zoe_genre(self):
+        """Wave 137: Anubis Zone of the Enders genre filled as Action."""
+        g = self.jp_games.get("Anubis: Zone of the Enders (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_spectral_force_chronicle_dev(self):
+        """Wave 137: Spectral Force Chronicle developer filled as Idea Factory."""
+        g = self.jp_games.get("Spectral Force Chronicle (JP)", {})
+        self.assertEqual(g.get("developer"), "Idea Factory")
+
+    def test_gun_survivor2_dev(self):
+        """Wave 137: Gun Survivor 2 Biohazard developer filled as Capcom."""
+        g = self.jp_games.get("Gun Survivor 2: Biohazard: Code: Veronica (JP)", {})
+        self.assertEqual(g.get("developer"), "Capcom")
+
+    def test_gun_survivor4_genre(self):
+        """Wave 137: Gun Survivor 4 genre filled as Light Gun Shooter."""
+        g = self.jp_games.get("Gun Survivor 4: Biohazard: Heroes Never Die (JP)", {})
+        self.assertEqual(g.get("genre"), "Light Gun Shooter")
+
+    def test_k1_world_max_dev(self):
+        """Wave 137: K-1 World Max 2005 developer filled as Konami."""
+        g = self.jp_games.get("K-1 World Max 2005 (JP)", {})
+        self.assertEqual(g.get("developer"), "Konami")
+
+    def test_ryuu_ga_gotoku_dev(self):
+        """Wave 137: Ryuu ga Gotoku developer filled as Sega CS1."""
+        g = self.jp_games.get("Ryuu ga Gotoku (JP)", {})
+        self.assertEqual(g.get("developer"), "Sega CS1")
+
+    def test_ryuu_ga_gotoku2_dev(self):
+        """Wave 137: Ryuu ga Gotoku 2 developer filled as Sega CS1."""
+        g = self.jp_games.get("Ryuu ga Gotoku 2 (JP)", {})
+        self.assertEqual(g.get("developer"), "Sega CS1")
+
+    def test_fifa_jp_2002_dev(self):
+        """Wave 137: FIFA 2002 JP developer filled as EA Canada."""
+        g = self.jp_games.get("FIFA 2002: Road to FIFA World Cup (JP)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    def test_fifa_jp_total_football_dev(self):
+        """Wave 137: FIFA Total Football JP developer filled as EA Canada."""
+        g = self.jp_games.get("FIFA Total Football (JP)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    # ── PAL ──────────────────────────────────────────────────────────────────
+
+    def test_pal_hp_chamber_french_dev(self):
+        """Wave 137: Harry Potter Chamber of Secrets (French) developer filled."""
+        g = self.pal_games.get("Harry Potter et la Chambre des Secrets (PAL)", {})
+        self.assertEqual(g.get("developer"), "Eurocom")
+        self.assertEqual(g.get("publisher"), "Electronic Arts")
+
+    def test_pal_hp_chamber_german_genre(self):
+        """Wave 137: Harry Potter Chamber of Secrets (German) genre filled."""
+        g = self.pal_games.get("Harry Potter und die Kammer des Schreckens (PAL)", {})
+        self.assertEqual(g.get("genre"), "Adventure")
+
+    def test_pal_hp_poa_polish_dev(self):
+        """Wave 137: Harry Potter Prisoner of Azkaban (Polish) developer filled."""
+        g = self.pal_games.get("Harry Potter i Więzień Azkabanu (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Bright Light")
+
+    def test_pal_this_is_football_2004_dev(self):
+        """Wave 137: This is Football 2004 developer filled as SCEE London Studio."""
+        g = self.pal_games.get("This is Football 2004 (PAL)", {})
+        self.assertEqual(g.get("developer"), "SCEE London Studio")
+
+    def test_pal_fifa_07_lowercase_dev(self):
+        """Wave 137: Fifa '07 PAL developer filled as EA Canada."""
+        g = self.pal_games.get("Fifa '07 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    def test_pal_fifa_wc_2006_lowercase_dev(self):
+        """Wave 137: Fifa World Cup Germany 2006 PAL developer filled."""
+        g = self.pal_games.get("Fifa World Cup: Germany 2006 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    # ── count regressions ─────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave137(self):
+        """Wave 137: JP DB must have at most 740 entries without developer (was 770)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 740,
+            f"JP still has {len(empty)} entries without developer, expected <= 740")
+
+    def test_jp_pub_count_wave137(self):
+        """Wave 137: JP DB must have at most 582 entries without publisher (was 602)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 582,
+            f"JP still has {len(empty)} entries without publisher, expected <= 582")
+
+    def test_jp_genre_count_wave137(self):
+        """Wave 137: JP DB must have at most 493 entries without genre (was 510)."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 493,
+            f"JP still has {len(empty)} entries without genre, expected <= 493")
+
+    def test_pal_dev_count_wave137(self):
+        """Wave 137: PAL DB must have at most 226 entries without developer (was 242)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 226,
+            f"PAL still has {len(empty)} entries without developer, expected <= 226")
+
+    def test_pal_pub_count_wave137(self):
+        """Wave 137: PAL DB must have at most 192 entries without publisher (was 204)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 192,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 192")
+
+    def test_pal_genre_count_wave137(self):
+        """Wave 137: PAL DB must have at most 161 entries without genre (was 173)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 161,
+            f"PAL still has {len(empty)} entries without genre, expected <= 161")
