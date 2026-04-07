@@ -24454,3 +24454,133 @@ class TestWave140PalGenreAndDevFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 148,
             f"PAL still has {len(empty)} entries without genre, expected <= 148")
+
+
+class TestWave141LocalizedPalFills(unittest.TestCase):
+    """Wave 141: PAL localized/translated title fills + genre fills."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_pal.json') as f:
+            self.pal_games = json.load(f)['games']
+
+    def test_pal_simpsons_german_dev(self):
+        """Wave 141: Die Simpsons Das Spiel dev filled as Rebellion."""
+        g = self.pal_games.get("Die Simpsons: Das Spiel (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rebellion")
+        self.assertEqual(g.get("publisher"), "Electronic Arts")
+
+    def test_pal_simpsons_french_dev(self):
+        """Wave 141: Les Simpson Le Jeu dev filled as Rebellion."""
+        g = self.pal_games.get("Les Simpson: Le Jeu (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rebellion")
+        self.assertEqual(g.get("publisher"), "Electronic Arts")
+
+    def test_pal_up_german_dev(self):
+        """Wave 141: Disney Pixar Oben (Up German) dev filled."""
+        g = self.pal_games.get("Disney/Pixar Oben (PAL)", {})
+        self.assertEqual(g.get("developer"), "Asobo Studio")
+        self.assertEqual(g.get("genre"), "Adventure")
+
+    def test_pal_up_greek_dev(self):
+        """Wave 141: Disney Pixar Up Greek dev filled."""
+        g = self.pal_games.get("Disney/Pixar Psila ston Ourano (PAL)", {})
+        self.assertEqual(g.get("developer"), "Asobo Studio")
+
+    def test_pal_over_hedge_swedish_dev(self):
+        """Wave 141: Over the Hedge Swedish dev filled."""
+        g = self.pal_games.get("DreamWorks' P Andra Sidan Hcken (Over the hedge) (PAL)", {})
+        self.assertEqual(g.get("developer"), "Dreamworks Interactive")
+
+    def test_pal_madagascar2_german_dev(self):
+        """Wave 141: DreamWorks Madagaskar 2 dev filled."""
+        g = self.pal_games.get("DreamWorks Madagaskar 2 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Toys for Bob")
+        self.assertEqual(g.get("publisher"), "Activision")
+
+    def test_pal_vecinos_invasores_dev(self):
+        """Wave 141: DreamWorks Vecinos Invasores (Over the Hedge Spanish) dev filled."""
+        g = self.pal_games.get("DreamWorks Vecinos Invasores (PAL)", {})
+        self.assertEqual(g.get("developer"), "Dreamworks Interactive")
+
+    def test_pal_star_wars_clone_wars_italian_dev(self):
+        """Wave 141: Star Wars La Guerra dei Cloni dev filled as Pandemic Studios."""
+        g = self.pal_games.get("Star Wars: La Guerra dei Cloni (PAL)", {})
+        self.assertEqual(g.get("developer"), "Pandemic Studios")
+        self.assertEqual(g.get("publisher"), "Lucasarts")
+
+    def test_pal_thrillville_spanish_dev(self):
+        """Wave 141: Thrillville Fuera de Control dev filled."""
+        g = self.pal_games.get("Thrillville: Fuera de Control (PAL)", {})
+        self.assertEqual(g.get("developer"), "Frontier Developments")
+
+    def test_pal_thrillville_french_dev(self):
+        """Wave 141: Thrillville Le Parc en Folie dev filled."""
+        g = self.pal_games.get("Thrillville: Le Parc en Folie (PAL)", {})
+        self.assertEqual(g.get("developer"), "Frontier Developments")
+
+    def test_pal_gladiator_german_dev(self):
+        """Wave 141: Gladiator Schwert der Rache dev filled."""
+        g = self.pal_games.get("Gladiator: Schwert der Rache (PAL)", {})
+        self.assertEqual(g.get("developer"), "Acclaim Studios Manchester")
+        self.assertEqual(g.get("genre"), "Beat 'Em Up")
+
+    def test_pal_piglet_italian_dev(self):
+        """Wave 141: Disney Pimpi Piccolo Grande Eroe dev filled."""
+        g = self.pal_games.get("Disney Pimpi, Piccolo Grande Eroe (PAL)", {})
+        self.assertEqual(g.get("developer"), "Doki Denki")
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_pal_barnyard_german_dev(self):
+        """Wave 141: Nick Der tierisch verruckte Bauernhof (Barnyard German) dev filled."""
+        g = self.pal_games.get("Nick: Der tierisch verrückte Bauernhof (PAL)", {})
+        self.assertEqual(g.get("developer"), "THQ")
+        self.assertEqual(g.get("genre"), "Adventure")
+
+    def test_pal_disney_sing_it_pop_hits_apostrophe_dev(self):
+        """Wave 141: Disney's Sing It Pop Hits dev filled."""
+        g = self.pal_games.get("Disney's Sing It: Pop Hits (PAL)", {})
+        self.assertEqual(g.get("developer"), "Zoe Mode")
+
+    def test_pal_disney_think_fast_apostrophe_dev(self):
+        """Wave 141: Disney's Think Fast dev filled."""
+        g = self.pal_games.get("Disney's Th!nk Fast (PAL)", {})
+        self.assertEqual(g.get("developer"), "Magenta Software Ltd")
+        self.assertEqual(g.get("genre"), "Quiz")
+
+    def test_pal_ratatouille_apostrophe_dev(self):
+        """Wave 141: Disney Pixar's Ratatouille dev filled."""
+        g = self.pal_games.get("Disney/Pixar's: Ratatouille (PAL)", {})
+        self.assertEqual(g.get("developer"), "Asobo Studios, Heavy Iron Studios")
+        self.assertEqual(g.get("publisher"), "THQ")
+
+    def test_pal_walle_bundled_dev(self):
+        """Wave 141: Disney Pixar's Wall-E Bundled dev filled."""
+        g = self.pal_games.get("Disney/Pixar's Wall-E: Bundled with PS2 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Asobo Studios")
+
+    def test_pal_disney_otvechaj_dev(self):
+        """Wave 141: Disney Otvechaj Russian Think Fast dev filled."""
+        g = self.pal_games.get("Disney Otvechaj-ne zevaj! (PAL)", {})
+        self.assertEqual(g.get("developer"), "Magenta Software Ltd")
+        self.assertEqual(g.get("genre"), "Quiz")
+
+    # ── count regressions (Wave 141) ─────────────────────────────────────────
+
+    def test_pal_dev_count_wave141(self):
+        """Wave 141: PAL DB must have at most 181 entries without developer."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 181,
+            f"PAL still has {len(empty)} entries without developer, expected <= 181")
+
+    def test_pal_pub_count_wave141(self):
+        """Wave 141: PAL DB must have at most 158 entries without publisher."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 158,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 158")
+
+    def test_pal_genre_count_wave141(self):
+        """Wave 141: PAL DB must have at most 115 entries without genre."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 115,
+            f"PAL still has {len(empty)} entries without genre, expected <= 115")
