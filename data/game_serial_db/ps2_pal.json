@@ -318,7 +318,7 @@
     },
     "ATV Offroad Fury 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Rainbow Studios",
       "genre": "Racing",
       "publisher": "THQ",
       "release_date": "2003",
@@ -1242,7 +1242,7 @@
     "BDFL Manager 2003 (PAL)": {
       "alt_serials": [],
       "developer": "Hoodoo Studios",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Codemasters",
       "release_date": "",
       "serial": "SLES-51025"
@@ -1258,7 +1258,7 @@
     "BDFL Manager 2005 (PAL)": {
       "alt_serials": [],
       "developer": "Hoodoo Studios",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Codemasters",
       "release_date": "",
       "serial": "SLES-52694"
@@ -1580,9 +1580,9 @@
     },
     "Big Idea's VeggieTales: LarryBoy and the Bad Apple (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Papaya Studio",
+      "genre": "Action, Adventure, Platformer",
+      "publisher": "Crave Entertainment",
       "release_date": "",
       "serial": "SLES-54536"
     },
@@ -2782,7 +2782,7 @@
         "SLES-55074"
       ],
       "developer": "Data Design Interactive",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Blast Entertainment",
       "release_date": "",
       "serial": "SLES-54672"
@@ -2965,7 +2965,7 @@
     },
     "Cheggers' Party Quiz (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Twelve Games",
       "genre": "Party",
       "publisher": "Oxygen Interactive",
       "release_date": "2008-03-19",
@@ -3024,7 +3024,7 @@
     "Circuit Blasters (PAL)": {
       "alt_serials": [],
       "developer": "Supersonic Software",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "Metro3D",
       "release_date": "",
       "serial": "SLES-53090"
@@ -3056,7 +3056,7 @@
     "Classic British Motor Racing (PAL)": {
       "alt_serials": [],
       "developer": "Data Design Interactive",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "Metro3D",
       "release_date": "",
       "serial": "SLES-53614"
@@ -3508,7 +3508,7 @@
     },
     "Colosseum: Road to Freedom (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Goshow Inc.",
       "genre": "Action-RPG",
       "publisher": "KOEI Corporation",
       "release_date": "2005",
@@ -3850,7 +3850,7 @@
     "Crime Life: Gang Wars (PAL)": {
       "alt_serials": [],
       "developer": "Hothouse Creations",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Konami of Europe",
       "release_date": "",
       "serial": "SLES-52122"
@@ -3980,7 +3980,7 @@
     "DJ: Decks & FX Radio FG (PAL)": {
       "alt_serials": [],
       "developer": "Relentless Software",
-      "genre": "",
+      "genre": "Music",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-52762"
@@ -3988,7 +3988,7 @@
     "DJ: Decks & FX: Claudio Coccoluto Edition (PAL)": {
       "alt_serials": [],
       "developer": "Relentless Software",
-      "genre": "",
+      "genre": "Music",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-52756"
@@ -3996,7 +3996,7 @@
     "DJ: Decks & FX: House Edition (PAL)": {
       "alt_serials": [],
       "developer": "Relentless Software",
-      "genre": "",
+      "genre": "Music",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-52405"
@@ -4004,7 +4004,7 @@
     "DJ: Decks & FX: Live Session (PAL)": {
       "alt_serials": [],
       "developer": "Relentless Software",
-      "genre": "",
+      "genre": "Music",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-52764"
@@ -4712,7 +4712,7 @@
     "Disney Chicken Little: As en Acción (PAL)": {
       "alt_serials": [],
       "developer": "Avalanche Software",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Buena Vista Games",
       "release_date": "",
       "serial": "SLES-54452"
@@ -4720,8 +4720,8 @@
     "Disney Chicken Little: Asso Spaziale! (PAL)": {
       "alt_serials": [],
       "developer": "Avalanche Software",
-      "genre": "",
-      "publisher": "",
+      "genre": "Action",
+      "publisher": "Buena Vista Games",
       "release_date": "",
       "serial": "SLES-54453"
     },
@@ -4796,7 +4796,7 @@
     },
     "Disney Move (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Avalanche Software",
       "genre": "Party",
       "publisher": "Buena Vista Games",
       "release_date": "2004-11-19",
@@ -5157,7 +5157,7 @@
     "Disney/Pixar Alla Ricerca di Nemo (PAL)": {
       "alt_serials": [],
       "developer": "Traveller's Tales",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-51907"
@@ -5174,25 +5174,25 @@
     },
     "Disney/Pixar Cars: Hook International (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Rainbow Studios",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55027"
     },
     "Disney/Pixar Cars: La Copa Internacional de Mate (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Rainbow Studios",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55029"
     },
     "Disney/Pixar Cars: La Coppa Internazionale di Carl Attrezzi (PAL)": {
       "alt_serials": [],
-      "developer": "THQ",
+      "developer": "Rainbow Studios",
       "genre": "Racing",
-      "publisher": "Disney Software",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55028"
     },
@@ -5405,8 +5405,8 @@
     },
     "Disney/Pixar À Procura de Nemo (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "Traveller's Tales",
+      "genre": "Adventure",
       "publisher": "",
       "release_date": "",
       "serial": "SLES-51960"
@@ -5607,7 +5607,7 @@
     "Drag Racer USA (PAL)": {
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "Phoenix Games",
       "release_date": "",
       "serial": "SLES-54155"
@@ -5792,7 +5792,7 @@
     "DreamWorks La Gang del Bosco (PAL)": {
       "alt_serials": [],
       "developer": "Edge of Reality",
-      "genre": "",
+      "genre": "Platformer",
       "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-53986"
@@ -8332,9 +8332,9 @@
     },
     "Godzilla: Unleashed (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Pipeworks Software",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Atari",
       "release_date": "",
       "serial": "SLES-54960"
     },
@@ -10082,7 +10082,7 @@
     },
     "Junior Board Games (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Twelve Games",
       "genre": "Party",
       "publisher": "Oxygen Interactive",
       "release_date": "",
@@ -10496,7 +10496,7 @@
     "L'Eredità (PAL)": {
       "alt_serials": [],
       "developer": "Milestone",
-      "genre": "",
+      "genre": "Trivia",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2003",
       "serial": "SLES-52155"
@@ -12180,7 +12180,7 @@
     },
     "Moderngroove: Ministry of Sound Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Ubisoft Entertainment",
       "genre": "Simulation",
       "publisher": "Ubi Soft Entertainment",
       "release_date": "2000",
@@ -12634,9 +12634,9 @@
     },
     "NASCAR '08 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Tiburon",
+      "genre": "Racing",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-54813"
     },
@@ -12770,9 +12770,9 @@
     },
     "NBA Live '06 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "EA Sports",
       "release_date": "",
       "serial": "SLES-53547"
     },
@@ -12941,9 +12941,9 @@
     },
     "NHL '09 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "Electronic Arts",
       "release_date": "",
       "serial": "SLES-55339"
     },
@@ -13447,8 +13447,8 @@
     },
     "Nickelodeon Bob Esponja: ¡Luces, Cámara, Esponja! (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "THQ Australia",
+      "genre": "Party",
       "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-53498"
@@ -13513,7 +13513,7 @@
     },
     "Nickelodeon Jimmy Neutron: Der mutige Erfinder (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "BigSky Interactive",
       "genre": "Action",
       "publisher": "THQ",
       "release_date": "",
@@ -13612,8 +13612,8 @@
     },
     "Nickelodeon SpongeBob SquarePants: Licht uit, Camera aan! (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
+      "developer": "THQ Australia",
+      "genre": "Party",
       "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-53499"
@@ -16223,7 +16223,7 @@
     },
     "SCAR: Squadra Corse Alfa Romeo (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Plucky Bytes",
       "genre": "Racing",
       "publisher": "Black Bean Games",
       "release_date": "2005-06-24",
@@ -18444,7 +18444,7 @@
     },
     "Speed Challenge: Jacques Villeneuve's Racing Vision (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Ubisoft Entertainment",
       "genre": "Racing",
       "publisher": "Ubi Soft Entertainment",
       "release_date": "2002-11-22",
@@ -18527,9 +18527,9 @@
     },
     "Spider-Man: Friend or Foe (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Next Level Games",
+      "genre": "Action",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-54901"
     },
@@ -18578,17 +18578,17 @@
     },
     "SpongeBob and Friends: Battle for Volcano Island (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Blue Tongue",
+      "genre": "RPG",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-54522"
     },
     "SpongeBob's Atlantis Squarepants (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "THQ Studio Australia",
+      "genre": "Adventure",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-55080"
     },
@@ -19659,17 +19659,17 @@
     },
     "Teenage Mutant Ninja Turtles 2: Battle Nexus (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami Computer Entertainment Studios, Inc",
+      "genre": "Beat 'Em Up",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-53017"
     },
     "Teenage Mutant Ninja Turtles 3: Mutant Nightmare (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Action, Platformer",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLES-53850"
     },
@@ -20796,9 +20796,9 @@
         "SCES-51611",
         "SCES-51612"
       ],
-      "developer": "",
+      "developer": "SCEE London Studio",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2005-03-26",
       "serial": "SCES-51610"
     },
@@ -22788,9 +22788,9 @@
     },
     "World Championship Snooker 2002 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Blade Interactive Studios",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Codemasters Software Co.",
       "release_date": "2001-09-28",
       "serial": "SLES-50395"
     },
@@ -22804,9 +22804,9 @@
     },
     "World Championship Snooker 2004 (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Blade Interactive Studios",
+      "genre": "Sports",
+      "publisher": "Codemasters Software Co.",
       "release_date": "",
       "serial": "SLES-52386"
     },

@@ -24181,3 +24181,276 @@ class TestWave137TargetedSeriesFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 161,
             f"PAL still has {len(empty)} entries without genre, expected <= 161")
+
+
+class TestWave138And139MetadataFills(unittest.TestCase):
+    """Wave 138-139: JP publisher fills and PAL metadata fills from NTSC-U cross-reference."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_japan.json') as f:
+            self.jp_games = json.load(f)['games']
+        with open('data/game_serial_db/ps2_pal.json') as f:
+            self.pal_games = json.load(f)['games']
+
+    # ── JP publisher fills (Wave 139) ─────────────────────────────────────────
+
+    def test_jp_gust_atelier_marie_elie_pub(self):
+        """Wave 139: Atelier Marie + Elie publisher filled as Gust."""
+        g = self.jp_games.get("Atelier Marie + Elie: Salburg no Renkinjutsushi 1 & 2 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Gust")
+
+    def test_jp_gust_hermina_pub(self):
+        """Wave 139: Hermina to Culus: Lilie no Atelier publisher filled as Gust."""
+        g = self.jp_games.get("Hermina to Culus: Lilie no Atelier Mou Hitotsu no Monogatari (JP)", {})
+        self.assertEqual(g.get("publisher"), "Gust")
+
+    def test_jp_gust_judie_atelier_pub(self):
+        """Wave 139: Judie no Atelier publisher filled as Gust."""
+        g = self.jp_games.get("Judie no Atelier: Gramnad no Renkinjutsushi (JP)", {})
+        self.assertEqual(g.get("publisher"), "Gust")
+
+    def test_jp_gust_viorate_atelier_pub(self):
+        """Wave 139: Viorate no Atelier publisher filled as Gust."""
+        g = self.jp_games.get("Viorate no Atelier: Gramnad no Renkinjutsushi 2 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Gust")
+
+    def test_jp_naruto_hero3_pub(self):
+        """Wave 139: Naruto Narutimate Hero 3 publisher filled as Namco Bandai."""
+        g = self.jp_games.get("Naruto: Narutimate Hero 3 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Namco Bandai")
+
+    def test_jp_summon_night_ex_pub(self):
+        """Wave 139: Summon Night Ex-These publisher filled as Banpresto."""
+        g = self.jp_games.get("Summon Night Ex-These: Yoake no Tsubasa (JP)", {})
+        self.assertEqual(g.get("publisher"), "Banpresto")
+
+    def test_jp_summon_night_4_pub(self):
+        """Wave 139: Summon Night 4 publisher filled as Bandai Namco Games."""
+        g = self.jp_games.get("Summon Night 4 (JP)", {})
+        self.assertEqual(g.get("publisher"), "Bandai Namco Games")
+
+    def test_jp_zero_tsukaima_fantasy_force_pub(self):
+        """Wave 139: Zero no Tsukaima Fantasy Force publisher filled as Marvelous."""
+        g = self.jp_games.get("Zero no Tsukaima: Fantasy Force (JP)", {})
+        self.assertEqual(g.get("publisher"), "Marvelous")
+
+    def test_jp_zero_tsukaima_fantasy_force2_pub(self):
+        """Wave 139: Zero no Tsukaima Fantasy Force 2nd Impact publisher filled as Marvelous."""
+        g = self.jp_games.get("Zero no Tsukaima: Fantasy Force 2nd Impact (JP)", {})
+        self.assertEqual(g.get("publisher"), "Marvelous")
+
+    # ── PAL fills from NTSC-U (Wave 139) ─────────────────────────────────────
+
+    def test_pal_atv_offroad_fury2_dev(self):
+        """Wave 139: ATV Offroad Fury 2 PAL developer filled as Rainbow Studios."""
+        g = self.pal_games.get("ATV Offroad Fury 2 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rainbow Studios")
+
+    def test_pal_veggietales_dev(self):
+        """Wave 139: VeggieTales LarryBoy PAL developer filled as Papaya Studio."""
+        g = self.pal_games.get("Big Idea's VeggieTales: LarryBoy and the Bad Apple (PAL)", {})
+        self.assertEqual(g.get("developer"), "Papaya Studio")
+
+    def test_pal_colosseum_dev(self):
+        """Wave 139: Colosseum Road to Freedom PAL developer filled as Goshow Inc."""
+        g = self.pal_games.get("Colosseum: Road to Freedom (PAL)", {})
+        self.assertEqual(g.get("developer"), "Goshow Inc.")
+
+    def test_pal_godzilla_unleashed_dev(self):
+        """Wave 139: Godzilla Unleashed PAL developer filled as Pipeworks Software."""
+        g = self.pal_games.get("Godzilla: Unleashed (PAL)", {})
+        self.assertEqual(g.get("developer"), "Pipeworks Software")
+
+    def test_pal_nascar08_dev(self):
+        """Wave 139: NASCAR 08 PAL developer filled as EA Tiburon."""
+        g = self.pal_games.get("NASCAR '08 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Tiburon")
+
+    def test_pal_spiderman_friend_foe_dev(self):
+        """Wave 139: Spider-Man Friend or Foe PAL developer filled as Next Level Games."""
+        g = self.pal_games.get("Spider-Man: Friend or Foe (PAL)", {})
+        self.assertEqual(g.get("developer"), "Next Level Games")
+
+    def test_pal_tmnt2_dev(self):
+        """Wave 139: TMNT 2 Battle Nexus PAL developer filled."""
+        g = self.pal_games.get("Teenage Mutant Ninja Turtles 2: Battle Nexus (PAL)", {})
+        self.assertEqual(g.get("developer"), "Konami Computer Entertainment Studios, Inc")
+
+    def test_pal_tmnt3_dev(self):
+        """Wave 139: TMNT 3 Mutant Nightmare PAL developer filled as Konami."""
+        g = self.pal_games.get("Teenage Mutant Ninja Turtles 3: Mutant Nightmare (PAL)", {})
+        self.assertEqual(g.get("developer"), "Konami")
+
+    def test_pal_nba_live06_dev(self):
+        """Wave 139: NBA Live 06 PAL developer filled as EA Canada."""
+        g = self.pal_games.get("NBA Live '06 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    def test_pal_nhl09_dev(self):
+        """Wave 139: NHL 09 PAL developer filled as EA Canada."""
+        g = self.pal_games.get("NHL '09 (PAL)", {})
+        self.assertEqual(g.get("developer"), "EA Canada")
+
+    def test_pal_cheggers_dev(self):
+        """Wave 139: Cheggers' Party Quiz PAL developer filled as Twelve Games."""
+        g = self.pal_games.get("Cheggers' Party Quiz (PAL)", {})
+        self.assertEqual(g.get("developer"), "Twelve Games")
+
+    def test_pal_disney_move_dev(self):
+        """Wave 139: Disney Move PAL developer filled as Avalanche Software."""
+        g = self.pal_games.get("Disney Move (PAL)", {})
+        self.assertEqual(g.get("developer"), "Avalanche Software")
+
+    def test_pal_this_is_football_2004_uppercase_dev(self):
+        """Wave 139: This Is Football 2004 PAL cross-filled from lowercase variant."""
+        g = self.pal_games.get("This Is Football 2004 (PAL)", {})
+        self.assertEqual(g.get("developer"), "SCEE London Studio")
+        self.assertEqual(g.get("publisher"), "Sony Computer Entertainment Europe")
+
+    # ── count regressions (Wave 139) ─────────────────────────────────────────
+
+    def test_jp_pub_count_wave139(self):
+        """Wave 139: JP DB must have at most 550 entries without publisher."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 550,
+            f"JP still has {len(empty)} entries without publisher, expected <= 550")
+
+    def test_pal_dev_count_wave139(self):
+        """Wave 139: PAL DB must have at most 209 entries without developer."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 209,
+            f"PAL still has {len(empty)} entries without developer, expected <= 209")
+
+    def test_pal_pub_count_wave139(self):
+        """Wave 139: PAL DB must have at most 183 entries without publisher."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 183,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 183")
+
+    def test_pal_genre_count_wave139(self):
+        """Wave 139: PAL DB must have at most 155 entries without genre."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 155,
+            f"PAL still has {len(empty)} entries without genre, expected <= 155")
+
+
+class TestWave140PalGenreAndDevFills(unittest.TestCase):
+    """Wave 140: PAL series-based dev/pub/genre fills and Cars dev fix."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_pal.json') as f:
+            self.pal_games = json.load(f)['games']
+        with open('data/game_serial_db/ps2_japan.json') as f:
+            self.jp_games = json.load(f)['games']
+
+    # ── Cars fix and localized fills ─────────────────────────────────────────
+
+    def test_pal_cars_la_coppa_dev_fixed(self):
+        """Wave 140: Disney/Pixar Cars La Coppa Internazionale dev corrected to Rainbow Studios."""
+        g = self.pal_games.get("Disney/Pixar Cars: La Coppa Internazionale di Carl Attrezzi (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rainbow Studios")
+        self.assertEqual(g.get("publisher"), "THQ")
+
+    def test_pal_cars_la_copa_dev(self):
+        """Wave 140: Disney/Pixar Cars La Copa Internacional de Mate dev filled."""
+        g = self.pal_games.get("Disney/Pixar Cars: La Copa Internacional de Mate (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rainbow Studios")
+        self.assertEqual(g.get("publisher"), "THQ")
+
+    def test_pal_cars_hook_dev(self):
+        """Wave 140: Disney/Pixar Cars Hook International dev filled."""
+        g = self.pal_games.get("Disney/Pixar Cars: Hook International (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rainbow Studios")
+
+    # ── Snooker series ────────────────────────────────────────────────────────
+
+    def test_pal_snooker_2002_dev(self):
+        """Wave 140: World Championship Snooker 2002 dev filled."""
+        g = self.pal_games.get("World Championship Snooker 2002 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Blade Interactive Studios")
+        self.assertEqual(g.get("publisher"), "Codemasters Software Co.")
+
+    def test_pal_snooker_2004_dev(self):
+        """Wave 140: World Championship Snooker 2004 dev and genre filled."""
+        g = self.pal_games.get("World Championship Snooker 2004 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Blade Interactive Studios")
+        self.assertEqual(g.get("genre"), "Sports")
+
+    # ── SpongeBob localized ───────────────────────────────────────────────────
+
+    def test_pal_bob_esponja_lights_camera_dev(self):
+        """Wave 140: SpongeBob Spanish (Bob Esponja) Lights Camera Pants dev filled."""
+        g = self.pal_games.get("Nickelodeon Bob Esponja: ¡Luces, Cámara, Esponja! (PAL)", {})
+        self.assertEqual(g.get("developer"), "THQ Australia")
+        self.assertEqual(g.get("genre"), "Party")
+
+    def test_pal_spongebob_dutch_dev(self):
+        """Wave 140: SpongeBob Dutch (Licht uit Camera aan) dev filled."""
+        g = self.pal_games.get("Nickelodeon SpongeBob SquarePants: Licht uit, Camera aan! (PAL)", {})
+        self.assertEqual(g.get("developer"), "THQ Australia")
+
+    def test_pal_spongebob_bfvi_dev(self):
+        """Wave 140: SpongeBob and Friends Battle for Volcano Island dev filled."""
+        g = self.pal_games.get("SpongeBob and Friends: Battle for Volcano Island (PAL)", {})
+        self.assertEqual(g.get("developer"), "Blue Tongue")
+        self.assertEqual(g.get("publisher"), "THQ")
+
+    def test_pal_spongebob_atlantis_dev(self):
+        """Wave 140: SpongeBob's Atlantis Squarepants dev filled."""
+        g = self.pal_games.get("SpongeBob's Atlantis Squarepants (PAL)", {})
+        self.assertEqual(g.get("developer"), "THQ Studio Australia")
+        self.assertEqual(g.get("publisher"), "THQ")
+
+    # ── Disney Chicken Little localized ──────────────────────────────────────
+
+    def test_pal_chicken_little_spanish_pub(self):
+        """Wave 140: Disney Chicken Little As en Accion PAL pub filled."""
+        g = self.pal_games.get("Disney Chicken Little: As en Acción (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Buena Vista Games")
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_pal_chicken_little_italian_pub(self):
+        """Wave 140: Disney Chicken Little Asso Spaziale PAL pub filled."""
+        g = self.pal_games.get("Disney Chicken Little: Asso Spaziale! (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Buena Vista Games")
+
+    # ── Jimmy Neutron German ──────────────────────────────────────────────────
+
+    def test_pal_jimmy_neutron_german_dev(self):
+        """Wave 140: Jimmy Neutron German version dev filled as BigSky Interactive."""
+        g = self.pal_games.get("Nickelodeon Jimmy Neutron: Der mutige Erfinder (PAL)", {})
+        self.assertEqual(g.get("developer"), "BigSky Interactive")
+
+    # ── JP genre fills ────────────────────────────────────────────────────────
+
+    def test_jp_psikyo_genre(self):
+        """Wave 140: Psikyo Shooting Collection Vol 1 genre filled."""
+        g = self.jp_games.get("Psikyo Shooting Collection Vol. 1: Strikers 1945 I & II (JP)", {})
+        self.assertEqual(g.get("genre"), "Shoot 'Em Up")
+
+    def test_jp_we7_international_genre(self):
+        """Wave 140: WE7 International genre filled as Sports."""
+        g = self.jp_games.get("World Soccer Winning Eleven 7 International (Adidas Premium Package) (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    # ── count regressions (Wave 140) ─────────────────────────────────────────
+
+    def test_pal_dev_count_wave140(self):
+        """Wave 140: PAL DB must have at most 200 entries without developer."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 200,
+            f"PAL still has {len(empty)} entries without developer, expected <= 200")
+
+    def test_pal_pub_count_wave140(self):
+        """Wave 140: PAL DB must have at most 176 entries without publisher."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 176,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 176")
+
+    def test_pal_genre_count_wave140(self):
+        """Wave 140: PAL DB must have at most 148 entries without genre."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 148,
+            f"PAL still has {len(empty)} entries without genre, expected <= 148")
