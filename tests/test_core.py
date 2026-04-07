@@ -24750,3 +24750,258 @@ class TestWave144PalDevPubFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
         self.assertLessEqual(len(empty), 148,
             f"PAL still has {len(empty)} entries without publisher, expected <= 148")
+
+
+class TestWave145JpGenreFillsAndPalDevPubFills(unittest.TestCase):
+    """Wave 145: JP genre fills and PAL developer/publisher fills."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_japan.json', encoding='utf-8') as f:
+            self.jp_games = json.load(f)['games']
+        with open('data/game_serial_db/ps2_pal.json', encoding='utf-8') as f:
+            self.pal_games = json.load(f)['games']
+
+    # ── JP genre fills ────────────────────────────────────────────────────────
+
+    def test_jp_digimon_savers_genre(self):
+        g = self.jp_games.get("Digimon Savers: Another Mission (JP)", {})
+        self.assertEqual(g.get("genre"), "Action RPG")
+
+    def test_jp_european_club_soccer_genre(self):
+        g = self.jp_games.get("European Club Soccer: Winning Eleven Tactics (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    def test_jp_eyetoy_play_best_genre(self):
+        g = self.jp_games.get("EyeToy: Play (Playstation 2 The Best) (JP)", {})
+        self.assertEqual(g.get("genre"), "Party")
+
+    def test_jp_dokuro_chan_genre(self):
+        g = self.jp_games.get("Game ni Natta yo! Dokuro-chan: Kenkou Shindan Daisakusen (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_jikkyou_world_soccer_2002_genre(self):
+        g = self.jp_games.get("Jikkyou World Soccer 2002 (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    def test_jp_katekyou_hitman_reborn_genre(self):
+        g = self.jp_games.get("Katekyou Hitman Reborn! Kindan no Yami no Delta: Best Collection (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_musou_orochi_genre(self):
+        g = self.jp_games.get("Musou Orochi (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_musou_orochi_best_reprint_genre(self):
+        g = self.jp_games.get("Musou Orochi (Playstation 2 The Best Reprint) (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_namco_50_anniversary_genre(self):
+        g = self.jp_games.get("Namco 50 Anniversary: namCollection (JP)", {})
+        self.assertEqual(g.get("genre"), "Compilation")
+
+    def test_jp_pyuu_jaguar_ashita_jump_genre(self):
+        g = self.jp_games.get("Pyuu to Fuku! Jaguar Ashita no Jump (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_pyuu_jaguar_ashita_jump2_genre(self):
+        g = self.jp_games.get("Pyuu to Fuku! Jaguar: Ashita no Jump (JP)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_jp_recca_honoo_final_burning_genre(self):
+        g = self.jp_games.get("Recca no Honoo: Final Burning: Konami Dendou Selection (JP)", {})
+        self.assertEqual(g.get("genre"), "Fighting")
+
+    def test_jp_silent_scope_3_best_genre(self):
+        g = self.jp_games.get("Silent Scope 3: Konami the Best (JP)", {})
+        self.assertEqual(g.get("genre"), "Shooter")
+
+    def test_jp_simple_2000_vol106_genre(self):
+        g = self.jp_games.get("Simple 2000 Series Vol. 106: The Block Kuzushi Quest: Dragon Kingdom (JP)", {})
+        self.assertEqual(g.get("genre"), "Puzzle")
+
+    def test_jp_simple_2000_vol21_genre(self):
+        g = self.jp_games.get("Simple 2000 Series Vol. 21: The Bishoujo Simulation RPG: Moonlight Tale (JP)", {})
+        self.assertEqual(g.get("genre"), "Simulation")
+
+    def test_jp_simple_2000_vol25_genre(self):
+        g = self.jp_games.get("Simple 2000 Series Vol. 25: The Menkyo Shutoku Simulation (JP)", {})
+        self.assertEqual(g.get("genre"), "Simulation")
+
+    def test_jp_simple_2000_vol40_genre(self):
+        g = self.jp_games.get("Simple 2000 Series Vol. 40: The Touyou Sandai Senjutsu: Fuusui, Seimei Handan, Ekisen (JP)", {})
+        self.assertEqual(g.get("genre"), "Simulation")
+
+    def test_jp_tvware_gendai_yougo_genre(self):
+        g = self.jp_games.get("TVware Jouhou Kakumei Series: Gendai Yougo no Kiso Chishiki 2001 (JP)", {})
+        self.assertEqual(g.get("genre"), "Edutainment")
+
+    def test_jp_tvware_katei_igaku_genre(self):
+        g = self.jp_games.get("TVware Jouhou Kakumei Series: Katei no Igaku (JP)", {})
+        self.assertEqual(g.get("genre"), "Edutainment")
+
+    def test_jp_tvware_pro_atlas_kinki_genre(self):
+        g = self.jp_games.get("TVware Jouhou Kakumei Series: Pro Atlas for TV: Kinki (JP)", {})
+        self.assertEqual(g.get("genre"), "Edutainment")
+
+    def test_jp_tvware_evangelion_typing_genre(self):
+        g = self.jp_games.get("TVware Jouhou Kakumei Series: Shin Seiki Evangelion: Typing E Keikaku (JP)", {})
+        self.assertEqual(g.get("genre"), "Edutainment")
+
+    def test_jp_wswe_2009_genre(self):
+        g = self.jp_games.get("World Soccer Winning Eleven 2009 (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    def test_jp_wswe_2010_genre(self):
+        g = self.jp_games.get("World Soccer Winning Eleven 2010 (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    def test_jp_wswe_2011_genre(self):
+        g = self.jp_games.get("World Soccer Winning Eleven 2011 (JP)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    # ── PAL developer fills ───────────────────────────────────────────────────
+
+    def test_pal_jello_dev(self):
+        g = self.pal_games.get("Jello (PAL)", {})
+        self.assertEqual(g.get("developer"), "Phoenix Games")
+
+    def test_pal_monster_eggs_dev(self):
+        g = self.pal_games.get("Monster Eggs (PAL)", {})
+        self.assertEqual(g.get("developer"), "Phoenix Games")
+
+    def test_pal_pinocchio_dev(self):
+        g = self.pal_games.get("Pinocchio (PAL)", {})
+        self.assertEqual(g.get("developer"), "Phoenix Games")
+
+    def test_pal_shadow_of_ganymede_dev(self):
+        g = self.pal_games.get("Shadow of Ganymede (PAL)", {})
+        self.assertEqual(g.get("developer"), "Phoenix Games")
+
+    def test_pal_matrix_path_of_neo_dev(self):
+        g = self.pal_games.get("The Matrix: Path of Neo (PAL)", {})
+        self.assertEqual(g.get("developer"), "Shiny Entertainment")
+
+    def test_pal_matrix_path_of_neo_pub(self):
+        g = self.pal_games.get("The Matrix: Path of Neo (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Atari")
+
+    def test_pal_tmnt_mutant_melee_dev(self):
+        g = self.pal_games.get("Teenage Mutant Ninja Turtles: Mutant Melee (PAL)", {})
+        self.assertEqual(g.get("developer"), "Konami Computer Entertainment Hawaii")
+
+    def test_pal_tmnt_mutant_melee_pub(self):
+        g = self.pal_games.get("Teenage Mutant Ninja Turtles: Mutant Melee (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Konami")
+
+    def test_pal_worms_forts_dev(self):
+        g = self.pal_games.get("Worms Forts: Under Siege (PAL)", {})
+        self.assertEqual(g.get("developer"), "Team17 Software")
+
+    def test_pal_worms_forts_pub(self):
+        g = self.pal_games.get("Worms Forts: Under Siege (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Sega")
+
+    def test_pal_wipeout_pulse_dev(self):
+        g = self.pal_games.get("WipEout Pulse (PAL)", {})
+        self.assertEqual(g.get("developer"), "Sony Studio Liverpool")
+
+    def test_pal_wipeout_pulse_pub(self):
+        g = self.pal_games.get("WipEout Pulse (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Sony Computer Entertainment Europe")
+
+    def test_pal_splashdown2_dev(self):
+        g = self.pal_games.get("Splashdown 2: Rides Gone Wild (PAL)", {})
+        self.assertEqual(g.get("developer"), "Rainbow Studios")
+
+    def test_pal_splashdown2_pub(self):
+        g = self.pal_games.get("Splashdown 2: Rides Gone Wild (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Midway")
+
+    def test_pal_spawn_armaggedon_dev(self):
+        g = self.pal_games.get("Spawn Armaggedon (PAL)", {})
+        self.assertEqual(g.get("developer"), "Point of View Inc.")
+
+    def test_pal_namco_museum_50th_dev(self):
+        g = self.pal_games.get("Namco Museum 50th Anniversary (PAL)", {})
+        self.assertEqual(g.get("developer"), "Namco")
+
+    def test_pal_ty_tasmanian_3_dev(self):
+        g = self.pal_games.get("Ty: The Tasmanian Tiger 3: Night of the Quinkan (PAL)", {})
+        self.assertEqual(g.get("developer"), "Krome Studios")
+
+    def test_pal_ty_tasmanian_3_pub(self):
+        g = self.pal_games.get("Ty: The Tasmanian Tiger 3: Night of the Quinkan (PAL)", {})
+        self.assertEqual(g.get("publisher"), "EA Games")
+
+    def test_pal_frogger_beyond_dev(self):
+        g = self.pal_games.get("Frogger Beyond (PAL)", {})
+        self.assertEqual(g.get("developer"), "Hijinx Studios")
+
+    def test_pal_frogger_beyond_pub(self):
+        g = self.pal_games.get("Frogger Beyond (PAL)", {})
+        self.assertEqual(g.get("publisher"), "Konami")
+
+    def test_pal_suffering_ties_that_bind_dev(self):
+        g = self.pal_games.get("The Suffering: Ties That Bind (PAL)", {})
+        self.assertEqual(g.get("developer"), "Surreal Software")
+
+    def test_pal_energy_airforce_dev(self):
+        g = self.pal_games.get("Energy Airforce (PAL)", {})
+        self.assertEqual(g.get("developer"), "Taito")
+
+    def test_pal_sbk08_dev(self):
+        g = self.pal_games.get("SBK 08: Superbike World Championship (PAL)", {})
+        self.assertEqual(g.get("developer"), "Milestone")
+
+    def test_pal_midas_deadly_strike_dev(self):
+        g = self.pal_games.get("Deadly Strike (PAL)", {})
+        self.assertEqual(g.get("developer"), "Midas Interactive Entertainment")
+
+    def test_pal_midas_splatter_master_dev(self):
+        g = self.pal_games.get("Splatter Master (PAL)", {})
+        self.assertEqual(g.get("developer"), "Midas Interactive Entertainment")
+
+    def test_pal_midas_urban_extreme_dev(self):
+        g = self.pal_games.get("Urban Extreme (PAL)", {})
+        self.assertEqual(g.get("developer"), "Midas Interactive Entertainment")
+
+    def test_pal_dark_wind_dev(self):
+        g = self.pal_games.get("Dark Wind (PAL)", {})
+        self.assertEqual(g.get("developer"), "Konami Computer Entertainment Hawaii")
+
+    def test_pal_thrillville_fuori_dev(self):
+        g = self.pal_games.get("Thrillville: Fuori dai Binari (PAL)", {})
+        self.assertEqual(g.get("developer"), "Frontier Developments")
+
+    def test_pal_thrillville_verruckte_pub(self):
+        g = self.pal_games.get("Thrillville: Verrückte Achterbahn (PAL)", {})
+        self.assertEqual(g.get("publisher"), "LucasArts")
+
+    def test_pal_manchester_united_manager_dev(self):
+        g = self.pal_games.get("Manchester United Manager 2005 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Beautiful Game Studios")
+
+    def test_pal_winx_club_dev(self):
+        g = self.pal_games.get("Winx Club (PAL)", {})
+        self.assertEqual(g.get("developer"), "Lucky Red")
+
+    # ── count regressions ─────────────────────────────────────────────────────
+
+    def test_pal_dev_count_wave145(self):
+        """Wave 145: PAL DB must have at most 3 entries without developer."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 3,
+            f"PAL still has {len(empty)} entries without developer, expected <= 3")
+
+    def test_pal_pub_count_wave145(self):
+        """Wave 145: PAL DB must have at most 25 entries without publisher."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 25,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 25")
+
+    def test_jp_genre_count_wave145(self):
+        """Wave 145: JP DB must have at most 451 entries without genre."""
+        empty = [t for t, i in self.jp_games.items() if not i.get("genre", "").strip()]
+        self.assertLessEqual(len(empty), 451,
+            f"JP still has {len(empty)} entries without genre, expected <= 451")

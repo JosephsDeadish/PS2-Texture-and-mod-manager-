@@ -4847,7 +4847,7 @@
     "Digimon Savers: Another Mission (JP)": {
       "alt_serials": [],
       "developer": "Bandai Entertainment Company (BEC)",
-      "genre": "",
+      "genre": "Action RPG",
       "publisher": "Bandai Namco Games",
       "release_date": "2006",
       "serial": "SLPS-25716"
@@ -6026,7 +6026,7 @@
     "European Club Soccer: Winning Eleven Tactics (JP)": {
       "alt_serials": [],
       "developer": "Konami Computer Entertainment Tokyo",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65804"
@@ -6268,7 +6268,7 @@
     "EyeToy: Play (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
       "developer": "SCE London Studio",
-      "genre": "",
+      "genre": "Party",
       "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCPS-19315"
@@ -8003,7 +8003,7 @@
         "SLPM-66186"
       ],
       "developer": "Idea Factory",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Idea Factory",
       "release_date": "2005-11-10",
       "serial": "SLPM-66185"
@@ -11676,7 +11676,7 @@
     "Jikkyou World Soccer 2002 (JP)": {
       "alt_serials": [],
       "developer": "Major A",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-62169"
@@ -12767,7 +12767,7 @@
     "Katekyou Hitman Reborn! Kindan no Yami no Delta: Best Collection (JP)": {
       "alt_serials": [],
       "developer": "Marvelous Entertainment",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Marvelous Entertainment",
       "release_date": "2009-11-26",
       "serial": "SLPS-25952"
@@ -16835,7 +16835,7 @@
         "SLPM-74271"
       ],
       "developer": "Omega Force",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-66721"
@@ -16843,7 +16843,7 @@
     "Musou Orochi (Playstation 2 The Best Reprint) (JP)": {
       "alt_serials": [],
       "developer": "Omega Force",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
       "serial": "SLPM-74285"
@@ -17241,7 +17241,7 @@
     "Namco 50 Anniversary: namCollection (JP)": {
       "alt_serials": [],
       "developer": "Namco",
-      "genre": "",
+      "genre": "Compilation",
       "publisher": "Namco",
       "release_date": "2005-07-21",
       "serial": "SLPS-25500"
@@ -20355,7 +20355,7 @@
     "Pyuu to Fuku! Jaguar Ashita no Jump (JP)": {
       "alt_serials": [],
       "developer": "Konami",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Konami",
       "release_date": "2004-03-18",
       "serial": "SLPM-65568"
@@ -20363,7 +20363,7 @@
     "Pyuu to Fuku! Jaguar: Ashita no Jump (JP)": {
       "alt_serials": [],
       "developer": "Konami",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Konami",
       "release_date": "2004-03-18",
       "serial": "SLPM-65533"
@@ -20865,7 +20865,7 @@
     "Recca no Honoo: Final Burning: Konami Dendou Selection (JP)": {
       "alt_serials": [],
       "developer": "Konami",
-      "genre": "",
+      "genre": "Fighting",
       "publisher": "Konami",
       "release_date": "2005-10-20",
       "serial": "SLPM-66155"
@@ -24494,7 +24494,7 @@
     "Silent Scope 3: Konami the Best (JP)": {
       "alt_serials": [],
       "developer": "Konami",
-      "genre": "",
+      "genre": "Shooter",
       "publisher": "Konami",
       "release_date": "2003-11-27",
       "serial": "SLPM-62410"
@@ -24928,7 +24928,7 @@
     "Simple 2000 Series Vol. 106: The Block Kuzushi Quest: Dragon Kingdom (JP)": {
       "alt_serials": [],
       "developer": "Tamsoft",
-      "genre": "",
+      "genre": "Puzzle",
       "publisher": "D3 Publisher",
       "release_date": "2006-09-14",
       "serial": "SLPS-20468"
@@ -25170,7 +25170,7 @@
     "Simple 2000 Series Vol. 21: The Bishoujo Simulation RPG: Moonlight Tale (JP)": {
       "alt_serials": [],
       "developer": "Yuki Enterprise",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "D3 Publisher",
       "release_date": "2003-04-24",
       "serial": "SLPM-62294"
@@ -25206,7 +25206,7 @@
     "Simple 2000 Series Vol. 25: The Menkyo Shutoku Simulation (JP)": {
       "alt_serials": [],
       "developer": "Vingt-et-un Systems",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "D3 Publisher",
       "release_date": "2003-04-03",
       "serial": "SLPM-62309"
@@ -25350,7 +25350,7 @@
         "SLPM-62632"
       ],
       "developer": "Game Stage",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "D3 Publisher",
       "release_date": "2003-11-06",
       "serial": "SLPM-62352"
@@ -27822,7 +27822,7 @@
     "TVware Jouhou Kakumei Series: Gendai Yougo no Kiso Chishiki 2001 (JP)": {
       "alt_serials": [],
       "developer": "Matrix Software",
-      "genre": "",
+      "genre": "Edutainment",
       "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-20115"
@@ -27830,7 +27830,7 @@
     "TVware Jouhou Kakumei Series: Katei no Igaku (JP)": {
       "alt_serials": [],
       "developer": "Matrix Software",
-      "genre": "",
+      "genre": "Edutainment",
       "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-20114"
@@ -27846,7 +27846,7 @@
     "TVware Jouhou Kakumei Series: Pro Atlas for TV: Kinki (JP)": {
       "alt_serials": [],
       "developer": "Matrix Software",
-      "genre": "",
+      "genre": "Edutainment",
       "publisher": "Bandai",
       "release_date": "2005-03-31",
       "serial": "SLPS-20146"
@@ -27878,7 +27878,7 @@
     "TVware Jouhou Kakumei Series: Shin Seiki Evangelion: Typing E Keikaku (JP)": {
       "alt_serials": [],
       "developer": "Matrix Software",
-      "genre": "",
+      "genre": "Edutainment",
       "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-20094"
@@ -31589,7 +31589,7 @@
     "World Soccer Winning Eleven 2009 (JP)": {
       "alt_serials": [],
       "developer": "Konami Computer Entertainment Tokyo",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-55131"
@@ -31597,7 +31597,7 @@
     "World Soccer Winning Eleven 2010 (JP)": {
       "alt_serials": [],
       "developer": "Konami Computer Entertainment Tokyo",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-55209"
@@ -31613,7 +31613,7 @@
     "World Soccer Winning Eleven 2011 (JP)": {
       "alt_serials": [],
       "developer": "Konami Computer Entertainment Tokyo",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-55276"
