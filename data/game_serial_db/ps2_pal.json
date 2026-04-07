@@ -1280,7 +1280,7 @@
       ],
       "developer": "Aqua Pacific",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Aqua Pacific",
       "release_date": "2006-10-13",
       "serial": "SLES-54380"
     },
@@ -2959,7 +2959,7 @@
       ],
       "developer": "Atomic Planet",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Blast! Entertainment",
       "release_date": "2007-04-01",
       "serial": "SLES-54657"
     },
@@ -4087,7 +4087,7 @@
       "alt_serials": [],
       "developer": "Broadsword Interactive",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Broadsword Interactive",
       "release_date": "2003-10-03",
       "serial": "SLES-52107"
     },
@@ -4111,7 +4111,7 @@
       "alt_serials": [],
       "developer": "Broadsword Interactive",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Broadsword Interactive",
       "release_date": "",
       "serial": "SLES-55461"
     },
@@ -4127,7 +4127,7 @@
       "alt_serials": [],
       "developer": "Broadsword Interactive",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Broadsword Interactive",
       "release_date": "2003-10-03",
       "serial": "SLES-51991"
     },
@@ -5407,7 +5407,7 @@
       "alt_serials": [],
       "developer": "Traveller's Tales",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "THQ",
       "release_date": "",
       "serial": "SLES-51960"
     },
@@ -6560,9 +6560,9 @@
     },
     "Exclusive PlayStation 2 Summer Sample Disc (PAL)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony Computer Entertainment Europe",
+      "genre": "Compilation",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-51407"
     },
@@ -9386,7 +9386,7 @@
       ],
       "developer": "ITE Media",
       "genre": "Platformer",
-      "publisher": "",
+      "publisher": "ITE Media",
       "release_date": "",
       "serial": "SLES-52102"
     },
@@ -10060,7 +10060,7 @@
       ],
       "developer": "Atomic Planet Entertainment",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Blast! Entertainment",
       "release_date": "2006",
       "serial": "SLES-54382"
     },
@@ -10679,7 +10679,7 @@
       "alt_serials": [],
       "developer": "EM Studios",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "EM Studios",
       "release_date": "2007-10-26",
       "serial": "SLES-54669"
     },
@@ -11044,7 +11044,7 @@
       "alt_serials": [],
       "developer": "Davilex Games B.V.",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Davilex",
       "release_date": "2002-06-14",
       "serial": "SLES-50955"
     },
@@ -12507,7 +12507,7 @@
       "alt_serials": [],
       "developer": "Anco",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Ubisoft",
       "release_date": "2002",
       "serial": "SLES-50855"
     },
@@ -13358,9 +13358,9 @@
         "SCES-51578",
         "SCES-52677"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Sony Computer Entertainment Europe",
+      "genre": "Utility",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SCES-51003"
     },
@@ -14269,7 +14269,7 @@
       "alt_serials": [],
       "developer": "Davilex Games B.V.",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Davilex",
       "release_date": "2002",
       "serial": "SLES-50994"
     },
@@ -14596,7 +14596,7 @@
       "alt_serials": [],
       "developer": "The Code Monkeys",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Funsoft",
       "release_date": "2008-01-25",
       "serial": "SLES-54983"
     },
@@ -15424,7 +15424,7 @@
       "alt_serials": [],
       "developer": "Atomic Planet",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Eidos Interactive",
       "release_date": "",
       "serial": "SLES-55465"
     },
@@ -15474,7 +15474,7 @@
       "alt_serials": [],
       "developer": "Icon Games",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2007-11-30",
       "serial": "SLES-54930"
     },
@@ -15482,7 +15482,7 @@
       "alt_serials": [],
       "developer": "Icon Games",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
       "serial": "SLES-54929"
     },
@@ -16361,7 +16361,7 @@
     },
     "Saint & Sinner (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Phoenix Games",
       "genre": "Puzzle",
       "publisher": "Phoenix Games",
       "release_date": "",
@@ -16723,7 +16723,7 @@
       "alt_serials": [],
       "developer": "SNK Playmore",
       "genre": "Beat 'Em Up",
-      "publisher": "",
+      "publisher": "SNK Playmore",
       "release_date": "2009-09-01",
       "serial": "SLES-55512"
     },
@@ -19619,7 +19619,7 @@
       "alt_serials": [],
       "developer": "Ubisoft",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Ubisoft",
       "release_date": "2003-02-23",
       "serial": "SLES-51377"
     },
@@ -20668,7 +20668,7 @@
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Phoenix Games",
       "release_date": "",
       "serial": "SLES-53596"
     },
@@ -20692,7 +20692,7 @@
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Phoenix Games",
       "release_date": "",
       "serial": "SLES-53598"
     },
@@ -20700,7 +20700,7 @@
       "alt_serials": [],
       "developer": "Mere Mortals Ltd.",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Phoenix Games",
       "release_date": "2006-05-12",
       "serial": "SLES-53600"
     },
@@ -20740,7 +20740,7 @@
       "alt_serials": [],
       "developer": "Milestone",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Codemasters",
       "release_date": "2005-10-21",
       "serial": "SLES-53321"
     },
@@ -20879,7 +20879,7 @@
       ],
       "developer": "Broadsword Interactive",
       "genre": "Puzzle",
-      "publisher": "",
+      "publisher": "Funsoft",
       "release_date": "2007-08-24",
       "serial": "SLES-54668"
     },
