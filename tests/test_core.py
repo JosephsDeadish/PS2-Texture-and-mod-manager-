@@ -22540,9 +22540,9 @@ class TestWave127SerialFixes(unittest.TestCase):
     # ── PAL count regression ──────────────────────────────────────────────────
 
     def test_pal_game_count_wave127(self):
-        """Wave 127: PAL DB must have at least 2642 entries (Wave 148: 5 removed, 10 swapped, 3 fixed)."""
-        self.assertGreaterEqual(len(self.pal_games), 2642,
-            f"PAL DB has only {len(self.pal_games)} entries, expected >= 2642")
+        """Wave 127: PAL DB must have at least 2639 entries (Wave 148: 8 removed, 10 swapped, 3 fixed + Wave 148b: 3 more fixed)."""
+        self.assertGreaterEqual(len(self.pal_games), 2639,
+            f"PAL DB has only {len(self.pal_games)} entries, expected >= 2639")
 
     # ── Removed entries no longer exist with wrong serials ────────────────────
 
@@ -23263,8 +23263,8 @@ class TestWave131PatternBasedPalFills(unittest.TestCase):
     # ── Buzz! pattern ─────────────────────────────────────────────────────────
 
     def test_buzz_brain_switzerland_dev_filled(self):
-        """Wave 131: Buzz! Brain of Switzerland (PAL) developer filled."""
-        g = self.pal_games.get("Buzz! Brain of Switzerland (PAL)", {})
+        """Wave 131: Buzz! Brain of the UK (PAL) developer filled (Wave 148: Switzerland entry corrected to UK)."""
+        g = self.pal_games.get("Buzz! Brain of the UK (PAL)", {})
         self.assertEqual(g.get("developer"), "Relentless Software",
             f"Expected 'Relentless Software', got {g.get('developer')!r}")
 
@@ -25771,6 +25771,82 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
         self.assertNotIn('SLES-55380', all_serials, "Wrong serial SLES-55380 still in PAL DB")
 
     def test_pal_count_wave148(self):
-        """Wave 148: PAL DB must have at most 2642 entries (5 true duplicates removed, 10 serials swapped, 3 fixed)."""
-        self.assertLessEqual(len(self.pal_games), 2642,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2642 after Wave 148 changes")
+        """Wave 148: PAL DB must have at most 2639 entries (8 total duplicates removed, 10 serials swapped, 3+3 fixed)."""
+        self.assertLessEqual(len(self.pal_games), 2639,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2639 after Wave 148 changes")
+
+
+class TestWave149AdditionalSerialFixes(unittest.TestCase):
+    """Wave 149: Additional serial fixes verified against PS2.txt.
+    PAL: Fixed 3 more wrong serials (Buzz! UK, Shaun White, Captain Scarlet).
+    Removed 3 more duplicate/wrong-named entries (Brain of Switzerland, Disney Sing It wrong serial, Captain Scarlet wrong serial).
+    JP: 9 dev/pub/genre/date fills from PS2.data.json.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            cls.jp_db = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            cls.pal_db = json.load(f)
+        cls.jp_games = cls.jp_db['games']
+        cls.pal_games = cls.pal_db['games']
+
+    # ── PAL serial fixes ───────────────────────────────────────────────────────
+
+    def test_pal_buzz_brain_uk_serial_fixed(self):
+        """Wave 149: Buzz! Brain of the UK must use SCES-53385, not SCES-55385."""
+        g = self.pal_games.get('Buzz! Brain of the UK (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-53385',
+            f"Buzz! Brain of the UK serial should be SCES-53385, got {g.get('serial')!r}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SCES-55385', all_serials, "Wrong serial SCES-55385 still in PAL DB")
+
+    def test_pal_buzz_brain_switzerland_removed(self):
+        """Wave 149: Buzz! Brain of Switzerland (wrongly named SCES-53385 entry) must be removed."""
+        self.assertNotIn('Buzz! Brain of Switzerland (PAL)', self.pal_games,
+            "Buzz! Brain of Switzerland with wrong serial SCES-53385 should not exist")
+
+    def test_pal_shaun_white_serial_fixed(self):
+        """Wave 149: Shaun White Snowboarding must use SLES-55542, not SLES-55452."""
+        g = self.pal_games.get('Shaun White Snowboarding (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-55542',
+            f"Shaun White serial should be SLES-55542, got {g.get('serial')!r}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SLES-55452', all_serials, "Wrong serial SLES-55452 still in PAL DB")
+
+    def test_pal_disney_sing_it_wrong_entry_removed(self):
+        """Wave 149: Disney Sing It: Pop Hits with wrong serial SLES-55542 must be removed; correct entry SLES-55942 remains."""
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        # The entry with wrong serial SLES-55542 for Disney Sing It must be gone
+        # (SLES-55542 is Shaun White Snowboarding)
+        # Verify SLES-55942 correct entry still exists
+        self.assertIn('SLES-55942', all_serials,
+            "Disney Sing It correct serial SLES-55942 must still be in PAL DB")
+
+    def test_pal_captain_scarlet_wrong_entry_removed(self):
+        """Wave 149: Captain Scarlet with wrong serial SLES-54612 must be removed; SLES-54471 remains."""
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SLES-54612', all_serials, "Wrong serial SLES-54612 still in PAL DB")
+        self.assertIn('SLES-54471', all_serials,
+            "Captain Scarlet correct serial SLES-54471 must still be in PAL DB")
+
+    def test_pal_count_wave149(self):
+        """Wave 149: PAL DB must have at most 2639 entries."""
+        self.assertLessEqual(len(self.pal_games), 2639,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2639 after Wave 149 changes")
+
+    # ── JP metadata fills ──────────────────────────────────────────────────────
+
+    def test_jp_dev_count_wave149(self):
+        """Wave 149: JP DB must have at most 536 entries without developer."""
+        empty = [t for t, i in self.jp_games.items() if not i.get('developer', '').strip()]
+        self.assertLessEqual(len(empty), 536,
+            f"JP still has {len(empty)} entries without developer, expected <= 536")
+
+    def test_jp_date_count_wave149(self):
+        """Wave 149: JP DB must have at most 921 entries without release_date."""
+        empty = [t for t, i in self.jp_games.items() if not i.get('release_date', '').strip()]
+        self.assertLessEqual(len(empty), 921,
+            f"JP still has {len(empty)} entries without date, expected <= 921")

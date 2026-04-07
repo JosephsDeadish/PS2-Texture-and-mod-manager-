@@ -2502,10 +2502,10 @@
     },
     "Bujingai (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "RED Entertainment",
+      "genre": "Action",
+      "publisher": "Taito Corporation",
+      "release_date": "2003-12-26",
       "serial": "SLPM-65459"
     },
     "Bully (JP)": {
@@ -4586,7 +4586,7 @@
       "developer": "Taito",
       "genre": "Simulation",
       "publisher": "Taito",
-      "release_date": "",
+      "release_date": "2004-05-27",
       "serial": "SLPM-65590"
     },
     "Densha de Go! Professional 2 (JP)": {
@@ -5102,9 +5102,9 @@
         "SLPM-66207"
       ],
       "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "genre": "Action",
+      "publisher": "Sega",
+      "release_date": "2004-09-09",
       "serial": "SLPM-65526"
     },
     "Dot Hack Akusei Hen'i Vol. 2 (JP)": {
@@ -5874,7 +5874,7 @@
       "developer": "Taito",
       "genre": "Action/Shooter",
       "publisher": "Taito Corporation",
-      "release_date": "",
+      "release_date": "2002-09-26",
       "serial": "SLPM-65177"
     },
     "Energy Airforce (Taito Best) (JP)": {
@@ -5921,10 +5921,10 @@
       "alt_serials": [
         "SLPM-66257"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Konami",
+      "genre": "Driving, Racing",
+      "publisher": "Konami",
+      "release_date": "2005-03-17",
       "serial": "SLPM-65948"
     },
     "Enthusia Professional Racing: Subaru Impreza WRX STI (JP)": {
@@ -10054,10 +10054,10 @@
     },
     "Hippa Linda (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Treasure",
+      "genre": "Action",
+      "publisher": "Kadokawa Shoten",
+      "release_date": "2001-12-06",
       "serial": "SLPM-62109"
     },
     "Hissatsu Pachi-Slot Evolution 2: Osomatsu-kun (JP)": {
@@ -14031,10 +14031,10 @@
     },
     "Kunoichi (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Sega Wow Entertainment, Inc",
+      "genre": "Action, Beat'em Up",
+      "publisher": "Sega",
+      "release_date": "2003-12-04",
       "serial": "SLPM-65447"
     },
     "Kuon (JP)": {
@@ -15547,10 +15547,10 @@
         "SLPM-64504",
         "SLPM-74004"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Capcom Production Studio 8",
+      "genre": "Action, Platformer",
+      "publisher": "Capcom",
+      "release_date": "2001-12-27",
       "serial": "SLPM-62127"
     },
     "Medal of Honor: Europa Kyoushuu [EA:SY! 1980] (JP)": {
@@ -20243,7 +20243,7 @@
       "developer": "Sonic Team",
       "genre": "Puzzle",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2004-02-04",
       "serial": "SLPM-65532"
     },
     "Puyo Puyo Fever 2 (JP)": {
@@ -21011,10 +21011,10 @@
     },
     "Rockman X7 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Capcom Production Studio 3",
+      "genre": "Action, Platformer, Shooter",
+      "publisher": "Capcom",
+      "release_date": "2003-07-17",
       "serial": "SLPM-65331"
     },
     "Rockman X8 (JP)": {
@@ -22739,7 +22739,7 @@
       "developer": "Sega",
       "genre": "Racing/Driving",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2006-01-09",
       "serial": "SLPM-66212"
     },
     "Sega Rally Championship (JP)": {
@@ -23396,10 +23396,10 @@
       "alt_serials": [
         "SLPM-66319"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Takara",
+      "genre": "Driving, Mini Games, Racing, Shooter",
+      "publisher": "Takara",
+      "release_date": "2002-06-27",
       "serial": "SLPM-65105"
     },
     "Shin Contra (JP)": {
@@ -23531,7 +23531,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2000-08-03",
       "serial": "SLPM-62005"
     },
     "Shin Sangoku Musou 2 & Moushouden Saikyou Data (JP)": {
@@ -24199,7 +24199,7 @@
       "developer": "Genki",
       "genre": "Racing",
       "publisher": "Genki Co. Ltd.",
-      "release_date": "",
+      "release_date": "2003-07-24",
       "serial": "SLPM-65308"
     },
     "Shutokou Battle 01: PlayStation 2 the Best (JP)": {
@@ -29789,10 +29789,10 @@
     },
     "Touge 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Altus",
+      "genre": "Racing",
+      "publisher": "Atlus",
+      "release_date": "2001-10-11",
       "serial": "SLPM-62087"
     },
     "Tough: Dark Fight (JP)": {
@@ -30062,7 +30062,7 @@
       "developer": "Blue Moon",
       "genre": "Action/Shooter",
       "publisher": "Taito",
-      "release_date": "",
+      "release_date": "2005-02-24",
       "serial": "SLPM-65826"
     },
     "Tsukiyo ni Saraba [Taito Best] (JP)": {
@@ -31621,7 +31621,7 @@
       "developer": "Yuke's",
       "genre": "Sports",
       "publisher": "Yuke's",
-      "release_date": "",
+      "release_date": "2006-07-20",
       "serial": "SLPM-66401"
     },
     "Wrestle Kingdom 2: Pro Wrestling Sekai Taisen (JP)": {
@@ -32415,10 +32415,10 @@
       "alt_serials": [
         "SLPM-66525"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "RPG",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Koei",
+      "release_date": "2005-06-23",
       "serial": "SLPM-65892"
     },
     "Zipang (JP)": {

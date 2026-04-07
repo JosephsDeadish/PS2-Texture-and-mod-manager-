@@ -2089,23 +2089,13 @@
       "release_date": "2009-03-24",
       "serial": "SCES-55419"
     },
-    "Buzz! Brain of Switzerland (PAL)": {
-      "alt_serials": [
-        "SCES-55421"
-      ],
-      "developer": "Relentless Software",
-      "genre": "Party",
-      "publisher": "Sony Computer Entertainment Europe",
-      "release_date": "",
-      "serial": "SCES-53385"
-    },
     "Buzz! Brain of the UK (PAL)": {
       "alt_serials": [],
       "developer": "Relentless Software",
       "genre": "Party",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "",
-      "serial": "SCES-55385"
+      "serial": "SCES-53385"
     },
     "Buzz! Brain of the World (PAL)": {
       "alt_serials": [
@@ -2679,14 +2669,6 @@
       "publisher": "Capcom",
       "release_date": "2001-11-30",
       "serial": "SLES-50541"
-    },
-    "Captain Scarlet (PAL)": {
-      "alt_serials": [],
-      "developer": "Brain in a Jar",
-      "genre": "Racing",
-      "publisher": "Mastertronic",
-      "release_date": "2006-05-12",
-      "serial": "SLES-54612"
     },
     "Captain Scarlet [IT] (PAL)": {
       "alt_serials": [],
@@ -4864,14 +4846,6 @@
       "publisher": "Disney Interactive Studios",
       "release_date": "2010",
       "serial": "SLES-55628"
-    },
-    "Disney Sing It: Pop Hits (PAL)": {
-      "alt_serials": [],
-      "developer": "Zoe Mode",
-      "genre": "Party",
-      "publisher": "Disney Interactive Studios",
-      "release_date": "2009-10-09",
-      "serial": "SLES-55542"
     },
     "Disney Stitch: Esperimento 626 (Disney Interactive) (PAL)": {
       "alt_serials": [],
@@ -16822,7 +16796,7 @@
       "genre": "Snowboarding",
       "publisher": "Ubisoft",
       "release_date": "2008-12-04",
-      "serial": "SLES-55452"
+      "serial": "SLES-55542"
     },
     "ShellShock: Nam '67 (PAL)": {
       "alt_serials": [
