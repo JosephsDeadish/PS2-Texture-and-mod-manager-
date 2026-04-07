@@ -24687,3 +24687,66 @@ class TestWave142And143PalGenreFills(unittest.TestCase):
         # Only Exclusive Sample Disc and Network Access Disc should remain
         self.assertLessEqual(len(empty), 2,
             f"PAL still has {len(empty)} entries without genre, expected <= 2")
+
+
+class TestWave144PalDevPubFills(unittest.TestCase):
+    """Wave 144: PAL developer/publisher fills from series patterns and known mappings."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_pal.json') as f:
+            self.pal_games = json.load(f)['games']
+
+    def test_pal_davilex_autobahn4_dev(self):
+        """Wave 144: Autobahn Raser IV dev filled as Davilex."""
+        g = self.pal_games.get("Autobahn Raser IV (PAL)", {})
+        self.assertEqual(g.get("developer"), "Davilex")
+
+    def test_pal_hugo_hula_dev(self):
+        """Wave 144: Agent Hugo Hula Holiday dev filled as ITE Media."""
+        g = self.pal_games.get("Agent Hugo: Hula Holiday (PAL)", {})
+        self.assertEqual(g.get("developer"), "ITE Media")
+
+    def test_pal_cocoto_kart_dev(self):
+        """Wave 144: Cocoto Kart Racer dev filled as Neko Entertainment."""
+        g = self.pal_games.get("Cocoto Kart Racer (PAL)", {})
+        self.assertEqual(g.get("developer"), "Neko Entertainment")
+
+    def test_pal_shrek2_dreamworks_dev(self):
+        """Wave 144: DreamWorks Shrek 2 dev filled as Luxoflux."""
+        g = self.pal_games.get("DreamWorks' Shrek 2 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Luxoflux")
+
+    def test_pal_mercenaries2_italian_dev(self):
+        """Wave 144: Mercenaries 2 Inferno di Fuoco dev filled."""
+        g = self.pal_games.get("Mercenaries 2: Inferno di Fuoco (PAL)", {})
+        self.assertEqual(g.get("developer"), "Artificial Mind and Movement")
+
+    def test_pal_roger_lemerre_2005_dev(self):
+        """Wave 144: Roger Lemerre 2005 dev filled as Codemasters."""
+        g = self.pal_games.get("Roger Lemerre: La Sélection des Champions 2005 (PAL)", {})
+        self.assertEqual(g.get("developer"), "Codemasters")
+
+    def test_pal_who_wants_millionaire_dev(self):
+        """Wave 144: Who Wants to Be a Millionaire 2nd Edition dev filled."""
+        g = self.pal_games.get("Who Wants to Be a Millionaire: 2nd Edition (PAL)", {})
+        self.assertEqual(g.get("developer"), "Eidos Interactive")
+
+    def test_pal_torrente3_dev(self):
+        """Wave 144: Torrente 3 El Protector dev filled as Pyro Studios."""
+        g = self.pal_games.get("Torrente 3: El Protector (PAL)", {})
+        self.assertEqual(g.get("developer"), "Pyro Studios")
+
+    # ── count regressions ─────────────────────────────────────────────────────
+
+    def test_pal_dev_count_wave144(self):
+        """Wave 144: PAL DB must have at most 157 entries without developer."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("developer", "").strip()]
+        self.assertLessEqual(len(empty), 157,
+            f"PAL still has {len(empty)} entries without developer, expected <= 157")
+
+    def test_pal_pub_count_wave144(self):
+        """Wave 144: PAL DB must have at most 148 entries without publisher."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("publisher", "").strip()]
+        self.assertLessEqual(len(empty), 148,
+            f"PAL still has {len(empty)} entries without publisher, expected <= 148")

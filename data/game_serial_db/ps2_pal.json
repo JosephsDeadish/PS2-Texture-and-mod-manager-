@@ -479,9 +479,9 @@
         "SLES-55365",
         "SLES-55366"
       ],
-      "developer": "",
+      "developer": "ITE Media",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "ITE Media",
       "release_date": "",
       "serial": "SLES-53265"
     },
@@ -1193,7 +1193,7 @@
     },
     "Autobahn Raser IV (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Davilex",
       "genre": "Racing",
       "publisher": "Davilex",
       "release_date": "2002-11-13",
@@ -1201,7 +1201,7 @@
     },
     "Autobahn Raser: Das Spiel zum Film (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Davilex",
       "genre": "Racing",
       "publisher": "Davilex",
       "release_date": "2004",
@@ -1490,7 +1490,7 @@
     },
     "Beach King Stunt Racer (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Davilex",
       "genre": "Racing",
       "publisher": "Davilex",
       "release_date": "2003-08-29",
@@ -1506,7 +1506,7 @@
     },
     "Ben 10: Alien Force (K.E. Media) (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Papaya Studios",
       "genre": "Action",
       "publisher": "D3 Publisher",
       "release_date": "",
@@ -1620,7 +1620,7 @@
     },
     "Billy the Wizard: Rocket Broomstick Racing (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Data Design Interactive",
       "genre": "Racing",
       "publisher": "Data Design Interactive",
       "release_date": "",
@@ -2827,7 +2827,7 @@
     },
     "Castleween (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Kalisto Entertainment",
       "genre": "Action",
       "publisher": "Wanadoo Edition",
       "release_date": "",
@@ -3415,25 +3415,25 @@
     },
     "Cocoto Funfair (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Neko Entertainment",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "NEKO Entertainment",
       "release_date": "",
       "serial": "SLES-53805"
     },
     "Cocoto Kart Racer (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Neko Entertainment",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "NEKO Entertainment",
       "release_date": "",
       "serial": "SLES-52858"
     },
     "Cocoto Platform Jumper (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Neko Entertainment",
       "genre": "Action/Platformer",
-      "publisher": "",
+      "publisher": "NEKO Entertainment",
       "release_date": "",
       "serial": "SLES-52523"
     },
@@ -5481,7 +5481,7 @@
       "alt_serials": [
         "SLES-54948"
       ],
-      "developer": "",
+      "developer": "Ubisoft Montreal",
       "genre": "Simulation",
       "publisher": "Ubisoft Entertainment",
       "release_date": "",
@@ -5925,9 +5925,9 @@
     },
     "DreamWorks' Shrek 2 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Luxoflux",
       "genre": "Platformer",
-      "publisher": "",
+      "publisher": "Activision",
       "release_date": "",
       "serial": "SLES-52383"
     },
@@ -9392,9 +9392,9 @@
     },
     "Hugo: Cannon Cruise (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "ITE Media",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "ITE Media",
       "release_date": "",
       "serial": "SLES-52675"
     },
@@ -9404,9 +9404,9 @@
         "SLES-52746",
         "SLES-52767"
       ],
-      "developer": "",
+      "developer": "ITE Media",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "ITE Media",
       "release_date": "",
       "serial": "SLES-52676"
     },
@@ -11823,7 +11823,7 @@
     },
     "Mercenaries 2: Inferno di Fuoco (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Artificial Mind and Movement",
       "genre": "Action",
       "publisher": "Electronic Arts",
       "release_date": "",
@@ -15169,7 +15169,7 @@
       "alt_serials": [],
       "developer": "RTL interactive",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "RTL Enterprises",
       "release_date": "2005",
       "serial": "SLES-53303"
     },
@@ -15183,7 +15183,7 @@
     },
     "RTL Skispringen 2004 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "49Games",
       "genre": "Sports",
       "publisher": "RTL Enterprises",
       "release_date": "",
@@ -15268,7 +15268,7 @@
     },
     "Raging Blades (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Kubik",
       "genre": "Action",
       "publisher": "Wanadoo Edition",
       "release_date": "2003-05-30",
@@ -15945,7 +15945,7 @@
     },
     "Roger Lemerre: La Sélection des Champions 2005 (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Codemasters",
       "genre": "Sports",
       "publisher": "Codemasters",
       "release_date": "",
@@ -21436,7 +21436,7 @@
     },
     "Torrente 3: El Protector (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Pyro Studios",
       "genre": "Action-Adventure",
       "publisher": "Virgin Play",
       "release_date": "",
@@ -21444,7 +21444,7 @@
     },
     "Torrente 3: The Protector (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Pyro Studios",
       "genre": "Action-Adventure",
       "publisher": "Virgin Play",
       "release_date": "2006",
@@ -22552,17 +22552,17 @@
     },
     "Wer wird Millionär: 2. Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eidos Interactive",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Eidos Interactive",
       "release_date": "",
       "serial": "SLES-50497"
     },
     "Wer wird Millionär: Party Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eidos Interactive",
       "genre": "Party",
-      "publisher": "",
+      "publisher": "Eidos Interactive",
       "release_date": "",
       "serial": "SLES-54805"
     },
@@ -22600,7 +22600,7 @@
     },
     "Who Wants to Be a Millionaire: 2nd Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eidos Interactive",
       "genre": "Party",
       "publisher": "Eidos Interactive",
       "release_date": "2001-12-07",
@@ -22608,7 +22608,7 @@
     },
     "Who Wants to Be a Millionaire: Party Edition (PAL)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Eidos Interactive",
       "genre": "Party",
       "publisher": "Eidos Interactive",
       "release_date": "2006-11-24",
