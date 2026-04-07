@@ -24584,3 +24584,106 @@ class TestWave141LocalizedPalFills(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
         self.assertLessEqual(len(empty), 115,
             f"PAL still has {len(empty)} entries without genre, expected <= 115")
+
+
+class TestWave142And143PalGenreFills(unittest.TestCase):
+    """Wave 142-143: PAL genre fills from title recognition and reference cross-matching."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_pal.json') as f:
+            self.pal_games = json.load(f)['games']
+
+    def test_pal_matrix_path_of_neo_genre(self):
+        """Wave 143: The Matrix Path of Neo genre filled as Action."""
+        g = self.pal_games.get("The Matrix: Path of Neo (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_pal_suffering_ties_genre(self):
+        """Wave 143: The Suffering Ties That Bind genre filled as Survival Horror."""
+        g = self.pal_games.get("The Suffering: Ties That Bind (PAL)", {})
+        self.assertEqual(g.get("genre"), "Survival Horror")
+
+    def test_pal_spawn_armageddon_genre(self):
+        """Wave 143: Spawn Armaggedon genre filled as Action-Adventure."""
+        g = self.pal_games.get("Spawn Armaggedon (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action-Adventure")
+
+    def test_pal_wipeout_pulse_genre(self):
+        """Wave 143: WipEout Pulse genre filled as Racing."""
+        g = self.pal_games.get("WipEout Pulse (PAL)", {})
+        self.assertEqual(g.get("genre"), "Racing")
+
+    def test_pal_namco_museum_50_genre(self):
+        """Wave 143: Namco Museum 50th Anniversary genre filled."""
+        g = self.pal_games.get("Namco Museum 50th Anniversary (PAL)", {})
+        self.assertEqual(g.get("genre"), "Compilation")
+
+    def test_pal_thrillville_italian_genre(self):
+        """Wave 143: Thrillville Fuori dai Binari (Italian) genre filled as Simulation."""
+        g = self.pal_games.get("Thrillville: Fuori dai Binari (PAL)", {})
+        self.assertEqual(g.get("genre"), "Simulation")
+
+    def test_pal_thrillville_german_genre(self):
+        """Wave 143: Thrillville Verruckte Achterbahn (German) genre filled as Simulation."""
+        g = self.pal_games.get("Thrillville: Verrückte Achterbahn (PAL)", {})
+        self.assertEqual(g.get("genre"), "Simulation")
+
+    def test_pal_rtl_winter_sports_genre(self):
+        """Wave 143: RTL Winter Sports 2008 genre filled as Sports."""
+        g = self.pal_games.get("RTL Winter Sports 2008: The Ultimate Challenge (PAL)", {})
+        self.assertEqual(g.get("genre"), "Sports")
+
+    def test_pal_worms_forts_genre(self):
+        """Wave 143: Worms Forts Under Siege genre filled as Strategy."""
+        g = self.pal_games.get("Worms Forts: Under Siege (PAL)", {})
+        self.assertEqual(g.get("genre"), "Strategy")
+
+    def test_pal_xena_genre(self):
+        """Wave 143: Xena Warrior Princess genre filled as Action."""
+        g = self.pal_games.get("Xena: Warrior Princess (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_pal_ice_age_3_italian_genre(self):
+        """Wave 143: L'Era Glaciale 3 (Ice Age 3 Italian) genre filled."""
+        g = self.pal_games.get("L'Era Glaciale 3: L'Alba dei Dinosauri (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action/Platformer")
+
+    def test_pal_weakest_link_french_genre(self):
+        """Wave 143: Le Maillon Faible (Weakest Link French) genre filled as Party."""
+        g = self.pal_games.get("Le Maillon Faible (PAL)", {})
+        self.assertEqual(g.get("genre"), "Party")
+
+    def test_pal_wer_wird_millionar_genre(self):
+        """Wave 143: Wer wird Millionar German Who Wants to Be Millionaire genre."""
+        g = self.pal_games.get("Wer wird Millionär: 2. Edition (PAL)", {})
+        self.assertEqual(g.get("genre"), "Party")
+
+    def test_pal_bob_builder_genre(self):
+        """Wave 142: Bob the Builder genre filled as Action/Platformer."""
+        g = self.pal_games.get("Bob the Builder (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action/Platformer")
+
+    def test_pal_crime_life_genre(self):
+        """Wave 142: Crime Life Gang Wars genre filled as Action."""
+        g = self.pal_games.get("Crime Life: Gang Wars (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action")
+
+    def test_pal_frogger_beyond_genre(self):
+        """Wave 142: Frogger Beyond genre filled as Action/Platformer."""
+        g = self.pal_games.get("Frogger Beyond (PAL)", {})
+        self.assertEqual(g.get("genre"), "Action/Platformer")
+
+    def test_pal_board_games_gallery_genre(self):
+        """Wave 142: Board Games Gallery genre filled as Classic."""
+        g = self.pal_games.get("Board Games Gallery (PAL)", {})
+        self.assertEqual(g.get("genre"), "Classic")
+
+    # ── count regressions (Wave 142-143) ─────────────────────────────────────
+
+    def test_pal_genre_count_wave143(self):
+        """Wave 143: PAL DB must have at most 2 entries without genre (sample/utility discs)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get("genre", "").strip()]
+        # Only Exclusive Sample Disc and Network Access Disc should remain
+        self.assertLessEqual(len(empty), 2,
+            f"PAL still has {len(empty)} entries without genre, expected <= 2")
