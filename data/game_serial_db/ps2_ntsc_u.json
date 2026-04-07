@@ -911,15 +911,6 @@
       "release_date": "2001-09-17",
       "serial": "SLUS-20217"
     },
-    "Arctic Thunder (SLUS-29007)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Inland Productions",
-      "genre": "Action, Driving, Racing",
-      "publisher": "Midway",
-      "release_date": "2001-09-17",
-      "serial": "SLUS-29007"
-    },
     "Are You Smarter than a 5th Grader? Make the Grade": {
       "alt_serials": [],
       "crcs": [],
@@ -1251,15 +1242,6 @@
       "publisher": "Capcom",
       "release_date": "2003-03-26",
       "serial": "SLUS-20498"
-    },
-    "Auto Modellista (SLUS-28031)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom",
-      "genre": "Driving, Racing",
-      "publisher": "Capcom",
-      "release_date": "2003-03-26",
-      "serial": "SLUS-28031"
     },
     "Avatar - The Last Airbender": {
       "alt_serials": [],
@@ -8108,15 +8090,6 @@
       "release_date": "2001-10-29",
       "serial": "SLUS-20066"
     },
-    "Half-Life (SLUS-29014)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Gearbox Software, Valve L.L.C",
-      "genre": "First Person Shooter",
-      "publisher": "Sierra On-Line, Inc",
-      "release_date": "2001-10-29",
-      "serial": "SLUS-29014"
-    },
     "Hannspree Ten Kate Honda SBK": {
       "alt_serials": [],
       "crcs": [
@@ -9291,15 +9264,6 @@
       "publisher": "THQ",
       "release_date": "2005-06-14",
       "serial": "SLUS-20872"
-    },
-    "Juiced (SLUS-29147)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Juice Games, Ltd",
-      "genre": "Driving, Racing",
-      "publisher": "THQ",
-      "release_date": "2005-06-14",
-      "serial": "SLUS-29147"
     },
     "Juiced 2: Hot Import Nights": {
       "alt_serials": [],
@@ -11498,15 +11462,6 @@
       "release_date": "2006-04-25",
       "serial": "SLUS-21293"
     },
-    "Metal Saga (SLUS-28059)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Crea-Tech",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2006-04-25",
-      "serial": "SLUS-28059"
-    },
     "Metal Slug 4": {
       "alt_serials": [],
       "crcs": [
@@ -12877,15 +12832,6 @@
       "release_date": "2004-11-16",
       "serial": "SLUS-21100"
     },
-    "NCAA March Madness 2005 (SLUS-29135)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2004-11-16",
-      "serial": "SLUS-29135"
-    },
     "NFL 2K2": {
       "alt_serials": [],
       "crcs": [],
@@ -12952,15 +12898,6 @@
       "publisher": "Sony Computer Entertainment America",
       "release_date": "2001-07-17",
       "serial": "SCUS-97106"
-    },
-    "NFL GameDay 2002": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "989 Sports",
-      "genre": "Sports",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2001-08-01",
-      "serial": "SCUS-97178"
     },
     "NFL GameDay 2003": {
       "alt_serials": [],
@@ -14059,15 +13996,6 @@
       "publisher": "Atlus, Inc",
       "release_date": "2007-05-22",
       "serial": "SLUS-21577"
-    },
-    "Odin Sphere (SLUS-28065)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Vanillaware, Ltd",
-      "genre": "Action, RPG",
-      "publisher": "Atlus, Inc",
-      "release_date": "2007-05-22",
-      "serial": "SLUS-28065"
     },
     "Okage: Shadow King": {
       "alt_serials": [
@@ -18096,15 +18024,6 @@
       "publisher": "Activision",
       "release_date": "2007-05-04",
       "serial": "SLUS-21552"
-    },
-    "Spider-Man 3 (SLUS-21617)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Vicarious Visions",
-      "genre": "Action",
-      "publisher": "Activision",
-      "release_date": "2007-05-04",
-      "serial": "SLUS-21617"
     },
     "Spider-Man: The Movie": {
       "alt_serials": [],

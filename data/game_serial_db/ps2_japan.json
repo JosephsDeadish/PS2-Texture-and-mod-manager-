@@ -620,14 +620,12 @@
       "serial": "SLPM-65330"
     },
     "Akudaikan 3 (JP)": {
-      "alt_serials": [
-        "SLPM-66653"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "Action",
       "publisher": "",
       "release_date": "2009-02-26",
-      "serial": "SLPM-55145"
+      "serial": "SLPM-66653"
     },
     "Akumajou Dracula: Yami no Juin (JP)": {
       "alt_serials": [
@@ -2085,14 +2083,12 @@
       "serial": "SLPM-65665"
     },
     "Bloody Roar 3 (JP)": {
-      "alt_serials": [
-        "SLPM-62055"
-      ],
+      "alt_serials": [],
       "developer": "Eighting Co., Ltd. (8ing)",
       "genre": "Fighting",
       "publisher": "Activision",
       "release_date": "2001-06-26",
-      "serial": "SLPM-60136"
+      "serial": "SLPM-62055"
     },
     "Bloody Roar 3 [Hudson the Best] (JP)": {
       "alt_serials": [],
@@ -2505,14 +2501,12 @@
       "serial": "SLPM-60157"
     },
     "Bujingai (JP)": {
-      "alt_serials": [
-        "SLPM-65459"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60211"
+      "serial": "SLPM-65459"
     },
     "Bully (JP)": {
       "alt_serials": [],
@@ -2837,16 +2831,6 @@
       "publisher": "GN Software",
       "release_date": "",
       "serial": "SLPM-65898"
-    },
-    "Castlevania (JP)": {
-      "alt_serials": [
-        "SLPM-65406"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLPM-61062"
     },
     "Castlevania: Lament of Innocence (JP)": {
       "alt_serials": [],
@@ -4596,7 +4580,6 @@
     },
     "Densha de Go! Final (JP)": {
       "alt_serials": [
-        "SLPM-65590",
         "SLPM-66772",
         "SLPM-74214"
       ],
@@ -4604,7 +4587,7 @@
       "genre": "Simulation",
       "publisher": "Taito",
       "release_date": "",
-      "serial": "SLPM-60237"
+      "serial": "SLPM-65590"
     },
     "Densha de Go! Professional 2 (JP)": {
       "alt_serials": [
@@ -5057,14 +5040,12 @@
       "serial": "SLPM-66053"
     },
     "Dokapon Kingdom (JP)": {
-      "alt_serials": [
-        "SLPM-66878"
-      ],
+      "alt_serials": [],
       "developer": "Sting",
       "genre": "RPG",
       "publisher": "ATLUS USA, Inc",
       "release_date": "2008-10-14",
-      "serial": "SLPM-55115"
+      "serial": "SLPM-66878"
     },
     "Dokapon the World (JP)": {
       "alt_serials": [
@@ -5118,14 +5099,13 @@
     },
     "Dororo (JP)": {
       "alt_serials": [
-        "SLPM-65526",
         "SLPM-66207"
       ],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60248"
+      "serial": "SLPM-65526"
     },
     "Dot Hack Akusei Hen'i Vol. 2 (JP)": {
       "alt_serials": [],
@@ -5889,14 +5869,13 @@
     },
     "Energy Airforce (JP)": {
       "alt_serials": [
-        "SLPM-65177",
         "SLPM-74414"
       ],
       "developer": "Taito",
       "genre": "Action/Shooter",
       "publisher": "Taito Corporation",
       "release_date": "",
-      "serial": "SLPM-60183"
+      "serial": "SLPM-65177"
     },
     "Energy Airforce (Taito Best) (JP)": {
       "alt_serials": [],
@@ -5940,14 +5919,13 @@
     },
     "Enthusia Professional Racing (JP)": {
       "alt_serials": [
-        "SLPM-65948",
         "SLPM-66257"
       ],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-61110"
+      "serial": "SLPM-65948"
     },
     "Enthusia Professional Racing: Subaru Impreza WRX STI (JP)": {
       "alt_serials": [],
@@ -6652,14 +6630,6 @@
       "release_date": "",
       "serial": "SLPM-66072"
     },
-    "Fight Night Round 2 (JP)": {
-      "alt_serials": [],
-      "developer": "EA Sports",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-02-28",
-      "serial": "SLPM-55035"
-    },
     "Fighting for One Piece (JP)": {
       "alt_serials": [],
       "developer": "Bandai",
@@ -7227,14 +7197,6 @@
       "publisher": "Success",
       "release_date": "2004-06-24",
       "serial": "SLPM-62505"
-    },
-    "Full House Kiss 2 (JP)": {
-      "alt_serials": [],
-      "developer": "Tenky",
-      "genre": "Adventure",
-      "publisher": "Capcom",
-      "release_date": "",
-      "serial": "SLPM-60274"
     },
     "Full House Kiss 2: Ren'ai Kaseifu Adventure (JP)": {
       "alt_serials": [
@@ -8858,14 +8820,12 @@
       "serial": "SLPS-20038"
     },
     "Greatest Striker (JP)": {
-      "alt_serials": [
-        "SLPM-62028"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60120"
+      "serial": "SLPM-62028"
     },
     "Green Green: Kane no Ne: Dynamic (JP)": {
       "alt_serials": [],
@@ -9240,24 +9200,21 @@
       "alt_serials": [
         "SCPS-56014",
         "SLPM-65152",
-        "SLPM-65153",
         "SLPM-65502"
       ],
       "developer": "Positron Co., Ltd",
       "genre": "Action, Shooter",
       "publisher": "Sega",
       "release_date": "2002-09-17",
-      "serial": "SLPM-60184"
+      "serial": "SLPM-65153"
     },
     "Gungrave O.D. (JP)": {
-      "alt_serials": [
-        "SLPM-65492"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60218"
+      "serial": "SLPM-65492"
     },
     "Gungriffon Blaze & Silpheed: The Lost Planet (JP)": {
       "alt_serials": [],
@@ -10024,14 +9981,6 @@
       "release_date": "",
       "serial": "SLPM-62325"
     },
-    "Higurashi no Naku Koro ni Matsuri (JP)": {
-      "alt_serials": [],
-      "developer": "07th Expansion",
-      "genre": "Adventure",
-      "publisher": "Alchemist",
-      "release_date": "2007-02-22",
-      "serial": "SLPS-66620"
-    },
     "Higurashi no Naku Koro ni: Matsuri (JP)": {
       "alt_serials": [],
       "developer": "07th Expansion",
@@ -10104,14 +10053,12 @@
       "serial": "SLPS-25721"
     },
     "Hippa Linda (JP)": {
-      "alt_serials": [
-        "SLPM-62109"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60158"
+      "serial": "SLPM-62109"
     },
     "Hissatsu Pachi-Slot Evolution 2: Osomatsu-kun (JP)": {
       "alt_serials": [],
@@ -11382,16 +11329,6 @@
       "publisher": "",
       "release_date": "",
       "serial": "SCPS-56012"
-    },
-    "Jet de Go! 2 (JP)": {
-      "alt_serials": [
-        "SLPM-74407"
-      ],
-      "developer": "Taito Corporation",
-      "genre": "Flight Simulator",
-      "publisher": "Taito Corporation",
-      "release_date": "",
-      "serial": "SLPM-60166"
     },
     "Jet de Go! 2: Let's Go By Airliner (JP)": {
       "alt_serials": [
@@ -12989,7 +12926,6 @@
     },
     "Kessen III (JP)": {
       "alt_serials": [
-        "SLPM-65781",
         "SLPM-74223",
         "SLPM-74231"
       ],
@@ -12997,7 +12933,7 @@
       "genre": "Strategy",
       "publisher": "Koei",
       "release_date": "2005-02-22",
-      "serial": "SLPM-61103"
+      "serial": "SLPM-65781"
     },
     "Kessen III (Treasure Box) (JP)": {
       "alt_serials": [],
@@ -14094,14 +14030,12 @@
       "serial": "SCPS-11031"
     },
     "Kunoichi (JP)": {
-      "alt_serials": [
-        "SLPM-65447"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-61059"
+      "serial": "SLPM-65447"
     },
     "Kuon (JP)": {
       "alt_serials": [],
@@ -15610,7 +15544,6 @@
     },
     "Maximo (JP)": {
       "alt_serials": [
-        "SLPM-62127",
         "SLPM-64504",
         "SLPM-74004"
       ],
@@ -15618,7 +15551,7 @@
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60165"
+      "serial": "SLPM-62127"
     },
     "Medal of Honor: Europa Kyoushuu [EA:SY! 1980] (JP)": {
       "alt_serials": [],
@@ -16777,14 +16710,6 @@
       "publisher": "Artdink",
       "release_date": "2002-03-07",
       "serial": "SLPS-20183"
-    },
-    "Moujuutsukai to Oujisama (JP)": {
-      "alt_serials": [],
-      "developer": "Design Factory",
-      "genre": "Adventure/Breeding",
-      "publisher": "Idea Factory",
-      "release_date": "2010-06-24",
-      "serial": "SLPM-55264"
     },
     "Moujuutsukai to Oujisama: Snow Bride (JP)": {
       "alt_serials": [
@@ -18390,16 +18315,6 @@
       "release_date": "2004-07-28",
       "serial": "SLPS-25382"
     },
-    "Onimusha (JP)": {
-      "alt_serials": [
-        "SLPM-66501"
-      ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
-      "serial": "SLPM-61001"
-    },
     "Onimusha 2 (JP)": {
       "alt_serials": [],
       "developer": "Capcom",
@@ -19207,14 +19122,12 @@
       "serial": "SLPS-20135"
     },
     "Palais de Reine (JP)": {
-      "alt_serials": [
-        "SLPM-66817"
-      ],
+      "alt_serials": [],
       "developer": "Kogado Studio",
       "genre": "Adventure/Strategy",
       "publisher": "GungHo",
       "release_date": "2010-11-18",
-      "serial": "SLPM-55280"
+      "serial": "SLPM-66817"
     },
     "Pandora: Kimi no Namae o Boku wa Shiru (JP)": {
       "alt_serials": [],
@@ -20325,24 +20238,21 @@
     },
     "Puyo Puyo Fever (JP)": {
       "alt_serials": [
-        "SLPM-65532",
         "SLPM-74210"
       ],
       "developer": "Sonic Team",
       "genre": "Puzzle",
       "publisher": "Sega",
       "release_date": "",
-      "serial": "SLPM-61072"
+      "serial": "SLPM-65532"
     },
     "Puyo Puyo Fever 2 (JP)": {
-      "alt_serials": [
-        "SLPM-66104"
-      ],
+      "alt_serials": [],
       "developer": "Sonic Team",
       "genre": "Puzzle",
       "publisher": "Sega",
       "release_date": "",
-      "serial": "SLPM-61139"
+      "serial": "SLPM-66104"
     },
     "Puyo Puyo! (JP)": {
       "alt_serials": [],
@@ -20783,14 +20693,12 @@
       "serial": "SCPS-19310"
     },
     "Rayman Revolution (JP)": {
-      "alt_serials": [
-        "SLPM-67519"
-      ],
+      "alt_serials": [],
       "developer": "Ubisoft",
       "genre": "Platformer",
       "publisher": "Ubisoft",
       "release_date": "2001-05-31",
-      "serial": "SLPS-25029"
+      "serial": "SLPM-67519"
     },
     "Ready 2 Rumble Boxing: Round 2 (JP)": {
       "alt_serials": [],
@@ -21045,14 +20953,13 @@
     },
     "Ring of Red (JP)": {
       "alt_serials": [
-        "SLPM-62013",
         "SLPM-62091"
       ],
       "developer": "Konami Computer Entertainment Japan",
       "genre": "Strategy",
       "publisher": "KCE Studios",
       "release_date": "2001-03-12",
-      "serial": "SLPM-60122"
+      "serial": "SLPM-62013"
     },
     "Ring of Red (Konami The Best) (JP)": {
       "alt_serials": [],
@@ -21103,14 +21010,12 @@
       "serial": "SLPS-25005"
     },
     "Rockman X7 (JP)": {
-      "alt_serials": [
-        "SLPM-65331"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60207"
+      "serial": "SLPM-65331"
     },
     "Rockman X8 (JP)": {
       "alt_serials": [],
@@ -21288,14 +21193,13 @@
     },
     "Rumble Roses (JP)": {
       "alt_serials": [
-        "SLPM-65885",
         "SLPM-66085"
       ],
       "developer": "KCET, Yuke's",
       "genre": "Wrestling",
       "publisher": "Konami",
       "release_date": "2004-11-09",
-      "serial": "SLPM-61106"
+      "serial": "SLPM-65885"
     },
     "Run Like Hell (JP)": {
       "alt_serials": [],
@@ -21524,14 +21428,12 @@
       "serial": "SCPS-15044"
     },
     "SSX 3 (JP)": {
-      "alt_serials": [
-        "SLPM-65449"
-      ],
+      "alt_serials": [],
       "developer": "Electronic Arts Canada",
       "genre": "Sports/Snowboard",
       "publisher": "EA Sports Big",
       "release_date": "2008-09-18",
-      "serial": "SLPM-55077"
+      "serial": "SLPM-65449"
     },
     "SSX 3 [EA Best Hits] (JP)": {
       "alt_serials": [],
@@ -22833,14 +22735,12 @@
       "serial": "SLPM-61077"
     },
     "Sega Rally 2006 (JP)": {
-      "alt_serials": [
-        "SLPM-66212"
-      ],
+      "alt_serials": [],
       "developer": "Sega",
       "genre": "Racing/Driving",
       "publisher": "Sega",
       "release_date": "",
-      "serial": "SLPM-61137"
+      "serial": "SLPM-66212"
     },
     "Sega Rally Championship (JP)": {
       "alt_serials": [],
@@ -23271,14 +23171,12 @@
       "serial": "SLPS-25217"
     },
     "Shadow of Memories (JP)": {
-      "alt_serials": [
-        "SLPM-65013"
-      ],
+      "alt_serials": [],
       "developer": "Konami",
       "genre": "Action/Adventure",
       "publisher": "Konami",
       "release_date": "2001-03-30",
-      "serial": "SLPM-60135"
+      "serial": "SLPM-65013"
     },
     "Shadow of Memories / Zone of the Enders: Z.O.E: Tentou Houei-you Movie-ban (JP)": {
       "alt_serials": [],
@@ -23299,14 +23197,13 @@
     "Shadow of Rome (JP)": {
       "alt_serials": [
         "SLPM-61114",
-        "SLPM-65883",
         "SLPM-66745"
       ],
       "developer": "Capcom",
       "genre": "Action, Beat'em Up",
       "publisher": "Capcom",
       "release_date": "2005-02-08",
-      "serial": "SLPM-61109"
+      "serial": "SLPM-65883"
     },
     "Shadow of the Colossus (JP)": {
       "alt_serials": [],
@@ -23497,14 +23394,13 @@
     },
     "Shin Combat Choro Q (JP)": {
       "alt_serials": [
-        "SLPM-65105",
         "SLPM-66319"
       ],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-61029"
+      "serial": "SLPM-65105"
     },
     "Shin Contra (JP)": {
       "alt_serials": [
@@ -23627,7 +23523,6 @@
     },
     "Shin Sangoku Musou (JP)": {
       "alt_serials": [
-        "SLPM-62005",
         "SLPM-62183",
         "SLPM-62568",
         "SLPM-62714",
@@ -23637,7 +23532,7 @@
       "genre": "Action",
       "publisher": "Koei",
       "release_date": "",
-      "serial": "SLPM-60117"
+      "serial": "SLPM-62005"
     },
     "Shin Sangoku Musou 2 & Moushouden Saikyou Data (JP)": {
       "alt_serials": [],
@@ -24033,14 +23928,13 @@
     },
     "Shinobi (JP)": {
       "alt_serials": [
-        "SLPM-65200",
         "SLPM-74415"
       ],
       "developer": "Overworks",
       "genre": "Action, Beat'em Up",
       "publisher": "Sega",
       "release_date": "2002-11-10",
-      "serial": "SLPM-60192"
+      "serial": "SLPM-65200"
     },
     "Shinobido Takumi (JP)": {
       "alt_serials": [],
@@ -24301,14 +24195,12 @@
       "serial": "SLPM-73402"
     },
     "Shutokou Battle 01 (JP)": {
-      "alt_serials": [
-        "SLPM-65308"
-      ],
+      "alt_serials": [],
       "developer": "Genki",
       "genre": "Racing",
       "publisher": "Genki Co. Ltd.",
       "release_date": "",
-      "serial": "SLPM-60206"
+      "serial": "SLPM-65308"
     },
     "Shutokou Battle 01: PlayStation 2 the Best (JP)": {
       "alt_serials": [],
@@ -24391,14 +24283,12 @@
       "serial": "SLPM-64549"
     },
     "Silent Hill 2 (JP)": {
-      "alt_serials": [
-        "SLPM-65051"
-      ],
+      "alt_serials": [],
       "developer": "Konami Computer Entertainment Tokyo",
       "genre": "Action, Adventure, Survival Horror",
       "publisher": "Konami",
       "release_date": "2001-09-24",
-      "serial": "SLPM-61009"
+      "serial": "SLPM-65051"
     },
     "Silent Hill 2: Saigo no Uta (JP)": {
       "alt_serials": [
@@ -27134,14 +27024,13 @@
     },
     "Super Puzzle Bobble (JP)": {
       "alt_serials": [
-        "SLPM-62016",
-        "SLPM-64512"
+        "SLPM-62016"
       ],
       "developer": "Taito",
       "genre": "Puzzle",
       "publisher": "Taito",
       "release_date": "",
-      "serial": "SLPM-60115"
+      "serial": "SLPM-64512"
     },
     "Super Puzzle Bobble 2 (JP)": {
       "alt_serials": [
@@ -29250,7 +29139,6 @@
     },
     "The Sims (JP)": {
       "alt_serials": [
-        "SLPM-64540",
         "SLPM-65479",
         "SLPM-66516"
       ],
@@ -29258,7 +29146,7 @@
       "genre": "Simulation",
       "publisher": "EA Games",
       "release_date": "2003",
-      "serial": "SLPM-62240"
+      "serial": "SLPM-64540"
     },
     "The Sky Odyssey (JP)": {
       "alt_serials": [],
@@ -29900,14 +29788,12 @@
       "serial": "SLPS-20225"
     },
     "Touge 3 (JP)": {
-      "alt_serials": [
-        "SLPM-62087"
-      ],
+      "alt_serials": [],
       "developer": "",
       "genre": "",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-60154"
+      "serial": "SLPM-62087"
     },
     "Tough: Dark Fight (JP)": {
       "alt_serials": [],
@@ -30172,14 +30058,12 @@
       "serial": "SLPM-65895"
     },
     "Tsukiyo ni Saraba (JP)": {
-      "alt_serials": [
-        "SLPM-65826"
-      ],
+      "alt_serials": [],
       "developer": "Blue Moon",
       "genre": "Action/Shooter",
       "publisher": "Taito",
       "release_date": "",
-      "serial": "SLPM-61102"
+      "serial": "SLPM-65826"
     },
     "Tsukiyo ni Saraba [Taito Best] (JP)": {
       "alt_serials": [],
@@ -31733,14 +31617,12 @@
       "serial": "SLPM-55058"
     },
     "Wrestle Kingdom (JP)": {
-      "alt_serials": [
-        "SLPM-66401"
-      ],
+      "alt_serials": [],
       "developer": "Yuke's",
       "genre": "Sports",
       "publisher": "Yuke's",
       "release_date": "",
-      "serial": "SLPM-60278"
+      "serial": "SLPM-66401"
     },
     "Wrestle Kingdom 2: Pro Wrestling Sekai Taisen (JP)": {
       "alt_serials": [],
@@ -32531,14 +32413,13 @@
     },
     "Zill O'll Infinite (JP)": {
       "alt_serials": [
-        "SLPM-65892",
         "SLPM-66525"
       ],
       "developer": "",
       "genre": "RPG",
       "publisher": "",
       "release_date": "",
-      "serial": "SLPM-55234"
+      "serial": "SLPM-65892"
     },
     "Zipang (JP)": {
       "alt_serials": [],

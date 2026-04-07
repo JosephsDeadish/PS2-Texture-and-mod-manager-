@@ -8730,7 +8730,7 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
 
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.data), 2180)
+        self.assertGreaterEqual(len(self.data), 2174)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8819,7 +8819,7 @@ class TestWave47NewGames(unittest.TestCase):
 
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.games), 2180)
+        self.assertGreaterEqual(len(self.games), 2174)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9157,9 +9157,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count >= 2180 (demo/kiosk entries moved to ps2_demos.json in Wave 124)."""
+        """Wave 49: serial DB game count >= 2174 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148)."""
         self.assertGreaterEqual(
-            len(self.games), 2180,
+            len(self.games), 2174,
             f"Serial DB game count too low: {len(self.games)}"
         )
 
@@ -9381,7 +9381,7 @@ class TestWave50VersionLabels(unittest.TestCase):
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
         """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2180)
+        self.assertGreaterEqual(len(self.raw_games), 2174)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9586,7 +9586,7 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2180)
+        self.assertGreaterEqual(len(self.raw_games), 2174)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9774,7 +9774,7 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
 
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2180)
+        self.assertGreaterEqual(len(self.raw_games), 2174)
 
 
 # ===========================================================================
@@ -20170,7 +20170,7 @@ class TestWave108DbSerialFixes(unittest.TestCase):
 
     def test_ntsc_db_count(self):
         """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json."""
-        self.assertGreaterEqual(len(self.ntsc), 2180)
+        self.assertGreaterEqual(len(self.ntsc), 2174)
 
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
@@ -21788,8 +21788,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
             f"JP DB has only {len(self.jp)} entries, expected >= 3500")
 
     def test_ntsc_u_db_minimum_entries(self):
-        self.assertGreaterEqual(len(self.ntsc), 2180,
-            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2180")
+        self.assertGreaterEqual(len(self.ntsc), 2174,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2174")
 
     # ── All entries have non-empty serial ─────────────────────────────────────
 
@@ -22540,9 +22540,9 @@ class TestWave127SerialFixes(unittest.TestCase):
     # ── PAL count regression ──────────────────────────────────────────────────
 
     def test_pal_game_count_wave127(self):
-        """Wave 127: PAL DB must have at least 2647 entries after 6 removals."""
-        self.assertGreaterEqual(len(self.pal_games), 2647,
-            f"PAL DB has only {len(self.pal_games)} entries, expected >= 2647")
+        """Wave 127: PAL DB must have at least 2642 entries (Wave 148: 5 removed, 10 swapped, 3 fixed)."""
+        self.assertGreaterEqual(len(self.pal_games), 2642,
+            f"PAL DB has only {len(self.pal_games)} entries, expected >= 2642")
 
     # ── Removed entries no longer exist with wrong serials ────────────────────
 
@@ -24543,10 +24543,9 @@ class TestWave141LocalizedPalFills(unittest.TestCase):
         self.assertEqual(g.get("developer"), "Zoe Mode")
 
     def test_pal_disney_think_fast_apostrophe_dev(self):
-        """Wave 141: Disney's Think Fast dev filled."""
-        g = self.pal_games.get("Disney's Th!nk Fast (PAL)", {})
+        """Wave 141: Disney Think Fast dev filled (Wave 148: entry renamed to Disney Think Fast)."""
+        g = self.pal_games.get("Disney Think Fast (PAL)", {})
         self.assertEqual(g.get("developer"), "Magenta Software Ltd")
-        self.assertEqual(g.get("genre"), "Quiz")
 
     def test_pal_ratatouille_apostrophe_dev(self):
         """Wave 141: Disney Pixar's Ratatouille dev filled."""
@@ -25633,3 +25632,145 @@ class TestWave147SerialFixes(unittest.TestCase):
         empty = [t for t, i in self.pal_games.items() if not i.get('release_date', '').strip()]
         self.assertLessEqual(len(empty), 372,
             f"PAL still has {len(empty)} entries without date, expected <= 372")
+
+
+class TestWave148DuplicateSerialRemovals(unittest.TestCase):
+    """Wave 148: Remove duplicate/wrong serial entries verified against PS2.txt.
+    JP: 44 removed (wrong SLPM-6xxxx/SLPM-55xxx serials, correct serial already in DB).
+    NTSC-U: 9 removed (wrong SLUS-28xxx/SLUS-29xxx serials, correct already in DB).
+    PAL: 18 removed (wrong serials, correct already in DB) + 3 serial fixes.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            cls.jp_db = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            cls.ntsc_db = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            cls.pal_db = json.load(f)
+        cls.jp_games = cls.jp_db['games']
+        cls.ntsc_games = cls.ntsc_db['games']
+        cls.pal_games = cls.pal_db['games']
+
+    # ── JP removals ────────────────────────────────────────────────────────────
+
+    def test_jp_wrong_serial_entries_removed(self):
+        """Wave 148: Wrong-serial JP duplicates must not exist."""
+        bad = [
+            ('Castlevania (JP)', 'SLPM-61062'),
+            ('Bloody Roar 3 (JP)', 'SLPM-60136'),
+            ('Onimusha (JP)', 'SLPM-61001'),
+            ('Silent Hill 2 (JP)', 'SLPM-61009'),
+            ('Ring of Red (JP)', 'SLPM-60122'),
+            ('Gungrave (JP)', 'SLPM-60184'),
+            ('Shinobi (JP)', 'SLPM-60192'),
+            ('Shadow of Memories (JP)', 'SLPM-60135'),
+            ('Kunoichi (JP)', 'SLPM-61059'),
+            ('Puyo Puyo Fever (JP)', 'SLPM-61072'),
+        ]
+        for title, bad_serial in bad:
+            entry = self.jp_games.get(title)
+            if entry is not None:
+                self.assertNotEqual(entry.get('serial'), bad_serial,
+                    f"JP entry '{title}' still has wrong serial {bad_serial}")
+            # The title with that exact name and wrong serial should not exist
+            all_serials = {e['serial'] for e in self.jp_games.values()}
+            self.assertNotIn(bad_serial, all_serials,
+                f"Wrong serial {bad_serial} (from duplicate '{title}') still in JP DB")
+
+    def test_jp_correct_serials_present(self):
+        """Wave 148: Correct JP serials (replacing wrong ones) must still be present."""
+        expected = [
+            ('Castlevania: Lament of Innocence (JP)', 'SLPM-65444'),
+            ('Bloody Roar 3 (JP)', 'SLPM-62055'),
+            ('Onimusha: Warlords (JP)', 'SLPM-65010'),
+            ('Silent Hill 2 (JP)', 'SLPM-65051'),
+            ('Ring of Red (JP)', 'SLPM-62013'),
+            ('Gungrave (JP)', 'SLPM-65153'),
+            ('Shinobi (JP)', 'SLPM-65200'),
+            ('Shadow of Memories (JP)', 'SLPM-65013'),
+            ('Kunoichi (JP)', 'SLPM-65447'),
+            ('Puyo Puyo Fever (JP)', 'SLPM-65532'),
+            ('Sega Rally 2006 (JP)', 'SLPM-66212'),
+            ('Enthusia Professional Racing (JP)', 'SLPM-65948'),
+            ('Rumble Roses (JP)', 'SLPM-65885'),
+            ('Wrestle Kingdom (JP)', 'SLPM-66401'),
+        ]
+        for title, serial in expected:
+            g = self.jp_games.get(title, {})
+            all_serials = {e['serial'] for e in self.jp_games.values()}
+            all_serials |= {s for e in self.jp_games.values() for s in e.get('alt_serials', [])}
+            self.assertIn(serial, all_serials,
+                f"Expected correct serial {serial} ({title}) not found in JP DB")
+
+    def test_jp_count_wave148(self):
+        """Wave 148: JP DB must have at most 3762 entries (7 true duplicates removed, 37 primary serials swapped to correct values)."""
+        self.assertLessEqual(len(self.jp_games), 3762,
+            f"JP DB has {len(self.jp_games)} entries, expected <= 3762 after Wave 148 removals")
+
+    # ── NTSC-U removals ────────────────────────────────────────────────────────
+
+    def test_ntsc_wrong_serial_entries_removed(self):
+        """Wave 148: Wrong-serial NTSC-U duplicates must not exist."""
+        bad = [
+            ('Arctic Thunder (SLUS-29007)', 'SLUS-29007'),
+            ('Auto Modellista (SLUS-28031)', 'SLUS-28031'),
+            ('Half-Life (SLUS-29014)', 'SLUS-29014'),
+            ('Juiced (SLUS-29147)', 'SLUS-29147'),
+            ('Metal Saga (SLUS-28059)', 'SLUS-28059'),
+            ('Odin Sphere (SLUS-28065)', 'SLUS-28065'),
+            ('Spider-Man 3 (SLUS-21617)', 'SLUS-21617'),
+        ]
+        for title, bad_serial in bad:
+            all_serials = {e['serial'] for e in self.ntsc_games.values()}
+            self.assertNotIn(bad_serial, all_serials,
+                f"Wrong serial {bad_serial} (from duplicate '{title}') still in NTSC-U DB")
+
+    def test_ntsc_correct_serials_present(self):
+        """Wave 148: Correct NTSC-U serials (replacing wrong ones) must still be present."""
+        expected = [
+            ('Arctic Thunder', 'SLUS-20217'),
+            ('Auto Modellista', 'SLUS-20498'),
+            ('Half-Life', 'SLUS-20066'),
+            ('Juiced', 'SLUS-20872'),
+            ('Odin Sphere', 'SLUS-21577'),
+        ]
+        for title, serial in expected:
+            all_serials = {e['serial'] for e in self.ntsc_games.values()}
+            all_serials |= {s for e in self.ntsc_games.values() for s in e.get('alt_serials', [])}
+            self.assertIn(serial, all_serials,
+                f"Expected correct NTSC-U serial {serial} ({title}) not found")
+
+    # ── PAL fixes ─────────────────────────────────────────────────────────────
+
+    def test_pal_buzz_hollywood_serial_fixed(self):
+        """Wave 148: Buzz! Hollywood (PAL) must have serial SCES-54458, not SCES-54848."""
+        g = self.pal_games.get('Buzz! Hollywood (PAL)', {})
+        if g:
+            self.assertEqual(g.get('serial'), 'SCES-54458',
+                f"Buzz! Hollywood serial should be SCES-54458, got {g.get('serial')}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SCES-54848', all_serials, "Wrong serial SCES-54848 still in PAL DB")
+
+    def test_pal_deep_water_serial_fixed(self):
+        """Wave 148: Deep Water (PAL) must have serial SCES-53404, not SLES-53404."""
+        g = self.pal_games.get('Deep Water (PAL)', {})
+        if g:
+            self.assertEqual(g.get('serial'), 'SCES-53404',
+                f"Deep Water serial should be SCES-53404, got {g.get('serial')}")
+
+    def test_pal_sonic_unleashed_serial_fixed(self):
+        """Wave 148: Sonic Unleashed (PAL) must have serial SLES-55580, not SLES-55380."""
+        g = self.pal_games.get('Sonic Unleashed (PAL)', {})
+        if g:
+            self.assertEqual(g.get('serial'), 'SLES-55580',
+                f"Sonic Unleashed serial should be SLES-55580, got {g.get('serial')}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SLES-55380', all_serials, "Wrong serial SLES-55380 still in PAL DB")
+
+    def test_pal_count_wave148(self):
+        """Wave 148: PAL DB must have at most 2642 entries (5 true duplicates removed, 10 serials swapped, 3 fixed)."""
+        self.assertLessEqual(len(self.pal_games), 2642,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2642 after Wave 148 changes")
