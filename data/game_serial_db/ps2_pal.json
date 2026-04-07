@@ -482,7 +482,7 @@
       "developer": "ITE Media",
       "genre": "Action",
       "publisher": "ITE Media",
-      "release_date": "",
+      "release_date": "2008-12-09",
       "serial": "SLES-53265"
     },
     "Agent Hugo: Lemoon Twist (PAL)": {
@@ -1164,7 +1164,7 @@
       "developer": "Cryo Interactive",
       "genre": "Adventure",
       "publisher": "Cryo Interactive",
-      "release_date": "",
+      "release_date": "2002-02-08",
       "serial": "SLES-50661"
     },
     "Attheraces Presents Gallop Racer (PAL)": {
@@ -1320,9 +1320,7 @@
       "serial": "SLES-55579"
     },
     "Baldur's Gate: Dark Alliance (PAL)": {
-      "alt_serials": [
-        "SLES-50825"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Black Isle Studios",
       "genre": "Action-RPG",
@@ -1779,7 +1777,7 @@
       "developer": "Atomic Planet",
       "genre": "Action/Platformer",
       "publisher": "Mastertronic",
-      "release_date": "",
+      "release_date": "2007",
       "serial": "SLES-54981"
     },
     "Bombastic (PAL)": {
@@ -2705,7 +2703,7 @@
       "developer": "Sony Computer Entertainment Europe",
       "genre": "Racing",
       "publisher": "Sony Computer Entertainment Europe",
-      "release_date": "",
+      "release_date": "2006-02",
       "serial": "SCES-53485"
     },
     "Carmen Sandiego: The Secret of the Stolen Drums (PAL)": {
@@ -2784,7 +2782,7 @@
       "developer": "Data Design Interactive",
       "genre": "Action",
       "publisher": "Blast Entertainment",
-      "release_date": "",
+      "release_date": "2006-02-01",
       "serial": "SLES-54672"
     },
     "Casper: Spirit Dimensions (PAL)": {
@@ -5484,7 +5482,7 @@
       "developer": "Ubisoft Montreal",
       "genre": "Simulation",
       "publisher": "Ubisoft Entertainment",
-      "release_date": "",
+      "release_date": "2007",
       "serial": "SLES-54947"
     },
     "Don 2: The Game (PAL)": {
@@ -6345,7 +6343,7 @@
       "developer": "Taito",
       "genre": "Flight Simulator",
       "publisher": "Taito",
-      "release_date": "",
+      "release_date": "2004-03-04",
       "serial": "SLES-51646"
     },
     "Energy Airforce: Aim Strike! (PAL)": {
@@ -6809,7 +6807,7 @@
       "developer": "EA Canada",
       "genre": "Sports",
       "publisher": "EA Sports",
-      "release_date": "",
+      "release_date": "2009",
       "serial": "SLES-55581"
     },
     "FIFA 11 (PAL)": {
@@ -7207,8 +7205,7 @@
         "SCES-50490",
         "SCES-50491",
         "SCES-50493",
-        "SCES-50494",
-        "SLES-50490"
+        "SCES-50494"
       ],
       "crcs": [
         "941BB7D9"
@@ -9407,7 +9404,7 @@
       "developer": "ITE Media",
       "genre": "Action",
       "publisher": "ITE Media",
-      "release_date": "",
+      "release_date": "2004",
       "serial": "SLES-52676"
     },
     "Hugo: Magic in the Trollwoods (PAL)": {
@@ -9692,7 +9689,7 @@
       "developer": "Blade Interactive Studios",
       "genre": "Sports",
       "publisher": "Blade Interactive Studios",
-      "release_date": "",
+      "release_date": "2003",
       "serial": "SLES-51629"
     },
     "International Snooker Championship (PAL)": {
@@ -14166,7 +14163,7 @@
       "developer": "Konami",
       "genre": "Sports",
       "publisher": "Konami",
-      "release_date": "",
+      "release_date": "2013-11-08",
       "serial": "SLES-55673"
     },
     "PaRappa the Rapper 2 (PAL)": {
@@ -14314,9 +14311,7 @@
       "serial": "SLES-51735"
     },
     "Persona 3 FES (PAL)": {
-      "alt_serials": [
-        "SLES-54495"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Atlus",
       "genre": "RPG",
@@ -14326,9 +14321,7 @@
       "serial": "SLES-55354"
     },
     "Persona 4 (PAL)": {
-      "alt_serials": [
-        "SLES-55283"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Atlus",
       "genre": "RPG",
@@ -16825,8 +16818,7 @@
         "SotC"
       ],
       "alt_serials": [
-        "SCED-53962",
-        "SCES-53005"
+        "SCED-53962"
       ],
       "crcs": [
         "73E68475"
@@ -17023,9 +17015,7 @@
       "aliases": [
         "SH2"
       ],
-      "alt_serials": [
-        "SLES-50966"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Konami",
       "genre": "Survival Horror",
@@ -17056,10 +17046,7 @@
       "serial": "SLES-51434"
     },
     "Silent Hill 4: The Room (PAL)": {
-      "alt_serials": [
-        "SLES-52232",
-        "SLES-52777"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Konami",
       "genre": "Survival Horror",
@@ -18065,9 +18052,7 @@
       "serial": "SLES-50683"
     },
     "Sly 2: Band of Thieves (PAL)": {
-      "alt_serials": [
-        "SCES-52836"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Sucker Punch Productions",
       "genre": "Platformer",
@@ -18098,8 +18083,7 @@
     },
     "Sly Raccoon (PAL)": {
       "alt_serials": [
-        "SCED-51452",
-        "SCES-54423"
+        "SCED-51452"
       ],
       "crcs": [],
       "developer": "Sucker Punch Productions",
@@ -19704,9 +19688,7 @@
       "serial": "SCES-50878"
     },
     "Tekken 5 (PAL)": {
-      "alt_serials": [
-        "SCES-52878"
-      ],
+      "alt_serials": [],
       "crcs": [],
       "developer": "Namco",
       "genre": "Fighting",
@@ -19956,7 +19938,7 @@
       "developer": "Traveller's Tales",
       "genre": "Action",
       "publisher": "Buena Vista Games Inc",
-      "release_date": "",
+      "release_date": "2008-05-15",
       "serial": "SLES-55143"
     },
     "The Chronicles of Narnia: The Lion, The Witch, and The Wardrobe (PAL)": {
@@ -20050,7 +20032,7 @@
       "developer": "Coyote Console",
       "genre": "Racing",
       "publisher": "Mastertronic",
-      "release_date": "",
+      "release_date": "2007-10-02",
       "serial": "SLES-54473"
     },
     "The Getaway (PAL)": {
@@ -20337,7 +20319,7 @@
       "developer": "Shiny Entertainment",
       "genre": "Action",
       "publisher": "Atari",
-      "release_date": "",
+      "release_date": "2005-11-10",
       "serial": "SLES-53462"
     },
     "The Millennium European Paintball Series: Championship Paintball 2009 (PAL)": {
@@ -20619,7 +20601,7 @@
       "developer": "Surreal Software",
       "genre": "Survival Horror",
       "publisher": "Midway",
-      "release_date": "",
+      "release_date": "2005-10-28",
       "serial": "SLES-53526"
     },
     "The Sum of All Fears (PAL)": {
@@ -21645,7 +21627,7 @@
       "developer": "Midas Interactive Entertainment",
       "genre": "Racing",
       "publisher": "Midas Interactive Entertainment",
-      "release_date": "",
+      "release_date": "2008-09-26",
       "serial": "SLES-55343"
     },
     "Turbo Trucks (PAL)": {
@@ -22973,7 +22955,7 @@
       "developer": "Team17 Software",
       "genre": "Strategy",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2004-11-19",
       "serial": "SLES-52342"
     },
     "Wrath Unleashed (PAL)": {
@@ -23141,7 +23123,7 @@
       "developer": "Blast!",
       "genre": "Action",
       "publisher": "Zoo Digital Publishing",
-      "release_date": "",
+      "release_date": "2006",
       "serial": "SLES-54142"
     },
     "Xenosaga Episode II: Jenseits von Gut und Böse (Disc 1) (PAL)": {

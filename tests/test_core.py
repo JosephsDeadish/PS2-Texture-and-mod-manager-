@@ -25405,3 +25405,231 @@ class TestWave146PalCompletionAndJpFills(unittest.TestCase):
         empty = [t for t, i in self.jp_games.items() if not i.get("developer", "").strip()]
         self.assertLessEqual(len(empty), 637,
             f"JP still has {len(empty)} entries without developer, expected <= 637")
+
+
+class TestWave147SerialFixes(unittest.TestCase):
+    """Wave 147: Serial fixes verified against PS2.data.json, PS2.titles.json, PS2.txt reference files."""
+
+    def setUp(self):
+        import json
+        with open('data/game_serial_db/ps2_japan.json', encoding='utf-8') as f:
+            self.jp_games = json.load(f)['games']
+        with open('data/game_serial_db/ps2_pal.json', encoding='utf-8') as f:
+            self.pal_games = json.load(f)['games']
+        with open('data/game_serial_db/ps2_ntsc_u.json', encoding='utf-8') as f:
+            self.ntsc_games = json.load(f)['games']
+
+    # ── JP: fake/wrong entries removed ───────────────────────────────────────
+
+    def test_jp_without_warning_removed(self):
+        """SLPS-99999 (PAL game) must not appear in JP DB."""
+        self.assertNotIn('Without Warning (JP)', self.jp_games)
+
+    def test_jp_without_warning_serial_absent(self):
+        """SLPS-99999 must not be used as a primary serial in JP DB."""
+        serials = {v['serial'] for v in self.jp_games.values()}
+        self.assertNotIn('SLPS-99999', serials)
+
+    def test_jp_robocop_fake_removed(self):
+        """RoboCop (JP) with fake serial SLPS-12345 must not appear in JP DB."""
+        self.assertNotIn('RoboCop (JP)', self.jp_games)
+
+    def test_jp_robocop_fake_serial_absent(self):
+        """SLPS-12345 (fake placeholder) must not be a primary JP serial."""
+        serials = {v['serial'] for v in self.jp_games.values()}
+        self.assertNotIn('SLPS-12345', serials)
+
+    def test_jp_robocop_aratanaru_kiki_present(self):
+        """The real JP RoboCop (SLPM-62321) must still exist."""
+        self.assertIn('RoboCop: Aratanaru Kiki (JP)', self.jp_games)
+
+    def test_jp_robocop_aratanaru_kiki_serial(self):
+        g = self.jp_games.get('RoboCop: Aratanaru Kiki (JP)', {})
+        self.assertEqual(g.get('serial'), 'SLPM-62321')
+
+    # ── PAL: wrong alt_serials removed ───────────────────────────────────────
+
+    def test_pal_sh2_bad_alt_removed(self):
+        """SLES-50966 (not a real serial) must be removed from Silent Hill 2 alts."""
+        g = self.pal_games.get('Silent Hill 2 (PAL)', {})
+        self.assertNotIn('SLES-50966', g.get('alt_serials', []))
+
+    def test_pal_sh2_primary_serial_correct(self):
+        g = self.pal_games.get('Silent Hill 2 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-50382')
+
+    def test_pal_sotc_bad_alt_removed(self):
+        """SCES-53005 must be removed from Shadow of the Colossus alts."""
+        g = self.pal_games.get('Shadow of the Colossus (PAL)', {})
+        self.assertNotIn('SCES-53005', g.get('alt_serials', []))
+
+    def test_pal_sotc_primary_serial_correct(self):
+        g = self.pal_games.get('Shadow of the Colossus (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-53326')
+
+    def test_pal_sly2_bad_alt_removed(self):
+        """SCES-52836 must be removed from Sly 2 alts."""
+        g = self.pal_games.get('Sly 2: Band of Thieves (PAL)', {})
+        self.assertNotIn('SCES-52836', g.get('alt_serials', []))
+
+    def test_pal_sly2_primary_serial_correct(self):
+        g = self.pal_games.get('Sly 2: Band of Thieves (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-52529')
+
+    def test_pal_sh4_bad_alts_removed(self):
+        """SLES-52232 and SLES-52777 must be removed from Silent Hill 4 alts."""
+        g = self.pal_games.get('Silent Hill 4: The Room (PAL)', {})
+        alts = g.get('alt_serials', [])
+        self.assertNotIn('SLES-52232', alts)
+        self.assertNotIn('SLES-52777', alts)
+
+    def test_pal_sh4_primary_serial_correct(self):
+        g = self.pal_games.get('Silent Hill 4: The Room (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-52445')
+
+    def test_pal_ffx_bad_alt_removed(self):
+        """SLES-50490 (not a real PAL FFX serial) must be removed from FFX alts."""
+        g = self.pal_games.get('Final Fantasy X (PAL)', {})
+        self.assertNotIn('SLES-50490', g.get('alt_serials', []))
+
+    def test_pal_sly_raccoon_bad_alt_removed(self):
+        """SCES-54423 must be removed from Sly Raccoon alts."""
+        g = self.pal_games.get('Sly Raccoon (PAL)', {})
+        self.assertNotIn('SCES-54423', g.get('alt_serials', []))
+
+    def test_pal_sly_raccoon_primary_serial_correct(self):
+        g = self.pal_games.get('Sly Raccoon (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-50917')
+
+    def test_pal_tekken5_bad_alt_removed(self):
+        """SCES-52878 must be removed from Tekken 5 alts."""
+        g = self.pal_games.get('Tekken 5 (PAL)', {})
+        self.assertNotIn('SCES-52878', g.get('alt_serials', []))
+
+    def test_pal_tekken5_primary_serial_correct(self):
+        g = self.pal_games.get('Tekken 5 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-53202')
+
+    def test_pal_p3fes_bad_alt_removed(self):
+        """SLES-54495 must be removed from Persona 3 FES alts."""
+        g = self.pal_games.get('Persona 3 FES (PAL)', {})
+        self.assertNotIn('SLES-54495', g.get('alt_serials', []))
+
+    def test_pal_p3fes_primary_serial_correct(self):
+        g = self.pal_games.get('Persona 3 FES (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-55354')
+
+    def test_pal_baldurs_gate_bad_alt_removed(self):
+        """SLES-50825 must be removed from Baldur's Gate: Dark Alliance alts."""
+        g = self.pal_games.get("Baldur's Gate: Dark Alliance (PAL)", {})
+        self.assertNotIn('SLES-50825', g.get('alt_serials', []))
+
+    def test_pal_baldurs_gate_primary_serial_correct(self):
+        g = self.pal_games.get("Baldur's Gate: Dark Alliance (PAL)", {})
+        self.assertEqual(g.get('serial'), 'SLES-50672')
+
+    def test_pal_persona4_bad_alt_removed(self):
+        """SLES-55283 must be removed from Persona 4 alts."""
+        g = self.pal_games.get('Persona 4 (PAL)', {})
+        self.assertNotIn('SLES-55283', g.get('alt_serials', []))
+
+    def test_pal_persona4_primary_serial_correct(self):
+        g = self.pal_games.get('Persona 4 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-55474')
+
+    # ── NTSC-U: Rampage duplicate resolved ───────────────────────────────────
+
+    def test_ntsc_rampage_wrong_entry_removed(self):
+        """'Rampage - Total Destruction' with wrong serial SLUS-21249 must be removed."""
+        self.assertNotIn('Rampage - Total Destruction', self.ntsc_games)
+
+    def test_ntsc_rampage_correct_entry_exists(self):
+        """'Rampage: Total Destruction' with correct serial SLUS-21323 must exist."""
+        self.assertIn('Rampage: Total Destruction', self.ntsc_games)
+
+    def test_ntsc_rampage_correct_serial(self):
+        g = self.ntsc_games.get('Rampage: Total Destruction', {})
+        self.assertEqual(g.get('serial'), 'SLUS-21323')
+
+    def test_ntsc_rampage_crc_transferred(self):
+        """CRC E389B921 must be in the correct Rampage: Total Destruction entry."""
+        g = self.ntsc_games.get('Rampage: Total Destruction', {})
+        self.assertIn('E389B921', g.get('crcs', []))
+
+    def test_ntsc_yourself_fitness_lifestyle_added(self):
+        """'Yourself Fitness: Lifestyle' (SLUS-21249) must be added to NTSC-U DB."""
+        self.assertIn('Yourself Fitness: Lifestyle', self.ntsc_games)
+
+    def test_ntsc_yourself_fitness_lifestyle_serial(self):
+        g = self.ntsc_games.get('Yourself Fitness: Lifestyle', {})
+        self.assertEqual(g.get('serial'), 'SLUS-21249')
+
+    # ── PAL: release dates filled from reference ──────────────────────────────
+
+    def test_pal_agent_hugo_hula_holiday_date(self):
+        g = self.pal_games.get('Agent Hugo: Hula Holiday (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2008-12-09')
+
+    def test_pal_atlantis_iii_date(self):
+        g = self.pal_games.get('Atlantis III: The New World (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2002-02-08')
+
+    def test_pal_energy_airforce_date(self):
+        g = self.pal_games.get('Energy Airforce (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2004-03-04')
+
+    def test_pal_matrix_path_of_neo_date(self):
+        g = self.pal_games.get('The Matrix: Path of Neo (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2005-11-10')
+
+    def test_pal_suffering_ties_that_bind_date(self):
+        g = self.pal_games.get('The Suffering: Ties That Bind (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2005-10-28')
+
+    def test_pal_worms_forts_date(self):
+        g = self.pal_games.get('Worms Forts: Under Siege (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2004-11-19')
+
+    def test_pal_caspers_scare_school_date(self):
+        g = self.pal_games.get("Casper's Scare School (PAL)", {})
+        self.assertEqual(g.get('release_date'), '2006-02-01')
+
+    def test_pal_pes_2014_date(self):
+        g = self.pal_games.get('PES 2014: Pro Evolution Soccer (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2013-11-08')
+
+    def test_pal_chronicles_narnia_prince_caspian_date(self):
+        g = self.pal_games.get('The Chronicles of Narnia: Prince Caspian (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2008-05-15')
+
+    def test_pal_flintstones_bedrock_racing_date(self):
+        g = self.pal_games.get('The Flintstones: Bedrock Racing (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2007-10-02')
+
+    def test_pal_tube_mania_date(self):
+        g = self.pal_games.get('Tube Mania (PAL)', {})
+        self.assertEqual(g.get('release_date'), '2008-09-26')
+
+    # ── count regressions ─────────────────────────────────────────────────────
+
+    def test_jp_count_wave147(self):
+        """Wave 147: JP DB must have at most 3769 entries (2 wrong removed)."""
+        self.assertLessEqual(len(self.jp_games), 3769)
+
+    def test_jp_genre_count_wave147(self):
+        """Wave 147: JP DB must have at most 419 entries without genre."""
+        empty = [t for t, i in self.jp_games.items() if not i.get('genre', '').strip()]
+        self.assertLessEqual(len(empty), 419,
+            f"JP still has {len(empty)} entries without genre, expected <= 419")
+
+    def test_jp_dev_count_wave147(self):
+        """Wave 147: JP DB must have at most 548 entries without developer."""
+        empty = [t for t, i in self.jp_games.items() if not i.get('developer', '').strip()]
+        self.assertLessEqual(len(empty), 548,
+            f"JP still has {len(empty)} entries without developer, expected <= 548")
+
+    def test_pal_date_count_wave147(self):
+        """Wave 147: PAL DB must have at most 372 entries without release_date (18 filled)."""
+        empty = [t for t, i in self.pal_games.items() if not i.get('release_date', '').strip()]
+        self.assertLessEqual(len(empty), 372,
+            f"PAL still has {len(empty)} entries without date, expected <= 372")

@@ -4802,17 +4802,12 @@
       "serial": "SLUS-21678"
     },
     "Dragon Ball Z: Budokai Tenkaichi 4": {
-      "aliases": [
-        "DBZ BT4",
-        "DBZ Tenkaichi 4",
-        "Tenkaichi 4"
-      ],
       "alt_serials": [],
       "crcs": [],
-      "developer": "Spike Chunsoft",
+      "developer": "Spike",
       "genre": "Fighting",
-      "publisher": "Bandai Namco",
-      "release_date": "2007-11-20",
+      "publisher": "Atari",
+      "release_date": "2007-10-04",
       "serial": "SLUS-21978"
     },
     "Dragon Ball Z: Infinite World": {
@@ -15074,20 +15069,11 @@
       "release_date": "2002-12-13",
       "serial": "SLUS-20361"
     },
-    "Rampage - Total Destruction": {
+    "Rampage: Total Destruction": {
       "alt_serials": [],
       "crcs": [
         "E389B921"
       ],
-      "developer": "Pipeworks Software",
-      "genre": "Action",
-      "publisher": "Midway Home Entertainment",
-      "release_date": "2006-05-29",
-      "serial": "SLUS-21249"
-    },
-    "Rampage: Total Destruction": {
-      "alt_serials": [],
-      "crcs": [],
       "developer": "Pipeworks Software, Inc",
       "genre": "Action",
       "publisher": "Midway",
@@ -22460,6 +22446,15 @@
       "publisher": "Koei Corporation",
       "release_date": "2001-10-03",
       "serial": "SLUS-20278"
+    },
+    "Yourself Fitness: Lifestyle": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "responDesign",
+      "genre": "Exercise",
+      "publisher": "Respondesign",
+      "release_date": "2007",
+      "serial": "SLUS-21249"
     },
     "Yourself!Fitness": {
       "alt_serials": [],
