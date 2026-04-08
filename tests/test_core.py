@@ -25755,20 +25755,22 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
         self.assertNotIn('SCES-54848', all_serials, "Wrong serial SCES-54848 still in PAL DB")
 
     def test_pal_deep_water_serial_fixed(self):
-        """Wave 148: Deep Water (PAL) must have serial SCES-53404, not SLES-53404."""
+        """Wave 150: Deep Water (PAL) must have serial SLES-53404 (publisher 505 Game Street = SLES range)."""
         g = self.pal_games.get('Deep Water (PAL)', {})
         if g:
-            self.assertEqual(g.get('serial'), 'SCES-53404',
-                f"Deep Water serial should be SCES-53404, got {g.get('serial')}")
+            self.assertEqual(g.get('serial'), 'SLES-53404',
+                f"Deep Water serial should be SLES-53404, got {g.get('serial')}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SCES-53404', all_serials, "Wrong serial SCES-53404 still in PAL DB")
 
     def test_pal_sonic_unleashed_serial_fixed(self):
-        """Wave 148: Sonic Unleashed (PAL) must have serial SLES-55580, not SLES-55380."""
+        """Wave 150: Sonic Unleashed (PAL) must have serial SLES-55380 (ref confirms, 2008 serial range)."""
         g = self.pal_games.get('Sonic Unleashed (PAL)', {})
         if g:
-            self.assertEqual(g.get('serial'), 'SLES-55580',
-                f"Sonic Unleashed serial should be SLES-55580, got {g.get('serial')}")
+            self.assertEqual(g.get('serial'), 'SLES-55380',
+                f"Sonic Unleashed serial should be SLES-55380, got {g.get('serial')}")
         all_serials = {e['serial'] for e in self.pal_games.values()}
-        self.assertNotIn('SLES-55380', all_serials, "Wrong serial SLES-55380 still in PAL DB")
+        self.assertNotIn('SLES-55580', all_serials, "Wrong serial SLES-55580 still in PAL DB")
 
     def test_pal_count_wave148(self):
         """Wave 148: PAL DB must have at most 2639 entries (8 total duplicates removed, 10 serials swapped, 3+3 fixed)."""
@@ -25809,12 +25811,12 @@ class TestWave149AdditionalSerialFixes(unittest.TestCase):
             "Buzz! Brain of Switzerland with wrong serial SCES-53385 should not exist")
 
     def test_pal_shaun_white_serial_fixed(self):
-        """Wave 149: Shaun White Snowboarding must use SLES-55542, not SLES-55452."""
+        """Wave 150: Shaun White Snowboarding must use SLES-55452 (ref confirms; SLES-55542=Disney Sing It Pop Hits)."""
         g = self.pal_games.get('Shaun White Snowboarding (PAL)', {})
-        self.assertEqual(g.get('serial'), 'SLES-55542',
-            f"Shaun White serial should be SLES-55542, got {g.get('serial')!r}")
+        self.assertEqual(g.get('serial'), 'SLES-55452',
+            f"Shaun White serial should be SLES-55452, got {g.get('serial')!r}")
         all_serials = {e['serial'] for e in self.pal_games.values()}
-        self.assertNotIn('SLES-55452', all_serials, "Wrong serial SLES-55452 still in PAL DB")
+        self.assertNotIn('SLES-55542', all_serials, "Wrong serial SLES-55542 still assigned to Shaun White")
 
     def test_pal_disney_sing_it_wrong_entry_removed(self):
         """Wave 149: Disney Sing It: Pop Hits with wrong serial SLES-55542 must be removed; correct entry SLES-55942 remains."""
