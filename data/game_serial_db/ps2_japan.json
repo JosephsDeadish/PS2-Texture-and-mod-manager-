@@ -216,9 +216,9 @@
       "alt_serials": [
         "SLPS-73408"
       ],
-      "developer": "",
+      "developer": "Namco",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Namco",
       "release_date": "2000-12-21",
       "serial": "SLPS-25025"
     },
@@ -277,7 +277,7 @@
         "SLPM-65086"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Other",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-25071"
@@ -287,7 +287,7 @@
         "SLPM-65087"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Other",
       "publisher": "",
       "release_date": "",
       "serial": "SLPS-25072"
@@ -384,10 +384,10 @@
       "alt_serials": [
         "SLPM-65054"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Alfa System",
+      "genre": "RPG",
+      "publisher": "Kadokawa",
+      "release_date": "2001-11-29",
       "serial": "SLPM-61018"
     },
     "Ace Combat 04: Shattered Skies (JP)": {
@@ -633,9 +633,9 @@
         "SLPM-66668"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2005-11-24",
       "serial": "SLPM-61138"
     },
     "All Star Pro-Wrestling (JP)": {
@@ -1848,10 +1848,10 @@
         "SLPM-65686",
         "SLPM-65688"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Yuke's Co. Ltd",
+      "genre": "Action, Beat'em Up",
+      "publisher": "Sammy",
+      "release_date": "2004-07-10",
       "serial": "SLPM-61091"
     },
     "Bikkuri Mouse (JP)": {
@@ -2153,7 +2153,7 @@
       ],
       "developer": "",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Marvelous Interactive",
       "release_date": "2002-07-11",
       "serial": "SLPS-20208"
     },
@@ -2194,9 +2194,9 @@
         "SLPM-62503"
       ],
       "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "genre": "Action",
+      "publisher": "Hudson",
+      "release_date": "2004-10-07",
       "serial": "SLPS-62503"
     },
     "Bomberman Jetters (JP)": {
@@ -2249,7 +2249,7 @@
       "developer": "Racjin",
       "genre": "Racing",
       "publisher": "Hudson Soft",
-      "release_date": "",
+      "release_date": "2004-04-15",
       "serial": "SLPS-62478"
     },
     "Bomberman Kart: Hudson the Best (JP)": {
@@ -2265,10 +2265,10 @@
         "SLPM-62291",
         "SLPM-74101"
       ],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Action",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Hudson Soft",
+      "release_date": "2004-08-05",
       "serial": "SLPS-62291"
     },
     "Bomberman Land 2: Game Shijou Saidai no Theme Park (Playstation 2 The Best) (JP)": {
@@ -2291,10 +2291,10 @@
       "alt_serials": [
         "SLPM-62643"
       ],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Action",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Hudson Soft",
+      "release_date": "2005-08-04",
       "serial": "SLPS-62643"
     },
     "Bomberman Land 3: Hudson the Best (JP)": {
@@ -2360,10 +2360,10 @@
         "SLPM-66060",
         "SLPM-66939"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Koei",
+      "genre": "Simulation",
+      "publisher": "Koei",
+      "release_date": "2005-07-21",
       "serial": "SLPS-66060"
     },
     "Boukoku no Aegis 2035: Warship Gunner (Koei Selection) (JP)": {
@@ -2494,10 +2494,10 @@
       "alt_serials": [
         "SLPM-62157"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "KAZe",
+      "genre": "Puzzle",
+      "publisher": "Kadokawa",
+      "release_date": "2002-03-20",
       "serial": "SLPM-60157"
     },
     "Bujingai (JP)": {
@@ -2829,7 +2829,7 @@
       "developer": "Studio E-Go",
       "genre": "Adventure/Tactical RPG",
       "publisher": "GN Software",
-      "release_date": "",
+      "release_date": "2005-02-24",
       "serial": "SLPM-65898"
     },
     "Castlevania: Lament of Innocence (JP)": {
@@ -2963,9 +2963,9 @@
       "alt_serials": [
         "SLPM-62771"
       ],
-      "developer": "",
+      "developer": "Takara",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Atlus",
       "release_date": "2002-12-12",
       "serial": "SLPM-62244"
     },
@@ -3013,10 +3013,10 @@
       "alt_serials": [
         "SLPM-62403"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Psikyo",
+      "genre": "Shoot 'Em Up",
+      "publisher": "Global A Entertainment",
+      "release_date": "2003-10",
       "serial": "SLPM-62360"
     },
     "Chou Battle Houshin (JP)": {
@@ -4562,10 +4562,10 @@
       "alt_serials": [
         "SLPM-65303"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Hitmaker Co., Ltd",
+      "genre": "Action",
+      "publisher": "Sega",
+      "release_date": "2003-05-29",
       "serial": "SLPM-61046"
     },
     "Densha de Go! 3: Tsuukin-hen (JP)": {
@@ -4575,7 +4575,7 @@
       "developer": "Taito",
       "genre": "Simulation",
       "publisher": "Taito",
-      "release_date": "",
+      "release_date": "2001-03-15",
       "serial": "SLPM-60142"
     },
     "Densha de Go! Final (JP)": {
@@ -4607,7 +4607,7 @@
       "developer": "Taito",
       "genre": "Simulation",
       "publisher": "Taito",
-      "release_date": "",
+      "release_date": "2002-07-25",
       "serial": "SLPM-60179"
     },
     "Densha de Go! Shinkansen: San'you Shinkansen-hen (JP)": {
@@ -5153,7 +5153,7 @@
       "developer": "CyberConnect2",
       "genre": "RPG",
       "publisher": "Bandai",
-      "release_date": "",
+      "release_date": "2009-11-26",
       "serial": "SLPS-25655"
     },
     "Dot Hack G.U. Vol. 3: Aruku You na Hayasa de (JP)": {
@@ -5397,9 +5397,9 @@
       "alt_serials": [
         "SLPM-66781"
       ],
-      "developer": "",
+      "developer": "Square Enix",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Square Enix",
       "release_date": "2006-04-20",
       "serial": "SLPM-66363"
     },
@@ -5497,10 +5497,10 @@
       "alt_serials": [
         "SLPM-66931"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Juice Games",
+      "genre": "Racing",
+      "publisher": "THQ",
+      "release_date": "2008-01-17",
       "serial": "SLPM-55139"
     },
     "Driv3r (JP)": {
@@ -6148,7 +6148,7 @@
       "developer": "Spike",
       "genre": "Sports",
       "publisher": "Spike",
-      "release_date": "",
+      "release_date": "2003-02-06",
       "serial": "SLPS-20223"
     },
     "Exciting Pro Wres 5 (JP)": {
@@ -6159,7 +6159,7 @@
       "developer": "Spike",
       "genre": "Sports",
       "publisher": "Spike",
-      "release_date": "",
+      "release_date": "2004-11-25",
       "serial": "SLPS-25326"
     },
     "Exciting Pro Wres 6 (JP)": {
@@ -6178,7 +6178,7 @@
       "developer": "Spike",
       "genre": "Sports",
       "publisher": "Spike",
-      "release_date": "",
+      "release_date": "2005-02-03",
       "serial": "SLPM-61098"
     },
     "Exciting Pro Wres 7 (JP)": {
@@ -6228,7 +6228,7 @@
         "SCPS-15076"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Rhythm",
       "publisher": "",
       "release_date": "",
       "serial": "SCPS-15073"
@@ -7410,10 +7410,10 @@
         "SLPM-65813",
         "SLPM-74228"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Genki",
+      "genre": "Action",
+      "publisher": "Genki",
+      "release_date": "2005-01-20",
       "serial": "SLPM-61096"
     },
     "Fuuun Shinsengumi (JP)": {
@@ -7421,10 +7421,10 @@
         "SLPM-65494",
         "SLPM-74202"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Genki",
+      "genre": "Action",
+      "publisher": "Genki Co. Ltd.",
+      "release_date": "2004-01-22",
       "serial": "SLPM-60225"
     },
     "G-Saviour (JP)": {
@@ -7512,7 +7512,7 @@
       "developer": "Koei",
       "genre": "Horse Racing",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2000-11-02",
       "serial": "SLPM-60125"
     },
     "GI Jockey 2 2001 (JP)": {
@@ -7831,7 +7831,7 @@
       "developer": "Seta Corporation",
       "genre": "Strategy",
       "publisher": "Broccoli",
-      "release_date": "",
+      "release_date": "2004-02-26",
       "serial": "SLPM-61073"
     },
     "Galaxy Angel: Moonlit Lovers: Broccoli Best Quality (JP)": {
@@ -7992,10 +7992,10 @@
         "SLPM-65097",
         "SLPM-74408"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Taito",
+      "genre": "Action, Breeding, Building, RPG",
+      "publisher": "Taito Corporation",
+      "release_date": "2002-03-20",
       "serial": "SLPM-60153"
     },
     "Garasu no Bara (JP)": {
@@ -8010,10 +8010,10 @@
       "alt_serials": [
         "SLPM-66378"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Eko Software SARL",
+      "genre": "Action, Platform",
+      "publisher": "Titus",
+      "release_date": "2006-04-27",
       "serial": "SLPM-62733"
     },
     "Garou Densetsu Battle Archive 1(NeoGeo Online Collection Vol.5 The Best) (JP)": {
@@ -8112,10 +8112,10 @@
       "alt_serials": [
         "SLPM-65335"
       ],
-      "developer": "",
-      "genre": "",
+      "developer": "WOW Entertainment",
+      "genre": "Sports",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2003-09-11",
       "serial": "SLPM-61052"
     },
     "Gendai Daisenryaku: Isshoku Sokuhatsu Gunji Balance Houkai (JP)": {
@@ -8224,7 +8224,7 @@
       "developer": "Konami",
       "genre": "RPG",
       "publisher": "Konami",
-      "release_date": "",
+      "release_date": "2006-12-07",
       "serial": "SLPM-66286"
     },
     "Get Bass Battle (JP)": {
@@ -8863,10 +8863,10 @@
       "alt_serials": [
         "SLPM-65324"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Capcom",
+      "genre": "Adventure",
+      "publisher": "Capcom",
+      "release_date": "2003-08-07",
       "serial": "SLPM-61055"
     },
     "GrimGrimoire (JP)": {
@@ -8930,10 +8930,10 @@
         "SLPM-66249",
         "SLPM-66418"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Atlus",
+      "genre": "RPG",
+      "publisher": "Atlus",
+      "release_date": "2006-08-03",
       "serial": "SLPM-61148"
     },
     "Growlanser VI: Precarious World (JP)": {
@@ -9125,7 +9125,7 @@
       "developer": "Capcom",
       "genre": "Light Gun Shooter",
       "publisher": "Capcom",
-      "release_date": "",
+      "release_date": "2001-11-08",
       "serial": "SLPM-61020"
     },
     "Gun Survivor 3: Dino Crisis (JP)": {
@@ -9136,7 +9136,7 @@
       "developer": "Capcom",
       "genre": "Light Gun Shooter",
       "publisher": "Capcom",
-      "release_date": "",
+      "release_date": "2002-06-27",
       "serial": "SLPM-61026"
     },
     "Gun Survivor 4: Biohazard: Heroes Never Die (JP)": {
@@ -9146,7 +9146,7 @@
       "developer": "Capcom",
       "genre": "Light Gun Shooter",
       "publisher": "Capcom",
-      "release_date": "",
+      "release_date": "2003-02-13",
       "serial": "SLPM-61039"
     },
     "Gunbird 1 & 2 (JP)": {
@@ -9361,10 +9361,10 @@
         "SLPM-65708",
         "SLPM-65747"
       ],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "RPG",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Square Enix",
+      "release_date": "2004-09-22",
       "serial": "SLPM-61087"
     },
     "Hagane no Renkinjutsushi 3: Kami o Tsugu Shoujo (JP)": {
@@ -9437,7 +9437,7 @@
       "developer": "New Corporation",
       "genre": "Sports",
       "publisher": "ESP",
-      "release_date": "",
+      "release_date": "2002-06-27",
       "serial": "SLPS-25129"
     },
     "Hajime no Ippo: Victorious Boxers: Championship Version (Limited Edition) (JP)": {
@@ -9594,7 +9594,7 @@
       "developer": "Square Enix",
       "genre": "Strategy",
       "publisher": "Square Enix",
-      "release_date": "",
+      "release_date": "2003-06-26",
       "serial": "SLPM-61050"
     },
     "Happiness! De-Lucks (JP)": {
@@ -9778,7 +9778,7 @@
       "developer": "Ruby Party",
       "genre": "Sports",
       "publisher": "Konami",
-      "release_date": "",
+      "release_date": "2005-09-22",
       "serial": "SLPM-66099"
     },
     "Harukanaru Toki no Naka de 3: Unmei no Labyrinth (JP)": {
@@ -9789,7 +9789,7 @@
       "developer": "Ruby Party",
       "genre": "Adventure/RPG",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2006-03-23",
       "serial": "SLPM-66344"
     },
     "Harukanaru Toki no Naka de 4 (JP)": {
@@ -9799,7 +9799,7 @@
       "developer": "Ruby Party",
       "genre": "Adventure/RPG",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2008-06-19",
       "serial": "SLPM-66951"
     },
     "Harukanaru Toki no Naka de 4 [Koei the Best] (JP)": {
@@ -9826,7 +9826,7 @@
       "developer": "Ruby Party",
       "genre": "Adventure/RPG",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2006-12-14",
       "serial": "SLPM-65957"
     },
     "Harukanaru Toki no Naka de: Hachiyoushou (JP)": {
@@ -9854,7 +9854,7 @@
       "developer": "Ruby Party",
       "genre": "Adventure/RPG",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2009-01-29",
       "serial": "SLPM-55137"
     },
     "Harukaze P. S.: Plus Situation (JP)": {
@@ -10205,7 +10205,7 @@
       "developer": "D3 Publisher",
       "genre": "Casino",
       "publisher": "D3 Publisher",
-      "release_date": "",
+      "release_date": "2008-12-04",
       "serial": "SLPS-25813"
     },
     "Hisshou Pachinko Pachi-Slot Kouryaku Series Vol. 12: CR Shin Seiki Evangelion: Shito, Futatabi (JP)": {
@@ -10883,10 +10883,10 @@
         "SLPM-66184",
         "SLPM-74227"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Genki",
+      "genre": "Action",
+      "publisher": "Genki Co. Ltd.",
+      "release_date": "2005-11-24",
       "serial": "SLPM-61130"
     },
     "Ikuze! Onsen Takkyuu! (Psykio Best) (JP)": {
@@ -10902,9 +10902,9 @@
         "SLPS-20303",
         "SLPS-20499"
       ],
-      "developer": "",
+      "developer": "Polygon Magic",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Marvelous Entertainment",
       "release_date": "2002-09-12",
       "serial": "SLPS-20222"
     },
@@ -10918,7 +10918,7 @@
       "developer": "e Frontier",
       "genre": "Action/Educational",
       "publisher": "SunSoft",
-      "release_date": "",
+      "release_date": "2003-06-24",
       "serial": "SLPM-60204"
     },
     "Initial D: Takahashi Ryosuke no Typing Saisoku Riron (JP)": {
@@ -11442,10 +11442,10 @@
       "alt_serials": [
         "SLPM-65317"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Diamond Head",
+      "genre": "Sports",
+      "publisher": "Konami",
+      "release_date": "2003-07-17",
       "serial": "SLPM-61053"
     },
     "Jikkyou Powerful Pro Yakyuu 10: Chou Ketteiban: 2003 Memorial (JP)": {
@@ -11532,10 +11532,10 @@
       "alt_serials": [
         "SLPM-55416"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Pawapuro Production",
+      "genre": "Sports",
+      "publisher": "Konami Digital Entertainment",
+      "release_date": "2009-03-19",
       "serial": "SLPM-55146"
     },
     "Jikkyou Powerful Pro Yakyuu 7 (JP)": {
@@ -11717,7 +11717,7 @@
       "developer": "Sammy",
       "genre": "Gambling",
       "publisher": "Sammy",
-      "release_date": "",
+      "release_date": "2006-08-03",
       "serial": "SLPM-60277"
     },
     "Jissen Pachi-Slot Hisshouhou! Juuou (JP)": {
@@ -11908,10 +11908,10 @@
       "alt_serials": [
         "SLPM-65140"
       ],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Action",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Capcom",
+      "release_date": "2002-07-25",
       "serial": "SLPM-61030"
     },
     "Jojo no Kimyou na Bouken: Phantom Blood (JP)": {
@@ -12012,10 +12012,10 @@
       "alt_serials": [
         "SLPM-65796"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "WOW Entertainment",
+      "genre": "Action, Beat'em Up",
+      "publisher": "Sega",
+      "release_date": "2005-01-27",
       "serial": "SLPM-61100"
     },
     "K-1 Premium 2004 Dynamite!! (JP)": {
@@ -12814,10 +12814,10 @@
         "SLPM-65700",
         "SLPM-74220"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "LightWeight Co., Ltd",
+      "genre": "Fighting",
+      "publisher": "Genki",
+      "release_date": "2004-09-22",
       "serial": "SLPM-61086"
     },
     "Kenka Banchou (JP)": {
@@ -13153,7 +13153,7 @@
       "developer": "Bandai",
       "genre": "Action",
       "publisher": "Bandai",
-      "release_date": "",
+      "release_date": "2005-02-17",
       "serial": "SLPS-25061"
     },
     "Kidou Senshi Z Gundam: A.E.U.G. vs. Titans (JP)": {
@@ -13831,7 +13831,7 @@
       "developer": "Eighting",
       "genre": "Fighting",
       "publisher": "Bandai",
-      "release_date": "",
+      "release_date": "2005-12-15",
       "serial": "SLPS-25594"
     },
     "Konjiki no Gashbell!! Yuujou Tag Battle (JP)": {
@@ -15073,7 +15073,7 @@
       "developer": "",
       "genre": "Strategy",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2003-11-13",
       "serial": "SLPS-20134"
     },
     "Mahjong Haou: Shinken Battle (JP)": {
@@ -15362,10 +15362,10 @@
       "alt_serials": [
         "SLPM-65367"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Capcom",
+      "genre": "Action, Platformer",
+      "publisher": "Capcom",
+      "release_date": "2003-09-18",
       "serial": "SLPM-60212"
     },
     "Makai Senki Disgaea (JP)": {
@@ -16762,7 +16762,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2009-07-23",
       "serial": "SLPM-66721"
     },
     "Musou Orochi (Playstation 2 The Best Reprint) (JP)": {
@@ -17117,10 +17117,10 @@
       "alt_serials": [
         "SLPM-65362"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "TOSE",
+      "genre": "RPG",
+      "publisher": "Taito Corporation",
+      "release_date": "2003-09-18",
       "serial": "SLPM-61056"
     },
     "NHL 06 (JP)": {
@@ -17692,7 +17692,7 @@
       "developer": "SNK Playmore",
       "genre": "Fighting",
       "publisher": "SNK Playmore",
-      "release_date": "",
+      "release_date": "2006-04-20",
       "serial": "SLPS-25535"
     },
     "NeoGeo Online Collection Vol. 4: Ryuuko no Ken: Ten Chi Jin (JP)": {
@@ -17956,9 +17956,9 @@
         "SLPM-66274"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2006-03-02",
       "serial": "SLPM-61144"
     },
     "Nishikaze no Kyoushikyouku: The Rhapsody of Zephyr (JP)": {
@@ -18764,9 +18764,9 @@
         "SLPS-20463"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2006-04-20",
       "serial": "SLPS-20462"
     },
     "Ouka: Kokoro Kagayakaseru Sakura (JP)": {
@@ -19379,7 +19379,7 @@
       ],
       "developer": "",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Interchannel",
       "release_date": "2003-03-27",
       "serial": "SLPS-25221"
     },
@@ -20089,7 +20089,7 @@
       "developer": "Yuke's Co. Ltd",
       "genre": "Driving, Racing",
       "publisher": "Yuke's Company of America",
-      "release_date": "",
+      "release_date": "2005-10-20",
       "serial": "SLPM-60270"
     },
     "Project Arms (JP)": {
@@ -21286,7 +21286,7 @@
       "developer": "Sega CS1",
       "genre": "Action-Adventure",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2006-10-26",
       "serial": "SLPM-61140"
     },
     "Ryuu ga Gotoku 2 (Disc 2) (JP)": {
@@ -21304,7 +21304,7 @@
       "developer": "Sega CS1",
       "genre": "Action-Adventure",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2007-12-05",
       "serial": "SLPM-61154"
     },
     "Ryuuko no Ken: Ten-Chi-Jin [SNK Best Collection] (JP)": {
@@ -21782,7 +21782,7 @@
       "developer": "Overworks",
       "genre": "Adventure",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2005-07-07",
       "serial": "SLPM-62598"
     },
     "Sakura Taisen: Atsuki Chishio ni (JP)": {
@@ -21912,10 +21912,10 @@
       "alt_serials": [
         "SLPM-65755"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Acquire",
+      "genre": "Action, Beat'em Up",
+      "publisher": "Spike",
+      "release_date": "2005-01-01",
       "serial": "SLPM-61104"
     },
     "Samurai-dou 2: Kettouban (JP)": {
@@ -22010,7 +22010,7 @@
       "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2003-10-02",
       "serial": "SLPM-65093"
     },
     "Sangokushi Senki 2 (JP)": {
@@ -22020,7 +22020,7 @@
       "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2003-06-26",
       "serial": "SLPM-65247"
     },
     "Sangokushi Senki 2: Koei Teiban Series (JP)": {
@@ -22056,7 +22056,7 @@
       "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2002-04-19",
       "serial": "SLPM-62010"
     },
     "Sangokushi VIII (JP)": {
@@ -22069,7 +22069,7 @@
       "developer": "Koei",
       "genre": "Strategy",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2002-04-19",
       "serial": "SLPM-62131"
     },
     "Sangokushi VIII With Power-Up Kit (JP)": {
@@ -22335,9 +22335,9 @@
         "SLPM-66685"
       ],
       "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "genre": "Simulation",
+      "publisher": "Sega",
+      "release_date": "2007-10-18",
       "serial": "SLPM-61163"
     },
     "Seaman: Kindan no Pet: Gaze Hakushi no Jikken Shima (JP)": {
@@ -22995,7 +22995,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2007-10-04",
       "serial": "SLPM-65718"
     },
     "Sengoku Musou: Premium Pack (JP)": {
@@ -23567,7 +23567,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2002-08-29",
       "serial": "SLPM-65170"
     },
     "Shin Sangoku Musou 2: Mushouden (Koei The Best) (JP)": {
@@ -23642,7 +23642,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2004-03-18",
       "serial": "SLPM-65376"
     },
     "Shin Sangoku Musou 4 & Shin Sangoku Musou 4: Moushouden Saikyou Data (JP)": {
@@ -23662,7 +23662,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2006-10-12",
       "serial": "SLPM-65890"
     },
     "Shin Sangoku Musou 4 (Treasure Box) (JP)": {
@@ -23691,7 +23691,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2006-03-23",
       "serial": "SLPM-55048"
     },
     "Shin Sangoku Musou 4: Moushouden (JP)": {
@@ -23714,7 +23714,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2010-09-02",
       "serial": "SLPM-55082"
     },
     "Shin Sangoku Musou 5 Special (Disc 2) (JP)": {
@@ -23724,7 +23724,7 @@
       "developer": "Omega Force",
       "genre": "Action",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2010-09-02",
       "serial": "SLPM-55083"
     },
     "Shin Sangoku Musou Series Collection Gekan Saikyou Data (JP)": {
@@ -23764,9 +23764,9 @@
         "SLPM-66957"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Fighting",
       "publisher": "",
-      "release_date": "",
+      "release_date": "2008-03-13",
       "serial": "SLPM-66763"
     },
     "Shin Seiki Evangelion: Koutetsu no Girlfriend 2nd (JP)": {
@@ -23851,7 +23851,7 @@
       "developer": "Idea Factory",
       "genre": "RPG",
       "publisher": "Idea Factory",
-      "release_date": "",
+      "release_date": "2003-10-30",
       "serial": "SLPM-65390"
     },
     "Shinki Gensou: Spectral Souls II (JP)": {
@@ -23982,10 +23982,10 @@
       "alt_serials": [
         "SLPM-65823"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Red Entertainment",
+      "genre": "Action",
+      "publisher": "Sega",
+      "release_date": "2005-02-10",
       "serial": "SLPM-61101"
     },
     "Shinten Makai: Generation of Chaos IV (JP)": {
@@ -24259,7 +24259,7 @@
       ],
       "developer": "",
       "genre": "Flight Simulator",
-      "publisher": "",
+      "publisher": "Asmik Ace Entertainment, Inc.",
       "release_date": "2000-12-07",
       "serial": "SLPS-25018"
     },
@@ -26684,9 +26684,9 @@
       "alt_serials": [
         "SLPM-66670"
       ],
-      "developer": "",
+      "developer": "Atlus",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Atlus",
       "release_date": "2004-10-26",
       "serial": "SLPM-65685"
     },
@@ -26739,7 +26739,7 @@
       "developer": "Capcom",
       "genre": "Fighting",
       "publisher": "Capcom",
-      "release_date": "",
+      "release_date": "2006-12-11",
       "serial": "SLPM-65621"
     },
     "Street Fighter Zero: Fighter's Generation (JP)": {
@@ -27060,7 +27060,7 @@
       "developer": "Banpresto",
       "genre": "Strategy",
       "publisher": "Banpresto",
-      "release_date": "",
+      "release_date": "2002-03-28",
       "serial": "SLPS-25103"
     },
     "Super Robot Taisen MX (JP)": {
@@ -28326,9 +28326,9 @@
       "alt_serials": [
         "SLPS-73226"
       ],
-      "developer": "",
+      "developer": "K2 LLC",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "FromSoftware",
       "release_date": "2004-07-22",
       "serial": "SLPS-25384"
     },
@@ -28519,7 +28519,7 @@
       "developer": "Koei",
       "genre": "Sports",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2005-06-30",
       "serial": "SLPM-65756"
     },
     "Tennis no Oujisama: Saikyou Team o Kessei seyo! (JP)": {
@@ -28544,7 +28544,7 @@
       "developer": "Koei",
       "genre": "Sports",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2003-07-24",
       "serial": "SLPM-60208"
     },
     "Tennis no Oujisama: Smash Hit! 2 (JP)": {
@@ -28568,7 +28568,7 @@
       "developer": "Koei",
       "genre": "Sports",
       "publisher": "Koei",
-      "release_date": "",
+      "release_date": "2003-12-18",
       "serial": "SLPM-62434"
     },
     "Tennis no Oujisama: Smash Hit! Original Anime Game (JP)": {
@@ -28793,7 +28793,7 @@
       "developer": "Konami",
       "genre": "Sports",
       "publisher": "Konami",
-      "release_date": "",
+      "release_date": "2003-03-20",
       "serial": "SLPM-61042"
     },
     "The Baseball 2003: Battle Ball Park Sengen: Perfect Play Pro Yakyuu: Shuukigou (JP)": {
@@ -28938,7 +28938,7 @@
       "developer": "SNK Playmore",
       "genre": "Fighting",
       "publisher": "SNK Playmore",
-      "release_date": "",
+      "release_date": "2004-12-28",
       "serial": "SLPS-25448"
     },
     "The King of Fighters 2000 (JP)": {
@@ -29160,10 +29160,10 @@
       "alt_serials": [
         "SLPM-62566"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Sega",
+      "genre": "Action, Educational",
+      "publisher": "Sega",
+      "release_date": "2004-12-22",
       "serial": "SLPM-60258"
     },
     "The Urbz: Sims in the City (JP)": {
@@ -29290,7 +29290,7 @@
       "developer": "Capcom Co., Ltd",
       "genre": "Action/Beat'em Up",
       "publisher": "Capcom",
-      "release_date": "",
+      "release_date": "2004-10-21",
       "serial": "SLPM-61090"
     },
     "Time Crisis 2 & Vampire Night (JP)": {
@@ -30444,7 +30444,7 @@
       "developer": "Team Digi",
       "genre": "Mahjong",
       "publisher": "DigiCube",
-      "release_date": "",
+      "release_date": "2003-11-27",
       "serial": "SLPS-25323"
     },
     "Utawareru Mono: Chiri Yuku Mono e no Komori-uta (JP)": {
@@ -30679,7 +30679,7 @@
       "developer": "Sega AM2",
       "genre": "Fighting",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2004-08-26",
       "serial": "SLPM-60242"
     },
     "Virtual View: Megumi Eizou Play (JP)": {
@@ -31118,9 +31118,9 @@
         "SLPM-62299",
         "SLPM-62567"
       ],
-      "developer": "",
+      "developer": "Omega Force",
       "genre": "Third-person Shooter",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2000-12-21",
       "serial": "SLPM-62023"
     },
@@ -31925,10 +31925,10 @@
       "alt_serials": [
         "SLPM-62051"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "CAVE Co., Ltd",
+      "genre": "Skateboarding",
+      "publisher": "Koei",
+      "release_date": "2001-07-05",
       "serial": "SLPM-60148"
     },
     "Yatohime Zankikou (Limited Edition) (JP)": {
@@ -32029,10 +32029,10 @@
       "alt_serials": [
         "SLPS-25523"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Dream Factory",
+      "genre": "Action",
+      "publisher": "Banpresto",
+      "release_date": "2005-12-01",
       "serial": "SLPS-25522"
     },
     "Yotsunoha: A Journey of Sincerity (JP)": {
@@ -32465,9 +32465,9 @@
       "alt_serials": [
         "SLPM-66725"
       ],
-      "developer": "",
+      "developer": "Eighting",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Takara Tomy",
       "release_date": "2004-11-18",
       "serial": "SLPM-65748"
     },
