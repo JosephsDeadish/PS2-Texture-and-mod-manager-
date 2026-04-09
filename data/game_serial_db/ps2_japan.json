@@ -2273,10 +2273,10 @@
     },
     "Bomberman Land 2: Game Shijou Saidai no Theme Park (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Action",
-      "publisher": "",
-      "release_date": "",
+      "publisher": "Hudson Soft",
+      "release_date": "2004-08-05",
       "serial": "SLPS-74101"
     },
     "Bomberman Land 3 (Hudson Best) (JP)": {
@@ -2299,9 +2299,9 @@
     },
     "Bomberman Land 3: Hudson the Best (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Racjin",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Hudson Soft",
       "release_date": "2007-02-22",
       "serial": "SLPM-62763"
     },
@@ -2594,7 +2594,7 @@
       "developer": "Racjin",
       "genre": "RPG",
       "publisher": "Atlus",
-      "release_date": "",
+      "release_date": "2001-11-15",
       "serial": "SLPM-74007"
     },
     "Busou Renkin: Youkoso Papillon Park e (JP)": {
@@ -6217,19 +6217,19 @@
     },
     "Extermination (Playstation 2 The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Deep Space",
+      "genre": "Action",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2001-03-08",
       "serial": "SCPS-19002"
     },
     "EyeToy: Furi Furi Dance Tengoku (JP)": {
       "alt_serials": [
         "SCPS-15076"
       ],
-      "developer": "",
+      "developer": "SCE London Studio",
       "genre": "Rhythm",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment America",
       "release_date": "",
       "serial": "SCPS-15073"
     },
@@ -6248,7 +6248,7 @@
       "developer": "SCE London Studio",
       "genre": "Party",
       "publisher": "Sony Computer Entertainment America",
-      "release_date": "",
+      "release_date": "2004-02-11",
       "serial": "SCPS-19315"
     },
     "EyeToy: Play 2 (JP)": {
@@ -7598,9 +7598,9 @@
     },
     "GUNPARADE ORCHESTRA: MIDORI NO SHOU [LIMITED EDITION] (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Alfa System",
+      "genre": "Action/Adventure/Simulation",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "",
       "serial": "SCPS-15107"
     },
@@ -11916,9 +11916,9 @@
     },
     "Jojo no Kimyou na Bouken: Phantom Blood (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Capcom",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Capcom",
       "release_date": "2006-10-26",
       "serial": "SLPS-25686"
     },
@@ -13113,7 +13113,7 @@
       "alt_serials": [],
       "developer": "",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "",
       "serial": "SLPS-25419"
     },
@@ -17283,9 +17283,9 @@
     },
     "Naruto: Konoha Spirits!! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "CyberConnect2",
       "genre": "",
-      "publisher": "",
+      "publisher": "Namco Bandai",
       "release_date": "",
       "serial": "SLPS-25714"
     },
@@ -19961,9 +19961,9 @@
     },
     "Pro Yakyuu Spirits 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-65929"
     },
@@ -20025,9 +20025,9 @@
     },
     "Pro Yakyuu Spirits 6 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "",
       "serial": "SLPM-55158"
     },
@@ -20689,7 +20689,7 @@
       "developer": "Insomniac Games",
       "genre": "Platformer",
       "publisher": "Sony Computer Entertainment Inc.",
-      "release_date": "",
+      "release_date": "2002-12-03",
       "serial": "SCPS-19310"
     },
     "Rayman Revolution (JP)": {
@@ -21445,10 +21445,10 @@
     },
     "SSX On Tour (EA Best Hits) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "EA Canada",
+      "genre": "Sports",
+      "publisher": "EA Sports",
+      "release_date": "2005-10-11",
       "serial": "SLPM-66601"
     },
     "SSX Tricky (JP)": {
@@ -21754,7 +21754,7 @@
       "developer": "Overworks",
       "genre": "Adventure",
       "publisher": "Sega",
-      "release_date": "",
+      "release_date": "2005-02-24",
       "serial": "SLPM-55043"
     },
     "Sakura Taisen Monogatari: Mysterious Paris (JP)": {
@@ -27646,10 +27646,10 @@
     },
     "THREAD COLORS: SAYONARA NO MUKOUGAWA [LIMITED EDITION] (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "HuneX",
+      "genre": "Adventure",
+      "publisher": "D3Publisher",
+      "release_date": "2002-11-14",
       "serial": "SLPM-65186"
     },
     "TOCA Race Driver 2: Ultimate Racing Simulator (JP)": {
@@ -27787,7 +27787,7 @@
       "developer": "Namco",
       "genre": "Rhythm",
       "publisher": "Namco",
-      "release_date": "",
+      "release_date": "2003-10-30",
       "serial": "SLPS-73110"
     },
     "Taiko no Tatsujin: Atsumare! Matsuri da!! Yondaime (JP)": {
@@ -29736,7 +29736,7 @@
       "developer": "Sony Computer Entertainment Inc.",
       "genre": "Adventure",
       "publisher": "Sony Computer Entertainment Inc.",
-      "release_date": "",
+      "release_date": "2001-11-29",
       "serial": "SCPS-19212"
     },
     "Toro to Kyuujitsu: PlayStation 2 the Best (JP)": {
@@ -31144,10 +31144,10 @@
     },
     "Winback (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
-      "release_date": "",
+      "developer": "Omega Force",
+      "genre": "Third-person Shooter",
+      "publisher": "Koei",
+      "release_date": "2000-12-21",
       "serial": "SLPM-64502"
     },
     "Wind: A Breath of Heart (JP)": {
