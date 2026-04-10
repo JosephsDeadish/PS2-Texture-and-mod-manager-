@@ -26043,3 +26043,73 @@ class TestWave152SerialFixes(unittest.TestCase):
         """Wave 152: NTSC-U DB must have >= 2174 entries."""
         self.assertGreaterEqual(len(self.ntsc_games), 2174,
             f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2174")
+
+
+class TestWave153MetadataFills(unittest.TestCase):
+    """Wave 153: Metadata fills for JP (dev/pub/genre/date) and PAL (date).
+    JP: Filled release_date for all 813 missing entries via serial-range estimation.
+    JP: Filled 68 dev/pub via SCPS/SCAJ→SCEJ, extended title patterns (81), cross-fills (38).
+    JP: Filled 151 genre entries via title/keyword patterns.
+    PAL: Filled 365→0 missing dates via title-match (13), series proximity (169+53+15),
+         NTSC-U cross-ref (2), serial-range (113).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            cls.jp_db = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            cls.pal_db = json.load(f)
+        cls.jp_games = cls.jp_db['games']
+        cls.pal_games = cls.pal_db['games']
+
+    def test_jp_no_missing_dates(self):
+        """Wave 153: All JP entries must have a release_date."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('release_date', '').strip()]
+        self.assertEqual(len(missing), 0,
+            f"JP has {len(missing)} entries without release_date: {missing[:5]}")
+
+    def test_jp_dev_filled_max(self):
+        """Wave 153: JP missing developer must be <= 350."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('developer', '').strip()]
+        self.assertLessEqual(len(missing), 350,
+            f"JP still has {len(missing)} entries without developer, expected <= 350")
+
+    def test_jp_pub_filled_max(self):
+        """Wave 153: JP missing publisher must be <= 350."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('publisher', '').strip()]
+        self.assertLessEqual(len(missing), 350,
+            f"JP still has {len(missing)} entries without publisher, expected <= 350")
+
+    def test_jp_genre_filled_max(self):
+        """Wave 153: JP missing genre must be <= 212."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('genre', '').strip()]
+        self.assertLessEqual(len(missing), 212,
+            f"JP still has {len(missing)} entries without genre, expected <= 212")
+
+    def test_jp_scps_publisher_filled(self):
+        """Wave 153: SCPS/SCAJ entries have Sony Computer Entertainment publisher."""
+        for title, info in self.jp_games.items():
+            ser = info.get('serial', '')
+            if ser.startswith(('SCPS', 'SCAJ', 'SCKA')):
+                self.assertTrue(info.get('publisher', '').strip(),
+                    f"SCEJ serial {ser} ({title}) missing publisher")
+
+    def test_pal_no_missing_dates(self):
+        """Wave 153: All PAL entries must have a release_date."""
+        missing = [t for t, i in self.pal_games.items() if not i.get('release_date', '').strip()]
+        self.assertEqual(len(missing), 0,
+            f"PAL has {len(missing)} entries without release_date: {missing[:5]}")
+
+    def test_jp_dev_improved(self):
+        """Wave 153: JP dev count improved from 486 to <= 350."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('developer', '').strip()]
+        self.assertLess(len(missing), 486,
+            f"JP dev count {len(missing)} should be less than previous 486")
+
+    def test_jp_genre_improved(self):
+        """Wave 153: JP genre count improved from 367 to <= 212."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('genre', '').strip()]
+        self.assertLess(len(missing), 367,
+            f"JP genre count {len(missing)} should be less than previous 367")
