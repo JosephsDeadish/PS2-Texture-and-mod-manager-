@@ -8730,7 +8730,7 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
 
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.data), 2174)
+        self.assertGreaterEqual(len(self.data), 2173)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8819,7 +8819,7 @@ class TestWave47NewGames(unittest.TestCase):
 
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.games), 2174)
+        self.assertGreaterEqual(len(self.games), 2173)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9157,9 +9157,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count >= 2174 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148)."""
+        """Wave 49: serial DB game count >= 2173 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155)."""
         self.assertGreaterEqual(
-            len(self.games), 2174,
+            len(self.games), 2173,
             f"Serial DB game count too low: {len(self.games)}"
         )
 
@@ -9381,7 +9381,7 @@ class TestWave50VersionLabels(unittest.TestCase):
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
         """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2174)
+        self.assertGreaterEqual(len(self.raw_games), 2173)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9586,7 +9586,7 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2174)
+        self.assertGreaterEqual(len(self.raw_games), 2173)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9774,7 +9774,7 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
 
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2174)
+        self.assertGreaterEqual(len(self.raw_games), 2173)
 
 
 # ===========================================================================
@@ -20170,7 +20170,7 @@ class TestWave108DbSerialFixes(unittest.TestCase):
 
     def test_ntsc_db_count(self):
         """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json."""
-        self.assertGreaterEqual(len(self.ntsc), 2174)
+        self.assertGreaterEqual(len(self.ntsc), 2173)
 
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
@@ -21788,8 +21788,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
             f"JP DB has only {len(self.jp)} entries, expected >= 3500")
 
     def test_ntsc_u_db_minimum_entries(self):
-        self.assertGreaterEqual(len(self.ntsc), 2174,
-            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2174")
+        self.assertGreaterEqual(len(self.ntsc), 2173,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2173")
 
     # ── All entries have non-empty serial ─────────────────────────────────────
 
@@ -26040,9 +26040,9 @@ class TestWave152SerialFixes(unittest.TestCase):
             "Simpsons Road Rage must have SLUS-20139 as alt_serial")
 
     def test_ntsc_count_wave152(self):
-        """Wave 152: NTSC-U DB must have >= 2174 entries."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2174,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2174")
+        """Wave 152: NTSC-U DB must have >= 2173 entries (Naruto UN5 dupe removed in Wave 155)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2173,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2173")
 
 
 class TestWave153MetadataFills(unittest.TestCase):
