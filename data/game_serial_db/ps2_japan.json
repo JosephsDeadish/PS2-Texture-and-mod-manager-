@@ -120,9 +120,9 @@
     },
     "10th Anniversary Memorial Save Data (Disc 2) (PlayStation 2 Taiou) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Compilation",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SLPM-60262"
     },
@@ -162,9 +162,9 @@
     },
     "2003-nen Kaimaku: Ganbare Kyuukai-ou: Iwayuru Pro Yakyuu desu ne (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2001",
       "serial": "SLPM-62320"
     },
@@ -251,7 +251,7 @@
         "SLPS-25175"
       ],
       "developer": "Artdink",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "Artdink",
       "release_date": "2002",
       "serial": "SLPS-25017"
@@ -259,7 +259,7 @@
     "A Taiheiyou no Arashi: Senkan Yamatokatsuki ni Shutsugeki su! (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Strategy",
       "publisher": "",
       "release_date": "2007",
       "serial": "SLPS-25954"
@@ -276,9 +276,9 @@
       "alt_serials": [
         "SLPM-65086"
       ],
-      "developer": "",
+      "developer": "Avex",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Avex",
       "release_date": "2002",
       "serial": "SLPS-25071"
     },
@@ -286,16 +286,16 @@
       "alt_serials": [
         "SLPM-65087"
       ],
-      "developer": "",
+      "developer": "Avex",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Avex",
       "release_date": "2002",
       "serial": "SLPS-25072"
     },
     "A-Ressha de Ikou 2001 Perfect Set (JP)": {
       "alt_serials": [],
       "developer": "Artdink",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "Artdink",
       "release_date": "2002",
       "serial": "SLPS-25082"
@@ -327,7 +327,7 @@
     "AH-64D Apache (JP)": {
       "alt_serials": [],
       "developer": "Titus Software",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Titus Software",
       "release_date": "2001",
       "serial": "SLPS-20000"
@@ -359,7 +359,7 @@
     "Aa Megami-sama (JP)": {
       "alt_serials": [],
       "developer": "Bandai",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Bandai",
       "release_date": "2006",
       "serial": "SLPS-25894"
@@ -367,7 +367,7 @@
     "Aa! Megami-sama (JP)": {
       "alt_serials": [],
       "developer": "Bandai",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Bandai",
       "release_date": "2006",
       "serial": "SLPS-25743"
@@ -375,7 +375,7 @@
     "Aa! Megami-sama [Limited Edition] (JP)": {
       "alt_serials": [],
       "developer": "Bandai",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Bandai",
       "release_date": "2006",
       "serial": "SLPS-25742"
@@ -1293,7 +1293,7 @@
     "Artlist Collection: The Dog Island: Hitotsu no Hana no Monogatari (JP)": {
       "alt_serials": [],
       "developer": "Artlist Japan",
-      "genre": "",
+      "genre": "Simulation",
       "publisher": "Artlist Japan",
       "release_date": "2006",
       "serial": "SLPM-66662"
@@ -1481,9 +1481,9 @@
     },
     "Bakusou Convoy Densetsu: Otoko Hanamichi America Roman (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Racing",
+      "publisher": "Konami",
       "release_date": "2001",
       "serial": "SLPM-62378"
     },
@@ -1574,7 +1574,7 @@
     "Basic Studio: Powerful Game Koubou (Disc 1) (Basic Studio Disc) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Tool",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPS-20084"
@@ -1582,23 +1582,23 @@
     "Basic Studio: Powerful Game Koubou (Disc 2) (Play Disc) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Tool",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPS-20085"
     },
     "Baskelian (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Kemco",
+      "genre": "Sports",
+      "publisher": "Kemco",
       "release_date": "2001",
       "serial": "SLPS-20266"
     },
     "Bass Landing 3  With Tsuricon 2+(Sammy Best) (JP)": {
       "alt_serials": [],
       "developer": "Team Ico",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2004",
       "serial": "SLPS-25336"
@@ -1608,9 +1608,9 @@
         "SLPM-66075",
         "SLPS-25337"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Ascii",
+      "genre": "Sports",
+      "publisher": "Ascii",
       "release_date": "2003",
       "serial": "SLPS-25213"
     },
@@ -2037,7 +2037,7 @@
     "Blokus Club with Bumpy Trot (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Puzzle",
       "publisher": "",
       "release_date": "2002",
       "serial": "SLPS-20443"
@@ -2458,9 +2458,9 @@
     },
     "Brother in Arms: Road to Hill 30 (Ubisof Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Gearbox Software",
+      "genre": "Action",
+      "publisher": "Ubisoft",
       "release_date": "2005",
       "serial": "SLPM-66568"
     },
@@ -2602,7 +2602,7 @@
         "SLPS-25877"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
       "release_date": "2006",
       "serial": "SLPS-25764"
@@ -2626,7 +2626,7 @@
     "C@M-Station (With Eye-Toy & USB Headset) (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "",
       "release_date": "2002",
       "serial": "SLPS-20406"
@@ -2634,7 +2634,7 @@
     "C@m Station (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "",
       "release_date": "2002",
       "serial": "SLPS-20418"
@@ -2695,9 +2695,9 @@
       "alt_serials": [
         "SLPM-66265"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Marvelous Interactive",
+      "genre": "Adventure",
+      "publisher": "Marvelous Interactive",
       "release_date": "2005",
       "serial": "SLPM-66264"
     },
@@ -2766,9 +2766,9 @@
     },
     "Card Captor Sakura: Sakura-chan to Asobo! (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Kadokawa",
+      "genre": "Adventure",
+      "publisher": "Kadokawa",
       "release_date": "2002",
       "serial": "SLPS-20408"
     },
@@ -2893,7 +2893,7 @@
         "SCPS-11015"
       ],
       "developer": "Sony Computer Entertainment Japan",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SCPS-11011"
@@ -2996,7 +2996,7 @@
     "Choro Q: HG (JP)": {
       "alt_serials": [],
       "developer": "Takara",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "Atlus",
       "release_date": "2002",
       "serial": "SLPS-25015"
@@ -3004,7 +3004,7 @@
     "Choro Q: HG 4 (JP)": {
       "alt_serials": [],
       "developer": "Takara",
-      "genre": "",
+      "genre": "Racing",
       "publisher": "Atlus",
       "release_date": "2003",
       "serial": "SLPM-65326"
@@ -3100,7 +3100,7 @@
         "SLPS-20169"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPS-20127"
@@ -3134,9 +3134,9 @@
     },
     "Cinema Surfing: Youga Taizen (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Other",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SLPS-25073"
     },
@@ -3262,7 +3262,7 @@
     "Coloball 2002 (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPS-20202"
@@ -3291,7 +3291,7 @@
     "Colorio Hagaki Print (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPS-20056"
@@ -3368,9 +3368,9 @@
     },
     "Cool Shot: Yukawa Keiko no Professional Billiard (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Syscom Entertainment",
+      "genre": "Sports",
+      "publisher": "Syscom Entertainment",
       "release_date": "2001",
       "serial": "SLPS-20256"
     },
@@ -3499,16 +3499,16 @@
     "Critical Bullet: 7th Target (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Action",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPM-62212"
     },
     "Critical Velocity (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Racing",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "2005-10-13",
       "serial": "SLPS-25532"
     },
@@ -3559,7 +3559,7 @@
         "SLPM-74411"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Card Game",
       "publisher": "",
       "release_date": "2003",
       "serial": "SLPM-65179"
@@ -3575,7 +3575,7 @@
     "Cyber Jansou: Toufuusou-hen (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Mahjong",
       "publisher": "",
       "release_date": "2001",
       "serial": "SLPM-62140"
@@ -3591,7 +3591,7 @@
     "D → A: Black (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "",
       "release_date": "2003",
       "serial": "SLPS-25292"
@@ -3599,24 +3599,24 @@
     "D → A: White (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "",
       "release_date": "2004-12-02",
       "serial": "SLPS-25438"
     },
     "D-A: Black (Best Prize) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Marvelous",
       "release_date": "2005",
       "serial": "SLPS-25618"
     },
     "D-A: Black (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Marvelous",
       "genre": "Adventure",
-      "publisher": "",
+      "publisher": "Marvelous",
       "release_date": "2003-12-25",
       "serial": "SLPS-25288"
     },
@@ -3625,7 +3625,7 @@
         "SLPS-25619"
       ],
       "developer": "",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "",
       "release_date": "2004",
       "serial": "SLPS-25437"
@@ -3667,7 +3667,7 @@
     "D.C.I.F.: Da Capo: Innocent Finale (JP)": {
       "alt_serials": [],
       "developer": "Circus",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Kadokawa Shoten",
       "release_date": "2001",
       "serial": "SLPM-55156"
@@ -3712,9 +3712,9 @@
     },
     "D.Gray-man: Sousha no Shikaku (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Namco Bandai",
+      "genre": "Action",
+      "publisher": "Namco Bandai",
       "release_date": "2001",
       "serial": "SLPM-55060"
     },
@@ -3771,7 +3771,7 @@
         "SCPS-15082"
       ],
       "developer": "Sony Computer Entertainment Japan",
-      "genre": "",
+      "genre": "Music",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SCPS-15075"
@@ -3840,17 +3840,17 @@
     },
     "Daisan Teikoku Koubouki II: Aufstieg und Fall des Dritten Reiches (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "2005",
       "serial": "SLPM-66050"
     },
     "Daisan Teikoku Koubouki: Aufstieg und Fall des Dritten Reiches (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "2002",
       "serial": "SLPM-62458"
     },
@@ -4909,9 +4909,9 @@
     },
     "Disney Princess: Mahou no Sekai e (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Buena Vista Games",
+      "genre": "Adventure",
+      "publisher": "Buena Vista Games",
       "release_date": "2006",
       "serial": "SLPM-66902"
     },
@@ -4926,7 +4926,7 @@
     "Disney's Donald Duck: Rescue Daisakusen!! (JP)": {
       "alt_serials": [],
       "developer": "Ubisoft Montreal Studios",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Ubisoft, Disney Interactive",
       "release_date": "2001",
       "serial": "SLPS-20070"
@@ -4936,7 +4936,7 @@
         "SLPM-25153"
       ],
       "developer": "Ubisoft Montreal Studios",
-      "genre": "",
+      "genre": "Adventure",
       "publisher": "Ubisoft, Disney Interactive",
       "release_date": "2003",
       "serial": "SLPS-25153"
@@ -5549,9 +5549,9 @@
     },
     "Duel Masters: Birth of Super Dragon (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Takara Tomy",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Takara Tomy",
       "release_date": "2004",
       "serial": "SLPM-65882"
     },
@@ -5593,25 +5593,25 @@
       "alt_serials": [
         "SLPM-62111"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "I-O Data",
+      "genre": "Other",
+      "publisher": "I-O Data",
       "release_date": "2001",
       "serial": "SLPM-62068"
     },
     "EGBrowser BB (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "I-O Data",
+      "genre": "Other",
+      "publisher": "I-O Data",
       "release_date": "2001",
       "serial": "SLPM-62176"
     },
     "EGBrowser Light for I-O Data Device, Inc. (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "I-O Data",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "I-O Data",
       "release_date": "2001-04-12",
       "serial": "SLPM-69004"
     },
@@ -5665,9 +5665,9 @@
     },
     "EX Billiards (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Syscom Entertainment",
+      "genre": "Sports",
+      "publisher": "Syscom Entertainment",
       "release_date": "2001",
       "serial": "SLPS-20005"
     },
@@ -5765,65 +5765,65 @@
       "alt_serials": [
         "SLPS-20274"
       ],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2001",
       "serial": "SLPS-20184"
     },
     "Eikan wa Kimi ni 2004: Koushien no Kodou (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2002",
       "serial": "SLPS-20379"
     },
     "Eikan wa Kimi ni: Koushien e no Michi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2002",
       "serial": "SLPS-25006"
     },
     "Eikan wa Kimi ni: Koushien no Hasha (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2002",
       "serial": "SLPS-25053"
     },
     "Eisei Meijin 7: Tsuushin Shougi Club (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2001",
       "serial": "SLPM-62302"
     },
     "Eisei Meijin IV (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board Game",
+      "publisher": "Mycom",
       "release_date": "2001",
       "serial": "SLPM-62006"
     },
     "Eisei Meijin V (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Mycom",
+      "genre": "Board Game",
+      "publisher": "Mycom",
       "release_date": "2001",
       "serial": "SLPM-62054"
     },
     "Eisei Meijin VI: Tsuushin Shougi Club (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2001",
       "serial": "SLPM-62141"
     },
@@ -6019,9 +6019,9 @@
     },
     "Evangelion: Jo (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Gainax",
+      "genre": "Action",
+      "publisher": "Gainax",
       "release_date": "2007",
       "serial": "SLPS-25932"
     },
@@ -6272,7 +6272,7 @@
     "Eyeshield 21: AmeFoot Yarou ze! Ya-! Ha-! (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "",
       "release_date": "2005",
       "serial": "SLPM-66218"
@@ -6439,9 +6439,9 @@
       "alt_serials": [
         "SLPM-62770"
       ],
-      "developer": "",
+      "developer": "SCEJ",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SLPS-20505"
     },
@@ -6576,9 +6576,9 @@
     },
     "Fever 6: Sankyo Koushiki Pachinko Simulation (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Sankyo",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Sankyo",
       "release_date": "2003",
       "serial": "SLPS-25117"
     },
@@ -6914,25 +6914,25 @@
     },
     "Fish Eyes 3 (Best Collectgion) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Victor Interactive Software",
       "genre": "Sports/Fishing",
-      "publisher": "",
+      "publisher": "Victor Interactive Software",
       "release_date": "2002",
       "serial": "SLPS-20377"
     },
     "Fish Eyes 3 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Victor Interactive Software",
       "genre": "Sports/Fishing",
-      "publisher": "",
+      "publisher": "Victor Interactive Software",
       "release_date": "2001",
       "serial": "SLPS-20291"
     },
     "Fish Eyes 3: Kioku no Hahen-tachi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Victor Interactive Software",
       "genre": "Sports/Fishing",
-      "publisher": "",
+      "publisher": "Victor Interactive Software",
       "release_date": "2002",
       "serial": "SLPS-20477"
     },
@@ -7116,17 +7116,17 @@
       "alt_serials": [
         "SLPM-65570"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Platformer",
+      "publisher": "Konami",
       "release_date": "2003",
       "serial": "SLPM-65304"
     },
     "Frogger Rescue (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Platformer",
+      "publisher": "Konami",
       "release_date": "2004",
       "serial": "SLPM-65501"
     },
@@ -7946,17 +7946,17 @@
     },
     "Game Select 5: Wa (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Hudson Soft",
+      "genre": "Compilation",
+      "publisher": "Hudson Soft",
       "release_date": "2001",
       "serial": "SLPS-20028"
     },
     "Game Select 5: You (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Hudson Soft",
+      "genre": "Compilation",
+      "publisher": "Hudson Soft",
       "release_date": "2001",
       "serial": "SLPS-20071"
     },
@@ -8604,9 +8604,9 @@
       "alt_serials": [
         "SLPM-60141"
       ],
-      "developer": "",
+      "developer": "Sony Computer Entertainment",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SLPS-25032"
     },
@@ -9210,9 +9210,9 @@
     },
     "Gungrave O.D. (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Red Entertainment",
+      "genre": "Action",
+      "publisher": "Sega",
       "release_date": "2003",
       "serial": "SLPM-65492"
     },
@@ -9975,9 +9975,9 @@
     },
     "High Heat: Major League Baseball 2003 (Takara The Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "3DO",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "3DO",
       "release_date": "2001",
       "serial": "SLPM-62325"
     },
@@ -10346,9 +10346,9 @@
     },
     "Hokka Hoka Sentou (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Banpresto",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Banpresto",
       "release_date": "2001",
       "serial": "SLPS-20217"
     },
@@ -10396,9 +10396,9 @@
     },
     "Honkakuteki Pachinko Jikki Kouryaku Series: Milky Bar & Killer Queen: Eikyuu Hozon-ban (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Atlus",
       "genre": "Gambling",
-      "publisher": "",
+      "publisher": "Atlus",
       "release_date": "2001",
       "serial": "SLPM-62074"
     },
@@ -10659,9 +10659,9 @@
     },
     "I Love Baseball: Pro Yakyuu o Koyonaku Ai suru Hitotachi e (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2004",
       "serial": "SLPM-65633"
     },
@@ -10981,25 +10981,25 @@
     },
     "Internet Shougi: Shougi Doujou 24 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Genki",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Genki",
       "release_date": "2001",
       "serial": "SLPM-62172"
     },
     "Inu to Asobou: DogStation: Mic Pack (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "SCEJ",
       "genre": "Simulation",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SLPM-62260"
     },
     "Inu to Asobou: Dogstation (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "SCEJ",
       "genre": "Simulation",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SLPM-62261"
     },
@@ -11090,9 +11090,9 @@
       "alt_serials": [
         "SLPM-62112"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Square Enix",
+      "genre": "Board Game",
+      "publisher": "Square Enix",
       "release_date": "2001",
       "serial": "SLPM-60172"
     },
@@ -11924,17 +11924,17 @@
     },
     "Joshikousei Game's High! (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "TGS",
+      "genre": "Simulation",
+      "publisher": "TGS",
       "release_date": "2005",
       "serial": "SLPM-66495"
     },
     "Joshikousei Game's-High!! (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "TGS",
+      "genre": "Simulation",
+      "publisher": "TGS",
       "release_date": "2005",
       "serial": "SLPM-66494"
     },
@@ -12212,9 +12212,9 @@
     },
     "Kaijuu Daigekisen: War of the Monsters (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "SCEJ",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2003",
       "serial": "SLPM-65412"
     },
@@ -12852,16 +12852,16 @@
     "Kenran Butousai (JP)": {
       "alt_serials": [],
       "developer": "Sony Computer Entertainment Japan",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SCPS-15085"
     },
     "Kensetsu Juuki Kenka Battle: Buchigire Kongou!! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Fighting",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2000-06-01",
       "serial": "SLPS-25004"
     },
@@ -13561,9 +13561,9 @@
     },
     "Kinkoumyaku Tansa Simulation: Ingot 79 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2003",
       "serial": "SLPS-25166"
     },
@@ -13793,17 +13793,17 @@
     },
     "Komorebi no Namikimichi: Utsurikawaru Kisetsu no Chuu de (GN Software Best) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "HuneX",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "HuneX",
       "release_date": "2006",
       "serial": "SLPM-66802"
     },
     "Komorebi no Namikimichi: Utsurikawaru Kisetsu no Naka de (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "HuneX",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "HuneX",
       "release_date": "2004",
       "serial": "SLPM-65646"
     },
@@ -13961,17 +13961,17 @@
     },
     "Koushien: Konpeki no Sora (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "2001",
       "serial": "SLPS-20172"
     },
     "Koushien: Konpeki no Sora (New Price) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "2001",
       "serial": "SLPS-20269"
     },
@@ -14086,17 +14086,17 @@
         "SLPM-66266",
         "SLPM-66972"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2003",
       "serial": "SLPM-65458"
     },
     "Kurogane no Houkou 2: Warship Commander (Limited Edition) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2003",
       "serial": "SLPM-65474"
     },
@@ -14105,9 +14105,9 @@
         "SLPM-65978",
         "SLPM-66573"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2003",
       "serial": "SLPM-65267"
     },
@@ -14116,9 +14116,9 @@
         "SLPM-62406",
         "SLPM-62678"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2001",
       "serial": "SLPM-62042"
     },
@@ -14510,7 +14510,7 @@
     "Linux for PlayStation 2: Release 1.0 (Disc 1) (Runtime Environment) (JP)": {
       "alt_serials": [],
       "developer": "Sony Computer Entertainment Japan",
-      "genre": "",
+      "genre": "Utility",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2006",
       "serial": "SCPS-17501"
@@ -14551,9 +14551,9 @@
     },
     "Loop Sequencer: Music Generator (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Eidos",
+      "genre": "Music",
+      "publisher": "Eidos",
       "release_date": "2002",
       "serial": "SLPM-62463"
     },
@@ -14697,9 +14697,9 @@
     },
     "LowRider: Round the World (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Takara",
+      "genre": "Racing",
+      "publisher": "Takara",
       "release_date": "2001",
       "serial": "SLPS-20245"
     },
@@ -16144,17 +16144,17 @@
     },
     "Mezase! Meimon Yakyuubu 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "2001",
       "serial": "SLPS-20110"
     },
     "Mezase! Meimon Yakyuubu 2 (Reprint) (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Jaleco",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Jaleco",
       "release_date": "2001",
       "serial": "SLPS-20179"
     },
@@ -16543,9 +16543,9 @@
     },
     "Monopoly: Mezase!! Daifugou Jinsei!! (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Hasbro",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Hasbro",
       "release_date": "2001",
       "serial": "SLPS-20281"
     },
@@ -16621,9 +16621,9 @@
     },
     "Morita Shougi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Vivid Image",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Vivid Image",
       "release_date": "2001",
       "serial": "SLPS-20008"
     },
@@ -17284,7 +17284,7 @@
     "Naruto: Konoha Spirits!! (JP)": {
       "alt_serials": [],
       "developer": "CyberConnect2",
-      "genre": "",
+      "genre": "Sports",
       "publisher": "Namco Bandai",
       "release_date": "2006",
       "serial": "SLPS-25714"
@@ -17422,9 +17422,9 @@
     },
     "Naxat Soft Reach Mania Vol. 1: CR Galaxy Angel (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Naxat Soft",
+      "genre": "Gambling",
+      "publisher": "Naxat Soft",
       "release_date": "2001",
       "serial": "SLPM-55089"
     },
@@ -17815,9 +17815,9 @@
     },
     "Netsu Chu! Pro Baseball 2004 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2002",
       "serial": "SLPS-23350"
     },
@@ -17910,9 +17910,9 @@
       "alt_serials": [
         "SLPM-65130"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Hudson Soft",
+      "genre": "Sports",
+      "publisher": "Hudson Soft",
       "release_date": "2001",
       "serial": "SLPM-60178"
     },
@@ -18428,7 +18428,7 @@
     "Ookami: Fude-hajime no Maki (JP)": {
       "alt_serials": [],
       "developer": "Capcom",
-      "genre": "",
+      "genre": "Action",
       "publisher": "Capcom",
       "release_date": "2001",
       "serial": "SLPM-61124"
@@ -18763,9 +18763,9 @@
       "alt_serials": [
         "SLPS-20463"
       ],
-      "developer": "",
+      "developer": "Bandai",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Bandai",
       "release_date": "2006-04-20",
       "serial": "SLPS-20462"
     },
@@ -18815,9 +18815,9 @@
       "alt_serials": [
         "SLPM-66261"
       ],
-      "developer": "",
+      "developer": "Atlus",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Atlus",
       "release_date": "2005-06-30",
       "serial": "SLPM-66033"
     },
@@ -19115,9 +19115,9 @@
     },
     "Pai Chanjong (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jaleco",
+      "genre": "Mahjong",
+      "publisher": "Jaleco",
       "release_date": "2001",
       "serial": "SLPS-20135"
     },
@@ -19358,9 +19358,9 @@
       "alt_serials": [
         "SLPM-66741"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "2006",
       "serial": "SLPM-66740"
     },
@@ -19409,17 +19409,17 @@
     },
     "PictureParadise Club (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broccoli",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Broccoli",
       "release_date": "2007",
       "serial": "SLPM-69001"
     },
     "PictureParadise Club Vol. 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Broccoli",
       "genre": "Other",
-      "publisher": "",
+      "publisher": "Broccoli",
       "release_date": "2007",
       "serial": "SLPM-69006"
     },
@@ -19503,9 +19503,9 @@
     },
     "PlayOnline Beta Edition: PlayOnline Viewer Beta Version & Tetra Master Beta Version (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Square Enix",
+      "genre": "Online",
+      "publisher": "Square Enix",
       "release_date": "2001",
       "serial": "SLPM-62086"
     },
@@ -19729,9 +19729,9 @@
     },
     "PrideGP Grand Prix 2003 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Yuke's",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Capcom",
       "release_date": "2003",
       "serial": "SLPM-65416"
     },
@@ -19753,17 +19753,17 @@
     },
     "Primopuel: My Special Partner (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Simulation",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SLPS-20311"
     },
     "Primopuel: Oshaberi Heartner (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Simulation",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2002",
       "serial": "SLPS-20312"
     },
@@ -20102,9 +20102,9 @@
     },
     "Project FIFA World Cup: Sorenara Kimi ga Daihyou Kantoku (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "EA Canada",
       "genre": "Sports",
-      "publisher": "",
+      "publisher": "Electronic Arts",
       "release_date": "2003",
       "serial": "SLPS-25110"
     },
@@ -20330,9 +20330,9 @@
     },
     "Quiz & Variety SukuSuku Inufuku 2: Motto SukuSuku (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Spike",
+      "genre": "Puzzle",
+      "publisher": "Spike",
       "release_date": "2007-08-23",
       "serial": "SLPM-66818"
     },
@@ -20340,17 +20340,17 @@
       "alt_serials": [
         "SLPM-62630"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Spike",
+      "genre": "Puzzle",
+      "publisher": "Spike",
       "release_date": "2002",
       "serial": "SLPM-62424"
     },
     "Quiz & Variety: Suku Suku Inufuku 2: Motto Suku Suku (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Spike",
+      "genre": "Puzzle",
+      "publisher": "Spike",
       "release_date": "2002",
       "serial": "SLPM-62769"
     },
@@ -20415,17 +20415,17 @@
     },
     "RPG Tkool (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Enterbrain",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Enterbrain",
       "release_date": "2004",
       "serial": "SLPS-25404"
     },
     "RPG Tkool 5 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Enterbrain",
       "genre": "RPG",
-      "publisher": "",
+      "publisher": "Enterbrain",
       "release_date": "2001",
       "serial": "SLPS-20143"
     },
@@ -20439,9 +20439,9 @@
     },
     "RSII: Riding Spirits 2 (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Konami",
+      "genre": "Sports",
+      "publisher": "Konami",
       "release_date": "2003",
       "serial": "SLPM-65427"
     },
@@ -20488,17 +20488,17 @@
         "SCPS-51011",
         "SLPS-51011"
       ],
-      "developer": "",
+      "developer": "Sammy",
       "genre": "Beat 'Em Up",
-      "publisher": "",
+      "publisher": "Sammy",
       "release_date": "2002-06-06",
       "serial": "SLPS-20198"
     },
     "Raging Bless: Hangma Muksirok (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Sammy",
       "genre": "Beat 'Em Up",
-      "publisher": "",
+      "publisher": "Sammy",
       "release_date": "2003",
       "serial": "SLPM-64521"
     },
@@ -20710,9 +20710,9 @@
     },
     "Real Bass Fishing: Top Angler (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Jaleco",
+      "genre": "Sports",
+      "publisher": "Jaleco",
       "release_date": "2001",
       "serial": "SLPS-20182"
     },
@@ -21488,9 +21488,9 @@
     },
     "Saikyo Shogi Gekisashi Special (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2002",
       "serial": "SLPM-62740"
     },
@@ -21590,9 +21590,9 @@
       "alt_serials": [
         "SLPM-62312"
       ],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2001",
       "serial": "SLPM-62156"
     },
@@ -21832,9 +21832,9 @@
     },
     "Samgukji Jeongi (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Koei",
+      "genre": "Strategy",
+      "publisher": "Koei",
       "release_date": "2007",
       "serial": "SLPM-67522"
     },
@@ -22788,25 +22788,25 @@
     },
     "Sekai Saikyou Ginsei Igo 5 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2002",
       "serial": "SLPS-20364"
     },
     "Sekai Saikyou Ginsei Igo 6 (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2002",
       "serial": "SLPS-20421"
     },
     "Sekai Saikyou Ginsei Igo Kouza (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Mycom",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Mycom",
       "release_date": "2002",
       "serial": "SLPS-20510"
     },
@@ -23938,9 +23938,9 @@
     },
     "Shinobido Takumi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Acquire",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Acquire",
       "release_date": "2006-03-30",
       "serial": "SLPM-66358"
     },
@@ -26096,9 +26096,9 @@
       "alt_serials": [
         "SLPS-25342"
       ],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "Data East",
+      "genre": "Adventure",
+      "publisher": "Data East",
       "release_date": "2004",
       "serial": "SLPS-25332"
     },
@@ -26692,17 +26692,17 @@
     },
     "Stepping Selection (Disc 1) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Other",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SLPS-20018"
     },
     "Stepping Selection (Disc 2) (JP)": {
       "alt_serials": [],
-      "developer": "",
-      "genre": "",
-      "publisher": "",
+      "developer": "SCEJ",
+      "genre": "Other",
+      "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SLPS-20019"
     },
@@ -27948,9 +27948,9 @@
     },
     "Taisen 4: Soldier: Kigyou Senshi Shougi (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Matsushita",
       "genre": "Board Game",
-      "publisher": "",
+      "publisher": "Matsushita",
       "release_date": "2002",
       "serial": "SLPS-20336"
     },
@@ -29349,7 +29349,7 @@
     "Tir-Na-Nog: Yuukyuu no Jin (JP)": {
       "alt_serials": [],
       "developer": "",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "",
       "release_date": "2006",
       "serial": "SLPS-25843"
@@ -30016,7 +30016,7 @@
     "Tsugunai (JP)": {
       "alt_serials": [],
       "developer": "Sony Computer Entertainment Japan",
-      "genre": "",
+      "genre": "RPG",
       "publisher": "Sony Computer Entertainment",
       "release_date": "2001",
       "serial": "SCPS-11007"
@@ -30187,9 +30187,9 @@
     },
     "Uchuu Keiji Tamashii: The Space Sheriff Spirits (JP)": {
       "alt_serials": [],
-      "developer": "",
+      "developer": "Konami",
       "genre": "Action",
-      "publisher": "",
+      "publisher": "Konami",
       "release_date": "2006-05-25",
       "serial": "SLPS-25649"
     },
@@ -30898,9 +30898,9 @@
       "alt_serials": [
         "SLPM-66656"
       ],
-      "developer": "",
+      "developer": "Koei",
       "genre": "Strategy",
-      "publisher": "",
+      "publisher": "Koei",
       "release_date": "2001",
       "serial": "SLPM-55250"
     },
