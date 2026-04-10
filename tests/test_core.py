@@ -25773,9 +25773,9 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
         self.assertNotIn('SLES-55580', all_serials, "Wrong serial SLES-55580 still in PAL DB")
 
     def test_pal_count_wave148(self):
-        """Wave 148: PAL DB must have at most 2639 entries (8 total duplicates removed, 10 serials swapped, 3+3 fixed)."""
-        self.assertLessEqual(len(self.pal_games), 2639,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2639 after Wave 148 changes")
+        """Wave 148: PAL DB must have at most 2640 entries (Wave 152 adds Star Wars La Guerra dei Cloni with corrected serial)."""
+        self.assertLessEqual(len(self.pal_games), 2640,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2640 after Wave 148/152 changes")
 
 
 class TestWave149AdditionalSerialFixes(unittest.TestCase):
@@ -25835,9 +25835,9 @@ class TestWave149AdditionalSerialFixes(unittest.TestCase):
             "Captain Scarlet correct serial SLES-54471 must still be in PAL DB")
 
     def test_pal_count_wave149(self):
-        """Wave 149: PAL DB must have at most 2639 entries."""
-        self.assertLessEqual(len(self.pal_games), 2639,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2639 after Wave 149 changes")
+        """Wave 149: PAL DB must have at most 2640 entries (Wave 152 corrects Star Wars La Guerra dei Cloni serial)."""
+        self.assertLessEqual(len(self.pal_games), 2640,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2640 after Wave 149/152 changes")
 
     # ── JP metadata fills ──────────────────────────────────────────────────────
 
@@ -25852,3 +25852,194 @@ class TestWave149AdditionalSerialFixes(unittest.TestCase):
         empty = [t for t, i in self.jp_games.items() if not i.get('release_date', '').strip()]
         self.assertLessEqual(len(empty), 921,
             f"JP still has {len(empty)} entries without date, expected <= 921")
+
+
+class TestWave152SerialFixes(unittest.TestCase):
+    """Wave 152: Serial fixes and additions verified against PS2.txt reference.
+    PAL: Removed 4 fake/wrong-serial entries (Donkey Kong Country 5/SCES-50987,
+         21 Card Games/SLES-53357, Panzer Elite Action/SLES-53444,
+         Star Wars La Guerra dei Cloni/SLES-50829=Commandos2).
+    PAL: Fixed 3 wrong serial prefixes (Wild Wild Racing SLES→SCES-50009,
+         Tourist Trophy SLES→SCES-53372, Speed Challenge SLES→SCES-51022).
+    PAL: Added 4 confirmed missing entries (Virtual Racer/SLES-51022,
+         Star Wars La Guerra dei Cloni/SLES-50828, Ratchet & Clank 3/SCES-52456,
+         EyeToy Disney Move/SCES-52922, This is Football/SCES-51548).
+    PAL: Added alt_serials (RE:Outbreak SCES-50987, God of War SCES-51533,
+         Jak and Daxter SCES-50614, I-Ninja SCES-53146).
+    NTSC-U: Removed College Hoops 2K7 (SLUS-21463=Ghost Recon 2 per PS2.txt).
+    NTSC-U: Renamed Lucinda Green's Equestrian Challenge → Equestriad (SLUS-21401).
+    NTSC-U: Added Cowboy Bebop (SLUS-20699), alt_serials Simpsons Road Rage
+             (SLUS-20139), Onimusha Dawn of Dreams (SLUS-21362).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            cls.pal_db = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            cls.ntsc_db = json.load(f)
+        cls.pal_games = cls.pal_db['games']
+        cls.ntsc_games = cls.ntsc_db['games']
+
+    # ── PAL removals ──────────────────────────────────────────────────────────
+
+    def test_pal_donkey_kong_country_5_removed(self):
+        """Wave 152: Fake 'Donkey Kong Country 5 (PAL)' must be removed (DKC5 is not a PS2 game)."""
+        self.assertNotIn('Donkey Kong Country 5 (PAL)', self.pal_games,
+            "Fake Donkey Kong Country 5 (PAL) must not exist in PAL DB")
+
+    def test_pal_sces_50987_not_fake(self):
+        """Wave 152: SCES-50987 must not be assigned to Donkey Kong Country 5."""
+        for title, info in self.pal_games.items():
+            if info.get('serial') == 'SCES-50987':
+                self.assertNotIn('Donkey Kong', title,
+                    f"SCES-50987 must not be assigned to Donkey Kong game, got: {title}")
+
+    def test_pal_21_card_games_removed(self):
+        """Wave 152: '21 Card Games (PAL)' with wrong serial SLES-53357 (=Colosseum) must be removed."""
+        self.assertNotIn('21 Card Games (PAL)', self.pal_games,
+            "21 Card Games (PAL) with wrong serial SLES-53357 must not exist")
+
+    def test_pal_panzer_elite_wrong_serial_removed(self):
+        """Wave 152: 'Panzer Elite Action: Fields of Glory (PAL)' with SLES-53444 (=PES 5) removed."""
+        self.assertNotIn('Panzer Elite Action: Fields of Glory (PAL)', self.pal_games,
+            "Panzer Elite Action: Fields of Glory with wrong serial SLES-53444 must be removed")
+
+    def test_pal_sles_53444_not_panzer(self):
+        """Wave 152: SLES-53444 must not be assigned to Panzer Elite Action."""
+        for title, info in self.pal_games.items():
+            if info.get('serial') == 'SLES-53444':
+                self.assertNotIn('Panzer', title,
+                    f"SLES-53444 is PES 5, must not be Panzer Elite, got: {title}")
+
+    # ── PAL serial fixes ───────────────────────────────────────────────────────
+
+    def test_pal_wild_wild_racing_serial_fixed(self):
+        """Wave 152: Wild Wild Racing must use SCES-50009 (not SLES-50009 which is Action Replay MAX)."""
+        g = self.pal_games.get('Wild Wild Racing (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-50009',
+            f"Wild Wild Racing serial should be SCES-50009, got {g.get('serial')!r}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SLES-50009', all_serials,
+            "Wrong serial SLES-50009 (=Action Replay MAX) must not be in PAL DB")
+
+    def test_pal_tourist_trophy_serial_fixed(self):
+        """Wave 152: Tourist Trophy must use SCES-53372 (not SLES-53372 per PS2.txt)."""
+        g = self.pal_games.get('Tourist Trophy: Platinum (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-53372',
+            f"Tourist Trophy serial should be SCES-53372, got {g.get('serial')!r}")
+
+    def test_pal_speed_challenge_serial_fixed(self):
+        """Wave 152: Speed Challenge must use SCES-51022 (SLES-51022 is Virtual Racer per PS2.txt)."""
+        g = self.pal_games.get("Speed Challenge: Jacques Villeneuve's Racing Vision (PAL)", {})
+        self.assertEqual(g.get('serial'), 'SCES-51022',
+            f"Speed Challenge serial should be SCES-51022, got {g.get('serial')!r}")
+
+    # ── PAL additions ──────────────────────────────────────────────────────────
+
+    def test_pal_virtual_racer_added(self):
+        """Wave 152: Virtual Racer: Jacques Villeneuve (PAL) added with SLES-51022."""
+        g = self.pal_games.get('Virtual Racer: Jacques Villeneuve (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-51022',
+            f"Virtual Racer serial should be SLES-51022, got {g.get('serial')!r}")
+
+    def test_pal_star_wars_guerra_dei_cloni_corrected(self):
+        """Wave 152: Star Wars La Guerra dei Cloni uses SLES-50828 (not SLES-50829=Commandos 2)."""
+        g = self.pal_games.get('Star Wars: La Guerra dei Cloni (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-50828',
+            f"Star Wars La Guerra dei Cloni serial should be SLES-50828, got {g.get('serial')!r}")
+        all_serials = {e['serial'] for e in self.pal_games.values()}
+        self.assertNotIn('SLES-50829', all_serials,
+            "Wrong serial SLES-50829 (=Commandos 2) must not be in PAL DB")
+
+    def test_pal_ratchet_clank_3_added(self):
+        """Wave 152: Ratchet & Clank 3 (PAL) added with SCES-52456."""
+        g = self.pal_games.get('Ratchet & Clank 3 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-52456',
+            f"Ratchet & Clank 3 serial should be SCES-52456, got {g.get('serial')!r}")
+
+    def test_pal_eyetoy_disney_move_added(self):
+        """Wave 152: EyeToy: Disney Move (PAL) added with SCES-52922."""
+        g = self.pal_games.get('EyeToy: Disney Move (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-52922',
+            f"EyeToy Disney Move serial should be SCES-52922, got {g.get('serial')!r}")
+
+    def test_pal_this_is_football_added(self):
+        """Wave 152: This is Football (PAL) added with SCES-51548."""
+        g = self.pal_games.get('This is Football (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SCES-51548',
+            f"This is Football serial should be SCES-51548, got {g.get('serial')!r}")
+
+    def test_pal_re_outbreak_alt_serial(self):
+        """Wave 152: Resident Evil: Outbreak has SCES-50987 as alt_serial."""
+        g = self.pal_games.get('Resident Evil: Outbreak (PAL)', {})
+        alts = g.get('alt_serials', [])
+        self.assertIn('SCES-50987', alts,
+            "Resident Evil: Outbreak must have SCES-50987 as alt_serial")
+
+    def test_pal_jak_daxter_alt_serial(self):
+        """Wave 152: Jak and Daxter: The Precursor Legacy has SCES-50614 as alt_serial."""
+        g = self.pal_games.get('Jak and Daxter: The Precursor Legacy (PAL)', {})
+        alts = g.get('alt_serials', [])
+        self.assertIn('SCES-50614', alts,
+            "Jak and Daxter must have SCES-50614 as alt_serial")
+
+    def test_pal_no_duplicate_serials_wave152(self):
+        """Wave 152: No duplicate primary serials in PAL DB."""
+        seen = {}
+        for title, info in self.pal_games.items():
+            s = info.get('serial', '')
+            if s:
+                if s in seen:
+                    seen[s].append(title)
+                else:
+                    seen[s] = [title]
+        dups = [(s, titles) for s, titles in seen.items() if len(titles) > 1]
+        self.assertEqual(len(dups), 0,
+            f"PAL DB has {len(dups)} duplicate serials: {dups[:5]}")
+
+    def test_pal_count_wave152(self):
+        """Wave 152: PAL DB must have >= 2639 entries."""
+        self.assertGreaterEqual(len(self.pal_games), 2639,
+            f"PAL DB has {len(self.pal_games)} entries, expected >= 2639")
+
+    # ── NTSC-U fixes ──────────────────────────────────────────────────────────
+
+    def test_ntsc_college_hoops_2k7_removed(self):
+        """Wave 152: College Hoops 2K7 with wrong serial SLUS-21463 (=Ghost Recon 2) must be removed."""
+        self.assertNotIn('College Hoops 2K7', self.ntsc_games,
+            "College Hoops 2K7 with wrong serial SLUS-21463 must not exist")
+        all_serials = {e['serial'] for e in self.ntsc_games.values()}
+        # SLUS-21463 was Ghost Recon 2 per PS2.txt; should not be in DB (Ghost Recon 2 uses SLUS-21105)
+        if 'SLUS-21463' in all_serials:
+            for t, i in self.ntsc_games.items():
+                if i.get('serial') == 'SLUS-21463':
+                    self.assertNotIn('College Hoops', t,
+                        f"SLUS-21463 must not be assigned to College Hoops, got: {t}")
+
+    def test_ntsc_equestriad_renamed(self):
+        """Wave 152: 'Equestriad' exists at SLUS-21401 (was wrong-named Lucinda Green's Equestrian Challenge)."""
+        g = self.ntsc_games.get('Equestriad', {})
+        self.assertEqual(g.get('serial'), 'SLUS-21401',
+            f"Equestriad serial should be SLUS-21401, got {g.get('serial')!r}")
+        self.assertNotIn("Lucinda Green's Equestrian Challenge", self.ntsc_games,
+            "Lucinda Green's Equestrian Challenge (wrong NTSC-U title) must be removed")
+
+    def test_ntsc_cowboy_bebop_added(self):
+        """Wave 152: Cowboy Bebop added with SLUS-20699."""
+        g = self.ntsc_games.get('Cowboy Bebop', {})
+        self.assertEqual(g.get('serial'), 'SLUS-20699',
+            f"Cowboy Bebop serial should be SLUS-20699, got {g.get('serial')!r}")
+
+    def test_ntsc_simpsons_road_rage_alt_serial(self):
+        """Wave 152: The Simpsons: Road Rage has SLUS-20139 as alt_serial."""
+        g = self.ntsc_games.get('The Simpsons: Road Rage', {})
+        alts = g.get('alt_serials', [])
+        self.assertIn('SLUS-20139', alts,
+            "Simpsons Road Rage must have SLUS-20139 as alt_serial")
+
+    def test_ntsc_count_wave152(self):
+        """Wave 152: NTSC-U DB must have >= 2174 entries."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2174,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2174")

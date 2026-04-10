@@ -2936,15 +2936,6 @@
       "release_date": "2005-11-30",
       "serial": "SLUS-21232"
     },
-    "College Hoops 2K7": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Visual Concepts",
-      "genre": "Sports",
-      "publisher": "2K Sports",
-      "release_date": "2006-12-11",
-      "serial": "SLUS-21463"
-    },
     "College Hoops 2K8": {
       "alt_serials": [],
       "crcs": [],
@@ -10105,15 +10096,6 @@
       "publisher": "PCCW Japan",
       "release_date": "2003-10-28",
       "serial": "SLUS-20676"
-    },
-    "Lucinda Green's Equestrian Challenge": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Bit Managers",
-      "genre": "Sports",
-      "publisher": "THQ",
-      "release_date": "2006-11-15",
-      "serial": "SLUS-21401"
     },
     "Lumines Plus": {
       "alt_serials": [],
@@ -19873,7 +19855,9 @@
       "serial": "SLUS-20624"
     },
     "The Simpsons: Road Rage": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLUS-20139"
+      ],
       "crcs": [],
       "developer": "Radical Entertainment",
       "genre": "Action, Driving",
@@ -22507,6 +22491,24 @@
       "publisher": "Crave Entertainment",
       "release_date": "2003-07-29",
       "serial": "SLUS-20525"
+    },
+    "Equestriad": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Bit Managers",
+      "genre": "Sports",
+      "publisher": "THQ",
+      "release_date": "2006-11-15",
+      "serial": "SLUS-21401"
+    },
+    "Cowboy Bebop": {
+      "serial": "SLUS-20699",
+      "title": "Cowboy Bebop",
+      "region": "NTSC-U",
+      "developer": "Namco",
+      "publisher": "Bandai Namco",
+      "genre": "Action",
+      "release_date": "2005-05-17"
     }
   },
   "version": "1.0"

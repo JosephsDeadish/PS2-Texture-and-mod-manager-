@@ -127,14 +127,6 @@
       "release_date": "2002-04-26",
       "serial": "SLES-50796"
     },
-    "21 Card Games (PAL)": {
-      "alt_serials": [],
-      "developer": "Phoenix Games Ltd.",
-      "genre": "Casino",
-      "publisher": "Phoenix Games",
-      "release_date": "2005",
-      "serial": "SLES-53357"
-    },
     "24: The Game (PAL)": {
       "alt_serials": [
         "SCED-53622"
@@ -5451,14 +5443,6 @@
       "release_date": "",
       "serial": "SCES-55670"
     },
-    "Donkey Kong Country 5 (PAL)": {
-      "alt_serials": [],
-      "developer": "Sony Computer Entertainment Europe",
-      "genre": "Action/Platformer",
-      "publisher": "Sony Computer Entertainment Europe",
-      "release_date": "",
-      "serial": "SCES-50987"
-    },
     "Donkey Xote (PAL)": {
       "alt_serials": [],
       "developer": "Revistronic",
@@ -8234,7 +8218,8 @@
         "GoW1"
       ],
       "alt_serials": [
-        "SCED-53431"
+        "SCED-53431",
+        "SCES-51533"
       ],
       "crcs": [],
       "developer": "Santa Monica Studio",
@@ -9416,7 +9401,8 @@
     },
     "I-Ninja (PAL)": {
       "alt_serials": [
-        "SCED-52311"
+        "SCED-52311",
+        "SCES-53146"
       ],
       "developer": "Argonaut Software Ltd",
       "genre": "Action/Platform",
@@ -9840,7 +9826,8 @@
     },
     "Jak and Daxter: The Precursor Legacy (PAL)": {
       "alt_serials": [
-        "SCED-50614"
+        "SCED-50614",
+        "SCES-50614"
       ],
       "crcs": [],
       "developer": "Naughty Dog",
@@ -14174,14 +14161,6 @@
       "release_date": "",
       "serial": "SLES-54713"
     },
-    "Panzer Elite Action: Fields of Glory (PAL)": {
-      "alt_serials": [],
-      "developer": "ZootFly",
-      "genre": "Simulation",
-      "publisher": "JoWooD Entertainment AG",
-      "release_date": "2006-07-14",
-      "serial": "SLES-53444"
-    },
     "Panzer Front Ausf.B (PAL)": {
       "alt_serials": [],
       "developer": "enterbrain, Inc",
@@ -15568,7 +15547,9 @@
       "serial": "SLES-51448"
     },
     "Resident Evil: Outbreak (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SCES-50987"
+      ],
       "developer": "Capcom",
       "genre": "Action/Shooter/Survival Horror",
       "publisher": "Capcom",
@@ -18368,7 +18349,7 @@
       "genre": "Racing",
       "publisher": "Ubi Soft Entertainment",
       "release_date": "2002-11-22",
-      "serial": "SLES-51022"
+      "serial": "SCES-51022"
     },
     "Speed Kings (PAL)": {
       "alt_serials": [],
@@ -18735,14 +18716,6 @@
       "release_date": "2002-03-28",
       "serial": "SLES-50371"
     },
-    "Star Wars: La Guerra dei Cloni (PAL)": {
-      "alt_serials": [],
-      "developer": "Pandemic Studios",
-      "genre": "Action/Shooter",
-      "publisher": "Lucasarts",
-      "release_date": "",
-      "serial": "SLES-50829"
-    },
     "Star Wars: Las Guerras Clon (PAL)": {
       "alt_serials": [],
       "developer": "Pandemic Studios",
@@ -18787,8 +18760,7 @@
     },
     "Star Wars: The Clone Wars (PAL)": {
       "alt_serials": [
-        "SLES-50827",
-        "SLES-50828"
+        "SLES-50827"
       ],
       "developer": "Pandemic Studios",
       "genre": "Action/Shooter",
@@ -21398,7 +21370,7 @@
       "genre": "Racing",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2007-01-12",
-      "serial": "SLES-53372"
+      "serial": "SCES-53372"
     },
     "Toy Golf Extreme (PAL)": {
       "alt_serials": [],
@@ -22550,7 +22522,7 @@
       "genre": "Racing",
       "publisher": "Empire Interactive",
       "release_date": "2000-10-26",
-      "serial": "SLES-50009"
+      "serial": "SCES-50009"
     },
     "Winter Sports (PAL)": {
       "alt_serials": [],
@@ -23283,6 +23255,51 @@
       "publisher": "Phoenix Games",
       "release_date": "2006-12-11",
       "serial": "SLES-54604"
+    },
+    "Virtual Racer: Jacques Villeneuve (PAL)": {
+      "serial": "SLES-51022",
+      "title": "Virtual Racer: Jacques Villeneuve",
+      "region": "PAL",
+      "developer": "Ubisoft Montreal",
+      "publisher": "Ubisoft",
+      "genre": "Racing",
+      "release_date": ""
+    },
+    "Ratchet & Clank 3 (PAL)": {
+      "serial": "SCES-52456",
+      "title": "Ratchet & Clank 3",
+      "region": "PAL",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "Action Platform",
+      "release_date": "2004-11-05"
+    },
+    "EyeToy: Disney Move (PAL)": {
+      "serial": "SCES-52922",
+      "title": "EyeToy: Disney Move",
+      "region": "PAL",
+      "developer": "SCEE London Studio",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "Party",
+      "release_date": "2004-12-01"
+    },
+    "This is Football (PAL)": {
+      "serial": "SCES-51548",
+      "title": "This is Football",
+      "region": "PAL",
+      "developer": "Sony Computer Entertainment Europe",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Sports",
+      "release_date": "2003-01-01"
+    },
+    "Star Wars: La Guerra dei Cloni (PAL)": {
+      "serial": "SLES-50828",
+      "title": "Star Wars: La Guerra dei Cloni",
+      "region": "PAL",
+      "developer": "Pandemic Studios",
+      "publisher": "Lucasarts",
+      "genre": "Action",
+      "release_date": "2002-11-22"
     }
   },
   "version": "1.0"
