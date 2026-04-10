@@ -26113,3 +26113,115 @@ class TestWave153MetadataFills(unittest.TestCase):
         missing = [t for t, i in self.jp_games.items() if not i.get('genre', '').strip()]
         self.assertLess(len(missing), 367,
             f"JP genre count {len(missing)} should be less than previous 367")
+
+
+class TestWave155JpMetadataFills(unittest.TestCase):
+    """Wave 155: Complete JP dev/pub/genre fills - all 3762 entries now complete."""
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            data = json.load(f)
+        cls.jp_games = data['games']
+
+    def test_jp_no_missing_developer(self):
+        """Wave 155: All JP entries must have a developer."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('developer', '').strip()]
+        self.assertEqual(len(missing), 0,
+            f"JP has {len(missing)} entries without developer: {missing[:5]}")
+
+    def test_jp_no_missing_publisher(self):
+        """Wave 155: All JP entries must have a publisher."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('publisher', '').strip()]
+        self.assertEqual(len(missing), 0,
+            f"JP has {len(missing)} entries without publisher: {missing[:5]}")
+
+    def test_jp_no_missing_genre(self):
+        """Wave 155: All JP entries must have a genre."""
+        missing = [t for t, i in self.jp_games.items() if not i.get('genre', '').strip()]
+        self.assertEqual(len(missing), 0,
+            f"JP has {len(missing)} entries without genre: {missing[:5]}")
+
+    def test_koei_warship_gunner_fills(self):
+        """Wave 155: Koei Warship Gunner budget releases have Koei as publisher."""
+        for suffix in ["(Koei Selection)", "(Koei The Best)"]:
+            title = f"Boukoku no Aegis 2035: Warship Gunner {suffix} (JP)"
+            self.assertIn(title, self.jp_games, f"Missing {title}")
+            self.assertEqual(self.jp_games[title]['publisher'], 'Koei')
+            self.assertEqual(self.jp_games[title]['developer'], 'Koei')
+
+    def test_fromsoft_kaidou_battle_fills(self):
+        """Wave 155: Kaidou Battle series has From Software as publisher."""
+        title = "Kaidou Battle: Nikko, Haruna, Rokko, Hakone (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'From Software')
+        self.assertEqual(self.jp_games[title]['genre'], 'Racing')
+
+    def test_konami_jleague_fills(self):
+        """Wave 155: Jikkyou J.League series has Konami as publisher."""
+        for num in [3, 4, 5]:
+            title = f"Jikkyou J.League: Perfect Striker {num} (JP)"
+            self.assertIn(title, self.jp_games, f"Missing {title}")
+            self.assertEqual(self.jp_games[title]['publisher'], 'Konami')
+            self.assertEqual(self.jp_games[title]['developer'], 'Konami')
+
+    def test_nis_phantom_brave_fills(self):
+        """Wave 155: Phantom Brave best releases have NIS as publisher."""
+        title = "Phantom Brave: 2-shuume Hajimemashita (Playstation2 The Best) (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'Nippon Ichi Software')
+        self.assertEqual(self.jp_games[title]['publisher'], 'Nippon Ichi Software')
+
+    def test_gust_mana_khemia2_fills(self):
+        """Wave 155: Mana-Khemia 2 has Gust as developer and publisher."""
+        title = "Mana-Khemia 2: Ochita Gakuen to Renkinjutsushi-tachi (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'Gust')
+        self.assertEqual(self.jp_games[title]['publisher'], 'Gust')
+
+    def test_sega_power_smash2_fills(self):
+        """Wave 155: Power Smash 2 has Sega as publisher."""
+        title = "Power Smash 2 (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['publisher'], 'Sega')
+
+    def test_konami_rhapsodia_fills(self):
+        """Wave 155: Rhapsodia has Neverland as dev and Konami as publisher."""
+        title = "Rhapsodia (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'Neverland')
+        self.assertEqual(self.jp_games[title]['publisher'], 'Konami')
+        self.assertEqual(self.jp_games[title]['genre'], 'RPG')
+
+    def test_ea_rugby_fills(self):
+        """Wave 155: EA Sports Rugby has Electronic Arts Japan as publisher."""
+        title = "EA Sports Rugby '08 (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'EA Sports')
+        self.assertEqual(self.jp_games[title]['publisher'], 'Electronic Arts Japan')
+
+    def test_acquire_wizardry_fills(self):
+        """Wave 155: Wizardry Xth series has Acquire as developer and publisher."""
+        for title in ["Wizardry Xth: Zensen no Gakufu (JP)", "Wizardry Xth 2: Mugen no Gakuto (JP)"]:
+            self.assertIn(title, self.jp_games, f"Missing {title}")
+            self.assertEqual(self.jp_games[title]['developer'], 'Acquire')
+            self.assertEqual(self.jp_games[title]['publisher'], 'Acquire')
+
+    def test_tomy_zoids_fills(self):
+        """Wave 155: Zoids series has Tomy as publisher."""
+        for title in ["Zoids Infinity Fuzors (JP)", "Zoids Tactics (JP)"]:
+            self.assertIn(title, self.jp_games, f"Missing {title}")
+            self.assertEqual(self.jp_games[title]['publisher'], 'Tomy')
+
+    def test_psikyo_onsen_fills(self):
+        """Wave 155: Iku ze! Onsen Takkyuu series has Psikyo as developer."""
+        title = "Iku ze! Onsen Takkyuu!! (JP)"
+        self.assertIn(title, self.jp_games)
+        self.assertEqual(self.jp_games[title]['developer'], 'Psikyo')
+        self.assertEqual(self.jp_games[title]['genre'], 'Sports')
+
+    def test_jp_total_entries_preserved(self):
+        """Wave 155: JP total entry count preserved at 3762."""
+        self.assertGreaterEqual(len(self.jp_games), 3762,
+            f"JP DB shrank: {len(self.jp_games)}")
