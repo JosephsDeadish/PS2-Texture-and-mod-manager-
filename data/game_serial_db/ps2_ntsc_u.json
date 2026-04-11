@@ -2364,6 +2364,15 @@
       "release_date": "2002-11-21",
       "serial": "SLUS-20534"
     },
+    "Cabela's Big Game Hunter 2005 Adventures": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
+      "release_date": "2004-11-09",
+      "serial": "SLUS-21021"
+    },
     "Cabela's Big Game Hunter 2008": {
       "alt_serials": [],
       "crcs": [],
@@ -2408,6 +2417,17 @@
       "publisher": "Activision",
       "release_date": "2003-08-27",
       "serial": "SLUS-20665"
+    },
+    "Cabela's Deer Hunt: 2005 Season": {
+      "alt_serials": [],
+      "crcs": [
+        "DF6BC54F"
+      ],
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
+      "release_date": "2004-08-31",
+      "serial": "SLUS-21011"
     },
     "Cabela's Legendary Adventures": {
       "alt_serials": [],
@@ -2678,16 +2698,7 @@
       "release_date": "2004-07-20",
       "serial": "SLUS-20992"
     },
-    "Champions of Norrath (SLUS-29088)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Snowblind Studios",
-      "genre": "Action-RPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2004-01-27",
-      "serial": "SLUS-29088"
-    },
-    "Champions of Norrath: Realms of EverQuest": {
+    "Champions of Norrath": {
       "aliases": [
         "Champions of Norrath EQ",
         "CoN"
@@ -2703,15 +2714,6 @@
       "release_date": "2004-02-10",
       "serial": "SLUS-20565"
     },
-    "Champions of Norrath: Realms of Everquest": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Snowblind Studios",
-      "genre": "Action-RPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2004-02-10",
-      "serial": "SLUS-29085"
-    },
     "Champions: Return to Arms": {
       "alt_serials": [],
       "crcs": [
@@ -2723,15 +2725,6 @@
       "publisher": "Sony Online Entertainment",
       "release_date": "2005-02-08",
       "serial": "SLUS-20973"
-    },
-    "Champions: Return to Arms (SLUS-29126)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Snowblind Studios",
-      "genre": "Action-RPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2005-02-08",
-      "serial": "SLUS-29126"
     },
     "Chaos Legion": {
       "alt_serials": [],
@@ -3098,6 +3091,15 @@
       "publisher": "Valcon Games, LLC",
       "release_date": "2006-10-11",
       "serial": "SLUS-21499"
+    },
+    "Cowboy Bebop": {
+      "developer": "Namco",
+      "genre": "Action",
+      "publisher": "Bandai Namco",
+      "region": "NTSC-U",
+      "release_date": "2005-05-17",
+      "serial": "SLUS-20699",
+      "title": "Cowboy Bebop"
     },
     "Crash 'N' Burn": {
       "alt_serials": [],
@@ -4101,15 +4103,6 @@
       "publisher": "Atlus",
       "release_date": "2003-08-26",
       "serial": "SLUS-20666"
-    },
-    "Disgaea: Hour of Darkness (SLUS-28034)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Nippon Ichi Software",
-      "genre": "Strategy",
-      "publisher": "Atlus",
-      "release_date": "2003-08-26",
-      "serial": "SLUS-28034"
     },
     "Disney G-Force": {
       "alt_serials": [],
@@ -5484,15 +5477,6 @@
       "release_date": "2005-05-03",
       "serial": "SLUS-20967"
     },
-    "Enthusia: Professional Racing (SLUS-29151)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami",
-      "genre": "Driving, Racing",
-      "publisher": "Konami",
-      "release_date": "2005-05-03",
-      "serial": "SLUS-29151"
-    },
     "Ephemeral Fantasia": {
       "alt_serials": [],
       "crcs": [
@@ -5503,6 +5487,15 @@
       "publisher": "Konami",
       "release_date": "2001-09-07",
       "serial": "SLUS-20169"
+    },
+    "Equestriad": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Bit Managers",
+      "genre": "Sports",
+      "publisher": "THQ",
+      "release_date": "2006-11-15",
+      "serial": "SLUS-21401"
     },
     "Eragon": {
       "alt_serials": [],
@@ -5740,14 +5733,6 @@
       "publisher": "Sony Computer Entertainment America",
       "release_date": "2003-08-05",
       "serial": "SCUS-97600"
-    },
-    "EyeToy: AntiGrav (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "Harmonix",
-      "genre": "Racing",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2004-11-09",
-      "serial": "SLUS-97414"
     },
     "EyeToy: Antigrav": {
       "alt_serials": [],
@@ -9098,14 +9083,6 @@
       "release_date": "2001-12-04",
       "serial": "SCUS-97171"
     },
-    "Jak and Daxter: The Precursor Legacy: Greatest Hits (NTSC-U)": {
-      "alt_serials": [],
-      "developer": "Naughty Dog",
-      "genre": "Platformer",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2001-12-03",
-      "serial": "SLUS-97124"
-    },
     "James Cameron's Dark Angel": {
       "alt_serials": [],
       "crcs": [
@@ -10598,15 +10575,6 @@
       "publisher": "EA Sports",
       "release_date": "2007-08-14",
       "serial": "SLUS-21638"
-    },
-    "Madden NFL 08 (SLUS-26138)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Tiburon",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2007-08-14",
-      "serial": "SLUS-26138"
     },
     "Madden NFL 08 en Español": {
       "alt_serials": [],
@@ -13925,6 +13893,17 @@
       "release_date": "2005-04-06",
       "serial": "SLUS-20777"
     },
+    "ObsCure: The Aftermath": {
+      "alt_serials": [],
+      "crcs": [
+        "408DFB9C"
+      ],
+      "developer": "Hydravision Entertainment",
+      "genre": "Action, Adventure, Survival Horror",
+      "publisher": "Ignition Entertainment",
+      "release_date": "2008-03-25",
+      "serial": "SLUS-21709"
+    },
     "Odin Sphere": {
       "alt_serials": [],
       "crcs": [
@@ -15164,6 +15143,18 @@
       "release_date": "2007-06-19",
       "serial": "SLUS-21501"
     },
+    "Rayman 2: Revolution": {
+      "alt_serials": [],
+      "crcs": [
+        "B4F84074",
+        "D2F77DF2"
+      ],
+      "developer": "Ubisoft Entertainment",
+      "genre": "Platformer",
+      "publisher": "Ubisoft Entertainment SA",
+      "release_date": "2001-01-30",
+      "serial": "SLUS-20138"
+    },
     "Rayman 3: Hoodlum Havoc": {
       "alt_serials": [],
       "crcs": [
@@ -16126,15 +16117,6 @@
       "release_date": "2002-08-27",
       "serial": "SCUS-97230"
     },
-    "SOCOM: U.S. Navy SEALs (SCUS-97859)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Zipper Interactive",
-      "genre": "Action, Shooter",
-      "publisher": "Sony",
-      "release_date": "2002-08-27",
-      "serial": "SCUS-97859"
-    },
     "SOCOM: U.S. Navy SEALs Combined Assault": {
       "aliases": [
         "SOCOM CA"
@@ -16895,15 +16877,6 @@
       "release_date": "2005-10-11",
       "serial": "SLUS-21152"
     },
-    "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-28052)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2005-10-11",
-      "serial": "SLUS-28052"
-    },
     "Shin Megami Tensei: Nocturne": {
       "aliases": [
         "Nocturne",
@@ -16929,37 +16902,6 @@
       "publisher": "Atlus U.S.A",
       "release_date": "2004-10-12",
       "serial": "SLUS-28045"
-    },
-    "Shin Megami Tensei: Persona 3": {
-      "aliases": [
-        "P3",
-        "Persona 3"
-      ],
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2007-08-14",
-      "serial": "SLUS-28067"
-    },
-    "Shin Megami Tensei: Persona 3 FES": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2008-04-22",
-      "serial": "SLUS-28068"
-    },
-    "Shin Megami Tensei: Persona 4": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2008-12-09",
-      "serial": "SLUS-28069"
     },
     "Shining Force EXA": {
       "alt_serials": [],
@@ -22437,67 +22379,6 @@
       "publisher": "Crave Entertainment",
       "release_date": "2003-07-29",
       "serial": "SLUS-20525"
-    },
-    "Equestriad": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Bit Managers",
-      "genre": "Sports",
-      "publisher": "THQ",
-      "release_date": "2006-11-15",
-      "serial": "SLUS-21401"
-    },
-    "Cowboy Bebop": {
-      "serial": "SLUS-20699",
-      "title": "Cowboy Bebop",
-      "region": "NTSC-U",
-      "developer": "Namco",
-      "publisher": "Bandai Namco",
-      "genre": "Action",
-      "release_date": "2005-05-17"
-    },
-    "Cabela's Deer Hunt: 2005 Season": {
-      "alt_serials": [],
-      "crcs": [
-        "DF6BC54F"
-      ],
-      "developer": "Sand Grain Studios",
-      "genre": "Sports",
-      "publisher": "Activision",
-      "release_date": "2004-08-31",
-      "serial": "SLUS-21011"
-    },
-    "Cabela's Big Game Hunter 2005 Adventures": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sand Grain Studios",
-      "genre": "Sports",
-      "publisher": "Activision",
-      "release_date": "2004-11-09",
-      "serial": "SLUS-21021"
-    },
-    "ObsCure: The Aftermath": {
-      "alt_serials": [],
-      "crcs": [
-        "408DFB9C"
-      ],
-      "developer": "Hydravision Entertainment",
-      "genre": "Action, Adventure, Survival Horror",
-      "publisher": "Ignition Entertainment",
-      "release_date": "2008-03-25",
-      "serial": "SLUS-21709"
-    },
-    "Rayman 2: Revolution": {
-      "alt_serials": [],
-      "crcs": [
-        "B4F84074",
-        "D2F77DF2"
-      ],
-      "developer": "Ubisoft Entertainment",
-      "genre": "Platformer",
-      "publisher": "Ubisoft Entertainment SA",
-      "release_date": "2001-01-30",
-      "serial": "SLUS-20138"
     }
   },
   "version": "1.0"

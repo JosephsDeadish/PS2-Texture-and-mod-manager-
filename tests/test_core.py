@@ -8730,7 +8730,7 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
 
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.data), 2173)
+        self.assertGreaterEqual(len(self.data), 2160)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8819,7 +8819,7 @@ class TestWave47NewGames(unittest.TestCase):
 
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.games), 2173)
+        self.assertGreaterEqual(len(self.games), 2160)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9157,9 +9157,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count >= 2173 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155)."""
+        """Wave 49: serial DB game count >= 2160 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157)."""
         self.assertGreaterEqual(
-            len(self.games), 2173,
+            len(self.games), 2160,
             f"Serial DB game count too low: {len(self.games)}"
         )
 
@@ -9380,8 +9380,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2173)
+        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307; Wave 157: reduced to 2160."""
+        self.assertGreaterEqual(len(self.raw_games), 2160)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9586,7 +9586,7 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2173)
+        self.assertGreaterEqual(len(self.raw_games), 2160)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9774,7 +9774,7 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
 
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2173)
+        self.assertGreaterEqual(len(self.raw_games), 2160)
 
 
 # ===========================================================================
@@ -18080,7 +18080,9 @@ class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
         self.assertNotIn("Capcom Vs. SNK 2", self.games)
 
     def test_champions_of_norrath_crcs_merged(self):
-        entry = self.games.get("Champions of Norrath: Realms of EverQuest", {})
+        # Wave 157: title corrected from 'Champions of Norrath: Realms of EverQuest' to
+        # 'Champions of Norrath' because SLUS-20565 is the original game per PS2.txt.
+        entry = self.games.get("Champions of Norrath", {})
         crcs = entry.get("crcs", [])
         self.assertIn("22CA9B7A", crcs)
         self.assertIn("F27239BA", crcs)
@@ -20169,8 +20171,8 @@ class TestWave108DbSerialFixes(unittest.TestCase):
     # ── NTSC-U DB count reduced by 4 ─────────────────────────────────────────
 
     def test_ntsc_db_count(self):
-        """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json."""
-        self.assertGreaterEqual(len(self.ntsc), 2173)
+        """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json; Wave 157: removed 13 wrong-serial dupes."""
+        self.assertGreaterEqual(len(self.ntsc), 2160)
 
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
@@ -20966,19 +20968,22 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._date('Persona 4'), '2008-12-09')
 
     def test_smt_persona3_genre_date(self):
-        """Wave 113: Shin Megami Tensei: Persona 3 genre=RPG, date=2007-08-14."""
-        self.assertEqual(self._genre('Shin Megami Tensei: Persona 3'), 'RPG')
-        self.assertEqual(self._date('Shin Megami Tensei: Persona 3'), '2007-08-14')
+        """Wave 113: SMT Persona 3 genre=RPG. Wave 157: title key corrected from
+        'Shin Megami Tensei: Persona 3' (SLUS-28067 demo serial) to 'Persona 3' (SLUS-21569)."""
+        self.assertEqual(self._genre('Persona 3'), 'RPG')
+        self.assertEqual(self._date('Persona 3'), '2007-08-14')
 
     def test_smt_persona3_fes_genre_date(self):
-        """Wave 113: Shin Megami Tensei: Persona 3 FES genre=RPG, date=2008-04-22."""
-        self.assertEqual(self._genre('Shin Megami Tensei: Persona 3 FES'), 'RPG')
-        self.assertEqual(self._date('Shin Megami Tensei: Persona 3 FES'), '2008-04-22')
+        """Wave 113: SMT Persona 3 FES genre=RPG. Wave 157: title key corrected from
+        'Shin Megami Tensei: Persona 3 FES' (SLUS-28068 demo serial) to 'Persona 3 FES' (SLUS-21621)."""
+        self.assertEqual(self._genre('Persona 3 FES'), 'RPG')
+        self.assertEqual(self._date('Persona 3 FES'), '2008-10-17')
 
     def test_smt_persona4_genre_date(self):
-        """Wave 113: Shin Megami Tensei: Persona 4 genre=RPG, date=2008-12-09."""
-        self.assertEqual(self._genre('Shin Megami Tensei: Persona 4'), 'RPG')
-        self.assertEqual(self._date('Shin Megami Tensei: Persona 4'), '2008-12-09')
+        """Wave 113: SMT Persona 4 genre=RPG. Wave 157: title key corrected from
+        'Shin Megami Tensei: Persona 4' (SLUS-28069 demo serial) to 'Persona 4' (SLUS-21782)."""
+        self.assertEqual(self._genre('Persona 4'), 'RPG')
+        self.assertEqual(self._date('Persona 4'), '2008-12-09')
 
     def test_smt_devil_summoner_genre_date(self):
         """Wave 113: SMT: Devil Summoner: Raidou Kuzunoha genre=RPG."""
@@ -21128,9 +21133,11 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._date('ATV Offroad Fury 2 (SCUS-97238)'), '2002-11-12')
 
     def test_champions_of_norrath_orphan_genre_date(self):
-        """Wave 113: Champions of Norrath (SLUS-29088) orphan alt-serial filled directly."""
-        self.assertEqual(self._genre('Champions of Norrath (SLUS-29088)'), 'Action-RPG')
-        self.assertEqual(self._date('Champions of Norrath (SLUS-29088)'), '2004-01-27')
+        """Wave 113: Champions of Norrath orphan alt-serial filled directly.
+        Wave 157: entry renamed from 'Champions of Norrath (SLUS-29088)' to 'Champions of Norrath'
+        (SLUS-29088 was demo serial per PS2.txt; correct entry is SLUS-20565)."""
+        self.assertEqual(self._genre('Champions of Norrath'), 'Action, RPG')
+        self.assertEqual(self._date('Champions of Norrath'), '2004-02-10')
 
     def test_espn_nba_2night_orphan_genre_date(self):
         """Wave 113: ESPN NBA 2Night (SLUS-20143) orphan alt-serial filled directly."""
@@ -21790,8 +21797,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
             f"JP DB has only {len(self.jp)} entries, expected >= 3500")
 
     def test_ntsc_u_db_minimum_entries(self):
-        self.assertGreaterEqual(len(self.ntsc), 2173,
-            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2173")
+        self.assertGreaterEqual(len(self.ntsc), 2160,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2160")
 
     # ── All entries have non-empty serial ─────────────────────────────────────
 
@@ -26047,9 +26054,9 @@ class TestWave152SerialFixes(unittest.TestCase):
             "Simpsons Road Rage must have SLUS-20139 as alt_serial")
 
     def test_ntsc_count_wave152(self):
-        """Wave 152: NTSC-U DB must have >= 2173 entries (Naruto UN5 dupe removed in Wave 155)."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2173,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2173")
+        """Wave 152: NTSC-U DB must have >= 2160 entries (Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2160,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2160")
 
 
 class TestWave153MetadataFills(unittest.TestCase):
@@ -26324,3 +26331,140 @@ class TestWave156SerialTitleFixes(unittest.TestCase):
             if e.get('serial') == 'SCPS-15021' or 'SCPS-15021' in e.get('alt_serials', []):
                 self.assertNotIn('Jak II', title,
                     f"SCPS-15021 is Jak 1 JP, should not be Jak II: {title!r}")
+
+
+class TestWave157NtscUSerialFixes(unittest.TestCase):
+    """Wave 157: Remove wrong-serial duplicate NTSC-U entries verified against PS2.txt.
+    Removed 13 wrong entries:
+    - SLUS-97414 (EyeToy AntiGrav wrong prefix, SCUS-97414 correct)
+    - SLUS-97124 (Jak GH wrong prefix, SCUS-97124 is main entry)
+    - SCUS-97859 (SOCOM, not in PS2.txt)
+    - SLUS-28067/28068/28069 (Persona 3/3FES/4, demo-range serials)
+    - SLUS-28034 (Disgaea HoD, not in PS2.txt)
+    - SLUS-28052 (SMT DDS2, trade demo serial)
+    - SLUS-29085/29088 (Champions of Norrath, wrong/demo serials)
+    - SLUS-29126 (Champions:Return to Arms demo)
+    - SLUS-29151 (Enthusia, not in PS2.txt)
+    - SLUS-26138 (Madden NFL 08, not in PS2.txt)
+    Fixed 'Champions of Norrath: Realms of EverQuest' (SLUS-20565) title to 'Champions of Norrath'.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+
+    def test_ntsc_count_wave157(self):
+        """Wave 157: NTSC-U DB must have >= 2160 entries after removing 13 wrong-serial duplicates."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2160,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2160")
+
+    def test_ntsc_eyetoy_antigrav_wrong_prefix_removed(self):
+        """Wave 157: 'EyeToy: AntiGrav (NTSC-U)' with SLUS-97414 (wrong prefix) must be removed."""
+        self.assertNotIn("EyeToy: AntiGrav (NTSC-U)", self.ntsc_games,
+            "Wave 157: SLUS-97414 is wrong prefix, correct is SCUS-97414 (already in DB as 'EyeToy: Antigrav')")
+
+    def test_ntsc_eyetoy_antigrav_correct_entry_exists(self):
+        """Wave 157: 'EyeToy: Antigrav' with SCUS-97414 must exist."""
+        g = self.ntsc_games.get("EyeToy: Antigrav", {})
+        self.assertEqual(g.get('serial'), 'SCUS-97414',
+            "EyeToy: Antigrav must have correct serial SCUS-97414")
+
+    def test_ntsc_jak_gh_wrong_prefix_removed(self):
+        """Wave 157: 'Jak and Daxter: The Precursor Legacy: Greatest Hits (NTSC-U)' with SLUS-97124 removed."""
+        self.assertNotIn("Jak and Daxter: The Precursor Legacy: Greatest Hits (NTSC-U)", self.ntsc_games,
+            "Wave 157: SLUS-97124 is wrong prefix, SCUS-97124 is main Jak entry")
+
+    def test_ntsc_socom_wrong_serial_removed(self):
+        """Wave 157: 'SOCOM: U.S. Navy SEALs (SCUS-97859)' removed (SCUS-97859 not in PS2.txt)."""
+        self.assertNotIn("SOCOM: U.S. Navy SEALs (SCUS-97859)", self.ntsc_games,
+            "Wave 157: SCUS-97859 not in PS2.txt, correct SOCOM serial is SCUS-97134")
+
+    def test_ntsc_socom_correct_entry_exists(self):
+        """Wave 157: 'SOCOM: U.S. Navy SEALs' with SCUS-97134 must still exist."""
+        g = self.ntsc_games.get("SOCOM: U.S. Navy SEALs", {})
+        self.assertEqual(g.get('serial'), 'SCUS-97134',
+            "SOCOM: U.S. Navy SEALs must have correct serial SCUS-97134")
+
+    def test_ntsc_persona3_wrong_serial_removed(self):
+        """Wave 157: 'Shin Megami Tensei: Persona 3' with SLUS-28067 removed (demo-range serial)."""
+        self.assertNotIn("Shin Megami Tensei: Persona 3", self.ntsc_games,
+            "Wave 157: SLUS-28067 not in PS2.txt; correct Persona 3 serial is SLUS-21569 under 'Persona 3'")
+
+    def test_ntsc_persona3_correct_entry_exists(self):
+        """Wave 157: 'Persona 3' with SLUS-21569 must exist."""
+        g = self.ntsc_games.get("Persona 3", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21569',
+            "Persona 3 must have correct serial SLUS-21569")
+
+    def test_ntsc_persona3fes_wrong_serial_removed(self):
+        """Wave 157: 'Shin Megami Tensei: Persona 3 FES' with SLUS-28068 removed."""
+        self.assertNotIn("Shin Megami Tensei: Persona 3 FES", self.ntsc_games,
+            "Wave 157: SLUS-28068 not in PS2.txt; correct entry is 'Persona 3 FES' SLUS-21621")
+
+    def test_ntsc_persona4_wrong_serial_removed(self):
+        """Wave 157: 'Shin Megami Tensei: Persona 4' with SLUS-28069 removed."""
+        self.assertNotIn("Shin Megami Tensei: Persona 4", self.ntsc_games,
+            "Wave 157: SLUS-28069 not in PS2.txt; correct entry is 'Persona 4' SLUS-21782")
+
+    def test_ntsc_disgaea_wrong_serial_removed(self):
+        """Wave 157: 'Disgaea: Hour of Darkness (SLUS-28034)' removed (SLUS-28034 not in PS2.txt)."""
+        self.assertNotIn("Disgaea: Hour of Darkness (SLUS-28034)", self.ntsc_games,
+            "Wave 157: SLUS-28034 not in PS2.txt; correct entry is 'Disgaea: Hour of Darkness' SLUS-20666")
+
+    def test_ntsc_dds2_wrong_serial_removed(self):
+        """Wave 157: 'SMT Digital Devil Saga 2 (SLUS-28052)' removed (SLUS-28052 is trade demo)."""
+        self.assertNotIn("Shin Megami Tensei: Digital Devil Saga 2 (SLUS-28052)", self.ntsc_games,
+            "Wave 157: SLUS-28052 is trade demo per PS2.txt; correct is 'Shin Megami Tensei: Digital Devil Saga 2' SLUS-21152")
+
+    def test_ntsc_champions_norrath_demo_removed(self):
+        """Wave 157: 'Champions of Norrath (SLUS-29088)' removed (SLUS-29088 is demo per PS2.txt)."""
+        self.assertNotIn("Champions of Norrath (SLUS-29088)", self.ntsc_games,
+            "Wave 157: SLUS-29088 is 'Champions of Norrath: Realms of EverQuest [Demo]' per PS2.txt")
+
+    def test_ntsc_champions_realms_wrong_removed(self):
+        """Wave 157: 'Champions of Norrath: Realms of Everquest' with SLUS-29085 removed."""
+        self.assertNotIn("Champions of Norrath: Realms of Everquest", self.ntsc_games,
+            "Wave 157: SLUS-29085 not in PS2.txt; no NTSC-U retail release of Realms of EverQuest")
+
+    def test_ntsc_champions_return_demo_removed(self):
+        """Wave 157: 'Champions: Return to Arms (SLUS-29126)' removed (SLUS-29126 is demo per PS2.txt)."""
+        self.assertNotIn("Champions: Return to Arms (SLUS-29126)", self.ntsc_games,
+            "Wave 157: SLUS-29126 is 'Champions - Return to Arms [Demo]' per PS2.txt")
+
+    def test_ntsc_champions_norrath_title_fixed(self):
+        """Wave 157: 'Champions of Norrath' with SLUS-20565 exists (title was wrongly 'Realms of EverQuest')."""
+        g = self.ntsc_games.get("Champions of Norrath", {})
+        self.assertEqual(g.get('serial'), 'SLUS-20565',
+            "Champions of Norrath must have serial SLUS-20565 (original game, not sequel)")
+
+    def test_ntsc_enthusia_wrong_serial_removed(self):
+        """Wave 157: 'Enthusia: Professional Racing (SLUS-29151)' removed (not in PS2.txt)."""
+        self.assertNotIn("Enthusia: Professional Racing (SLUS-29151)", self.ntsc_games,
+            "Wave 157: SLUS-29151 not in PS2.txt; correct is 'Enthusia: Professional Racing' SLUS-20967")
+
+    def test_ntsc_enthusia_correct_entry_exists(self):
+        """Wave 157: 'Enthusia: Professional Racing' with SLUS-20967 must still exist."""
+        g = self.ntsc_games.get("Enthusia: Professional Racing", {})
+        self.assertEqual(g.get('serial'), 'SLUS-20967',
+            "Enthusia: Professional Racing must have correct serial SLUS-20967")
+
+    def test_ntsc_madden_wrong_serial_removed(self):
+        """Wave 157: 'Madden NFL 08 (SLUS-26138)' removed (SLUS-26138 not in PS2.txt)."""
+        self.assertNotIn("Madden NFL 08 (SLUS-26138)", self.ntsc_games,
+            "Wave 157: SLUS-26138 not in PS2.txt; correct Madden NFL 08 serial is SLUS-21638")
+
+    def test_ntsc_madden_08_correct_entry_exists(self):
+        """Wave 157: 'Madden NFL 08' with SLUS-21638 must still exist."""
+        g = self.ntsc_games.get("Madden NFL 08", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21638',
+            "Madden NFL 08 must have correct serial SLUS-21638")
+
+    def test_ntsc_no_slus_97xxx_serials(self):
+        """Wave 157: No NTSC-U entry should use SLUS-97xxx prefix (those are wrong prefix, should be SCUS)."""
+        for title, e in self.ntsc_games.items():
+            s = e.get('serial', '')
+            self.assertFalse(s.startswith('SLUS-97'),
+                f"SLUS-97xxx is wrong prefix (should be SCUS-97xxx): {title!r} serial={s!r}")
