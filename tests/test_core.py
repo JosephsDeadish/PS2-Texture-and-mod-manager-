@@ -8730,7 +8730,7 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
 
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.data), 2015)
+        self.assertGreaterEqual(len(self.data), 1994)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8819,7 +8819,7 @@ class TestWave47NewGames(unittest.TestCase):
 
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.games), 2015)
+        self.assertGreaterEqual(len(self.games), 1994)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9157,9 +9157,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count >= 2015 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157; 145 demo-serial dupes removed in Wave 158)."""
+        """Wave 49: serial DB game count >= 1994 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157; 145 demo-serial dupes removed in Wave 158; 21 more demo-serial dupes removed in Wave 159)."""
         self.assertGreaterEqual(
-            len(self.games), 2015,
+            len(self.games), 1994,
             f"Serial DB game count too low: {len(self.games)}"
         )
 
@@ -9380,8 +9380,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307; Wave 158: reduced to 2015."""
-        self.assertGreaterEqual(len(self.raw_games), 2015)
+        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307; Wave 158: reduced to 2015; Wave 159: reduced to 1994."""
+        self.assertGreaterEqual(len(self.raw_games), 1994)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9586,7 +9586,7 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2015)
+        self.assertGreaterEqual(len(self.raw_games), 1994)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9774,7 +9774,7 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
 
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2015)
+        self.assertGreaterEqual(len(self.raw_games), 1994)
 
 
 # ===========================================================================
@@ -20172,7 +20172,7 @@ class TestWave108DbSerialFixes(unittest.TestCase):
 
     def test_ntsc_db_count(self):
         """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json; Wave 157: removed 13 wrong-serial dupes."""
-        self.assertGreaterEqual(len(self.ntsc), 2015)
+        self.assertGreaterEqual(len(self.ntsc), 1994)
 
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
@@ -20767,8 +20767,9 @@ class TestWave112DbAuditFixes(unittest.TestCase):
             self.assertEqual(info.get('developer'), 'Polyphony Digital', title)
 
     def test_burnout_alt_serial_propagated(self):
-        """Wave 112: Burnout alt-serial inherits Criterion Games dev."""
-        info = self._info('Burnout (SLUS-28006)')
+        """Wave 112: Burnout inherits Criterion Games dev.
+        Wave 159: entry renamed from 'Burnout (SLUS-28006)' (trade demo) to 'Burnout' (SLUS-20307)."""
+        info = self._info('Burnout')
         self.assertEqual(info.get('developer'), 'Criterion Games')
 
     # ── Phase-2 known-wrong fixes ─────────────────────────────────────────────
@@ -20859,8 +20860,9 @@ class TestWave112DbAuditFixes(unittest.TestCase):
         self.assertEqual(info.get('developer'), 'SCE London Studio')
 
     def test_dot_hack_infection_dev_pub(self):
-        """Wave 112: Dot Hack Part 1: Infection has CyberConnect2 dev."""
-        info = self._info('Dot Hack Part 1: Infection')
+        """Wave 112: .hack//Infection has CyberConnect2 dev.
+        Wave 159: entry renamed from 'Dot Hack Part 1: Infection' (trade demo) to '.hack//Infection' (SLUS-20267)."""
+        info = self._info('.hack//Infection')
         self.assertEqual(info.get('developer'), 'CyberConnect2')
         self.assertEqual(info.get('publisher'), 'Bandai')
 
@@ -20938,19 +20940,22 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
 
     # ── Phase-1 spot-checks (base titles filled) ─────────────────────────────
     def test_007_everything_or_nothing_genre_date(self):
-        """Wave 113: 007: Everything or Nothing genre=Action, date=2004-02-17."""
-        self.assertEqual(self._genre('007: Everything or Nothing'), 'Action')
-        self.assertEqual(self._date('007: Everything or Nothing'), '2004-02-17')
+        """Wave 113: 007: Everything or Nothing genre=Action, date=2004-02-17.
+        Wave 159: entry renamed from '007: Everything or Nothing' (demo) to '007 - Everything or Nothing' (SLUS-20751)."""
+        self.assertEqual(self._genre('007 - Everything or Nothing'), 'Action, Adventure, Shooter')
+        self.assertEqual(self._date('007 - Everything or Nothing'), '2004-02-17')
 
     def test_battlefield2_modern_combat_genre_date(self):
-        """Wave 113: Battlefield 2: Modern Combat genre=First-person Shooter."""
-        self.assertEqual(self._genre('Battlefield 2: Modern Combat'), 'First-person Shooter')
-        self.assertEqual(self._date('Battlefield 2: Modern Combat'), '2005-11-01')
+        """Wave 113: Battlefield 2: Modern Combat genre=First-person Shooter.
+        Wave 159: entry renamed from 'Battlefield 2: Modern Combat' (beta) to 'Battlefield 2 - Modern Combat' (SLUS-21026)."""
+        self.assertEqual(self._genre('Battlefield 2 - Modern Combat'), 'Action, First Person Shooter')
+        self.assertEqual(self._date('Battlefield 2 - Modern Combat'), '2005-10-24')
 
     def test_def_jam_vendetta_genre_date(self):
-        """Wave 113: Def Jam: Vendetta genre=Fighting, date=2003-03-18."""
-        self.assertEqual(self._genre('Def Jam: Vendetta'), 'Fighting')
-        self.assertEqual(self._date('Def Jam: Vendetta'), '2003-03-18')
+        """Wave 113: Def Jam: Vendetta genre=Fighting.
+        Wave 159: entry renamed from 'Def Jam: Vendetta' (demo) to 'Def Jam Vendetta' (SLUS-20639)."""
+        self.assertEqual(self._genre('Def Jam Vendetta'), 'Fighting')
+        self.assertEqual(self._date('Def Jam Vendetta'), '2003-04-01')
 
     def test_dmc3_special_edition_genre_date(self):
         """Wave 113: Devil May Cry 3: Special Edition genre=Action, date=2006-02-22."""
@@ -20986,20 +20991,24 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._date('Persona 4'), '2008-12-09')
 
     def test_smt_devil_summoner_genre_date(self):
-        """Wave 113: SMT: Devil Summoner: Raidou Kuzunoha genre=RPG."""
-        title = 'Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army'
-        self.assertEqual(self._genre(title), 'RPG')
+        """Wave 113: SMT: Devil Summoner: Raidou Kuzunoha genre=RPG.
+        Wave 159: renamed from wrong-serial entry (SLUS-28064 trade demo) to retail entry
+        'Devil Summoner: Raidou Kuzunoha vs. The Soulless Army' (SLUS-21431)."""
+        title = 'Devil Summoner: Raidou Kuzunoha vs. The Soulless Army'
+        self.assertEqual(self._genre(title), 'Action-RPG')
         self.assertEqual(self._date(title), '2006-10-10')
 
     def test_dot_hack_infection_genre_date(self):
-        """Wave 113: Dot Hack Part 1: Infection genre=Action-RPG, date=2003-02-11."""
-        self.assertEqual(self._genre('Dot Hack Part 1: Infection'), 'Action-RPG')
-        self.assertEqual(self._date('Dot Hack Part 1: Infection'), '2003-02-11')
+        """Wave 113: .hack//Infection genre=Action,RPG.
+        Wave 159: entry renamed from 'Dot Hack Part 1: Infection' (demo) to '.hack//Infection' (SLUS-20267)."""
+        self.assertEqual(self._genre('.hack//Infection'), 'Action, RPG')
+        self.assertEqual(self._date('.hack//Infection'), '2003-03-10')
 
     def test_dot_hack_mutation_genre_date(self):
-        """Wave 113: Dot Hack Part 2: Mutation genre=Action-RPG, date=2003-06-03."""
-        self.assertEqual(self._genre('Dot Hack Part 2: Mutation'), 'Action-RPG')
-        self.assertEqual(self._date('Dot Hack Part 2: Mutation'), '2003-06-03')
+        """Wave 113: .hack//Mutation genre=Action-RPG.
+        Wave 159: entry renamed from 'Dot Hack Part 2: Mutation' (demo) to '.hack//Mutation' (SLUS-20562)."""
+        self.assertEqual(self._genre('.hack//Mutation'), 'Action-RPG')
+        self.assertEqual(self._date('.hack//Mutation'), '2003-05-06')
 
     def test_dbz_budokai_tenkaichi2_genre_date(self):
         """Wave 113: Dragon Ball Z: Budokai Tenkaichi 2 genre=Fighting, date=2006-11-15."""
@@ -21022,9 +21031,10 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._date('NHL Hitz 2003'), '2002-09-12')
 
     def test_soulcalibur_ii_genre_date(self):
-        """Wave 113: Soulcalibur II genre=Fighting, date=2003-08-27."""
-        self.assertEqual(self._genre('Soulcalibur II'), 'Fighting')
-        self.assertEqual(self._date('Soulcalibur II'), '2003-08-27')
+        """Wave 113: SoulCalibur II genre=Fighting, date=2003-08-27.
+        Wave 159: entry renamed from 'Soulcalibur II' (demo SLUS-29058) to 'SoulCalibur II' (SLUS-20643)."""
+        self.assertEqual(self._genre('SoulCalibur II'), 'Fighting')
+        self.assertEqual(self._date('SoulCalibur II'), '2003-08-27')
 
     def test_socom_combined_assault_genre_date(self):
         """Wave 113: SOCOM: U.S. Navy SEALs: Combined Assault genre=Action, Shooter."""
@@ -21043,8 +21053,9 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
 
     def test_mx_vs_atv_unleashed_genre_date(self):
         """Wave 113: MX vs. ATV Unleashed genre=Racing, date=2005-02-15."""
-        self.assertEqual(self._genre('MX vs. ATV Unleashed'), 'Racing')
-        self.assertEqual(self._date('MX vs. ATV Unleashed'), '2005-02-15')
+        # Wave 159: entry renamed from 'MX vs. ATV Unleashed' (demo) to 'MX Vs. ATV Unleashed' (SLUS-21104)
+        self.assertEqual(self._genre('MX Vs. ATV Unleashed'), 'Racing')
+        self.assertEqual(self._date('MX Vs. ATV Unleashed'), '2005-03-16')
 
     def test_naruto_ultimate_ninja_genre_date(self):
         """Wave 113: Naruto: Ultimate Ninja genre=Fighting, date=2006-06-26."""
@@ -21084,15 +21095,15 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
 
     # ── Phase-3 spot-checks (alt-serial propagation) ─────────────────────────
     def test_battlefield2_alt_serials_genre_propagated(self):
-        """Wave 113: Battlefield 2 alt-serial variants inherited genre from base."""
-        for title in ('Battlefield 2: Modern Combat (SLUS-29152)',
-                      'Battlefield 2: Modern Combat (SLUS-29172)'):
-            self.assertEqual(self._genre(title), 'First-person Shooter', title)
-            self.assertEqual(self._date(title), '2005-11-01', title)
+        """Wave 113: Battlefield 2 genre/date check.
+        Wave 159: demo entries (SLUS-29152/29172) removed; check retail 'Battlefield 2 - Modern Combat' (SLUS-21026)."""
+        self.assertEqual(self._genre('Battlefield 2 - Modern Combat'), 'Action, First Person Shooter')
+        self.assertEqual(self._date('Battlefield 2 - Modern Combat'), '2005-10-24')
 
     def test_dot_hack_infection_alt_serial_propagated(self):
-        """Wave 113: Dot Hack Part 1: Infection alt-serial inherited genre."""
-        self.assertEqual(self._genre('Dot Hack Part 1: Infection (SLUS-29042)'), 'Action-RPG')
+        """Wave 113: .hack//Infection genre check.
+        Wave 159: demo entries (SLUS-28023, SLUS-29042) removed; check retail '.hack//Infection' (SLUS-20267)."""
+        self.assertEqual(self._genre('.hack//Infection'), 'Action, RPG')
 
     def test_eyetoy_alt_serial_propagated(self):
         """Wave 113: EyeToy alt-serial (SCUS-97600) inherited genre=Party."""
@@ -21115,16 +21126,19 @@ class TestWave113DbGenreDateFills(unittest.TestCase):
         self.assertEqual(self._genre('Syphon Filter: The Omega Strain (SCUS-97397)'), 'Action, Shooter')
 
     def test_ufc_throwdown_alt_serial_propagated(self):
-        """Wave 113: UFC: Throwdown alt-serial inherited genre=Fighting."""
-        self.assertEqual(self._genre('UFC: Throwdown (SLUS-29022)'), 'Fighting')
+        """Wave 113: UFC Throwdown genre check.
+        Wave 159: demo entries (SLUS-28009, SLUS-29022) removed; check retail 'UFC Throwdown' (SLUS-20252)."""
+        self.assertEqual(self._genre('UFC Throwdown'), 'Sports')
 
     def test_transformers_alt_serial_propagated(self):
-        """Wave 113: Transformers alt-serial inherited genre=Action."""
-        self.assertEqual(self._genre('Transformers (SLUS-29107)'), 'Action')
+        """Wave 113: TransFormers genre check.
+        Wave 159: demo entries (SLUS-28040, SLUS-29107) removed; check retail 'TransFormers' (SLUS-20668)."""
+        self.assertEqual(self._genre('TransFormers'), 'Third-person Shooter')
 
     def test_dance_factory_alt_serial_propagated(self):
-        """Wave 113: Dance Factory alt-serial inherited genre=Rhythm."""
-        self.assertEqual(self._genre('Dance Factory (SLUS-28062)'), 'Rhythm')
+        """Wave 113: Dance Factory genre=Rhythm.
+        Wave 159: demo entry (SLUS-28062) removed; check retail 'Dance Factory' (SLUS-21296)."""
+        self.assertEqual(self._genre('Dance Factory'), 'Rhythm')
 
     # ── Phase-4 spot-checks (orphan alt-serial direct fills) ─────────────────
     def test_atv_offroad_fury2_orphan_genre_date(self):
@@ -21797,8 +21811,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
             f"JP DB has only {len(self.jp)} entries, expected >= 3500")
 
     def test_ntsc_u_db_minimum_entries(self):
-        self.assertGreaterEqual(len(self.ntsc), 2015,
-            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2015")
+        self.assertGreaterEqual(len(self.ntsc), 1994,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 1994")
 
     # ── All entries have non-empty serial ─────────────────────────────────────
 
@@ -26054,9 +26068,9 @@ class TestWave152SerialFixes(unittest.TestCase):
             "Simpsons Road Rage must have SLUS-20139 as alt_serial")
 
     def test_ntsc_count_wave152(self):
-        """Wave 152: NTSC-U DB must have >= 2015 entries (Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157; 145 demo-serial dupes removed in Wave 158)."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2015,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
+        """Wave 152: NTSC-U DB must have >= 1994 entries (through Wave 159: 13+145+21 demo-serial dupes removed)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 1994,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 1994")
 
 
 class TestWave153MetadataFills(unittest.TestCase):
@@ -26357,9 +26371,9 @@ class TestWave157NtscUSerialFixes(unittest.TestCase):
         cls.ntsc_games = ntsc_data['games']
 
     def test_ntsc_count_wave157(self):
-        """Wave 157: NTSC-U DB must have >= 2015 entries after removing 13 wrong-serial duplicates (Wave 157) and 145 demo-serial duplicates (Wave 158)."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2015,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
+        """Wave 157: NTSC-U DB must have >= 1994 entries after removing wrong-serial duplicates (Waves 157-159)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 1994,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 1994")
 
     def test_ntsc_eyetoy_antigrav_wrong_prefix_removed(self):
         """Wave 157: 'EyeToy: AntiGrav (NTSC-U)' with SLUS-97414 (wrong prefix) must be removed."""
@@ -26485,36 +26499,15 @@ class TestWave158NtscUDemoSerialCleanup(unittest.TestCase):
         cls.ntsc_games = ntsc_data['games']
 
     def test_ntsc_count_wave158(self):
-        """Wave 158: NTSC-U DB must have >= 2015 entries after removing 145 demo-serial duplicates."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2015,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
+        """Wave 158: NTSC-U DB must have >= 1994 entries after removing 145+21 demo-serial duplicates (Waves 158-159)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 1994,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 1994")
 
     def test_ntsc_no_demo_slus_28_29_without_suffix(self):
         """Wave 158: SLUS-28/29 entries without proper retail suffix should not be in DB
         unless they have no retail alternative (exception: tested entries)."""
-        # These are known demo serials that remained because they have test coverage:
+        # The only remaining SLUS-28/29 entry is one with no retail alternative:
         allowed_demo_serials = {
-            'SLUS-29095',  # 007: Everything or Nothing (has test from prev wave)
-            'SLUS-29017',  # AirBlade
-            'SLUS-29117',  # Battlefield 2: Modern Combat
-            'SLUS-29152',  # Battlefield 2: Modern Combat (SLUS-29152)
-            'SLUS-29172',  # Battlefield 2: Modern Combat (SLUS-29172)
-            'SLUS-28006',  # Burnout (SLUS-28006)
-            'SLUS-28062',  # Dance Factory (SLUS-28062)
-            'SLUS-29047',  # Def Jam: Vendetta
-            'SLUS-28023',  # Dot Hack Part 1: Infection
-            'SLUS-29042',  # Dot Hack Part 1: Infection (SLUS-29042)
-            'SLUS-28032',  # Dot Hack Part 2: Mutation
-            'SLUS-29140',  # MX vs. ATV Unleashed
-            'SLUS-29137',  # Mercenaries
-            'SLUS-29154',  # NHL 06
-            'SLUS-28064',  # SMT Devil Summoner
-            'SLUS-29058',  # Soulcalibur II
-            'SLUS-28040',  # Transformers
-            'SLUS-29107',  # Transformers (SLUS-29107)
-            'SLUS-28009',  # UFC: Throwdown
-            'SLUS-29022',  # UFC: Throwdown (SLUS-29022)
-            'SLUS-29116',  # WWE SmackDown! vs. Raw
             'SLUS-29004',  # Unison: Rebels of Rhythm & Dance (no retail alternative)
         }
         for title, e in self.ntsc_games.items():
@@ -26545,3 +26538,80 @@ class TestWave158NtscUDemoSerialCleanup(unittest.TestCase):
             all_s |= {s for e in self.ntsc_games.values() for s in e.get('alt_serials', [])}
             self.assertIn(serial, all_s,
                 f"Wave 158: Retail entry {title!r} ({serial}) lost after demo cleanup")
+
+
+class TestWave159NtscUFinalDemoCleanup(unittest.TestCase):
+    """Wave 159: Remove 21 remaining SLUS-28/29 demo-serial entries that had test coverage
+    from Wave 112/113. All tests updated to use correct retail entries.
+    Removed entries and their retail replacements:
+    - '007: Everything or Nothing' (SLUS-29095 demo) → '007 - Everything or Nothing' (SLUS-20751)
+    - 'AirBlade' (SLUS-29017 demo) → 'Airblade' (SLUS-20346)
+    - 'Battlefield 2: Modern Combat' (SLUS-29117 beta) → 'Battlefield 2 - Modern Combat' (SLUS-21026)
+    - 'Battlefield 2: Modern Combat (SLUS-29152)' (demo) → retail SLUS-21026
+    - 'Battlefield 2: Modern Combat (SLUS-29172)' (not in PS2.txt) → retail SLUS-21026
+    - 'Burnout (SLUS-28006)' (trade demo) → 'Burnout' (SLUS-20307)
+    - 'Dance Factory (SLUS-28062)' (demo) → 'Dance Factory' (SLUS-21296)
+    - 'Def Jam: Vendetta' (SLUS-29047 demo) → 'Def Jam Vendetta' (SLUS-20639)
+    - 'Dot Hack Part 1: Infection' (SLUS-28023 trade demo) → '.hack//Infection' (SLUS-20267)
+    - 'Dot Hack Part 1: Infection (SLUS-29042)' (demo) → '.hack//Infection' (SLUS-20267)
+    - 'Dot Hack Part 2: Mutation' (SLUS-28032 trade demo) → '.hack//Mutation' (SLUS-20562)
+    - 'MX vs. ATV Unleashed' (SLUS-29140 demo) → 'MX Vs. ATV Unleashed' (SLUS-21104)
+    - 'Mercenaries' (SLUS-29137 demo) → 'Mercenaries - Playground of Destruction' (SLUS-20932)
+    - 'NHL 06' (SLUS-29154 demo) → 'NHL 2006' (SLUS-21241)
+    - 'Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army' (SLUS-28064)
+      → 'Devil Summoner: Raidou Kuzunoha vs. The Soulless Army' (SLUS-21431)
+    - 'Soulcalibur II' (SLUS-29058 demo) → 'SoulCalibur II' (SLUS-20643)
+    - 'Transformers' (SLUS-28040 trade demo) → 'TransFormers' (SLUS-20668)
+    - 'Transformers (SLUS-29107)' (demo) → 'TransFormers' (SLUS-20668)
+    - 'UFC: Throwdown' (SLUS-28009 trade demo) → 'UFC Throwdown' (SLUS-20252)
+    - 'UFC: Throwdown (SLUS-29022)' (demo) → 'UFC Throwdown' (SLUS-20252)
+    - 'WWE SmackDown! vs. Raw' (SLUS-29116 beta) → 'WWE SmackDown! vs. RAW' (SLUS-21060)
+    After Wave 159, only ONE SLUS-28/29 entry remains: 'Unison: Rebels of Rhythm & Dance / DOA2: Hardcore'
+    (SLUS-29004) which has no retail alternative in NTSC-U.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+
+    def test_ntsc_count_wave159(self):
+        """Wave 159: NTSC-U DB must have >= 1994 entries after removing 21 more demo-serial entries."""
+        self.assertGreaterEqual(len(self.ntsc_games), 1994,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 1994")
+
+    def test_ntsc_only_one_demo_serial_remains(self):
+        """Wave 159: After cleanup, only SLUS-29004 (Unison/DOA2) should be in SLUS-28/29 range."""
+        demo_entries = {t: e for t, e in self.ntsc_games.items()
+                       if e.get('serial', '').startswith('SLUS-28') or e.get('serial', '').startswith('SLUS-29')}
+        self.assertEqual(len(demo_entries), 1,
+            f"Expected only 1 SLUS-28/29 entry (Unison), found {len(demo_entries)}: {list(demo_entries.keys())}")
+        self.assertIn('Unison: Rebels of Rhythm & Dance / DOA2: Hardcore', demo_entries,
+            "Wave 159: 'Unison: Rebels of Rhythm & Dance / DOA2: Hardcore' must be the only SLUS-28/29 entry")
+
+    def test_ntsc_retail_entries_for_removed_demos(self):
+        """Wave 159: All retail entries must exist after demo removal."""
+        expected = [
+            ('007 - Everything or Nothing', 'SLUS-20751'),
+            ('Airblade', 'SLUS-20346'),
+            ('Battlefield 2 - Modern Combat', 'SLUS-21026'),
+            ('Burnout', 'SLUS-20307'),
+            ('Dance Factory', 'SLUS-21296'),
+            ('Def Jam Vendetta', 'SLUS-20639'),
+            ('.hack//Infection', 'SLUS-20267'),
+            ('.hack//Mutation', 'SLUS-20562'),
+            ('MX Vs. ATV Unleashed', 'SLUS-21104'),
+            ('Mercenaries - Playground of Destruction', 'SLUS-20932'),
+            ('NHL 2006', 'SLUS-21241'),
+            ('Devil Summoner: Raidou Kuzunoha vs. The Soulless Army', 'SLUS-21431'),
+            ('SoulCalibur II', 'SLUS-20643'),
+            ('TransFormers', 'SLUS-20668'),
+            ('UFC Throwdown', 'SLUS-20252'),
+            ('WWE SmackDown! vs. RAW', 'SLUS-21060'),
+        ]
+        for title, serial in expected:
+            g = self.ntsc_games.get(title, {})
+            self.assertEqual(g.get('serial'), serial,
+                f"Wave 159: Retail entry {title!r} ({serial}) must exist after demo cleanup")

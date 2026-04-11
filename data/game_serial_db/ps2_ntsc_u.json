@@ -127,15 +127,6 @@
       "release_date": "2001-11-13",
       "serial": "SLUS-20265"
     },
-    "007: Everything or Nothing": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Redwood Shores",
-      "genre": "Action",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-02-17",
-      "serial": "SLUS-29095"
-    },
     "007: From Russia with Love": {
       "alt_serials": [],
       "crcs": [],
@@ -484,15 +475,6 @@
       "publisher": "Acclaim",
       "release_date": "2002-05-30",
       "serial": "SLUS-20327"
-    },
-    "AirBlade": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Criterion Games",
-      "genre": "Racing",
-      "publisher": "Namco",
-      "release_date": "2002-05-21",
-      "serial": "SLUS-29017"
     },
     "Airblade": {
       "alt_serials": [],
@@ -1516,33 +1498,6 @@
       "release_date": "2005-10-24",
       "serial": "SLUS-21026"
     },
-    "Battlefield 2: Modern Combat": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "DICE",
-      "genre": "First-person Shooter",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-11-01",
-      "serial": "SLUS-29117"
-    },
-    "Battlefield 2: Modern Combat (SLUS-29152)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "DICE",
-      "genre": "First-person Shooter",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-11-01",
-      "serial": "SLUS-29152"
-    },
-    "Battlefield 2: Modern Combat (SLUS-29172)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "DICE",
-      "genre": "First-person Shooter",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-11-01",
-      "serial": "SLUS-29172"
-    },
     "Battlestar Galactica": {
       "alt_serials": [],
       "crcs": [
@@ -2037,15 +1992,6 @@
       "publisher": "Acclaim Entertainment",
       "release_date": "2001-11-02",
       "serial": "SLUS-20307"
-    },
-    "Burnout (SLUS-28006)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Criterion Games",
-      "genre": "Racing",
-      "publisher": "Acclaim Entertainment",
-      "release_date": "2001-11-02",
-      "serial": "SLUS-28006"
     },
     "Burnout 2: Point of Impact": {
       "alt_serials": [],
@@ -3337,15 +3283,6 @@
       "release_date": "2006-08-22",
       "serial": "SLUS-21296"
     },
-    "Dance Factory (SLUS-28062)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Broadsword Interactive",
-      "genre": "Rhythm",
-      "publisher": "Codemasters",
-      "release_date": "2006-08-22",
-      "serial": "SLUS-28062"
-    },
     "Dancing with the Stars": {
       "alt_serials": [],
       "crcs": [],
@@ -3529,15 +3466,6 @@
       "publisher": "EA Games",
       "release_date": "2004-09-20",
       "serial": "SLUS-21004"
-    },
-    "Def Jam: Vendetta": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Aki Corp",
-      "genre": "Fighting",
-      "publisher": "EA Games",
-      "release_date": "2003-03-18",
-      "serial": "SLUS-29047"
     },
     "Defender": {
       "alt_serials": [],
@@ -4285,33 +4213,6 @@
       "publisher": "Namco Bandai Games",
       "release_date": "2006-10-24",
       "serial": "SLUS-21480"
-    },
-    "Dot Hack Part 1: Infection": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2003-02-11",
-      "serial": "SLUS-28023"
-    },
-    "Dot Hack Part 1: Infection (SLUS-29042)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2003-02-11",
-      "serial": "SLUS-29042"
-    },
-    "Dot Hack Part 2: Mutation": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2003-06-03",
-      "serial": "SLUS-28032"
     },
     "Downforce": {
       "alt_serials": [],
@@ -9816,15 +9717,6 @@
       "release_date": "2005-03-29",
       "serial": "SLUS-21097"
     },
-    "MX vs. ATV Unleashed": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Racing",
-      "publisher": "THQ",
-      "release_date": "2005-02-15",
-      "serial": "SLUS-29140"
-    },
     "MX vs. ATV Untamed": {
       "alt_serials": [],
       "crcs": [
@@ -10479,15 +10371,6 @@
       "publisher": "Infogrames",
       "release_date": "2002-06-28",
       "serial": "SLUS-20373"
-    },
-    "Mercenaries": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Pandemic Studios",
-      "genre": "Action",
-      "publisher": "LucasArts",
-      "release_date": "2005-01-11",
-      "serial": "SLUS-29137"
     },
     "Mercenaries - Playground of Destruction": {
       "alt_serials": [],
@@ -12125,15 +12008,6 @@
       "publisher": "EA Sports",
       "release_date": "2006-11-14",
       "serial": "SLUS-21482"
-    },
-    "NHL 06": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-09-09",
-      "serial": "SLUS-29154"
     },
     "NHL 08": {
       "alt_serials": [],
@@ -15844,15 +15718,6 @@
       "release_date": "2009-05-12",
       "serial": "SLUS-21897"
     },
-    "Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2006-10-10",
-      "serial": "SLUS-28064"
-    },
     "Shin Megami Tensei: Digital Devil Saga": {
       "aliases": [
         "DDS",
@@ -16727,15 +16592,6 @@
       "publisher": "Namco",
       "release_date": "2005-10-25",
       "serial": "SLUS-21216"
-    },
-    "Soulcalibur II": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Fighting",
-      "publisher": "Namco",
-      "release_date": "2003-08-27",
-      "serial": "SLUS-29058"
     },
     "Space Channel 5: Special Edition (Disc 1)": {
       "alt_serials": [
@@ -19277,24 +19133,6 @@
       "release_date": "2002-05-03",
       "serial": "SLUS-20356"
     },
-    "Transformers": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Melbourne House",
-      "genre": "Action",
-      "publisher": "Atari",
-      "release_date": "2004-05-12",
-      "serial": "SLUS-28040"
-    },
-    "Transformers (SLUS-29107)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Melbourne House",
-      "genre": "Action",
-      "publisher": "Atari",
-      "release_date": "2004-05-12",
-      "serial": "SLUS-29107"
-    },
     "Transformers - Revenge of the Fallen": {
       "alt_serials": [],
       "crcs": [
@@ -19533,24 +19371,6 @@
       "publisher": "Anchor Inc.",
       "release_date": "2002-06-05",
       "serial": "SLUS-20252"
-    },
-    "UFC: Throwdown": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Anchor Inc.",
-      "genre": "Fighting",
-      "publisher": "Crave Entertainment",
-      "release_date": "2002-04-22",
-      "serial": "SLUS-28009"
-    },
-    "UFC: Throwdown (SLUS-29022)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Anchor Inc.",
-      "genre": "Fighting",
-      "publisher": "Crave Entertainment",
-      "release_date": "2002-04-22",
-      "serial": "SLUS-29022"
     },
     "UFC: Ultimate Fighting Championship: Sudden Impact": {
       "alt_serials": [],
@@ -19967,15 +19787,6 @@
       "publisher": "THQ",
       "release_date": "2005-11-14",
       "serial": "SLUS-21286"
-    },
-    "WWE SmackDown! vs. Raw": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Yuke's",
-      "genre": "Fighting",
-      "publisher": "THQ",
-      "release_date": "2004-11-02",
-      "serial": "SLUS-29116"
     },
     "WWF SmackDown! Just Bring It": {
       "alt_serials": [],
