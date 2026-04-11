@@ -145,15 +145,6 @@
       "release_date": "2005-11-01",
       "serial": "SLUS-21282"
     },
-    "007: From Russia with Love (SLUS-29168)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Redwood Shores",
-      "genre": "Action, Driving, Shooter",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-11-01",
-      "serial": "SLUS-29168"
-    },
     "007: Quantum of Solace": {
       "alt_serials": [],
       "crcs": [],
@@ -214,15 +205,6 @@
       "publisher": "Eidos Interactive",
       "release_date": "2006-01-17",
       "serial": "SLUS-21016"
-    },
-    "25 to Life": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ritual Entertainment",
-      "genre": "Action",
-      "publisher": "Eidos Interactive",
-      "release_date": "2006-01-10",
-      "serial": "SLUS-29129"
     },
     "4x4 Evo": {
       "alt_serials": [],
@@ -503,15 +485,6 @@
       "release_date": "2002-05-30",
       "serial": "SLUS-20327"
     },
-    "Aggressive Inline (SLUS-29021)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Z-Axis, Ltd",
-      "genre": "Skateboarding",
-      "publisher": "Acclaim",
-      "release_date": "2002-05-30",
-      "serial": "SLUS-29021"
-    },
     "AirBlade": {
       "alt_serials": [],
       "crcs": [],
@@ -613,15 +586,6 @@
       "release_date": "2002-02-28",
       "serial": "SLUS-20311"
     },
-    "All-Star Baseball 2003 featuring Derek Jeter (SLUS-28007)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Acclaim Studios Austin",
-      "genre": "Sports",
-      "publisher": "Acclaim Entertainment",
-      "release_date": "2002-02-28",
-      "serial": "SLUS-28007"
-    },
     "All-Star Baseball 2004 featuring Derek Jeter": {
       "alt_serials": [],
       "crcs": [],
@@ -661,15 +625,6 @@
       "publisher": "THQ",
       "release_date": "2003-08-12",
       "serial": "SLUS-20465"
-    },
-    "Alter Echo (SLUS-29056)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Outrage Games",
-      "genre": "Action-Adventure",
-      "publisher": "THQ",
-      "release_date": "2003-08-12",
-      "serial": "SLUS-29056"
     },
     "Alvin and the Chipmunks": {
       "alt_serials": [],
@@ -1126,15 +1081,6 @@
       "publisher": "Atari",
       "release_date": "2004-09-14",
       "serial": "SLUS-20866"
-    },
-    "Asterix & Obelix: Kick Buttix (SLUS-29111)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Etranges Libellules",
-      "genre": "Action, Adventure, Beat'em Up",
-      "publisher": "Atari",
-      "release_date": "2004-09-14",
-      "serial": "SLUS-29111"
     },
     "Astro Boy": {
       "alt_serials": [],
@@ -1670,15 +1616,6 @@
       "release_date": "2003-11-11",
       "serial": "SLUS-20763"
     },
-    "Beyond Good & Evil (SLUS-29082)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ubisoft Entertainment",
-      "genre": "Action-Adventure",
-      "publisher": "Ubi Soft Entertainment",
-      "release_date": "2003-11-11",
-      "serial": "SLUS-29082"
-    },
     "Big Idea's VeggieTales - LarryBoy and the Bad Apple": {
       "alt_serials": [],
       "crcs": [
@@ -1798,33 +1735,6 @@
       "publisher": "Majesco",
       "release_date": "2003-01-30",
       "serial": "SLUS-20506"
-    },
-    "Black & Bruised (SLUS-28027)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Digital Fiction, Inc.",
-      "genre": "Sports",
-      "publisher": "Majesco",
-      "release_date": "2003-01-30",
-      "serial": "SLUS-28027"
-    },
-    "Black & Bruised (SLUS-29045)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Digital Fiction, Inc.",
-      "genre": "Sports",
-      "publisher": "Majesco",
-      "release_date": "2003-01-30",
-      "serial": "SLUS-29045"
-    },
-    "Black (SLUS-29180)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Criterion Games",
-      "genre": "RPG",
-      "publisher": "Electronic Arts",
-      "release_date": "2006-02-28",
-      "serial": "SLUS-29180"
     },
     "Blade II": {
       "alt_serials": [],
@@ -2170,15 +2080,6 @@
       "release_date": "2004-09-07",
       "serial": "SLUS-21050"
     },
-    "Burnout 3: Takedown (SLUS-29113)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Criterion Games",
-      "genre": "Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-09-07",
-      "serial": "SLUS-29113"
-    },
     "Burnout Anthology": {
       "alt_serials": [],
       "crcs": [],
@@ -2219,15 +2120,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2005-09-13",
       "serial": "SLUS-21242"
-    },
-    "Burnout Revenge (SLUS-29153)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Criterion Games",
-      "genre": "Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-09-13",
-      "serial": "SLUS-29153"
     },
     "Butt-Ugly Martians: Zoom or Doom!": {
       "alt_serials": [],
@@ -2777,15 +2669,6 @@
       "release_date": "2004-11-17",
       "serial": "SLUS-20930"
     },
-    "Choro Q (SLUS-28044)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Barnhouse Effect",
-      "genre": "Racing",
-      "publisher": "Atlus",
-      "release_date": "2004-11-17",
-      "serial": "SLUS-28044"
-    },
     "Chronicles of Narnia, The - Prince Caspian": {
       "alt_serials": [],
       "crcs": [
@@ -2937,15 +2820,6 @@
       "publisher": "SouthPeak Games",
       "release_date": "2005-11-21",
       "serial": "SLUS-20715"
-    },
-    "Combat Elite: WWII Paratroopers (SLUS-28054)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "BattleBorne",
-      "genre": "Action",
-      "publisher": "SouthPeak Games",
-      "release_date": "2005-11-21",
-      "serial": "SLUS-28054"
     },
     "Commandos 2: Men of Courage": {
       "alt_serials": [],
@@ -3112,15 +2986,6 @@
       "release_date": "2004-11-15",
       "serial": "SLUS-21013"
     },
-    "Crash 'n' Burn": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Climax Group",
-      "genre": "Racing",
-      "publisher": "Eidos Interactive",
-      "release_date": "2004-11-01",
-      "serial": "SLUS-29130"
-    },
     "Crash Bandicoot: Action Pack": {
       "alt_serials": [],
       "crcs": [],
@@ -3149,15 +3014,6 @@
       "release_date": "2001-10-31",
       "serial": "SLUS-20238"
     },
-    "Crash Bandicoot: The Wrath of Cortex (SLUS-29010)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Traveller's Tales",
-      "genre": "Action, Platformer",
-      "publisher": "Universal Interactive Studios",
-      "release_date": "2001-10-31",
-      "serial": "SLUS-29010"
-    },
     "Crash Nitro Kart": {
       "alt_serials": [],
       "crcs": [
@@ -3168,15 +3024,6 @@
       "publisher": "Vivendi Universal Games",
       "release_date": "2003-11-11",
       "serial": "SLUS-20649"
-    },
-    "Crash Nitro Kart (SLUS-29068)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Vicarious Visions, Inc",
-      "genre": "Driving, Racing",
-      "publisher": "Vivendi Universal Games",
-      "release_date": "2003-11-11",
-      "serial": "SLUS-29068"
     },
     "Crash Tag Team Racing": {
       "aliases": [
@@ -3211,15 +3058,6 @@
       "publisher": "Vivendi Universal Games",
       "release_date": "2004-09-26",
       "serial": "SLUS-20909"
-    },
-    "Crash Twinsanity / Spyro: A Hero's Tail": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Traveller's Tales",
-      "genre": "Compilation",
-      "publisher": "Vivendi Universal Games",
-      "release_date": "2004-09-28",
-      "serial": "SLUS-29101"
     },
     "Crash of the Titans": {
       "alt_serials": [],
@@ -3358,15 +3196,6 @@
       "release_date": "2003-09-23",
       "serial": "SLUS-20711"
     },
-    "DDRMAX2: Dance Dance Revolution (SLUS-29074)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Rhythm",
-      "publisher": "Konami of America",
-      "release_date": "2003-09-23",
-      "serial": "SLUS-29074"
-    },
     "DDRMAX: Dance Dance Revolution": {
       "alt_serials": [],
       "crcs": [],
@@ -3375,15 +3204,6 @@
       "publisher": "Konami",
       "release_date": "2002-10-28",
       "serial": "SLUS-20437"
-    },
-    "DDRMAX: Dance Dance Revolution (SLUS-29037)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Rhythm",
-      "publisher": "Konami",
-      "release_date": "2002-10-28",
-      "serial": "SLUS-29037"
     },
     "DICE: DNA Integrated Cybernetic Enterprises": {
       "alt_serials": [],
@@ -3606,15 +3426,6 @@
       "release_date": "2001-11-29",
       "serial": "SLUS-20300"
     },
-    "Dark Summit (SLUS-29015)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Radical Entertainment",
-      "genre": "Sports",
-      "publisher": "THQ",
-      "release_date": "2001-11-29",
-      "serial": "SLUS-29015"
-    },
     "Darkwatch": {
       "alt_serials": [],
       "crcs": [
@@ -3719,15 +3530,6 @@
       "release_date": "2004-09-20",
       "serial": "SLUS-21004"
     },
-    "Def Jam: Fight for NY (SLUS-29108)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Aki Corp",
-      "genre": "Action, Fighting",
-      "publisher": "EA Games",
-      "release_date": "2004-09-20",
-      "serial": "SLUS-29108"
-    },
     "Def Jam: Vendetta": {
       "alt_serials": [],
       "crcs": [],
@@ -3791,15 +3593,6 @@
       "release_date": "2005-07-21",
       "serial": "SLUS-20945"
     },
-    "Destroy All Humans! (SLUS-29150)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Pandemic Studio Pty. Ltd",
-      "genre": "Action, Shooter",
-      "publisher": "THQ",
-      "release_date": "2005-07-21",
-      "serial": "SLUS-29150"
-    },
     "Destroy All Humans! 2": {
       "alt_serials": [],
       "crcs": [
@@ -3811,15 +3604,6 @@
       "publisher": "THQ",
       "release_date": "2006-10-17",
       "serial": "SLUS-21439"
-    },
-    "Destroy All Humans! 2 (SLUS-29196)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Pandemic Studios",
-      "genre": "Action-Adventure",
-      "publisher": "THQ",
-      "release_date": "2006-10-17",
-      "serial": "SLUS-29196"
     },
     "Destruction Derby Arenas": {
       "alt_serials": [],
@@ -3875,15 +3659,6 @@
       "publisher": "Capcom",
       "release_date": "2001-10-16",
       "serial": "SLUS-20216"
-    },
-    "Devil May Cry (SLUS-29009)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom Co., Ltd",
-      "genre": "Action, Shooter, Survival Horror",
-      "publisher": "Capcom",
-      "release_date": "2001-10-16",
-      "serial": "SLUS-29009"
     },
     "Devil May Cry 2": {
       "aliases": [
@@ -4061,15 +3836,6 @@
       "publisher": "Agetec Inc",
       "release_date": "2003-02-15",
       "serial": "SLUS-20561"
-    },
-    "Disaster Report (SLUS-28025)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Irem Software Engineering, Inc",
-      "genre": "Action, Adventure",
-      "publisher": "Agetec Inc",
-      "release_date": "2003-02-15",
-      "serial": "SLUS-28025"
     },
     "Disgaea 2: Cursed Memories": {
       "aliases": [
@@ -4511,15 +4277,6 @@
       "release_date": "2010-10-26",
       "serial": "SLUS-21944"
     },
-    "Dot Hack G.U. Vol. 1: Rebirth": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Namco Bandai",
-      "release_date": "2006-10-24",
-      "serial": "SLUS-29199"
-    },
     "Dot Hack G.U. Vol. 1: Rebirth: Terminal Disc": {
       "alt_serials": [],
       "crcs": [],
@@ -4555,33 +4312,6 @@
       "publisher": "Bandai",
       "release_date": "2003-06-03",
       "serial": "SLUS-28032"
-    },
-    "Dot Hack Part 2: Mutation (SLUS-29055)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2003-06-03",
-      "serial": "SLUS-29055"
-    },
-    "Dot Hack Part 3: Outbreak": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2003-09-09",
-      "serial": "SLUS-29065"
-    },
-    "Dot Hack Part 4: Quarantine": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Action-RPG",
-      "publisher": "Bandai",
-      "release_date": "2004-02-17",
-      "serial": "SLUS-29084"
     },
     "Downforce": {
       "alt_serials": [],
@@ -4624,15 +4354,6 @@
       "publisher": "Midway",
       "release_date": "2002-11-19",
       "serial": "SLUS-20458"
-    },
-    "Dr. Muto (SLUS-29040)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Midway Games West Inc",
-      "genre": "Action, Platformer",
-      "publisher": "Midway",
-      "release_date": "2002-11-19",
-      "serial": "SLUS-29040"
     },
     "Dr. Seuss' The Cat in the Hat": {
       "alt_serials": [],
@@ -4804,15 +4525,6 @@
       "release_date": "2005-11-15",
       "serial": "SLUS-21207"
     },
-    "Dragon Quest VIII: Journey of the Cursed King (SLUS-29157)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Level-5",
-      "genre": "RPG",
-      "publisher": "Square Enix",
-      "release_date": "2005-11-15",
-      "serial": "SLUS-29157"
-    },
     "Dragon Rage": {
       "alt_serials": [],
       "crcs": [
@@ -4868,15 +4580,6 @@
       "publisher": "Ubisoft",
       "release_date": "2006-02-14",
       "serial": "SLUS-21373"
-    },
-    "DreamWorks & Aardman Flushed Away": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Warthog Games",
-      "genre": "Action, Adventure",
-      "publisher": "THQ",
-      "release_date": "2006-11-01",
-      "serial": "SLUS-29197"
     },
     "DreamWorks Bee Movie Game": {
       "alt_serials": [],
@@ -4998,15 +4701,6 @@
       "release_date": "2006-03-14",
       "serial": "SLUS-21399"
     },
-    "Driver: Parallel Lines (SLUS-29185)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Reflections Interactive",
-      "genre": "Racing",
-      "publisher": "Atari",
-      "release_date": "2006-03-14",
-      "serial": "SLUS-29185"
-    },
     "Driving Emotion Type-S": {
       "alt_serials": [],
       "crcs": [
@@ -5048,24 +4742,6 @@
       "publisher": "Atlus U.S.A",
       "release_date": "2002-09-25",
       "serial": "SLUS-20475"
-    },
-    "Dual Hearts (SLUS-28013)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Matrix",
-      "genre": "Action, Adventure, Platform",
-      "publisher": "Atlus U.S.A",
-      "release_date": "2002-09-25",
-      "serial": "SLUS-28013"
-    },
-    "Dual Hearts (SLUS-29033)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Matrix",
-      "genre": "Action, Adventure, Platform",
-      "publisher": "Atlus U.S.A",
-      "release_date": "2002-09-25",
-      "serial": "SLUS-29033"
     },
     "Duel Masters": {
       "alt_serials": [],
@@ -5361,15 +5037,6 @@
       "release_date": "2002-01-14",
       "serial": "SLUS-20089"
     },
-    "ESPN Winter X Games Snowboarding (SLUS-29001)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Sports",
-      "publisher": "Konami",
-      "release_date": "2002-01-14",
-      "serial": "SLUS-29001"
-    },
     "ESPN X Games Skateboarding": {
       "alt_serials": [],
       "crcs": [],
@@ -5378,15 +5045,6 @@
       "publisher": "Konami",
       "release_date": "2001-08-15",
       "serial": "SLUS-20237"
-    },
-    "ESPN X Games Skateboarding (SLUS-29008)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Sports",
-      "publisher": "Konami",
-      "release_date": "2001-08-15",
-      "serial": "SLUS-29008"
     },
     "Eagle Eye Golf": {
       "alt_serials": [],
@@ -5438,15 +5096,6 @@
       "publisher": "Kemco",
       "release_date": "2002-09-12",
       "serial": "SLUS-20452"
-    },
-    "Egg Mania: Eggstreme Madness (SLUS-29032)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "HotGen",
-      "genre": "Puzzle",
-      "publisher": "Kemco",
-      "release_date": "2002-09-12",
-      "serial": "SLUS-29032"
     },
     "Endgame": {
       "alt_serials": [],
@@ -5578,42 +5227,6 @@
       "release_date": "2003-02-09",
       "serial": "SLUS-20470"
     },
-    "EverQuest: Online Adventures (SLUS-28020)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2003-02-09",
-      "serial": "SLUS-28020"
-    },
-    "EverQuest: Online Adventures (SLUS-28021)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2003-02-09",
-      "serial": "SLUS-28021"
-    },
-    "EverQuest: Online Adventures (SLUS-28026)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2003-02-09",
-      "serial": "SLUS-28026"
-    },
-    "EverQuest: Online Adventures (SLUS-29050)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "publisher": "Sony Online Entertainment",
-      "release_date": "2003-02-09",
-      "serial": "SLUS-29050"
-    },
     "EverQuest: Online Adventures: Frontiers": {
       "alt_serials": [],
       "crcs": [],
@@ -5622,15 +5235,6 @@
       "publisher": "Sony Computer Entertainment America",
       "release_date": "2003-11-17",
       "serial": "SLUS-20744"
-    },
-    "EverQuest: Online Adventures: Frontiers (SLUS-29063)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "publisher": "Sony Computer Entertainment America",
-      "release_date": "2003-11-17",
-      "serial": "SLUS-29063"
     },
     "Everblue 2": {
       "alt_serials": [],
@@ -5864,15 +5468,6 @@
       "release_date": "2000-12-20",
       "serial": "SLUS-20103"
     },
-    "FIFA 06": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-09-27",
-      "serial": "SLUS-29160"
-    },
     "FIFA 13": {
       "alt_serials": [],
       "crcs": [],
@@ -5918,15 +5513,6 @@
       "release_date": "2006-10-03",
       "serial": "SLUS-21433"
     },
-    "FIFA Soccer 07 (SLUS-29194)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Team Fusion",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2006-10-03",
-      "serial": "SLUS-29194"
-    },
     "FIFA Soccer 08": {
       "alt_serials": [],
       "crcs": [],
@@ -5935,15 +5521,6 @@
       "publisher": "EA Sports",
       "release_date": "2007-10-08",
       "serial": "SLUS-21648"
-    },
-    "FIFA Soccer 08 (SLUS-29201)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2007-10-08",
-      "serial": "SLUS-29201"
     },
     "FIFA Soccer 09": {
       "alt_serials": [],
@@ -6023,15 +5600,6 @@
       "release_date": "2004-10-12",
       "serial": "SLUS-21051"
     },
-    "FIFA Soccer 2005 (SLUS-29127)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-10-12",
-      "serial": "SLUS-29127"
-    },
     "FIFA Street": {
       "alt_serials": [],
       "crcs": [
@@ -6062,15 +5630,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2006-04-24",
       "serial": "SLUS-21408"
-    },
-    "FIFA World Cup Germany 2006 (SLUS-29189)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2006-04-24",
-      "serial": "SLUS-29189"
     },
     "Fairly OddParents, The - Shadow Showdown": {
       "alt_serials": [],
@@ -6252,15 +5811,6 @@
       "release_date": "2004-11-16",
       "serial": "SLUS-20857"
     },
-    "Fight Club (SLUS-29124)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Genuine Games",
-      "genre": "Fighting",
-      "publisher": "Vivendi Universal Games",
-      "release_date": "2004-11-16",
-      "serial": "SLUS-29124"
-    },
     "Fight Night 2004": {
       "alt_serials": [],
       "crcs": [
@@ -6272,15 +5822,6 @@
       "release_date": "2004-04-05",
       "serial": "SLUS-20906"
     },
-    "Fight Night 2004 (SLUS-29096)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-04-05",
-      "serial": "SLUS-29096"
-    },
     "Fight Night Round 2": {
       "alt_serials": [],
       "crcs": [],
@@ -6290,15 +5831,6 @@
       "release_date": "2005-02-28",
       "serial": "SLUS-21161"
     },
-    "Fight Night Round 2 (SLUS-29145)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Sports",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-02-28",
-      "serial": "SLUS-29145"
-    },
     "Fight Night Round 3": {
       "alt_serials": [],
       "crcs": [],
@@ -6307,15 +5839,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2006-03-20",
       "serial": "SLUS-21383"
-    },
-    "Fight Night Round 3 (SLUS-29183)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Chicago",
-      "genre": "Boxing",
-      "publisher": "Electronic Arts",
-      "release_date": "2006-03-20",
-      "serial": "SLUS-29183"
     },
     "Fighter Maker 2": {
       "alt_serials": [],
@@ -6454,15 +5977,6 @@
       "release_date": "2006-10-31",
       "serial": "SLUS-21475"
     },
-    "Final Fantasy XII (SLUS-29171)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Square Enix",
-      "genre": "RPG",
-      "publisher": "Square Enix",
-      "release_date": "2006-10-31",
-      "serial": "SLUS-29171"
-    },
     "Final Fight: Streetwise": {
       "alt_serials": [],
       "crcs": [],
@@ -6498,15 +6012,6 @@
       "publisher": "Midway",
       "release_date": "2002-06-16",
       "serial": "SLUS-20198"
-    },
-    "FireBlade (SLUS-29030)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "5000ft Inc.",
-      "genre": "Action",
-      "publisher": "Midway",
-      "release_date": "2002-06-16",
-      "serial": "SLUS-29030"
     },
     "Firefighter F.D. 18": {
       "alt_serials": [],
@@ -6568,15 +6073,6 @@
       "publisher": "Capcom",
       "release_date": "2005-07-13",
       "serial": "SLUS-21157"
-    },
-    "Flipnic: Ultimate Pinball (SLUS-29149)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment Japan",
-      "genre": "Pinball",
-      "publisher": "Capcom",
-      "release_date": "2005-07-13",
-      "serial": "SLUS-29149"
     },
     "Flow: Urban Dance Uprising": {
       "alt_serials": [],
@@ -6711,15 +6207,6 @@
       "publisher": "Midway Home Entertainment",
       "release_date": "2003-08-04",
       "serial": "SLUS-20284"
-    },
-    "Freaky Flyers (SLUS-29061)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Midway Studios - San Diego",
-      "genre": "Racing",
-      "publisher": "Midway Home Entertainment",
-      "release_date": "2003-08-04",
-      "serial": "SLUS-29061"
     },
     "Freedom Fighters": {
       "alt_serials": [],
@@ -6951,15 +6438,6 @@
       "release_date": "2004-06-29",
       "serial": "SLUS-20822"
     },
-    "Galactic Wrestling featuring Ultimate Muscle: The Kinnikuman Legacy (SLUS-29104)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "AKI Corporation",
-      "genre": "Wrestling",
-      "publisher": "Bandai",
-      "release_date": "2004-06-29",
-      "serial": "SLUS-29104"
-    },
     "Galerians: Ash": {
       "alt_serials": [],
       "crcs": [],
@@ -7109,15 +6587,6 @@
       "release_date": "2004-11-08",
       "serial": "SLUS-21006"
     },
-    "Ghost in the Shell: Stand Alone Complex": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Production I.G.",
-      "genre": "Action, Shooter",
-      "publisher": "Bandai",
-      "release_date": "2004-12-14",
-      "serial": "SLUS-29123"
-    },
     "Ghostbusters: The Video Game": {
       "alt_serials": [],
       "crcs": [],
@@ -7179,15 +6648,6 @@
       "publisher": "Lucasarts",
       "release_date": "2003-10-28",
       "serial": "SLUS-20490"
-    },
-    "Gladius (SLUS-29060)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Lucasarts",
-      "genre": "Action, Tactical RPG",
-      "publisher": "Lucasarts",
-      "release_date": "2003-10-28",
-      "serial": "SLUS-29060"
     },
     "Global Touring Challenge: Africa": {
       "alt_serials": [],
@@ -7780,15 +7240,6 @@
       "release_date": "2004-11-02",
       "serial": "SLUS-20908"
     },
-    "Guilty Gear Isuka (SLUS-28046)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sammy Studios",
-      "genre": "Fighting",
-      "publisher": "Arc System Works",
-      "release_date": "2004-11-02",
-      "serial": "SLUS-28046"
-    },
     "Guilty Gear X": {
       "alt_serials": [],
       "crcs": [
@@ -7890,15 +7341,6 @@
       "release_date": "2006-11-07",
       "serial": "SLUS-21447"
     },
-    "Guitar Hero II (SLUS-29198)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Harmonix Music Systems",
-      "genre": "Rhythm",
-      "publisher": "RedOctane",
-      "release_date": "2006-11-07",
-      "serial": "SLUS-29198"
-    },
     "Guitar Hero III: Legends of Rock": {
       "aliases": [
         "GH 3",
@@ -7983,15 +7425,6 @@
       "publisher": "Sega",
       "release_date": "2002-09-17",
       "serial": "SLUS-20493"
-    },
-    "Gungrave (SLUS-28015)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Positron Co., Ltd",
-      "genre": "Action, Shooter",
-      "publisher": "Sega",
-      "release_date": "2002-09-17",
-      "serial": "SLUS-28015"
     },
     "Gungrave - Overdose": {
       "alt_serials": [],
@@ -8243,24 +7676,6 @@
       "release_date": "2002-11-17",
       "serial": "SLUS-20517"
     },
-    "Haven: Call of the King (SLUS-28019)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Traveller's Tales",
-      "genre": "Action, Adventure, Platformer",
-      "publisher": "Midway Home Entertainment",
-      "release_date": "2002-11-17",
-      "serial": "SLUS-28019"
-    },
-    "Haven: Call of the King (SLUS-29038)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Traveller's Tales",
-      "genre": "Action, Adventure, Platformer",
-      "publisher": "Midway Home Entertainment",
-      "release_date": "2002-11-17",
-      "serial": "SLUS-29038"
-    },
     "Headhunter": {
       "alt_serials": [],
       "crcs": [
@@ -8372,15 +7787,6 @@
       "release_date": "2002-02-12",
       "serial": "SLUS-20298"
     },
-    "High Heat Major League Baseball 2003 (SLUS-29019)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "3DO",
-      "genre": "Sports",
-      "publisher": "3DO",
-      "release_date": "2002-02-12",
-      "serial": "SLUS-29019"
-    },
     "High Heat Major League Baseball 2004": {
       "alt_serials": [],
       "crcs": [],
@@ -8389,15 +7795,6 @@
       "publisher": "3DO",
       "release_date": "2003-02-20",
       "serial": "SLUS-20602"
-    },
-    "High Heat Major League Baseball 2004 (SLUS-28029)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "3DO",
-      "genre": "Sports",
-      "publisher": "3DO",
-      "release_date": "2003-02-20",
-      "serial": "SLUS-28029"
     },
     "High Rollers Casino": {
       "alt_serials": [],
@@ -8455,15 +7852,6 @@
       "publisher": "Eidos Interactive",
       "release_date": "2006-03-30",
       "serial": "SLUS-21108"
-    },
-    "Hitman: Blood Money / Urban Chaos: Riot Response": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "IO Interactive",
-      "genre": "Action",
-      "publisher": "Eidos Interactive",
-      "release_date": "2006-05-09",
-      "serial": "SLUS-29191"
     },
     "Hitman: Contracts": {
       "aliases": [
@@ -8624,15 +8012,6 @@
       "release_date": "2003-09-09",
       "serial": "SLUS-20511"
     },
-    "Hunter: The Reckoning: Wayward (SLUS-29059)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "High Voltage Software, Inc",
-      "genre": "Action",
-      "publisher": "Vivendi Universal Games",
-      "release_date": "2003-09-09",
-      "serial": "SLUS-29059"
-    },
     "I-Ninja": {
       "alt_serials": [],
       "crcs": [
@@ -8643,15 +8022,6 @@
       "publisher": "Namco",
       "release_date": "2003-11-18",
       "serial": "SLUS-20705"
-    },
-    "I-Ninja (SLUS-29077)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Argonaut Software Ltd",
-      "genre": "Action, Platform",
-      "publisher": "Namco",
-      "release_date": "2003-11-18",
-      "serial": "SLUS-29077"
     },
     "IGPX: Immortal Grand Prix": {
       "alt_serials": [],
@@ -9602,15 +8972,6 @@
       "release_date": "2001-07-31",
       "serial": "SLUS-20151"
     },
-    "Klonoa 2: Lunatea's Veil (SLUS-28004)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Action, Platformer",
-      "publisher": "Namco",
-      "release_date": "2001-07-31",
-      "serial": "SLUS-28004"
-    },
     "Knockout Kings 2001": {
       "alt_serials": [],
       "crcs": [
@@ -9632,15 +8993,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2002-03-06",
       "serial": "SLUS-20369"
-    },
-    "Konami Kids Playground": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami",
-      "genre": "Edutainment",
-      "publisher": "Konami",
-      "release_date": "2004-09-28",
-      "serial": "SLUS-29200"
     },
     "Konami Kids Playground: Alphabet Circus": {
       "alt_serials": [],
@@ -9698,15 +9050,6 @@
       "publisher": "Atari",
       "release_date": "2003-11-18",
       "serial": "SLUS-20440"
-    },
-    "Kya: Dark Lineage (SLUS-28037)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Eden Studios",
-      "genre": "Action, Platformer",
-      "publisher": "Atari",
-      "release_date": "2003-11-18",
-      "serial": "SLUS-28037"
     },
     "L.A. Rush": {
       "alt_serials": [],
@@ -10420,15 +9763,6 @@
       "release_date": "2001-07-03",
       "serial": "SLUS-20072"
     },
-    "MX 2002 featuring Ricky Carmichael": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Racing",
-      "publisher": "THQ",
-      "release_date": "2001-10-30",
-      "serial": "SLUS-29006"
-    },
     "MX Rider": {
       "alt_serials": [],
       "crcs": [
@@ -10439,15 +9773,6 @@
       "publisher": "Infogrames",
       "release_date": "2001-08-01",
       "serial": "SLUS-20234"
-    },
-    "MX SuperFly": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Racing",
-      "publisher": "THQ",
-      "release_date": "2002-06-17",
-      "serial": "SLUS-29026"
     },
     "MX Superfly": {
       "alt_serials": [],
@@ -10470,15 +9795,6 @@
       "publisher": "THQ",
       "release_date": "2004-02-10",
       "serial": "SLUS-20767"
-    },
-    "MX Unleashed (SLUS-29091)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Racing",
-      "publisher": "THQ",
-      "release_date": "2004-02-10",
-      "serial": "SLUS-29091"
     },
     "MX Vs. ATV Unleashed": {
       "alt_serials": [],
@@ -10732,15 +10048,6 @@
       "release_date": "2005-11-15",
       "serial": "SLUS-21221"
     },
-    "Magna Carta: Tears of Blood (SLUS-28053)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Softmax Co. Ltd",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2005-11-15",
-      "serial": "SLUS-28053"
-    },
     "Major League Baseball 2K10": {
       "alt_serials": [],
       "crcs": [],
@@ -10928,15 +10235,6 @@
       "release_date": "2005-09-20",
       "serial": "SLUS-21281"
     },
-    "Marvel Nemesis: Rise of the Imperfects (SLUS-29156)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Nihilistic Software",
-      "genre": "Fighting",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-09-20",
-      "serial": "SLUS-29156"
-    },
     "Marvel Super Hero Squad": {
       "alt_serials": [],
       "crcs": [],
@@ -10999,15 +10297,6 @@
       "release_date": "2002-08-12",
       "serial": "SLUS-20335"
     },
-    "Mat Hoffman's Pro BMX 2 (SLUS-28014)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Sports",
-      "publisher": "Activision",
-      "release_date": "2002-08-12",
-      "serial": "SLUS-28014"
-    },
     "Matrix, The - Path of Neo": {
       "alt_serials": [],
       "crcs": [
@@ -11051,15 +10340,6 @@
       "publisher": "Capcom",
       "release_date": "2004-01-20",
       "serial": "SLUS-20722"
-    },
-    "Maximo vs Army of Zin": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom Production Studio 8",
-      "genre": "Action, Platformer",
-      "publisher": "Capcom",
-      "release_date": "2004-01-20",
-      "serial": "SLUS-29083"
     },
     "Maximo: Ghosts to Glory": {
       "alt_serials": [],
@@ -11258,15 +10538,6 @@
       "release_date": "2003-11-20",
       "serial": "SLUS-20786"
     },
-    "Metal Arms: Glitch in the System (SLUS-29081)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Swingin' Ape Studios",
-      "genre": "Third-person Shooter",
-      "publisher": "Sierra",
-      "release_date": "2003-11-20",
-      "serial": "SLUS-29081"
-    },
     "Metal Gear Solid 2: Sons of Liberty": {
       "aliases": [
         "MGS 2",
@@ -11293,15 +10564,6 @@
       "publisher": "Konami",
       "release_date": "2001-11-12",
       "serial": "SLUS-20144"
-    },
-    "Metal Gear Solid 2: Sons of Liberty: Trial Edition": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Demo",
-      "publisher": "Konami",
-      "release_date": "2001-11-13",
-      "serial": "SLUS-29003"
     },
     "Metal Gear Solid 2: Substance": {
       "aliases": [
@@ -11709,15 +10971,6 @@
       "publisher": "Capcom",
       "release_date": "2004-09-21",
       "serial": "SLUS-20896"
-    },
-    "Monster Hunter (SLUS-29110)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom",
-      "genre": "Action, RPG",
-      "publisher": "Capcom",
-      "release_date": "2004-09-21",
-      "serial": "SLUS-29110"
     },
     "Monster Jam": {
       "alt_serials": [],
@@ -12279,15 +11532,6 @@
       "release_date": "2005-09-26",
       "serial": "SLUS-21279"
     },
-    "NBA Live 06 (SLUS-29162)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-09-26",
-      "serial": "SLUS-29162"
-    },
     "NBA Live 07": {
       "alt_serials": [],
       "crcs": [],
@@ -12436,15 +11680,6 @@
       "release_date": "2001-06-18",
       "serial": "SLUS-20187"
     },
-    "NBA Street V3": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports BIG",
-      "release_date": "2005-11-08",
-      "serial": "SLUS-29141"
-    },
     "NBA Street Vol. 2": {
       "alt_serials": [],
       "crcs": [
@@ -12456,15 +11691,6 @@
       "publisher": "EA Sports BIG",
       "release_date": "2003-08-19",
       "serial": "SLUS-20651"
-    },
-    "NBA Street Vol. 2 (SLUS-29053)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports BIG",
-      "release_date": "2003-08-19",
-      "serial": "SLUS-29053"
     },
     "NBA Street Vol. 3": {
       "alt_serials": [],
@@ -12690,15 +11916,6 @@
       "release_date": "2005-10-11",
       "serial": "SLUS-21298"
     },
-    "NCAA March Madness 06 (SLUS-29163)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-10-11",
-      "serial": "SLUS-29163"
-    },
     "NCAA March Madness 07": {
       "alt_serials": [],
       "crcs": [],
@@ -12743,15 +11960,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2003-11-21",
       "serial": "SLUS-20771"
-    },
-    "NCAA March Madness 2004 (SLUS-29079)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "NuFX",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2003-11-21",
-      "serial": "SLUS-29079"
     },
     "NCAA March Madness 2005": {
       "alt_serials": [],
@@ -12895,15 +12103,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2004-01-15",
       "serial": "SLUS-20841"
-    },
-    "NFL Street (SLUS-29093)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Tiburon",
-      "genre": "Sports",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-01-15",
-      "serial": "SLUS-29093"
     },
     "NFL Street 2": {
       "alt_serials": [],
@@ -13369,15 +12568,6 @@
       "release_date": "2006-10-31",
       "serial": "SLUS-21493"
     },
-    "Need for Speed: Carbon (SLUS-29193)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Black Box",
-      "genre": "Driving, Racing",
-      "publisher": "EA Games",
-      "release_date": "2006-10-31",
-      "serial": "SLUS-29193"
-    },
     "Need for Speed: Carbon: Collector's Edition": {
       "alt_serials": [],
       "crcs": [],
@@ -13433,15 +12623,6 @@
       "release_date": "2005-11-15",
       "serial": "SLUS-21257"
     },
-    "Need for Speed: Most Wanted (SLUS-29155)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Black Box",
-      "genre": "Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-11-15",
-      "serial": "SLUS-29155"
-    },
     "Need for Speed: Most Wanted: Black Edition": {
       "alt_serials": [],
       "crcs": [],
@@ -13490,15 +12671,6 @@
       "release_date": "2003-11-17",
       "serial": "SLUS-20811"
     },
-    "Need for Speed: Underground (SLUS-29073)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Black Box",
-      "genre": "Driving, Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2003-11-17",
-      "serial": "SLUS-29073"
-    },
     "Need for Speed: Underground 2": {
       "aliases": [
         "NFS U2",
@@ -13516,15 +12688,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2004-11-16",
       "serial": "SLUS-21065"
-    },
-    "Need for Speed: Underground 2 (SLUS-29118)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Black Box",
-      "genre": "Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2004-11-16",
-      "serial": "SLUS-29118"
     },
     "Neo Contra": {
       "alt_serials": [],
@@ -14556,15 +13719,6 @@
       "release_date": "2003-02-12",
       "serial": "SLUS-20406"
     },
-    "Pride FC: Fighting Championships (SLUS-29044)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Taito Corporation",
-      "genre": "Sports",
-      "publisher": "THQ",
-      "release_date": "2003-02-12",
-      "serial": "SLUS-29044"
-    },
     "Primal": {
       "alt_serials": [],
       "crcs": [
@@ -14603,15 +13757,6 @@
       "publisher": "Ubisoft",
       "release_date": "2003-11-15",
       "serial": "SLUS-20743"
-    },
-    "Prince of Persia: The Sands of Time (SLUS-29069)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ubisoft",
-      "genre": "Action, Adventure, Platformer",
-      "publisher": "Ubisoft",
-      "release_date": "2003-11-15",
-      "serial": "SLUS-29069"
     },
     "Prince of Persia: The Two Thrones": {
       "aliases": [
@@ -14705,15 +13850,6 @@
       "publisher": "Eidos Interactive",
       "release_date": "2001-10-22",
       "serial": "SLUS-20164"
-    },
-    "Project: Snowblind": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Crystal Dynamics",
-      "genre": "First-person Shooter",
-      "publisher": "Eidos Interactive",
-      "release_date": "2005-02-22",
-      "serial": "SLUS-29131"
     },
     "Pryzm - Chapter One": {
       "alt_serials": [],
@@ -15246,24 +14382,6 @@
       "release_date": "2001-05-22",
       "serial": "SLUS-20073"
     },
-    "Red Faction (SLUS-28002)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Volition, Inc",
-      "genre": "First Person Shooter",
-      "publisher": "THQ",
-      "release_date": "2001-05-22",
-      "serial": "SLUS-28002"
-    },
-    "Red Faction (SLUS-29005)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Volition, Inc",
-      "genre": "First Person Shooter",
-      "publisher": "THQ",
-      "release_date": "2001-05-22",
-      "serial": "SLUS-29005"
-    },
     "Red Faction II": {
       "alt_serials": [],
       "crcs": [
@@ -15274,15 +14392,6 @@
       "publisher": "THQ",
       "release_date": "2002-10-15",
       "serial": "SLUS-20442"
-    },
-    "Red Faction II (SLUS-29027)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Volition",
-      "genre": "First-person Shooter",
-      "publisher": "THQ",
-      "release_date": "2002-10-15",
-      "serial": "SLUS-29027"
     },
     "Red Ninja - End of Honor": {
       "alt_serials": [],
@@ -15354,15 +14463,6 @@
       "release_date": "2005-10-25",
       "serial": "SLUS-21134"
     },
-    "Resident Evil 4 (SLUS-29169)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom",
-      "genre": "Action, Adventure, Survival Horror",
-      "publisher": "Capcom",
-      "release_date": "2005-10-25",
-      "serial": "SLUS-29169"
-    },
     "Resident Evil: Code Veronica X": {
       "aliases": [
         "Code Veronica",
@@ -15403,15 +14503,6 @@
       "publisher": "Capcom",
       "release_date": "2004-03-31",
       "serial": "SLUS-20765"
-    },
-    "Resident Evil: Outbreak (SLUS-29089)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom Production Studio 1",
-      "genre": "Survival Horror",
-      "publisher": "Capcom",
-      "release_date": "2004-03-09",
-      "serial": "SLUS-29089"
     },
     "Resident Evil: Outbreak File #2": {
       "alt_serials": [],
@@ -15465,15 +14556,6 @@
       "publisher": "Bandai",
       "release_date": "2004-06-10",
       "serial": "SLUS-20837"
-    },
-    "Ribbit King (SLUS-29100)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Anthropomorphic Animals Jamsworks Co., Ltd",
-      "genre": "Golf",
-      "publisher": "Bandai",
-      "release_date": "2004-06-10",
-      "serial": "SLUS-29100"
     },
     "Ridge Racer V": {
       "alt_serials": [],
@@ -15611,15 +14693,6 @@
       "publisher": "Enix America Inc",
       "release_date": "2002-11-06",
       "serial": "SLUS-20445"
-    },
-    "Robot Alchemic Drive (SLUS-29025)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sandlot",
-      "genre": "Action, Adventure",
-      "publisher": "Enix America Inc",
-      "release_date": "2002-11-06",
-      "serial": "SLUS-29025"
     },
     "Robotech: Battlecry": {
       "alt_serials": [],
@@ -15776,15 +14849,6 @@
       "release_date": "2003-10-28",
       "serial": "SLUS-20746"
     },
-    "Rogue Ops (SLUS-28039)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "BITS Studios",
-      "genre": "Action, Adventure, Shooter",
-      "publisher": "Kemco",
-      "release_date": "2003-10-28",
-      "serial": "SLUS-28039"
-    },
     "Rogue Trooper": {
       "alt_serials": [],
       "crcs": [
@@ -15916,15 +14980,6 @@
       "release_date": "2006-09-12",
       "serial": "SLUS-21448"
     },
-    "Rule of Rose (SLUS-28063)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Punchline CG",
-      "genre": "Adventure, Survival Horror",
-      "publisher": "Atlus",
-      "release_date": "2006-09-12",
-      "serial": "SLUS-28063"
-    },
     "Rumble Racing": {
       "alt_serials": [],
       "crcs": [
@@ -15988,15 +15043,6 @@
       "publisher": "Konami",
       "release_date": "2005-09-21",
       "serial": "SLUS-20969"
-    },
-    "S.L.A.I.: Steel Lancer Arena International (SLUS-29132)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Genki",
-      "genre": "Simulation",
-      "publisher": "Konami",
-      "release_date": "2005-09-21",
-      "serial": "SLUS-29132"
     },
     "SBK - Superbike World Championship": {
       "alt_serials": [],
@@ -16194,15 +15240,6 @@
       "release_date": "2001-11-07",
       "serial": "SLUS-20326"
     },
-    "SSX on Tour": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "EA Canada",
-      "genre": "Sports",
-      "publisher": "EA Sports",
-      "release_date": "2005-10-11",
-      "serial": "SLUS-29161"
-    },
     "SWAT: Global Strike Team": {
       "alt_serials": [],
       "crcs": [],
@@ -16337,15 +15374,6 @@
       "publisher": "Atlus USA",
       "release_date": "2005-06-07",
       "serial": "SLUS-21187"
-    },
-    "Samurai Western (SLUS-28051)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Acquire",
-      "genre": "Action, Beat'em Up",
-      "publisher": "Atlus USA",
-      "release_date": "2005-06-07",
-      "serial": "SLUS-28051"
     },
     "Saturday Night Speedway": {
       "alt_serials": [],
@@ -16691,15 +15719,6 @@
       "release_date": "2005-02-08",
       "serial": "SLUS-20902"
     },
-    "Shadow of Rome (SLUS-29139)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Capcom",
-      "genre": "Action, Beat'em Up",
-      "publisher": "Capcom",
-      "release_date": "2005-02-08",
-      "serial": "SLUS-29139"
-    },
     "Shadow of the Colossus": {
       "aliases": [
         "SOTC",
@@ -16852,15 +15871,6 @@
       "release_date": "2005-04-05",
       "serial": "SLUS-20974"
     },
-    "Shin Megami Tensei: Digital Devil Saga (SLUS-28049)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "RPG",
-      "publisher": "Atlus",
-      "release_date": "2005-04-05",
-      "serial": "SLUS-28049"
-    },
     "Shin Megami Tensei: Digital Devil Saga 2": {
       "aliases": [
         "DDS2",
@@ -16893,15 +15903,6 @@
       "publisher": "Atlus U.S.A",
       "release_date": "2004-10-12",
       "serial": "SLUS-20911"
-    },
-    "Shin Megami Tensei: Nocturne (SLUS-28045)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "Action, RPG",
-      "publisher": "Atlus U.S.A",
-      "release_date": "2004-10-12",
-      "serial": "SLUS-28045"
     },
     "Shining Force EXA": {
       "alt_serials": [],
@@ -16947,15 +15948,6 @@
       "release_date": "2002-11-10",
       "serial": "SLUS-20459"
     },
-    "Shinobi (SLUS-28016)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Overworks",
-      "genre": "Action, Beat'em Up",
-      "publisher": "Sega",
-      "release_date": "2002-11-10",
-      "serial": "SLUS-28016"
-    },
     "Shonen Jump's One Piece: Grand Adventure": {
       "alt_serials": [],
       "crcs": [],
@@ -16973,15 +15965,6 @@
       "publisher": "Bandai",
       "release_date": "2005-10-07",
       "serial": "SLUS-20975"
-    },
-    "Shonen Jump's One Piece: Grand Battle (SLUS-29159)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ganbarion Co. Ltd",
-      "genre": "Fighting",
-      "publisher": "Bandai",
-      "release_date": "2005-10-07",
-      "serial": "SLUS-29159"
     },
     "Shonen Jump's One Piece: Pirates' Carnival": {
       "alt_serials": [],
@@ -17427,24 +16410,6 @@
       "release_date": "2002-06-26",
       "serial": "SLUS-20384"
     },
-    "SkyGunner (SLUS-28008)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment Inc. (Japan)",
-      "genre": "Action, Shooter",
-      "publisher": "Atlus USA",
-      "release_date": "2002-06-26",
-      "serial": "SLUS-28008"
-    },
-    "SkyGunner (SLUS-29020)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sony Computer Entertainment Inc. (Japan)",
-      "genre": "Action, Shooter",
-      "publisher": "Atlus USA",
-      "release_date": "2002-06-26",
-      "serial": "SLUS-29020"
-    },
     "Sled Storm": {
       "alt_serials": [],
       "crcs": [
@@ -17697,15 +16662,6 @@
       "release_date": "2006-02-21",
       "serial": "SLUS-21331"
     },
-    "Sonic Riders (SLUS-29179)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sonic Team",
-      "genre": "Action, Racing",
-      "publisher": "Sega",
-      "release_date": "2006-02-21",
-      "serial": "SLUS-29179"
-    },
     "Sonic Riders: Zero Gravity": {
       "alt_serials": [],
       "crcs": [],
@@ -17850,15 +16806,6 @@
       "release_date": "2003-03-10",
       "serial": "SLUS-20482"
     },
-    "Sphinx and the Shadow of Set": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Eurocom",
-      "genre": "Action, Adventure",
-      "publisher": "THQ",
-      "release_date": "2003-11-10",
-      "serial": "SLUS-29057"
-    },
     "Spider-Man - Friend or Foe": {
       "alt_serials": [],
       "crcs": [
@@ -17945,15 +16892,6 @@
       "publisher": "THQ",
       "release_date": "2003-08-05",
       "serial": "SLUS-20686"
-    },
-    "Splashdown: Rides Gone Wild (SLUS-29054)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rainbow Studios",
-      "genre": "Racing",
-      "publisher": "THQ",
-      "release_date": "2003-08-05",
-      "serial": "SLUS-29054"
     },
     "Splashdown: Rides Gone Wild / ATV Offroad Fury 2 / Need for Speed Hot Pursuit 2": {
       "alt_serials": [],
@@ -18191,15 +17129,6 @@
       "release_date": "2005-11-01",
       "serial": "SLUS-21240"
     },
-    "Star Wars: Battlefront II (SLUS-29164)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Pandemic Studios",
-      "genre": "Third-person Shooter",
-      "publisher": "LucasArts",
-      "release_date": "2005-11-01",
-      "serial": "SLUS-29164"
-    },
     "Star Wars: Bounty Hunter": {
       "alt_serials": [],
       "crcs": [],
@@ -18217,15 +17146,6 @@
       "publisher": "Lucasarts",
       "release_date": "2002-03-11",
       "serial": "SLUS-20293"
-    },
-    "Star Wars: Jedi Starfighter (SLUS-28010)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "LucasArts Entertainment Company",
-      "genre": "Action, Shooter",
-      "publisher": "Lucasarts",
-      "release_date": "2002-03-11",
-      "serial": "SLUS-28010"
     },
     "Star Wars: Racer Revenge": {
       "alt_serials": [],
@@ -18304,15 +17224,6 @@
       "release_date": "2006-02-14",
       "serial": "SLUS-20966"
     },
-    "State of Emergency 2 (SLUS-28056)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "DC Studios, Inc., VIS entertainment plc",
-      "genre": "Action, Beat'em Up, Shooter",
-      "publisher": "Southpeak Interactive",
-      "release_date": "2006-02-14",
-      "serial": "SLUS-28056"
-    },
     "Steambot Chronicles": {
       "alt_serials": [],
       "crcs": [
@@ -18324,24 +17235,6 @@
       "release_date": "2006-05-23",
       "serial": "SLUS-21344"
     },
-    "Steambot Chronicles (SLUS-28061)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Irem Software Engineering, Inc",
-      "genre": "Action, RPG",
-      "publisher": "Atlus U.S.A., Inc",
-      "release_date": "2006-05-23",
-      "serial": "SLUS-28061"
-    },
-    "Steambot Chronicles (SLUS-29188)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Irem Software Engineering, Inc",
-      "genre": "Action, RPG",
-      "publisher": "Atlus U.S.A., Inc",
-      "release_date": "2006-05-23",
-      "serial": "SLUS-29188"
-    },
     "Stella Deus: The Gate of Eternity": {
       "alt_serials": [],
       "crcs": [],
@@ -18350,15 +17243,6 @@
       "publisher": "Atlus",
       "release_date": "2005-04-26",
       "serial": "SLUS-21132"
-    },
-    "Stella Deus: The Gate of Eternity (SLUS-28050)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Atlus",
-      "genre": "Strategy",
-      "publisher": "Atlus",
-      "release_date": "2005-04-26",
-      "serial": "SLUS-28050"
     },
     "Stolen": {
       "alt_serials": [],
@@ -18622,15 +17506,6 @@
       "publisher": "THQ",
       "release_date": "2002-09-23",
       "serial": "SLUS-20448"
-    },
-    "Summoner 2 (SLUS-29029)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Volition",
-      "genre": "Action-RPG",
-      "publisher": "THQ",
-      "release_date": "2002-09-23",
-      "serial": "SLUS-29029"
     },
     "Sunny Garcia Surfing": {
       "alt_serials": [],
@@ -18906,15 +17781,6 @@
       "release_date": "2004-10-05",
       "serial": "SLUS-21039"
     },
-    "TOCA Race Driver 3": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Codemasters",
-      "genre": "Racing",
-      "publisher": "Codemasters",
-      "release_date": "2006-03-24",
-      "serial": "SLUS-29178"
-    },
     "TOCA Race Driver 3: The Ultimate Racing Simulator": {
       "alt_serials": [],
       "crcs": [],
@@ -18972,15 +17838,6 @@
       "publisher": "THQ",
       "release_date": "2003-10-15",
       "serial": "SLUS-20519"
-    },
-    "Tak and the Power of Juju": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Avalanche Software",
-      "genre": "Action, Platformer",
-      "publisher": "THQ",
-      "release_date": "2003-09-16",
-      "serial": "SLUS-29067"
     },
     "Tales of Legendia": {
       "aliases": [
@@ -19103,24 +17960,6 @@
       "publisher": "Namco",
       "release_date": "2002-09-25",
       "serial": "SLUS-20328"
-    },
-    "Tekken 4 (SLUS-28012)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Fighting",
-      "publisher": "Namco",
-      "release_date": "2002-09-25",
-      "serial": "SLUS-28012"
-    },
-    "Tekken 4 (SLUS-29034)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Fighting",
-      "publisher": "Namco",
-      "release_date": "2002-09-25",
-      "serial": "SLUS-29034"
     },
     "Tekken 5": {
       "aliases": [
@@ -19251,15 +18090,6 @@
       "release_date": "2007-03-20",
       "serial": "SLUS-21490"
     },
-    "Test Drive Unlimited (SLUS-29192)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Melbourne House",
-      "genre": "Racing",
-      "publisher": "Atari",
-      "release_date": "2007-03-20",
-      "serial": "SLUS-29192"
-    },
     "Test Drive: Eve of Destruction": {
       "alt_serials": [],
       "crcs": [],
@@ -19268,15 +18098,6 @@
       "publisher": "Atari",
       "release_date": "2004-08-24",
       "serial": "SLUS-20910"
-    },
-    "Test Drive: Eve of Destruction (SLUS-28043)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Monster Games, Inc.",
-      "genre": "Racing",
-      "publisher": "Atari",
-      "release_date": "2004-08-24",
-      "serial": "SLUS-28043"
     },
     "Tetris Worlds": {
       "alt_serials": [],
@@ -19443,15 +18264,6 @@
       "publisher": "Sega",
       "release_date": "2008-06-05",
       "serial": "SLUS-21765"
-    },
-    "The Incredible Hulk: Ultimate Destruction": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Radical Entertainment",
-      "genre": "Action",
-      "publisher": "Vivendi Universal Games",
-      "release_date": "2005-08-23",
-      "serial": "SLUS-29148"
     },
     "The Italian Job": {
       "alt_serials": [],
@@ -19659,15 +18471,6 @@
       "release_date": "2002-11-26",
       "serial": "SLUS-20585"
     },
-    "The Punisher": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Volition, Inc",
-      "genre": "Action",
-      "publisher": "THQ",
-      "release_date": "2005-01-18",
-      "serial": "SLUS-29138"
-    },
     "The Red Star": {
       "alt_serials": [],
       "crcs": [],
@@ -19685,15 +18488,6 @@
       "publisher": "Universal Interactive",
       "release_date": "2002-09-12",
       "serial": "SLUS-20424"
-    },
-    "The Scorpion King: Rise of the Akkadian (SLUS-29036)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Point of View, Inc.",
-      "genre": "Action",
-      "publisher": "Universal Interactive",
-      "release_date": "2002-09-12",
-      "serial": "SLUS-29036"
     },
     "The Secret Saturdays: Beasts of the 5th Sun": {
       "alt_serials": [],
@@ -19776,15 +18570,6 @@
       "publisher": "Electronic Arts",
       "release_date": "2005-10-25",
       "serial": "SLUS-21265"
-    },
-    "The Sims 2 (SLUS-29173)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Maxis",
-      "genre": "Simulation, Breeding, Constructing, Strategy",
-      "publisher": "Electronic Arts",
-      "release_date": "2005-10-25",
-      "serial": "SLUS-29173"
     },
     "The Sims 2: Castaway": {
       "alt_serials": [],
@@ -20209,15 +18994,6 @@
       "release_date": "2003-04-08",
       "serial": "SLUS-20652"
     },
-    "Tom Clancy's Splinter Cell (SLUS-29048)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ubisoft Montreal",
-      "genre": "Action, Adventure, Shooter",
-      "publisher": "Ubisoft Entertainment",
-      "release_date": "2003-04-08",
-      "serial": "SLUS-29048"
-    },
     "Tom Clancy's Splinter Cell - Double Agent": {
       "aliases": [
         "SC4",
@@ -20419,15 +19195,6 @@
       "release_date": "2001-06-26",
       "serial": "SLUS-20211"
     },
-    "Top Gun: Combat Zones (SLUS-29012)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Titus Software",
-      "genre": "Flight Simulator",
-      "publisher": "Digital Integration",
-      "release_date": "2001-06-26",
-      "serial": "SLUS-29012"
-    },
     "Top Spin": {
       "alt_serials": [],
       "crcs": [
@@ -20469,15 +19236,6 @@
       "publisher": "Eidos Interactive",
       "release_date": "2005-09-27",
       "serial": "SLUS-21283"
-    },
-    "Total Overdose: A Gunslinger's Tale in Mexico (SLUS-29170)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Deadline Games",
-      "genre": "Action, Shooter",
-      "publisher": "Eidos Interactive",
-      "release_date": "2005-09-27",
-      "serial": "SLUS-29170"
     },
     "Totally Spies! Totally Party": {
       "alt_serials": [],
@@ -21007,15 +19765,6 @@
       "release_date": "2001-11-08",
       "serial": "SLUS-20282"
     },
-    "Victorious Boxers: Ippo's Road to Glory (SLUS-29013)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "New Corporation",
-      "genre": "Sports",
-      "publisher": "Empire Interactive",
-      "release_date": "2001-11-08",
-      "serial": "SLUS-29013"
-    },
     "Vietcong: Purple Haze": {
       "alt_serials": [],
       "crcs": [],
@@ -21237,15 +19986,6 @@
       "release_date": "2001-11-20",
       "serial": "SLUS-20316"
     },
-    "WWF SmackDown! Just Bring It (SLUS-29011)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Yuke's",
-      "genre": "Sports",
-      "publisher": "THQ",
-      "release_date": "2001-11-20",
-      "serial": "SLUS-29011"
-    },
     "Wakeboarding Unleashed featuring Shaun Murray": {
       "alt_serials": [],
       "crcs": [],
@@ -21337,15 +20077,6 @@
       "publisher": "THQ",
       "release_date": "2003-11-17",
       "serial": "SLUS-20597"
-    },
-    "Warhammer 40,000: Fire Warrior (SLUS-29049)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Kuju Entertainment",
-      "genre": "First-person Shooter",
-      "publisher": "THQ",
-      "release_date": "2003-11-17",
-      "serial": "SLUS-29049"
     },
     "Warriors Orochi": {
       "alt_serials": [],
@@ -21461,15 +20192,6 @@
       "publisher": "Eidos Interactive",
       "release_date": "2003-11-18",
       "serial": "SLUS-20684"
-    },
-    "Whiplash (SLUS-29080)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Crystal Dynamics, Inc",
-      "genre": "Action, Platformer",
-      "publisher": "Eidos Interactive",
-      "release_date": "2003-11-18",
-      "serial": "SLUS-29080"
     },
     "Whirl Tour": {
       "alt_serials": [],
@@ -22004,15 +20726,6 @@
       "release_date": "2004-03-16",
       "serial": "SLUS-20179"
     },
-    "X-Games Winter SnoCross + ESPN International Winter Sports 2002 + Winter X Games Snowboarding 2002": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Konami Computer Entertainment Japan",
-      "genre": "Compilation",
-      "publisher": "Konami",
-      "release_date": "2001-12-01",
-      "serial": "SLUS-29016"
-    },
     "X-Men - The Official Game": {
       "alt_serials": [],
       "crcs": [
@@ -22112,15 +20825,6 @@
       "release_date": "2003-10-28",
       "serial": "SLUS-20677"
     },
-    "XIII (SLUS-29070)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Ubisoft Montreal",
-      "genre": "First Person Shooter",
-      "publisher": "Ubisoft",
-      "release_date": "2003-10-28",
-      "serial": "SLUS-29070"
-    },
     "Xenosaga Episode I: Der Wille zur Macht": {
       "aliases": [
         "XS1",
@@ -22211,15 +20915,6 @@
       "publisher": "Sega",
       "release_date": "2006-09-08",
       "serial": "SLUS-21348"
-    },
-    "Yakuza (SLUS-29195)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Amusement Vision",
-      "genre": "Action, Adventure, Beat'em Up",
-      "publisher": "Sega",
-      "release_date": "2006-09-08",
-      "serial": "SLUS-29195"
     },
     "Yakuza 2": {
       "alt_serials": [],

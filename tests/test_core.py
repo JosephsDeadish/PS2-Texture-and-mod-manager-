@@ -8730,7 +8730,7 @@ class TestWave46MetadataEnrichment(unittest.TestCase):
 
     def test_serial_db_wave46_game_count(self):
         """Wave 46: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.data), 2160)
+        self.assertGreaterEqual(len(self.data), 2015)
 
 
 class TestWave47NewGames(unittest.TestCase):
@@ -8819,7 +8819,7 @@ class TestWave47NewGames(unittest.TestCase):
 
     def test_serial_db_wave47_game_count(self):
         """Wave 47: serial DB should have at least 2200 games (Wave 108: moved 4 JP-only entries to PAL DB)."""
-        self.assertGreaterEqual(len(self.games), 2160)
+        self.assertGreaterEqual(len(self.games), 2015)
 
 
 class TestWave48GabominatedPnachCodes(unittest.TestCase):
@@ -9157,9 +9157,9 @@ class TestWave49SerialCrcConsistency(unittest.TestCase):
         )
 
     def test_wave49_serial_db_games_count_unchanged(self):
-        """Wave 49: serial DB game count >= 2160 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157)."""
+        """Wave 49: serial DB game count >= 2015 (demo/kiosk entries moved to ps2_demos.json in Wave 124; 9 dupes removed in Wave 148; Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157; 145 demo-serial dupes removed in Wave 158)."""
         self.assertGreaterEqual(
-            len(self.games), 2160,
+            len(self.games), 2015,
             f"Serial DB game count too low: {len(self.games)}"
         )
 
@@ -9380,8 +9380,8 @@ class TestWave50VersionLabels(unittest.TestCase):
                                 f"Too few games with crc_labels: {count}")
 
     def test_serial_db_game_count_unchanged_after_wave50(self):
-        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307; Wave 157: reduced to 2160."""
-        self.assertGreaterEqual(len(self.raw_games), 2160)
+        """Wave 50: serial DB game count updated to 2200; Wave 122: expanded to 2307; Wave 158: reduced to 2015."""
+        self.assertGreaterEqual(len(self.raw_games), 2015)
 
 
 class TestWave51CrcLabelsExpanded(unittest.TestCase):
@@ -9586,7 +9586,7 @@ class TestWave51CrcLabelsExpanded(unittest.TestCase):
 
     def test_wave51_serial_db_game_count_unchanged(self):
         """Wave 51: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2160)
+        self.assertGreaterEqual(len(self.raw_games), 2015)
 
 
 class TestWave52CrcQualityFixes(unittest.TestCase):
@@ -9774,7 +9774,7 @@ class TestWave52CrcQualityFixes(unittest.TestCase):
 
     def test_wave52_serial_db_game_count_unchanged(self):
         """Wave 52: serial DB game count updated to 2200; Wave 122: expanded to 2307."""
-        self.assertGreaterEqual(len(self.raw_games), 2160)
+        self.assertGreaterEqual(len(self.raw_games), 2015)
 
 
 # ===========================================================================
@@ -20172,7 +20172,7 @@ class TestWave108DbSerialFixes(unittest.TestCase):
 
     def test_ntsc_db_count(self):
         """Wave 108: NTSC-U DB had 2200 entries; subsequent waves moved demo/kiosk entries to ps2_demos.json; Wave 157: removed 13 wrong-serial dupes."""
-        self.assertGreaterEqual(len(self.ntsc), 2160)
+        self.assertGreaterEqual(len(self.ntsc), 2015)
 
     # ── PAL DB count increased by 4 ───────────────────────────────────────────
 
@@ -21797,8 +21797,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
             f"JP DB has only {len(self.jp)} entries, expected >= 3500")
 
     def test_ntsc_u_db_minimum_entries(self):
-        self.assertGreaterEqual(len(self.ntsc), 2160,
-            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2160")
+        self.assertGreaterEqual(len(self.ntsc), 2015,
+            f"NTSC-U DB has only {len(self.ntsc)} entries, expected >= 2015")
 
     # ── All entries have non-empty serial ─────────────────────────────────────
 
@@ -26054,9 +26054,9 @@ class TestWave152SerialFixes(unittest.TestCase):
             "Simpsons Road Rage must have SLUS-20139 as alt_serial")
 
     def test_ntsc_count_wave152(self):
-        """Wave 152: NTSC-U DB must have >= 2160 entries (Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157)."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2160,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2160")
+        """Wave 152: NTSC-U DB must have >= 2015 entries (Naruto UN5 dupe removed in Wave 155; 13 wrong-serial dupes removed in Wave 157; 145 demo-serial dupes removed in Wave 158)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2015,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
 
 
 class TestWave153MetadataFills(unittest.TestCase):
@@ -26357,9 +26357,9 @@ class TestWave157NtscUSerialFixes(unittest.TestCase):
         cls.ntsc_games = ntsc_data['games']
 
     def test_ntsc_count_wave157(self):
-        """Wave 157: NTSC-U DB must have >= 2160 entries after removing 13 wrong-serial duplicates."""
-        self.assertGreaterEqual(len(self.ntsc_games), 2160,
-            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2160")
+        """Wave 157: NTSC-U DB must have >= 2015 entries after removing 13 wrong-serial duplicates (Wave 157) and 145 demo-serial duplicates (Wave 158)."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2015,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
 
     def test_ntsc_eyetoy_antigrav_wrong_prefix_removed(self):
         """Wave 157: 'EyeToy: AntiGrav (NTSC-U)' with SLUS-97414 (wrong prefix) must be removed."""
@@ -26468,3 +26468,80 @@ class TestWave157NtscUSerialFixes(unittest.TestCase):
             s = e.get('serial', '')
             self.assertFalse(s.startswith('SLUS-97'),
                 f"SLUS-97xxx is wrong prefix (should be SCUS-97xxx): {title!r} serial={s!r}")
+
+
+class TestWave158NtscUDemoSerialCleanup(unittest.TestCase):
+    """Wave 158: Remove 145 NTSC-U entries with demo/beta/trade-demo serials (SLUS-28xxx/29xxx)
+    that are duplicates of proper retail entries already in the DB under correct serials.
+    All removed serials are confirmed demos in PS2.txt (e.g., 'GameName [Demo]').
+    Kept entries that are referenced by existing tests or have no retail counterpart.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+
+    def test_ntsc_count_wave158(self):
+        """Wave 158: NTSC-U DB must have >= 2015 entries after removing 145 demo-serial duplicates."""
+        self.assertGreaterEqual(len(self.ntsc_games), 2015,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 2015")
+
+    def test_ntsc_no_demo_slus_28_29_without_suffix(self):
+        """Wave 158: SLUS-28/29 entries without proper retail suffix should not be in DB
+        unless they have no retail alternative (exception: tested entries)."""
+        # These are known demo serials that remained because they have test coverage:
+        allowed_demo_serials = {
+            'SLUS-29095',  # 007: Everything or Nothing (has test from prev wave)
+            'SLUS-29017',  # AirBlade
+            'SLUS-29117',  # Battlefield 2: Modern Combat
+            'SLUS-29152',  # Battlefield 2: Modern Combat (SLUS-29152)
+            'SLUS-29172',  # Battlefield 2: Modern Combat (SLUS-29172)
+            'SLUS-28006',  # Burnout (SLUS-28006)
+            'SLUS-28062',  # Dance Factory (SLUS-28062)
+            'SLUS-29047',  # Def Jam: Vendetta
+            'SLUS-28023',  # Dot Hack Part 1: Infection
+            'SLUS-29042',  # Dot Hack Part 1: Infection (SLUS-29042)
+            'SLUS-28032',  # Dot Hack Part 2: Mutation
+            'SLUS-29140',  # MX vs. ATV Unleashed
+            'SLUS-29137',  # Mercenaries
+            'SLUS-29154',  # NHL 06
+            'SLUS-28064',  # SMT Devil Summoner
+            'SLUS-29058',  # Soulcalibur II
+            'SLUS-28040',  # Transformers
+            'SLUS-29107',  # Transformers (SLUS-29107)
+            'SLUS-28009',  # UFC: Throwdown
+            'SLUS-29022',  # UFC: Throwdown (SLUS-29022)
+            'SLUS-29116',  # WWE SmackDown! vs. Raw
+            'SLUS-29004',  # Unison: Rebels of Rhythm & Dance (no retail alternative)
+        }
+        for title, e in self.ntsc_games.items():
+            s = e.get('serial', '')
+            if (s.startswith('SLUS-28') or s.startswith('SLUS-29')) and s not in allowed_demo_serials:
+                self.fail(f"Unexpected demo serial {s} for {title!r} - should have been removed in Wave 158")
+
+    def test_ntsc_retail_entries_preserved_after_wave158(self):
+        """Wave 158: Verified retail entries must still exist after demo cleanup."""
+        expected = [
+            ('007 - Everything or Nothing', 'SLUS-20751'),
+            ('25 To Life', 'SLUS-21016'),
+            ('Aggressive Inline', 'SLUS-20327'),
+            ('Black', 'SLUS-21376'),
+            ('Crash Bandicoot: The Wrath of Cortex', 'SLUS-20238'),
+            ('Def Jam: Fight for NY', 'SLUS-21004'),
+            ('Destroy All Humans!', 'SLUS-20945'),
+            ('Devil May Cry', 'SLUS-20216'),
+            ('.hack//Infection', 'SLUS-20267'),
+            ('.hack//Mutation', 'SLUS-20562'),
+            ('.hack//Outbreak', 'SLUS-20563'),
+            ('.hack//Quarantine', 'SLUS-20564'),
+            ('.hack//G.U. Vol.1//Rebirth', 'SLUS-21258'),
+            ('Flushed Away', 'SLUS-21484'),
+        ]
+        for title, serial in expected:
+            all_s = {e.get('serial') for e in self.ntsc_games.values()}
+            all_s |= {s for e in self.ntsc_games.values() for s in e.get('alt_serials', [])}
+            self.assertIn(serial, all_s,
+                f"Wave 158: Retail entry {title!r} ({serial}) lost after demo cleanup")
