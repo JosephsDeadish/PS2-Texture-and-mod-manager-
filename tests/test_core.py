@@ -21705,7 +21705,9 @@ class TestWave121DbSerialFixes(unittest.TestCase):
         self.assertEqual(self._jp_serial("Jak & Daxter: The Precursor Legacy (JP)"), "SCPS-56003")
 
     def test_jak_ii_jp_serial(self):
-        self.assertEqual(self._jp_serial("Jak II: Renegade (JP)"), "SCPS-15021")
+        """Wave 156: Jak II JP is 'Jak II: Jak x Daxter 2 (JP)' with SCPS-15057.
+        'Jak II: Renegade (JP)' with SCPS-15021 was wrong (SCPS-15021 is Jak 1 JP)."""
+        self.assertEqual(self._jp_serial("Jak II: Jak x Daxter 2 (JP)"), "SCPS-15057")
 
     def test_ratchet_clank_2_jp_serial(self):
         self.assertEqual(self._jp_serial("Ratchet & Clank 2 (JP)"), "SCPS-15056")
@@ -22480,10 +22482,15 @@ class TestWave126DuplicateSerialFixes(unittest.TestCase):
     # ── Key JP fixes verified ─────────────────────────────────────────────────
 
     def test_jak2_jp_no_jak1_serial(self):
-        """Wave 126: Jak II (JP) must NOT have SCPS-55004 (Jak 1 JP) as alt."""
-        g = self.jp_games.get("Jak II: Renegade (JP)", {})
+        """Wave 126/156: Jak II JP is 'Jak II: Jak x Daxter 2 (JP)' -> SCPS-15057.
+        Must NOT have SCPS-55004 (Jak 1 JP) as alt. 'Jak II: Renegade (JP)' with SCPS-15021 removed in Wave 156
+        (SCPS-15021 is Jak x Daxter Precursor Legacy JP, not Jak II)."""
+        g = self.jp_games.get("Jak II: Jak x Daxter 2 (JP)", {})
         self.assertNotIn("SCPS-55004", g.get("alt_serials", []),
             "SCPS-55004 is Jak x Daxter: Kyuu Sekai no Isan (Jak 1 JP)")
+        # Verify the wrong entry has been removed
+        self.assertNotIn("Jak II: Renegade (JP)", self.jp_games,
+            "Wave 156: 'Jak II: Renegade (JP)' with SCPS-15021 must be removed (SCPS-15021 is Jak 1 JP)")
 
     def test_fatal_frame2_jp_no_zero_serials(self):
         """Wave 126: Fatal Frame II (JP) must NOT have Zero: Akai Chou serials as alts."""
@@ -26222,6 +26229,98 @@ class TestWave155JpMetadataFills(unittest.TestCase):
         self.assertEqual(self.jp_games[title]['genre'], 'Sports')
 
     def test_jp_total_entries_preserved(self):
-        """Wave 155: JP total entry count preserved at 3762."""
-        self.assertGreaterEqual(len(self.jp_games), 3762,
-            f"JP DB shrank: {len(self.jp_games)}")
+        """Wave 155→156: JP total entry count >= 3761 (Wave 156 removed 1 wrong 'Jak II: Renegade (JP)' entry)."""
+        self.assertGreaterEqual(len(self.jp_games), 3761,
+            f"JP DB shrank below expected: {len(self.jp_games)}")
+
+class TestWave156SerialTitleFixes(unittest.TestCase):
+    """Wave 156: Fix wrong game titles/serials verified against PS2.data.json, PS2.titles.json.
+    NTSC-U: Cabela's Deer Hunt 2005 (SLUS-21011), ObsCure: The Aftermath (SLUS-21709),
+    Rayman 2: Revolution (SLUS-20138), Cabela's BG Hunter 2005 cleanup.
+    PAL: Naruto Shippuden: Ultimate Ninja 5 (SLES-55605).
+    JP: removed wrong 'Jak II: Renegade (JP)' entry (SCPS-15021 is Jak 1, not Jak II).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            pal_data = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            jp_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+        cls.pal_games = pal_data['games']
+        cls.jp_games = jp_data['games']
+
+    def test_ntsc_cabelas_deer_hunt_2005_serial(self):
+        """Wave 156: 'Cabela's Deer Hunt: 2005 Season' must use SLUS-21011 (was wrongly titled Big Game Hunter)."""
+        g = self.ntsc_games.get("Cabela's Deer Hunt: 2005 Season", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21011',
+            "Cabela's Deer Hunt: 2005 Season must have serial SLUS-21011")
+
+    def test_ntsc_cabelas_big_game_hunter_2005_serial(self):
+        """Wave 156: 'Cabela's Big Game Hunter 2005 Adventures' must use SLUS-21021."""
+        g = self.ntsc_games.get("Cabela's Big Game Hunter 2005 Adventures", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21021',
+            "Cabela's Big Game Hunter 2005 Adventures must have serial SLUS-21021")
+
+    def test_ntsc_no_cabelas_bgh_with_wrong_serial(self):
+        """Wave 156: No entry titled 'Big Game Hunter 2005 Adventures' should have SLUS-21011."""
+        for title, e in self.ntsc_games.items():
+            if e.get('serial') == 'SLUS-21011':
+                self.assertNotIn('Big Game Hunter', title,
+                    f"SLUS-21011 is Deer Hunt, not Big Game Hunter: {title!r}")
+
+    def test_ntsc_obscure_aftermath_serial(self):
+        """Wave 156: 'ObsCure: The Aftermath' must use SLUS-21709 (was 'Obscure II')."""
+        g = self.ntsc_games.get("ObsCure: The Aftermath", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21709',
+            "ObsCure: The Aftermath must have serial SLUS-21709")
+
+    def test_ntsc_obscure_ii_removed(self):
+        """Wave 156: 'Obscure II' title removed; replaced with 'ObsCure: The Aftermath'."""
+        self.assertNotIn("Obscure II", self.ntsc_games,
+            "Wave 156: 'Obscure II' renamed to 'ObsCure: The Aftermath'")
+
+    def test_ntsc_rayman2_revolution_serial(self):
+        """Wave 156: 'Rayman 2: Revolution' must use SLUS-20138 (was 'Rayman 2: The Great Escape')."""
+        g = self.ntsc_games.get("Rayman 2: Revolution", {})
+        self.assertEqual(g.get('serial'), 'SLUS-20138',
+            "Rayman 2: Revolution must have serial SLUS-20138")
+
+    def test_ntsc_rayman2_great_escape_removed(self):
+        """Wave 156: 'Rayman 2: The Great Escape' title removed; PS2 version is 'Rayman 2: Revolution'."""
+        self.assertNotIn("Rayman 2: The Great Escape", self.ntsc_games,
+            "Wave 156: PS2 SLUS-20138 is 'Rayman 2: Revolution', not 'The Great Escape'")
+
+    def test_pal_naruto_shippuden_un5_serial(self):
+        """Wave 156: 'Naruto Shippuden: Ultimate Ninja 5 (PAL)' must use SLES-55605."""
+        g = self.pal_games.get("Naruto Shippuden: Ultimate Ninja 5 (PAL)", {})
+        self.assertEqual(g.get('serial'), 'SLES-55605',
+            "Naruto Shippuden: Ultimate Ninja 5 (PAL) must have serial SLES-55605")
+
+    def test_pal_naruto_un5_old_title_removed(self):
+        """Wave 156: 'Naruto: Ultimate Ninja 5 (PAL)' renamed to 'Naruto Shippuden: Ultimate Ninja 5 (PAL)'."""
+        self.assertNotIn("Naruto: Ultimate Ninja 5 (PAL)", self.pal_games,
+            "Wave 156: Old PAL title 'Naruto: Ultimate Ninja 5' must be renamed to include 'Shippuden'")
+
+    def test_jp_jak_ii_renegade_wrong_entry_removed(self):
+        """Wave 156: 'Jak II: Renegade (JP)' with SCPS-15021 removed.
+        SCPS-15021 is Jak x Daxter: Kyuu Sekai no Isan (Jak 1 JP), not Jak II."""
+        self.assertNotIn("Jak II: Renegade (JP)", self.jp_games,
+            "Wave 156: 'Jak II: Renegade (JP)' had wrong serial SCPS-15021 (Jak 1 JP) and was removed")
+
+    def test_jp_jak_ii_correct_entry_present(self):
+        """Wave 156: 'Jak II: Jak x Daxter 2 (JP)' with SCPS-15057 is the correct JP Jak II entry."""
+        g = self.jp_games.get("Jak II: Jak x Daxter 2 (JP)", {})
+        self.assertEqual(g.get('serial'), 'SCPS-15057',
+            "Jak II: Jak x Daxter 2 (JP) must have serial SCPS-15057")
+
+    def test_jp_scps_15021_not_jak2(self):
+        """Wave 156: No JP entry should claim SCPS-15021 is Jak II (it is Jak 1 JP)."""
+        for title, e in self.jp_games.items():
+            if e.get('serial') == 'SCPS-15021' or 'SCPS-15021' in e.get('alt_serials', []):
+                self.assertNotIn('Jak II', title,
+                    f"SCPS-15021 is Jak 1 JP, should not be Jak II: {title!r}")

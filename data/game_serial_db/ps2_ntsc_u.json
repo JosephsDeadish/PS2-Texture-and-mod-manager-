@@ -2364,26 +2364,6 @@
       "release_date": "2002-11-21",
       "serial": "SLUS-20534"
     },
-    "Cabela's Big Game Hunter 2005 Adventures": {
-      "alt_serials": [],
-      "crcs": [
-        "DF6BC54F"
-      ],
-      "developer": "Sand Grain Studios",
-      "genre": "Sports",
-      "publisher": "Activision",
-      "release_date": "2004-08-31",
-      "serial": "SLUS-21011"
-    },
-    "Cabela's Big Game Hunter 2005 Adventures (SLUS-21021)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Sand Grain Studios",
-      "genre": "Sports",
-      "publisher": "Activision",
-      "release_date": "2004-11-09",
-      "serial": "SLUS-21021"
-    },
     "Cabela's Big Game Hunter 2008": {
       "alt_serials": [],
       "crcs": [],
@@ -13945,17 +13925,6 @@
       "release_date": "2005-04-06",
       "serial": "SLUS-20777"
     },
-    "Obscure II": {
-      "alt_serials": [],
-      "crcs": [
-        "408DFB9C"
-      ],
-      "developer": "Hydravision Entertainment",
-      "genre": "Action, Adventure, Survival Horror",
-      "publisher": "Ignition Entertainment",
-      "release_date": "2008-03-25",
-      "serial": "SLUS-21709"
-    },
     "Odin Sphere": {
       "alt_serials": [],
       "crcs": [
@@ -15194,18 +15163,6 @@
       "publisher": "Agetec",
       "release_date": "2007-06-19",
       "serial": "SLUS-21501"
-    },
-    "Rayman 2: The Great Escape": {
-      "alt_serials": [],
-      "crcs": [
-        "B4F84074",
-        "D2F77DF2"
-      ],
-      "developer": "Ubisoft Entertainment",
-      "genre": "Platformer",
-      "publisher": "Ubisoft Entertainment SA",
-      "release_date": "2001-01-30",
-      "serial": "SLUS-20138"
     },
     "Rayman 3: Hoodlum Havoc": {
       "alt_serials": [],
@@ -22498,6 +22455,49 @@
       "publisher": "Bandai Namco",
       "genre": "Action",
       "release_date": "2005-05-17"
+    },
+    "Cabela's Deer Hunt: 2005 Season": {
+      "alt_serials": [],
+      "crcs": [
+        "DF6BC54F"
+      ],
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
+      "release_date": "2004-08-31",
+      "serial": "SLUS-21011"
+    },
+    "Cabela's Big Game Hunter 2005 Adventures": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sand Grain Studios",
+      "genre": "Sports",
+      "publisher": "Activision",
+      "release_date": "2004-11-09",
+      "serial": "SLUS-21021"
+    },
+    "ObsCure: The Aftermath": {
+      "alt_serials": [],
+      "crcs": [
+        "408DFB9C"
+      ],
+      "developer": "Hydravision Entertainment",
+      "genre": "Action, Adventure, Survival Horror",
+      "publisher": "Ignition Entertainment",
+      "release_date": "2008-03-25",
+      "serial": "SLUS-21709"
+    },
+    "Rayman 2: Revolution": {
+      "alt_serials": [],
+      "crcs": [
+        "B4F84074",
+        "D2F77DF2"
+      ],
+      "developer": "Ubisoft Entertainment",
+      "genre": "Platformer",
+      "publisher": "Ubisoft Entertainment SA",
+      "release_date": "2001-01-30",
+      "serial": "SLUS-20138"
     }
   },
   "version": "1.0"

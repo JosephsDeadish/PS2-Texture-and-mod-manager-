@@ -13089,16 +13089,6 @@
       "release_date": "2008-09-15",
       "serial": "SLES-55237"
     },
-    "Naruto: Ultimate Ninja 5 (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "CyberConnect2",
-      "genre": "Fighting",
-      "publisher": "Namco Bandai",
-      "region": "PAL",
-      "release_date": "2008-11-28",
-      "serial": "SLES-55605"
-    },
     "Naruto: Uzumaki Chronicles (PAL)": {
       "alt_serials": [],
       "developer": "Cavia, Inc",
@@ -23300,6 +23290,16 @@
       "publisher": "Lucasarts",
       "genre": "Action",
       "release_date": "2002-11-22"
+    },
+    "Naruto Shippuden: Ultimate Ninja 5 (PAL)": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "CyberConnect2",
+      "genre": "Fighting",
+      "publisher": "Namco Bandai",
+      "region": "PAL",
+      "release_date": "2008-11-28",
+      "serial": "SLES-55605"
     }
   },
   "version": "1.0"
