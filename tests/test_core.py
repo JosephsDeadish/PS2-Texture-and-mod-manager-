@@ -14898,8 +14898,8 @@ class TestWave73PalDbResolvedTitles(unittest.TestCase):
         self.assertIn("Grand Theft Auto: Vice City Stories (PAL)", self.games)
 
     def test_bully_pal_present(self):
-        """Bully (PAL) must be in the PAL DB."""
-        self.assertIn("Bully (PAL)", self.games)
+        """Bully PAL must be in the PAL DB as 'Canis Canem Edit (PAL)' (Wave 161 rename)."""
+        self.assertIn("Canis Canem Edit (PAL)", self.games)
 
     def test_yakuza_pal_present(self):
         """Yakuza (PAL) must be in the PAL DB."""
@@ -18411,7 +18411,8 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         self.assertIn("DMC", self.pal_games.get("Devil May Cry (PAL)", {}).get("aliases", []))
 
     def test_pal_bully_has_canis_canem_edit_alias(self):
-        self.assertIn("Canis Canem Edit", self.pal_games.get("Bully (PAL)", {}).get("aliases", []))
+        # Wave 161: renamed to 'Canis Canem Edit (PAL)'; 'Bully' is now the alias
+        self.assertIn("Bully", self.pal_games.get("Canis Canem Edit (PAL)", {}).get("aliases", []))
 
     def test_pal_fahrenheit_has_indigo_prophecy_alias(self):
         self.assertIn("Indigo Prophecy", self.pal_games.get("Fahrenheit (PAL)", {}).get("aliases", []))
@@ -21437,7 +21438,8 @@ class TestWave120JapanDbRebuild(unittest.TestCase):
         self.assertEqual(self._serial("Armored Core 3 (JP)"), "SLPS-25112")
 
     def test_armored_core_silent_line_serial(self):
-        self.assertEqual(self._serial("Armored Core: Silent Line (JP)"), "SLPS-25169")
+        # Wave 161: renamed to 'Armored Core 3: Silent Line (JP)' (correct PS2.txt title)
+        self.assertEqual(self._serial("Armored Core 3: Silent Line (JP)"), "SLPS-25169")
 
     # Aruze / Shadow Hearts
     def test_shadow_hearts_covenant_serial(self):
@@ -21679,7 +21681,8 @@ class TestWave121DbSerialFixes(unittest.TestCase):
         self.assertEqual(self._pal_serial("Metal Gear Solid 3: Subsistence (PAL)"), "SLES-82042")
 
     def test_bully_pal_serial(self):
-        self.assertEqual(self._pal_serial("Bully (PAL)"), "SLES-53561")
+        # Wave 161: renamed to 'Canis Canem Edit (PAL)' (correct PAL title per PS2.txt)
+        self.assertEqual(self._pal_serial("Canis Canem Edit (PAL)"), "SLES-53561")
 
     def test_we_love_katamari_pal_serial(self):
         self.assertEqual(self._pal_serial("We Love Katamari (PAL)"), "SLES-53828")
@@ -21931,7 +21934,8 @@ class TestWave122ComprehensiveDbExpansion(unittest.TestCase):
         self.assertEqual(self._pal("2002 FIFA World Cup (PAL)"), "SLES-50796")
 
     def test_pal_ace_combat_04(self):
-        self.assertEqual(self._pal("Ace Combat 04: Shattered Skies (PAL)"), "SCES-50410")
+        # Wave 161: renamed to 'Ace Combat: Distant Thunder (PAL)' (correct PAL title)
+        self.assertEqual(self._pal("Ace Combat: Distant Thunder (PAL)"), "SCES-50410")
 
     # ── JP spot-checks (~20 well-known games) ─────────────────────────────────
 
@@ -24532,8 +24536,9 @@ class TestWave141LocalizedPalFills(unittest.TestCase):
         self.assertEqual(g.get("developer"), "Dreamworks Interactive")
 
     def test_pal_star_wars_clone_wars_italian_dev(self):
-        """Wave 141: Star Wars La Guerra dei Cloni dev filled as Pandemic Studios."""
-        g = self.pal_games.get("Star Wars: La Guerra dei Cloni (PAL)", {})
+        """Wave 141→161: Star Wars The Clone Wars (PAL) dev filled as Pandemic Studios.
+        Wave 161: renamed from 'Star Wars: La Guerra dei Cloni (PAL)' to correct English title."""
+        g = self.pal_games.get("Star Wars: The Clone Wars (PAL)", {})
         self.assertEqual(g.get("developer"), "Pandemic Studios")
         self.assertEqual(g.get("publisher"), "Lucasarts")
 
@@ -25953,10 +25958,15 @@ class TestWave152SerialFixes(unittest.TestCase):
             "Wrong serial SLES-50009 (=Action Replay MAX) must not be in PAL DB")
 
     def test_pal_tourist_trophy_serial_fixed(self):
-        """Wave 152: Tourist Trophy must use SCES-53372 (not SLES-53372 per PS2.txt)."""
-        g = self.pal_games.get('Tourist Trophy: Platinum (PAL)', {})
+        """Wave 152→161: Tourist Trophy original (SCES-53372) has correct title.
+        Wave 161: SCES-53372 is 'Tourist Trophy: The Real Riding Simulator' (not Platinum).
+        Platinum re-release is SLES-53372."""
+        g = self.pal_games.get('Tourist Trophy: The Real Riding Simulator (PAL)', {})
         self.assertEqual(g.get('serial'), 'SCES-53372',
-            f"Tourist Trophy serial should be SCES-53372, got {g.get('serial')!r}")
+            f"Tourist Trophy original serial should be SCES-53372, got {g.get('serial')!r}")
+        g2 = self.pal_games.get('Tourist Trophy: Platinum (PAL)', {})
+        self.assertEqual(g2.get('serial'), 'SLES-53372',
+            f"Tourist Trophy Platinum serial should be SLES-53372, got {g2.get('serial')!r}")
 
     def test_pal_speed_challenge_serial_fixed(self):
         """Wave 152: Speed Challenge must use SCES-51022 (SLES-51022 is Virtual Racer per PS2.txt)."""
@@ -25973,10 +25983,11 @@ class TestWave152SerialFixes(unittest.TestCase):
             f"Virtual Racer serial should be SLES-51022, got {g.get('serial')!r}")
 
     def test_pal_star_wars_guerra_dei_cloni_corrected(self):
-        """Wave 152: Star Wars La Guerra dei Cloni uses SLES-50828 (not SLES-50829=Commandos 2)."""
-        g = self.pal_games.get('Star Wars: La Guerra dei Cloni (PAL)', {})
+        """Wave 152→161: Star Wars Clone Wars (SLES-50828) has correct English title.
+        Wave 161: Italian title key replaced with English 'Star Wars: The Clone Wars (PAL)'."""
+        g = self.pal_games.get('Star Wars: The Clone Wars (PAL)', {})
         self.assertEqual(g.get('serial'), 'SLES-50828',
-            f"Star Wars La Guerra dei Cloni serial should be SLES-50828, got {g.get('serial')!r}")
+            f"Star Wars The Clone Wars serial should be SLES-50828, got {g.get('serial')!r}")
         all_serials = {e['serial'] for e in self.pal_games.values()}
         self.assertNotIn('SLES-50829', all_serials,
             "Wrong serial SLES-50829 (=Commandos 2) must not be in PAL DB")
@@ -26253,8 +26264,8 @@ class TestWave155JpMetadataFills(unittest.TestCase):
         self.assertEqual(self.jp_games[title]['genre'], 'Sports')
 
     def test_jp_total_entries_preserved(self):
-        """Wave 155→156: JP total entry count >= 3761 (Wave 156 removed 1 wrong 'Jak II: Renegade (JP)' entry)."""
-        self.assertGreaterEqual(len(self.jp_games), 3761,
+        """Wave 155→161: JP total entry count >= 3760 (Wave 161 removed 1 duplicate 'Armored Core: Silent Line' entry)."""
+        self.assertGreaterEqual(len(self.jp_games), 3760,
             f"JP DB shrank below expected: {len(self.jp_games)}")
 
 class TestWave156SerialTitleFixes(unittest.TestCase):
@@ -26706,3 +26717,125 @@ class TestWave160MissingNtscUAdditions(unittest.TestCase):
             g = self.ntsc_games.get(title, {})
             self.assertEqual(g.get('serial'), serial,
                 f"Wave 160: {title!r} ({serial}) must be in NTSC-U DB")
+
+
+class TestWave161TitleFixes(unittest.TestCase):
+    """Wave 161: Fix wrong title keys in PAL/NTSC-U/JP DBs, verified against
+    PS2.data.json, PS2.titles.json, and PS2.txt reference files.
+
+    PAL fixes:
+    - SCES-50410: 'Ace Combat 04: Shattered Skies' → 'Ace Combat: Distant Thunder'
+      (PAL version title confirmed by PS2.txt and PS2.data.json)
+    - SCES-52424: 'Ace Combat 5: The Unsung War' → 'Ace Combat: Squadron Leader'
+      (PAL version title confirmed by PS2.txt and PS2.data.json)
+    - SLES-53561: 'Bully' → 'Canis Canem Edit'
+      (PAL title per PS2.txt and PS2.data.json; 'Bully' alias retained)
+    - SCES-53372: 'Tourist Trophy: Platinum' → 'Tourist Trophy: The Real Riding Simulator'
+      (SCES is original release; SLES-53372 is the Platinum re-release)
+    - Add SLES-53372: 'Tourist Trophy: Platinum' (missing Platinum PAL entry)
+    - SLES-50828: 'Star Wars: La Guerra dei Cloni' → 'Star Wars: The Clone Wars'
+      (German PAL SKU; PS2.txt and ref_data confirm English title)
+    NTSC-U fix:
+    - SLUS-20627: 'Devil May Cry 2 (alt serial)' → 'Devil May Cry 2 (Disc 2)'
+      (PS2.txt: 'Devil May Cry 2 [Disc2of2]')
+    JP fix:
+    - SLPS-25169: removed duplicate 'Armored Core: Silent Line' (merged into
+      existing 'Armored Core 3: Silent Line' entry confirmed by PS2.txt)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            pal_data = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            jp_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+        cls.pal_games = pal_data['games']
+        cls.jp_games = jp_data['games']
+
+    # ── PAL fixes ──────────────────────────────────────────────────────
+    def test_ace_combat_distant_thunder_pal(self):
+        """Wave 161: SCES-50410 must be 'Ace Combat: Distant Thunder (PAL)'."""
+        self.assertIn('Ace Combat: Distant Thunder (PAL)', self.pal_games,
+            "Wave 161: 'Ace Combat: Distant Thunder (PAL)' must be in PAL DB")
+        g = self.pal_games['Ace Combat: Distant Thunder (PAL)']
+        self.assertEqual(g.get('serial'), 'SCES-50410',
+            "Wave 161: Ace Combat: Distant Thunder must have serial SCES-50410")
+        # Old wrong title must not exist
+        self.assertNotIn('Ace Combat 04: Shattered Skies (PAL)', self.pal_games,
+            "Wave 161: 'Ace Combat 04: Shattered Skies (PAL)' must be removed from PAL DB")
+
+    def test_ace_combat_squadron_leader_pal(self):
+        """Wave 161: SCES-52424 must be 'Ace Combat: Squadron Leader (PAL)'."""
+        self.assertIn('Ace Combat: Squadron Leader (PAL)', self.pal_games,
+            "Wave 161: 'Ace Combat: Squadron Leader (PAL)' must be in PAL DB")
+        g = self.pal_games['Ace Combat: Squadron Leader (PAL)']
+        self.assertEqual(g.get('serial'), 'SCES-52424',
+            "Wave 161: Ace Combat: Squadron Leader must have serial SCES-52424")
+        self.assertNotIn('Ace Combat 5: The Unsung War (PAL)', self.pal_games,
+            "Wave 161: 'Ace Combat 5: The Unsung War (PAL)' must be removed from PAL DB")
+
+    def test_canis_canem_edit_pal(self):
+        """Wave 161: SLES-53561 must be 'Canis Canem Edit (PAL)' (not 'Bully (PAL)')."""
+        self.assertIn('Canis Canem Edit (PAL)', self.pal_games,
+            "Wave 161: 'Canis Canem Edit (PAL)' must be in PAL DB")
+        g = self.pal_games['Canis Canem Edit (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-53561',
+            "Wave 161: Canis Canem Edit must have serial SLES-53561")
+        self.assertNotIn('Bully (PAL)', self.pal_games,
+            "Wave 161: 'Bully (PAL)' must be removed (title is Canis Canem Edit in PAL)")
+        # 'Bully' alias must still exist
+        aliases = g.get('aliases', [])
+        self.assertIn('Bully', aliases,
+            "Wave 161: 'Bully' alias must be retained in Canis Canem Edit entry")
+
+    def test_tourist_trophy_original_pal(self):
+        """Wave 161: SCES-53372 must be 'Tourist Trophy: The Real Riding Simulator (PAL)'."""
+        self.assertIn('Tourist Trophy: The Real Riding Simulator (PAL)', self.pal_games,
+            "Wave 161: 'Tourist Trophy: The Real Riding Simulator (PAL)' must be in PAL DB")
+        g = self.pal_games['Tourist Trophy: The Real Riding Simulator (PAL)']
+        self.assertEqual(g.get('serial'), 'SCES-53372',
+            "Wave 161: Tourist Trophy original must have serial SCES-53372")
+
+    def test_tourist_trophy_platinum_pal(self):
+        """Wave 161: SLES-53372 must be 'Tourist Trophy: Platinum (PAL)' (new entry)."""
+        self.assertIn('Tourist Trophy: Platinum (PAL)', self.pal_games,
+            "Wave 161: 'Tourist Trophy: Platinum (PAL)' must be in PAL DB as SLES-53372")
+        g = self.pal_games['Tourist Trophy: Platinum (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-53372',
+            "Wave 161: Tourist Trophy Platinum must have serial SLES-53372")
+
+    def test_star_wars_clone_wars_pal(self):
+        """Wave 161: SLES-50828 must be 'Star Wars: The Clone Wars (PAL)'."""
+        self.assertIn('Star Wars: The Clone Wars (PAL)', self.pal_games,
+            "Wave 161: 'Star Wars: The Clone Wars (PAL)' must be in PAL DB")
+        g = self.pal_games['Star Wars: The Clone Wars (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-50828',
+            "Wave 161: Star Wars: The Clone Wars (PAL) must have serial SLES-50828")
+        self.assertNotIn('Star Wars: La Guerra dei Cloni (PAL)', self.pal_games,
+            "Wave 161: Italian title key must be removed from PAL DB")
+
+    # ── NTSC-U fix ─────────────────────────────────────────────────────
+    def test_dmc2_disc2_ntsc_u(self):
+        """Wave 161: SLUS-20627 must be 'Devil May Cry 2 (Disc 2)' (not 'alt serial')."""
+        self.assertIn('Devil May Cry 2 (Disc 2)', self.ntsc_games,
+            "Wave 161: 'Devil May Cry 2 (Disc 2)' must be in NTSC-U DB")
+        g = self.ntsc_games['Devil May Cry 2 (Disc 2)']
+        self.assertEqual(g.get('serial'), 'SLUS-20627',
+            "Wave 161: Devil May Cry 2 (Disc 2) must have serial SLUS-20627")
+        self.assertNotIn('Devil May Cry 2 (alt serial)', self.ntsc_games,
+            "Wave 161: 'Devil May Cry 2 (alt serial)' must be removed from NTSC-U DB")
+
+    # ── JP fix ─────────────────────────────────────────────────────────
+    def test_armored_core_3_silent_line_jp(self):
+        """Wave 161: SLPS-25169 must be 'Armored Core 3: Silent Line (JP)'."""
+        self.assertIn('Armored Core 3: Silent Line (JP)', self.jp_games,
+            "Wave 161: 'Armored Core 3: Silent Line (JP)' must be in JP DB")
+        g = self.jp_games['Armored Core 3: Silent Line (JP)']
+        self.assertEqual(g.get('serial'), 'SLPS-25169',
+            "Wave 161: Armored Core 3: Silent Line (JP) must have serial SLPS-25169")
+        self.assertNotIn('Armored Core: Silent Line (JP)', self.jp_games,
+            "Wave 161: 'Armored Core: Silent Line (JP)' must be removed (duplicate/wrong title)")

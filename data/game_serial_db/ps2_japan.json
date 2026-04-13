@@ -1217,8 +1217,11 @@
       "developer": "FromSoftware",
       "genre": "Third-person Shooter",
       "publisher": "FromSoftware",
-      "release_date": "2004-02-26",
-      "serial": "SLPS-73420"
+      "release_date": "2003-01-23",
+      "serial": "SLPS-25169",
+      "aliases": [
+        "Armored Core: Silent Line"
+      ]
     },
     "Armored Core: Formula Front (JP)": {
       "alt_serials": [],
@@ -1281,14 +1284,6 @@
       "publisher": "FromSoftware",
       "release_date": "2004-10-28",
       "serial": "SLPS-25408"
-    },
-    "Armored Core: Silent Line (JP)": {
-      "alt_serials": [],
-      "developer": "FromSoftware",
-      "genre": "Third-person Shooter",
-      "publisher": "FromSoftware",
-      "release_date": "2003-01-23",
-      "serial": "SLPS-25169"
     },
     "Artlist Collection: The Dog Island: Hitotsu no Hana no Monogatari (JP)": {
       "alt_serials": [],

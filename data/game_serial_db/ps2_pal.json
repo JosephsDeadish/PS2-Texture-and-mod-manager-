@@ -350,29 +350,6 @@
       "release_date": "2003-02-28",
       "serial": "SLES-50850"
     },
-    "Ace Combat 04: Shattered Skies (PAL)": {
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Flight Simulator",
-      "publisher": "Namco",
-      "region": "PAL",
-      "release_date": "2002-01-25",
-      "serial": "SCES-50410"
-    },
-    "Ace Combat 5: The Unsung War (PAL)": {
-      "alt_serials": [
-        "SCED-53081",
-        "SCED-53115"
-      ],
-      "crcs": [],
-      "developer": "Namco",
-      "genre": "Flight Simulator",
-      "publisher": "Namco",
-      "region": "PAL",
-      "release_date": "2005-01-28",
-      "serial": "SCES-52424"
-    },
     "Ace Combat: The Belkan War (PAL)": {
       "alt_serials": [],
       "developer": "Project Aces",
@@ -1968,20 +1945,6 @@
       "publisher": "505 Gamestreet",
       "release_date": "2005-02-18",
       "serial": "SLES-52495"
-    },
-    "Bully (PAL)": {
-      "aliases": [
-        "Bully Canis Canem Edit",
-        "Canis Canem Edit"
-      ],
-      "alt_serials": [],
-      "crcs": [],
-      "developer": "Rockstar Vancouver",
-      "genre": "Action-Adventure",
-      "publisher": "Rockstar Games",
-      "region": "PAL",
-      "release_date": "2006-10-27",
-      "serial": "SLES-53561"
     },
     "Burnout (PAL)": {
       "alt_serials": [
@@ -18749,14 +18712,15 @@
       "serial": "SLES-50204"
     },
     "Star Wars: The Clone Wars (PAL)": {
-      "alt_serials": [
-        "SLES-50827"
-      ],
+      "serial": "SLES-50828",
+      "region": "PAL",
       "developer": "Pandemic Studios",
-      "genre": "Action/Shooter",
       "publisher": "Lucasarts",
-      "release_date": "2002-12-11",
-      "serial": "SLES-50826"
+      "genre": "Action",
+      "release_date": "2002-11-22",
+      "aliases": [
+        "Star Wars: La Guerra dei Cloni"
+      ]
     },
     "Star Wars: The Force Unleashed (PAL)": {
       "alt_serials": [
@@ -21354,14 +21318,6 @@
       "release_date": "2008-02-15",
       "serial": "SLES-54953"
     },
-    "Tourist Trophy: Platinum (PAL)": {
-      "alt_serials": [],
-      "developer": "Polyphony Digital",
-      "genre": "Racing",
-      "publisher": "Sony Computer Entertainment Europe",
-      "release_date": "2007-01-12",
-      "serial": "SCES-53372"
-    },
     "Toy Golf Extreme (PAL)": {
       "alt_serials": [],
       "developer": "Midas Interactive Entertainment",
@@ -23282,15 +23238,6 @@
       "genre": "Sports",
       "release_date": "2003-01-01"
     },
-    "Star Wars: La Guerra dei Cloni (PAL)": {
-      "serial": "SLES-50828",
-      "title": "Star Wars: La Guerra dei Cloni",
-      "region": "PAL",
-      "developer": "Pandemic Studios",
-      "publisher": "Lucasarts",
-      "genre": "Action",
-      "release_date": "2002-11-22"
-    },
     "Naruto Shippuden: Ultimate Ninja 5 (PAL)": {
       "alt_serials": [],
       "crcs": [],
@@ -23300,6 +23247,68 @@
       "region": "PAL",
       "release_date": "2008-11-28",
       "serial": "SLES-55605"
+    },
+    "Ace Combat: Distant Thunder (PAL)": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Flight Simulator",
+      "publisher": "Namco",
+      "region": "PAL",
+      "release_date": "2002-01-25",
+      "serial": "SCES-50410",
+      "aliases": [
+        "Ace Combat 04: Shattered Skies"
+      ]
+    },
+    "Ace Combat: Squadron Leader (PAL)": {
+      "alt_serials": [
+        "SCED-53081",
+        "SCED-53115"
+      ],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Flight Simulator",
+      "publisher": "Namco",
+      "region": "PAL",
+      "release_date": "2005-01-28",
+      "serial": "SCES-52424",
+      "aliases": [
+        "Ace Combat 5: The Unsung War"
+      ]
+    },
+    "Canis Canem Edit (PAL)": {
+      "aliases": [
+        "Bully",
+        "Bully Canis Canem Edit",
+        "Canis Canem Edit"
+      ],
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Rockstar Vancouver",
+      "genre": "Action-Adventure",
+      "publisher": "Rockstar Games",
+      "region": "PAL",
+      "release_date": "2006-10-27",
+      "serial": "SLES-53561"
+    },
+    "Tourist Trophy: The Real Riding Simulator (PAL)": {
+      "alt_serials": [],
+      "developer": "Polyphony Digital",
+      "genre": "Racing",
+      "publisher": "Sony Computer Entertainment Europe",
+      "release_date": "2007-01-12",
+      "serial": "SCES-53372",
+      "aliases": []
+    },
+    "Tourist Trophy: Platinum (PAL)": {
+      "serial": "SLES-53372",
+      "alt_serials": [],
+      "developer": "Polyphony Digital",
+      "genre": "Racing",
+      "publisher": "Sony Computer Entertainment Europe",
+      "release_date": "2007-01-12",
+      "region": "PAL"
     }
   },
   "version": "1.0"

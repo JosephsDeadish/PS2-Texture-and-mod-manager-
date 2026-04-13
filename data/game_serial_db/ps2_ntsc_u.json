@@ -3628,18 +3628,6 @@
       "release_date": "2003-01-29",
       "serial": "SLUS-20484"
     },
-    "Devil May Cry 2 (alt serial)": {
-      "alt_serials": [],
-      "crcs": [
-        "1B14C0AC",
-        "A71E7805"
-      ],
-      "developer": "Capcom",
-      "genre": "Action, Platformer, Beat'em Up, Survival Horror",
-      "publisher": "Capcom",
-      "release_date": "2003-01-29",
-      "serial": "SLUS-20627"
-    },
     "Devil May Cry 3: Dante's Awakening": {
       "aliases": [
         "DMC 3",
@@ -20909,6 +20897,18 @@
       "publisher": "Crave Entertainment",
       "release_date": "2003-07-29",
       "serial": "SLUS-20525"
+    },
+    "Devil May Cry 2 (Disc 2)": {
+      "alt_serials": [],
+      "crcs": [
+        "1B14C0AC",
+        "A71E7805"
+      ],
+      "developer": "Capcom",
+      "genre": "Action, Platformer, Beat'em Up, Survival Horror",
+      "publisher": "Capcom",
+      "release_date": "2003-01-29",
+      "serial": "SLUS-20627"
     }
   },
   "version": "1.0"
