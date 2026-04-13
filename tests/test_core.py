@@ -25806,9 +25806,9 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
         self.assertNotIn('SLES-55580', all_serials, "Wrong serial SLES-55580 still in PAL DB")
 
     def test_pal_count_wave148(self):
-        """Wave 148: PAL DB must have at most 2646 entries (Wave 162 adds 6 missing retail games)."""
-        self.assertLessEqual(len(self.pal_games), 2646,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2646 after Wave 148/152/162 changes")
+        """Wave 148: PAL DB must have at most 2650 entries (Wave 162 adds 6, Wave 163 adds 4 net)."""
+        self.assertLessEqual(len(self.pal_games), 2650,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2650 after Wave 148/152/162/163 changes")
 
 
 class TestWave149AdditionalSerialFixes(unittest.TestCase):
@@ -25868,9 +25868,9 @@ class TestWave149AdditionalSerialFixes(unittest.TestCase):
             "Captain Scarlet correct serial SLES-54471 must still be in PAL DB")
 
     def test_pal_count_wave149(self):
-        """Wave 149: PAL DB must have at most 2646 entries (Wave 162 adds 6 missing retail games)."""
-        self.assertLessEqual(len(self.pal_games), 2646,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2646 after Wave 149/152/162 changes")
+        """Wave 149: PAL DB must have at most 2650 entries (Wave 162 adds 6, Wave 163 adds 4 net)."""
+        self.assertLessEqual(len(self.pal_games), 2650,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2650 after Wave 149/152/162/163 changes")
 
     # ── JP metadata fills ──────────────────────────────────────────────────────
 
@@ -27078,3 +27078,121 @@ class TestWave162JpDbFixes(unittest.TestCase):
         """Wave 162: JP DB must have at least 3763 entries after 3 new additions."""
         self.assertGreaterEqual(len(self.jp_games), 3763,
             f"JP DB has {len(self.jp_games)} entries, expected >= 3763 after Wave 162 additions")
+
+
+class TestWave163PalDbAdditions(unittest.TestCase):
+    """Wave 163: PAL DB additions of missing retail games and alt_serial fixes.
+
+    Changes:
+    - Added Jet Ski Riders (PAL): SLES-50552
+    - Added Sword of the Samurai (PAL): SLES-51290
+    - Added Smash Court Tennis: Pro Tournament 2 (PAL): SCES-52423
+    - Added Pippa Funnell: Ranch Rescue (PAL): SLES-54994
+    - Added SLES-50356 as alt_serial to Salt Lake 2002 (PAL)
+    - Added SLES-51450 as alt_serial to Return to Castle Wolfenstein (PAL)
+    - Added SLES-51639 as alt_serial to The Suffering (PAL)
+    - Added SLES-50244 as alt_serial to This Is Football 2002 (PAL)
+    - Added SLES-54143 as alt_serial to Hard Rock Casino (PAL)
+    NOT added (wrong serials confirmed by PS2.txt/Wave 152):
+    - SLES-53357 = Colosseum (not 21 Card Games)
+    - SLES-53444 = PES 5 (not Panzer Elite Action)
+    - SLES-54612 = unknown (not Captain Scarlet; correct=SLES-54471)
+    - SLES-55542 = Shaun White (not Disney Sing It Pop Hits; correct=SLES-55942)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            pal_data = json.load(f)
+        cls.pal_games = pal_data['games']
+
+    def test_jet_ski_riders_added(self):
+        """Wave 163: Jet Ski Riders (PAL) must be in PAL DB with SLES-50552."""
+        self.assertIn('Jet Ski Riders (PAL)', self.pal_games,
+            "Wave 163: 'Jet Ski Riders (PAL)' must be in PAL DB")
+        g = self.pal_games['Jet Ski Riders (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-50552',
+            "Wave 163: Jet Ski Riders (PAL) must have serial SLES-50552")
+
+    def test_sword_of_the_samurai_added(self):
+        """Wave 163: Sword of the Samurai (PAL) must be in PAL DB with SLES-51290."""
+        self.assertIn('Sword of the Samurai (PAL)', self.pal_games,
+            "Wave 163: 'Sword of the Samurai (PAL)' must be in PAL DB")
+        g = self.pal_games['Sword of the Samurai (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-51290',
+            "Wave 163: Sword of the Samurai (PAL) must have serial SLES-51290")
+
+    def test_smash_court_tennis_pt2_added(self):
+        """Wave 163: Smash Court Tennis: Pro Tournament 2 (PAL) must be in PAL DB with SCES-52423."""
+        self.assertIn('Smash Court Tennis: Pro Tournament 2 (PAL)', self.pal_games,
+            "Wave 163: 'Smash Court Tennis: Pro Tournament 2 (PAL)' must be in PAL DB")
+        g = self.pal_games['Smash Court Tennis: Pro Tournament 2 (PAL)']
+        self.assertEqual(g.get('serial'), 'SCES-52423',
+            "Wave 163: Smash Court Tennis: Pro Tournament 2 (PAL) must have serial SCES-52423")
+
+    def test_pal_count_wave163(self):
+        """Wave 163: PAL DB must have at least 2650 entries after 4 net new game additions."""
+        self.assertGreaterEqual(len(self.pal_games), 2650,
+            f"PAL DB has {len(self.pal_games)} entries, expected >= 2650 after Wave 163 additions")
+
+    def test_pippa_funnell_ranch_rescue_added(self):
+        """Wave 163: Pippa Funnell: Ranch Rescue (PAL) must be in PAL DB with SLES-54994."""
+        self.assertIn('Pippa Funnell: Ranch Rescue (PAL)', self.pal_games,
+            "Wave 163: 'Pippa Funnell: Ranch Rescue (PAL)' must be in PAL DB")
+        g = self.pal_games['Pippa Funnell: Ranch Rescue (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-54994',
+            "Wave 163: Pippa Funnell: Ranch Rescue (PAL) must have serial SLES-54994")
+
+    def test_captain_scarlet_wrong_serial_not_added(self):
+        """Wave 163: SLES-54612 must NOT be in PAL DB (wrong serial for Captain Scarlet; correct is SLES-54471)."""
+        all_serials = {g['serial'] for g in self.pal_games.values()}
+        self.assertNotIn('SLES-54612', all_serials,
+            "Wave 163: SLES-54612 is wrong for Captain Scarlet (correct=SLES-54471) and must not be in DB")
+
+    def test_disney_sing_it_wrong_serial_not_added(self):
+        """Wave 163: SLES-55542 must NOT be in PAL DB (Shaun White serial; Disney Sing It Pop Hits=SLES-55942)."""
+        all_serials = {g['serial'] for g in self.pal_games.values()}
+        self.assertNotIn('SLES-55542', all_serials,
+            "Wave 163: SLES-55542 is Shaun White (not Disney Sing It) and must not be in DB")
+
+    def test_21_card_games_wrong_serial_not_added(self):
+        """Wave 163: SLES-53357 must NOT be for 21 Card Games (Wave 152: SLES-53357=Colosseum)."""
+        all_serials = {g['serial'] for g in self.pal_games.values()}
+        self.assertNotIn('21 Card Games (PAL)', self.pal_games,
+            "Wave 163: 21 Card Games with SLES-53357 is wrong (SLES-53357=Colosseum) and must not be in DB")
+
+    def test_panzer_elite_wrong_serial_not_added(self):
+        """Wave 163: SLES-53444 must NOT be for Panzer Elite Action (Wave 152: SLES-53444=PES5)."""
+        self.assertNotIn('Panzer Elite Action: Fields of Glory (PAL)', self.pal_games,
+            "Wave 163: Panzer Elite with SLES-53444 is wrong (SLES-53444=PES5) and must not be in DB")
+
+    def test_salt_lake_2002_alt_serial_added(self):
+        """Wave 163: Salt Lake 2002 (PAL) must have SLES-50356 as alt_serial."""
+        g = self.pal_games.get('Salt Lake 2002 (PAL)', {})
+        self.assertIn('SLES-50356', g.get('alt_serials', []),
+            "Wave 163: SLES-50356 must be alt_serial of Salt Lake 2002 (PAL)")
+
+    def test_rtcw_alt_serial_added(self):
+        """Wave 163: Return to Castle Wolfenstein (PAL) must have SLES-51450 as alt_serial."""
+        g = self.pal_games.get('Return to Castle Wolfenstein: Operation Resurrection (PAL)', {})
+        self.assertIn('SLES-51450', g.get('alt_serials', []),
+            "Wave 163: SLES-51450 must be alt_serial of Return to Castle Wolfenstein (PAL)")
+
+    def test_the_suffering_alt_serial_added(self):
+        """Wave 163: The Suffering (PAL) must have SLES-51639 as alt_serial."""
+        g = self.pal_games.get('The Suffering (PAL)', {})
+        self.assertIn('SLES-51639', g.get('alt_serials', []),
+            "Wave 163: SLES-51639 must be alt_serial of The Suffering (PAL)")
+
+    def test_this_is_football_2002_alt_serial_added(self):
+        """Wave 163: This Is Football 2002 (PAL) must have SLES-50244 as alt_serial."""
+        g = self.pal_games.get('This Is Football 2002 (PAL)', {})
+        self.assertIn('SLES-50244', g.get('alt_serials', []),
+            "Wave 163: SLES-50244 must be alt_serial of This Is Football 2002 (PAL)")
+
+    def test_hard_rock_casino_alt_serial_added(self):
+        """Wave 163: Hard Rock Casino (PAL) must have SLES-54143 as alt_serial."""
+        g = self.pal_games.get('Hard Rock Casino (PAL)', {})
+        self.assertIn('SLES-54143', g.get('alt_serials', []),
+            "Wave 163: SLES-54143 must be alt_serial of Hard Rock Casino (PAL)")

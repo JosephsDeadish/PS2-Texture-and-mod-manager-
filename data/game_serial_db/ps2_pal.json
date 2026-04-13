@@ -8809,7 +8809,9 @@
       "serial": "SLES-54590"
     },
     "Hard Rock Casino (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLES-54143"
+      ],
       "developer": "Farsight Studios",
       "genre": "Casino",
       "publisher": "Majesco",
@@ -15553,7 +15555,8 @@
     },
     "Return to Castle Wolfenstein: Operation Resurrection (PAL)": {
       "alt_serials": [
-        "SLES-51522"
+        "SLES-51522",
+        "SLES-51450"
       ],
       "developer": "Gray Matter Interactive Studios, Inc",
       "genre": "First Person Shooter",
@@ -16271,7 +16274,9 @@
       "serial": "SLES-53201"
     },
     "Salt Lake 2002 (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLES-50356"
+      ],
       "developer": "Ubisoft Montreal",
       "genre": "Sports",
       "publisher": "Ubisoft",
@@ -20460,7 +20465,8 @@
       "alt_serials": [
         "SLED-52488",
         "SLES-52439",
-        "SLES-52531"
+        "SLES-52531",
+        "SLES-51639"
       ],
       "developer": "Surreal Software, Inc",
       "genre": "Survival horror",
@@ -20628,7 +20634,8 @@
     },
     "This Is Football 2002 (PAL)": {
       "alt_serials": [
-        "SCED-50449"
+        "SCED-50449",
+        "SLES-50244"
       ],
       "developer": "Team SOHO",
       "genre": "Soccer",
@@ -23397,6 +23404,42 @@
       "genre": "RPG",
       "release_date": "2007-05-22",
       "region": "PAL"
+    },
+    "Jet Ski Riders (PAL)": {
+      "serial": "SLES-50552",
+      "region": "PAL",
+      "developer": "Opus Corp",
+      "publisher": "Eidos Interactive",
+      "genre": "Racing",
+      "release_date": "2001-12-21",
+      "alt_serials": []
+    },
+    "Sword of the Samurai (PAL)": {
+      "serial": "SLES-51290",
+      "region": "PAL",
+      "developer": "LightWeight Co., Ltd",
+      "publisher": "Ubi Soft Entertainment Software",
+      "genre": "Fighting",
+      "release_date": "2003-02-14",
+      "alt_serials": []
+    },
+    "Smash Court Tennis: Pro Tournament 2 (PAL)": {
+      "serial": "SCES-52423",
+      "region": "PAL",
+      "developer": "Namco",
+      "publisher": "Namco",
+      "genre": "Tennis",
+      "release_date": "2004-06-08",
+      "alt_serials": []
+    },
+    "Pippa Funnell: Ranch Rescue (PAL)": {
+      "serial": "SLES-54994",
+      "region": "PAL",
+      "developer": "Phoenix Interactive Entertainment",
+      "publisher": "Ubisoft",
+      "genre": "Other",
+      "release_date": "2007-10-25",
+      "alt_serials": []
     }
   },
   "version": "1.0"
