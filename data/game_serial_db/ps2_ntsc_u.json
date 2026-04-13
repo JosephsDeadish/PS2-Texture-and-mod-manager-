@@ -2738,6 +2738,18 @@
       "release_date": "2005-11-30",
       "serial": "SLUS-21232"
     },
+    "College Hoops 2K7": {
+      "aliases": [
+        "College Hoops 2K7"
+      ],
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Visual Concepts",
+      "genre": "Sports",
+      "publisher": "2K Sports",
+      "release_date": "2006-12-11",
+      "serial": "SLUS-21463"
+    },
     "College Hoops 2K8": {
       "alt_serials": [],
       "crcs": [],
@@ -14842,6 +14854,18 @@
       "publisher": "Electronic Arts",
       "release_date": "2003-09-16",
       "serial": "SLUS-20749"
+    },
+    "Rugby 2005": {
+      "aliases": [
+        "Rugby 2005"
+      ],
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "HB Studios",
+      "genre": "Sports",
+      "publisher": "EA Sports",
+      "release_date": "2004-11-09",
+      "serial": "SLUS-21158"
     },
     "Rule of Rose": {
       "alt_serials": [],

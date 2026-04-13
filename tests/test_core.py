@@ -26034,17 +26034,20 @@ class TestWave152SerialFixes(unittest.TestCase):
 
     # ── NTSC-U fixes ──────────────────────────────────────────────────────────
 
-    def test_ntsc_college_hoops_2k7_removed(self):
-        """Wave 152: College Hoops 2K7 with wrong serial SLUS-21463 (=Ghost Recon 2) must be removed."""
-        self.assertNotIn('College Hoops 2K7', self.ntsc_games,
-            "College Hoops 2K7 with wrong serial SLUS-21463 must not exist")
-        all_serials = {e['serial'] for e in self.ntsc_games.values()}
-        # SLUS-21463 was Ghost Recon 2 per PS2.txt; should not be in DB (Ghost Recon 2 uses SLUS-21105)
-        if 'SLUS-21463' in all_serials:
-            for t, i in self.ntsc_games.items():
-                if i.get('serial') == 'SLUS-21463':
-                    self.assertNotIn('College Hoops', t,
-                        f"SLUS-21463 must not be assigned to College Hoops, got: {t}")
+    def test_ntsc_college_hoops_2k7_serial_correct(self):
+        """Wave 152 (updated by Wave 160): SLUS-21463 = College Hoops 2K7, confirmed by
+        PS2.titles.json and PS2.data.json. Wave 152 incorrectly removed it based solely on
+        PS2.txt (which has an error for this serial). Ghost Recon 2 uses SLUS-21105.
+        Wave 160 re-added College Hoops 2K7 with SLUS-21463 as the correct serial."""
+        # Ghost Recon 2 must use SLUS-21105 (not SLUS-21463)
+        g = self.ntsc_games.get("Tom Clancy's Ghost Recon 2", {})
+        self.assertEqual(g.get('serial'), 'SLUS-21105',
+            "Ghost Recon 2 must use SLUS-21105, not SLUS-21463")
+        # College Hoops 2K7 is correctly at SLUS-21463 per PS2.titles.json + PS2.data.json
+        if 'College Hoops 2K7' in self.ntsc_games:
+            g = self.ntsc_games['College Hoops 2K7']
+            self.assertEqual(g.get('serial'), 'SLUS-21463',
+                "College Hoops 2K7 must use SLUS-21463 (confirmed by PS2.titles.json + PS2.data.json)")
 
     def test_ntsc_equestriad_renamed(self):
         """Wave 152: 'Equestriad' exists at SLUS-21401 (was wrong-named Lucinda Green's Equestrian Challenge)."""
@@ -26615,3 +26618,91 @@ class TestWave159NtscUFinalDemoCleanup(unittest.TestCase):
             g = self.ntsc_games.get(title, {})
             self.assertEqual(g.get('serial'), serial,
                 f"Wave 159: Retail entry {title!r} ({serial}) must exist after demo cleanup")
+
+
+class TestWave160MissingNtscUAdditions(unittest.TestCase):
+    """Wave 160: Add 2 confirmed missing NTSC-U retail games verified against
+    PS2.titles.json, PS2.data.json, and PS2.txt reference files.
+    - Rugby 2005 (SLUS-21158): confirmed in PS2.titles.json + PS2.txt + PS2.data.json.
+      Series: Rugby(2001)→Rugby 2004→Rugby 2005→Rugby 06→Rugby 08 (all HB Studios/EA Sports).
+    - College Hoops 2K7 (SLUS-21463): confirmed in PS2.titles.json + PS2.data.json.
+      Series: ESPN College Hoops→ESPN College Hoops 2K5→College Hoops 2K6→College Hoops 2K7→
+      College Hoops 2K8. PS2.data.json: dev=Visual Concepts, pub=2K Sports, date=2006-12-11.
+    NTSC-U DB: 1994→1996 entries.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        cls.ntsc_games = ntsc_data['games']
+
+    def test_ntsc_count_wave160(self):
+        """Wave 160: NTSC-U DB must have >= 1996 entries after adding 2 missing games."""
+        self.assertGreaterEqual(len(self.ntsc_games), 1996,
+            f"NTSC-U DB has {len(self.ntsc_games)} entries, expected >= 1996")
+
+    def test_rugby_2005_added(self):
+        """Wave 160: Rugby 2005 (SLUS-21158) must be in NTSC-U DB."""
+        self.assertIn('Rugby 2005', self.ntsc_games,
+            "Wave 160: 'Rugby 2005' must be in NTSC-U DB")
+        g = self.ntsc_games['Rugby 2005']
+        self.assertEqual(g.get('serial'), 'SLUS-21158',
+            "Wave 160: Rugby 2005 must have serial SLUS-21158")
+
+    def test_rugby_2005_metadata(self):
+        """Wave 160: Rugby 2005 must have correct publisher and genre."""
+        g = self.ntsc_games.get('Rugby 2005', {})
+        self.assertEqual(g.get('publisher'), 'EA Sports',
+            "Wave 160: Rugby 2005 publisher must be EA Sports")
+        self.assertEqual(g.get('developer'), 'HB Studios',
+            "Wave 160: Rugby 2005 developer must be HB Studios")
+        self.assertEqual(g.get('genre'), 'Sports',
+            "Wave 160: Rugby 2005 genre must be Sports")
+
+    def test_college_hoops_2k7_added(self):
+        """Wave 160: College Hoops 2K7 (SLUS-21463) must be in NTSC-U DB."""
+        self.assertIn('College Hoops 2K7', self.ntsc_games,
+            "Wave 160: 'College Hoops 2K7' must be in NTSC-U DB")
+        g = self.ntsc_games['College Hoops 2K7']
+        self.assertEqual(g.get('serial'), 'SLUS-21463',
+            "Wave 160: College Hoops 2K7 must have serial SLUS-21463")
+
+    def test_college_hoops_2k7_metadata(self):
+        """Wave 160: College Hoops 2K7 must have correct metadata from PS2.data.json."""
+        g = self.ntsc_games.get('College Hoops 2K7', {})
+        self.assertEqual(g.get('developer'), 'Visual Concepts',
+            "Wave 160: College Hoops 2K7 developer must be Visual Concepts")
+        self.assertEqual(g.get('publisher'), '2K Sports',
+            "Wave 160: College Hoops 2K7 publisher must be 2K Sports")
+        self.assertEqual(g.get('release_date'), '2006-12-11',
+            "Wave 160: College Hoops 2K7 release_date must be 2006-12-11")
+
+    def test_college_hoops_series_complete(self):
+        """Wave 160: Full College Hoops series must be present in NTSC-U DB."""
+        expected = [
+            ('ESPN College Hoops', 'SLUS-20729'),
+            ('ESPN College Hoops 2K5', 'SLUS-20922'),
+            ('College Hoops 2K6', 'SLUS-21232'),
+            ('College Hoops 2K7', 'SLUS-21463'),
+            ('College Hoops 2K8', 'SLUS-21673'),
+        ]
+        for title, serial in expected:
+            g = self.ntsc_games.get(title, {})
+            self.assertEqual(g.get('serial'), serial,
+                f"Wave 160: {title!r} ({serial}) must be in NTSC-U DB")
+
+    def test_rugby_series_complete(self):
+        """Wave 160: Rugby series entries must be present and correct."""
+        expected = [
+            ('Rugby', 'SLUS-20262'),
+            ('Rugby 2004', 'SLUS-20749'),
+            ('Rugby 2005', 'SLUS-21158'),
+            ('Rugby 06', 'SLUS-21368'),
+            ('Rugby 08', 'SLUS-21640'),
+        ]
+        for title, serial in expected:
+            g = self.ntsc_games.get(title, {})
+            self.assertEqual(g.get('serial'), serial,
+                f"Wave 160: {title!r} ({serial}) must be in NTSC-U DB")
