@@ -27196,3 +27196,94 @@ class TestWave163PalDbAdditions(unittest.TestCase):
         g = self.pal_games.get('Hard Rock Casino (PAL)', {})
         self.assertIn('SLES-54143', g.get('alt_serials', []),
             "Wave 163: SLES-54143 must be alt_serial of Hard Rock Casino (PAL)")
+
+
+class TestWave164JpAltSerials(unittest.TestCase):
+    """Wave 164: JP DB - added SLPM-60xxx early-release alt_serials to existing entries.
+
+    The SLPM-60xxx serials are early/pre-production versions confirmed in PS2.data.json
+    that correspond to games already in the DB with their standard SLPS/SLPM retail serials.
+    Changes:
+    - Ring of Red (JP) +SLPM-60122
+    - Shadow of Memories (JP) +SLPM-60135
+    - Bloody Roar 3 (JP) +SLPM-60136
+    - Gungrave (JP) +SLPM-60184
+    - Shinobi (JP) +SLPM-60192
+    - Rockman X7 (JP) +SLPM-60207
+    - Bujingai (JP) +SLPM-60211
+    - Shadow Hearts II (JP) +SLPM-60214
+    - Gungrave O.D. (JP) +SLPM-60218
+    - Jet de Go! 2: Let's Go By Airliner (JP) +SLPM-60166
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            jp_data = json.load(f)
+        cls.jp_games = jp_data['games']
+
+    def test_ring_of_red_alt_serial_added(self):
+        """Wave 164: Ring of Red (JP) must have SLPM-60122 as alt_serial."""
+        g = self.jp_games.get('Ring of Red (JP)', {})
+        self.assertIn('SLPM-60122', g.get('alt_serials', []),
+            "Wave 164: SLPM-60122 must be alt_serial of Ring of Red (JP)")
+
+    def test_shadow_of_memories_alt_serial_added(self):
+        """Wave 164: Shadow of Memories (JP) must have SLPM-60135 as alt_serial."""
+        g = self.jp_games.get('Shadow of Memories (JP)', {})
+        self.assertIn('SLPM-60135', g.get('alt_serials', []),
+            "Wave 164: SLPM-60135 must be alt_serial of Shadow of Memories (JP)")
+
+    def test_bloody_roar_3_alt_serial_added(self):
+        """Wave 164: Bloody Roar 3 (JP) must have SLPM-60136 as alt_serial."""
+        g = self.jp_games.get('Bloody Roar 3 (JP)', {})
+        self.assertIn('SLPM-60136', g.get('alt_serials', []),
+            "Wave 164: SLPM-60136 must be alt_serial of Bloody Roar 3 (JP)")
+
+    def test_gungrave_alt_serial_added(self):
+        """Wave 164: Gungrave (JP) must have SLPM-60184 as alt_serial."""
+        g = self.jp_games.get('Gungrave (JP)', {})
+        self.assertIn('SLPM-60184', g.get('alt_serials', []),
+            "Wave 164: SLPM-60184 must be alt_serial of Gungrave (JP)")
+
+    def test_shinobi_alt_serial_added(self):
+        """Wave 164: Shinobi (JP) must have SLPM-60192 as alt_serial."""
+        g = self.jp_games.get('Shinobi (JP)', {})
+        self.assertIn('SLPM-60192', g.get('alt_serials', []),
+            "Wave 164: SLPM-60192 must be alt_serial of Shinobi (JP)")
+
+    def test_rockman_x7_alt_serial_added(self):
+        """Wave 164: Rockman X7 (JP) must have SLPM-60207 as alt_serial."""
+        g = self.jp_games.get('Rockman X7 (JP)', {})
+        self.assertIn('SLPM-60207', g.get('alt_serials', []),
+            "Wave 164: SLPM-60207 must be alt_serial of Rockman X7 (JP)")
+
+    def test_bujingai_alt_serial_added(self):
+        """Wave 164: Bujingai (JP) must have SLPM-60211 as alt_serial."""
+        g = self.jp_games.get('Bujingai (JP)', {})
+        self.assertIn('SLPM-60211', g.get('alt_serials', []),
+            "Wave 164: SLPM-60211 must be alt_serial of Bujingai (JP)")
+
+    def test_shadow_hearts_ii_alt_serial_added(self):
+        """Wave 164: Shadow Hearts II (JP) must have SLPM-60214 as alt_serial."""
+        g = self.jp_games.get('Shadow Hearts II (JP)', {})
+        self.assertIn('SLPM-60214', g.get('alt_serials', []),
+            "Wave 164: SLPM-60214 must be alt_serial of Shadow Hearts II (JP)")
+
+    def test_gungrave_od_alt_serial_added(self):
+        """Wave 164: Gungrave O.D. (JP) must have SLPM-60218 as alt_serial."""
+        g = self.jp_games.get('Gungrave O.D. (JP)', {})
+        self.assertIn('SLPM-60218', g.get('alt_serials', []),
+            "Wave 164: SLPM-60218 must be alt_serial of Gungrave O.D. (JP)")
+
+    def test_jet_de_go2_slpm60166_alt_serial_added(self):
+        """Wave 164: Jet de Go! 2 (JP) must have SLPM-60166 as alt_serial."""
+        g = self.jp_games.get("Jet de Go! 2: Let's Go By Airliner (JP)", {})
+        self.assertIn('SLPM-60166', g.get('alt_serials', []),
+            "Wave 164: SLPM-60166 must be alt_serial of Jet de Go! 2 (JP)")
+
+    def test_jp_count_wave164(self):
+        """Wave 164: JP DB must still have at least 3763 entries (no new games added)."""
+        self.assertGreaterEqual(len(self.jp_games), 3763,
+            f"JP DB has {len(self.jp_games)} entries, expected >= 3763 after Wave 164")

@@ -2080,7 +2080,9 @@
       "serial": "SLPM-65665"
     },
     "Bloody Roar 3 (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-60136"
+      ],
       "developer": "Eighting Co., Ltd. (8ing)",
       "genre": "Fighting",
       "publisher": "Activision",
@@ -2498,7 +2500,9 @@
       "serial": "SLPM-60157"
     },
     "Bujingai (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-60211"
+      ],
       "developer": "RED Entertainment",
       "genre": "Action",
       "publisher": "Taito Corporation",
@@ -9197,7 +9201,8 @@
       "alt_serials": [
         "SCPS-56014",
         "SLPM-65152",
-        "SLPM-65502"
+        "SLPM-65502",
+        "SLPM-60184"
       ],
       "developer": "Positron Co., Ltd",
       "genre": "Action, Shooter",
@@ -9206,7 +9211,9 @@
       "serial": "SLPM-65153"
     },
     "Gungrave O.D. (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-60218"
+      ],
       "developer": "Red Entertainment",
       "genre": "Action",
       "publisher": "Sega",
@@ -11320,7 +11327,8 @@
     "Jet de Go! 2: Let's Go By Airliner (JP)": {
       "alt_serials": [
         "SCPS-55016",
-        "SLPM-74407"
+        "SLPM-74407",
+        "SLPM-60166"
       ],
       "developer": "Taito Corporation",
       "genre": "Flight Simulator",
@@ -20943,7 +20951,8 @@
     },
     "Ring of Red (JP)": {
       "alt_serials": [
-        "SLPM-62091"
+        "SLPM-62091",
+        "SLPM-60122"
       ],
       "developer": "Konami Computer Entertainment Japan",
       "genre": "Strategy",
@@ -21000,7 +21009,9 @@
       "serial": "SLPS-25005"
     },
     "Rockman X7 (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-60207"
+      ],
       "developer": "Capcom Production Studio 3",
       "genre": "Action, Platformer, Shooter",
       "publisher": "Capcom",
@@ -23093,7 +23104,8 @@
     },
     "Shadow Hearts II (JP)": {
       "alt_serials": [
-        "SLPM-60226"
+        "SLPM-60226",
+        "SLPM-60214"
       ],
       "developer": "Aruze Corp",
       "genre": "RPG",
@@ -23161,7 +23173,9 @@
       "serial": "SLPS-25217"
     },
     "Shadow of Memories (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-60135"
+      ],
       "developer": "Konami",
       "genre": "Action/Adventure",
       "publisher": "Konami",
@@ -23918,7 +23932,8 @@
     },
     "Shinobi (JP)": {
       "alt_serials": [
-        "SLPM-74415"
+        "SLPM-74415",
+        "SLPM-60192"
       ],
       "developer": "Overworks",
       "genre": "Action, Beat'em Up",
