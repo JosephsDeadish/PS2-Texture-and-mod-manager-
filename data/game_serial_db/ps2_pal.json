@@ -409,12 +409,14 @@
       "serial": "SLES-52521"
     },
     "Aeon Flux (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLES-53956"
+      ],
       "developer": "Terminal Reality",
       "genre": "Action",
       "publisher": "Majesco",
       "release_date": "2005-11-15",
-      "serial": "SLES-53956"
+      "serial": "SLES-54169"
     },
     "Agassi Tennis Generation (PAL)": {
       "alt_serials": [],
@@ -1686,12 +1688,21 @@
       "serial": "SLES-51474"
     },
     "BloodRayne 2 (PAL)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLES-53832"
+      ],
       "developer": "Terminal Reality",
       "genre": "Action",
       "publisher": "Majesco Entertainment",
       "release_date": "2004-10-14",
-      "serial": "SLES-53832"
+      "serial": "SLES-53831",
+      "language": [
+        "English",
+        "French",
+        "German",
+        "Italian",
+        "Spanish"
+      ]
     },
     "Bloody Roar 3 (PAL)": {
       "alt_serials": [],
@@ -3792,7 +3803,8 @@
     },
     "Crimson Sea 2 (PAL)": {
       "alt_serials": [
-        "SLES-52558"
+        "SLES-52558",
+        "SLES-52557"
       ],
       "developer": "Koei",
       "genre": "Action",
@@ -4841,7 +4853,8 @@
       "alt_serials": [
         "SLES-53742",
         "SLES-53743",
-        "SLES-53744"
+        "SLES-53744",
+        "SLES-53741"
       ],
       "developer": "Avalanche Software",
       "genre": "Action/Adventure/Platformer",
@@ -8397,7 +8410,10 @@
         "GTA VC",
         "GTAVC"
       ],
-      "alt_serials": [],
+      "alt_serials": [
+        "SLES-51316",
+        "SLES-51595"
+      ],
       "crcs": [],
       "developer": "Rockstar North",
       "genre": "Action-Adventure",
@@ -12760,7 +12776,8 @@
     },
     "NBA Live 2005 (PAL)": {
       "alt_serials": [
-        "SLES-52727"
+        "SLES-52727",
+        "SLES-52726"
       ],
       "developer": "EA Canada",
       "genre": "Sports",
@@ -14555,7 +14572,8 @@
     "Premier Manager 2004-2005 (PAL)": {
       "alt_serials": [
         "SLES-52960",
-        "SLES-52961"
+        "SLES-52961",
+        "SLES-52959"
       ],
       "developer": "Zoo Games",
       "genre": "Simulation",
@@ -18596,7 +18614,8 @@
     },
     "Star Wars: Battlefront (PAL)": {
       "alt_serials": [
-        "SLES-52547"
+        "SLES-52547",
+        "SLES-52546"
       ],
       "crcs": [],
       "developer": "Pandemic Studios",
@@ -18720,6 +18739,10 @@
       "release_date": "2002-11-22",
       "aliases": [
         "Star Wars: La Guerra dei Cloni"
+      ],
+      "alt_serials": [
+        "SLES-50826",
+        "SLES-50827"
       ]
     },
     "Star Wars: The Force Unleashed (PAL)": {
@@ -19594,7 +19617,8 @@
       "alt_serials": [
         "SLES-53013",
         "SLES-53015",
-        "SLES-53016"
+        "SLES-53016",
+        "SLES-53014"
       ],
       "developer": "K2 LLC",
       "genre": "Action",
@@ -23209,7 +23233,8 @@
       "developer": "Ubisoft Montreal",
       "publisher": "Ubisoft",
       "genre": "Racing",
-      "release_date": "2002"
+      "release_date": "2002",
+      "alt_serials": []
     },
     "Ratchet & Clank 3 (PAL)": {
       "serial": "SCES-52456",
@@ -23218,7 +23243,8 @@
       "developer": "Insomniac Games",
       "publisher": "Sony Computer Entertainment",
       "genre": "Action Platform",
-      "release_date": "2004-11-05"
+      "release_date": "2004-11-05",
+      "alt_serials": []
     },
     "EyeToy: Disney Move (PAL)": {
       "serial": "SCES-52922",
@@ -23227,7 +23253,8 @@
       "developer": "SCEE London Studio",
       "publisher": "Sony Computer Entertainment",
       "genre": "Party",
-      "release_date": "2004-12-01"
+      "release_date": "2004-12-01",
+      "alt_serials": []
     },
     "This is Football (PAL)": {
       "serial": "SCES-51548",
@@ -23236,7 +23263,8 @@
       "developer": "Sony Computer Entertainment Europe",
       "publisher": "Sony Computer Entertainment Europe",
       "genre": "Sports",
-      "release_date": "2003-01-01"
+      "release_date": "2003-01-01",
+      "alt_serials": []
     },
     "Naruto Shippuden: Ultimate Ninja 5 (PAL)": {
       "alt_serials": [],
@@ -23308,6 +23336,66 @@
       "genre": "Racing",
       "publisher": "Sony Computer Entertainment Europe",
       "release_date": "2007-01-12",
+      "region": "PAL"
+    },
+    "WWF SmackDown! Just Bring It (PAL)": {
+      "serial": "SLES-50477",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Yuke's",
+      "publisher": "THQ",
+      "genre": "Fighting",
+      "release_date": "2002-01-18",
+      "region": "PAL"
+    },
+    "Onimusha 2: Samurai's Destiny (PAL)": {
+      "serial": "SLES-50978",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Action-Adventure",
+      "release_date": "2002-10-04",
+      "region": "PAL"
+    },
+    "Boxing Champions (PAL)": {
+      "serial": "SLES-51717",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Tamsoft Corporation",
+      "publisher": "Midas Interactive Entertainment",
+      "genre": "Sports",
+      "release_date": "2003-11-07",
+      "region": "PAL"
+    },
+    "Predator: Concrete Jungle (PAL)": {
+      "serial": "SLES-53091",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Eurocom Entertainment Software",
+      "publisher": "Vivendi Universal Games",
+      "genre": "Action",
+      "release_date": "2005-04-15",
+      "region": "PAL"
+    },
+    "Final Fight: Streetwise (PAL)": {
+      "serial": "SLES-53853",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Beat'em Up",
+      "release_date": "2006-04-07",
+      "region": "PAL"
+    },
+    "Ar Tonelico: Melody of Elemia (PAL)": {
+      "serial": "SLES-54586",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Gust",
+      "publisher": "505 Games",
+      "genre": "RPG",
+      "release_date": "2007-05-22",
       "region": "PAL"
     }
   },

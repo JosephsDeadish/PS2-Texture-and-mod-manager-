@@ -25806,9 +25806,9 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
         self.assertNotIn('SLES-55580', all_serials, "Wrong serial SLES-55580 still in PAL DB")
 
     def test_pal_count_wave148(self):
-        """Wave 148: PAL DB must have at most 2640 entries (Wave 152 adds Star Wars La Guerra dei Cloni with corrected serial)."""
-        self.assertLessEqual(len(self.pal_games), 2640,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2640 after Wave 148/152 changes")
+        """Wave 148: PAL DB must have at most 2646 entries (Wave 162 adds 6 missing retail games)."""
+        self.assertLessEqual(len(self.pal_games), 2646,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2646 after Wave 148/152/162 changes")
 
 
 class TestWave149AdditionalSerialFixes(unittest.TestCase):
@@ -25868,9 +25868,9 @@ class TestWave149AdditionalSerialFixes(unittest.TestCase):
             "Captain Scarlet correct serial SLES-54471 must still be in PAL DB")
 
     def test_pal_count_wave149(self):
-        """Wave 149: PAL DB must have at most 2640 entries (Wave 152 corrects Star Wars La Guerra dei Cloni serial)."""
-        self.assertLessEqual(len(self.pal_games), 2640,
-            f"PAL DB has {len(self.pal_games)} entries, expected <= 2640 after Wave 149/152 changes")
+        """Wave 149: PAL DB must have at most 2646 entries (Wave 162 adds 6 missing retail games)."""
+        self.assertLessEqual(len(self.pal_games), 2646,
+            f"PAL DB has {len(self.pal_games)} entries, expected <= 2646 after Wave 149/152/162 changes")
 
     # ── JP metadata fills ──────────────────────────────────────────────────────
 
@@ -26839,3 +26839,177 @@ class TestWave161TitleFixes(unittest.TestCase):
             "Wave 161: Armored Core 3: Silent Line (JP) must have serial SLPS-25169")
         self.assertNotIn('Armored Core: Silent Line (JP)', self.jp_games,
             "Wave 161: 'Armored Core: Silent Line (JP)' must be removed (duplicate/wrong title)")
+
+
+class TestWave162PalDbFixes(unittest.TestCase):
+    """Wave 162: PAL DB serial fixes, alt_serial additions, and missing game additions.
+
+    Changes made:
+    - BloodRayne 2: primary serial corrected SLES-53832 → SLES-53831 (English multi-lang),
+      SLES-53832 added as alt_serial (German-only variant)
+    - Aeon Flux: primary serial corrected SLES-53956 → SLES-54169 (English/FR/DE/ES),
+      SLES-53956 added as alt_serial (English-only)
+    - Star Wars Clone Wars: SLES-50826 (EN) and SLES-50827 (FR) added as alt_serials
+    - Tenchu Fatal Shadows: SLES-53014 (DE) added as alt_serial
+    - Disney's Chicken Little: SLES-53741 (RU) added as alt_serial
+    - Crimson Sea 2: SLES-52557 (FR) added as alt_serial
+    - NBA Live 2005: SLES-52726 (FR) added as alt_serial
+    - Premier Manager 2004-2005: SLES-52959 (DE) added as alt_serial
+    - GTA Vice City: SLES-51316 and SLES-51595 added as alt_serials
+    - Star Wars Battlefront: SLES-52546 (FR) added as alt_serial
+    - None alt_serials fixed to [] for 5 PAL entries + Cowboy Bebop NTSC-U
+    - New entries added: WWF SmackDown! Just Bring It, Onimusha 2: Samurai's Destiny,
+      Boxing Champions, Predator: Concrete Jungle, Final Fight: Streetwise,
+      Ar Tonelico: Melody of Elemia
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            pal_data = json.load(f)
+        with open(os.path.join(root, 'data/game_serial_db/ps2_ntsc_u.json')) as f:
+            ntsc_data = json.load(f)
+        cls.pal_games = pal_data['games']
+        cls.ntsc_games = ntsc_data['games']
+
+    def test_bloodrayne2_primary_serial_corrected(self):
+        """Wave 162: BloodRayne 2 (PAL) primary serial must be SLES-53831 (EN multi-lang)."""
+        g = self.pal_games.get('BloodRayne 2 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-53831',
+            "Wave 162: BloodRayne 2 (PAL) primary serial must be SLES-53831")
+        self.assertIn('SLES-53832', g.get('alt_serials', []),
+            "Wave 162: SLES-53832 (DE) must be in BloodRayne 2 alt_serials")
+
+    def test_aeon_flux_primary_serial_corrected(self):
+        """Wave 162: Aeon Flux (PAL) primary serial must be SLES-54169 (multi-lang)."""
+        g = self.pal_games.get('Aeon Flux (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-54169',
+            "Wave 162: Aeon Flux (PAL) primary serial must be SLES-54169")
+        self.assertIn('SLES-53956', g.get('alt_serials', []),
+            "Wave 162: SLES-53956 must be in Aeon Flux alt_serials")
+
+    def test_star_wars_clone_wars_alt_serials(self):
+        """Wave 162: Star Wars Clone Wars (PAL) must have SLES-50826 and SLES-50827 as alt_serials."""
+        g = self.pal_games.get('Star Wars: The Clone Wars (PAL)', {})
+        # Primary serial must still be SLES-50828 per Wave 161 fix
+        self.assertEqual(g.get('serial'), 'SLES-50828',
+            "Wave 162: Star Wars Clone Wars primary serial must remain SLES-50828")
+        alts = g.get('alt_serials', [])
+        self.assertIn('SLES-50826', alts,
+            "Wave 162: SLES-50826 (EN) must be alt_serial of Star Wars Clone Wars")
+        self.assertIn('SLES-50827', alts,
+            "Wave 162: SLES-50827 (FR) must be alt_serial of Star Wars Clone Wars")
+
+    def test_tenchu_fatal_shadows_alt_serial(self):
+        """Wave 162: Tenchu Fatal Shadows (PAL) must have SLES-53014 as alt_serial."""
+        g = self.pal_games.get('Tenchu: Fatal Shadows (PAL)', {})
+        self.assertIn('SLES-53014', g.get('alt_serials', []),
+            "Wave 162: SLES-53014 must be alt_serial of Tenchu: Fatal Shadows (PAL)")
+
+    def test_disney_chicken_little_alt_serial(self):
+        """Wave 162: Disney's Chicken Little (PAL) must have SLES-53741 as alt_serial."""
+        g = self.pal_games.get("Disney's Chicken Little (PAL)", {})
+        self.assertIn('SLES-53741', g.get('alt_serials', []),
+            "Wave 162: SLES-53741 must be alt_serial of Disney's Chicken Little (PAL)")
+
+    def test_crimson_sea2_alt_serial(self):
+        """Wave 162: Crimson Sea 2 (PAL) must have SLES-52557 as alt_serial."""
+        g = self.pal_games.get('Crimson Sea 2 (PAL)', {})
+        self.assertIn('SLES-52557', g.get('alt_serials', []),
+            "Wave 162: SLES-52557 must be alt_serial of Crimson Sea 2 (PAL)")
+
+    def test_nba_live_2005_alt_serial(self):
+        """Wave 162: NBA Live 2005 (PAL) must have SLES-52726 as alt_serial."""
+        g = self.pal_games.get('NBA Live 2005 (PAL)', {})
+        self.assertIn('SLES-52726', g.get('alt_serials', []),
+            "Wave 162: SLES-52726 must be alt_serial of NBA Live 2005 (PAL)")
+
+    def test_premier_manager_2004_2005_alt_serial(self):
+        """Wave 162: Premier Manager 2004-2005 (PAL) must have SLES-52959 as alt_serial."""
+        g = self.pal_games.get('Premier Manager 2004-2005 (PAL)', {})
+        self.assertIn('SLES-52959', g.get('alt_serials', []),
+            "Wave 162: SLES-52959 must be alt_serial of Premier Manager 2004-2005 (PAL)")
+
+    def test_gta_vice_city_alt_serials(self):
+        """Wave 162: GTA Vice City (PAL) must have SLES-51316 and SLES-51595 as alt_serials."""
+        g = self.pal_games.get('Grand Theft Auto: Vice City (PAL)', {})
+        alts = g.get('alt_serials', [])
+        self.assertIn('SLES-51316', alts,
+            "Wave 162: SLES-51316 must be alt_serial of GTA Vice City (PAL)")
+        self.assertIn('SLES-51595', alts,
+            "Wave 162: SLES-51595 must be alt_serial of GTA Vice City (PAL)")
+
+    def test_star_wars_battlefront_alt_serial(self):
+        """Wave 162: Star Wars Battlefront (PAL) must have SLES-52546 (FR) as alt_serial."""
+        g = self.pal_games.get('Star Wars: Battlefront (PAL)', {})
+        self.assertIn('SLES-52546', g.get('alt_serials', []),
+            "Wave 162: SLES-52546 (FR) must be alt_serial of Star Wars: Battlefront (PAL)")
+
+    def test_none_alt_serials_fixed_pal(self):
+        """Wave 162: No PAL entries must have None alt_serials (all should be [])."""
+        for key, entry in self.pal_games.items():
+            self.assertIsNotNone(entry.get('alt_serials'),
+                f"Wave 162: '{key}' has None alt_serials, must be []")
+
+    def test_none_alt_serials_fixed_ntsc_cowboy_bebop(self):
+        """Wave 162: Cowboy Bebop (NTSC-U) must have [] not None for alt_serials."""
+        g = self.ntsc_games.get('Cowboy Bebop', {})
+        self.assertIsNotNone(g.get('alt_serials'),
+            "Wave 162: Cowboy Bebop alt_serials must not be None")
+        self.assertEqual(g.get('alt_serials'), [],
+            "Wave 162: Cowboy Bebop alt_serials must be []")
+
+    def test_wwf_smackdown_just_bring_it_pal(self):
+        """Wave 162: WWF SmackDown! Just Bring It (PAL) must be in PAL DB with SLES-50477."""
+        self.assertIn('WWF SmackDown! Just Bring It (PAL)', self.pal_games,
+            "Wave 162: 'WWF SmackDown! Just Bring It (PAL)' must be in PAL DB")
+        g = self.pal_games['WWF SmackDown! Just Bring It (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-50477',
+            "Wave 162: WWF SmackDown! Just Bring It (PAL) must have serial SLES-50477")
+
+    def test_onimusha2_samurais_destiny_pal(self):
+        """Wave 162: Onimusha 2: Samurai's Destiny (PAL) must be in PAL DB with SLES-50978."""
+        self.assertIn("Onimusha 2: Samurai's Destiny (PAL)", self.pal_games,
+            "Wave 162: Onimusha 2: Samurai's Destiny (PAL) must be in PAL DB")
+        g = self.pal_games["Onimusha 2: Samurai's Destiny (PAL)"]
+        self.assertEqual(g.get('serial'), 'SLES-50978',
+            "Wave 162: Onimusha 2: Samurai's Destiny (PAL) must have serial SLES-50978")
+        self.assertEqual(g.get('developer'), 'Capcom',
+            "Wave 162: Onimusha 2 (PAL) developer must be Capcom")
+
+    def test_boxing_champions_pal(self):
+        """Wave 162: Boxing Champions (PAL) must be in PAL DB with SLES-51717."""
+        self.assertIn('Boxing Champions (PAL)', self.pal_games,
+            "Wave 162: 'Boxing Champions (PAL)' must be in PAL DB")
+        g = self.pal_games['Boxing Champions (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-51717',
+            "Wave 162: Boxing Champions (PAL) must have serial SLES-51717")
+
+    def test_predator_concrete_jungle_pal(self):
+        """Wave 162: Predator: Concrete Jungle (PAL) must be in PAL DB with SLES-53091."""
+        self.assertIn('Predator: Concrete Jungle (PAL)', self.pal_games,
+            "Wave 162: 'Predator: Concrete Jungle (PAL)' must be in PAL DB")
+        g = self.pal_games['Predator: Concrete Jungle (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-53091',
+            "Wave 162: Predator: Concrete Jungle (PAL) must have serial SLES-53091")
+
+    def test_final_fight_streetwise_pal(self):
+        """Wave 162: Final Fight: Streetwise (PAL) must be in PAL DB with SLES-53853."""
+        self.assertIn('Final Fight: Streetwise (PAL)', self.pal_games,
+            "Wave 162: 'Final Fight: Streetwise (PAL)' must be in PAL DB")
+        g = self.pal_games['Final Fight: Streetwise (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-53853',
+            "Wave 162: Final Fight: Streetwise (PAL) must have serial SLES-53853")
+        self.assertEqual(g.get('developer'), 'Capcom',
+            "Wave 162: Final Fight: Streetwise (PAL) developer must be Capcom")
+
+    def test_ar_tonelico_melody_of_elemia_pal(self):
+        """Wave 162: Ar Tonelico: Melody of Elemia (PAL) must be in PAL DB with SLES-54586."""
+        self.assertIn('Ar Tonelico: Melody of Elemia (PAL)', self.pal_games,
+            "Wave 162: 'Ar Tonelico: Melody of Elemia (PAL)' must be in PAL DB")
+        g = self.pal_games['Ar Tonelico: Melody of Elemia (PAL)']
+        self.assertEqual(g.get('serial'), 'SLES-54586',
+            "Wave 162: Ar Tonelico: Melody of Elemia (PAL) must have serial SLES-54586")
+        self.assertEqual(g.get('genre'), 'RPG',
+            "Wave 162: Ar Tonelico: Melody of Elemia (PAL) genre must be RPG")
