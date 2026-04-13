@@ -25739,9 +25739,9 @@ class TestWave148DuplicateSerialRemovals(unittest.TestCase):
                 f"Expected correct serial {serial} ({title}) not found in JP DB")
 
     def test_jp_count_wave148(self):
-        """Wave 148: JP DB must have at most 3762 entries (7 true duplicates removed, 37 primary serials swapped to correct values)."""
-        self.assertLessEqual(len(self.jp_games), 3762,
-            f"JP DB has {len(self.jp_games)} entries, expected <= 3762 after Wave 148 removals")
+        """Wave 148: JP DB must have at most 3765 entries (Wave 162 adds 3 missing JP retail games)."""
+        self.assertLessEqual(len(self.jp_games), 3765,
+            f"JP DB has {len(self.jp_games)} entries, expected <= 3765 after Wave 148/162 changes")
 
     # ── NTSC-U removals ────────────────────────────────────────────────────────
 
@@ -27013,3 +27013,68 @@ class TestWave162PalDbFixes(unittest.TestCase):
             "Wave 162: Ar Tonelico: Melody of Elemia (PAL) must have serial SLES-54586")
         self.assertEqual(g.get('genre'), 'RPG',
             "Wave 162: Ar Tonelico: Melody of Elemia (PAL) genre must be RPG")
+
+
+class TestWave162JpDbFixes(unittest.TestCase):
+    """Wave 162: JP DB additions and alt_serial fixes.
+
+    Changes:
+    - Added Hitman: Contracts (JP): SLPS-25406
+    - Added Onimusha: Warlords [Mega Hits] (JP): SLPM-66501
+    - Added Onimusha 2: Samurai's Destiny [Mega Hits] (JP): SLPM-66504
+    - Added SLPM-64522 as alt_serial to La Pucelle (JP)
+    - Added SLPS-73420 as alt_serial to Armored Core 3: Silent Line (JP)
+    - Added SLPM-74407 as alt_serial to Jet de Go! 2 (JP)
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_japan.json')) as f:
+            jp_data = json.load(f)
+        cls.jp_games = jp_data['games']
+
+    def test_hitman_contracts_jp_added(self):
+        """Wave 162: Hitman: Contracts (JP) must be in JP DB with SLPS-25406."""
+        self.assertIn('Hitman: Contracts (JP)', self.jp_games,
+            "Wave 162: 'Hitman: Contracts (JP)' must be in JP DB")
+        g = self.jp_games['Hitman: Contracts (JP)']
+        self.assertEqual(g.get('serial'), 'SLPS-25406',
+            "Wave 162: Hitman: Contracts (JP) must have serial SLPS-25406")
+
+    def test_onimusha_mega_hits_jp_added(self):
+        """Wave 162: Onimusha Mega Hits budget releases must be in JP DB."""
+        self.assertIn('Onimusha: Warlords [Mega Hits] (JP)', self.jp_games,
+            "Wave 162: Onimusha Mega Hits must be in JP DB")
+        g1 = self.jp_games['Onimusha: Warlords [Mega Hits] (JP)']
+        self.assertEqual(g1.get('serial'), 'SLPM-66501',
+            "Wave 162: Onimusha Mega Hits must have serial SLPM-66501")
+
+        self.assertIn("Onimusha 2: Samurai's Destiny [Mega Hits] (JP)", self.jp_games,
+            "Wave 162: Onimusha 2 Mega Hits must be in JP DB")
+        g2 = self.jp_games["Onimusha 2: Samurai's Destiny [Mega Hits] (JP)"]
+        self.assertEqual(g2.get('serial'), 'SLPM-66504',
+            "Wave 162: Onimusha 2 Mega Hits must have serial SLPM-66504")
+
+    def test_la_pucelle_alt_serial_added(self):
+        """Wave 162: La Pucelle (JP) must have SLPM-64522 as alt_serial."""
+        g = self.jp_games.get('La Pucelle (JP)', {})
+        self.assertIn('SLPM-64522', g.get('alt_serials', []),
+            "Wave 162: SLPM-64522 must be alt_serial of La Pucelle (JP)")
+
+    def test_armored_core3_sl_alt_serial_added(self):
+        """Wave 162: Armored Core 3: Silent Line (JP) must have SLPS-73420 as alt_serial."""
+        g = self.jp_games.get('Armored Core 3: Silent Line (JP)', {})
+        self.assertIn('SLPS-73420', g.get('alt_serials', []),
+            "Wave 162: SLPS-73420 must be alt_serial of Armored Core 3: Silent Line (JP)")
+
+    def test_jet_de_go2_alt_serial_added(self):
+        """Wave 162: Jet de Go! 2 (JP) must have SLPM-74407 as alt_serial."""
+        g = self.jp_games.get("Jet de Go! 2: Let's Go By Airliner (JP)", {})
+        self.assertIn('SLPM-74407', g.get('alt_serials', []),
+            "Wave 162: SLPM-74407 must be alt_serial of Jet de Go! 2 (JP)")
+
+    def test_jp_count_wave162(self):
+        """Wave 162: JP DB must have at least 3763 entries after 3 new additions."""
+        self.assertGreaterEqual(len(self.jp_games), 3763,
+            f"JP DB has {len(self.jp_games)} entries, expected >= 3763 after Wave 162 additions")

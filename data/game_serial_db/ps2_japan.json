@@ -1213,7 +1213,9 @@
       "serial": "SLPS-25112"
     },
     "Armored Core 3: Silent Line (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPS-73420"
+      ],
       "developer": "FromSoftware",
       "genre": "Third-person Shooter",
       "publisher": "FromSoftware",
@@ -11317,7 +11319,8 @@
     },
     "Jet de Go! 2: Let's Go By Airliner (JP)": {
       "alt_serials": [
-        "SCPS-55016"
+        "SCPS-55016",
+        "SLPM-74407"
       ],
       "developer": "Taito Corporation",
       "genre": "Flight Simulator",
@@ -14238,7 +14241,9 @@
       "serial": "SLPS-20423"
     },
     "La Pucelle (JP)": {
-      "alt_serials": [],
+      "alt_serials": [
+        "SLPM-64522"
+      ],
       "developer": "Nippon Ichi",
       "genre": "RPG",
       "publisher": "Nippon Ichi",
@@ -32551,6 +32556,36 @@
       "publisher": "Takuyo",
       "release_date": "2006-04-28",
       "serial": "SLPS-25617"
+    },
+    "Hitman: Contracts (JP)": {
+      "serial": "SLPS-25406",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "IO Interactive",
+      "publisher": "Eidos",
+      "genre": "Action-Stealth",
+      "release_date": "2004-04-22",
+      "region": "NTSC-J"
+    },
+    "Onimusha: Warlords [Mega Hits] (JP)": {
+      "serial": "SLPM-66501",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Action-Adventure",
+      "release_date": "2005",
+      "region": "NTSC-J"
+    },
+    "Onimusha 2: Samurai's Destiny [Mega Hits] (JP)": {
+      "serial": "SLPM-66504",
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Capcom",
+      "publisher": "Capcom",
+      "genre": "Action-Adventure",
+      "release_date": "2005",
+      "region": "NTSC-J"
     }
   },
   "version": "2.0"
