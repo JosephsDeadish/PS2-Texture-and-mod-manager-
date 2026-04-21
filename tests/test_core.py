@@ -27287,3 +27287,90 @@ class TestWave164JpAltSerials(unittest.TestCase):
         """Wave 164: JP DB must still have at least 3763 entries (no new games added)."""
         self.assertGreaterEqual(len(self.jp_games), 3763,
             f"JP DB has {len(self.jp_games)} entries, expected >= 3763 after Wave 164")
+
+
+class TestWave165PalWrongSerialFixes(unittest.TestCase):
+    """Wave 165: PAL DB - removed 3 entries with wrong primary serials in SLES-2xxxx range.
+
+    All SLES-2xxxx serials are PS1-era numbers and cannot be valid PS2 PAL serials.
+    These were typos where the leading '5' digit was missing from SLES-5xxxx serials.
+
+    Changes:
+    - Fixed NBA Live 08 (PAL): primary SLES-24895 → SLES-54895
+      (SLES-24895 was a typo; SLES-54895 was already listed as alt_serial)
+    - Removed Fight Night Round 3 [FI] (PAL): SLES-23982
+      (SLES-23982 is a typo of SLES-53982 which is already the main entry's primary)
+    - Removed Need For Speed: Carbon [FI] (PAL): SLES-24322
+      (SLES-24322 is a typo of SLES-54322 which is already in main entry's alt_serials)
+
+    PAL DB count: 2650 → 2648 (net -2 wrong entries removed).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, 'data/game_serial_db/ps2_pal.json')) as f:
+            pal_data = json.load(f)
+        cls.pal_games = pal_data['games']
+
+    def test_nba_live_08_primary_serial_fixed(self):
+        """Wave 165: NBA Live 08 (PAL) primary serial must be SLES-54895 (not SLES-24895)."""
+        g = self.pal_games.get('NBA Live 08 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-54895',
+            "Wave 165: NBA Live 08 (PAL) primary must be SLES-54895 (SLES-24895 was a typo)")
+
+    def test_nba_live_08_wrong_serial_not_primary(self):
+        """Wave 165: SLES-24895 must NOT be primary or alt_serial for any PAL game."""
+        for name, entry in self.pal_games.items():
+            self.assertNotEqual(entry.get('serial'), 'SLES-24895',
+                f"Wave 165: SLES-24895 is wrong (typo of SLES-54895) and must not be primary in {name}")
+            self.assertNotIn('SLES-24895', entry.get('alt_serials', []),
+                f"Wave 165: SLES-24895 must not be an alt_serial in {name}")
+
+    def test_fight_night_round_3_fi_removed(self):
+        """Wave 165: Fight Night Round 3 [FI] (PAL) with wrong SLES-23982 must be removed."""
+        self.assertNotIn('Fight Night Round 3 [FI] (PAL)', self.pal_games,
+            "Wave 165: 'Fight Night Round 3 [FI] (PAL)' had wrong serial SLES-23982 and must be removed")
+
+    def test_fight_night_wrong_serial_not_in_db(self):
+        """Wave 165: SLES-23982 must NOT be in PAL DB (PS1-era typo of SLES-53982)."""
+        for name, entry in self.pal_games.items():
+            self.assertNotEqual(entry.get('serial'), 'SLES-23982',
+                f"Wave 165: SLES-23982 is wrong (PS1-era; typo of SLES-53982) and must not be in {name}")
+
+    def test_fight_night_round_3_main_entry_preserved(self):
+        """Wave 165: Fight Night Round 3 (PAL) main entry must still exist with SLES-53982."""
+        g = self.pal_games.get('Fight Night Round 3 (PAL)', {})
+        self.assertEqual(g.get('serial'), 'SLES-53982',
+            "Wave 165: Fight Night Round 3 (PAL) main entry must still have SLES-53982")
+
+    def test_nfs_carbon_fi_removed(self):
+        """Wave 165: Need For Speed: Carbon [FI] (PAL) with wrong SLES-24322 must be removed."""
+        self.assertNotIn('Need For Speed: Carbon [FI] (PAL)', self.pal_games,
+            "Wave 165: 'Need For Speed: Carbon [FI] (PAL)' had wrong serial SLES-24322 and must be removed")
+
+    def test_nfs_carbon_wrong_serial_not_in_db(self):
+        """Wave 165: SLES-24322 must NOT be in PAL DB (PS1-era typo of SLES-54322)."""
+        for name, entry in self.pal_games.items():
+            self.assertNotEqual(entry.get('serial'), 'SLES-24322',
+                f"Wave 165: SLES-24322 is wrong (PS1-era; typo of SLES-54322) and must not be in {name}")
+
+    def test_nfs_carbon_main_entry_preserved(self):
+        """Wave 165: Need for Speed: Carbon (PAL) main entry must still have SLES-54322 as alt."""
+        g = self.pal_games.get('Need for Speed: Carbon (PAL)', {})
+        self.assertIn('SLES-54322', g.get('alt_serials', []),
+            "Wave 165: Need for Speed: Carbon (PAL) must still have SLES-54322 in alt_serials")
+
+    def test_pal_count_wave165(self):
+        """Wave 165: PAL DB must have at least 2648 entries after removing 2 wrong-serial entries."""
+        self.assertGreaterEqual(len(self.pal_games), 2648,
+            f"PAL DB has {len(self.pal_games)} entries, expected >= 2648 after Wave 165 fixes")
+
+    def test_no_sles_2xxxx_serials_remain(self):
+        """Wave 165: No PAL game must have a SLES/SCES primary serial in the PS1-era 20000-49999 range."""
+        for name, entry in self.pal_games.items():
+            s = entry.get('serial', '')
+            if s.startswith(('SLES-', 'SCES-', 'SLED-')):
+                n = int(s[5:])
+                self.assertFalse(1000 < n < 50000,
+                    f"Wave 165: {name} has suspicious PS1-era serial {s} (n={n}); must be >= 50000")

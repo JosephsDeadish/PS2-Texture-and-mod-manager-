@@ -7065,14 +7065,6 @@
       "release_date": "2006-03-10",
       "serial": "SLES-53982"
     },
-    "Fight Night Round 3 [FI] (PAL)": {
-      "alt_serials": [],
-      "developer": "EA Chicago",
-      "genre": "Fighting",
-      "publisher": "Electronic",
-      "release_date": "2006",
-      "serial": "SLES-23982"
-    },
     "FightBox (PAL)": {
       "alt_serials": [],
       "developer": "Gamezlab",
@@ -12712,7 +12704,6 @@
     },
     "NBA Live 08 (PAL)": {
       "alt_serials": [
-        "SLES-54895",
         "SLES-54896",
         "SLES-54933"
       ],
@@ -12720,7 +12711,7 @@
       "genre": "Sports",
       "publisher": "Electronic Arts",
       "release_date": "2007",
-      "serial": "SLES-24895"
+      "serial": "SLES-54895"
     },
     "NBA Live 09 (PAL)": {
       "alt_serials": [
@@ -13104,14 +13095,6 @@
       "publisher": "Koei",
       "release_date": "2004-03-10",
       "serial": "SLES-51893"
-    },
-    "Need For Speed: Carbon [FI] (PAL)": {
-      "alt_serials": [],
-      "developer": "EA Black Box",
-      "genre": "Racing",
-      "publisher": "Electronic Arts",
-      "release_date": "2006",
-      "serial": "SLES-24322"
     },
     "Need for Speed: Carbon (PAL)": {
       "aliases": [
