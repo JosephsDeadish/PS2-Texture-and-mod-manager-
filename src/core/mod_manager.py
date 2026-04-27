@@ -754,6 +754,46 @@ class ModManager:
 
         return conflicts
 
+    def detect_shadowed_mods(self, mod_type: Optional[ModType] = None) -> Dict[str, List[str]]:
+        """
+        Return mods whose every file is overridden by a higher-priority enabled mod.
+
+        A mod is *completely shadowed* when every path in ``mod.files`` is also
+        claimed by at least one enabled mod with a **higher** priority.  Disabled
+        mods and mods with an empty file list are never considered shadowed.
+
+        Returns a ``{mod_id: [shadowing_mod_id, ...]}`` dict for each shadowed mod.
+        """
+        mods = self.db.by_type(mod_type) if mod_type else self.db.all()
+        enabled = [m for m in mods if m.enabled and m.files]
+
+        # Build a map: relative_path → list of (priority, mod_id) sorted high→low
+        file_owners: Dict[str, List[tuple]] = {}
+        for mod in enabled:
+            for rel_path in mod.files:
+                file_owners.setdefault(rel_path, []).append((mod.priority, mod.id))
+
+        for owners in file_owners.values():
+            owners.sort(key=lambda x: x[0], reverse=True)
+
+        shadowed: Dict[str, List[str]] = {}
+        for mod in enabled:
+            if not mod.files:
+                continue
+            shadowers: set = set()
+            fully_shadowed = True
+            for rel_path in mod.files:
+                owners = file_owners.get(rel_path, [])
+                higher = [mid for prio, mid in owners if prio > mod.priority and mid != mod.id]
+                if not higher:
+                    fully_shadowed = False
+                    break
+                shadowers.update(higher)
+            if fully_shadowed:
+                shadowed[mod.id] = list(shadowers)
+
+        return shadowed
+
     def detect_pnach_conflicts(
         self, mod_type: Optional[ModType] = None
     ) -> List[dict]:
@@ -821,59 +861,38 @@ class ModManager:
                 deduped.append(r)
         return deduped
 
-    def detect_shadowed_mods(self, mod_type: Optional[ModType] = None) -> Dict[str, List[str]]:
+    def validate_all_pnach(self) -> Dict[str, list]:
         """
-        Detect enabled mods that are **completely shadowed** by higher-priority mods.
+        Run :func:`src.core.pnach.validate_pnach_file` on all enabled
+        PNACH and CHEAT mods.
 
-        A mod is considered shadowed when *all* of its registered files are also
-        present in at least one higher-priority enabled mod.
-
-        Returns a dict mapping ``mod_id`` → list of mod IDs that shadow it.
-        Only mods with at least one registered file are considered; mods with no
-        file list are skipped (they can't be shadowed by this analysis).
+        Returns a dict mapping ``mod_id`` → list of
+        :class:`~src.core.pnach.ValidationIssue`.  Only mods with at least
+        one issue are included; mods that pass cleanly are omitted.
         """
-        mods = self.db.by_type(mod_type) if mod_type else self.db.all()
-        enabled = sorted(
-            [m for m in mods if m.enabled],
-            key=lambda m: m.priority,
-            reverse=True,
-        )
+        from src.core.pnach import validate_pnach_file
+        from pathlib import Path as _Path
 
-        # Build a map: file → set of mod_ids that own it (in priority order)
-        file_owners: Dict[str, List[str]] = {}
-        for mod in enabled:
-            for rel in mod.files:
-                file_owners.setdefault(rel, []).append(mod.id)
-
-        shadowed: Dict[str, List[str]] = {}
-
-        for mod in enabled:
-            if not mod.files:
-                continue  # can't determine shadowing without file list
-
-            # Gather all mod_ids that beat this mod's priority
-            higher_ids = {m.id for m in enabled if m.priority > mod.priority}
-            if not higher_ids:
-                continue
-
-            # Check whether every file of this mod is also owned by a higher-priority mod
-            shadowing: set = set()
-            for rel in mod.files:
-                owners = file_owners.get(rel, [])
-                # Find any higher-priority owner for this file
-                for owner_id in owners:
-                    if owner_id in higher_ids:
-                        shadowing.add(owner_id)
-                        break
-                else:
-                    # At least one file is NOT shadowed — mod is not fully shadowed
-                    shadowing = set()
-                    break
-
-            if shadowing:
-                shadowed[mod.id] = list(shadowing)
-
-        return shadowed
+        results: Dict[str, list] = {}
+        for mt in (ModType.PNACH, ModType.CHEAT):
+            for mod in self.db.by_type(mt):
+                if not mod.enabled:
+                    continue
+                src = _Path(mod.path)
+                pnach_files = (
+                    list(src.rglob("*.pnach")) if src.is_dir()
+                    else [src] if src.suffix.lower() == ".pnach" else []
+                )
+                all_issues = []
+                for pf in pnach_files:
+                    try:
+                        issues = validate_pnach_file(str(pf))
+                        all_issues.extend(issues)
+                    except Exception:
+                        pass
+                if all_issues:
+                    results[mod.id] = all_issues
+        return results
 
     def resolve_conflict(
         self,

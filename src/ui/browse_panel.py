@@ -1284,7 +1284,27 @@ class DownloadInstallDialog(QDialog):
                     description=description, source_url=source_url,
                 )
                 import shutil
+                try:
+                    installed_size = sum(
+                        f.stat().st_size for f in Path(dest).rglob('*') if f.is_file()
+                    ) if Path(dest).exists() else 0
+                except Exception:
+                    installed_size = 0
                 shutil.rmtree(tmpdir, ignore_errors=True)
+
+                try:
+                    from src.core.download_history import record_event, STATUS_SUCCESS
+                    record_event(
+                        self.config,
+                        mod_name=mod.name,
+                        mod_type=mod_type.value,
+                        serial=game,
+                        source_url=source_url,
+                        status=STATUS_SUCCESS,
+                        size_bytes=installed_size,
+                    )
+                except Exception:
+                    pass
 
                 def _done():
                     self._progress.setRange(0, 100)
@@ -1293,14 +1313,42 @@ class DownloadInstallDialog(QDialog):
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _done)
             except DownloadError as exc:
+                _download_err_msg = str(exc)
+                try:
+                    from src.core.download_history import record_event, STATUS_FAILED
+                    record_event(
+                        self.config,
+                        mod_name=_name_text or Path(urlparse(url).path).name,
+                        mod_type=mod_type.value,
+                        serial=_game_text,
+                        source_url=_source_url_text or raw_url,
+                        status=STATUS_FAILED,
+                        note=_download_err_msg,
+                    )
+                except Exception:
+                    pass
                 def _err():
-                    self._status.setText(f"❌  Download failed: {exc}")
+                    self._status.setText(f"❌  Download failed: {_download_err_msg}")
                     self._progress.hide()
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _err)
             except Exception as exc:
+                _general_err_msg = str(exc)
+                try:
+                    from src.core.download_history import record_event, STATUS_FAILED
+                    record_event(
+                        self.config,
+                        mod_name=_name_text or Path(urlparse(url).path).name,
+                        mod_type=mod_type.value,
+                        serial=_game_text,
+                        source_url=_source_url_text or raw_url,
+                        status=STATUS_FAILED,
+                        note=_general_err_msg,
+                    )
+                except Exception:
+                    pass
                 def _err2():
-                    self._status.setText(f"❌  Error: {exc}")
+                    self._status.setText(f"❌  Error: {_general_err_msg}")
                     self._progress.hide()
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _err2)
@@ -1540,6 +1588,7 @@ class PnachGitHubDialog(QDialog):
                     if self.db is not None:
                         try:
                             pnach_file_path = Path(path)
+                            _sz = pnach_file_path.stat().st_size if pnach_file_path.exists() else 0
                             mod_record = ModInfo(
                                 id=str(uuid.uuid4()),
                                 name=f"Widescreen Patch ({patch['crc']})",
@@ -1551,15 +1600,37 @@ class PnachGitHubDialog(QDialog):
                                     f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
                                 ),
                                 files=[path],
-                                size_bytes=pnach_file_path.stat().st_size if pnach_file_path.exists() else 0,
+                                size_bytes=_sz,
                             )
                             self.db.add(mod_record)
+                            try:
+                                from src.core.download_history import record_event, STATUS_SUCCESS
+                                record_event(
+                                    self.config,
+                                    mod_name=f"Widescreen Patch ({patch['crc']})",
+                                    mod_type="pnach",
+                                    source_url=mod_record.source_url,
+                                    status=STATUS_SUCCESS,
+                                    size_bytes=_sz,
+                                )
+                            except Exception:
+                                pass
                         except Exception as _reg_exc:  # DB registration is best-effort
                             import sys
                             print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)
                 else:
                     btn.setText("⬇ Install")
                     self._status.setText(f"❌  Download failed for {patch['filename']}.")
+                    try:
+                        from src.core.download_history import record_event, STATUS_FAILED
+                        record_event(
+                            self.config,
+                            mod_name=f"Widescreen Patch ({patch['crc']})",
+                            mod_type="pnach",
+                            status=STATUS_FAILED,
+                        )
+                    except Exception:
+                        pass
 
             QTimer.singleShot(0, _done)
 
@@ -1880,6 +1951,17 @@ class _CatalogueTabContent(QWidget):
         q = query.lower()
         fav_authors = getattr(self.config, "favorite_authors", [])
 
+        # Resolve alias-aware game title matching via the serial database.
+        # This lets users search "DMC3", "GoW", "GTA III" etc. and find entries
+        # whose catalogue "game" field uses the full canonical title.
+        _sdb = None
+        if q:
+            try:
+                from src.core.serial_validator import SerialDatabase
+                _sdb = SerialDatabase()
+            except Exception:
+                pass
+
         filtered = []
         for e in self._all_entries:
             # NSFW filter — hide adult-content entries unless the user enables them
@@ -1897,15 +1979,27 @@ class _CatalogueTabContent(QWidget):
             # In-app download filter — hide entries that require a browser or external tool
             if in_app_only and not _entry_is_in_app_downloadable(e):
                 continue
-            if q and not (
-                q in e.get("name", "").lower()
-                or q in e.get("description", "").lower()
-                or q in e.get("author", "").lower()
-                or q in e.get("game", "").lower()
-                or q in e.get("context", "").lower()
-                or any(q in t.lower() for t in e.get("tags", []))
-            ):
-                continue
+            if q:
+                game_field = e.get("game", "")
+                # Alias-aware game field matching: if the query doesn't match
+                # the raw game string, check via SerialDatabase aliases.
+                game_matches = (
+                    q in game_field.lower()
+                    or (
+                        _sdb is not None
+                        and game_field
+                        and _sdb.title_matches_query(game_field, q)
+                    )
+                )
+                if not (
+                    q in e.get("name", "").lower()
+                    or q in e.get("description", "").lower()
+                    or q in e.get("author", "").lower()
+                    or game_matches
+                    or q in e.get("context", "").lower()
+                    or any(q in t.lower() for t in e.get("tags", []))
+                ):
+                    continue
             if source and e.get("source", "") != source:
                 continue
             if author and e.get("author", "") != author:
@@ -2013,9 +2107,11 @@ class _CatalogueTabContent(QWidget):
 class BrowsePanel(BasePanel):
     """Panel for discovering and downloading mods from public sources."""
 
+    mod_installed = pyqtSignal()   # emitted after any install dialog closes
+
     def __init__(self, config: AppConfig, parent=None):
         super().__init__(
-            "🌐  Browse & Download",
+            "🌐  Discover",
             "Discover community mods and resources",
             parent=parent,
         )
@@ -2403,6 +2499,7 @@ class BrowsePanel(BasePanel):
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _install_catalogue_entry(self, entry: dict):
         """Open the appropriate download dialog pre-filled from a catalogue entry."""
@@ -2424,6 +2521,7 @@ class BrowsePanel(BasePanel):
                     "Texture Packs panel to install it."
                 )
                 dlg.exec()
+                self.mod_installed.emit()
             else:
                 # No direct MEGA link — send user to the source page
                 msg = (
@@ -2471,6 +2569,7 @@ class BrowsePanel(BasePanel):
                 hint += f"\n\nSource page: {source_url}"
             dlg._status.setText(hint)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _prefill_dialog(self, dlg, entry: dict):
         """Prefill a DownloadInstallDialog with metadata from a catalogue entry."""
@@ -2494,10 +2593,12 @@ class BrowsePanel(BasePanel):
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _open_gbatemp_scraper(self):
         dlg = GBATempScraperDialog(self.config, self._db, self)
         dlg.exec()
+        self.mod_installed.emit()
 
     def _open_cover_art_dialog(self):
         """Open the Cover Art download dialog from the toolbar."""

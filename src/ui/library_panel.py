@@ -246,12 +246,50 @@ class _GameDetailPane(QWidget):
 
         layout.addLayout(header_row)
 
-        if self._game.size_bytes:
-            size_lbl = QLabel(
-                f"File: {Path(self._game.path).name}  •  {_fmt_size(self._game.size_bytes)}"
+        # ── Identity row: serial, region, disc type, CRCs, file path ────────
+        id_parts: list[str] = []
+        if self._game.serial:
+            id_parts.append(self._game.serial)
+        if self._game.region:
+            id_parts.append(self._game.region)
+        id_parts.append(self._game.disc_type)
+
+        id_row = QHBoxLayout()
+        id_row.setSpacing(6)
+
+        if id_parts:
+            identity_lbl = QLabel("  •  ".join(id_parts))
+            identity_lbl.setStyleSheet(
+                "color: #7070a0; font-size: 11px; font-family: monospace;"
             )
-            size_lbl.setStyleSheet("color: #50507a; font-size: 11px;")
-            layout.addWidget(size_lbl)
+            id_row.addWidget(identity_lbl)
+
+        # CRC badge(s) — each CRC is important for PCSX2
+        for crc in self._game.crcs:
+            crc_lbl = QLabel(f"CRC: {crc}")
+            crc_lbl.setToolTip(
+                f"PCSX2 CRC: {crc}\n"
+                "This is the game's internal checksum used by PCSX2 to name\n"
+                "PNACH cheat files and texture replacement folders."
+            )
+            crc_lbl.setStyleSheet(
+                "background:#0a1a0a; color:#40c060; border:1px solid #205020;"
+                "border-radius:3px; font-size:10px; font-family:monospace;"
+                "padding:1px 5px;"
+            )
+            id_row.addWidget(crc_lbl)
+
+        id_row.addStretch()
+        layout.addLayout(id_row)
+
+        if self._game.path:
+            file_parts = [f"📁 {Path(self._game.path).name}"]
+            if self._game.size_bytes:
+                file_parts.append(_fmt_size(self._game.size_bytes))
+            path_lbl = QLabel("  •  ".join(file_parts))
+            path_lbl.setStyleSheet("color: #50507a; font-size: 11px;")
+            path_lbl.setToolTip(self._game.path)
+            layout.addWidget(path_lbl)
 
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
@@ -446,6 +484,9 @@ class _GameCard(QFrame):
         sub_parts = []
         if game.serial:
             sub_parts.append(game.serial)
+        if game.region:
+            sub_parts.append(game.region)
+        sub_parts.append(game.disc_type)
         if game.size_bytes:
             sub_parts.append(_fmt_size(game.size_bytes))
         if sub_parts:

@@ -1513,6 +1513,37 @@
     ]
   },
   {
+    "id": "guitar_hero_2_hd",
+    "type": "texture_pack",
+    "source": "GBAtemp",
+    "game": "Guitar Hero II",
+    "game_serial": "SLUS-21447",
+    "author": "Unknown",
+    "author_url": "https://gbatemp.net/threads/guitar-hero-slus-21224-guitar-hero-ii-slus-21447-hd-texture-packs-upscales.667554/",
+    "name": "Guitar Hero II (SLUS-21447) HD Texture Pack / Upscale",
+    "description": "HD texture pack / upscale for Guitar Hero II (SLUS-21447). This pack is part of the same GBAtemp thread that covers both Guitar Hero (SLUS-21224) and Guitar Hero II (SLUS-21447).",
+    "context": "Visit the GBAtemp thread for download and installation instructions. Covers both SLUS-21224 (Guitar Hero) and SLUS-21447 (Guitar Hero II).",
+    "url": "https://gbatemp.net/threads/guitar-hero-slus-21224-guitar-hero-ii-slus-21447-hd-texture-packs-upscales.667554/",
+    "direct_download_url": "",
+    "download_action": "",
+    "upscale_tech": "HD textures",
+    "is_complete": true,
+    "is_free": true,
+    "is_hub": false,
+    "nsfw": false,
+    "requires_account": false,
+    "size_label": "~800 MB",
+    "thumbnail_url": "",
+    "tags": [
+      "guitar hero",
+      "guitar hero ii",
+      "hd",
+      "upscale",
+      "ps2",
+      "gbatemp"
+    ]
+  },
+  {
     "id": "guitar_hero_hd_sombershroud",
     "type": "texture_pack",
     "source": "GBAtemp",
@@ -2167,7 +2198,7 @@
     "nsfw": false,
     "url": "https://gbatemp.net/threads/prince-of-persia-trilogy-hd-textures.622976/",
     "type": "texture_pack",
-    "game_serial": "",
+    "game_serial": "SLUS-20743",
     "source": "GBAtemp",
     "game": "Prince of Persia Trilogy",
     "thumbnail_url": "",
@@ -3884,8 +3915,8 @@
     ]
   },
   {
-    "id": "ironhulk33_hd_ps2_hub",
-    "name": "HD PS2 Textures by ironhulk33",
+    "id": "josephsdeadish_hd_ps2_hub",
+    "name": "HD PS2 Texture by JosephsDeadish",
     "author": "",
     "author_url": "https://gbatemp.net/threads/hd-ps2-texture.677743/",
     "is_hub": true,
@@ -3896,21 +3927,21 @@
     "source": "GBAtemp",
     "game": "",
     "download_action": "",
-    "direct_download_url": "",
+    "direct_download_url": "https://www.patreon.com/collection/1891902?view=expanded",
     "upscale_tech": "HD textures",
     "is_free": true,
     "requires_account": false,
     "is_complete": true,
     "size_label": "",
-    "description": "Hub thread for HD texture packs by ironhulk33, covering multiple PS2 titles. See individual entries for specific game packs.",
-    "context": "Visit the GBAtemp thread for links to individual game packs.",
+    "description": "Hub thread by JosephsDeadish containing their own PS2 HD texture packs, including work on Manhunt 2 and other titles. Complete packs are available via their Patreon collection.",
+    "context": "Visit the GBAtemp thread for links to individual packs. Complete packs: https://www.patreon.com/collection/1891902?view=expanded",
     "thumbnail_url": "",
     "tags": [
       "hub",
       "hd",
       "ps2",
       "gbatemp",
-      "ironhulk33"
+      "josephsdeadish"
     ]
   },
   {

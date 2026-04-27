@@ -1,0 +1,6167 @@
+{
+  "version": "1.0",
+  "description": "PS2 demo, kiosk, and promotional disc serial database. Entries here use serial codes (SCCD/SLCD for NA demos, SCED/SLED for PAL demos, SCPD/SLPD for JP demos) that are distinct from retail game serials to prevent ID mix-ups.",
+  "games": {
+    "ATV Offroad Fury (Demo)": {
+      "serial": "SCUS-97010",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Rainbow Studios",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "ATV Offroad Fury Demo"
+      ]
+    },
+    "Crash Bandicoot: The Wrath of Cortex (Demo)": {
+      "serial": "SCUS-97007",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Traveller's Tales",
+      "publisher": "Universal Interactive",
+      "genre": "Platformer",
+      "aliases": [
+        "Crash Bandicoot WoC Demo"
+      ]
+    },
+    "Dark Cloud (Demo)": {
+      "serial": "SCUS-97002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Level-5",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Action-RPG",
+      "aliases": [
+        "Dark Cloud Demo"
+      ]
+    },
+    "Devil May Cry (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Capcom Production Studio 4",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC Demo"
+      ]
+    },
+    "Final Fantasy X (Demo)": {
+      "serial": "SLUS-29002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "RPG",
+      "aliases": [
+        "FFX Demo",
+        "Final Fantasy 10 Demo"
+      ]
+    },
+    "Gran Turismo 3: A-Spec (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 Demo",
+        "Gran Turismo 3 Demo"
+      ]
+    },
+    "Gran Turismo 4 (Prologue)": {
+      "serial": "SCUS-97328",
+      "alt_serials": [
+        "SCUS-97404"
+      ],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue",
+        "Gran Turismo 4 Prologue"
+      ]
+    },
+    "Ico (Demo)": {
+      "serial": "SCUS-97113",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Team Ico",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Puzzle-Adventure",
+      "aliases": [
+        "Ico Demo"
+      ]
+    },
+    "Jak and Daxter: The Precursor Legacy (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak and Daxter Demo",
+        "J&D Demo"
+      ]
+    },
+    "Kingdom Hearts (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH Demo",
+        "Kingdom Hearts Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 Demo",
+        "Metal Gear Solid 2 Demo"
+      ]
+    },
+    "Ratchet & Clank (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Ratchet and Clank Demo",
+        "R&C Demo"
+      ]
+    },
+    "Silent Hill 2 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Team Silent",
+      "publisher": "Konami",
+      "genre": "Survival Horror",
+      "aliases": [
+        "SH2 Demo",
+        "Silent Hill 2 Demo"
+      ]
+    },
+    "Spyro: Enter the Dragonfly (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Check Six Studios",
+      "publisher": "Universal Interactive",
+      "genre": "Platformer",
+      "aliases": [
+        "Spyro EtD Demo",
+        "Spyro Dragonfly Demo"
+      ]
+    },
+    "SSX (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "EA Canada",
+      "publisher": "EA Sports",
+      "genre": "Sports",
+      "aliases": [
+        "SSX Demo"
+      ]
+    },
+    "Twisted Metal: Black (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Incognito Entertainment",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Vehicular Combat",
+      "aliases": [
+        "TM Black Demo",
+        "Twisted Metal Black Demo"
+      ]
+    },
+    "PlayStation Underground Jampack Vol. 1": {
+      "serial": "SCUS-97100",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 1",
+        "PSU Jampack 1"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2000": {
+      "serial": "SCUS-97001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2000",
+        "PSU Jampack Summer 2000"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2000": {
+      "serial": "SCUS-97009",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2000",
+        "PSU Jampack Fall 2000"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2001": {
+      "serial": "SCUS-97023",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2001",
+        "PSU Jampack Winter 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Spring 2001": {
+      "serial": "SCUS-97035",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Spring 2001",
+        "PSU Jampack Spring 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2001": {
+      "serial": "SCUS-97047",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2001",
+        "PSU Jampack Summer 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2001": {
+      "serial": "SCUS-97057",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2001",
+        "PSU Jampack Fall 2001"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2002": {
+      "serial": "SCUS-97066",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2002",
+        "PSU Jampack Winter 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Spring 2002": {
+      "serial": "SCUS-97075",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Spring 2002",
+        "PSU Jampack Spring 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Summer 2002": {
+      "serial": "SCUS-97082",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2002",
+        "PSU Jampack Summer 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Fall 2002": {
+      "serial": "SCUS-97090",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Fall 2002",
+        "PSU Jampack Fall 2002"
+      ]
+    },
+    "PlayStation Underground Jampack Winter 2003": {
+      "serial": "SCUS-97097",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2003",
+        "PSU Jampack Winter 2003"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 1": {
+      "serial": "SCUS-97018",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 1",
+        "OPS2 Demo 1"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 2": {
+      "serial": "SCUS-97026",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 2",
+        "OPS2 Demo 2"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 3": {
+      "serial": "SCUS-97033",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 3",
+        "OPS2 Demo 3"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 4": {
+      "serial": "SCUS-97043",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 4",
+        "OPS2 Demo 4"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 5": {
+      "serial": "SCUS-97050",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 5",
+        "OPS2 Demo 5"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 6": {
+      "serial": "SCUS-97058",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 6",
+        "OPS2 Demo 6"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 7": {
+      "serial": "SCUS-97065",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 7",
+        "OPS2 Demo 7"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 8": {
+      "serial": "SCUS-97072",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 8",
+        "OPS2 Demo 8"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 9": {
+      "serial": "SCUS-97078",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 9",
+        "OPS2 Demo 9"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 10": {
+      "serial": "SCUS-97085",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 10",
+        "OPS2 Demo 10"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 11": {
+      "serial": "SCUS-97091",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 11",
+        "OPS2 Demo 11"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 12": {
+      "serial": "SCUS-97098",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 12",
+        "OPS2 Demo 12"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 13": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 13",
+        "OPS2 Demo 13"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 14": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 14",
+        "OPS2 Demo 14"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 15": {
+      "serial": "SCUS-97119",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 15",
+        "OPS2 Demo 15"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 16": {
+      "serial": "SCUS-97126",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 16",
+        "OPS2 Demo 16"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 17": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 17",
+        "OPS2 Demo 17"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 18": {
+      "serial": "SCUS-97138",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 18",
+        "OPS2 Demo 18"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 19": {
+      "serial": "SCUS-97143",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 19",
+        "OPS2 Demo 19"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 20": {
+      "serial": "SCUS-97148",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 20",
+        "OPS2 Demo 20"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 21": {
+      "serial": "SCUS-97155",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 21",
+        "OPS2 Demo 21"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 22": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 22",
+        "OPS2 Demo 22"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 23": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 23",
+        "OPS2 Demo 23"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 24": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 24",
+        "OPS2 Demo 24"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 25": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 25",
+        "OPS2 Demo 25"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 26": {
+      "serial": "SCUS-97182",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 26",
+        "OPS2 Demo 26"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 27": {
+      "serial": "SCUS-97187",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 27",
+        "OPS2 Demo 27"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 28": {
+      "serial": "SCUS-97193",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 28",
+        "OPS2 Demo 28"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 29": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 29",
+        "OPS2 Demo 29"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 30": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 30",
+        "OPS2 Demo 30"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 31": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 31",
+        "OPS2 Demo 31"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 32": {
+      "serial": "SCUS-97215",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 32",
+        "OPS2 Demo 32"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 33": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 33",
+        "OPS2 Demo 33"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 34": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 34",
+        "OPS2 Demo 34"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 35": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 35",
+        "OPS2 Demo 35"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 36": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 36",
+        "OPS2 Demo 36"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 37": {
+      "serial": "SCUS-97242",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 37",
+        "OPS2 Demo 37"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 38": {
+      "serial": "SCUS-97249",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 38",
+        "OPS2 Demo 38"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 39": {
+      "serial": "SCUS-97255",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 39",
+        "OPS2 Demo 39"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 40": {
+      "serial": "SCUS-97261",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 40",
+        "OPS2 Demo 40"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 41": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 41",
+        "OPS2 Demo 41"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 42": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 42",
+        "OPS2 Demo 42"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 43": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 43",
+        "OPS2 Demo 43"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 44": {
+      "serial": "SCUS-97284",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 44",
+        "OPS2 Demo 44"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 45": {
+      "serial": "SCUS-97292",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 45",
+        "OPS2 Demo 45"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 46": {
+      "serial": "SCUS-97298",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 46",
+        "OPS2 Demo 46"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 47": {
+      "serial": "SCUS-97304",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 47",
+        "OPS2 Demo 47"
+      ]
+    },
+    "Official PlayStation 2 Magazine Demo Vol. 48": {
+      "serial": "SCUS-97311",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Ziff Davis Media",
+      "publisher": "Ziff Davis Media",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM Demo Vol 48",
+        "OPS2 Demo 48"
+      ]
+    },
+    "Kiosk Demo Disc (2000 Launch)": {
+      "serial": "PBPX-95500",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2000",
+        "PS2 Launch Kiosk"
+      ]
+    },
+    "Kiosk Demo Disc (2004)": {
+      "serial": "PBPX-95504",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Interactive Entertainment America",
+      "publisher": "Sony Interactive Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "PS2 Kiosk Demo 2004"
+      ]
+    },
+    "Gran Turismo 3: A-Spec Prologue (PAL Demo)": {
+      "serial": "SCED-50093",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2000",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Interactive Entertainment Europe",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 PAL Demo",
+        "Gran Turismo 3 PAL Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (PAL Demo)": {
+      "serial": "SLED-50397",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 PAL Demo",
+        "Metal Gear Solid 2 PAL Demo"
+      ]
+    },
+    "Final Fantasy X (PAL Demo)": {
+      "serial": "SLED-50460",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square Electronic Arts",
+      "genre": "RPG",
+      "aliases": [
+        "FFX PAL Demo",
+        "Final Fantasy 10 PAL Demo"
+      ]
+    },
+    "Devil May Cry (PAL Demo)": {
+      "serial": "SLED-50328",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Capcom Production Studio 4",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC PAL Demo"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 1": {
+      "serial": "SCED-50001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2000",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 1",
+        "OPS2 UK 1"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 2": {
+      "serial": "SCED-50110",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 2",
+        "OPS2 UK 2"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 3": {
+      "serial": "SCED-50175",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 3",
+        "OPS2 UK 3"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 4": {
+      "serial": "SCED-50240",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 4",
+        "OPS2 UK 4"
+      ]
+    },
+    "Official PlayStation 2 Magazine (UK) Demo Vol. 5": {
+      "serial": "SCED-50320",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2001",
+      "developer": "Future Publishing",
+      "publisher": "Future Publishing",
+      "genre": "Compilation",
+      "aliases": [
+        "OPM UK Demo 5",
+        "OPS2 UK 5"
+      ]
+    },
+    "Gran Turismo Concept: 2002 Tokyo (JP Demo)": {
+      "serial": "SCPD-10006",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2002",
+      "developer": "Polyphony Digital",
+      "publisher": "SCEJ",
+      "genre": "Racing",
+      "aliases": [
+        "GT Concept JP Demo"
+      ]
+    },
+    "Metal Gear Solid 2: Sons of Liberty (JP Demo)": {
+      "serial": "SLPD-00001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "KCEJ",
+      "publisher": "Konami",
+      "genre": "Action-Stealth",
+      "aliases": [
+        "MGS2 JP Demo"
+      ]
+    },
+    "Final Fantasy X (JP Demo)": {
+      "serial": "SLPD-00010",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "RPG",
+      "aliases": [
+        "FFX JP Demo",
+        "Final Fantasy X JP Demo"
+      ]
+    },
+    "Kingdom Hearts (JP Demo)": {
+      "serial": "SLPD-00015",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2002",
+      "developer": "Square",
+      "publisher": "Square",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH JP Demo",
+        "Kingdom Hearts JP Demo"
+      ]
+    },
+    "Devil May Cry 2 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Capcom Production Studio 1",
+      "publisher": "Capcom",
+      "genre": "Action",
+      "aliases": [
+        "DMC2 Demo",
+        "Devil May Cry 2 Demo"
+      ]
+    },
+    "Grand Theft Auto III (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "DMA Design",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GTA III Demo",
+        "Grand Theft Auto 3 Demo"
+      ]
+    },
+    "Grand Theft Auto: Vice City (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Rockstar North",
+      "publisher": "Rockstar Games",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GTA Vice City Demo",
+        "Vice City Demo"
+      ]
+    },
+    "Jak II: Renegade (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak II Demo",
+        "Jak 2 Demo"
+      ]
+    },
+    "Kingdom Hearts II (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Square Enix",
+      "publisher": "Square Enix",
+      "genre": "Action-RPG",
+      "aliases": [
+        "KH2 Demo",
+        "Kingdom Hearts 2 Demo"
+      ]
+    },
+    "Sly Cooper and the Thievius Raccoonus (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sucker Punch Productions",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Sly Cooper Demo",
+        "Sly Raccoon Demo"
+      ]
+    },
+    "SOCOM: U.S. Navy SEALs (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Zipper Interactive",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Tactical Shooter",
+      "aliases": [
+        "SOCOM Demo",
+        "Socom Navy SEALs Demo"
+      ]
+    },
+    "God of War (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW Demo",
+        "God of War 1 Demo"
+      ]
+    },
+    "Shadow of the Colossus (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "SotC Demo",
+        "Wander and the Colossus Demo"
+      ]
+    },
+    "God of War II (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW2 Demo",
+        "God of War 2 Demo"
+      ]
+    },
+    "Jak 3 (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak III Demo"
+      ]
+    },
+    "Sly 2: Band of Thieves (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sucker Punch Productions",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "Sly 2 Demo"
+      ]
+    },
+    "Ratchet & Clank: Going Commando (Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platformer",
+      "aliases": [
+        "R&C Going Commando Demo",
+        "Ratchet & Clank 2 Demo"
+      ]
+    },
+    "Jak and Daxter: The Precursor Legacy (PAL Demo)": {
+      "serial": "SCES-50361",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2002",
+      "developer": "Naughty Dog",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Platformer",
+      "aliases": [
+        "Jak and Daxter PAL Demo",
+        "JakDax PAL Demo"
+      ]
+    },
+    "Killzone (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2004",
+      "developer": "Guerrilla Games",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "First-Person Shooter",
+      "aliases": [
+        "Killzone Demo PAL"
+      ]
+    },
+    "Shadow of the Colossus (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "SotC PAL Demo",
+        "Wander and the Colossus PAL Demo"
+      ]
+    },
+    "God of War (PAL Demo)": {
+      "serial": "",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2005",
+      "developer": "SCE Studio Santa Monica",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "GoW PAL Demo"
+      ]
+    },
+    "Gran Turismo 4 (PAL Prologue)": {
+      "serial": "SCED-52246",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "PAL",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment Europe",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 PAL Prologue",
+        "Gran Turismo 4 PAL Demo"
+      ]
+    },
+    "Ico (JP Demo)": {
+      "serial": "SCPD-10002",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2001",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "Ico Japan Demo"
+      ]
+    },
+    "Dark Cloud (JP Demo)": {
+      "serial": "SLPD-00009",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2000",
+      "developer": "Level-5",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-RPG",
+      "aliases": [
+        "Dark Cloud Japan Demo"
+      ]
+    },
+    "Shadow of the Colossus (JP Demo)": {
+      "serial": "SLPD-00025",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-J",
+      "release_date": "2005",
+      "developer": "Team Ico",
+      "publisher": "Sony Computer Entertainment Japan",
+      "genre": "Action-Adventure",
+      "aliases": [
+        "Wanda to Kyozou Demo",
+        "SotC JP Demo"
+      ]
+    },
+    "Ace Combat: Squadron Leader (PAL)": {
+      "alt_serials": [
+        "SCED-53115"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53081",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Best PS2 Games Ever 10 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51389",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 10 (Old) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53514",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 10 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53515",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 10 (You) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53513",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 11 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54338",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 11 (You) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54101",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 11m (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54102",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 12 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54399",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 12 (You) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54397",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 12m (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54398",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 4 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51486",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 5 (PAL)": {
+      "alt_serials": [
+        "SCED-51941"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51940",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 6 (PAL)": {
+      "alt_serials": [
+        "SCED-52391"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52390",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 7 (6/7) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52436",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 8 (Geu) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53018",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 8 (Old) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52932",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 8 (You) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52933",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 9 (Old) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53117",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Bonus Demo 9 (You) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53116",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Buzz! Junior: RoboJam + Buzz! Junior: Jungle Party (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54808",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Crash Twinsanity + Spyro: A Hero's Tail (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-52574",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "DJ: Decks & FX (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52723",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Das Offizielle PlayStation 2 Magazin 02/2004: Uncut Edition (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52082",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Das Offizielle PlayStation 2 Magazin 09/2004 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52089",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Das Offizielle PlayStation 2 Magazin 12/2003 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51936",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Das Offizielle PlayStation 2 Magazin: Special Edition 2 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51161",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EA Demo Disc: From Russia with Love + Need for Speed: Most Wanted + SSX on Tour (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-53681",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EyeToy Special Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53177",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EyeToy: Antigrav + SpyToy Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53792",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EyeToy: Chat Light (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "Other",
+      "publisher": "",
+      "release_date": "2005-02-11",
+      "serial": "SCED-52818",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EyeToy: Christmas Wishi Washi (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52147",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "EyeToy: Play 3 + SpyToy (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53613",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "FIFA 06: Demo Pre-Release Version (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-53664",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Fire It Up Lads (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53679",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "G-Con 2 Competition Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52094",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Genji Special Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53733",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Germany Special Issue 3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51375",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gran Turismo 4 (BMW 1 Series Virtual Drive Dealership) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52578",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gran Turismo 4 (BMW 1 Series Virtual Drive) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52681",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gran Turismo Special Edition 2004 Geneva Version (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52455",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gran Turismo: Nissan Micra Edition (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51352",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gravity Sucks (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50633",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Jak II: Renegade (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51700",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Jak X & Ratchet: Gladiator (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53660",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Jak and Daxter: The Precursor Legacy DVD (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50621",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Killzone (Bonus Disc) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52899",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo 2005/01 Ita (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53070",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 01/2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53933",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 03/2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54090",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 04/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51652",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 05/2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54180",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 06/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51752",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 07-2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54314",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 07/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51836",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 08/02 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51111",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 08/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51880",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 09/02 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51173",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia 09/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51894",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Italia Special Racing (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54069",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Demo Special Cinema (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54543",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 01/04 Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52186",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 02/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51411",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 04/2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54149",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 05/04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52443",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 06/04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52580",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 06/2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54208",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 09/04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52855",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 10/2005: Italian Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53294",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 11/04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52981",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia 12/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52057",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia Demo 02/04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52272",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia Demo Speciale Horror (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53947",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia Speciale Kids (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54523",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italia Speciale Wrestling (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54602",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Italian Demo 61 07/05 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53516",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Platinum Speciale 2003 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52183",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Special Sports Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53905",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Speciale Platinum Italia (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53043",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Magazine Ufficiale PlayStation 2 Speciale di Corso (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52795",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Maximo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-50762",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Metal Gear Solid 2: Sons of Liberty: Trial Edition (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-50117",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Military Multi Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52355",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Nordic Fall 2003 Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-51962",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official Demo Disc 1: Retail Edition November 01 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50615",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official Demo Disc Retail Edition February 02 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50732",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 1 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50065",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 10 (PAL)": {
+      "alt_serials": [
+        "SCED-50404"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50145",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 100 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55119",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 101 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55120",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 11 (PAL)": {
+      "alt_serials": [
+        "SCED-50460",
+        "SCED-50463"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50146",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 12 (PAL)": {
+      "alt_serials": [
+        "SCED-50506",
+        "SCED-50543"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50147",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 13 (PAL)": {
+      "alt_serials": [
+        "SCED-50593",
+        "SCED-50594"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50148",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 14 (PAL)": {
+      "alt_serials": [
+        "SCED-50610",
+        "SCED-50622"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50149",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 15 (PAL)": {
+      "alt_serials": [
+        "SCED-50685",
+        "SCED-50708"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50150",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 16 (PAL)": {
+      "alt_serials": [
+        "SCED-50675",
+        "SCED-50736"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50151",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 17 (PAL)": {
+      "alt_serials": [
+        "SCED-50697"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50152",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 18 (PAL)": {
+      "alt_serials": [
+        "SCED-50698",
+        "SCED-50825"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50153",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 19 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50154",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 2 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50066",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 20 (PAL)": {
+      "alt_serials": [
+        "SCED-50743",
+        "SCED-50945"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50699",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 21 (PAL)": {
+      "alt_serials": [
+        "SCED-50742",
+        "SCED-50989"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50700",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 22 (PAL)": {
+      "alt_serials": [
+        "SCED-50744"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50701",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 22/23 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51016",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 23 (PAL)": {
+      "alt_serials": [
+        "SCED-51163"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50745",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 24 (PAL)": {
+      "alt_serials": [
+        "SCED-51147",
+        "SCED-51185"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50746",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 25 (PAL)": {
+      "alt_serials": [
+        "SCED-51262",
+        "SCED-51279"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50747",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 26 (PAL)": {
+      "alt_serials": [
+        "SCED-51321"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50748",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 27 (PAL)": {
+      "alt_serials": [
+        "SCED-51319",
+        "SCED-51359"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50749",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 28 (PAL)": {
+      "alt_serials": [
+        "SCED-51376"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50750",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 29 (PAL)": {
+      "alt_serials": [
+        "SCED-51432",
+        "SCED-51440"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51384",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50067",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 30 (PAL)": {
+      "alt_serials": [
+        "SCED-51483",
+        "SCED-51485",
+        "SCED-51489",
+        "SCED-51552"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51457",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 31 (PAL)": {
+      "alt_serials": [
+        "SCED-51556",
+        "SCED-51566"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51529",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 32 (PAL)": {
+      "alt_serials": [
+        "SCED-51558",
+        "SCED-51567",
+        "SCED-51656"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51530",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 33 (PAL)": {
+      "alt_serials": [
+        "SCED-51559",
+        "SCED-51568"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51531",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 34 (PAL)": {
+      "alt_serials": [
+        "SCED-51560",
+        "SCED-51569",
+        "SCED-51760"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51532",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 35 (PAL)": {
+      "alt_serials": [
+        "SCED-51561",
+        "SCED-51570"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51533",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 36 (PAL)": {
+      "alt_serials": [
+        "SCED-51571"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51534",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 37 (PAL)": {
+      "alt_serials": [
+        "SCED-51563",
+        "SCED-51572"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51537",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 38 (PAL)": {
+      "alt_serials": [
+        "SCED-51573",
+        "SCED-51935"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51538",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 39 (PAL)": {
+      "alt_serials": [
+        "SCED-52037"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51540",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 40 (PAL)": {
+      "alt_serials": [
+        "SCED-51565",
+        "SCED-51575",
+        "SCED-52053",
+        "SCED-52054"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51535",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 41 (PAL)": {
+      "alt_serials": [
+        "SCED-52068",
+        "SCED-52081",
+        "SCED-52158",
+        "SCED-52177",
+        "SCED-52185"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51536",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 42 (PAL)": {
+      "alt_serials": [
+        "SCED-52069",
+        "SCED-52270",
+        "SCED-52271",
+        "SCED-52273"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51539",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 43 (PAL)": {
+      "alt_serials": [
+        "SCED-52083",
+        "SCED-52354"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52051",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 44 (PAL)": {
+      "alt_serials": [
+        "SCED-52377"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52052",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 45 (PAL)": {
+      "alt_serials": [
+        "SCED-52160",
+        "SCED-52442",
+        "SCED-52452"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52085",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 46 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52161",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 47 (PAL)": {
+      "alt_serials": [
+        "SCED-52162",
+        "SCED-52549"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52087",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 48 (PAL)": {
+      "alt_serials": [
+        "SCED-52163",
+        "SCED-52619"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52088",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 49 (PAL)": {
+      "alt_serials": [
+        "SCED-52164",
+        "SCED-52728"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52076",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 5 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50140",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 50 (PAL)": {
+      "alt_serials": [
+        "SCED-52165",
+        "SCED-52785",
+        "SCED-52796"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52090",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 51 (PAL)": {
+      "alt_serials": [
+        "SCED-52166",
+        "SCED-52786"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52091",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 52 (PAL)": {
+      "alt_serials": [
+        "SCED-52167",
+        "SCED-52938"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52092",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 53 (PAL)": {
+      "alt_serials": [
+        "SCED-52168",
+        "SCED-52990",
+        "SCED-52991"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52080",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 54 (PAL)": {
+      "alt_serials": [
+        "SCED-53056",
+        "SCED-53067",
+        "SCED-53068"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52169",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 55 (PAL)": {
+      "alt_serials": [
+        "SCED-52170",
+        "SCED-53123"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52120",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 56 (PAL)": {
+      "alt_serials": [
+        "SCED-53132",
+        "SCED-53176"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53122",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 57 (PAL)": {
+      "alt_serials": [
+        "SCED-53160",
+        "SCED-53228"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53159",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 58 (PAL)": {
+      "alt_serials": [
+        "SCED-53206",
+        "SCED-53288",
+        "SCED-53325",
+        "SCED-53348"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53161",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 59 (PAL)": {
+      "alt_serials": [
+        "SCED-53207",
+        "SCED-53289"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53162",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 6 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50141",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 60 (PAL)": {
+      "alt_serials": [
+        "SCED-53208",
+        "SCED-53290"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53163",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 61 (PAL)": {
+      "alt_serials": [
+        "SCED-53209",
+        "SCED-53291"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53164",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 62 (PAL)": {
+      "alt_serials": [
+        "SCED-53210",
+        "SCED-53292"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53165",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 63 (PAL)": {
+      "alt_serials": [
+        "SCED-53211",
+        "SCED-53293"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53166",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 64 (PAL)": {
+      "alt_serials": [
+        "SCED-53212"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53167",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 65 (PAL)": {
+      "alt_serials": [
+        "SCED-53213"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53168",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 66 (PAL)": {
+      "alt_serials": [
+        "SCED-53214"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53169",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 67 (PAL)": {
+      "alt_serials": [
+        "SCED-53215",
+        "SCED-53916",
+        "SCED-53932",
+        "SCED-53939"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53170",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 68 (PAL)": {
+      "alt_serials": [
+        "SCED-53216"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53171",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 69 & 70 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54036",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 69 (PAL)": {
+      "alt_serials": [
+        "SCED-53978",
+        "SCED-54001"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53217",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 7 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50142",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 70 (PAL)": {
+      "alt_serials": [
+        "SCED-54037"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54024",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 71 (PAL)": {
+      "alt_serials": [
+        "SCED-54050",
+        "SCED-54070",
+        "SCED-54079",
+        "SCED-54099"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54043",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 72 (PAL)": {
+      "alt_serials": [
+        "SCED-54051",
+        "SCED-54144"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54044",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 73 (PAL)": {
+      "alt_serials": [
+        "SCED-54052",
+        "SCED-54176"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54045",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 74 (PAL)": {
+      "alt_serials": [
+        "SCED-54053",
+        "SCED-54202"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54046",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 75 (PAL)": {
+      "alt_serials": [
+        "SCED-54054"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54047",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 76 (PAL)": {
+      "alt_serials": [
+        "SCED-54055"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54048",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 77 (PAL)": {
+      "alt_serials": [
+        "SCED-54056"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54049",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 78 (PAL)": {
+      "alt_serials": [
+        "SCED-54403",
+        "SCED-54480"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54057",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 79 (PAL)": {
+      "alt_serials": [
+        "SCED-54404",
+        "SCED-54481"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54058",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 8 (PAL)": {
+      "alt_serials": [
+        "SCED-50381"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50143",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 80 (PAL)": {
+      "alt_serials": [
+        "SCED-54405",
+        "SCED-54567"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54059",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 81 (PAL)": {
+      "alt_serials": [
+        "SCED-54603",
+        "SCED-54605"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54406",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 82 (PAL)": {
+      "alt_serials": [
+        "SCED-54642"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54407",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 83 (PAL)": {
+      "alt_serials": [
+        "SCED-54692"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54408",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 84 (PAL)": {
+      "alt_serials": [
+        "SCED-54758"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54409",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 85 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54410",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 86 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54411",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 87 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54412",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 88 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54413",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 89 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54414",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 9 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50144",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 90 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54415",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 91 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54416",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 92 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54417",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 93 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54418",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 94 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55113",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 95 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55114",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 96 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55115",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 97 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55116",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 98 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55117",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Demo 99 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-55118",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine French Christmas Special Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53854",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special 2/2005 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53662",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special 3/2005 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53938",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 01/2004 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52119",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 1 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50780",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 2003/01 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51512",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 2003/02 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51549",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 2003/03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51551",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 2005/01 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53298",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Special Edition 2007-1 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54693",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Germany Winter 2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54558",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Sonderausgabe 2004/3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52997",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine Spécial Noël 2004 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52996",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 1: Special Edition: Buyers Guide (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50161",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 2: Special Edition: A-Z of PS2 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50162",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 3: Special Edition: Players Guide (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50163",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 4: Special Edition: Yearbook 2001 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50164",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 5: Special Edition: Action Heroes (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50784",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 6: Special Edition: Awards 2002 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50783",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 7: Special Edition: Sports Games (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50785",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 8: Special Edition: Racing Games (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50786",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Greatest Hits Volume 9: Special Edition: Buyers Guide (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51280",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 11: The World's Best PS2 Games Ever (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51505",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 12: PlayStation 2 Blockbusters! (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51541",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 13: Girls! Motors! Guns! War! Monsters! (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51542",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 14: The Hit Squad (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51543",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 15: Summer Blockbusters! (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51544",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 16: Buyers Guide (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51545",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 17: The Best Games of 2003! (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51546",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 18: Hot 100 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52193",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 19: 2004 Classics Hitlist (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52194",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK Special Edition 20: It's Here! (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52196",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine-UK: Crime Special (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51444",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Official PlayStation 2 Magazine: German Kids Special (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53611",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PS2 Bonus Demo 03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51140",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PS2 Bonus Demo Jan 2001 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50133",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PS2 Bonus Demo Jan 2002 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50734",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Play the Best Demos from Atari (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-54035",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Play: Jan / Feb 2002 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50733",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Play: Sept / Oct / Nov 2001 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50569",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PlayStation 2 Christmas Special 2003 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52225",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PlayStation 2 Magazine Ufficiale Italia Presenta: Speciale Sport (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54640",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PlayStation 2 Official Demo Disc Edition Pour Revendeurs #5 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51591",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PlayStation 2 Revista Oficial: Portugal 9 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51657",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "PlayStation Experience (PAL)": {
+      "alt_serials": [
+        "SCED-51899",
+        "SCED-51938"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51148",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Primal + The Mark of Kri (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51491",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Primal + The Mark of Kri + War of the Monsters (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51506",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ratchet & Clank 3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52847",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ratchet & Clank 3 + Sly 2: Band of Thieves (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52848",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Retail Demo 11 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54105",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Roland Garros Virtual Tour '06 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54088",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Roland Garros Virtual Tour (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53349",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "SCEE Catalogue Video (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51187",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "SCEE Catalogue Video 3+ (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51278",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "SCEE Hits Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52970",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Sega³ Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50761",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 01 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-50811",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 03 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51146",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 04 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51269",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 05 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51683",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 06 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51596",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 08 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51598",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Selector Demo 7 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51597",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Shadow of the Colossus + Ico (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53990",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Smash Court Tennis: Pro Tournament 2 (PAL)": {
+      "alt_serials": [
+        "SCED-52618"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52423",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Soulcalibur III (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53674",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Space Channel 5: Part 2 Special Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51405",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "TOCA Race Driver 3 (Honda Civic 2006 Demo) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-53951",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "TOCA Race Driver 3 + V8 Supercars Australia 3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-53888",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Tango: Game On Demo Disc 1 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51454",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Tango: Game On Demo Disc 2 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51643",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Tango: Game On Demo Disc 3 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51644",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "The Suffering: Ties that Bind (PAL)": {
+      "alt_serials": [],
+      "developer": "Surreal Software",
+      "genre": "Survival Horror",
+      "publisher": "Midway Games",
+      "release_date": "",
+      "serial": "SLED-53627",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Top Gun: Combat Zones (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-50587",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Transformers: Optimus Prime (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-52473",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Transformers: Red Alert (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "Action-Adventure",
+      "publisher": "Atari",
+      "release_date": "",
+      "serial": "SLED-52474",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ufficiale PlayStation 2 Italia Kids Special 2005 Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53798",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ufficiale PlayStation 2 Special Platinum 2006 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-53946",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ufficiale PlayStation 2 Speciale Platinum 2007 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54682",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Ufficiale PlayStation 2 Speciale Racing 2007 (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-54730",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "WRC 4: The Official Game of the FIA World Rally Championship (Ford Fiesta Sports Edition Demo) (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-52945",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "WRC II Extreme: Peugeot Special Demo (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51304",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "WRC II Extreme: Special Demo (PAL)": {
+      "alt_serials": [
+        "SCED-51632"
+      ],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCED-51305",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "WWF SmackDown! Just Bring It (PAL)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SLED-50478",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "PAL"
+    },
+    "Gran Turismo 4: First Preview (JP)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCPM-85304",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "Japan"
+    },
+    "Gran Turismo Concept: Copen Special Edition (JP)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCPM-85301",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "Japan"
+    },
+    "McDonald's Original Happy Disc (JP)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCPM-85101",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "Japan"
+    },
+    "SpeSaru Disc 2003 (JP)": {
+      "alt_serials": [],
+      "developer": "",
+      "genre": "",
+      "publisher": "",
+      "release_date": "",
+      "serial": "SCPM-85303",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "Japan"
+    },
+    "HDD Utility Disc (NTSC-U)": {
+      "alt_serials": [],
+      "developer": "Square PDD 3",
+      "genre": "MMORPG",
+      "publisher": "Sony Computer Entertainment",
+      "release_date": "2006-06-15",
+      "serial": "SCUS-97395",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "utility",
+      "region": "NTSC-U"
+    },
+    "Jampack Demo Disc Volume 12 (NTSC-U)": {
+      "alt_serials": [
+        "SCUS-97420"
+      ],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2005-05-03",
+      "serial": "SCUS-97419",
+      "crcs": [],
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Summer 2003": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-07-01",
+      "serial": "SCUS-97280",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Summer 2003 (SCUS-97281)": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-07-01",
+      "serial": "SCUS-97281",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Winter 2002": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2002-11-01",
+      "serial": "SCUS-97234",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Winter 2002 (SCUS-97235)": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2002-11-01",
+      "serial": "SCUS-97235",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Winter 2003": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-11-01",
+      "serial": "SCUS-97312",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Jampack: Winter 2003 (SCUS-97313)": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-11-01",
+      "serial": "SCUS-97313",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Kiosk 2-11 Winter 2003": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-12-01",
+      "serial": "SCUS-97324",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "Kiosk 2-12 Spring 2004": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2004-03-01",
+      "serial": "SCUS-97383",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "Kiosk June-July-August 2003": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-06-01",
+      "serial": "SCUS-97321",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "Kiosk Q2-Q3 2006": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2006-06-01",
+      "serial": "SCUS-97557",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "Namco Transmission Vol. 2": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Demo",
+      "publisher": "Namco",
+      "release_date": "2004-01-01",
+      "serial": "SLUS-29134",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Namco Transmission v1.03": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Demo",
+      "publisher": "Namco",
+      "release_date": "2002-01-01",
+      "serial": "SLUS-29071",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Namco Transmission v2": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Demo",
+      "publisher": "Namco",
+      "release_date": "2003-01-01",
+      "serial": "SLUS-29133",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Namco Transmission v3.1": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Demo",
+      "publisher": "Namco",
+      "release_date": "2005-01-01",
+      "serial": "SLUS-29174",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Namco Transmission v3.2": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Namco",
+      "genre": "Demo",
+      "publisher": "Namco",
+      "release_date": "2005-06-01",
+      "serial": "SLUS-29175",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "PS2 Kiosk Q2-Q3 2004: Summer 2004": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2004-06-01",
+      "serial": "SCUS-97407",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "PS2 Kiosk Q3-Q4 2005": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2005-09-01",
+      "serial": "SCUS-97424",
+      "aliases": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U"
+    },
+    "PlayStation Underground: Holiday 2001": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2001-12-01",
+      "serial": "SCUS-97166",
+      "aliases": [],
+      "disc_type": "demo",
+      "region": "NTSC-U"
+    },
+    "Welcome to the World of Online Gaming for Your PlayStation 2": {
+      "alt_serials": [],
+      "crcs": [],
+      "developer": "Sony Computer Entertainment America",
+      "genre": "Demo",
+      "publisher": "Sony Computer Entertainment America",
+      "release_date": "2003-01-01",
+      "serial": "SCUS-97394",
+      "aliases": [],
+      "disc_type": "utility",
+      "region": "NTSC-U"
+    },
+    "Linux for PlayStation 2 Beta 1.0": {
+      "serial": "PBPX-95501",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "Linux Beta 1.0",
+        "PS2 Linux Beta"
+      ]
+    },
+    "Gran Turismo 3: A-spec (PS2 Bundle)": {
+      "serial": "PBPX-95502",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 PS2 Bundle",
+        "Gran Turismo 3 Bundle"
+      ]
+    },
+    "Gran Turismo 3: GT3 Racing Pack": {
+      "serial": "PBPX-95503",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT3 Racing Pack"
+      ]
+    },
+    "Kiosk Demo Disc 2.01": {
+      "serial": "SCUS-97116",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.01",
+        "PS2 Store Kiosk Disc 2.01"
+      ]
+    },
+    "Kiosk Demo Disc 2.02": {
+      "serial": "SCUS-97127",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.02"
+      ]
+    },
+    "Kiosk Demo Disc 2.03": {
+      "serial": "SCUS-97156",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.03"
+      ]
+    },
+    "Kiosk Demo Disc 2.04": {
+      "serial": "SCUS-97174",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.04"
+      ]
+    },
+    "Kiosk Demo Disc 2.05": {
+      "serial": "SCUS-97200",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.05"
+      ]
+    },
+    "Kiosk Demo Disc 2.06": {
+      "serial": "SCUS-97218",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.06"
+      ]
+    },
+    "Kiosk Demo Disc 2.07": {
+      "serial": "SCUS-97227",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.07"
+      ]
+    },
+    "Kiosk Demo Disc 2.09": {
+      "serial": "SCUS-97270",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.09"
+      ]
+    },
+    "Kiosk Demo Disc Q4-2004/Q1-2005": {
+      "serial": "SCUS-97421",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q4-2004/Q1-2005"
+      ]
+    },
+    "Kiosk Demo Disc Q1-Q2 2005": {
+      "serial": "SCUS-97422",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q1-Q2 2005"
+      ]
+    },
+    "Kiosk Demo Disc Q2-Q3 2005": {
+      "serial": "SCUS-97423",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q2-Q3 2005"
+      ]
+    },
+    "Kiosk Demo Disc Q3-Q4 2004": {
+      "serial": "SCUS-97428",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk Q3-Q4 2004"
+      ]
+    },
+    "Kiosk Disc 2.23": {
+      "serial": "SCUS-97582",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2007",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Kiosk 2.23"
+      ]
+    },
+    "Jampack Demo Disc - Summer 2001": {
+      "serial": "SCUS-97149",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Summer 2001"
+      ]
+    },
+    "Jampack Demo Disc - Winter 2001": {
+      "serial": "SCUS-97163",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Winter 2001"
+      ]
+    },
+    "Jampack Demo Disc Vol. 10 Summer 2004 (M-Rated)": {
+      "serial": "SCUS-97406",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 10 M",
+        "Jampack Summer 2004 M-Rated"
+      ]
+    },
+    "Jampack Demo Disc Vol. 10 (T-Rated)": {
+      "serial": "SCUS-97410",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 10 T",
+        "Jampack Summer 2004 T-Rated"
+      ]
+    },
+    "Jampack Demo Disc Vol. 11 (M-Rated)": {
+      "serial": "SCUS-97417",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 11 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 11 (T-Rated)": {
+      "serial": "SCUS-97418",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 11 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 12 (M-Rated)": {
+      "serial": "SCUS-97420",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 12 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 13 (T-Rated)": {
+      "serial": "SCUS-97491",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 13 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 13 (M-Rated)": {
+      "serial": "SCUS-97492",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 13 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 14 (T-Rated)": {
+      "serial": "SCUS-97493",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 14 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 14 (M-Rated)": {
+      "serial": "SCUS-97494",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 14 M"
+      ]
+    },
+    "Jampack Demo Disc Vol. 15 (T-Rated)": {
+      "serial": "SCUS-97564",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 15 T"
+      ]
+    },
+    "Jampack Demo Disc Vol. 15 (M-Rated)": {
+      "serial": "SCUS-97565",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2006",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Compilation",
+      "aliases": [
+        "Jampack Vol 15 M"
+      ]
+    },
+    "Dead or Alive 2 (PS2 Kiosk)": {
+      "serial": "PBPX-95201",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Tecmo",
+      "publisher": "Tecmo",
+      "genre": "Fighting",
+      "aliases": [
+        "DoA2 Kiosk",
+        "Dead or Alive 2 Kiosk Demo"
+      ]
+    },
+    "PS2 Demo Disc (PBPX-95204)": {
+      "serial": "PBPX-95204",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 Early Demo Disc"
+      ]
+    },
+    "PlayStation 2 Demo Disc 2000": {
+      "serial": "PBPX-95205",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Demo Disc 2000"
+      ]
+    },
+    "Ape Escape 3 (PS2 Kiosk Demo)": {
+      "serial": "PBPX-95235",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2005",
+      "developer": "Sony Computer Entertainment Japan",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Platform",
+      "aliases": [
+        "Ape Escape 3 Kiosk"
+      ]
+    },
+    "Ratchet & Clank (PS2 Kiosk Demo)": {
+      "serial": "PBPX-95516",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Insomniac Games",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Action",
+      "aliases": [
+        "R&C Kiosk",
+        "Ratchet and Clank Kiosk"
+      ]
+    },
+    "Gran Turismo 4: Prologue (PS2 Kiosk v1)": {
+      "serial": "PBPX-95523",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue Kiosk",
+        "Gran Turismo 4 Prologue Kiosk"
+      ]
+    },
+    "Gran Turismo 4: Prologue (PS2 Kiosk v2)": {
+      "serial": "PBPX-95524",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Prologue Kiosk v2"
+      ]
+    },
+    "Gran Turismo 4 (PS2 Kiosk)": {
+      "serial": "PBPX-95601",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "kiosk",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Polyphony Digital",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "Racing",
+      "aliases": [
+        "GT4 Kiosk"
+      ]
+    },
+    "PS2 Utility Disc Version 1.01 (PBPX-95202)": {
+      "serial": "PBPX-95202",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 Utility 1.01"
+      ]
+    },
+    "DVD Player Version 2.01 (PBPX-95206)": {
+      "serial": "PBPX-95206",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2000",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 DVD Player 2.01"
+      ]
+    },
+    "DVD Player Version 2.10 (PBPX-95207)": {
+      "serial": "PBPX-95207",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment",
+      "publisher": "Sony Computer Entertainment",
+      "genre": "",
+      "aliases": [
+        "PS2 DVD Player 2.10"
+      ]
+    },
+    "HDD Utility Disc v1.00 (PBPX-95211)": {
+      "serial": "PBPX-95211",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 HDD Utility v1.00"
+      ]
+    },
+    "HDD Utility Disc Beta (PBPX-95237)": {
+      "serial": "PBPX-95237",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2001",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 HDD Utility Beta"
+      ]
+    },
+    "Online Start-Up Disc V3.0 (PBPX-95239)": {
+      "serial": "PBPX-95239",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Online Start-Up V3"
+      ]
+    },
+    "Network Adapter Start-Up Disc v2.0 (PBPX-95517)": {
+      "serial": "PBPX-95517",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter v2.0 PBPX"
+      ]
+    },
+    "Network Adaptor Start-Up Disc v2.0 (SCUS-97095)": {
+      "serial": "SCUS-97095",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adaptor v2.0"
+      ]
+    },
+    "Network Adapter Start-Up Disc Ver.2.5": {
+      "serial": "SCUS-97356",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter 2.5"
+      ]
+    },
+    "Network Adapter Start-Up Disc Ver.3.0": {
+      "serial": "SCUS-97425",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "utility",
+      "region": "NTSC-U",
+      "release_date": "2004",
+      "developer": "Sony Computer Entertainment America",
+      "publisher": "Sony Computer Entertainment America",
+      "genre": "",
+      "aliases": [
+        "PS2 Network Adapter 3.0"
+      ]
+    },
+    "989 Sports 2003 Demo Disc": {
+      "serial": "SCUS-94677",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2002",
+      "developer": "989 Sports",
+      "publisher": "989 Sports",
+      "genre": "Compilation",
+      "aliases": [
+        "989 Sports Demo 2003"
+      ]
+    },
+    "989 Sports 2004 Demo Disc": {
+      "serial": "SCUS-97373",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "demo",
+      "region": "NTSC-U",
+      "release_date": "2003",
+      "developer": "989 Sports",
+      "publisher": "989 Sports",
+      "genre": "Compilation",
+      "aliases": [
+        "989 Sports Demo 2004"
+      ]
+    }
+  }
+}

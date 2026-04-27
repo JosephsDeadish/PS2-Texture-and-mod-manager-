@@ -62,7 +62,7 @@ class SettingsPanel(BasePanel):
         self._tex_chooser.set_path(self.config.textures_path)
         layout.addWidget(self._tex_chooser)
 
-        self._pnach_chooser = PathChooser("PNACH/Patches Folder:")
+        self._pnach_chooser = PathChooser("PNACH / Cheats Folder:")
         self._pnach_chooser.set_path(self.config.pnach_path)
         layout.addWidget(self._pnach_chooser)
 
@@ -73,10 +73,6 @@ class SettingsPanel(BasePanel):
         self._memcards_chooser = PathChooser("Memory Cards Folder:")
         self._memcards_chooser.set_path(self.config.memcards_path)
         layout.addWidget(self._memcards_chooser)
-
-        self._cheats_chooser = PathChooser("Cheats (WS) Folder:")
-        self._cheats_chooser.set_path(self.config.cheats_path)
-        layout.addWidget(self._cheats_chooser)
 
         self._partial_tex_chooser = PathChooser("Partial Textures Folder:")
         self._partial_tex_chooser.set_path(self.config.partial_textures_path)
@@ -212,9 +208,9 @@ class SettingsPanel(BasePanel):
         self.config.pcsx2_path = self._pcsx2_chooser.get_path()
         self.config.textures_path = self._tex_chooser.get_path()
         self.config.pnach_path = self._pnach_chooser.get_path()
+        self.config.cheats_path = self.config.pnach_path  # same folder in PCSX2
         self.config.cover_art_path = self._covers_chooser.get_path()
         self.config.memcards_path = self._memcards_chooser.get_path()
-        self.config.cheats_path = self._cheats_chooser.get_path()
         self.config.partial_textures_path = self._partial_tex_chooser.get_path()
         self.config.mods_storage_path = self._storage_chooser.get_path()
         self.config.game_library_path = self._game_lib_chooser.get_path()
@@ -273,7 +269,6 @@ class SettingsPanel(BasePanel):
         self._pnach_chooser.set_path(paths.get("pnach_path", ""))
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
         self._memcards_chooser.set_path(paths.get("memcards_path", ""))
-        self._cheats_chooser.set_path(paths.get("cheats_path", ""))
         self._partial_tex_chooser.set_path(paths.get("partial_textures_path", ""))
 
     def _open_patreon(self):
@@ -289,7 +284,6 @@ class SettingsPanel(BasePanel):
         self._pnach_chooser.set_path(config.pnach_path)
         self._covers_chooser.set_path(config.cover_art_path)
         self._memcards_chooser.set_path(config.memcards_path)
-        self._cheats_chooser.set_path(config.cheats_path)
         self._partial_tex_chooser.set_path(config.partial_textures_path)
         self._storage_chooser.set_path(config.mods_storage_path)
         self._game_lib_chooser.set_path(config.game_library_path)

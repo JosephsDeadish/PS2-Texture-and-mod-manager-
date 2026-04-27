@@ -84,6 +84,51 @@ SERIAL_PREFIXES: Tuple[str, ...] = (
 )
 
 # ---------------------------------------------------------------------------
+# Region mapping — serial prefix → human-readable region name
+# ---------------------------------------------------------------------------
+
+#: Maps each 4-letter serial prefix to its region string.
+_PREFIX_TO_REGION: dict[str, str] = {
+    # North America
+    "SLUS": "NTSC-U", "SCUS": "NTSC-U",
+    "SCCD": "NTSC-U", "SLCD": "NTSC-U",  # NA demo/promo
+    # Europe / PAL
+    "SLES": "PAL", "SCES": "PAL",
+    "SLEH": "PAL", "SCEH": "PAL",
+    "SLED": "PAL", "SCED": "PAL",  # PAL demo
+    "SCZS": "PAL",                  # European special
+    # Japan
+    "SLPS": "NTSC-J", "SCPS": "NTSC-J",
+    "SLPM": "NTSC-J", "SCPM": "NTSC-J",
+    "SLPD": "NTSC-J", "SCPD": "NTSC-J",  # JP demo/promo
+    # Korea
+    "SLKA": "NTSC-K", "SCKA": "NTSC-K",
+    # Asia (general)
+    "SLAJ": "Asia",   "SCAJ": "Asia",
+    "SCCS": "Asia",   "SLCS": "Asia",    # Chinese / Taiwan
+}
+
+
+def serial_to_region(serial: str) -> str:
+    """Return the region name for *serial* (e.g. ``"NTSC-U"`` for ``"SLUS-…"``).
+
+    Returns an empty string when the prefix is not recognised (e.g. ``"PBPX"``
+    or an empty/invalid input).
+
+    Examples::
+
+        serial_to_region("SLUS-20062")  # -> "NTSC-U"
+        serial_to_region("SLES-50000")  # -> "PAL"
+        serial_to_region("SLPS-25000")  # -> "NTSC-J"
+        serial_to_region("SLKA-10000")  # -> "NTSC-K"
+        serial_to_region("")            # -> ""
+    """
+    if not serial:
+        return ""
+    return _PREFIX_TO_REGION.get(serial[:4].upper(), "")
+
+
+# ---------------------------------------------------------------------------
 # Serial detection regex
 # ---------------------------------------------------------------------------
 
@@ -787,7 +832,29 @@ def _load_pal_serials() -> dict[str, str]:
     return result
 
 
+def _load_japan_serials() -> dict[str, str]:
+    """Load Japan (NTSC-J) serial → title mappings from ps2_japan.json."""
+    import json as _json
+    _jp_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
+    if not _jp_db.is_file():
+        return {}
+    try:
+        raw = _json.loads(_jp_db.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, str] = {}
+    for title, info in raw.get("games", {}).items():
+        serial = info.get("serial", "")
+        if serial:
+            result[serial] = title
+        for alt in info.get("alt_serials", []):
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
+
 _KNOWN_SERIALS.update(_load_pal_serials())
+_KNOWN_SERIALS.update(_load_japan_serials())
 
 
 def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> str:
@@ -968,6 +1035,9 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     Reverse lookup: return all ``(serial, title)`` pairs whose title contains
     *title_fragment* as a case-insensitive substring.
 
+    Also searches game aliases via :class:`~src.core.serial_validator.SerialDatabase`
+    so that abbreviations like ``"GoW"`` or ``"DMC3"`` resolve correctly.
+
     Useful for "find all serials for Kingdom Hearts" style searches.
 
     Example::
@@ -979,11 +1049,23 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     if not title_fragment:
         return []
     frag = title_fragment.lower()
-    return sorted(
-        [(serial, title) for serial, title in _KNOWN_SERIALS.items()
-         if frag in title.lower()],
-        key=lambda x: x[0],
-    )
+    pairs = {
+        (serial, title) for serial, title in _KNOWN_SERIALS.items()
+        if frag in title.lower()
+    }
+    # Also resolve via serial DB aliases so abbreviations like "GoW" work.
+    try:
+        from src.core.serial_validator import SerialDatabase
+        _sdb = SerialDatabase()
+        seen_titles = {t for _, t in pairs}
+        for title in _sdb.search_titles(title_fragment):
+            if title not in seen_titles:
+                serial = _sdb.get_serial(title)
+                if serial:
+                    pairs.add((serial, title))
+    except Exception:
+        pass
+    return sorted(pairs, key=lambda x: x[0])
 
 
 def is_valid_serial(text: str) -> bool:

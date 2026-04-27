@@ -412,12 +412,16 @@ class ModItemWidget(QFrame):
         mod: ModInfo,
         has_conflict: bool = False,
         is_shadowed: bool = False,
+        validation_errors: int = 0,
+        validation_warnings: int = 0,
         parent=None,
     ):
         super().__init__(parent)
         self.mod = mod
         self.has_conflict = has_conflict
         self.is_shadowed = is_shadowed
+        self.validation_errors = validation_errors
+        self.validation_warnings = validation_warnings
         self._build_ui()
 
     def _build_ui(self):
@@ -487,9 +491,36 @@ class ModItemWidget(QFrame):
             warn.setObjectName("badge")
             warn.setStyleSheet(
                 "background:#7a2020; color:#ff8080; border-radius:9px;"
+                "padding: 2px 8px; font-size:11px; cursor: pointer;"
+            )
+            warn.setToolTip("This mod conflicts with another enabled mod. Click '⚠ Conflicts' to resolve.")
+            name_row.addWidget(warn)
+
+        if self.validation_errors and not self.is_shadowed:
+            n = self.validation_errors
+            err_badge = QLabel(f"❌ {n} invalid code{'s' if n != 1 else ''}")
+            err_badge.setStyleSheet(
+                "background:#5a1010; color:#ff6060; border-radius:9px;"
                 "padding: 2px 8px; font-size:11px;"
             )
-            name_row.addWidget(warn)
+            err_badge.setToolTip(
+                f"{n} code error{'s' if n != 1 else ''} detected (invalid size, bad processor, "
+                "value overflow, or non-CRC filename). Click ⚠ Conflicts to review."
+            )
+            name_row.addWidget(err_badge)
+
+        if self.validation_warnings and not self.is_shadowed and not self.validation_errors:
+            n = self.validation_warnings
+            warn_badge = QLabel(f"⚠ {n} code warning{'s' if n != 1 else ''}")
+            warn_badge.setStyleSheet(
+                "background:#4a3010; color:#ffb060; border-radius:9px;"
+                "padding: 2px 8px; font-size:11px;"
+            )
+            warn_badge.setToolTip(
+                f"{n} code warning{'s' if n != 1 else ''} detected (address out of range, "
+                "redundant duplicate). Click ⚠ Conflicts to review."
+            )
+            name_row.addWidget(warn_badge)
 
         if self.mod.has_update:
             upd = QLabel("↑ Update")
