@@ -1,0 +1,1323 @@
+
+PCSX2, PNACH, CRC, SERIALS, REGIONS, TITLES, BOX ART, AND TEXTURE REPLACEMENT
+Accuracy-Focused Technical Reference
+Revision date: 2026-03-14
+
+======================================================================
+0) PURPOSE AND SCOPE
+======================================================================
+
+This document is meant to be a practical and accuracy-focused reference for:
+
+- what PCSX2 is doing at a high and mid level
+- what PNACH files are and what they can and cannot do
+- how CRC matching works in practice
+- how PS2 serials, regions, and titles relate to CRCs
+- how box art / game metadata fit into a manager or launcher workflow
+- how PS2 graphics and textures work at a useful modding/tool level
+- how PCSX2 texture dumping and replacement work conceptually
+- what is known, what is version-dependent, and what should not be overstated
+
+Important accuracy notes:
+
+1. Some internal PCSX2 implementation details can change between versions.
+   Where that matters, this document says so explicitly.
+
+2. This document avoids claiming exact internal algorithms unless the point
+   is stable, well-established, or safe to state without overcommitting.
+
+3. This is not a formal emulator source-code commentary. It is a practical
+   technical reference for modding, reverse engineering, and tool design.
+
+4. In real-world PS2 modding, the most important things are usually:
+   - matching the right game/build
+   - understanding what PNACH is really changing
+   - understanding that texture replacement keys must match what PCSX2 expects
+   - understanding how serials/regions/metadata differ from CRC
+
+
+======================================================================
+1) WHAT PCSX2 IS
+======================================================================
+
+PCSX2 is a PlayStation 2 emulator. Its job is to reproduce PS2 hardware
+behavior closely enough that original PS2 software can run on a PC.
+
+At a practical level, PCSX2 emulates or reproduces:
+
+- the Emotion Engine (EE), the PS2's main CPU
+- the Vector Units (VU0 and VU1)
+- the Graphics Synthesizer (GS)
+- the Input/Output Processor (IOP)
+- SPU2 audio hardware
+- DMA behavior
+- controller and memory card behavior
+- disc and BIOS behavior
+- many timing and hardware edge cases games rely on
+
+PCSX2 is not turning a PS2 game into a native Windows application.
+The original game code is still being run as PS2 code inside emulated
+hardware behavior.
+
+That is also why PCSX2 can provide emulator-specific features such as:
+
+- save states
+- internal resolution scaling
+- widescreen and no-interlace patches
+- debugging tools
+- texture dumping
+- texture replacement
+
+Useful mental model:
+
+- the game believes it is running on a PS2
+- PCSX2 sits between the game and your PC hardware
+- PCSX2 maps PS2 behavior onto modern CPU/GPU/audio/input systems
+
+
+======================================================================
+2) THE MAIN PS2 HARDWARE PIECES THAT MATTER HERE
+======================================================================
+
+Emotion Engine (EE)
+- the main PS2 CPU
+- based on the MIPS R5900 family
+- executes most core game logic
+
+VU0 and VU1
+- vector processors used for math-heavy work
+- VU1 is especially important for graphics geometry processing
+- VU0 can act as a coprocessor or run more independently depending on use
+
+Graphics Synthesizer (GS)
+- the PS2 GPU
+- fixed-function graphics hardware
+- has 4 MB of embedded VRAM
+- stores frame buffers, z buffers, textures, palettes, and render targets
+
+IOP
+- the Input/Output Processor
+- handles many lower-level I/O and subsystem tasks
+
+DMAC
+- the DMA controller
+- moves data efficiently between units without relying on normal CPU copying
+
+GIF
+- the Graphics Interface
+- transmits graphics command data toward the GS
+
+VIF
+- the Vector Interface
+- feeds data and microprograms to the vector units
+
+
+======================================================================
+3) WHAT A PNACH FILE IS
+======================================================================
+
+A PNACH file is a text file containing patch instructions that PCSX2 can
+apply to a running game.
+
+In practical terms:
+
+- PCSX2 identifies the running game/build
+- PCSX2 loads matching patch/cheat entries
+- PCSX2 writes values into emulated memory or applies other supported patch
+  behavior
+- the game's runtime behavior changes
+
+PNACH files can be used for:
+
+- cheats
+- bug fixes
+- widescreen patches
+- no-interlace patches
+- frame rate related fixes
+- camera/FOV changes
+- HUD position changes
+- disabling or altering certain effects
+- debugging and experimentation
+
+PNACH is a runtime patch format. It is not the same thing as editing the ISO.
+
+
+======================================================================
+4) WHAT PNACH CANNOT DO
+======================================================================
+
+By itself, PNACH cannot:
+
+- permanently rewrite files inside the ISO
+- add new models to the disc image
+- add new textures to the disc image
+- directly change file system structure
+- automatically understand game logic for you
+
+What PNACH does is modify the game's behavior at runtime by changing values
+or instructions in emulated memory.
+
+That distinction matters:
+
+- ISO patching changes stored files
+- PNACH changes runtime state
+
+
+======================================================================
+5) HOW PCSX2 MATCHES PATCHES/CHEATS TO A GAME
+======================================================================
+
+In ordinary PCSX2 use, patches and cheats are commonly matched by CRC.
+
+Two identifiers matter a lot in PS2 work:
+
+A) Serial / disc ID
+Examples:
+- SLUS-205.79
+- SLES-54221
+- SCUS-97124
+- SLPM-65428
+
+B) CRC
+Example:
+- 8C718D21
+
+Serial and CRC are not the same thing.
+
+Serial:
+- identifies the product/release/disc family
+- strongly tied to region and release metadata
+- useful for naming, region detection, title databases, cover art databases,
+  and human-friendly game identification
+
+CRC:
+- used as a build/runtime identifier in PCSX2 patch workflows
+- matters because addresses and instruction layout can differ between builds
+
+Why CRC matters:
+two copies of what players casually call "the same game" can still have
+different executable builds and therefore different memory layout.
+
+
+======================================================================
+6) CRC: WHAT IT IS AND WHAT IT IS NOT
+======================================================================
+
+CRC stands for Cyclic Redundancy Check.
+
+In PCSX2 usage, the shown CRC is a practical identifier associated with the
+booted executable build.
+
+Important practical rule:
+- the CRC relevant to PNACH matching is tied to the executable PCSX2 boots
+- it is not the checksum of the entire ISO
+- modders usually treat it as the key build identifier for runtime patches
+
+Why CRC matters:
+- different executables can have different code/data layout
+- PNACH patches often depend on exact addresses
+- one game's NTSC-U and PAL builds may need different patches even when the
+  underlying game is obviously the same title to a player
+
+
+======================================================================
+7) WHY CRC DIFFERENCES BREAK PATCHES
+======================================================================
+
+A runtime patch writes to an address or replaces an instruction at an address.
+
+If a different build changes:
+- function placement
+- compiler output
+- branch layout
+- data table placement
+- region-specific code
+- revision-specific bugfix layout
+
+then a code like:
+
+patch=1,EE,2034A1C0,extended,00000001
+
+may be writing to the wrong place in a different build.
+
+Best practical rule:
+always verify the correct CRC before trusting a patch.
+
+
+======================================================================
+8) THE SERIAL / DISC ID
+======================================================================
+
+A PS2 serial is the product-style identifier you usually see in forms like:
+
+- SLUS-205.79
+- SLES-54221
+- SCUS-97124
+- SLPM-65428
+
+This is usually what people mean when they say:
+- game ID
+- disc ID
+- serial
+- serial number
+
+Why serials matter:
+
+- they are much more human-friendly than CRCs
+- they help identify region
+- they are commonly used by compatibility databases and wiki pages
+- they are very useful for box art lookup, title lookup, release metadata,
+  and folder organization in a mod manager
+
+A strong practical design choice for a manager is:
+store both the serial and the CRC, because they solve different problems.
+
+
+======================================================================
+9) REGIONS: WHAT THEY MEAN IN PRACTICE
+======================================================================
+
+Common region labels in PS2 workflows include:
+
+- NTSC-U / NTSC-US
+- PAL
+- NTSC-J
+- occasionally other territory-specific release groupings
+
+Why region matters:
+
+- region often changes serials
+- region often changes executable layout
+- region can affect language, censorship, timing assumptions, and content
+- region differences are one of the main reasons one PNACH file will not
+  necessarily work across all releases of a game
+
+Examples of practical consequences:
+- the same cheat may need different addresses between NTSC-U and PAL
+- the same game title can have multiple serials across regions
+- a box art database often needs region-aware matching
+
+
+======================================================================
+10) TITLES, ALTERNATE TITLES, AND WHY THEY GET MESSY
+======================================================================
+
+A single PS2 game may have:
+
+- a primary marketed title
+- alternate regional titles
+- subtitle differences
+- punctuation differences
+- wiki/database naming differences
+- "Greatest Hits" / "Platinum" / reissue naming differences
+- translated vs untranslated names
+
+Examples of title mismatch problems in a manager:
+
+- user searches by common English title, but the game list shows another title
+- Japanese releases have romanized names in one database and Japanese script
+  in another
+- regional reissues have the same game content family but different title text
+
+Best practice for a manager:
+store multiple name fields when possible, such as:
+- display title
+- normalized title
+- alternate title(s)
+- serial
+- region
+- CRC(s), if known
+
+
+======================================================================
+11) BOX ART / COVER ART: WHAT IT IS AND HOW TO USE IT
+======================================================================
+
+For PS2 tools, "box art" or "cover art" is metadata and presentation material.
+It is not part of PNACH patching and not part of runtime memory editing.
+
+A manager typically uses cover art for:
+
+- game library display
+- easier browsing
+- region-aware identification
+- helping distinguish games with similar names
+- making it obvious whether a disc is NTSC-U, PAL, or NTSC-J
+- choosing the correct release visually when multiple releases exist
+
+What cover art is good for:
+- human-friendly identification
+- library UI
+- helping connect title + region + serial
+
+What cover art is NOT good for:
+- uniquely identifying an executable build
+- replacing CRC for patch matching
+- proving patch compatibility
+
+Best practical rule:
+use cover art as presentation metadata, not as a technical identity key.
+
+
+======================================================================
+12) HOW SERIAL, REGION, TITLE, CRC, AND COVER ART FIT TOGETHER
+======================================================================
+
+These fields solve different problems:
+
+Title
+- what the user sees and searches for
+
+Alternate titles
+- improves search and matching
+
+Serial
+- strongly identifies release/region family
+- very useful for metadata, file organization, and user-facing identification
+
+Region
+- helps explain why patches or titles may differ
+
+CRC
+- runtime/build identity that matters most for many patches
+
+Cover art / box art
+- user-facing visual metadata
+
+A strong PS2 manager usually benefits from all of them.
+
+
+======================================================================
+13) A PRACTICAL GAME RECORD MODEL FOR A PS2 MANAGER
+======================================================================
+
+Example record:
+
+Display Title:
+  The Sims 2: Castaway
+
+Alternate Titles:
+  Sims 2 Castaway
+  The Sims 2 Castaway
+
+Serial:
+  SLUS-21690
+
+Region:
+  NTSC-U
+
+CRC:
+  8C718D21
+
+Disc Type:
+  DVD
+
+Release Variant:
+  Original / Greatest Hits / Platinum / etc. (if known)
+
+Cover Art:
+  path or URL to NTSC-U cover image
+
+Notes:
+  supports texture replacement
+  uses per-region PNACH differences
+  known duplicate texture dumps in some scenes
+
+This kind of record is much more useful than storing only the filename.
+
+
+======================================================================
+14) HOW A TYPICAL PNACH LINE WORKS
+======================================================================
+
+Example:
+
+patch=1,EE,2034A1C0,extended,00000001
+
+Breakdown:
+
+- patch=1
+  enabled patch entry
+
+- EE
+  targets Emotion Engine side memory/execution context
+
+- 2034A1C0
+  target address
+
+- extended
+  patch/data type syntax used by PCSX2's patch system
+
+- 00000001
+  value being written
+
+Practical reading:
+"When this patch is active, write 00000001 to EE address 2034A1C0 under the
+rules of this code type."
+
+
+======================================================================
+15) PATCH=1 VS PATCH=0
+======================================================================
+
+In PCSX2 patch syntax, one important distinction is:
+
+patch=1
+- typically applied repeatedly during runtime / frame processing context
+
+patch=0
+- typically intended as a one-time boot-time style patch
+
+Practical consequence:
+some values get rewritten by the game constantly. If you patch them only once,
+the game may overwrite your change immediately. In those cases, repeated patch
+application is necessary.
+
+This is one reason some codes "work for a second" and then stop.
+
+
+======================================================================
+16) WHAT PNACH CODES ARE REALLY DOING
+======================================================================
+
+Most useful PNACH codes do one of these things:
+
+A) Write a data value
+Examples:
+- health
+- money
+- timer
+- FOV scalar
+- effect toggle
+- camera limit value
+
+B) Replace or alter machine instructions
+Examples:
+- remove a subtraction
+- replace a branch
+- skip a limiter
+- disable a routine
+
+C) Repeatedly force a state
+Examples:
+- infinite ammo
+- always-on widescreen variables
+- lock a menu/debug state
+
+So "cheat code" usually just means:
+"Change runtime memory or instructions so the game behaves differently."
+
+
+======================================================================
+17) WHY SOME PNACH CODES CRASH GAMES
+======================================================================
+
+Because you are editing live program behavior.
+
+A code can crash or break a game if it:
+- writes to the wrong address
+- uses the wrong width or code type
+- overwrites an instruction the game still needs
+- breaks pointer logic
+- breaks a branch target
+- creates impossible values
+- conflicts with another patch
+
+Useful mental model:
+PNACH is controlled memory/instruction editing, not magic.
+
+
+======================================================================
+18) HOW PNACH RELATES TO OLDER CHEAT DEVICES
+======================================================================
+
+PCSX2 patching is historically related to raw PS2 cheat code styles and the
+ecosystem around devices such as:
+- Action Replay
+- GameShark
+- CodeBreaker
+- PS2RD-related raw formats
+
+Important practical note:
+older cheat devices often used encoded or device-specific code formats.
+PCSX2 PNACH entries are commonly discussed in terms of decoded/raw behavior,
+which is why older codes often need conversion before they become usable PNACH
+entries.
+
+
+======================================================================
+19) HIGH-LEVEL PS2 MEMORY MAP THAT MATTERS FOR MODDING
+======================================================================
+
+For practical modding, useful EE-side memory regions include:
+
+00000000h - 01FFFFFFh
+- 32 MB main RAM
+
+20000000h - 21FFFFFFh
+- uncached mirror of main RAM
+
+10000000h region
+- EE I/O register space
+
+VU memory-related ranges
+- relevant when discussing vector units and low-level graphics behavior
+
+12000000h region
+- GS privileged register area context
+
+1C000000h
+- IOP RAM region
+
+1FC00000h
+- BIOS region
+
+Scratchpad RAM exists in its own special addressing context.
+
+Practical rule:
+most common gameplay values and many common instruction patches you will work
+with are ultimately about EE main RAM / EE code behavior.
+
+
+======================================================================
+20) WHY MODDERS OFTEN SEE ADDRESSES STARTING WITH 20XXXXXX
+======================================================================
+
+Many common PS2 cheat examples use address forms that start with 20 or 21.
+
+Important accuracy note:
+- this is often connected to common raw cheat/code conventions inherited from
+  the PS2 cheat ecosystem
+- do not mistake the prefix itself for a complete explanation of the hardware
+  map
+- in practice, modders often treat these as the usable addresses for runtime
+  patching in EE context
+
+The key real-world takeaway is:
+use the address format the patch type expects, and verify it against the
+correct build.
+
+
+======================================================================
+21) THE PS2 CPU AND INSTRUCTION PATCHING
+======================================================================
+
+The Emotion Engine uses a MIPS-family instruction set. Instructions are
+32 bits wide.
+
+That matters because many powerful PNACH patches do not just change variables.
+They replace instructions.
+
+Example concept:
+original instruction:
+- subtract damage from health
+
+patched instruction:
+- nop (no operation)
+
+Effect:
+- health no longer decreases from that code path
+
+Other common instruction-patch goals:
+- skip branch checks
+- bypass limiters
+- disable routines
+- force alternate logic flow
+
+
+======================================================================
+22) WHY INSTRUCTION PATCHES ARE MORE POWERFUL AND MORE DANGEROUS
+======================================================================
+
+Data-value cheats:
+- often simpler
+- usually safer
+- easier to find with live memory scanning
+
+Instruction patches:
+- can make deeper changes
+- can disable systems rather than just forcing output values
+- are much easier to break if used on the wrong build
+
+Examples of instruction-patch use:
+- widescreen FOV logic
+- post-process disable routines
+- frame limiter changes
+- HUD placement changes
+- bug fix patches
+
+
+======================================================================
+23) HOW YOU TYPICALLY MAKE A PNACH CODE
+======================================================================
+
+Simple workflow:
+
+1. run the game in PCSX2
+2. identify the build / CRC
+3. find a value or instruction of interest
+4. test changes live
+5. convert the final change into PNACH syntax
+6. save it under the correct CRC
+7. test from boot and in real gameplay
+
+Common tools/approaches:
+- Cheat Engine for value scanning
+- emulator debugger/recompiler tools for instruction work
+- disassembly / reverse engineering for advanced patches
+
+
+======================================================================
+24) WHY SOME CODES ONLY WORK IN ONE SCENE OR MENU
+======================================================================
+
+Because the value or instruction path may only exist or be used:
+- in a specific map
+- in combat only
+- in menus only
+- after a state transition
+- after a function is loaded or a system is initialized
+
+Common causes of "works here but not there":
+- the game uses different code paths in different situations
+- the address is dynamic or scene-dependent
+- multiple values mirror or rebuild the same visible state
+
+
+======================================================================
+25) THE PS2 GRAPHICS PIPELINE (SIMPLIFIED)
+======================================================================
+
+For graphics modding, a useful simplified model is:
+
+game logic on EE
+-> data moved by DMA
+-> VIF feeds vector units
+-> VU1 processes geometry-related data
+-> GIF transmits graphics command data
+-> GS renders using its own VRAM and fixed-function pipeline
+
+This is simplified, but it is the right mental model for understanding why:
+- textures live in GS-side memory context
+- geometry and rendering state matter
+- texture dumping is not just "reading image files from disc"
+
+
+======================================================================
+26) DMA, VIF, GIF: WHY THEY MATTER
+======================================================================
+
+DMA
+- moves data efficiently between PS2 subsystems
+
+VIF
+- sends data and microprogram uploads to vector units
+- handles packed vector/geometry-related data flow
+
+GIF
+- the path used to send graphics command data toward the GS
+
+Why you care:
+texture and rendering state are often being uploaded and configured through
+this broader pipeline, not loaded as simple modern image files.
+
+
+======================================================================
+27) THE GRAPHICS SYNTHESIZER (GS)
+======================================================================
+
+The GS is the PS2 GPU.
+
+Important practical facts:
+- it is fixed-function, not a modern programmable shader GPU
+- it has 4 MB of embedded VRAM
+- that VRAM is used for frame buffers, z buffers, textures, CLUT data, and
+  other render resources
+- because VRAM is so limited, PS2 games reuse and re-upload textures heavily
+
+This is one reason PS2 texture modding gets messy:
+the hardware was designed around extremely tight memory constraints.
+
+
+======================================================================
+28) GS VRAM IS NOT A SIMPLE LINEAR IMAGE STORE
+======================================================================
+
+PS2 GS VRAM is not just "rows of pixels in the obvious order."
+
+It uses page/block arrangements and swizzled layouts that depend on format.
+
+Practical consequences:
+- raw GS memory is not directly human-readable as a normal image
+- a texture extracted without correct interpretation can look scrambled
+- emulator texture dumping has to reconstruct a normal linear image view
+
+
+======================================================================
+29) SWIZZLING: THE PRACTICAL EXPLANATION
+======================================================================
+
+Swizzling is a memory-layout strategy that rearranges pixels in memory so
+access patterns are more efficient for the GPU.
+
+From a modder's perspective:
+- the texture in VRAM is not stored in plain top-left to bottom-right order
+- PCSX2 must interpret GS layout correctly and unswizzle when it exports a
+  dump as a normal image
+- if you try to interpret raw VRAM without doing that work, you can get
+  scrambled output
+
+Important accuracy note:
+the exact layout depends on pixel format and GS organization. Do not assume
+there is one universal swizzle formula for every case.
+
+
+======================================================================
+30) COMMON PS2 TEXTURE FORMATS YOU WILL SEE DISCUSSED
+======================================================================
+
+Common GS pixel storage modes discussed in PS2 work include:
+
+- 32-bit color formats
+- 24-bit color formats
+- 16-bit color formats
+- 8-bit indexed/paletted formats
+- 4-bit indexed/paletted formats
+
+Naming varies in casual discussion, but the important practical split is:
+
+Direct color formats
+- texture stores color values more directly
+
+Indexed / paletted formats
+- texture stores indices into a palette
+
+
+======================================================================
+31) CLUT / PALETTED TEXTURES
+======================================================================
+
+Many PS2 textures are paletted.
+
+CLUT means Color Lookup Table.
+
+In a paletted texture:
+- the texture pixel does not directly store full final color
+- it stores an index
+- the palette/CLUT maps that index to actual color data
+
+Example idea:
+pixel value = 5
+palette entry 5 = the real displayed color
+
+Why this matters:
+- two textures can look similar but behave differently because of palette state
+- CLUT handling can affect dumping/replacement identification
+- low-bit indexed textures are common because the PS2 had tight VRAM limits
+
+
+======================================================================
+32) HOW PCSX2 DUMPED TEXTURES RELATE TO ORIGINAL GS DATA
+======================================================================
+
+When PCSX2 dumps textures, it is not usually handing you the original raw
+swizzled GS memory layout as-is.
+
+Instead, conceptually, it reconstructs a usable image representation so that
+modders can inspect and edit the result.
+
+For paletted textures, that generally means the dump you see is a practical,
+expanded image representation rather than a raw GS memory dump.
+
+
+======================================================================
+33) WHAT TEXTURE DUMPING IN PCSX2 DOES
+======================================================================
+
+Texture dumping means PCSX2 watches textures/resources as they are used and
+saves identifiable texture images to disk for later inspection/modding.
+
+Practical workflow:
+- enable dumping
+- play until the texture appears
+- PCSX2 saves dumped textures
+- inspect dump files
+- edit the target texture
+- place a correctly named replacement in the replacement folder/context
+
+This is why texture dumping is so useful:
+it lets you work with what the game actually uses at runtime, not just what
+you guess is inside the ISO.
+
+
+======================================================================
+34) WHAT TEXTURE REPLACEMENT DOES
+======================================================================
+
+Texture replacement means:
+when PCSX2 sees a texture/resource at runtime, it checks whether there is a
+matching replacement file. If so, it uses the replacement instead of the
+original source texture data for rendering.
+
+At a practical level:
+- the original game still runs
+- the original texture identity is still what the game asks for
+- PCSX2 substitutes your edited image when it can match the target correctly
+
+This is why texture replacement is different from disc editing:
+you are replacing what the emulator feeds into rendering, not necessarily
+editing the original stored game assets.
+
+
+======================================================================
+35) THE MOST IMPORTANT PRACTICAL RULE ABOUT TEXTURE REPLACEMENT
+======================================================================
+
+Treat the dumped filename or replacement key generated by PCSX2 as the thing
+you must match.
+
+Do not casually rename dumped textures and expect replacement to work.
+
+The safe workflow is:
+- identify the actual dumped texture you want
+- preserve the key/filename PCSX2 expects
+- put the edited replacement where PCSX2 expects it
+
+
+======================================================================
+36) WHAT PEOPLE MEAN BY "TEXTURE HASH"
+======================================================================
+
+Modders often call the generated identifier in the dumped filename the
+"texture hash."
+
+Important accuracy note:
+that phrase is useful shorthand, but do not over-interpret it as proof that
+the filename is generated from one simple, fixed hash algorithm and nothing
+else.
+
+What matters in practice is:
+- PCSX2 generates an identifier-based filename or key
+- replacement depends on matching what PCSX2 expects
+- the exact internal components of that key can be more complicated than
+  "hash the visible pixels and done"
+
+
+======================================================================
+37) WHY TWO IDENTICAL-LOOKING TEXTURES CAN HAVE DIFFERENT KEYS
+======================================================================
+
+This is one of the most important real-world facts for PS2 texture work.
+
+Two textures can look identical to your eyes and still get different
+identifiers because identification can be influenced by things such as:
+- size
+- format
+- palette state
+- memory location/context
+- other internal state or implementation details
+
+So:
+visually identical does not guarantee replacement-identical.
+
+
+======================================================================
+38) WHY SOME GAMES DUMP MANY DUPLICATE-LOOKING TEXTURES
+======================================================================
+
+Common reasons:
+- the same-looking texture is uploaded multiple times
+- different runtime contexts produce distinct identifiers
+- palette or state differences exist
+- the game streams/rebuilds texture data repeatedly
+- implementation details create multiple dump entries for similar output
+
+Result:
+- huge dump folders
+- many near-duplicates
+- confusion over which file actually matters for replacement
+
+
+======================================================================
+39) WHY A TEXTURE REPLACEMENT MAY FAIL EVEN WHEN THE PNG LOOKS RIGHT
+======================================================================
+
+Common causes:
+1. wrong filename/key
+2. wrong folder/location
+3. wrong game/build context
+4. the game is currently using a different dumped variant
+5. alpha/transparency mismatch
+6. dimensions/layout changed in a way the game mapping does not tolerate
+7. replacement settings were not actually enabled
+8. version-dependent behavior changed in PCSX2
+
+Practical lesson:
+a valid-looking PNG is not enough. It must match the target correctly.
+
+
+======================================================================
+40) ALPHA / TRANSPARENCY: WHY IT CAUSES SO MANY PROBLEMS
+======================================================================
+
+A texture can contain color and transparency information.
+
+Simplified:
+- RGB = visible color
+- alpha = opacity/transparency information
+
+Typical interpretation:
+- alpha 0 = fully transparent
+- higher alpha = more opaque
+
+Why texture modders struggle here:
+an image can look fine in an editor but fail in-game if the transparency
+behavior no longer matches what the game/render path expects.
+
+Common symptoms:
+- dark edges
+- unexpected boxes/backgrounds
+- holes becoming solid
+- leaves/fences/hair looking wrong
+- texture disappearing or changing when moving/zooming
+- flicker or ugly cutout edges
+
+
+======================================================================
+41) WHY EXACT DIMENSIONS AND LAYOUT MATTER
+======================================================================
+
+PS2 textures are often mapped very tightly.
+
+If you:
+- change canvas size
+- shift details
+- resize unevenly
+- add background where there was transparency
+- crop the original layout
+
+then the model or sprite may sample the wrong pixels.
+
+Result:
+- misaligned textures
+- seams
+- wrong object parts showing
+- boxes/backgrounds
+- transparent areas becoming filled
+
+For replacement work, preserving original layout is often just as important
+as improving realism.
+
+
+======================================================================
+42) MIPMAPS AND DISTANCE BEHAVIOR
+======================================================================
+
+Mipmaps are lower-resolution versions of a texture used for smaller or more
+distant sampling situations.
+
+Important practical note:
+some games use mipmaps, some do not, and replacement behavior can be affected
+by how the emulator or renderer handles them.
+
+Symptoms of mipmap-related problems can include:
+- flicker
+- shimmer
+- odd distance changes
+- different appearance when zooming in/out
+
+
+======================================================================
+43) INTERNAL RESOLUTION VS TEXTURE RESOLUTION
+======================================================================
+
+PCSX2 internal resolution scaling and texture replacement are not the same.
+
+Internal resolution scaling:
+- makes geometry/raster output sharper
+- does not by itself replace the original texture artwork
+
+Texture replacement:
+- swaps in different texture content
+- can improve actual texture detail
+
+That is why both can help at the same time:
+- internal resolution improves rendering sharpness
+- replacement improves the artwork itself
+
+
+======================================================================
+44) TEXTURE CACHE: CONCEPTUAL VIEW
+======================================================================
+
+PCSX2 uses texture caching concepts to avoid unnecessary repeated work.
+
+At a practical level, the emulator is not trying to rediscover and rebuild the
+same usable texture result over and over if it can avoid it.
+
+For modders, the important takeaway is:
+- repeated uploads and runtime state can still create many dumped files
+- cache behavior can improve performance
+- replacement is ultimately about matching the correct runtime identity/key
+
+
+======================================================================
+45) WHY SOME TEXTURES NEVER DUMP OR ARE HARD TO TARGET
+======================================================================
+
+Possible reasons include:
+- procedural or dynamic generation
+- unusual runtime state
+- very short-lived usage
+- special render-target-like behavior
+- format/path/state complications
+- implementation-specific emulator limitations or changes
+
+This is one reason some PS2 texture projects are easy and others are very
+painful.
+
+
+======================================================================
+46) HOW PNACH AND TEXTURE MODDING DIFFER
+======================================================================
+
+PNACH:
+- changes runtime memory or instructions
+- affects behavior, logic, or configuration-like values
+
+Texture replacement:
+- changes artwork fed into rendering
+- affects appearance, not core game logic by itself
+
+Examples:
+
+PNACH:
+- disable blur
+- widen FOV
+- move HUD
+- change timer/health values
+- force 60 FPS-related logic patches
+
+Texture replacement:
+- HD rocks
+- better leaves
+- higher-quality UI art
+- improved wood/cloth/stone textures
+
+
+======================================================================
+47) WHY MODDERS OFTEN USE BOTH
+======================================================================
+
+A remaster-style PS2 project often needs both:
+
+PNACH handles:
+- behavior changes
+- camera/FOV changes
+- widescreen/hud fixes
+- effect toggles
+- bug fixes
+
+Texture replacement handles:
+- actual art upgrades
+
+Together they can create a much more complete enhancement.
+
+
+======================================================================
+48) BOX ART / COVER ART WORKFLOW IN A MANAGER
+======================================================================
+
+A strong manager usually treats box art as optional presentation metadata.
+
+Recommended behavior:
+- store cover art separately from technical patch data
+- make cover art region-aware
+- allow multiple covers for one title if the user wants
+- do not use cover art as the technical identity key
+- prefer serial + region for cover lookup, not just title text
+
+Why serial + region is usually better than title-only lookup:
+- titles can vary by punctuation and localization
+- regional releases can have different covers
+- reissues can have distinct packaging
+
+
+======================================================================
+49) PRACTICAL METADATA FIELDS WORTH STORING
+======================================================================
+
+For each game, a manager can benefit from storing:
+
+Required or strongly recommended:
+- display title
+- normalized title
+- serial
+- region
+- CRC (if known)
+- source path
+- disc type / format
+- user notes
+
+Very useful optional fields:
+- alternate titles
+- release variant
+- cover art path / URL
+- screenshot thumbnail
+- known patches
+- known texture pack folder
+- known issues
+- compatibility notes
+- aliases / search keywords
+
+
+======================================================================
+50) REGION / SERIAL EXAMPLES IN PRACTICE
+======================================================================
+
+A single game family can look like this conceptually:
+
+Title:
+  Lego Star Wars II: The Original Trilogy
+
+Region A:
+  NTSC-U
+  Serial: SLUS-21409
+  CRC: one value
+
+Region B:
+  PAL
+  Serial: SLES-54221
+  CRC: another value
+
+Region C:
+  NTSC-J
+  Serial: region-specific Japanese serial
+  CRC: another value
+
+Same broad game family, but not the same technical patch target.
+
+That is why "this cheat works for this game" is incomplete unless you also
+know the build/region/CRC context.
+
+
+======================================================================
+51) FILE NAMING STRATEGIES FOR A MOD MANAGER
+======================================================================
+
+Good human-facing naming:
+- Title (Region) [Serial]
+
+Examples:
+- The Sims 2: Castaway (NTSC-U) [SLUS-21690]
+- Lego Star Wars II: The Original Trilogy (PAL) [SLES-54221]
+
+Good technical keys:
+- CRC for runtime patch compatibility
+- serial + region for library metadata and cover art
+
+Best practice:
+show the title/region/serial to the user,
+use the CRC behind the scenes for patch matching where appropriate.
+
+
+======================================================================
+52) COMMON REAL-WORLD MISTAKES
+======================================================================
+
+Mistake 1:
+assuming title alone is enough to identify the correct patch
+
+Mistake 2:
+assuming serial alone guarantees CRC compatibility
+
+Mistake 3:
+assuming cover art proves patch compatibility
+
+Mistake 4:
+assuming a PNG that "looks right" is enough for texture replacement
+
+Mistake 5:
+assuming visually identical dumps always share the same replacement key
+
+Mistake 6:
+assuming a code found online works on all regions/revisions
+
+
+======================================================================
+53) A SAFE TROUBLESHOOTING CHECKLIST
+======================================================================
+
+For PNACH problems:
+- verify serial
+- verify region
+- verify CRC
+- verify filename
+- test one patch at a time
+- watch for scene-specific behavior
+- check whether the game rewrites the value
+- suspect region/build mismatch first
+
+For texture replacement problems:
+- verify the correct dump target
+- keep the expected filename/key
+- verify the replacement path
+- preserve layout/dimensions
+- preserve transparency behavior
+- test in the exact same scene
+- suspect duplicate-variant issues if it still fails
+
+
+======================================================================
+54) HOW TO THINK ABOUT ACCURACY WHEN DOCUMENTING PCSX2
+======================================================================
+
+The safest way to explain PCSX2 modding is:
+
+- be specific about what is practical fact
+- be careful with internal details that can vary by version
+- do not overclaim exact hashing behavior unless you are reading the exact
+  current source implementation
+- distinguish clearly between:
+  title metadata
+  serial metadata
+  region metadata
+  runtime CRC/build identity
+  texture replacement keys
+
+
+======================================================================
+55) FINAL TAKEAWAY
+======================================================================
+
+The cleanest mental model is:
+
+- Title / alternate titles help the user find the game
+- Serial and region help identify the release family
+- Box art helps presentation and human recognition
+- CRC helps match the executable build for many runtime patches
+- PNACH changes what the game does
+- Texture replacement changes what the game looks like
+- PCSX2 is the layer that makes all of this possible at runtime
+
+
+======================================================================
+56) SOURCE NOTES AND VERSION-DEPENDENT CAVEAT
+======================================================================
+
+This document is intentionally conservative in a few places.
+
+That means it prefers statements like:
+- "PCSX2 uses an identifier/key-based filename for replacement"
+instead of overclaiming:
+- "PCSX2 always uses exactly one fixed hash formula in all versions"
+
+Likewise, this document distinguishes:
+- user-facing identification (title, region, serial, cover art)
+from
+- runtime technical identification (CRC, patch target, replacement key)
+
+That distinction is one of the most important things to get right if you are
+building a PS2 mod manager or documentation set.
+
+END OF DOCUMENT
