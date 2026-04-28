@@ -210,6 +210,7 @@ class _GameDetailPane(QWidget):
         title_lbl.setStyleSheet(
             "font-size: 18px; font-weight: bold; color: #e0e0ff;"
         )
+        title_lbl.setWordWrap(True)  # issue #22: wrap long titles so they don't get cut off
         header_row.addWidget(title_lbl, 1)
 
         if self._game.serial:
@@ -451,17 +452,25 @@ class _GameCard(QFrame):
 
             for search_dir in cover_art_search_paths:
                 for ext in (".png", ".jpg", ".jpeg", ".webp"):
-                    thumb_path = search_dir / f"{game.serial}{ext}"
-                    if thumb_path.is_file():
-                        px = QPixmap(str(thumb_path))
-                        if not px.isNull():
-                            thumb_lbl.setPixmap(
-                                px.scaled(48, 68,
-                                          Qt.AspectRatioMode.KeepAspectRatio,
-                                          Qt.TransformationMode.SmoothTransformation)
-                            )
-                            thumb_loaded = True
-                            break
+                    # Issue #33: try exact serial, lowercase serial, and serial with dash replaced by underscore
+                    candidates = [
+                        search_dir / f"{game.serial}{ext}",
+                        search_dir / f"{game.serial.lower()}{ext}",
+                        search_dir / f"{game.serial.replace('-', '_')}{ext}",
+                    ]
+                    for thumb_path in candidates:
+                        if thumb_path.is_file():
+                            px = QPixmap(str(thumb_path))
+                            if not px.isNull():
+                                thumb_lbl.setPixmap(
+                                    px.scaled(48, 68,
+                                              Qt.AspectRatioMode.KeepAspectRatio,
+                                              Qt.TransformationMode.SmoothTransformation)
+                                )
+                                thumb_loaded = True
+                                break
+                    if thumb_loaded:
+                        break
                 if thumb_loaded:
                     break
         if not thumb_loaded:
@@ -478,10 +487,9 @@ class _GameCard(QFrame):
 
         name_lbl = QLabel(game.title or game.filename)
         name_lbl.setStyleSheet("font-weight: bold; color: #d0d0f0; font-size: 13px;")
-        name_lbl.setWordWrap(False)
+        name_lbl.setWordWrap(True)  # issue #32: wrap long game names instead of horizontal scroll
+        name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         info_col.addWidget(name_lbl)
-
-        sub_parts = []
         if game.serial:
             sub_parts.append(game.serial)
         if game.region:
@@ -697,13 +705,8 @@ class LibraryPanel(BasePanel):
         refresh_btn.clicked.connect(self.refresh)
         toolbar.addWidget(refresh_btn)
 
-        import_btn = QPushButton("📂 Import Installed Content")
-        import_btn.setToolTip(
-            "Scan your PCSX2 folder for texture packs, PNACH files, and cover art\n"
-            "that were installed outside of PS2 Mod Manager so you can manage them here"
-        )
-        import_btn.clicked.connect(self._open_installed_scanner)
-        toolbar.addWidget(import_btn)
+        # Issue #7: "Port installed content" button removed — content is detected automatically.
+        # The conflict resolver is still available for manual conflict management.
 
         conflict_btn = QPushButton("⚠ Resolve Conflicts")
         conflict_btn.setToolTip(
@@ -742,11 +745,13 @@ class LibraryPanel(BasePanel):
         self._all_mods_btn.clicked.connect(self._switch_to_all_mods)
         toolbar.addWidget(self._all_mods_btn)
 
+        # Issue #20: count label placed on its own row below toolbar to avoid overflow
+        content.addLayout(toolbar)
+
+        # Count label on its own row so it never forces a horizontal scroll bar (issue #20)
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
-        toolbar.addWidget(self._count_lbl)
-
-        content.addLayout(toolbar)
+        content.addWidget(self._count_lbl)
 
         # ── Mode stack: By Game (index 0) | All Mods (index 1) ──────────
         self._mode_stack = QStackedWidget()
@@ -777,8 +782,8 @@ class LibraryPanel(BasePanel):
 
         self._scroll.setWidget(self._list_container)
         left_layout.addWidget(self._scroll, 1)
-        left_widget.setMinimumWidth(240)
-        left_widget.setMaximumWidth(380)
+        left_widget.setMinimumWidth(260)
+        left_widget.setMaximumWidth(440)  # issue #32: wider so long game titles wrap nicely
 
         # Right: detail pane
         self._detail = _GameDetailPane(self.db)

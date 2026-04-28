@@ -74,6 +74,24 @@ class MainWindow(QMainWindow):
         self._build_ui()
         self._check_first_run()
         self._maybe_start_update_checker()
+        # Validate geometry against screen bounds so window never opens off-screen (issue #19)
+        self._clamp_to_screen()
+
+    def _clamp_to_screen(self):
+        """Ensure the window is fully visible on the current screen."""
+        try:
+            from PyQt6.QtWidgets import QApplication
+            screen = QApplication.primaryScreen()
+            if screen is None:
+                return
+            available = screen.availableGeometry()
+            geo = self.frameGeometry()
+            # Clamp position so the window stays within the available area
+            x = max(available.left(), min(geo.x(), available.right() - geo.width()))
+            y = max(available.top(), min(geo.y(), available.bottom() - geo.height()))
+            self.move(x, y)
+        except Exception:
+            pass  # Never crash startup due to geometry calculation
 
     # ------------------------------------------------------------------
     # UI Construction

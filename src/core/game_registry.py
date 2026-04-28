@@ -853,8 +853,52 @@ def _load_japan_serials() -> dict[str, str]:
     return result
 
 
+def _load_ntsc_u_serials() -> dict[str, str]:
+    """Load NTSC-U serial → title mappings from ps2_ntsc_u.json (issue #23)."""
+    import json as _json
+    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
+    if not _db.is_file():
+        return {}
+    try:
+        raw = _json.loads(_db.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, str] = {}
+    for title, info in raw.get("games", {}).items():
+        serial = info.get("serial", "")
+        if serial:
+            result[serial] = title
+        for alt in info.get("alt_serials", []):
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
+
+def _load_demos_serials() -> dict[str, str]:
+    """Load PS2 demo serial → title mappings from ps2_demos.json."""
+    import json as _json
+    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_demos.json"
+    if not _db.is_file():
+        return {}
+    try:
+        raw = _json.loads(_db.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    result: dict[str, str] = {}
+    for title, info in raw.get("games", {}).items():
+        serial = info.get("serial", "")
+        if serial:
+            result[serial] = title
+        for alt in info.get("alt_serials", []):
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
+
 _KNOWN_SERIALS.update(_load_pal_serials())
 _KNOWN_SERIALS.update(_load_japan_serials())
+_KNOWN_SERIALS.update(_load_ntsc_u_serials())
+_KNOWN_SERIALS.update(_load_demos_serials())
 
 
 def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> str:

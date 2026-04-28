@@ -38,7 +38,8 @@ class SetupWizard(QDialog):
     _PAGES = ["Welcome", "PCSX2 Location", "Advanced Paths", "Mod Storage", "Game Library", "Done"]
 
     def __init__(self, config: AppConfig, parent=None):
-        super().__init__(parent)
+        # Use Qt.WindowType.Window so the wizard shows in the taskbar (issue #1)
+        super().__init__(parent, Qt.WindowType.Window)
         self.config = config
         self.setWindowTitle("PS2 Mod Manager — Setup")
         self.setMinimumSize(680, 520)
@@ -213,10 +214,13 @@ class SetupWizard(QDialog):
         layout.setContentsMargins(40, 30, 40, 20)
         layout.setSpacing(14)
 
-        layout.addWidget(_h("Mod Storage Location"))
+        layout.addWidget(_h("Mod Download & Staging Location"))
         layout.addWidget(_p(
-            "Choose where PS2 Mod Manager will store downloaded/imported mods.\n"
-            "Enabling a mod copies it to PCSX2; disabling removes it."
+            "Choose a folder where PS2 Mod Manager will download and stage mods\n"
+            "before deploying them to PCSX2.\n\n"
+            "When you enable a mod it is copied from this staging folder into PCSX2.\n"
+            "When you disable it, it is removed from PCSX2 (but kept here for re-use).\n"
+            "Think of this as your mod library — not the PCSX2 game folder itself."
         ))
 
         from src.core.config_manager import get_data_dir
@@ -388,6 +392,9 @@ class SetupWizard(QDialog):
             self._run_automatic_setup()
             self._next_btn.setText("Finish ✓")
             self._next_btn.setObjectName("success_btn")
+            # Force Qt to re-evaluate the stylesheet after objectName change (issue #34)
+            self._next_btn.style().unpolish(self._next_btn)
+            self._next_btn.style().polish(self._next_btn)
             self._skip_btn.hide()
         else:
             self._next_btn.setText("Next →")
@@ -400,6 +407,9 @@ class SetupWizard(QDialog):
             self._back_btn.setEnabled(self._page_index > 0)
             self._next_btn.setText("Next →")
             self._next_btn.setObjectName("primary_btn")
+            # Force Qt to re-evaluate stylesheet after objectName change (issue #34)
+            self._next_btn.style().unpolish(self._next_btn)
+            self._next_btn.style().polish(self._next_btn)
             self._skip_btn.show()
 
     def _collect_current_page(self):

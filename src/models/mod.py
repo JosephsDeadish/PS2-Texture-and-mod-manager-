@@ -122,6 +122,7 @@ class AppConfig:
     show_paid: bool = False
     show_account_required: bool = False
     show_incomplete: bool = True
+    tooltip_mode: str = "normal"  # "normal", "dumbed_down", "no_filter"
 
     def to_dict(self) -> dict:
         return {
@@ -143,6 +144,7 @@ class AppConfig:
             "show_paid": self.show_paid,
             "show_account_required": self.show_account_required,
             "show_incomplete": self.show_incomplete,
+            "tooltip_mode": self.tooltip_mode,
         }
 
     @classmethod

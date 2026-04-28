@@ -177,7 +177,7 @@ class MemoryCardPanel(BasePanel):
             self,
             "Open Memory Card",
             self.config.memcards_path or "",
-            "Memory Cards (*.ps2 *.mcd *.mc2);;All Files (*)",
+            "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
         )
         if path:
             # Add to combo if not already there
@@ -417,7 +417,7 @@ class MemoryCardPanel(BasePanel):
             self,
             "Select Destination Memory Card",
             self.config.memcards_path or "",
-            "Memory Cards (*.ps2 *.mcd *.mc2);;All Files (*)",
+            "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
         )
         if not dest_card:
             return

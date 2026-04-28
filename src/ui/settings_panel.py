@@ -172,6 +172,53 @@ class SettingsPanel(BasePanel):
 
         layout.addWidget(_sep())
 
+        # ---- Tooltip Mode (issue #30/31) ----
+        layout.addWidget(_section("Tooltip Mode"))
+
+        tooltip_note = QLabel(
+            "Choose the style of tooltip hints shown throughout the app."
+        )
+        tooltip_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        tooltip_note.setWordWrap(True)
+        layout.addWidget(tooltip_note)
+
+        tooltip_row = QHBoxLayout()
+        tooltip_row.addWidget(QLabel("Tooltip Style:"))
+        self._tooltip_combo = QComboBox()
+        self._tooltip_combo.addItem("💬 Normal (helpful tips)", "normal")
+        self._tooltip_combo.addItem("🤔 Dumbed Down (simplified, calls you out)", "dumbed_down")
+        self._tooltip_combo.addItem("🔥 No Filter (vulgar but always helpful)", "no_filter")
+        current_mode = getattr(self.config, "tooltip_mode", "normal")
+        tip_idx = self._tooltip_combo.findData(current_mode)
+        if tip_idx >= 0:
+            self._tooltip_combo.setCurrentIndex(tip_idx)
+        tooltip_row.addWidget(self._tooltip_combo)
+        tooltip_row.addStretch()
+        layout.addLayout(tooltip_row)
+
+        layout.addWidget(_sep())
+
+        # ---- Favourite Authors (issue #24) ----
+        layout.addWidget(_section("Favourite Authors"))
+
+        fav_note = QLabel(
+            "Authors marked as favourites get a ❤ in mod dropdowns.\n"
+            "Enter one author name per line."
+        )
+        fav_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        fav_note.setWordWrap(True)
+        layout.addWidget(fav_note)
+
+        from PyQt6.QtWidgets import QTextEdit as _QTextEdit
+        self._fav_authors_edit = _QTextEdit()
+        self._fav_authors_edit.setMaximumHeight(80)
+        self._fav_authors_edit.setPlaceholderText("e.g.\nCoolModder\nTextureMaster")
+        fav_list = getattr(self.config, "favorite_authors", [])
+        self._fav_authors_edit.setPlainText("\n".join(fav_list))
+        layout.addWidget(self._fav_authors_edit)
+
+        layout.addWidget(_sep())
+
         # ---- About / Patreon ----
         layout.addWidget(_section("About"))
 
@@ -217,6 +264,12 @@ class SettingsPanel(BasePanel):
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
         self.config.theme = self._theme_combo.currentData() or "dark"
+        self.config.tooltip_mode = self._tooltip_combo.currentData() or "normal"
+        # Favourite authors — split by newlines, strip blanks
+        raw = self._fav_authors_edit.toPlainText()
+        self.config.favorite_authors = [
+            line.strip() for line in raw.splitlines() if line.strip()
+        ]
 
         save_config(self.config)
         self.settings_saved.emit(self.config)
@@ -296,6 +349,11 @@ class SettingsPanel(BasePanel):
             self._theme_combo.blockSignals(True)
             self._theme_combo.setCurrentIndex(idx)
             self._theme_combo.blockSignals(False)
+        tip_idx = self._tooltip_combo.findData(getattr(config, "tooltip_mode", "normal"))
+        if tip_idx >= 0:
+            self._tooltip_combo.setCurrentIndex(tip_idx)
+        fav_list = getattr(config, "favorite_authors", [])
+        self._fav_authors_edit.setPlainText("\n".join(fav_list))
 
 
 def _section(title: str) -> QLabel:

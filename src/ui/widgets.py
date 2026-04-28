@@ -535,7 +535,13 @@ class ModItemWidget(QFrame):
 
         meta_parts = []
         if self.mod.author:
-            meta_parts.append(f"by {self.mod.author}")
+            # Issue #8: distinguish externally-installed mods (no manager record of author)
+            if self.mod.author in ("Unknown", "unknown", ""):
+                meta_parts.append("by Unknown — may be externally installed")
+            else:
+                meta_parts.append(f"by {self.mod.author}")
+        else:
+            meta_parts.append("by Unknown — may be externally installed")
         if self.mod.version:
             meta_parts.append(f"v{self.mod.version}")
         if self.mod.game_id:
@@ -1125,18 +1131,35 @@ class ConflictDialog(QDialog):
             ignore_btn = QPushButton("⚡ Allow both (⚠ unexpected effects)")
             ignore_btn.setObjectName("primary_btn")
 
-            def _make_whole_resolver(ma, mb, which):
+            def _make_whole_resolver(ma, mb, which, btn_a, btn_b, ign_btn):
                 def _resolve():
                     if which == "a":
                         ma.priority = max(ma.priority, mb.priority) + 1
                         self.db.update(ma)
+                        btn_a.setEnabled(False)
+                        btn_b.setEnabled(False)
+                        ign_btn.setEnabled(False)
+                        btn_a.setText(f"✅ {ma.name} wins all  (applied)")
                     elif which == "b":
                         mb.priority = max(ma.priority, mb.priority) + 1
                         self.db.update(mb)
+                        btn_a.setEnabled(False)
+                        btn_b.setEnabled(False)
+                        ign_btn.setEnabled(False)
+                        btn_b.setText(f"✅ {mb.name} wins all  (applied)")
                 return _resolve
 
-            a_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "a"))
-            b_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "b"))
+            def _make_ignore_resolver(btn_a, btn_b, ign_btn):
+                def _ignore():
+                    btn_a.setEnabled(False)
+                    btn_b.setEnabled(False)
+                    ign_btn.setEnabled(False)
+                    ign_btn.setText("⚡ Allowing both  (applied)")
+                return _ignore
+
+            a_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "a", a_wins, b_wins, ignore_btn))
+            b_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "b", a_wins, b_wins, ignore_btn))
+            ignore_btn.clicked.connect(_make_ignore_resolver(a_wins, b_wins, ignore_btn))
 
             quick_row.addWidget(a_wins)
             quick_row.addWidget(b_wins)
@@ -1309,18 +1332,24 @@ class ConflictDialog(QDialog):
                 pb_wins = QPushButton(f"✅ {mod_b.name} wins")
                 pb_wins.setObjectName("success_btn")
 
-                def _make_pnach_resolver(ma, mb, which):
+                def _make_pnach_resolver(ma, mb, which, btn_a, btn_b):
                     def _resolve():
                         if which == "a":
                             ma.priority = max(ma.priority, mb.priority) + 1
                             self.db.update(ma)
+                            btn_a.setEnabled(False)
+                            btn_b.setEnabled(False)
+                            btn_a.setText(f"✅ {ma.name} wins  (applied)")
                         else:
                             mb.priority = max(ma.priority, mb.priority) + 1
                             self.db.update(mb)
+                            btn_a.setEnabled(False)
+                            btn_b.setEnabled(False)
+                            btn_b.setText(f"✅ {mb.name} wins  (applied)")
                     return _resolve
 
-                pa_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "a"))
-                pb_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "b"))
+                pa_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "a", pa_wins, pb_wins))
+                pb_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "b", pa_wins, pb_wins))
                 pq_row.addWidget(pa_wins)
                 pq_row.addWidget(pb_wins)
                 pq_row.addStretch()
