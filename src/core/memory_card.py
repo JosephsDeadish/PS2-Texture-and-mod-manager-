@@ -284,13 +284,16 @@ def copy_save_between_cards(
 
 
 def list_memcard_files(memcards_dir: str) -> List[str]:
-    """Return paths to all .ps2 and .mcd files in *memcards_dir*."""
+    """Return paths to all recognised PS2 memory card files in *memcards_dir*.
+
+    Supported extensions: .ps2, .mcd, .mc2, .bin (PCSX2 also uses .bin).
+    """
     result = []
     d = Path(memcards_dir)
     if not d.is_dir():
         return result
     for p in sorted(d.iterdir()):
-        if p.suffix.lower() in (".ps2", ".mcd", ".mc2"):
+        if p.suffix.lower() in (".ps2", ".mcd", ".mc2", ".bin"):
             result.append(str(p))
     return result
 

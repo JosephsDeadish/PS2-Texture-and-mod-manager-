@@ -1346,8 +1346,8 @@ class TestGameRegistry(unittest.TestCase):
 
     def test_serial_to_display_known(self):
         from src.core.game_registry import serial_to_display
-        result = serial_to_display("SLUS-20062")
-        self.assertIn("SLUS-20062", result)
+        result = serial_to_display("SLUS-20183")
+        self.assertIn("SLUS-20183", result)
         self.assertIn("Spyro", result)
 
     def test_serial_to_display_unknown(self):
@@ -2443,9 +2443,9 @@ class TestOnlineGameTitleLookup(unittest.TestCase):
         """Known serials should NOT trigger a network call."""
         from src.core.game_registry import serial_to_display_with_online_fallback
         with patch("src.core.downloader.requests.get") as mock_get:
-            result = serial_to_display_with_online_fallback("SLUS-20062")
+            result = serial_to_display_with_online_fallback("SLUS-20183")
         mock_get.assert_not_called()
-        self.assertIn("SLUS-20062", result)
+        self.assertIn("SLUS-20183", result)
         self.assertIn("Spyro", result)
 
     @patch("src.core.downloader.requests.get")
@@ -2477,7 +2477,7 @@ class TestOnlineGameTitleLookup(unittest.TestCase):
     def test_lookup_game_title_with_online_fallback_known(self, mock_get):
         """Known serials should return title from local registry."""
         from src.core.game_registry import lookup_game_title_with_online_fallback
-        result = lookup_game_title_with_online_fallback("SLUS-20062")
+        result = lookup_game_title_with_online_fallback("SLUS-20183")
         mock_get.assert_not_called()
         self.assertIn("Spyro", result)
 
@@ -27132,9 +27132,13 @@ class TestWave163PalDbAdditions(unittest.TestCase):
             "Wave 163: Smash Court Tennis: Pro Tournament 2 (PAL) must have serial SCES-52423")
 
     def test_pal_count_wave163(self):
-        """Wave 163: PAL DB must have at least 2650 entries after 4 net new game additions."""
-        self.assertGreaterEqual(len(self.pal_games), 2650,
-            f"PAL DB has {len(self.pal_games)} entries, expected >= 2650 after Wave 163 additions")
+        """Wave 163: PAL DB must have at least 2648 entries after 4 net new game additions.
+
+        Note: Wave 165 subsequently removed 2 wrong-serial entries (2650 → 2648),
+        so the effective floor after both waves is 2648.
+        """
+        self.assertGreaterEqual(len(self.pal_games), 2648,
+            f"PAL DB has {len(self.pal_games)} entries, expected >= 2648 after Wave 163 additions")
 
     def test_pippa_funnell_ranch_rescue_added(self):
         """Wave 163: Pippa Funnell: Ranch Rescue (PAL) must be in PAL DB with SLES-54994."""

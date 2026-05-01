@@ -190,8 +190,8 @@ class CatalogueCard(QFrame):
         self.entry = entry
         self.config = config
         self.setObjectName("card")
-        self.setMinimumWidth(240)
-        self.setMaximumWidth(400)
+        self.setMinimumWidth(260)  # issue #21: give cards enough room for button text
+        self.setMaximumWidth(420)
         self._fav_btn = None   # set to a QLabel widget inside _build() for non-hub entries; hub entries skip the favourite button entirely, so callers must guard with `if self._fav_btn`
         self._build()
 

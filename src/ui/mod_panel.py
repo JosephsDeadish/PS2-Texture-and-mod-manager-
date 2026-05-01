@@ -210,13 +210,14 @@ class ModPanel(BasePanel):
         author_row.addWidget(disable_all)
 
         # Status / conflict label — acts as a clickable link when conflicts exist
+        # Issue #20: placed on its own row below the toolbar to avoid triggering a scrollbar
         self._count_lbl = QPushButton("")
         self._count_lbl.setFlat(True)
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px; text-align: left; border: none;")
         self._count_lbl.setCursor(Qt.CursorShape.ArrowCursor)
         self._count_lbl.clicked.connect(self._on_count_lbl_clicked)
-        author_row.addWidget(self._count_lbl)
         content.addLayout(author_row)
+        content.addWidget(self._count_lbl)
 
         # ---- PCSX2 guidance banner (texture / pnach / cheat panels only) ----
         if self.mod_type in (ModType.TEXTURE_PACK, ModType.PNACH, ModType.CHEAT):
@@ -435,8 +436,10 @@ class ModPanel(BasePanel):
         invalid_mods = sum(1 for v in pnach_validation.values() if v.get("errors", 0))
         invalid_note = f"  •  ❌ {invalid_mods} invalid" if invalid_mods else ""
         has_any_issue = bool(conflicts or shadowed_ids or invalid_mods)
+        # Issue #4: clarify what the count refers to using the panel's mod type label
+        type_label = _TYPE_META[self.mod_type].get("label", "mod(s)")
         status = (
-            f"{enabled_count}/{total_count} enabled"
+            f"{enabled_count}/{total_count} {type_label} enabled"
             + (f"  •  ⚠ {len(conflicts)} conflict(s) — click to resolve" if conflicts else "")
             + shadow_note
             + invalid_note
