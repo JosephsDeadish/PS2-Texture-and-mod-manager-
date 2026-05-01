@@ -490,6 +490,7 @@ class _GameCard(QFrame):
         name_lbl.setWordWrap(True)  # issue #32: wrap long game names instead of horizontal scroll
         name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         info_col.addWidget(name_lbl)
+        sub_parts = []
         if game.serial:
             sub_parts.append(game.serial)
         if game.region:

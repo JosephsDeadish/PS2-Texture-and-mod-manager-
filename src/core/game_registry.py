@@ -42,7 +42,7 @@ Usage::
     serial = detect_game_serial("SLUS20062_HD.zip")     # -> "SLUS-20062"
     serial = detect_serial_from_path(                   # -> "SLUS-20062"
         "/textures/SLUS-20062/replacements/pack.zip")
-    display = serial_to_display("SLUS-20062")           # -> "SLUS-20062 — Spyro: Enter the Dragonfly"
+    display = serial_to_display("SLUS-20183")           # -> "SLUS-20183 — Spyro: Enter the Dragonfly"
     hits   = title_to_serials("kingdom hearts")         # -> [("SLUS-20370", "Kingdom Hearts"), ...]
 """
 
@@ -148,7 +148,8 @@ _KNOWN_SERIALS: dict[str, str] = {
     # ── North America (SLUS / SCUS) ──────────────────────────────────────────
 
     # Platformers / Action-Platformers
-    "SLUS-20062": "Spyro: Enter the Dragonfly",
+    "SLUS-20062": "Grand Theft Auto III",
+    "SLUS-20183": "Spyro: Enter the Dragonfly",
     "SLUS-20439": "Spyro: A Hero's Tail",
     "SCUS-97124": "Jak and Daxter: The Precursor Legacy",
     "SCUS-97120": "Jak and Daxter: The Precursor Legacy",
@@ -895,10 +896,17 @@ def _load_demos_serials() -> dict[str, str]:
     return result
 
 
+# Preserve the curated hardcoded entries so they can be re-applied with
+# higher priority after merging in the JSON databases.  This ensures that
+# well-known serials in the hardcoded dict are never clobbered by
+# incorrect or conflicting entries in the JSON serial databases.
+_hardcoded_serials = dict(_KNOWN_SERIALS)
 _KNOWN_SERIALS.update(_load_pal_serials())
 _KNOWN_SERIALS.update(_load_japan_serials())
 _KNOWN_SERIALS.update(_load_ntsc_u_serials())
 _KNOWN_SERIALS.update(_load_demos_serials())
+# Hardcoded entries take final priority over any JSON DB entry.
+_KNOWN_SERIALS.update(_hardcoded_serials)
 
 
 def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> str:
