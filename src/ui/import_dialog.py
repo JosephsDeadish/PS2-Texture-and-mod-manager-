@@ -411,7 +411,11 @@ class ImportModDialog(QDialog):
         self._multipart_hint.setText(msg)
         self._multipart_hint.show()
 
+    # ------------------------------------------------------------------
+    # Accept
+    # ------------------------------------------------------------------
 
+    def _accept(self):
         if not self._src_edit.text():
             from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(self, "No Source", "Please select a source folder or file.")

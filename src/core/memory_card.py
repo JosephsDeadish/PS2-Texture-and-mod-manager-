@@ -89,8 +89,10 @@ def list_saves(memcard_path: str) -> List[SaveEntry]:
         # Each directory entry starts at a cluster; do a simple scan for
         # directory entries that match the PS2 save dir pattern.
         # Directory entries are 512-byte pages; entry starts with mode flags.
+        # Scan the full card (up to MC_CARD_SIZE) so no saves are missed
+        # on larger or heavily-used cards.
         ENTRY_SIZE = 512
-        for offset in range(0, min(len(data), 1024 * 1024), ENTRY_SIZE):
+        for offset in range(0, min(len(data), MC_CARD_SIZE), ENTRY_SIZE):
             chunk = data[offset : offset + ENTRY_SIZE]
             if len(chunk) < 64:
                 break
