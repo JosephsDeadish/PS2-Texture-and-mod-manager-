@@ -414,6 +414,7 @@ class ModItemWidget(QFrame):
         is_shadowed: bool = False,
         validation_errors: int = 0,
         validation_warnings: int = 0,
+        tooltip_mode: str = "normal",
         parent=None,
     ):
         super().__init__(parent)
@@ -422,6 +423,7 @@ class ModItemWidget(QFrame):
         self.is_shadowed = is_shadowed
         self.validation_errors = validation_errors
         self.validation_warnings = validation_warnings
+        self.tooltip_mode = tooltip_mode
         self._build_ui()
 
     def _build_ui(self):
@@ -545,7 +547,16 @@ class ModItemWidget(QFrame):
         if self.mod.version:
             meta_parts.append(f"v{self.mod.version}")
         if self.mod.game_id:
-            meta_parts.append(f"Game: {self.mod.game_id}")
+            # Issue #23: show the human-readable game title alongside the serial
+            try:
+                from src.core.game_registry import lookup_game_title as _lgt
+                _title = _lgt(self.mod.game_id)
+            except Exception:
+                _title = ""
+            if _title:
+                meta_parts.append(f"Game: {self.mod.game_id} — {_title}")
+            else:
+                meta_parts.append(f"Game: {self.mod.game_id}")
         if self.mod.size_bytes:
             meta_parts.append(_fmt_size(self.mod.size_bytes))
 
@@ -566,11 +577,9 @@ class ModItemWidget(QFrame):
         prio_col.setSpacing(2)
         up_btn = QPushButton("▲")
         up_btn.setFixedSize(24, 24)
-        up_btn.setToolTip("Higher priority (wins conflicts)")
         up_btn.clicked.connect(lambda: self.priority_up.emit(self.mod.id))
         dn_btn = QPushButton("▼")
         dn_btn.setFixedSize(24, 24)
-        dn_btn.setToolTip("Lower priority")
         dn_btn.clicked.connect(lambda: self.priority_down.emit(self.mod.id))
         prio_lbl = QLabel(f"#{self.mod.priority}")
         prio_lbl.setStyleSheet("color: #7070a0; font-size: 10px;")
@@ -586,27 +595,23 @@ class ModItemWidget(QFrame):
 
         info_btn = QPushButton("ℹ")
         info_btn.setFixedSize(28, 28)
-        info_btn.setToolTip("Details")
         info_btn.clicked.connect(lambda: self.details_requested.emit(self.mod.id))
         btn_col.addWidget(info_btn)
 
         edit_btn = QPushButton("✏")
         edit_btn.setFixedSize(28, 28)
-        edit_btn.setToolTip("Edit metadata")
         edit_btn.clicked.connect(lambda: self.edit_requested.emit(self.mod.id))
         btn_col.addWidget(edit_btn)
 
         if self.mod.author and self.mod.author != "Unknown":
             author_btn = QPushButton("👤")
             author_btn.setFixedSize(28, 28)
-            author_btn.setToolTip(f"See more by {self.mod.author}")
             author_btn.clicked.connect(lambda: self.filter_by_author.emit(self.mod.author))
             btn_col.addWidget(author_btn)
 
         del_btn = QPushButton("🗑")
         del_btn.setFixedSize(28, 28)
         del_btn.setObjectName("danger_btn")
-        del_btn.setToolTip("Remove mod")
         del_btn.clicked.connect(lambda: self.remove_requested.emit(self.mod.id))
         btn_col.addWidget(del_btn)
 
@@ -615,9 +620,26 @@ class ModItemWidget(QFrame):
         # Toggle
         self.toggle = QCheckBox()
         self.toggle.setChecked(self.mod.enabled)
-        self.toggle.setToolTip("Enable / Disable")
         self.toggle.toggled.connect(lambda v: self.toggled.emit(self.mod.id, v))
         outer.addWidget(self.toggle)
+
+        # Apply mode-aware tooltips (issue #31)
+        from src.ui.tooltips import get_tip as _tip
+        _m = self.tooltip_mode
+        up_btn.setToolTip(_tip("priority_up", _m))
+        dn_btn.setToolTip(_tip("priority_down", _m))
+        info_btn.setToolTip(_tip("details", _m))
+        edit_btn.setToolTip(_tip("edit", _m))
+        del_btn.setToolTip(_tip("remove", _m))
+        self.toggle.setToolTip(_tip("toggle", _m))
+        if self.mod.author and self.mod.author != "Unknown":
+            # author_btn was the last widget added before del_btn in btn_col
+            _author_btn = btn_col.itemAt(btn_col.count() - 2).widget()
+            if _author_btn is not None:
+                _author_btn.setToolTip(
+                    _tip("author_filter", _m)
+                    + f"\n({self.mod.author})"
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -652,7 +674,16 @@ class ModDetailsDialog(QDialog):
         title_col.addWidget(_make_label(self.mod.name, bold=True))
         title_col.addWidget(_make_label(f"by {self.mod.author}  •  v{self.mod.version}"))
         if self.mod.game_id:
-            title_col.addWidget(_make_label(f"Game ID: {self.mod.game_id}"))
+            # Issue #23: show game title alongside the serial
+            try:
+                from src.core.game_registry import lookup_game_title as _lgt
+                _title = _lgt(self.mod.game_id)
+            except Exception:
+                _title = ""
+            if _title:
+                title_col.addWidget(_make_label(f"Game: {self.mod.game_id} — {_title}"))
+            else:
+                title_col.addWidget(_make_label(f"Game ID: {self.mod.game_id}"))
         header.addLayout(title_col, 1)
         layout.addLayout(header)
 

@@ -190,10 +190,6 @@ class ModPanel(BasePanel):
 
         # Game library filter — only show mods for games you own
         self._library_filter_check = QCheckBox("🎮 My Library Only")
-        self._library_filter_check.setToolTip(
-            "Show only mods whose game serial matches a disc image\n"
-            "in your Game Library folder (configure in Settings)."
-        )
         self._library_filter_check.setStyleSheet("color: #80b0ff; font-size: 12px;")
         self._library_filter_check.stateChanged.connect(self._apply_filter)
         author_row.addWidget(self._library_filter_check)
@@ -236,8 +232,22 @@ class ModPanel(BasePanel):
         self._scroll.setWidget(self._list_container)
         content.addWidget(self._scroll, 1)
 
+        # Apply mode-aware tooltips to toolbar buttons (issue #31)
+        self._apply_panel_tooltips(import_btn, conflict_btn, enable_all, disable_all)
+
         self._refresh_author_filter()
         self.refresh()
+
+    def _apply_panel_tooltips(self, import_btn, conflict_btn, enable_all, disable_all):
+        """Set tooltip mode-aware tooltips on the panel toolbar buttons."""
+        from src.ui.tooltips import get_tip as _tip
+        _m = getattr(self.config, "tooltip_mode", "normal") if self.config else "normal"
+        import_btn.setToolTip(_tip("import", _m))
+        conflict_btn.setToolTip(_tip("conflicts", _m))
+        enable_all.setToolTip(_tip("enable_all", _m))
+        disable_all.setToolTip(_tip("disable_all", _m))
+        if hasattr(self, "_library_filter_check"):
+            self._library_filter_check.setToolTip(_tip("library_only", _m))
 
     # ------------------------------------------------------------------
     # Refresh
@@ -413,12 +423,14 @@ class ModPanel(BasePanel):
         else:
             for i, mod in enumerate(mods):
                 v = pnach_validation.get(mod.id, {})
+                tip_mode = getattr(self.config, "tooltip_mode", "normal") if self.config else "normal"
                 widget = ModItemWidget(
                     mod,
                     has_conflict=(mod.id in conflicting_ids),
                     is_shadowed=(mod.id in shadowed_ids),
                     validation_errors=v.get("errors", 0),
                     validation_warnings=v.get("warnings", 0),
+                    tooltip_mode=tip_mode,
                 )
                 widget.toggled.connect(self._on_toggle)
                 widget.remove_requested.connect(self._on_remove)
