@@ -34,6 +34,7 @@ from PyQt6.QtWidgets import (
     QTabWidget,
 )
 
+from src.core.game_registry import lookup_game_title
 from src.models.mod import ModInfo, ModType, ConflictInfo
 
 # ---------------------------------------------------------------------------
@@ -548,11 +549,7 @@ class ModItemWidget(QFrame):
             meta_parts.append(f"v{self.mod.version}")
         if self.mod.game_id:
             # Issue #23: show the human-readable game title alongside the serial
-            try:
-                from src.core.game_registry import lookup_game_title as _lgt
-                _title = _lgt(self.mod.game_id)
-            except Exception:
-                _title = ""
+            _title = lookup_game_title(self.mod.game_id)
             if _title:
                 meta_parts.append(f"Game: {self.mod.game_id} — {_title}")
             else:
@@ -603,6 +600,7 @@ class ModItemWidget(QFrame):
         edit_btn.clicked.connect(lambda: self.edit_requested.emit(self.mod.id))
         btn_col.addWidget(edit_btn)
 
+        author_btn = None
         if self.mod.author and self.mod.author != "Unknown":
             author_btn = QPushButton("👤")
             author_btn.setFixedSize(28, 28)
@@ -632,14 +630,10 @@ class ModItemWidget(QFrame):
         edit_btn.setToolTip(_tip("edit", _m))
         del_btn.setToolTip(_tip("remove", _m))
         self.toggle.setToolTip(_tip("toggle", _m))
-        if self.mod.author and self.mod.author != "Unknown":
-            # author_btn was the last widget added before del_btn in btn_col
-            _author_btn = btn_col.itemAt(btn_col.count() - 2).widget()
-            if _author_btn is not None:
-                _author_btn.setToolTip(
-                    _tip("author_filter", _m)
-                    + f"\n({self.mod.author})"
-                )
+        if author_btn is not None:
+            author_btn.setToolTip(
+                _tip("author_filter", _m) + f"\n({self.mod.author})"
+            )
 
 
 # ---------------------------------------------------------------------------
