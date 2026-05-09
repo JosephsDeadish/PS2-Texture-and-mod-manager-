@@ -230,7 +230,7 @@ def _select_pnach_delete_path(
             return c_file
     # Identical or unknown — prefer deleting the cheats_ws file if possible
     for candidate in (p_file, c_file):
-        if "cheats_ws" in {part.lower() for part in candidate.parts}:
+        if any(part.lower() == "cheats_ws" for part in candidate.parts):
             return candidate
     return c_file
 
@@ -318,10 +318,7 @@ def resolve_pnach_conflicts(
         if clashing:
             auto_note = ""
             if auto_fixable and delete_target is not None:
-                auto_note = (
-                    f"\n\nAuto-fix is available because one file is fully contained "
-                    f"in the other. Auto-fix will delete: {delete_target.name}"
-                )
+                auto_note = f"\n\nAuto-fix is available because one file is fully contained in the other. Auto-fix will delete: {delete_target.name}"
             conflicts.append(Conflict(
                 conflict_type="pnach_address_clash",
                 severity=ConflictSeverity.ERROR,
