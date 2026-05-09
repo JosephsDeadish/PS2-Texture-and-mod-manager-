@@ -48,7 +48,13 @@ def download_file(
         raise DownloadError(f"Only http/https URLs are supported, got: {url!r}")
 
     try:
-        with requests.get(url, stream=True, timeout=timeout) as resp:
+        with requests.get(
+            url,
+            stream=True,
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        ) as resp:
             resp.raise_for_status()
             # Detect HTML error pages masquerading as successful responses —
             # e.g. login walls or CDN error pages that return 200 OK with HTML

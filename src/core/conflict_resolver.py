@@ -183,6 +183,60 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
     return addresses
 
 
+def _read_pnach_patch_set(path: Path) -> Set[Tuple[str, str, str, str]]:
+    """Return a set of enabled patch signatures from *path*.
+
+    Each entry is ``(processor, address, size, value)``. Unreadable files
+    return an empty set.
+    """
+    try:
+        from src.core.pnach import parse_pnach
+    except Exception:
+        return set()
+    try:
+        parsed = parse_pnach(str(path))
+    except ValueError:
+        return set()
+    patches: Set[Tuple[str, str, str, str]] = set()
+    for patch in parsed.patches:
+        if not patch.enabled:
+            continue
+        patches.add((
+            patch.processor.upper(),
+            patch.address.upper(),
+            patch.size.lower(),
+            patch.value.upper(),
+        ))
+    return patches
+
+
+def _select_pnach_delete_path(
+    p_file: Path,
+    c_file: Path,
+    p_set: Set[Tuple[str, str, str, str]],
+    c_set: Set[Tuple[str, str, str, str]],
+) -> Path:
+    """Choose which PNACH file should be deleted when auto-fixing duplicates."""
+    if p_set and c_set:
+        if p_set < c_set:
+            return p_file
+        if c_set < p_set:
+            return c_file
+    # Identical or unknown — prefer deleting the cheats_ws file if possible
+    for candidate in (p_file, c_file):
+        if "cheats_ws" in {part.lower() for part in candidate.parts}:
+            return candidate
+    return c_file
+
+
+def _pnach_can_auto_fix(
+    p_set: Set[Tuple[str, str, str, str]],
+    c_set: Set[Tuple[str, str, str, str]],
+) -> bool:
+    """Return True when one PNACH's enabled patches are contained in the other."""
+    return bool(p_set) and bool(c_set) and (p_set <= c_set or c_set <= p_set)
+
+
 def _is_ps2_serial(name: str) -> bool:
     return bool(_PS2_SERIAL_RE.match(name))
 
@@ -250,8 +304,18 @@ def resolve_pnach_conflicts(
         p_addrs = _read_pnach_addresses(p_file)
         c_addrs = _read_pnach_addresses(c_file)
         clashing = p_addrs & c_addrs
+        p_set = _read_pnach_patch_set(p_file)
+        c_set = _read_pnach_patch_set(c_file)
+        auto_fixable = _pnach_can_auto_fix(p_set, c_set)
+        delete_target = _select_pnach_delete_path(p_file, c_file, p_set, c_set) if auto_fixable else None
 
         if clashing:
+            auto_note = ""
+            if auto_fixable and delete_target is not None:
+                auto_note = (
+                    f"\n\nAuto-fix is available because one file is fully contained "
+                    f"in the other. Auto-fix will delete: {delete_target.name}"
+                )
             conflicts.append(Conflict(
                 conflict_type="pnach_address_clash",
                 severity=ConflictSeverity.ERROR,
@@ -261,13 +325,14 @@ def resolve_pnach_conflicts(
                     f"address(es): {', '.join(sorted(clashing)[:5])}{'…' if len(clashing) > 5 else ''}.\n"
                     f"The file in cheats_ws/ will overwrite patches applied by "
                     f"the file in cheats/, causing one set of codes to have no effect."
+                    f"{auto_note}"
                 ),
                 items=[p_file, c_file],
                 resolution=(
                     "Remove the duplicate patch lines from one of the files, "
                     "or delete the file whose patches are superseded."
                 ),
-                can_auto_fix=False,
+                can_auto_fix=auto_fixable,
             ))
         else:
             conflicts.append(Conflict(
@@ -285,7 +350,7 @@ def resolve_pnach_conflicts(
                     "If the two files contain the same patches, delete one. "
                     "If they are intentionally different, no action is needed."
                 ),
-                can_auto_fix=False,
+                can_auto_fix=auto_fixable,
             ))
 
     return conflicts
@@ -952,6 +1017,10 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
 
     * ``cover_art_duplicate`` – deletes all non-``.png`` duplicates (keeps the
       ``.png`` file).
+    * ``pnach_duplicate_crc`` – deletes the redundant file when one PNACH file
+      fully contains the other.
+    * ``pnach_address_clash`` – same as above when the overlapping patches are
+      identical and one file is a strict subset.
 
     Parameters
     ----------
@@ -966,6 +1035,24 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
     """
     if not conflict.can_auto_fix:
         return False, "This conflict cannot be auto-fixed."
+
+    if conflict.conflict_type in ("pnach_duplicate_crc", "pnach_address_clash"):
+        if len(conflict.items) != 2:
+            return False, "Auto-fix expects exactly two PNACH files."
+        p_file, c_file = conflict.items
+        p_set = _read_pnach_patch_set(p_file)
+        c_set = _read_pnach_patch_set(c_file)
+        if not _pnach_can_auto_fix(p_set, c_set):
+            return False, (
+                "Auto-fix is only available when one file's enabled patches "
+                "are fully contained in the other."
+            )
+        delete_path = _select_pnach_delete_path(p_file, c_file, p_set, c_set)
+        try:
+            delete_path.unlink()
+        except OSError as exc:
+            return False, f"Could not delete {delete_path.name}: {exc}"
+        return True, f"Deleted duplicate PNACH file: {delete_path.name}"
 
     if conflict.conflict_type == "cover_art_duplicate":
         deleted: List[str] = []
