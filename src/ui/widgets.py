@@ -416,7 +416,7 @@ class ModItemWidget(QFrame):
         is_shadowed: bool = False,
         validation_errors: int = 0,
         validation_warnings: int = 0,
-        tooltip_mode: str = "normal",
+        tooltip_mode: str = "normal",  # "normal" | "dumbed_down" | "no_filter"
         parent=None,
     ):
         super().__init__(parent)

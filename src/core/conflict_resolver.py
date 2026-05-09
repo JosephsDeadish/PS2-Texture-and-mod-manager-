@@ -43,6 +43,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 
+# (processor, address, size, value) for a single enabled PNACH patch line
 PatchSignature = Tuple[str, str, str, str]
 
 
@@ -318,7 +319,10 @@ def resolve_pnach_conflicts(
         if clashing:
             auto_note = ""
             if auto_fixable and delete_target is not None:
-                auto_note = f"\n\nAuto-fix is available because one file is fully contained in the other. Auto-fix will delete: {delete_target.name}"
+                auto_note = (
+                    "\n\nAuto-fix is available because one file's enabled patches are "
+                    f"fully contained in the other file's patches. Auto-fix will delete: {delete_target.name}"
+                )
             conflicts.append(Conflict(
                 conflict_type="pnach_address_clash",
                 severity=ConflictSeverity.ERROR,

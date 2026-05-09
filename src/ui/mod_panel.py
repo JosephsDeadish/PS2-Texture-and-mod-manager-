@@ -238,7 +238,13 @@ class ModPanel(BasePanel):
         self._refresh_author_filter()
         self.refresh()
 
-    def _apply_panel_tooltips(self, import_btn, conflict_btn, enable_all, disable_all):
+    def _apply_panel_tooltips(
+        self,
+        import_btn: QPushButton,
+        conflict_btn: QPushButton,
+        enable_all: QPushButton,
+        disable_all: QPushButton,
+    ) -> None:
         """Set tooltip mode-aware tooltips on the panel toolbar buttons."""
         from src.ui.tooltips import get_tip as _tip
         _m = getattr(self.config, "tooltip_mode", "normal") if self.config else "normal"
