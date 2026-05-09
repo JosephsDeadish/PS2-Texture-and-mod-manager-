@@ -33,12 +33,17 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
+
+PatchSignature = Tuple[str, str, str, str]
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +188,7 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
     return addresses
 
 
-def _read_pnach_patch_set(path: Path) -> Set[Tuple[str, str, str, str]]:
+def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
     """Return a set of enabled patch signatures from *path*.
 
     Each entry is ``(processor, address, size, value)``. Unreadable files
@@ -195,9 +200,10 @@ def _read_pnach_patch_set(path: Path) -> Set[Tuple[str, str, str, str]]:
         return set()
     try:
         parsed = parse_pnach(str(path))
-    except ValueError:
+    except ValueError as exc:
+        logger.warning("Failed to parse PNACH file %s: %s", path, exc)
         return set()
-    patches: Set[Tuple[str, str, str, str]] = set()
+    patches: Set[PatchSignature] = set()
     for patch in parsed.patches:
         if not patch.enabled:
             continue
@@ -213,8 +219,8 @@ def _read_pnach_patch_set(path: Path) -> Set[Tuple[str, str, str, str]]:
 def _select_pnach_delete_path(
     p_file: Path,
     c_file: Path,
-    p_set: Set[Tuple[str, str, str, str]],
-    c_set: Set[Tuple[str, str, str, str]],
+    p_set: Set[PatchSignature],
+    c_set: Set[PatchSignature],
 ) -> Path:
     """Choose which PNACH file should be deleted when auto-fixing duplicates."""
     if p_set and c_set:
@@ -230,8 +236,8 @@ def _select_pnach_delete_path(
 
 
 def _pnach_can_auto_fix(
-    p_set: Set[Tuple[str, str, str, str]],
-    c_set: Set[Tuple[str, str, str, str]],
+    p_set: Set[PatchSignature],
+    c_set: Set[PatchSignature],
 ) -> bool:
     """Return True when one PNACH's enabled patches are contained in the other."""
     return bool(p_set) and bool(c_set) and (p_set <= c_set or c_set <= p_set)

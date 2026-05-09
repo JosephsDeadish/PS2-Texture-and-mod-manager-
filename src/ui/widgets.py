@@ -36,6 +36,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.game_registry import lookup_game_title
 from src.models.mod import ModInfo, ModType, ConflictInfo
+from src.ui.tooltips import get_tip
 
 # ---------------------------------------------------------------------------
 # PnachCodePickerDialog
@@ -622,17 +623,16 @@ class ModItemWidget(QFrame):
         outer.addWidget(self.toggle)
 
         # Apply mode-aware tooltips (issue #31)
-        from src.ui.tooltips import get_tip as _tip
         _m = self.tooltip_mode
-        up_btn.setToolTip(_tip("priority_up", _m))
-        dn_btn.setToolTip(_tip("priority_down", _m))
-        info_btn.setToolTip(_tip("details", _m))
-        edit_btn.setToolTip(_tip("edit", _m))
-        del_btn.setToolTip(_tip("remove", _m))
-        self.toggle.setToolTip(_tip("toggle", _m))
+        up_btn.setToolTip(get_tip("priority_up", _m))
+        dn_btn.setToolTip(get_tip("priority_down", _m))
+        info_btn.setToolTip(get_tip("details", _m))
+        edit_btn.setToolTip(get_tip("edit", _m))
+        del_btn.setToolTip(get_tip("remove", _m))
+        self.toggle.setToolTip(get_tip("toggle", _m))
         if author_btn is not None:
             author_btn.setToolTip(
-                _tip("author_filter", _m) + f"\n({self.mod.author})"
+                get_tip("author_filter", _m) + f"\n({self.mod.author})"
             )
 
 
@@ -669,11 +669,7 @@ class ModDetailsDialog(QDialog):
         title_col.addWidget(_make_label(f"by {self.mod.author}  •  v{self.mod.version}"))
         if self.mod.game_id:
             # Issue #23: show game title alongside the serial
-            try:
-                from src.core.game_registry import lookup_game_title as _lgt
-                _title = _lgt(self.mod.game_id)
-            except Exception:
-                _title = ""
+            _title = lookup_game_title(self.mod.game_id)
             if _title:
                 title_col.addWidget(_make_label(f"Game: {self.mod.game_id} — {_title}"))
             else:
@@ -2428,7 +2424,6 @@ class PnachCodeBuilderDialog(QDialog):
         # Get CRC from first patch
         game_crc = patches[0].get("crc", "00000000") if patches else "00000000"
         # Get game title from serial
-        from src.core.game_registry import lookup_game_title
         game_title = lookup_game_title(self._game_serial) or self._game_serial
 
         return generate_pnach_text(game_crc, game_title, patches), game_crc
