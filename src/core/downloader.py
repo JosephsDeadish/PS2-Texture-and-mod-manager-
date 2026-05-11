@@ -27,6 +27,68 @@ class DownloadError(Exception):
     pass
 
 
+def convert_share_url(url: str) -> str:
+    """Convert common share links (Google Drive/Dropbox/GitHub blob) into direct-download URLs.
+
+    This helper performs only local string conversions (no network requests).
+    Unsupported or already-direct URLs are returned unchanged.
+    """
+    if not url:
+        return url
+
+    try:
+        parsed = urllib.parse.urlparse(url)
+    except Exception:
+        return url
+
+    netloc = parsed.netloc.lower()
+    path = parsed.path
+    query = urllib.parse.parse_qs(parsed.query)
+
+    # Google Drive: https://drive.google.com/file/d/<id>/view
+    if "drive.google.com" in netloc:
+        m = re.search(r"/file/d/([^/]+)", path)
+        if m:
+            file_id = m.group(1)
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+        # drive.google.com/open?id=<id>
+        if "open" in path and "id" in query:
+            return f"https://drive.google.com/uc?export=download&id={query['id'][0]}"
+        # drive.google.com/uc?id=<id>
+        if "uc" in path and "id" in query:
+            file_id = query["id"][0]
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+    # Dropbox share links: add dl=1 for direct download
+    if "dropbox.com" in netloc:
+        query["dl"] = ["1"]
+        new_query = urllib.parse.urlencode(query, doseq=True)
+        return parsed._replace(query=new_query).geturl()
+
+    # GitHub blob links: convert to raw.githubusercontent.com
+    if netloc == "github.com":
+        parts = [p for p in path.strip("/").split("/") if p]
+        if len(parts) >= 5 and parts[2] == "blob":
+            owner, repo, _blob, branch = parts[:4]
+            rest = "/".join(parts[4:])
+            return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rest}"
+
+    return url
+
+
+def _looks_like_html(chunk: bytes) -> bool:
+    """Heuristic check for HTML error pages."""
+    if not chunk:
+        return False
+    sample = chunk.lstrip()[:512].lower()
+    return (
+        sample.startswith(b"<!doctype html")
+        or sample.startswith(b"<html")
+        or b"<html" in sample
+        or b"<head" in sample
+    )
+
+
 def download_file(
     url: str,
     dest_path: str,
@@ -57,24 +119,30 @@ def download_file(
         ) as resp:
             resp.raise_for_status()
             # Detect HTML error pages masquerading as successful responses —
-            # e.g. login walls or CDN error pages that return 200 OK with HTML
+            # e.g. login walls or CDN error pages that return 200 OK with HTML.
             content_type = resp.headers.get("Content-Type", "").lower()
-            if "text/html" in content_type:
-                raise DownloadError(
-                    f"Server returned an HTML page instead of a file.\n"
-                    f"The URL may require a login or the file may no longer be available.\n"
-                    f"URL: {url}"
-                )
+            content_disp = resp.headers.get("Content-Disposition", "").lower()
             total = int(resp.headers.get("Content-Length", 0))
             received = 0
             try:
                 with open(dest, "wb") as f:
+                    first_chunk = True
                     for chunk in resp.iter_content(chunk_size=65536):
-                        if chunk:
-                            f.write(chunk)
-                            received += len(chunk)
-                            if progress_callback:
-                                progress_callback(received, total)
+                        if not chunk:
+                            continue
+                        if first_chunk:
+                            first_chunk = False
+                            if "text/html" in content_type and "attachment" not in content_disp:
+                                if _looks_like_html(chunk):
+                                    raise DownloadError(
+                                        f"Server returned an HTML page instead of a file.\n"
+                                        f"The URL may require a login or the file may no longer be available.\n"
+                                        f"URL: {url}"
+                                    )
+                        f.write(chunk)
+                        received += len(chunk)
+                        if progress_callback:
+                            progress_callback(received, total)
             except BaseException:
                 # Remove any partially-written file so callers never see a
                 # truncated download artifact.

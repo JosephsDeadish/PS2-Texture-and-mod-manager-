@@ -1131,20 +1131,19 @@ class DownloadInstallDialog(QDialog):
 
         Handles:
         * Google Drive share links → direct ``uc?export=download`` URL
+        * Dropbox share links → direct download (``dl=1``)
+        * GitHub blob links → raw.githubusercontent.com
         * MediaFire file-page links → resolved via :func:`resolve_mediafire_url`
 
         Returns the converted URL, or the original *url* unchanged if no
         conversion was needed.  Returns ``None`` if a MediaFire page fetch was
         attempted but failed (so the caller can show an appropriate error).
         """
-        import re as _re
-        # Google Drive
-        m = _re.search(r"drive\.google\.com/file/d/([^/?]+)", url)
-        if m:
-            return f"https://drive.google.com/uc?export=download&id={m.group(1)}"
-        m2 = _re.search(r"drive\.google\.com/open[?]id=([^&]+)", url)
-        if m2:
-            return f"https://drive.google.com/uc?export=download&id={m2.group(1)}"
+        if not url:
+            return url
+
+        from src.core.downloader import convert_share_url, resolve_mediafire_url
+        url = convert_share_url(url)
 
         # MediaFire file page — resolve to direct download URL
         try:
@@ -1156,7 +1155,6 @@ class DownloadInstallDialog(QDialog):
         except Exception:
             _is_mf = False
         if _is_mf:
-            from src.core.downloader import resolve_mediafire_url
             resolved = resolve_mediafire_url(url)
             return resolved  # None if resolution failed
 
