@@ -80,7 +80,7 @@ def _looks_like_html(chunk: bytes) -> bool:
     """Heuristic check for HTML error pages."""
     if not chunk:
         return False
-    sample = chunk[:1024].lstrip()[:512].lower()
+    sample = chunk[:512].lstrip().lower()
     return (
         sample.startswith(b"<!doctype html")
         or sample.startswith(b"<html")
