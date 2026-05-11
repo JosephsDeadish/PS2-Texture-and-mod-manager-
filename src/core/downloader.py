@@ -46,7 +46,7 @@ def convert_share_url(url: str) -> str:
     query = urllib.parse.parse_qs(parsed.query)
 
     # Google Drive: https://drive.google.com/file/d/<id>/view
-    if "drive.google.com" in netloc:
+    if netloc in ("drive.google.com", "www.drive.google.com"):
         m = re.search(r"/file/d/([^/]+)", path)
         if m:
             file_id = m.group(1)
@@ -60,7 +60,7 @@ def convert_share_url(url: str) -> str:
             return f"https://drive.google.com/uc?export=download&id={file_id}"
 
     # Dropbox share links: add dl=1 for direct download
-    if "dropbox.com" in netloc:
+    if netloc in ("dropbox.com", "www.dropbox.com"):
         query["dl"] = ["1"]
         new_query = urllib.parse.urlencode(query, doseq=True)
         return parsed._replace(query=new_query).geturl()
@@ -122,6 +122,7 @@ def download_file(
             # e.g. login walls or CDN error pages that return 200 OK with HTML.
             content_type = resp.headers.get("Content-Type", "").lower()
             content_disp = resp.headers.get("Content-Disposition", "").lower()
+            has_attachment = "attachment" in content_disp
             total = int(resp.headers.get("Content-Length", 0))
             received = 0
             try:
@@ -132,7 +133,7 @@ def download_file(
                             continue
                         if first_chunk:
                             first_chunk = False
-                            if "text/html" in content_type and "attachment" not in content_disp:
+                            if "text/html" in content_type and not has_attachment:
                                 if _looks_like_html(chunk):
                                     raise DownloadError(
                                         f"Server returned an HTML page instead of a file.\n"
