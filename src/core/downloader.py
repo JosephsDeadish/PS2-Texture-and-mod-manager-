@@ -44,6 +44,7 @@ def convert_share_url(url: str) -> str:
     netloc = parsed.netloc.lower()
     path = parsed.path
     query = urllib.parse.parse_qs(parsed.query)
+    query = {k: list(v) for k, v in query.items()}
 
     # Google Drive: https://drive.google.com/file/d/<id>/view
     if netloc in ("drive.google.com", "www.drive.google.com"):
