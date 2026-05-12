@@ -45,7 +45,7 @@ class GifMakerPanel(BasePanel):
         info.setWordWrap(True)
         content.addWidget(info)
 
-        self._ffmpeg_status = QLabel("")
+        self._ffmpeg_status = QLabel("Checking FFmpeg status…")
         self._ffmpeg_status.setStyleSheet("color: #506090; font-size: 11px;")
         content.addWidget(self._ffmpeg_status)
         self._refresh_ffmpeg_status()

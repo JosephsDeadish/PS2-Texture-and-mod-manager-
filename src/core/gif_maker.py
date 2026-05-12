@@ -37,7 +37,7 @@ def create_gif(
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     if duration_ms <= 0:
-        raise ValueError("duration_ms must be greater than 0")
+        raise ValueError(f"duration_ms must be greater than 0, got {duration_ms}")
 
     ffmpeg_path = resolve_ffmpeg_path() if prefer_ffmpeg else None
     if ffmpeg_path:
