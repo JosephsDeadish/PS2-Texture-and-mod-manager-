@@ -475,6 +475,9 @@ class ModItemWidget(QFrame):
         name_lbl.setStyleSheet(
             f"font-weight: bold; font-size: 14px; color: {name_color};"
         )
+        name_lbl.setWordWrap(True)
+        name_lbl.setMinimumWidth(0)
+        name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         name_row.addWidget(name_lbl)
 
         if self.is_shadowed:
@@ -560,6 +563,8 @@ class ModItemWidget(QFrame):
 
         meta_lbl = QLabel("  •  ".join(meta_parts))
         meta_lbl.setStyleSheet("color: #505070; font-size: 11px;" if self.is_shadowed else "color: #7070a0; font-size: 11px;")
+        meta_lbl.setWordWrap(True)
+        meta_lbl.setMinimumWidth(0)
         info.addWidget(meta_lbl)
 
         if self.mod.description:
