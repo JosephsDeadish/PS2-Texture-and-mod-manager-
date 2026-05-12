@@ -41,7 +41,7 @@ def create_gif(
 
     ffmpeg_path = resolve_ffmpeg_path() if prefer_ffmpeg else None
     if ffmpeg_path:
-        fps = max(1.0, 1000.0 / float(duration_ms))
+        fps = 1000.0 / float(duration_ms)
         with tempfile.TemporaryDirectory(prefix="ps2mm_gif_") as tmp_dir:
             tmp_path = Path(tmp_dir)
             _normalize_frames(frames, tmp_path)
@@ -70,7 +70,7 @@ def create_gif(
     images = []
     for path in frames_list:
         with Image.open(path) as img:
-            images.append(img.convert("RGBA"))
+            images.append(img.convert("RGBA").copy())
     base, *rest = images
     base.save(
         output,
