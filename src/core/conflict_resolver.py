@@ -10,8 +10,8 @@ include:
   game CRC (one patch will silently overwrite the other).
 * Two cover-art images for the same serial with different extensions (PCSX2
   picks one arbitrarily).
-* Multiple unrelated texture-pack directories under the same serial path
-  (replacements folder contains textures from different packs).
+* Duplicate texture files with identical content inside a serial's
+  ``replacements/`` folder (often caused by merged or repeated pack installs).
 
 Public API::
 
@@ -33,6 +33,7 @@ Public API::
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
 import re
@@ -424,12 +425,11 @@ def resolve_cover_art_conflicts(cover_art_path: str) -> List[Conflict]:
 
 
 def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
-    """Detect cases where the textures directory contains unexpected structures.
+    """Detect duplicate texture data inside ``replacements/`` folders.
 
-    Specifically checks whether any serial's ``replacements/`` folder contains
-    sub-directories that look like multiple separate packs merged together
-    (identified by the presence of more than one top-level sub-directory with
-    a non-texture extension).
+    Looks for multiple texture files in the same serial's replacements tree
+    that share identical content (matching file hashes). This avoids flagging
+    organized sub-directories that do not actually duplicate data.
 
     Parameters
     ----------
@@ -460,38 +460,40 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
         if not replacements.is_dir():
             continue
 
-        # Look for multiple top-level pack-indicator dirs/files
+        hash_map: Dict[str, List[Path]] = {}
         try:
-            top_entries = [e for e in replacements.iterdir()]
+            for dirpath, _dirs, files in os.walk(replacements):
+                for fname in files:
+                    if Path(fname).suffix.lower() not in _TEXTURE_EXTS:
+                        continue
+                    path = Path(dirpath) / fname
+                    digest = _hash_file(path)
+                    if digest:
+                        hash_map.setdefault(digest, []).append(path)
         except PermissionError:
             continue
 
-        # Heuristic: multiple non-DDS sub-dirs → possibly merged packs
-        subdirs = [e for e in top_entries if e.is_dir()]
-        if len(subdirs) >= 2:
-            # Only flag if the subdirs look like separate packs (no numbers in names)
-            pack_like = [d for d in subdirs if not d.name.isdigit()]
-            if len(pack_like) >= 2:
-                conflicts.append(Conflict(
-                    conflict_type="texture_pack_merged",
-                    severity=ConflictSeverity.INFO,
-                    title=f"Multiple texture sub-packs: {serial} ({len(pack_like)} sub-dirs)",
-                    description=(
-                        f"The replacements folder for {serial} contains "
-                        f"{len(pack_like)} sub-directories "
-                        f"({', '.join(d.name for d in pack_like[:3])}{'…' if len(pack_like) > 3 else ''}) "
-                        f"which may indicate two separate texture packs have been "
-                        f"merged.  This can cause texture overrides to behave "
-                        f"unpredictably."
-                    ),
-                    items=[replacements] + pack_like[:5],
-                    resolution=(
-                        "If the sub-directories belong to different texture packs, "
-                        "consider installing them one at a time through PS2 Mod Manager "
-                        "to track them properly."
-                    ),
-                    can_auto_fix=False,
-                ))
+        for digest, files in sorted(hash_map.items()):
+            if len(files) < 2:
+                continue
+            sample_names = ", ".join(p.name for p in files[:4])
+            conflicts.append(Conflict(
+                conflict_type="texture_duplicate_hash",
+                severity=ConflictSeverity.INFO,
+                title=f"Duplicate texture data: {serial} ({len(files)} copies)",
+                description=(
+                    f"Multiple texture files inside {serial}/replacements share the same "
+                    f"content hash. This often happens when packs are merged or copied "
+                    f"into organized sub-folders. Example files: {sample_names}"
+                    f"{'…' if len(files) > 4 else ''}."
+                ),
+                items=files[:8],
+                resolution=(
+                    "If these are redundant copies, keep a single version and remove "
+                    "the duplicates. Otherwise no action is required."
+                ),
+                can_auto_fix=False,
+            ))
 
     return conflicts
 
@@ -676,6 +678,18 @@ def _file_size_bytes(path: Path) -> int:
         return path.stat().st_size
     except OSError:
         return 0
+
+
+def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    """Return a hex hash for *path*, or empty string on error."""
+    hasher = hashlib.sha1()
+    try:
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(chunk_size), b""):
+                hasher.update(chunk)
+    except OSError:
+        return ""
+    return hasher.hexdigest()
 
 
 #: Image extensions scanned for overwrite conflict detection.

@@ -3029,7 +3029,7 @@ class ConflictResolverDialog(QDialog):
     * Duplicate CRC ``.pnach`` files in both ``cheats/`` and ``cheats_ws/``
     * Two ``.pnach`` files patching the **same EE memory address** for the same CRC
     * Multiple cover-art images for the same PS2 serial
-    * Multiple texture sub-packs merged into one replacements folder
+    * Duplicate texture files with identical content inside replacements folders
 
     Each conflict shows its severity (❌ Error / ⚠️ Warning / ℹ️ Info), a
     detailed description, and a suggested resolution.  Where safe, an

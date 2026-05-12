@@ -715,7 +715,7 @@ class LibraryPanel(BasePanel):
             "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
             "• PNACH patches writing to the same memory address\n"
             "• Multiple cover-art images for the same serial\n"
-            "• Merged texture packs that may override each other"
+            "• Duplicate texture files with identical content"
         )
         conflict_btn.clicked.connect(self._open_conflict_resolver)
         toolbar.addWidget(conflict_btn)

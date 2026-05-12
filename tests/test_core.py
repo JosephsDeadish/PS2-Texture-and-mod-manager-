@@ -6707,17 +6707,20 @@ class TestConflictResolver(unittest.TestCase):
         conflicts = resolve_texture_conflicts(tex_dir)
         self.assertEqual(conflicts, [])
 
-    def test_texture_merged_packs_detected(self):
+    def test_texture_duplicate_hash_detected(self):
         from src.core.conflict_resolver import resolve_texture_conflicts, ConflictSeverity
         tex_dir = os.path.join(self.tmpdir, "textures")
         repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
-        os.makedirs(os.path.join(repl, "PackAlpha"))
-        os.makedirs(os.path.join(repl, "PackBeta"))
-        os.makedirs(os.path.join(repl, "PackGamma"))
+        pack_a = os.path.join(repl, "PackAlpha")
+        pack_b = os.path.join(repl, "PackBeta")
+        os.makedirs(pack_a)
+        os.makedirs(pack_b)
+        Path(os.path.join(pack_a, "texture_a.dds")).write_bytes(b"DDS")
+        Path(os.path.join(pack_b, "texture_b.dds")).write_bytes(b"DDS")
         conflicts = resolve_texture_conflicts(tex_dir)
         self.assertEqual(len(conflicts), 1)
         self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
-        self.assertEqual(conflicts[0].conflict_type, "texture_pack_merged")
+        self.assertEqual(conflicts[0].conflict_type, "texture_duplicate_hash")
         self.assertIn("SLUS-20062", conflicts[0].title)
 
     def test_texture_missing_dir(self):
