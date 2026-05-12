@@ -96,6 +96,7 @@ class GifMakerPanel(BasePanel):
 
         options_layout.addWidget(QLabel("Frame Delay (ms):"))
         self._delay_spin = QSpinBox()
+        # 20ms minimum keeps GIF exports from hitting extreme frame rates.
         self._delay_spin.setRange(20, 10000)
         self._delay_spin.setValue(100)
         self._delay_spin.setSingleStep(10)
