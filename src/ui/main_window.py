@@ -23,7 +23,6 @@ from src.models.mod import AppConfig, ModType
 from src.ui.browse_panel import BrowsePanel
 from src.ui.dashboard import DashboardPanel
 from src.ui.downloads_panel import DownloadsPanel
-from src.ui.gif_maker_panel import GifMakerPanel
 from src.ui.library_panel import LibraryPanel
 from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
@@ -135,7 +134,6 @@ class MainWindow(QMainWindow):
             ("🌐", "Discover"),
             ("🎮", "My Library"),
             ("📥", "Downloads"),
-            ("🎞️", "GIF Maker"),
             ("🎨", "Texture Packs"),
             ("🔧", "PNACH Codes & Cheats"),
             ("🖼️", "Cover Art"),
@@ -195,33 +193,30 @@ class MainWindow(QMainWindow):
         self._downloads_panel = DownloadsPanel(self.config)
         self._stack.addWidget(self._downloads_panel)    # index 3
 
-        self._gif_panel = GifMakerPanel(self.config)
-        self._stack.addWidget(self._gif_panel)          # index 4
-
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
-        self._stack.addWidget(self._texture_panel)      # index 5
+        self._stack.addWidget(self._texture_panel)      # index 4
 
         self._pnach_panel = ModPanel(ModType.PNACH, self.db, self.config,
                                       extra_types=[ModType.CHEAT])
-        self._stack.addWidget(self._pnach_panel)        # index 6
+        self._stack.addWidget(self._pnach_panel)        # index 5
 
         self._cover_panel = ModPanel(ModType.COVER_ART, self.db, self.config)
-        self._stack.addWidget(self._cover_panel)        # index 7
+        self._stack.addWidget(self._cover_panel)        # index 6
 
         self._memcard_panel = MemoryCardPanel(self.config)
-        self._stack.addWidget(self._memcard_panel)      # index 8
+        self._stack.addWidget(self._memcard_panel)      # index 7
 
         self._settings_panel = SettingsPanel(self.config)
         self._settings_panel.settings_saved.connect(self._on_settings_saved)
         self._settings_panel.rerun_wizard.connect(self._run_wizard)
-        self._stack.addWidget(self._settings_panel)     # index 9
+        self._stack.addWidget(self._settings_panel)     # index 8
 
         # Wire cross-panel "see more by author" navigation
         _panel_nav_index = {
-            ModType.TEXTURE_PACK: 5,
-            ModType.PNACH: 6,
-            ModType.COVER_ART: 7,
-            ModType.CHEAT: 6,   # merged into PNACH panel
+            ModType.TEXTURE_PACK: 4,
+            ModType.PNACH: 5,
+            ModType.COVER_ART: 6,
+            ModType.CHEAT: 5,   # merged into PNACH panel
         }
         for panel in (
             self._texture_panel,

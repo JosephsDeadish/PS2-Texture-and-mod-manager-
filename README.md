@@ -45,11 +45,6 @@
 - **One cover art per game** — enabling a second cover for the same serial offers to auto-disable the other
 - Download cover art from **GameTDB** (free, by game serial ID)
 
-### 🎞️ GIF Maker
-- Create animated GIFs from image sequences
-- Drag to reorder frames before exporting
-- Uses FFmpeg when available (bundled via the `imageio-ffmpeg` dependency)
-
 ### 💾 Memory Card & Save File Manager
 - Browse all `.ps2` / `.mcd` memory card images
 - List and export individual saves
@@ -137,7 +132,6 @@
 | requests | ≥ 2.31.0 |
 | Pillow | ≥ 10.0.0 |
 | py7zr | ≥ 0.20.0 |
-| imageio-ffmpeg | ≥ 0.6.0 |
 
 Install all runtime dependencies:
 
