@@ -458,7 +458,7 @@ class CatalogueCard(QFrame):
         action_row = QHBoxLayout()
         action_row.setSpacing(6)
 
-        visit_btn = QPushButton("🌐 Visit Source")
+        visit_btn = QPushButton("🌐 Visit\nSource")
         visit_btn.setObjectName("primary_btn")
         visit_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
         action_row.addWidget(visit_btn, 1)
@@ -506,7 +506,7 @@ class CatalogueCard(QFrame):
 
         elif download_action in ("manual", "download_save"):
             # Manual download — user must browse to the source page
-            find_btn = QPushButton("🔍 Find on GBAtemp")
+            find_btn = QPushButton("🔍 Find on\nGBAtemp")
             find_btn.setObjectName("primary_btn")
             find_btn.setToolTip(
                 "Opens the GBAtemp page where you can find and download this file.\n"
@@ -517,7 +517,7 @@ class CatalogueCard(QFrame):
 
         else:
             # Generic: direct download available or user can paste a URL
-            dl_label = "⬇ Install In-App" if has_direct else "⬇ Download from URL"
+            dl_label = "⬇ Download\nfrom URL"
             dl_btn = QPushButton(dl_label)
             dl_btn.setObjectName("primary_btn")
             dl_btn.setToolTip(
