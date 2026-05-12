@@ -32,7 +32,7 @@ from PyInstaller.utils.hooks import collect_dynamic_libs, collect_data_files
 a = Analysis(
     ['main.py'],
     pathex=[os.path.abspath('.')],
-    binaries=[],
+    binaries=collect_dynamic_libs("imageio_ffmpeg"),
     datas=[
         # Bundle the entire assets folder (icons, SVG)
         ('assets',     'assets'),
@@ -40,7 +40,7 @@ a = Analysis(
         ('src',        'src'),
         # Bundle the data directory (catalogue JSON files, PNACH DB)
         ('data',       'data'),
-    ],
+    ] + collect_data_files("imageio_ffmpeg"),
     hiddenimports=[
         # PyQt6 modules that may not be auto-detected
         'PyQt6.QtSvg',
