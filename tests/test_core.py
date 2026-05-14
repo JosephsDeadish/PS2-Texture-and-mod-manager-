@@ -6631,6 +6631,28 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
         self.assertIn(shared_addr.upper(), conflicts[0].description)
 
+    def test_pnach_auto_fix_identical_unparseable_lines(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "DEADBEEF"
+        content = "patch=1,EE,00100000,word,12345678,extra\n"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(content)
+        c_file.write_text(content)
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].can_auto_fix)
+        ok, _ = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok)
+        self.assertTrue(p_file.exists())
+        self.assertFalse(c_file.exists())
+
     def test_pnach_non_crc_files_ignored(self):
         """Files that are not 8-hex-digit CRC filenames must be ignored."""
         from src.core.conflict_resolver import resolve_pnach_conflicts

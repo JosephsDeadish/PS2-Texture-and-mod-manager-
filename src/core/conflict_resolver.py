@@ -240,9 +240,17 @@ def _select_pnach_delete_path(
 def _pnach_can_auto_fix(
     p_set: Set[PatchSignature],
     c_set: Set[PatchSignature],
+    p_file: Optional[Path] = None,
+    c_file: Optional[Path] = None,
 ) -> bool:
     """Return True when one PNACH's enabled patches are contained in the other."""
-    return bool(p_set) and bool(c_set) and (p_set <= c_set or c_set <= p_set)
+    if p_set and c_set:
+        return p_set <= c_set or c_set <= p_set
+    if p_file and c_file:
+        p_hash = _hash_file(p_file)
+        c_hash = _hash_file(c_file)
+        return bool(p_hash) and p_hash == c_hash
+    return False
 
 
 def _is_ps2_serial(name: str) -> bool:
@@ -314,7 +322,7 @@ def resolve_pnach_conflicts(
         clashing = p_addrs & c_addrs
         p_set = _read_pnach_patch_set(p_file)
         c_set = _read_pnach_patch_set(c_file)
-        auto_fixable = _pnach_can_auto_fix(p_set, c_set)
+        auto_fixable = _pnach_can_auto_fix(p_set, c_set, p_file, c_file)
         delete_target = _select_pnach_delete_path(p_file, c_file, p_set, c_set) if auto_fixable else None
 
         if clashing:
@@ -1063,7 +1071,7 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
         p_file, c_file = conflict.items
         p_set = _read_pnach_patch_set(p_file)
         c_set = _read_pnach_patch_set(c_file)
-        if not _pnach_can_auto_fix(p_set, c_set):
+        if not _pnach_can_auto_fix(p_set, c_set, p_file, c_file):
             return False, (
                 "Auto-fix is only available when one file's enabled patches "
                 "are fully contained in the other."
