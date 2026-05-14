@@ -247,6 +247,11 @@ def _pnach_can_auto_fix(
     if p_set and c_set:
         return p_set <= c_set or c_set <= p_set
     if p_file and c_file:
+        try:
+            if p_file.stat().st_size != c_file.stat().st_size:
+                return False
+        except OSError:
+            pass
         p_hash = _hash_file(p_file)
         c_hash = _hash_file(c_file)
         return bool(p_hash) and p_hash == c_hash
@@ -695,7 +700,8 @@ def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
         with open(path, "rb") as handle:
             for chunk in iter(lambda: handle.read(chunk_size), b""):
                 hasher.update(chunk)
-    except OSError:
+    except OSError as exc:
+        logger.debug("Failed to hash file %s: %s", path, exc)
         return ""
     return hasher.hexdigest()
 
