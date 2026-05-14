@@ -690,7 +690,7 @@ def _file_size_bytes(path: Path) -> int:
 
 def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
     """Return a hex hash for *path*, or empty string on error."""
-    hasher = hashlib.sha1()
+    hasher = hashlib.sha256()
     try:
         with open(path, "rb") as handle:
             for chunk in iter(lambda: handle.read(chunk_size), b""):
