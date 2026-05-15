@@ -27403,3 +27403,35 @@ class TestWave165PalWrongSerialFixes(unittest.TestCase):
                 n = int(s[5:])
                 self.assertFalse(1000 < n < 50000,
                     f"Wave 165: {name} has suspicious PS1-era serial {s} (n={n}); must be >= 50000")
+
+
+class TestConflictResolverPNACH(unittest.TestCase):
+    """Tests for PNACH conflict auto-fix detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.cheats = Path(self.tmpdir) / "cheats"
+        self.cheats_ws = Path(self.tmpdir) / "cheats_ws"
+        self.cheats.mkdir(parents=True, exist_ok=True)
+        self.cheats_ws.mkdir(parents=True, exist_ok=True)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_pnach(self, directory: Path, crc: str, content: str) -> Path:
+        path = directory / f"{crc}.pnach"
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_identical_unparseable_pnach_can_auto_fix(self):
+        """Auto-fix should be allowed for identical PNACH files even if no patches parse."""
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+
+        crc = "DEADBEEF"
+        content = "// header only\npatch=1,EE,ZZZZZZZZ,word,0000\n"
+        self._write_pnach(self.cheats, crc, content)
+        self._write_pnach(self.cheats_ws, crc, content)
+
+        conflicts = resolve_pnach_conflicts(str(self.cheats), str(self.cheats_ws))
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].can_auto_fix)

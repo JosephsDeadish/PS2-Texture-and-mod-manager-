@@ -218,6 +218,18 @@ def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
     return patches
 
 
+def _files_identical(p_file: Path, c_file: Path) -> bool:
+    """Return True when two files match byte-for-byte."""
+    try:
+        if p_file.stat().st_size != c_file.stat().st_size:
+            return False
+    except OSError:
+        pass
+    p_hash = _hash_file(p_file)
+    c_hash = _hash_file(c_file)
+    return bool(p_hash) and p_hash == c_hash
+
+
 def _select_pnach_delete_path(
     p_file: Path,
     c_file: Path,
@@ -245,16 +257,13 @@ def _pnach_can_auto_fix(
 ) -> bool:
     """Return True when one PNACH's enabled patches are contained in the other."""
     if p_set and c_set:
-        return p_set <= c_set or c_set <= p_set
+        if p_set <= c_set or c_set <= p_set:
+            return True
+        if p_file and c_file:
+            return _files_identical(p_file, c_file)
+        return False
     if p_file and c_file:
-        try:
-            if p_file.stat().st_size != c_file.stat().st_size:
-                return False
-        except OSError:
-            pass
-        p_hash = _hash_file(p_file)
-        c_hash = _hash_file(c_file)
-        return bool(p_hash) and p_hash == c_hash
+        return _files_identical(p_file, c_file)
     return False
 
 
