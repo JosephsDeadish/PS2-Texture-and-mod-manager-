@@ -337,7 +337,8 @@ class MainWindow(QMainWindow):
             self._run_wizard()
 
     def _run_wizard(self):
-        wizard = SetupWizard(self.config, self)
+        parent = self if self.isVisible() else None
+        wizard = SetupWizard(self.config, parent)
         wizard.setup_complete.connect(self._on_setup_complete)
         wizard.exec()
 
