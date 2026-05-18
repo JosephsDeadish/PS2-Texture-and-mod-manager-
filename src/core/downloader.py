@@ -516,7 +516,20 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         data = resp.json()
         href = data.get("href", "")
-        return href if isinstance(href, str) and href.startswith(("http://", "https://")) else None
+        if not (isinstance(href, str) and href.startswith(("http://", "https://"))):
+            return None
+        try:
+            href_netloc = urllib.parse.urlparse(href).netloc.lower()
+        except Exception:
+            return None
+        if not (
+            href_netloc.endswith(".yandex.ru")
+            or href_netloc.endswith(".yandex.net")
+            or href_netloc == "yandex.ru"
+            or href_netloc == "yandex.net"
+        ):
+            return None
+        return href
     except Exception:
         return None
 

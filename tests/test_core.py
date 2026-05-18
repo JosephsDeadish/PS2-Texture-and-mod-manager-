@@ -2786,6 +2786,15 @@ class TestYandexDiskResolver(unittest.TestCase):
         self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
 
     @patch("src.core.downloader.requests.get")
+    def test_untrusted_href_domain_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://evil.example.com/file.bin"}
+        mock_get.return_value = mock_resp
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+
+    @patch("src.core.downloader.requests.get")
     def test_network_error_returns_none(self, mock_get):
         from src.core.downloader import resolve_yandex_disk_url
         mock_get.side_effect = Exception("timeout")
