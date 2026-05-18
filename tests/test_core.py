@@ -1383,7 +1383,7 @@ class TestGameRegistry(unittest.TestCase):
         from src.core.game_registry import lookup_game_title
         self.assertEqual(lookup_game_title("XXXX-99999"), "")
 
-    def test_load_informative_serials_parses_both_json_shapes(self):
+    def test_load_informative_serials_parses_json_txt_and_html_shapes(self):
         from src.core.game_registry import _load_informative_serials
         with tempfile.TemporaryDirectory() as tmpdir:
             info_dir = Path(tmpdir)
@@ -1402,10 +1402,25 @@ class TestGameRegistry(unittest.TestCase):
                 }),
                 encoding="utf-8",
             )
+            (info_dir / "PS2 codes and name 4.txt").write_text(
+                "IJKL-11111\tTitle From TXT\nBADLINEWITHOUTTAB\n",
+                encoding="utf-8",
+            )
+            (info_dir / "PS2.ID.List.02.13.20.htm").write_text(
+                (
+                    "<html><body><table>"
+                    "<tr><td>Title From HTML</td><td><center>MNOP-22222</center></td></tr>"
+                    "<tr><td>Ignored Prefix</td><td><center>1NOP-22222</center></td></tr>"
+                    "</table></body></html>"
+                ),
+                encoding="utf-8",
+            )
             loaded = _load_informative_serials(info_dir)
             self.assertEqual(loaded.get("ABCD-12345"), "Title From Flat Map")
             self.assertEqual(loaded.get("EFGH-54321"), "Title From Object Map")
             self.assertEqual(loaded.get("WXYZ-00001"), "Title With Underscore Serial")
+            self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
+            self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
             self.assertNotIn("BADSERIAL", loaded)
             self.assertNotIn("12AB-12345", loaded)
 

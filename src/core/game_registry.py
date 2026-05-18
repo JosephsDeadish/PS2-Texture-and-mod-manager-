@@ -899,14 +899,13 @@ def _load_demos_serials() -> dict[str, str]:
 def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]:
     """Load additional serial → title mappings from informative-document JSON files."""
     import json as _json
+    import html as _html
     root = base_dir or (Path(__file__).parent.parent.parent / "Informative doccument")
-    files = (
-        root / "PS2.data.json",
-        root / "Ps2 codes and names 3.json",
-    )
     serial_re = re.compile(r"^[A-Z]{4}-\d{5}$")
     result: dict[str, str] = {}
-    for fp in files:
+
+    # JSON maps: {serial: title} and {serial: {title: ...}}
+    for fp in (root / "PS2.data.json", root / "Ps2 codes and names 3.json"):
         if not fp.is_file():
             continue
         try:
@@ -919,6 +918,8 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
             serial = str(key).strip().upper().replace("_", "-")
             if not serial_re.match(serial):
                 continue
+            if serial.endswith("-99999"):
+                continue
             if isinstance(value, str):
                 title = value.strip()
             elif isinstance(value, dict):
@@ -927,6 +928,48 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                 title = ""
             if title and serial not in result:
                 result[serial] = title
+
+    # TXT map: "SERIAL<TAB>TITLE"
+    txt_fp = root / "PS2 codes and name 4.txt"
+    if txt_fp.is_file():
+        try:
+            for raw_line in txt_fp.read_text(encoding="utf-8", errors="replace").splitlines():
+                line = raw_line.strip()
+                if not line:
+                    continue
+                parts = line.split("\t", 1)
+                if len(parts) != 2:
+                    continue
+                serial = parts[0].strip().upper().replace("_", "-")
+                title = parts[1].strip()
+                if serial.endswith("-99999"):
+                    continue
+                if serial_re.match(serial) and title and serial not in result:
+                    result[serial] = title
+        except Exception:
+            pass
+
+    # HTML table: first <td> is title, GAME ID appears in a <center> cell.
+    htm_fp = root / "PS2.ID.List.02.13.20.htm"
+    if htm_fp.is_file():
+        try:
+            html_text = htm_fp.read_text(encoding="utf-8", errors="replace")
+            row_re = re.compile(
+                r"<tr><td>(.*?)</td>.*?<center>\s*([A-Z]{4}[-_]\d{5})\s*</center>",
+                re.IGNORECASE | re.DOTALL,
+            )
+            strip_tags_re = re.compile(r"<[^>]+>")
+            for title_cell, serial_raw in row_re.findall(html_text):
+                serial = serial_raw.strip().upper().replace("_", "-")
+                if not serial_re.match(serial) or serial in result:
+                    continue
+                if serial.endswith("-99999"):
+                    continue
+                title = _html.unescape(strip_tags_re.sub("", title_cell)).strip()
+                if title:
+                    result[serial] = title
+        except Exception:
+            pass
     return result
 
 
