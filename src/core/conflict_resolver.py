@@ -218,6 +218,42 @@ def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
     return patches
 
 
+def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
+    """Remove enabled EE patch lines for *addresses* from a PNACH file.
+
+    Returns ``(removed_count, remaining_patch_lines)``.
+    """
+    if not addresses:
+        return 0, 0
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return 0, 0
+
+    removed = 0
+    kept_lines: List[str] = []
+    remaining_patches = 0
+    wanted = {a.upper() for a in addresses}
+
+    for line in lines:
+        m = _PNACH_PATCH_LINE_RE.match(line)
+        if m and m.group(1).upper() in wanted:
+            removed += 1
+            continue
+        if m:
+            remaining_patches += 1
+        kept_lines.append(line)
+
+    if removed == 0:
+        return 0, remaining_patches
+
+    try:
+        path.write_text("\n".join(kept_lines) + ("\n" if kept_lines else ""), encoding="utf-8")
+    except OSError:
+        return 0, 0
+    return removed, remaining_patches
+
+
 def _files_identical(p_file: Path, c_file: Path) -> bool:
     """Return True when two files match byte-for-byte."""
     try:
@@ -336,15 +372,18 @@ def resolve_pnach_conflicts(
         clashing = p_addrs & c_addrs
         p_set = _read_pnach_patch_set(p_file)
         c_set = _read_pnach_patch_set(c_file)
-        auto_fixable = _pnach_can_auto_fix(p_set, c_set, p_file, c_file)
-        delete_target = _select_pnach_delete_path(p_file, c_file, p_set, c_set) if auto_fixable else None
+        # Issue #17 item #5: Address clashes should always allow auto-fix.
+        # Auto-fix removes overlapping address lines from cheats_ws/ (or deletes
+        # that file if it only contains clashing lines).
+        auto_fixable = bool(clashing) or _pnach_can_auto_fix(p_set, c_set, p_file, c_file)
+        delete_target = _select_pnach_delete_path(p_file, c_file, p_set, c_set) if (auto_fixable and not clashing) else None
 
         if clashing:
             auto_note = ""
-            if auto_fixable and delete_target is not None:
+            if auto_fixable:
                 auto_note = (
-                    "\n\nAuto-fix is available because one file's enabled patches are "
-                    f"fully contained in the other file's patches. Auto-fix will delete: {delete_target.name}"
+                    "\n\nAuto-fix is available: overlapping address patch lines will be "
+                    "removed from the cheats_ws file so only one value writes to each address."
                 )
             conflicts.append(Conflict(
                 conflict_type="pnach_address_clash",
@@ -359,8 +398,8 @@ def resolve_pnach_conflicts(
                 ),
                 items=[p_file, c_file],
                 resolution=(
-                    "Remove the duplicate patch lines from one of the files, "
-                    "or delete the file whose patches are superseded."
+                    "Remove overlapping patch lines from one file. "
+                    "Auto-fix removes conflicting lines from cheats_ws."
                 ),
                 can_auto_fix=auto_fixable,
             ))
@@ -1080,7 +1119,34 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
     if not conflict.can_auto_fix:
         return False, "This conflict cannot be auto-fixed."
 
-    if conflict.conflict_type in ("pnach_duplicate_crc", "pnach_address_clash"):
+    if conflict.conflict_type == "pnach_address_clash":
+        if len(conflict.items) != 2:
+            return False, "Auto-fix expects exactly two PNACH files."
+        p_file, c_file = conflict.items
+        p_addrs = _read_pnach_addresses(p_file)
+        c_addrs = _read_pnach_addresses(c_file)
+        clashing = p_addrs & c_addrs
+        if not clashing:
+            return False, "No overlapping addresses found to auto-fix."
+
+        # Prefer removing clashing lines from cheats_ws so regular cheats win.
+        target = c_file if any(part.lower() == "cheats_ws" for part in c_file.parts) else p_file
+        removed, remaining = _remove_pnach_addresses(target, clashing)
+        if removed <= 0:
+            return False, f"Could not remove overlapping patch lines from {target.name}."
+
+        if remaining == 0:
+            try:
+                target.unlink(missing_ok=True)
+            except OSError as exc:
+                return False, f"Removed lines but could not delete empty file {target.name}: {exc}"
+            return True, (
+                f"Removed {removed} overlapping patch line(s) and deleted empty file {target.name}."
+            )
+
+        return True, f"Removed {removed} overlapping patch line(s) from {target.name}."
+
+    if conflict.conflict_type == "pnach_duplicate_crc":
         if len(conflict.items) != 2:
             return False, "Auto-fix expects exactly two PNACH files."
         p_file, c_file = conflict.items

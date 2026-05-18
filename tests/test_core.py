@@ -6710,6 +6710,38 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].severity, ConflictSeverity.ERROR)
         self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
         self.assertIn(shared_addr.upper(), conflicts[0].description)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_pnach_address_clash_auto_fix_removes_overlapping_lines(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "55667788"
+        shared_addr = "0010ABCD"
+        other_ws_addr = "0020BEEF"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(f"patch=1,EE,{shared_addr},word,11111111\n", encoding="utf-8")
+        c_file.write_text(
+            f"patch=1,EE,{shared_addr},word,22222222\n"
+            f"patch=1,EE,{other_ws_addr},word,33333333\n",
+            encoding="utf-8",
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+        ok, message = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok, message)
+        self.assertTrue(c_file.exists())
+        content = c_file.read_text(encoding="utf-8")
+        self.assertIn(other_ws_addr, content)
+        self.assertNotIn(shared_addr, content)
 
     def test_pnach_auto_fix_identical_unparseable_lines(self):
         from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
