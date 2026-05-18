@@ -2742,6 +2742,57 @@ class TestMediaFireResolver(unittest.TestCase):
 
 
 # =============================================================================
+# Yandex Disk URL resolver (mocked network)
+# =============================================================================
+
+class TestYandexDiskResolver(unittest.TestCase):
+    """Tests for resolve_yandex_disk_url()."""
+
+    def test_non_yandex_url_returns_none(self):
+        from src.core.downloader import resolve_yandex_disk_url
+        self.assertIsNone(resolve_yandex_disk_url("https://example.com/file.zip"))
+
+    def test_empty_url_returns_none(self):
+        from src.core.downloader import resolve_yandex_disk_url
+        self.assertIsNone(resolve_yandex_disk_url(""))
+        self.assertIsNone(resolve_yandex_disk_url(None))  # type: ignore[arg-type]
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolves_disk_yandex_share_url(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://downloader.disk.yandex.ru/disk/abc123"}
+        mock_get.return_value = mock_resp
+        result = resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA")
+        self.assertEqual(result, "https://downloader.disk.yandex.ru/disk/abc123")
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolves_yadi_sk_share_url(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://downloader.disk.yandex.ru/disk/xyz987"}
+        mock_get.return_value = mock_resp
+        result = resolve_yandex_disk_url("https://yadi.sk/d/abcdef123")
+        self.assertEqual(result, "https://downloader.disk.yandex.ru/disk/xyz987")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 403
+        mock_get.return_value = mock_resp
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_get.side_effect = Exception("timeout")
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+
+
+# =============================================================================
 # GBAtemp thread scraper (mocked network)
 # =============================================================================
 

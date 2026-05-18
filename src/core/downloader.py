@@ -480,6 +480,47 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
         return None
 
 
+def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
+    """Resolve a Yandex Disk share URL to a direct download URL.
+
+    Supports public share URLs such as::
+
+        https://disk.yandex.ru/d/<key>
+        https://yadi.sk/d/<key>
+
+    Uses Yandex's public API endpoint to obtain a temporary direct download
+    ``href``. Returns ``None`` when the URL is not a supported Yandex share
+    page or cannot be resolved.
+    """
+    if not page_url:
+        return None
+    try:
+        parsed = urllib.parse.urlparse(page_url)
+        netloc = parsed.netloc.lower()
+        if netloc not in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk"):
+            return None
+        if "/d/" not in parsed.path.lower() and "/i/" not in parsed.path.lower():
+            return None
+    except Exception:
+        return None
+    try:
+        api = "https://cloud-api.yandex.net/v1/disk/public/resources/download"
+        resp = requests.get(
+            api,
+            params={"public_key": page_url},
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        href = data.get("href", "")
+        return href if isinstance(href, str) and href.startswith(("http://", "https://")) else None
+    except Exception:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # GBAtemp thread scraper
 # ---------------------------------------------------------------------------

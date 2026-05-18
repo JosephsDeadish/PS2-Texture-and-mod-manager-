@@ -1134,29 +1134,52 @@ class DownloadInstallDialog(QDialog):
         * Dropbox share links → direct download (``dl=1``)
         * GitHub blob links → raw.githubusercontent.com
         * MediaFire file-page links → resolved via :func:`resolve_mediafire_url`
+        * Yandex Disk share links → resolved via :func:`resolve_yandex_disk_url`
 
         Returns the converted URL, or the original *url* unchanged if no
-        conversion was needed.  Returns ``None`` if a MediaFire page fetch was
-        attempted but failed (so the caller can show an appropriate error).
+        conversion was needed.  Returns ``None`` when the URL requires manual
+        download (e.g. Google Drive folders / MediaFire folders / Patreon pages)
+        or when an attempted host-specific resolution fails.
         """
         if not url:
             return url
 
-        from src.core.downloader import convert_share_url, resolve_mediafire_url
+        from src.core.downloader import (
+            convert_share_url,
+            resolve_mediafire_url,
+            resolve_yandex_disk_url,
+        )
         url = convert_share_url(url)
-
-        # MediaFire file page — resolve to direct download URL
         try:
             import urllib.parse as _up
             _psd = _up.urlparse(url)
             _netloc = _psd.netloc.lower()
-            _is_mf = (_netloc in ("www.mediafire.com", "mediafire.com")
-                      and "/file/" in _psd.path.lower())
+            _path = _psd.path.lower()
         except Exception:
-            _is_mf = False
+            return url
+
+        # Google Drive folder pages are not direct file downloads.
+        if _netloc in ("drive.google.com", "www.drive.google.com") and "/drive/folders/" in _path:
+            return None
+
+        # MediaFire folders are not direct single-file download links.
+        if _netloc in ("www.mediafire.com", "mediafire.com") and "/folder/" in _path:
+            return None
+
+        # Patreon links require browser login and cannot be directly downloaded.
+        if _netloc.endswith("patreon.com"):
+            return None
+
+        # MediaFire file page — resolve to direct download URL
+        _is_mf = (_netloc in ("www.mediafire.com", "mediafire.com") and "/file/" in _path)
         if _is_mf:
             resolved = resolve_mediafire_url(url)
             return resolved  # None if resolution failed
+
+        # Yandex Disk public share pages require API resolution.
+        if _netloc in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk"):
+            resolved = resolve_yandex_disk_url(url)
+            return resolved
 
         return url
 
@@ -1207,9 +1230,46 @@ class DownloadInstallDialog(QDialog):
             threading.Thread(target=_resolve_then_download, daemon=True).start()
             return
 
+        # Resolve Yandex share links in a background thread (network API call).
+        try:
+            import urllib.parse as _up
+            _psd3 = _up.urlparse(raw_url)
+            _nl3 = _psd3.netloc.lower()
+            _is_yandex_raw = _nl3 in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk")
+        except Exception:
+            _is_yandex_raw = False
+        if _is_yandex_raw:
+            self._dl_btn.setEnabled(False)
+            self._progress.show()
+            self._status.setText("🔍 Resolving Yandex link…")
+
+            def _resolve_yandex_then_download():
+                resolved_url = self._convert_url(raw_url)
+                if not resolved_url:
+                    def _yd_err():
+                        self._status.setText(
+                            "❌  Could not resolve Yandex direct download link.\n"
+                            "Please open the source page in your browser and copy a direct file URL."
+                        )
+                        self._progress.hide()
+                        self._dl_btn.setEnabled(True)
+                    QTimer.singleShot(0, _yd_err)
+                    return
+                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
+                QTimer.singleShot(0, lambda r=resolved_url: self._run_download(raw_url, r))
+
+            threading.Thread(target=_resolve_yandex_then_download, daemon=True).start()
+            return
+
         url = self._convert_url(raw_url)
         if url is None:
-            url = raw_url
+            self._status.setText(
+                "❌  This URL cannot be resolved as a direct download.\n"
+                "Use 🌐 Visit Source to open the page, then copy a direct file link."
+            )
+            self._progress.hide()
+            self._dl_btn.setEnabled(True)
+            return
         mod_type = self._type_combo.currentData()
         storage = self.config.mods_storage_path
         if not storage:
