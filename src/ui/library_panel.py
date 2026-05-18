@@ -663,7 +663,7 @@ class _AllModsPane(QWidget):
 
         total = len(self._rows)
         self._count_lbl.setText(
-            f"Showing {shown} of {total} installed mod(s) in library"
+            f"Showing {shown} of {total} library-tracked installed mod(s)"
             + (" — no mods installed yet" if total == 0 else "")
         )
 

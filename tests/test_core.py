@@ -11452,7 +11452,7 @@ class TestWave55LibraryCountWording(unittest.TestCase):
         from pathlib import Path
         src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
                ).read_text(encoding="utf-8")
-        self.assertIn("installed mod(s) in library", src)
+        self.assertIn("library-tracked installed mod(s)", src)
 
 
 # ---------------------------------------------------------------------------
