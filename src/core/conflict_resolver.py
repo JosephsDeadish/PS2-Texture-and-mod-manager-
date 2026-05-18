@@ -376,7 +376,6 @@ def resolve_pnach_conflicts(
         # Auto-fix removes overlapping address lines from cheats_ws/ (or deletes
         # that file if it only contains clashing lines).
         auto_fixable = bool(clashing) or _pnach_can_auto_fix(p_set, c_set, p_file, c_file)
-        delete_target = _select_pnach_delete_path(p_file, c_file, p_set, c_set) if (auto_fixable and not clashing) else None
 
         if clashing:
             auto_note = ""
