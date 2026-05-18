@@ -263,7 +263,7 @@ def _merge_pnach_files(keep_path: Path, remove_path: Path) -> Tuple[bool, str]:
         return False, f"Could not read PNACH files for merge: {exc}"
 
     existing = set(keep_lines)
-    merged_lines = list(keep_lines)
+    merged_lines = keep_lines
     added = 0
     for line in remove_lines:
         if line not in existing:
