@@ -11432,6 +11432,29 @@ class TestWave55ScanLibraryAutoDetect(unittest.TestCase):
             shutil.rmtree(tmpdir, ignore_errors=True)
 
 
+class TestWave55LibraryCountWording(unittest.TestCase):
+    """Wave 55/Issue #17 item #4: Library count labels clarify what is counted."""
+
+    def test_all_mods_count_mentions_library_tracked_installed_mods(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("Library-tracked installed mods:", src)
+
+    def test_by_game_count_mentions_games_with_installed_mods(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("with at least 1 installed mod", src)
+        self.assertIn("Games with installed mods (DB tracked):", src)
+
+    def test_all_mods_pane_filter_count_mentions_installed_mods_in_library(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("installed mod(s) in library", src)
+
+
 # ---------------------------------------------------------------------------
 # Wave 56 — PCSX2 guidance banners, library DB auto-populate, cover art
 # ---------------------------------------------------------------------------
