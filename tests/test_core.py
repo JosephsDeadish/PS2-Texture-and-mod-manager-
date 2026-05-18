@@ -6334,6 +6334,86 @@ class TestInstalledScanner(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Tests for ModManager.auto_import_unmanaged_content
+# ---------------------------------------------------------------------------
+
+class TestModManagerAutoImportUnmanagedContent(unittest.TestCase):
+    """Auto-import unmanaged installed PCSX2 content into the mod DB."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_db_file = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+        from src.core.mod_manager import ModDatabase, ModManager
+        self.db = ModDatabase()
+        self.mgr = ModManager(self.db)
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig_db_file
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_pcsx2_layout(self):
+        root = Path(self.tmpdir) / "pcsx2"
+        textures = root / "textures"
+        cheats = root / "cheats"
+        cheats_ws = root / "cheats_ws"
+        covers = root / "covers"
+        storage = Path(self.tmpdir) / "managed_storage"
+
+        (textures / "SLUS-20062" / "replacements").mkdir(parents=True, exist_ok=True)
+        (textures / "SLUS-20062" / "replacements" / "a.png").write_bytes(b"PNGDATA")
+
+        cheats.mkdir(parents=True, exist_ok=True)
+        (cheats / "AABBCCDD.pnach").write_text("patch=1,EE,00123456,word,00000001", encoding="utf-8")
+
+        cheats_ws.mkdir(parents=True, exist_ok=True)
+        (cheats_ws / "DEADBEEF.pnach").write_text("patch=1,EE,00123456,word,00000002", encoding="utf-8")
+
+        covers.mkdir(parents=True, exist_ok=True)
+        (covers / "SLUS-20062.png").write_bytes(b"\x89PNG")
+
+        from src.models.mod import AppConfig
+        return AppConfig(
+            textures_path=str(textures),
+            pnach_path=str(cheats),
+            cheats_path=str(cheats_ws),
+            cover_art_path=str(covers),
+            mods_storage_path=str(storage),
+        )
+
+    def test_auto_import_unmanaged_content_imports_supported_types(self):
+        config = self._make_pcsx2_layout()
+        imported = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(imported, 4)
+        mods = self.db.all()
+        self.assertEqual(len(mods), 4)
+
+        types = {m.mod_type.value for m in mods}
+        self.assertIn("texture_pack", types)
+        self.assertIn("pnach", types)
+        self.assertIn("cheat", types)
+        self.assertIn("cover_art", types)
+
+        for mod in mods:
+            self.assertTrue(
+                mod.path.startswith(config.mods_storage_path),
+                f"Expected managed path under storage: {mod.path}",
+            )
+
+    def test_auto_import_unmanaged_content_does_not_duplicate_on_second_run(self):
+        config = self._make_pcsx2_layout()
+        first = self.mgr.auto_import_unmanaged_content(config)
+        second = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(first, 4)
+        self.assertEqual(second, 0)
+        self.assertEqual(len(self.db.all()), 4)
+
+
+# ---------------------------------------------------------------------------
 # Tests for custom_card_builder
 # ---------------------------------------------------------------------------
 
