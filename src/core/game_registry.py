@@ -896,6 +896,40 @@ def _load_demos_serials() -> dict[str, str]:
     return result
 
 
+def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]:
+    """Load additional serial → title mappings from informative-document JSON files."""
+    import json as _json
+    root = base_dir or (Path(__file__).parent.parent.parent / "Informative doccument")
+    files = (
+        root / "PS2.data.json",
+        root / "Ps2 codes and names 3.json",
+    )
+    serial_re = re.compile(r"^[A-Z]{4}-\d{5}$")
+    result: dict[str, str] = {}
+    for fp in files:
+        if not fp.is_file():
+            continue
+        try:
+            raw = _json.loads(fp.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(raw, dict):
+            continue
+        for key, value in raw.items():
+            serial = str(key).strip().upper().replace("_", "-")
+            if not serial_re.match(serial):
+                continue
+            if isinstance(value, str):
+                title = value.strip()
+            elif isinstance(value, dict):
+                title = str(value.get("title", "")).strip()
+            else:
+                title = ""
+            if title and serial not in result:
+                result[serial] = title
+    return result
+
+
 # Preserve the curated hardcoded entries so they can be re-applied with
 # higher priority after merging in the JSON databases.  This ensures that
 # well-known serials in the hardcoded dict are never clobbered by
@@ -905,6 +939,8 @@ _KNOWN_SERIALS.update(_load_pal_serials())
 _KNOWN_SERIALS.update(_load_japan_serials())
 _KNOWN_SERIALS.update(_load_ntsc_u_serials())
 _KNOWN_SERIALS.update(_load_demos_serials())
+for _serial, _title in _load_informative_serials().items():
+    _KNOWN_SERIALS.setdefault(_serial, _title)
 # Hardcoded entries take final priority over any JSON DB entry.
 _KNOWN_SERIALS.update(_hardcoded_serials)
 

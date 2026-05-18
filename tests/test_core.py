@@ -1383,6 +1383,32 @@ class TestGameRegistry(unittest.TestCase):
         from src.core.game_registry import lookup_game_title
         self.assertEqual(lookup_game_title("XXXX-99999"), "")
 
+    def test_load_informative_serials_parses_both_json_shapes(self):
+        from src.core.game_registry import _load_informative_serials
+        with tempfile.TemporaryDirectory() as tmpdir:
+            info_dir = Path(tmpdir)
+            (info_dir / "PS2.data.json").write_text(
+                json.dumps({
+                    "ABCD-12345": "Title From Flat Map",
+                    "BADSERIAL": "ignored",
+                }),
+                encoding="utf-8",
+            )
+            (info_dir / "Ps2 codes and names 3.json").write_text(
+                json.dumps({
+                    "EFGH-54321": {"title": "Title From Object Map"},
+                    "WXYZ_00001": {"title": "Title With Underscore Serial"},
+                    "12AB-12345": {"title": "ignored non-letter prefix"},
+                }),
+                encoding="utf-8",
+            )
+            loaded = _load_informative_serials(info_dir)
+            self.assertEqual(loaded.get("ABCD-12345"), "Title From Flat Map")
+            self.assertEqual(loaded.get("EFGH-54321"), "Title From Object Map")
+            self.assertEqual(loaded.get("WXYZ-00001"), "Title With Underscore Serial")
+            self.assertNotIn("BADSERIAL", loaded)
+            self.assertNotIn("12AB-12345", loaded)
+
     # ------------------------------------------------------------------
     # AppConfig favorite_authors
     # ------------------------------------------------------------------
