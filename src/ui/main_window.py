@@ -239,6 +239,7 @@ class MainWindow(QMainWindow):
             self._browse_panel,
             self._library_panel,
             self._downloads_panel,
+            self._gif_panel,
             self._settings_panel,
         ):
             panel.status_message.connect(self._show_status)
@@ -336,7 +337,8 @@ class MainWindow(QMainWindow):
             self._run_wizard()
 
     def _run_wizard(self):
-        wizard = SetupWizard(self.config, self)
+        parent = self if self.isVisible() else None
+        wizard = SetupWizard(self.config, parent)
         wizard.setup_complete.connect(self._on_setup_complete)
         wizard.exec()
 
@@ -382,4 +384,3 @@ class MainWindow(QMainWindow):
                 self._library_panel.refresh()
             except Exception:
                 pass
-

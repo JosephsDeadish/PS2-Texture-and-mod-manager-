@@ -23,7 +23,6 @@ block_cipher = None
 # Collect all PyQt6 plugin directories needed at runtime
 # ---------------------------------------------------------------------------
 
-from PyInstaller.utils.hooks import collect_dynamic_libs, collect_data_files
 
 # ---------------------------------------------------------------------------
 # Analysis

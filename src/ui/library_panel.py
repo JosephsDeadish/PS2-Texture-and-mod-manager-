@@ -663,7 +663,7 @@ class _AllModsPane(QWidget):
 
         total = len(self._rows)
         self._count_lbl.setText(
-            f"Showing {shown} of {total} mod(s)"
+            f"Showing {shown} of {total} tracked mod(s) in library"
             + (" — no mods installed yet" if total == 0 else "")
         )
 
@@ -685,6 +685,7 @@ class LibraryPanel(BasePanel):
         super().__init__("🎮  My Library", "Enable and disable mods for each game", parent)
         self.db = db
         self.config = config
+        self.manager = ModManager(self.db)
         self._cards: list[_GameCard] = []
         self._selected_card: Optional[_GameCard] = None
         self._build()
@@ -715,7 +716,7 @@ class LibraryPanel(BasePanel):
             "• Duplicate PNACH files across cheats/ and cheats_ws/\n"
             "• PNACH patches writing to the same memory address\n"
             "• Multiple cover-art images for the same serial\n"
-            "• Merged texture packs that may override each other"
+            "• Duplicate texture files with identical content"
         )
         conflict_btn.clicked.connect(self._open_conflict_resolver)
         toolbar.addWidget(conflict_btn)
@@ -805,6 +806,9 @@ class LibraryPanel(BasePanel):
 
         content.addWidget(self._mode_stack, 1)
 
+        # Auto-detect unmanaged installed content before initial populate.
+        self._sync_installed_content()
+
         # Initial populate (By Game mode)
         self._populate()
 
@@ -825,7 +829,9 @@ class LibraryPanel(BasePanel):
         self._all_mods_pane.refresh()
         total = len(self.db.all())
         enabled = sum(1 for m in self.db.all() if m.enabled)
-        self._count_lbl.setText(f"{total} mod(s)  •  {enabled} enabled")
+        self._count_lbl.setText(
+            f"Tracked mods in library: {total} total  •  {enabled} enabled"
+        )
 
     # ------------------------------------------------------------------
     # Populate game list
@@ -930,7 +936,7 @@ class LibraryPanel(BasePanel):
         games_with_mods = sum(1 for g in games if mods_by_serial.get((g.serial or "").upper(), 0) > 0)
         games_with_mods += len(db_only_games)
         self._count_lbl.setText(
-            f"{total} game(s)  •  {games_with_mods} have mods installed"
+            f"Library games: {total} total  •  {games_with_mods} with installed mods"
         )
 
     # ------------------------------------------------------------------
@@ -977,7 +983,7 @@ class LibraryPanel(BasePanel):
             self._list_layout.addWidget(card)
             self._cards.append(card)
         self._list_layout.addStretch()
-        self._count_lbl.setText(f"{len(db_only)} game(s) with mods installed")
+        self._count_lbl.setText(f"Tracked games with installed mods: {len(db_only)}")
 
     # ------------------------------------------------------------------
     # Handlers
@@ -1014,11 +1020,18 @@ class LibraryPanel(BasePanel):
                     break
 
     def refresh(self):
+        self._sync_installed_content()
         if self._mode_stack.currentIndex() == 1:
             self._switch_to_all_mods()
         else:
             self._populate()
         self.emit_status("Library refreshed")
+
+    def _sync_installed_content(self):
+        """Auto-import unmanaged installed content so it appears in the library."""
+        imported = self.manager.auto_import_unmanaged_content(self.config)
+        if imported > 0:
+            self.emit_status(f"Detected and added {imported} installed item(s)")
 
     def _open_installed_scanner(self):
         """Open the Installed Content Scanner dialog (import from PCSX2 folder)."""

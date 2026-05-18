@@ -34,7 +34,9 @@ from PyQt6.QtWidgets import (
     QTabWidget,
 )
 
+from src.core.game_registry import lookup_game_title
 from src.models.mod import ModInfo, ModType, ConflictInfo
+from src.ui.tooltips import get_tip
 
 # ---------------------------------------------------------------------------
 # PnachCodePickerDialog
@@ -414,6 +416,7 @@ class ModItemWidget(QFrame):
         is_shadowed: bool = False,
         validation_errors: int = 0,
         validation_warnings: int = 0,
+        tooltip_mode: str = "normal",  # "normal" | "dumbed_down" | "no_filter"
         parent=None,
     ):
         super().__init__(parent)
@@ -422,6 +425,7 @@ class ModItemWidget(QFrame):
         self.is_shadowed = is_shadowed
         self.validation_errors = validation_errors
         self.validation_warnings = validation_warnings
+        self.tooltip_mode = tooltip_mode
         self._build_ui()
 
     def _build_ui(self):
@@ -471,6 +475,9 @@ class ModItemWidget(QFrame):
         name_lbl.setStyleSheet(
             f"font-weight: bold; font-size: 14px; color: {name_color};"
         )
+        name_lbl.setWordWrap(True)
+        name_lbl.setMinimumWidth(0)
+        name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         name_row.addWidget(name_lbl)
 
         if self.is_shadowed:
@@ -545,12 +552,19 @@ class ModItemWidget(QFrame):
         if self.mod.version:
             meta_parts.append(f"v{self.mod.version}")
         if self.mod.game_id:
-            meta_parts.append(f"Game: {self.mod.game_id}")
+            # Issue #23: show the human-readable game title alongside the serial
+            _title = lookup_game_title(self.mod.game_id)
+            if _title:
+                meta_parts.append(f"Game: {self.mod.game_id} — {_title}")
+            else:
+                meta_parts.append(f"Game: {self.mod.game_id}")
         if self.mod.size_bytes:
             meta_parts.append(_fmt_size(self.mod.size_bytes))
 
         meta_lbl = QLabel("  •  ".join(meta_parts))
         meta_lbl.setStyleSheet("color: #505070; font-size: 11px;" if self.is_shadowed else "color: #7070a0; font-size: 11px;")
+        meta_lbl.setWordWrap(True)
+        meta_lbl.setMinimumWidth(0)
         info.addWidget(meta_lbl)
 
         if self.mod.description:
@@ -566,11 +580,9 @@ class ModItemWidget(QFrame):
         prio_col.setSpacing(2)
         up_btn = QPushButton("▲")
         up_btn.setFixedSize(24, 24)
-        up_btn.setToolTip("Higher priority (wins conflicts)")
         up_btn.clicked.connect(lambda: self.priority_up.emit(self.mod.id))
         dn_btn = QPushButton("▼")
         dn_btn.setFixedSize(24, 24)
-        dn_btn.setToolTip("Lower priority")
         dn_btn.clicked.connect(lambda: self.priority_down.emit(self.mod.id))
         prio_lbl = QLabel(f"#{self.mod.priority}")
         prio_lbl.setStyleSheet("color: #7070a0; font-size: 10px;")
@@ -586,27 +598,24 @@ class ModItemWidget(QFrame):
 
         info_btn = QPushButton("ℹ")
         info_btn.setFixedSize(28, 28)
-        info_btn.setToolTip("Details")
         info_btn.clicked.connect(lambda: self.details_requested.emit(self.mod.id))
         btn_col.addWidget(info_btn)
 
         edit_btn = QPushButton("✏")
         edit_btn.setFixedSize(28, 28)
-        edit_btn.setToolTip("Edit metadata")
         edit_btn.clicked.connect(lambda: self.edit_requested.emit(self.mod.id))
         btn_col.addWidget(edit_btn)
 
+        author_btn = None
         if self.mod.author and self.mod.author != "Unknown":
             author_btn = QPushButton("👤")
             author_btn.setFixedSize(28, 28)
-            author_btn.setToolTip(f"See more by {self.mod.author}")
             author_btn.clicked.connect(lambda: self.filter_by_author.emit(self.mod.author))
             btn_col.addWidget(author_btn)
 
         del_btn = QPushButton("🗑")
         del_btn.setFixedSize(28, 28)
         del_btn.setObjectName("danger_btn")
-        del_btn.setToolTip("Remove mod")
         del_btn.clicked.connect(lambda: self.remove_requested.emit(self.mod.id))
         btn_col.addWidget(del_btn)
 
@@ -615,9 +624,21 @@ class ModItemWidget(QFrame):
         # Toggle
         self.toggle = QCheckBox()
         self.toggle.setChecked(self.mod.enabled)
-        self.toggle.setToolTip("Enable / Disable")
         self.toggle.toggled.connect(lambda v: self.toggled.emit(self.mod.id, v))
         outer.addWidget(self.toggle)
+
+        # Apply mode-aware tooltips (issue #31)
+        _m = self.tooltip_mode
+        up_btn.setToolTip(get_tip("priority_up", _m))
+        dn_btn.setToolTip(get_tip("priority_down", _m))
+        info_btn.setToolTip(get_tip("details", _m))
+        edit_btn.setToolTip(get_tip("edit", _m))
+        del_btn.setToolTip(get_tip("remove", _m))
+        self.toggle.setToolTip(get_tip("toggle", _m))
+        if author_btn is not None:
+            author_btn.setToolTip(
+                get_tip("author_filter", _m) + f"\n({self.mod.author})"
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -652,7 +673,12 @@ class ModDetailsDialog(QDialog):
         title_col.addWidget(_make_label(self.mod.name, bold=True))
         title_col.addWidget(_make_label(f"by {self.mod.author}  •  v{self.mod.version}"))
         if self.mod.game_id:
-            title_col.addWidget(_make_label(f"Game ID: {self.mod.game_id}"))
+            # Issue #23: show game title alongside the serial
+            _title = lookup_game_title(self.mod.game_id)
+            if _title:
+                title_col.addWidget(_make_label(f"Game: {self.mod.game_id} — {_title}"))
+            else:
+                title_col.addWidget(_make_label(f"Game ID: {self.mod.game_id}"))
         header.addLayout(title_col, 1)
         layout.addLayout(header)
 
@@ -2403,7 +2429,6 @@ class PnachCodeBuilderDialog(QDialog):
         # Get CRC from first patch
         game_crc = patches[0].get("crc", "00000000") if patches else "00000000"
         # Get game title from serial
-        from src.core.game_registry import lookup_game_title
         game_title = lookup_game_title(self._game_serial) or self._game_serial
 
         return generate_pnach_text(game_crc, game_title, patches), game_crc
@@ -3004,7 +3029,7 @@ class ConflictResolverDialog(QDialog):
     * Duplicate CRC ``.pnach`` files in both ``cheats/`` and ``cheats_ws/``
     * Two ``.pnach`` files patching the **same EE memory address** for the same CRC
     * Multiple cover-art images for the same PS2 serial
-    * Multiple texture sub-packs merged into one replacements folder
+    * Duplicate texture files with identical content inside replacements folders
 
     Each conflict shows its severity (❌ Error / ⚠️ Warning / ℹ️ Info), a
     detailed description, and a suggested resolution.  Where safe, an

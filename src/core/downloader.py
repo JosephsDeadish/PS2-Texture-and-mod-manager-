@@ -27,6 +27,69 @@ class DownloadError(Exception):
     pass
 
 
+def convert_share_url(url: str) -> str:
+    """Convert common share links (Google Drive/Dropbox/GitHub blob) into direct-download URLs.
+
+    This helper performs only local string conversions (no network requests).
+    Unsupported or already-direct URLs are returned unchanged.
+    """
+    if not url:
+        return url
+
+    try:
+        parsed = urllib.parse.urlparse(url)
+    except Exception:
+        return url
+
+    netloc = parsed.netloc.lower()
+    path = parsed.path
+    query = urllib.parse.parse_qs(parsed.query)
+    query = {k: list(v) for k, v in query.items()}
+
+    # Google Drive: https://drive.google.com/file/d/<id>/view
+    if netloc in ("drive.google.com", "www.drive.google.com"):
+        m = re.search(r"/file/d/([^/]+)", path)
+        if m:
+            file_id = m.group(1)
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+        # drive.google.com/open?id=<id>
+        if "open" in path and "id" in query:
+            return f"https://drive.google.com/uc?export=download&id={query['id'][0]}"
+        # drive.google.com/uc?id=<id>
+        if "uc" in path and "id" in query:
+            file_id = query["id"][0]
+            return f"https://drive.google.com/uc?export=download&id={file_id}"
+
+    # Dropbox share links: add dl=1 for direct download
+    if netloc in ("dropbox.com", "www.dropbox.com"):
+        query["dl"] = ["1"]
+        new_query = urllib.parse.urlencode(query, doseq=True)
+        return parsed._replace(query=new_query).geturl()
+
+    # GitHub blob links: convert to raw.githubusercontent.com
+    if netloc == "github.com":
+        parts = [p for p in path.strip("/").split("/") if p]
+        if len(parts) >= 5 and parts[2] == "blob":
+            owner, repo, _blob, branch = parts[:4]
+            rest = "/".join(parts[4:])
+            return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rest}"
+
+    return url
+
+
+def _looks_like_html(chunk: bytes) -> bool:
+    """Heuristic check for HTML error pages."""
+    if not chunk:
+        return False
+    sample = chunk[:512].lstrip().lower()
+    return (
+        sample.startswith(b"<!doctype html")
+        or sample.startswith(b"<html")
+        or b"<html" in sample
+        or b"<head" in sample
+    )
+
+
 def download_file(
     url: str,
     dest_path: str,
@@ -48,27 +111,40 @@ def download_file(
         raise DownloadError(f"Only http/https URLs are supported, got: {url!r}")
 
     try:
-        with requests.get(url, stream=True, timeout=timeout) as resp:
+        with requests.get(
+            url,
+            stream=True,
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        ) as resp:
             resp.raise_for_status()
             # Detect HTML error pages masquerading as successful responses —
-            # e.g. login walls or CDN error pages that return 200 OK with HTML
+            # e.g. login walls or CDN error pages that return 200 OK with HTML.
             content_type = resp.headers.get("Content-Type", "").lower()
-            if "text/html" in content_type:
-                raise DownloadError(
-                    f"Server returned an HTML page instead of a file.\n"
-                    f"The URL may require a login or the file may no longer be available.\n"
-                    f"URL: {url}"
-                )
+            content_disp = resp.headers.get("Content-Disposition", "").lower()
+            has_attachment = "attachment" in content_disp
             total = int(resp.headers.get("Content-Length", 0))
             received = 0
             try:
                 with open(dest, "wb") as f:
+                    first_chunk = True
                     for chunk in resp.iter_content(chunk_size=65536):
-                        if chunk:
-                            f.write(chunk)
-                            received += len(chunk)
-                            if progress_callback:
-                                progress_callback(received, total)
+                        if not chunk:
+                            continue
+                        if first_chunk:
+                            first_chunk = False
+                            if "text/html" in content_type and not has_attachment:
+                                if _looks_like_html(chunk):
+                                    raise DownloadError(
+                                        f"Server returned an HTML page instead of a file.\n"
+                                        f"The URL may require a login or the file may no longer be available.\n"
+                                        f"URL: {url}"
+                                    )
+                        f.write(chunk)
+                        received += len(chunk)
+                        if progress_callback:
+                            progress_callback(received, total)
             except BaseException:
                 # Remove any partially-written file so callers never see a
                 # truncated download artifact.
@@ -400,6 +476,60 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return m2.group(1)
 
         return None
+    except Exception:
+        return None
+
+
+def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
+    """Resolve a Yandex Disk share URL to a direct download URL.
+
+    Supports public share URLs such as::
+
+        https://disk.yandex.ru/d/<key>
+        https://yadi.sk/d/<key>
+
+    Uses Yandex's public API endpoint to obtain a temporary direct download
+    ``href``. Returns ``None`` when the URL is not a supported Yandex share
+    page or cannot be resolved.
+    """
+    if not page_url:
+        return None
+    try:
+        parsed = urllib.parse.urlparse(page_url)
+        netloc = parsed.netloc.lower()
+        if netloc not in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk"):
+            return None
+        if "/d/" not in parsed.path.lower() and "/i/" not in parsed.path.lower():
+            return None
+    except Exception:
+        return None
+    try:
+        api = "https://cloud-api.yandex.net/v1/disk/public/resources/download"
+        resp = requests.get(
+            api,
+            params={"public_key": page_url},
+            timeout=timeout,
+            headers={"User-Agent": _USER_AGENT},
+            allow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        href = data.get("href", "")
+        if not (isinstance(href, str) and href.startswith(("http://", "https://"))):
+            return None
+        try:
+            href_netloc = urllib.parse.urlparse(href).netloc.lower()
+        except Exception:
+            return None
+        if not (
+            href_netloc.endswith(".yandex.ru")
+            or href_netloc.endswith(".yandex.net")
+            or href_netloc == "yandex.ru"
+            or href_netloc == "yandex.net"
+        ):
+            return None
+        return href
     except Exception:
         return None
 

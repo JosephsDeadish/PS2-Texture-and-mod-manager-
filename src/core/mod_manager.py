@@ -127,6 +127,101 @@ class ModManager:
         self.db = db
 
     # ------------------------------------------------------------------
+    # Installed-content sync
+    # ------------------------------------------------------------------
+
+    def auto_import_unmanaged_content(self, config) -> int:
+        """Import unmanaged installed PCSX2 content into the mod database.
+
+        Returns the number of new items imported.
+        """
+        try:
+            from src.core.config_manager import get_data_dir
+            from src.core.installed_scanner import scan_all
+            from src.core.game_registry import normalise_serial
+        except Exception:
+            return 0
+
+        storage = (getattr(config, "mods_storage_path", "") or "").strip()
+        if not storage:
+            storage = str(get_data_dir() / "mods")
+        Path(storage).mkdir(parents=True, exist_ok=True)
+
+        unmanaged = scan_all(config)
+        if not unmanaged:
+            return 0
+
+        crc_re = re.compile(r'^([0-9A-Fa-f]{8})\.pnach$')
+        known_signatures: set[tuple[str, str]] = set()
+
+        def _add_sig(kind: str, value: str):
+            if kind and value:
+                known_signatures.add((kind, value.upper()))
+
+        # Build signatures from already tracked mods so we don't re-import.
+        for mod in self.db.all():
+            if mod.mod_type == ModType.TEXTURE_PACK:
+                serial = normalise_serial(mod.game_id) if mod.game_id else ""
+                if serial:
+                    _add_sig("texture_pack", serial)
+            elif mod.mod_type == ModType.COVER_ART:
+                serial = normalise_serial(mod.game_id) if mod.game_id else ""
+                if serial:
+                    _add_sig("cover_art", serial)
+            elif mod.mod_type in (ModType.PNACH, ModType.CHEAT):
+                p = Path(mod.path)
+                if p.is_file():
+                    m = crc_re.match(p.name)
+                    if m:
+                        _add_sig(mod.mod_type.value, m.group(1))
+                elif p.is_dir():
+                    try:
+                        for pf in p.rglob("*.pnach"):
+                            m = crc_re.match(pf.name)
+                            if m:
+                                _add_sig(mod.mod_type.value, m.group(1))
+                    except OSError:
+                        pass
+
+        imported = 0
+        for item in unmanaged:
+            if item.item_type == ModType.TEXTURE_PACK:
+                serial = (item.serial or "").upper()
+                sig = ("texture_pack", serial) if serial else ("texture_pack_path", str(item.path.resolve()).upper())
+                name = f"{serial} Texture Pack (Detected)" if serial else f"{item.name} (Detected)"
+            elif item.item_type == ModType.COVER_ART:
+                serial = (item.serial or "").upper()
+                sig = ("cover_art", serial) if serial else ("cover_art_path", str(item.path.resolve()).upper())
+                name = f"{serial} Cover Art (Detected)" if serial else f"{item.name} (Detected)"
+            elif item.item_type in (ModType.PNACH, ModType.CHEAT):
+                crc = (item.crc or "").upper()
+                sig = (item.item_type.value, crc) if crc else (f"{item.item_type.value}_path", str(item.path.resolve()).upper())
+                name = f"{item.name} (Detected)"
+            else:
+                continue
+
+            if sig in known_signatures:
+                continue
+
+            try:
+                self.install_from_folder(
+                    source_path=str(item.path),
+                    mod_type=item.item_type,
+                    dest_base=storage,
+                    name=name,
+                    author="Existing Installation",
+                    description="Auto-detected from existing PCSX2 content.",
+                    game_id=(item.serial or "").upper(),
+                )
+                known_signatures.add(sig)
+                imported += 1
+            except Exception:
+                # Best-effort import — ignore individual failures.
+                continue
+
+        return imported
+
+    # ------------------------------------------------------------------
     # Install / Remove
     # ------------------------------------------------------------------
 

@@ -1383,6 +1383,47 @@ class TestGameRegistry(unittest.TestCase):
         from src.core.game_registry import lookup_game_title
         self.assertEqual(lookup_game_title("XXXX-99999"), "")
 
+    def test_load_informative_serials_parses_json_txt_and_html_shapes(self):
+        from src.core.game_registry import _load_informative_serials
+        with tempfile.TemporaryDirectory() as tmpdir:
+            info_dir = Path(tmpdir)
+            (info_dir / "PS2.data.json").write_text(
+                json.dumps({
+                    "ABCD-12345": "Title From Flat Map",
+                    "BADSERIAL": "ignored",
+                }),
+                encoding="utf-8",
+            )
+            (info_dir / "Ps2 codes and names 3.json").write_text(
+                json.dumps({
+                    "EFGH-54321": {"title": "Title From Object Map"},
+                    "WXYZ_00001": {"title": "Title With Underscore Serial"},
+                    "12AB-12345": {"title": "ignored non-letter prefix"},
+                }),
+                encoding="utf-8",
+            )
+            (info_dir / "PS2 codes and name 4.txt").write_text(
+                "IJKL-11111\tTitle From TXT\nBADLINEWITHOUTTAB\n",
+                encoding="utf-8",
+            )
+            (info_dir / "PS2.ID.List.02.13.20.htm").write_text(
+                (
+                    "<html><body><table>"
+                    "<tr><td>Title From HTML</td><td><center>MNOP-22222</center></td></tr>"
+                    "<tr><td>Ignored Prefix</td><td><center>1NOP-22222</center></td></tr>"
+                    "</table></body></html>"
+                ),
+                encoding="utf-8",
+            )
+            loaded = _load_informative_serials(info_dir)
+            self.assertEqual(loaded.get("ABCD-12345"), "Title From Flat Map")
+            self.assertEqual(loaded.get("EFGH-54321"), "Title From Object Map")
+            self.assertEqual(loaded.get("WXYZ-00001"), "Title With Underscore Serial")
+            self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
+            self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
+            self.assertNotIn("BADSERIAL", loaded)
+            self.assertNotIn("12AB-12345", loaded)
+
     # ------------------------------------------------------------------
     # AppConfig favorite_authors
     # ------------------------------------------------------------------
@@ -2698,6 +2739,66 @@ class TestMediaFireResolver(unittest.TestCase):
             "https://www.mediafire.com/file/abc/texture.zip/file"
         )
         self.assertIsNone(result)
+
+
+# =============================================================================
+# Yandex Disk URL resolver (mocked network)
+# =============================================================================
+
+class TestYandexDiskResolver(unittest.TestCase):
+    """Tests for resolve_yandex_disk_url()."""
+
+    def test_non_yandex_url_returns_none(self):
+        from src.core.downloader import resolve_yandex_disk_url
+        self.assertIsNone(resolve_yandex_disk_url("https://example.com/file.zip"))
+
+    def test_empty_url_returns_none(self):
+        from src.core.downloader import resolve_yandex_disk_url
+        self.assertIsNone(resolve_yandex_disk_url(""))
+        self.assertIsNone(resolve_yandex_disk_url(None))  # type: ignore[arg-type]
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolves_disk_yandex_share_url(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://downloader.disk.yandex.ru/disk/abc123"}
+        mock_get.return_value = mock_resp
+        result = resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA")
+        self.assertEqual(result, "https://downloader.disk.yandex.ru/disk/abc123")
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolves_yadi_sk_share_url(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://downloader.disk.yandex.ru/disk/xyz987"}
+        mock_get.return_value = mock_resp
+        result = resolve_yandex_disk_url("https://yadi.sk/d/abcdef123")
+        self.assertEqual(result, "https://downloader.disk.yandex.ru/disk/xyz987")
+
+    @patch("src.core.downloader.requests.get")
+    def test_non_200_response_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 403
+        mock_get.return_value = mock_resp
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+
+    @patch("src.core.downloader.requests.get")
+    def test_untrusted_href_domain_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"href": "https://evil.example.com/file.bin"}
+        mock_get.return_value = mock_resp
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+
+    @patch("src.core.downloader.requests.get")
+    def test_network_error_returns_none(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_get.side_effect = Exception("timeout")
+        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
 
 
 # =============================================================================
@@ -6334,6 +6435,86 @@ class TestInstalledScanner(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Tests for ModManager.auto_import_unmanaged_content
+# ---------------------------------------------------------------------------
+
+class TestModManagerAutoImportUnmanagedContent(unittest.TestCase):
+    """Auto-import unmanaged installed PCSX2 content into the mod DB."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        import src.core.config_manager as cm
+        self._orig_db_file = cm.MODS_DB_FILE
+        cm.MODS_DB_FILE = Path(self.tmpdir) / "mods.json"
+        from src.core.mod_manager import ModDatabase, ModManager
+        self.db = ModDatabase()
+        self.mgr = ModManager(self.db)
+
+    def tearDown(self):
+        import src.core.config_manager as cm
+        cm.MODS_DB_FILE = self._orig_db_file
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _make_pcsx2_layout(self):
+        root = Path(self.tmpdir) / "pcsx2"
+        textures = root / "textures"
+        cheats = root / "cheats"
+        cheats_ws = root / "cheats_ws"
+        covers = root / "covers"
+        storage = Path(self.tmpdir) / "managed_storage"
+
+        (textures / "SLUS-20062" / "replacements").mkdir(parents=True, exist_ok=True)
+        (textures / "SLUS-20062" / "replacements" / "a.png").write_bytes(b"PNGDATA")
+
+        cheats.mkdir(parents=True, exist_ok=True)
+        (cheats / "AABBCCDD.pnach").write_text("patch=1,EE,00123456,word,00000001", encoding="utf-8")
+
+        cheats_ws.mkdir(parents=True, exist_ok=True)
+        (cheats_ws / "DEADBEEF.pnach").write_text("patch=1,EE,00123456,word,00000002", encoding="utf-8")
+
+        covers.mkdir(parents=True, exist_ok=True)
+        (covers / "SLUS-20062.png").write_bytes(b"\x89PNG")
+
+        from src.models.mod import AppConfig
+        return AppConfig(
+            textures_path=str(textures),
+            pnach_path=str(cheats),
+            cheats_path=str(cheats_ws),
+            cover_art_path=str(covers),
+            mods_storage_path=str(storage),
+        )
+
+    def test_auto_import_unmanaged_content_imports_supported_types(self):
+        config = self._make_pcsx2_layout()
+        imported = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(imported, 4)
+        mods = self.db.all()
+        self.assertEqual(len(mods), 4)
+
+        types = {m.mod_type.value for m in mods}
+        self.assertIn("texture_pack", types)
+        self.assertIn("pnach", types)
+        self.assertIn("cheat", types)
+        self.assertIn("cover_art", types)
+
+        for mod in mods:
+            self.assertTrue(
+                mod.path.startswith(config.mods_storage_path),
+                f"Expected managed path under storage: {mod.path}",
+            )
+
+    def test_auto_import_unmanaged_content_does_not_duplicate_on_second_run(self):
+        config = self._make_pcsx2_layout()
+        first = self.mgr.auto_import_unmanaged_content(config)
+        second = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(first, 4)
+        self.assertEqual(second, 0)
+        self.assertEqual(len(self.db.all()), 4)
+
+
+# ---------------------------------------------------------------------------
 # Tests for custom_card_builder
 # ---------------------------------------------------------------------------
 
@@ -6608,6 +6789,41 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].severity, ConflictSeverity.WARNING)
         self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
         self.assertEqual(len(conflicts[0].items), 2)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_pnach_duplicate_crc_auto_fix_merges_and_deletes_cheats_ws(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "CAFEBABE"
+        addr_a = "00100000"
+        addr_b = "00200000"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(
+            f"patch=1,EE,{addr_a},word,11111111\n",
+            encoding="utf-8",
+        )
+        c_file.write_text(
+            f"patch=1,EE,{addr_b},word,22222222\n",
+            encoding="utf-8",
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+        ok, message = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok, message)
+        self.assertTrue(p_file.exists())
+        self.assertFalse(c_file.exists())
+        merged = p_file.read_text(encoding="utf-8")
+        self.assertIn(addr_a, merged)
+        self.assertIn(addr_b, merged)
 
     def test_pnach_address_clash_detected(self):
         from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
@@ -6630,6 +6846,60 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].severity, ConflictSeverity.ERROR)
         self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
         self.assertIn(shared_addr.upper(), conflicts[0].description)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_pnach_address_clash_auto_fix_removes_overlapping_lines(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "55667788"
+        shared_addr = "0010ABCD"
+        other_ws_addr = "0020BEEF"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(f"patch=1,EE,{shared_addr},word,11111111\n", encoding="utf-8")
+        c_file.write_text(
+            f"patch=1,EE,{shared_addr},word,22222222\n"
+            f"patch=1,EE,{other_ws_addr},word,33333333\n",
+            encoding="utf-8",
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_address_clash")
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+        ok, message = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok, message)
+        self.assertTrue(c_file.exists())
+        content = c_file.read_text(encoding="utf-8")
+        self.assertIn(other_ws_addr, content)
+        self.assertNotIn(shared_addr, content)
+
+    def test_pnach_auto_fix_identical_unparseable_lines(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws  = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "DEADBEEF"
+        content = "patch=1,EE,00100000,word,12345678,extra\n"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(content)
+        c_file.write_text(content)
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].can_auto_fix)
+        ok, _ = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok)
+        self.assertTrue(p_file.exists())
+        self.assertFalse(c_file.exists())
 
     def test_pnach_non_crc_files_ignored(self):
         """Files that are not 8-hex-digit CRC filenames must be ignored."""
@@ -6707,17 +6977,20 @@ class TestConflictResolver(unittest.TestCase):
         conflicts = resolve_texture_conflicts(tex_dir)
         self.assertEqual(conflicts, [])
 
-    def test_texture_merged_packs_detected(self):
+    def test_texture_duplicate_hash_detected(self):
         from src.core.conflict_resolver import resolve_texture_conflicts, ConflictSeverity
         tex_dir = os.path.join(self.tmpdir, "textures")
         repl    = os.path.join(tex_dir, "SLUS-20062", "replacements")
-        os.makedirs(os.path.join(repl, "PackAlpha"))
-        os.makedirs(os.path.join(repl, "PackBeta"))
-        os.makedirs(os.path.join(repl, "PackGamma"))
+        pack_a = os.path.join(repl, "PackAlpha")
+        pack_b = os.path.join(repl, "PackBeta")
+        os.makedirs(pack_a)
+        os.makedirs(pack_b)
+        Path(os.path.join(pack_a, "texture_a.dds")).write_bytes(b"DDS")
+        Path(os.path.join(pack_b, "texture_b.dds")).write_bytes(b"DDS")
         conflicts = resolve_texture_conflicts(tex_dir)
         self.assertEqual(len(conflicts), 1)
         self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
-        self.assertEqual(conflicts[0].conflict_type, "texture_pack_merged")
+        self.assertEqual(conflicts[0].conflict_type, "texture_duplicate_hash")
         self.assertIn("SLUS-20062", conflicts[0].title)
 
     def test_texture_missing_dir(self):
@@ -11325,6 +11598,29 @@ class TestWave55ScanLibraryAutoDetect(unittest.TestCase):
         finally:
             import shutil
             shutil.rmtree(tmpdir, ignore_errors=True)
+
+
+class TestWave55LibraryCountWording(unittest.TestCase):
+    """Wave 55/Issue #17 item #4: Library count labels clarify what is counted."""
+
+    def test_all_mods_count_mentions_library_tracked_installed_mods(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("Tracked mods in library:", src)
+
+    def test_by_game_count_mentions_games_with_installed_mods(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("with installed mods", src)
+        self.assertIn("Tracked games with installed mods:", src)
+
+    def test_all_mods_pane_filter_count_mentions_installed_mods_in_library(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "library_panel.py"
+               ).read_text(encoding="utf-8")
+        self.assertIn("tracked mod(s) in library", src)
 
 
 # ---------------------------------------------------------------------------
@@ -27378,3 +27674,35 @@ class TestWave165PalWrongSerialFixes(unittest.TestCase):
                 n = int(s[5:])
                 self.assertFalse(1000 < n < 50000,
                     f"Wave 165: {name} has suspicious PS1-era serial {s} (n={n}); must be >= 50000")
+
+
+class TestConflictResolverPNACH(unittest.TestCase):
+    """Tests for PNACH conflict auto-fix detection."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.cheats = Path(self.tmpdir) / "cheats"
+        self.cheats_ws = Path(self.tmpdir) / "cheats_ws"
+        self.cheats.mkdir(parents=True, exist_ok=True)
+        self.cheats_ws.mkdir(parents=True, exist_ok=True)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def _write_pnach(self, directory: Path, crc: str, content: str) -> Path:
+        path = directory / f"{crc}.pnach"
+        path.write_text(content, encoding="utf-8")
+        return path
+
+    def test_identical_unparseable_pnach_can_auto_fix(self):
+        """Auto-fix should be allowed for identical PNACH files even if no patches parse."""
+        from src.core.conflict_resolver import resolve_pnach_conflicts
+
+        crc = "DEADBEEF"
+        content = "// header only\npatch=1,EE,ZZZZZZZZ,word,0000\n"
+        self._write_pnach(self.cheats, crc, content)
+        self._write_pnach(self.cheats_ws, crc, content)
+
+        conflicts = resolve_pnach_conflicts(str(self.cheats), str(self.cheats_ws))
+        self.assertEqual(len(conflicts), 1)
+        self.assertTrue(conflicts[0].can_auto_fix)

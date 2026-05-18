@@ -214,24 +214,25 @@ class SetupWizard(QDialog):
         layout.setContentsMargins(40, 30, 40, 20)
         layout.setSpacing(14)
 
-        layout.addWidget(_h("Mod Download & Staging Location"))
+        layout.addWidget(_h("Download Library & Staging Location"))
         layout.addWidget(_p(
-            "Choose a folder where PS2 Mod Manager will download and stage mods\n"
+            "Choose a folder where PS2 Mod Manager will download and stage your files\n"
+            "(texture packs, PNACH codes, cover art, and other content)\n"
             "before deploying them to PCSX2.\n\n"
             "When you enable a mod it is copied from this staging folder into PCSX2.\n"
             "When you disable it, it is removed from PCSX2 (but kept here for re-use).\n"
-            "Think of this as your mod library — not the PCSX2 game folder itself."
+            "Think of this as your download library — not the PCSX2 game folder itself."
         ))
 
         from src.core.config_manager import get_data_dir
         default_storage = str(get_data_dir() / "mods")
 
-        self._storage_chooser = PathChooser("Mods Folder:", default_storage)
+        self._storage_chooser = PathChooser("Download Library Folder:", default_storage)
         self._storage_chooser.set_path(self.config.mods_storage_path or default_storage)
         layout.addWidget(self._storage_chooser)
 
         note = QLabel(
-            "ℹ  Mods are stored here and deployed automatically.\n"
+            "ℹ  Downloaded files are stored here and deployed automatically.\n"
             "Toggling a mod ON copies it to PCSX2; toggling OFF removes it."
         )
         note.setStyleSheet("color: #7070a0; font-size: 12px;")
@@ -548,4 +549,3 @@ def _p(text: str) -> QLabel:
     lbl.setStyleSheet("color: #9090b0; font-size: 13px;")
     lbl.setWordWrap(True)
     return lbl
-

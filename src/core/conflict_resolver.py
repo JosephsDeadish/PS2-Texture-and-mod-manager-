@@ -10,8 +10,8 @@ include:
   game CRC (one patch will silently overwrite the other).
 * Two cover-art images for the same serial with different extensions (PCSX2
   picks one arbitrarily).
-* Multiple unrelated texture-pack directories under the same serial path
-  (replacements folder contains textures from different packs).
+* Duplicate texture files with identical content inside a serial's
+  ``replacements/`` folder (often caused by merged or repeated pack installs).
 
 Public API::
 
@@ -33,12 +33,19 @@ Public API::
 
 from __future__ import annotations
 
+import hashlib
+import logging
 import os
 import re
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
+
+# (processor, address, size, value) for a single enabled PNACH patch line
+PatchSignature = Tuple[str, str, str, str]
 
 
 # ---------------------------------------------------------------------------
@@ -183,6 +190,149 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
     return addresses
 
 
+def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
+    """Return a set of enabled patch signatures from *path*.
+
+    Each entry is ``(processor, address, size, value)``. Unreadable files
+    return an empty set.
+    """
+    try:
+        from src.core.pnach import parse_pnach
+    except Exception:
+        return set()
+    try:
+        parsed = parse_pnach(str(path))
+    except ValueError as exc:
+        logger.warning("Failed to parse PNACH file %s: %s", path, exc)
+        return set()
+    patches: Set[PatchSignature] = set()
+    for patch in parsed.patches:
+        if not patch.enabled:
+            continue
+        patches.add((
+            patch.processor.upper(),
+            patch.address.upper(),
+            patch.size.lower(),
+            patch.value.upper(),
+        ))
+    return patches
+
+
+def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
+    """Remove enabled EE patch lines for *addresses* from a PNACH file.
+
+    Returns ``(removed_count, remaining_patch_lines)``.
+    """
+    if not addresses:
+        return 0, 0
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return 0, 0
+
+    removed = 0
+    kept_lines: List[str] = []
+    remaining_patches = 0
+    wanted = {a.upper() for a in addresses}
+
+    for line in lines:
+        m = _PNACH_PATCH_LINE_RE.match(line)
+        if m and m.group(1).upper() in wanted:
+            removed += 1
+            continue
+        if m:
+            remaining_patches += 1
+        kept_lines.append(line)
+
+    if removed == 0:
+        return 0, remaining_patches
+
+    try:
+        path.write_text("\n".join(kept_lines) + ("\n" if kept_lines else ""), encoding="utf-8")
+    except OSError:
+        return 0, 0
+    return removed, remaining_patches
+
+
+def _merge_pnach_files(keep_path: Path, remove_path: Path) -> Tuple[bool, str]:
+    """Merge PNACH lines from *remove_path* into *keep_path* and delete source."""
+    try:
+        keep_lines = keep_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        remove_lines = remove_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError as exc:
+        return False, f"Could not read PNACH files for merge: {exc}"
+
+    existing = set(keep_lines)
+    merged_lines = keep_lines
+    added = 0
+    for line in remove_lines:
+        if line not in existing:
+            merged_lines.append(line)
+            existing.add(line)
+            added += 1
+
+    try:
+        keep_path.write_text("\n".join(merged_lines) + ("\n" if merged_lines else ""), encoding="utf-8")
+    except OSError as exc:
+        return False, f"Could not write merged PNACH file {keep_path.name}: {exc}"
+
+    try:
+        remove_path.unlink()
+    except OSError as exc:
+        return False, f"Merged codes but could not delete {remove_path.name}: {exc}"
+
+    return True, f"Merged {added} code line(s) into {keep_path.name} and deleted {remove_path.name}."
+
+
+def _files_identical(p_file: Path, c_file: Path) -> bool:
+    """Return True when two files match byte-for-byte."""
+    try:
+        if p_file.stat().st_size != c_file.stat().st_size:
+            return False
+    except OSError:
+        pass
+    p_hash = _hash_file(p_file)
+    c_hash = _hash_file(c_file)
+    return bool(p_hash) and p_hash == c_hash
+
+
+def _select_pnach_delete_path(
+    p_file: Path,
+    c_file: Path,
+    p_set: Set[PatchSignature],
+    c_set: Set[PatchSignature],
+) -> Path:
+    """Choose which PNACH file should be deleted when auto-fixing duplicates."""
+    if p_set and c_set:
+        if p_set < c_set:
+            return p_file
+        if c_set < p_set:
+            return c_file
+    # Identical or unknown — prefer deleting the cheats_ws file if possible
+    for candidate in (p_file, c_file):
+        if any(part.lower() == "cheats_ws" for part in candidate.parts):
+            return candidate
+    return c_file
+
+
+def _pnach_can_auto_fix(
+    p_set: Set[PatchSignature],
+    c_set: Set[PatchSignature],
+    p_file: Optional[Path] = None,
+    c_file: Optional[Path] = None,
+) -> bool:
+    """Return True when one PNACH's enabled patches are contained in the other."""
+    if p_set and c_set:
+        if p_set <= c_set or c_set <= p_set:
+            return True
+        if p_file and c_file:
+            return _files_identical(p_file, c_file)
+        return False
+    if p_file and c_file:
+        return _files_identical(p_file, c_file)
+    return False
+
+
 def _is_ps2_serial(name: str) -> bool:
     return bool(_PS2_SERIAL_RE.match(name))
 
@@ -250,8 +400,20 @@ def resolve_pnach_conflicts(
         p_addrs = _read_pnach_addresses(p_file)
         c_addrs = _read_pnach_addresses(c_file)
         clashing = p_addrs & c_addrs
+        p_set = _read_pnach_patch_set(p_file)
+        c_set = _read_pnach_patch_set(c_file)
+        # Issue #17 item #5: Address clashes should always allow auto-fix.
+        # Auto-fix removes overlapping address lines from cheats_ws/ (or deletes
+        # that file if it only contains clashing lines).
+        auto_fixable = bool(clashing) or _pnach_can_auto_fix(p_set, c_set, p_file, c_file)
 
         if clashing:
+            auto_note = ""
+            if auto_fixable:
+                auto_note = (
+                    "\n\nAuto-fix is available: overlapping address patch lines will be "
+                    "removed from the cheats_ws file so only one value writes to each address."
+                )
             conflicts.append(Conflict(
                 conflict_type="pnach_address_clash",
                 severity=ConflictSeverity.ERROR,
@@ -261,13 +423,14 @@ def resolve_pnach_conflicts(
                     f"address(es): {', '.join(sorted(clashing)[:5])}{'…' if len(clashing) > 5 else ''}.\n"
                     f"The file in cheats_ws/ will overwrite patches applied by "
                     f"the file in cheats/, causing one set of codes to have no effect."
+                    f"{auto_note}"
                 ),
                 items=[p_file, c_file],
                 resolution=(
-                    "Remove the duplicate patch lines from one of the files, "
-                    "or delete the file whose patches are superseded."
+                    "Remove overlapping patch lines from one file. "
+                    "Auto-fix removes conflicting lines from cheats_ws."
                 ),
-                can_auto_fix=False,
+                can_auto_fix=auto_fixable,
             ))
         else:
             conflicts.append(Conflict(
@@ -282,10 +445,10 @@ def resolve_pnach_conflicts(
                 ),
                 items=[p_file, c_file],
                 resolution=(
-                    "If the two files contain the same patches, delete one. "
-                    "If they are intentionally different, no action is needed."
+                    "Auto-fix can merge unique code lines into cheats/ and remove "
+                    "the duplicate cheats_ws file."
                 ),
-                can_auto_fix=False,
+                can_auto_fix=True,
             ))
 
     return conflicts
@@ -352,12 +515,11 @@ def resolve_cover_art_conflicts(cover_art_path: str) -> List[Conflict]:
 
 
 def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
-    """Detect cases where the textures directory contains unexpected structures.
+    """Detect duplicate texture data inside ``replacements/`` folders.
 
-    Specifically checks whether any serial's ``replacements/`` folder contains
-    sub-directories that look like multiple separate packs merged together
-    (identified by the presence of more than one top-level sub-directory with
-    a non-texture extension).
+    Looks for multiple texture files in the same serial's replacements tree
+    that share identical content (matching file hashes). This avoids flagging
+    organized sub-directories that do not actually duplicate data.
 
     Parameters
     ----------
@@ -388,38 +550,40 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
         if not replacements.is_dir():
             continue
 
-        # Look for multiple top-level pack-indicator dirs/files
+        hash_map: Dict[str, List[Path]] = {}
         try:
-            top_entries = [e for e in replacements.iterdir()]
+            for dirpath, _dirs, files in os.walk(replacements):
+                for fname in files:
+                    if Path(fname).suffix.lower() not in _TEXTURE_EXTS:
+                        continue
+                    path = Path(dirpath) / fname
+                    digest = _hash_file(path)
+                    if digest:
+                        hash_map.setdefault(digest, []).append(path)
         except PermissionError:
             continue
 
-        # Heuristic: multiple non-DDS sub-dirs → possibly merged packs
-        subdirs = [e for e in top_entries if e.is_dir()]
-        if len(subdirs) >= 2:
-            # Only flag if the subdirs look like separate packs (no numbers in names)
-            pack_like = [d for d in subdirs if not d.name.isdigit()]
-            if len(pack_like) >= 2:
-                conflicts.append(Conflict(
-                    conflict_type="texture_pack_merged",
-                    severity=ConflictSeverity.INFO,
-                    title=f"Multiple texture sub-packs: {serial} ({len(pack_like)} sub-dirs)",
-                    description=(
-                        f"The replacements folder for {serial} contains "
-                        f"{len(pack_like)} sub-directories "
-                        f"({', '.join(d.name for d in pack_like[:3])}{'…' if len(pack_like) > 3 else ''}) "
-                        f"which may indicate two separate texture packs have been "
-                        f"merged.  This can cause texture overrides to behave "
-                        f"unpredictably."
-                    ),
-                    items=[replacements] + pack_like[:5],
-                    resolution=(
-                        "If the sub-directories belong to different texture packs, "
-                        "consider installing them one at a time through PS2 Mod Manager "
-                        "to track them properly."
-                    ),
-                    can_auto_fix=False,
-                ))
+        for digest, files in sorted(hash_map.items()):
+            if len(files) < 2:
+                continue
+            sample_names = ", ".join(p.name for p in files[:4])
+            conflicts.append(Conflict(
+                conflict_type="texture_duplicate_hash",
+                severity=ConflictSeverity.INFO,
+                title=f"Duplicate texture data: {serial} ({len(files)} copies)",
+                description=(
+                    f"Multiple texture files inside {serial}/replacements share the same "
+                    f"content hash. This often happens when packs are merged or copied "
+                    f"into organized sub-folders. Example files: {sample_names}"
+                    f"{'…' if len(files) > 4 else ''}."
+                ),
+                items=files[:8],
+                resolution=(
+                    "If these are redundant copies, keep a single version and remove "
+                    "the duplicates. Otherwise no action is required."
+                ),
+                can_auto_fix=False,
+            ))
 
     return conflicts
 
@@ -604,6 +768,19 @@ def _file_size_bytes(path: Path) -> int:
         return path.stat().st_size
     except OSError:
         return 0
+
+
+def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    """Return a SHA-256 hex hash for *path*, or empty string on error."""
+    hasher = hashlib.sha256()
+    try:
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(chunk_size), b""):
+                hasher.update(chunk)
+    except OSError as exc:
+        logger.debug("Failed to hash file %s: %s", path, exc)
+        return ""
+    return hasher.hexdigest()
 
 
 #: Image extensions scanned for overwrite conflict detection.
@@ -952,6 +1129,10 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
 
     * ``cover_art_duplicate`` – deletes all non-``.png`` duplicates (keeps the
       ``.png`` file).
+    * ``pnach_duplicate_crc`` – merges unique lines into ``cheats/`` and deletes
+      the duplicate ``cheats_ws/`` file.
+    * ``pnach_address_clash`` – removes overlapping address lines from
+      ``cheats_ws/`` so only one value is applied.
 
     Parameters
     ----------
@@ -966,6 +1147,44 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
     """
     if not conflict.can_auto_fix:
         return False, "This conflict cannot be auto-fixed."
+
+    if conflict.conflict_type == "pnach_address_clash":
+        if len(conflict.items) != 2:
+            return False, "Auto-fix expects exactly two PNACH files."
+        p_file, c_file = conflict.items
+        p_addrs = _read_pnach_addresses(p_file)
+        c_addrs = _read_pnach_addresses(c_file)
+        clashing = p_addrs & c_addrs
+        if not clashing:
+            return False, "No overlapping addresses found to auto-fix."
+
+        # Prefer removing clashing lines from cheats_ws so regular cheats win.
+        target = c_file if any(part.lower() == "cheats_ws" for part in c_file.parts) else p_file
+        removed, remaining = _remove_pnach_addresses(target, clashing)
+        if removed <= 0:
+            return False, f"Could not remove overlapping patch lines from {target.name}."
+
+        if remaining == 0:
+            try:
+                target.unlink(missing_ok=True)
+            except OSError as exc:
+                return False, f"Removed lines but could not delete empty file {target.name}: {exc}"
+            return True, (
+                f"Removed {removed} overlapping patch line(s) and deleted empty file {target.name}."
+            )
+
+        return True, f"Removed {removed} overlapping patch line(s) from {target.name}."
+
+    if conflict.conflict_type == "pnach_duplicate_crc":
+        if len(conflict.items) != 2:
+            return False, "Auto-fix expects exactly two PNACH files."
+        p_file, c_file = conflict.items
+        # Keep regular cheats/ as canonical and merge cheats_ws/ lines into it.
+        keep_path = p_file
+        remove_path = c_file
+        if any(part.lower() == "cheats_ws" for part in p_file.parts):
+            keep_path, remove_path = c_file, p_file
+        return _merge_pnach_files(keep_path, remove_path)
 
     if conflict.conflict_type == "cover_art_duplicate":
         deleted: List[str] = []
