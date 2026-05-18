@@ -663,7 +663,7 @@ class _AllModsPane(QWidget):
 
         total = len(self._rows)
         self._count_lbl.setText(
-            f"Showing {shown} of {total} library-tracked installed mod(s)"
+            f"Showing {shown} of {total} tracked mod(s) in library"
             + (" — no mods installed yet" if total == 0 else "")
         )
 
@@ -830,7 +830,7 @@ class LibraryPanel(BasePanel):
         total = len(self.db.all())
         enabled = sum(1 for m in self.db.all() if m.enabled)
         self._count_lbl.setText(
-            f"Library-tracked installed mods: {total} total  •  {enabled} enabled"
+            f"Tracked mods in library: {total} total  •  {enabled} enabled"
         )
 
     # ------------------------------------------------------------------
@@ -936,7 +936,7 @@ class LibraryPanel(BasePanel):
         games_with_mods = sum(1 for g in games if mods_by_serial.get((g.serial or "").upper(), 0) > 0)
         games_with_mods += len(db_only_games)
         self._count_lbl.setText(
-            f"Library games: {total} total  •  {games_with_mods} with at least 1 installed mod"
+            f"Library games: {total} total  •  {games_with_mods} with installed mods"
         )
 
     # ------------------------------------------------------------------
@@ -983,7 +983,7 @@ class LibraryPanel(BasePanel):
             self._list_layout.addWidget(card)
             self._cards.append(card)
         self._list_layout.addStretch()
-        self._count_lbl.setText(f"Games with installed mods (DB tracked): {len(db_only)}")
+        self._count_lbl.setText(f"Tracked games with installed mods: {len(db_only)}")
 
     # ------------------------------------------------------------------
     # Handlers
