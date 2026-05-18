@@ -1167,7 +1167,7 @@ class DownloadInstallDialog(QDialog):
             return None
 
         # Patreon links require browser login and cannot be directly downloaded.
-        if _netloc.endswith("patreon.com"):
+        if _netloc == "patreon.com" or _netloc.endswith(".patreon.com"):
             return None
 
         # MediaFire file page — resolve to direct download URL
