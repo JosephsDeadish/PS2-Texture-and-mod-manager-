@@ -254,6 +254,36 @@ def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
     return removed, remaining_patches
 
 
+def _merge_pnach_files(keep_path: Path, remove_path: Path) -> Tuple[bool, str]:
+    """Merge PNACH lines from *remove_path* into *keep_path* and delete source."""
+    try:
+        keep_lines = keep_path.read_text(encoding="utf-8", errors="replace").splitlines()
+        remove_lines = remove_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError as exc:
+        return False, f"Could not read PNACH files for merge: {exc}"
+
+    existing = set(keep_lines)
+    merged_lines = list(keep_lines)
+    added = 0
+    for line in remove_lines:
+        if line not in existing:
+            merged_lines.append(line)
+            existing.add(line)
+            added += 1
+
+    try:
+        keep_path.write_text("\n".join(merged_lines) + ("\n" if merged_lines else ""), encoding="utf-8")
+    except OSError as exc:
+        return False, f"Could not write merged PNACH file {keep_path.name}: {exc}"
+
+    try:
+        remove_path.unlink()
+    except OSError as exc:
+        return False, f"Merged codes but could not delete {remove_path.name}: {exc}"
+
+    return True, f"Merged {added} code line(s) into {keep_path.name} and deleted {remove_path.name}."
+
+
 def _files_identical(p_file: Path, c_file: Path) -> bool:
     """Return True when two files match byte-for-byte."""
     try:
@@ -415,10 +445,10 @@ def resolve_pnach_conflicts(
                 ),
                 items=[p_file, c_file],
                 resolution=(
-                    "If the two files contain the same patches, delete one. "
-                    "If they are intentionally different, no action is needed."
+                    "Auto-fix can merge unique code lines into cheats/ and remove "
+                    "the duplicate cheats_ws file."
                 ),
-                can_auto_fix=auto_fixable,
+                can_auto_fix=True,
             ))
 
     return conflicts
@@ -1099,10 +1129,10 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
 
     * ``cover_art_duplicate`` – deletes all non-``.png`` duplicates (keeps the
       ``.png`` file).
-    * ``pnach_duplicate_crc`` – deletes the redundant file when one PNACH file
-      fully contains the other.
-    * ``pnach_address_clash`` – same as above when the overlapping patches are
-      identical and one file is a strict subset.
+    * ``pnach_duplicate_crc`` – merges unique lines into ``cheats/`` and deletes
+      the duplicate ``cheats_ws/`` file.
+    * ``pnach_address_clash`` – removes overlapping address lines from
+      ``cheats_ws/`` so only one value is applied.
 
     Parameters
     ----------
@@ -1149,19 +1179,12 @@ def auto_fix_conflict(conflict: Conflict) -> Tuple[bool, str]:
         if len(conflict.items) != 2:
             return False, "Auto-fix expects exactly two PNACH files."
         p_file, c_file = conflict.items
-        p_set = _read_pnach_patch_set(p_file)
-        c_set = _read_pnach_patch_set(c_file)
-        if not _pnach_can_auto_fix(p_set, c_set, p_file, c_file):
-            return False, (
-                "Auto-fix is only available when one file's enabled patches "
-                "are fully contained in the other."
-            )
-        delete_path = _select_pnach_delete_path(p_file, c_file, p_set, c_set)
-        try:
-            delete_path.unlink()
-        except OSError as exc:
-            return False, f"Could not delete {delete_path.name}: {exc}"
-        return True, f"Deleted duplicate PNACH file: {delete_path.name}"
+        # Keep regular cheats/ as canonical and merge cheats_ws/ lines into it.
+        keep_path = p_file
+        remove_path = c_file
+        if any(part.lower() == "cheats_ws" for part in p_file.parts):
+            keep_path, remove_path = c_file, p_file
+        return _merge_pnach_files(keep_path, remove_path)
 
     if conflict.conflict_type == "cover_art_duplicate":
         deleted: List[str] = []

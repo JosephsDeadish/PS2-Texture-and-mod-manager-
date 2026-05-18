@@ -6688,6 +6688,41 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].severity, ConflictSeverity.WARNING)
         self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
         self.assertEqual(len(conflicts[0].items), 2)
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+    def test_pnach_duplicate_crc_auto_fix_merges_and_deletes_cheats_ws(self):
+        from src.core.conflict_resolver import resolve_pnach_conflicts, auto_fix_conflict
+        cheats_dir = os.path.join(self.tmpdir, "cheats")
+        cheats_ws = os.path.join(self.tmpdir, "cheats_ws")
+        os.makedirs(cheats_dir)
+        os.makedirs(cheats_ws)
+
+        crc = "CAFEBABE"
+        addr_a = "00100000"
+        addr_b = "00200000"
+        p_file = Path(os.path.join(cheats_dir, f"{crc}.pnach"))
+        c_file = Path(os.path.join(cheats_ws, f"{crc}.pnach"))
+        p_file.write_text(
+            f"patch=1,EE,{addr_a},word,11111111\n",
+            encoding="utf-8",
+        )
+        c_file.write_text(
+            f"patch=1,EE,{addr_b},word,22222222\n",
+            encoding="utf-8",
+        )
+
+        conflicts = resolve_pnach_conflicts(cheats_dir, cheats_ws)
+        self.assertEqual(len(conflicts), 1)
+        self.assertEqual(conflicts[0].conflict_type, "pnach_duplicate_crc")
+        self.assertTrue(conflicts[0].can_auto_fix)
+
+        ok, message = auto_fix_conflict(conflicts[0])
+        self.assertTrue(ok, message)
+        self.assertTrue(p_file.exists())
+        self.assertFalse(c_file.exists())
+        merged = p_file.read_text(encoding="utf-8")
+        self.assertIn(addr_a, merged)
+        self.assertIn(addr_b, merged)
 
     def test_pnach_address_clash_detected(self):
         from src.core.conflict_resolver import resolve_pnach_conflicts, ConflictSeverity
