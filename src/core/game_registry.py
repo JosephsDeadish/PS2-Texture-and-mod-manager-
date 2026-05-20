@@ -900,11 +900,11 @@ _STRICT_SERIAL_RE = re.compile(r"^[A-Z]{4}-\d{5}$")
 _EXTENDED_DASHED_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}$")
 _EXTENDED_COMPACT_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{5,15}$")
 _GENERIC_DASHED_SERIAL_PATTERN = re.compile(
-    r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{0,9}[-_][A-Z0-9]{2,8})(?![A-Za-z0-9])",
+    r"(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9]{0,9}[-_][A-Za-z0-9]{2,8})(?![A-Za-z0-9])",
     re.IGNORECASE,
 )
 _GENERIC_COMPACT_SERIAL_PATTERN = re.compile(
-    r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{5,15})(?![A-Za-z0-9])",
+    r"(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9]{5,15})(?![A-Za-z0-9])",
     re.IGNORECASE,
 )
 
@@ -919,18 +919,12 @@ def _normalise_informative_serial(raw_serial: str) -> str:
     - Extended compact IDs seen in source files: ``[A-Z][A-Z0-9]{5,15}``
       (e.g. ``IIDX16COMP``)
 
-    Also normalizes occasional 4-digit numeric suffix typos (``ALCH-0004`` →
-    ``ALCH-00004``) so duplicate malformed keys are not introduced.
     """
     serial = str(raw_serial).strip().upper().replace("_", "-")
     if not serial:
         return ""
     if serial.endswith("-99999"):
         return ""
-    if "-" in serial:
-        prefix, suffix = serial.split("-", 1)
-        if len(prefix) == 4 and suffix.isdigit() and len(suffix) == 4:
-            serial = f"{prefix}-{suffix.zfill(5)}"
     if _STRICT_SERIAL_RE.match(serial):
         return serial
     if _EXTENDED_DASHED_SERIAL_RE.match(serial):
