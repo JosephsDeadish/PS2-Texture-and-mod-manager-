@@ -900,11 +900,11 @@ _STRICT_SERIAL_RE = re.compile(r"^[A-Z]{4}-\d{5}$")
 _EXTENDED_DASHED_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}$")
 _EXTENDED_COMPACT_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{5,15}$")
 _GENERIC_DASHED_SERIAL_PATTERN = re.compile(
-    r"(?<![A-Z0-9])([A-Z][A-Z0-9]{0,9}[-_][A-Z0-9]{2,8})(?![A-Z0-9])",
+    r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{0,9}[-_][A-Z0-9]{2,8})(?![A-Za-z0-9])",
     re.IGNORECASE,
 )
 _GENERIC_COMPACT_SERIAL_PATTERN = re.compile(
-    r"(?<![A-Z0-9])([A-Z][A-Z0-9]{5,15})(?![A-Z0-9])",
+    r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{5,15})(?![A-Za-z0-9])",
     re.IGNORECASE,
 )
 
