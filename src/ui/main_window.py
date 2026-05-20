@@ -239,7 +239,6 @@ class MainWindow(QMainWindow):
             self._browse_panel,
             self._library_panel,
             self._downloads_panel,
-            self._gif_panel,
             self._settings_panel,
         ):
             panel.status_message.connect(self._show_status)
