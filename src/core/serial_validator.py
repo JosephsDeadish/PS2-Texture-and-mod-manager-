@@ -44,6 +44,16 @@ _CAT_DIR      = _REPO_ROOT / "data" / "catalogue"
 
 _SERIAL_RE = re.compile(r'^[A-Z]{4}-\d{5}$')
 
+# Title aliases that should resolve to the NTSC-U canonical retail entry when
+# loading other regional DBs.  This prevents PAL/JP rows with shortened or
+# punctuation-variant names from becoming the canonical title used by
+# catalogue validation.
+_CANONICAL_TITLE_OVERRIDES: Dict[str, str] = {
+    "Devil May Cry 3": "Devil May Cry 3: Dante's Awakening",
+    "Evil Dead: Regeneration": "Evil Dead - Regeneration",
+    "State of Emergency": "State Of Emergency",
+}
+
 
 # ---------------------------------------------------------------------------
 # Public types
@@ -182,6 +192,22 @@ class SerialDatabase:
         self._crc_to_title = {}
         self._alias_to_titles = {}
         self._demo_serials = set()
+        def _merge_optional_text(current: Optional[str], incoming: Optional[str]) -> Optional[str]:
+            """Keep current non-empty value; otherwise take incoming non-empty value."""
+            if current:
+                return current
+            return incoming or None
+
+        def _merge_unique_list(current: List[str], incoming: List[str]) -> List[str]:
+            """Merge two string lists preserving order and uniqueness."""
+            out = list(current)
+            seen = set(current)
+            for item in incoming:
+                if item and item not in seen:
+                    out.append(item)
+                    seen.add(item)
+            return out
+
         # Retail databases first (NTSC-U, PAL, Japan), then demos
         retail_paths = (self._path, self._pal_path, self._jp_path)
         for path in retail_paths:
@@ -192,7 +218,11 @@ class SerialDatabase:
             except Exception:
                 continue
             for title, info in raw.get("games", {}).items():
-                gi = GameInfo(
+                if path != self._path:
+                    canonical_title = _CANONICAL_TITLE_OVERRIDES.get(title)
+                    if canonical_title and canonical_title in self._games:
+                        title = canonical_title
+                incoming = GameInfo(
                     title=title,
                     serial=info.get("serial", ""),
                     alt_serials=info.get("alt_serials", []),
@@ -205,14 +235,48 @@ class SerialDatabase:
                     aliases=info.get("aliases") or [],
                     disc_type="retail",
                 )
-                gi._aliases_lower = [a.lower() for a in gi.aliases]
-                self._games[title] = gi
-                for s in gi.all_serials():
+
+                existing = self._games.get(title)
+                if existing is None:
+                    incoming._aliases_lower = [a.lower() for a in incoming.aliases]
+                    self._games[title] = incoming
+                    for s in incoming.all_serials():
+                        self._serial_to_titles.setdefault(s, []).append(title)
+                    for crc in incoming.crcs:
+                        self._crc_to_title[crc.upper()] = title
+                    for alias in incoming.aliases:
+                        self._alias_to_titles.setdefault(alias.lower(), []).append(title)
+                    continue
+
+                old_serials = set(existing.all_serials())
+                old_crcs = {c.upper() for c in existing.crcs}
+                old_aliases = {a.lower() for a in existing.aliases}
+
+                # Keep first-loaded primary serial (NTSC-U preferred by load order),
+                # but preserve alternates from later region DBs.
+                if incoming.serial and incoming.serial != existing.serial:
+                    existing.alt_serials = _merge_unique_list(existing.alt_serials, [incoming.serial])
+                existing.alt_serials = _merge_unique_list(existing.alt_serials, incoming.alt_serials)
+                existing.crcs = _merge_unique_list(existing.crcs, incoming.crcs)
+                existing.aliases = _merge_unique_list(existing.aliases, incoming.aliases)
+                existing.release_date = _merge_optional_text(existing.release_date, incoming.release_date)
+                existing.developer = _merge_optional_text(existing.developer, incoming.developer)
+                existing.publisher = _merge_optional_text(existing.publisher, incoming.publisher)
+                existing.genre = _merge_optional_text(existing.genre, incoming.genre)
+                if incoming.crc_labels:
+                    merged_labels = dict(existing.crc_labels)
+                    for crc_key, label in incoming.crc_labels.items():
+                        merged_labels.setdefault(crc_key, label)
+                    existing.crc_labels = merged_labels
+
+                existing._aliases_lower = [a.lower() for a in existing.aliases]
+
+                for s in set(existing.all_serials()) - old_serials:
                     self._serial_to_titles.setdefault(s, []).append(title)
-                for crc in gi.crcs:
-                    self._crc_to_title[crc.upper()] = title
-                for alias in gi.aliases:
-                    self._alias_to_titles.setdefault(alias.lower(), []).append(title)
+                for crc in ({c.upper() for c in existing.crcs} - old_crcs):
+                    self._crc_to_title[crc] = title
+                for alias in ({a.lower() for a in existing.aliases} - old_aliases):
+                    self._alias_to_titles.setdefault(alias, []).append(title)
         # Demo / kiosk / promo database
         if self._demo_path.is_file():
             try:
@@ -235,6 +299,16 @@ class SerialDatabase:
                     disc_type=disc_type,
                 )
                 gi._aliases_lower = [a.lower() for a in gi.aliases]
+                existing = self._games.get(title)
+                if existing and existing.disc_type == "retail":
+                    # Never let demo/kiosk rows clobber canonical retail entries.
+                    # Still register demo serials as demo-owned serials.
+                    for s in gi.all_serials():
+                        self._serial_to_titles.setdefault(s, []).append(title)
+                        self._demo_serials.add(s)
+                    for crc in gi.crcs:
+                        self._crc_to_title.setdefault(crc.upper(), title)
+                    continue
                 self._games[title] = gi
                 for s in gi.all_serials():
                     self._serial_to_titles.setdefault(s, []).append(title)
