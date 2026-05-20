@@ -896,12 +896,48 @@ def _load_demos_serials() -> dict[str, str]:
     return result
 
 
+_STRICT_SERIAL_RE = re.compile(r"^[A-Z]{4}-\d{5}$")
+_EXTENDED_DASHED_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}$")
+_EXTENDED_COMPACT_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{5,15}$")
+_GENERIC_DASHED_SERIAL_PATTERN = re.compile(
+    r"(?<![A-Z0-9])([A-Z][A-Z0-9]{0,9}[-_][A-Z0-9]{2,8})(?![A-Z0-9])",
+    re.IGNORECASE,
+)
+_GENERIC_COMPACT_SERIAL_PATTERN = re.compile(
+    r"(?<![A-Z0-9])([A-Z][A-Z0-9]{5,15})(?![A-Z0-9])",
+    re.IGNORECASE,
+)
+
+
+def _normalise_informative_serial(raw_serial: str) -> str:
+    """Normalise an informative-doc serial and return ``""`` when invalid."""
+    serial = str(raw_serial).strip().upper().replace("_", "-")
+    if not serial:
+        return ""
+    if serial.endswith("-99999"):
+        return ""
+    if "-" in serial:
+        prefix, suffix = serial.split("-", 1)
+        if len(prefix) == 4 and suffix.isdigit() and len(suffix) == 4:
+            serial = f"{prefix}-{suffix.zfill(5)}"
+    if _STRICT_SERIAL_RE.match(serial):
+        return serial
+    if _EXTENDED_DASHED_SERIAL_RE.match(serial):
+        # Avoid non-ID labels such as "SONY-ID" by requiring at least one digit.
+        return serial if any(ch.isdigit() for ch in serial) else ""
+    if _EXTENDED_COMPACT_SERIAL_RE.match(serial):
+        # Compact IDs (e.g. IIDX16COMP) must contain both letters and digits.
+        has_alpha = any(ch.isalpha() for ch in serial)
+        has_digit = any(ch.isdigit() for ch in serial)
+        return serial if (has_alpha and has_digit) else ""
+    return ""
+
+
 def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]:
-    """Load additional serial → title mappings from informative-document JSON files."""
+    """Load additional serial → title mappings from informative-document files."""
     import json as _json
     import html as _html
     root = base_dir or (Path(__file__).parent.parent.parent / "Informative doccument")
-    serial_re = re.compile(r"^[A-Z]{4}-\d{5}$")
     result: dict[str, str] = {}
 
     # JSON maps: {serial: title} and {serial: {title: ...}}
@@ -915,10 +951,8 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
         if not isinstance(raw, dict):
             continue
         for key, value in raw.items():
-            serial = str(key).strip().upper().replace("_", "-")
-            if not serial_re.match(serial):
-                continue
-            if serial.endswith("-99999"):
+            serial = _normalise_informative_serial(str(key))
+            if not serial:
                 continue
             if isinstance(value, str):
                 title = value.strip()
@@ -940,33 +974,40 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                 parts = line.split("\t", 1)
                 if len(parts) != 2:
                     continue
-                serial = parts[0].strip().upper().replace("_", "-")
+                serial = _normalise_informative_serial(parts[0])
                 title = parts[1].strip()
-                if serial.endswith("-99999"):
-                    continue
-                if serial_re.match(serial) and title and serial not in result:
+                if serial and title and serial not in result:
                     result[serial] = title
         except Exception:
             pass
 
-    # HTML table: first <td> is title, GAME ID appears in a <center> cell.
+    # HTML table: first <td> is title, GAME ID appears in one of the <center> cells.
     htm_fp = root / "PS2.ID.List.02.13.20.htm"
     if htm_fp.is_file():
         try:
             html_text = htm_fp.read_text(encoding="utf-8", errors="replace")
-            row_re = re.compile(
-                r"<tr><td>(.*?)</td>.*?<center>\s*([A-Z]{4}[-_]\d{5})\s*</center>",
-                re.IGNORECASE | re.DOTALL,
-            )
+            row_re = re.compile(r"<tr\b[^>]*>(.*?)</tr>", re.IGNORECASE | re.DOTALL)
+            td_re = re.compile(r"<td\b[^>]*>(.*?)</td>", re.IGNORECASE | re.DOTALL)
+            center_re = re.compile(r"<center>\s*([^<]+?)\s*</center>", re.IGNORECASE | re.DOTALL)
             strip_tags_re = re.compile(r"<[^>]+>")
-            for title_cell, serial_raw in row_re.findall(html_text):
-                serial = serial_raw.strip().upper().replace("_", "-")
-                if not serial_re.match(serial) or serial in result:
+            for row in row_re.findall(html_text):
+                cells = td_re.findall(row)
+                if not cells:
                     continue
-                if serial.endswith("-99999"):
+                title = _html.unescape(strip_tags_re.sub("", cells[0])).strip()
+                if not title:
                     continue
-                title = _html.unescape(strip_tags_re.sub("", title_cell)).strip()
-                if title:
+                centers: list[str] = []
+                for cell in cells[1:]:
+                    centers.extend(center_re.findall(cell))
+                if not centers:
+                    continue
+                serial = ""
+                for serial_raw in reversed(centers):
+                    serial = _normalise_informative_serial(serial_raw)
+                    if serial:
+                        break
+                if serial and serial not in result:
                     result[serial] = title
         except Exception:
             pass
@@ -1027,6 +1068,16 @@ def _parse_serial(text: str) -> str:
     """Extract and normalise the first PS2 serial found in *text*."""
     m = _SERIAL_PATTERN.search(text)
     if not m:
+        # Fallback: try non-standard informative-doc IDs and keep only
+        # candidates that are known serials in the loaded registry map.
+        for m2 in _GENERIC_DASHED_SERIAL_PATTERN.finditer(text):
+            candidate = _normalise_informative_serial(m2.group(1))
+            if candidate and candidate in _KNOWN_SERIALS:
+                return candidate
+        for m2 in _GENERIC_COMPACT_SERIAL_PATTERN.finditer(text):
+            candidate = _normalise_informative_serial(m2.group(1))
+            if candidate and candidate in _KNOWN_SERIALS:
+                return candidate
         return ""
     region = m.group(1).upper()
     number = m.group(2)

@@ -1325,6 +1325,14 @@ class TestGameRegistry(unittest.TestCase):
         from src.core.game_registry import detect_game_serial
         self.assertEqual(detect_game_serial("SLPS25516.pnach"), "SLPS-25516")
 
+    def test_detect_informative_alnum_prefix_serial(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("ARP2-01201_cover.png"), "ARP2-01201")
+
+    def test_detect_informative_compact_serial(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("IIDX16COMP.txt"), "IIDX16COMP")
+
     def test_detect_from_content(self):
         from src.core.game_registry import detect_game_serial
         content = b"gametitle=Gran Turismo 4\n// CRC for SLUS-21163\npatch=1,EE,..."
@@ -1398,6 +1406,9 @@ class TestGameRegistry(unittest.TestCase):
                 json.dumps({
                     "EFGH-54321": {"title": "Title From Object Map"},
                     "WXYZ_00001": {"title": "Title With Underscore Serial"},
+                    "ARP2-01201": {"title": "Title With Alnum Prefix"},
+                    "DMP-P201": {"title": "Title With Alnum Suffix"},
+                    "IIDX16COMP": {"title": "Title With Compact ID"},
                     "12AB-12345": {"title": "ignored non-letter prefix"},
                 }),
                 encoding="utf-8",
@@ -1410,7 +1421,7 @@ class TestGameRegistry(unittest.TestCase):
                 (
                     "<html><body><table>"
                     "<tr><td>Title From HTML</td><td><center>MNOP-22222</center></td></tr>"
-                    "<tr><td>Ignored Prefix</td><td><center>1NOP-22222</center></td></tr>"
+                    "<tr><td>Ignored Non-ID Cell</td><td><center>SONY ID</center></td></tr>"
                     "</table></body></html>"
                 ),
                 encoding="utf-8",
@@ -1419,6 +1430,9 @@ class TestGameRegistry(unittest.TestCase):
             self.assertEqual(loaded.get("ABCD-12345"), "Title From Flat Map")
             self.assertEqual(loaded.get("EFGH-54321"), "Title From Object Map")
             self.assertEqual(loaded.get("WXYZ-00001"), "Title With Underscore Serial")
+            self.assertEqual(loaded.get("ARP2-01201"), "Title With Alnum Prefix")
+            self.assertEqual(loaded.get("DMP-P201"), "Title With Alnum Suffix")
+            self.assertEqual(loaded.get("IIDX16COMP"), "Title With Compact ID")
             self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
             self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
             self.assertNotIn("BADSERIAL", loaded)
@@ -1644,11 +1658,14 @@ class TestGameRegistryExpanded(unittest.TestCase):
         self.assertGreaterEqual(len(serials), 200, f"Got only {len(serials)} entries")
 
     def test_all_keys_normalised_form(self):
-        """Every key in _KNOWN_SERIALS must be in XXXX-NNNNN form."""
-        from src.core.game_registry import all_known_serials
+        """Every key in _KNOWN_SERIALS must already be in supported normalized form."""
+        from src.core.game_registry import all_known_serials, _normalise_informative_serial
         for serial, _ in all_known_serials():
-            self.assertRegex(serial, r"^[A-Z]{4}-\d{5}$",
-                             f"Malformed serial key: {serial}")
+            self.assertEqual(
+                _normalise_informative_serial(serial),
+                serial,
+                f"Malformed or non-normalized serial key: {serial}",
+            )
 
 
 
