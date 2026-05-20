@@ -923,6 +923,16 @@ def _normalise_informative_serial(raw_serial: str) -> str:
     serial = str(raw_serial).strip().upper().replace("_", "-")
     if not serial:
         return ""
+    # Source informative files contain noisy separators/punctuation in some
+    # otherwise valid IDs (e.g. "SLPM.-65987", "SLKA 25447", "SCPS-56014<").
+    serial = re.sub(r"[.\s]+", "-", serial)
+    serial = re.sub(r"[^A-Z0-9-]", "", serial)
+    serial = re.sub(r"-{2,}", "-", serial).strip("-")
+    # Some rows append a single trailing disc/media marker to a strict serial
+    # (e.g. "SLES-50330-T", "SLPM-55221-2"). Keep the canonical game serial.
+    m_trailing = re.match(r"^([A-Z]{4}-\d{5})-[A-Z0-9]$", serial)
+    if m_trailing:
+        serial = m_trailing.group(1)
     if serial.endswith("-99999"):
         return ""
     if _STRICT_SERIAL_RE.match(serial):

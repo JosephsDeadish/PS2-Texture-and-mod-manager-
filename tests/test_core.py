@@ -1410,12 +1410,22 @@ class TestGameRegistry(unittest.TestCase):
                     "ARP2-01201": {"title": "Title With Alnum Prefix"},
                     "DMP-P201": {"title": "Title With Alnum Suffix"},
                     "IIDX16COMP": {"title": "Title With Compact ID"},
+                    "SNS-P-M4": {"title": "Non-PS2 Should Be Ignored"},
                     "12AB-12345": {"title": "ignored non-letter prefix"},
                 }),
                 encoding="utf-8",
             )
             (info_dir / "PS2 codes and name 4.txt").write_text(
-                "IJKL-11111\tTitle From TXT\nALCH-0004\tTypo 4-digit Variant\nBADLINEWITHOUTTAB\n",
+                (
+                    "IJKL-11111\tTitle From TXT\n"
+                    "ALCH-0004\tTypo 4-digit Variant\n"
+                    "SCPS-56014<\tTitle With Trailing Punctuation\n"
+                    "SLKA 25447\tTitle With Spaced Serial\n"
+                    "SLPM.-65987\tTitle With Dot-Dash Noise\n"
+                    "SLES-50330-T\tTitle With Trailing Disc Marker\n"
+                    "SLPM-55221-2\tTitle With Trailing Disc Number\n"
+                    "BADLINEWITHOUTTAB\n"
+                ),
                 encoding="utf-8",
             )
             (info_dir / "PS2.ID.List.02.13.20.htm").write_text(
@@ -1437,8 +1447,16 @@ class TestGameRegistry(unittest.TestCase):
             self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
             self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
             self.assertEqual(loaded.get("ALCH-00004"), "Canonical 5-digit Title")
+            self.assertEqual(loaded.get("SCPS-56014"), "Title With Trailing Punctuation")
+            self.assertEqual(loaded.get("SLKA-25447"), "Title With Spaced Serial")
+            self.assertEqual(loaded.get("SLPM-65987"), "Title With Dot-Dash Noise")
+            self.assertEqual(loaded.get("SLES-50330"), "Title With Trailing Disc Marker")
+            self.assertEqual(loaded.get("SLPM-55221"), "Title With Trailing Disc Number")
             self.assertNotIn("ALCH-0004", loaded)
+            self.assertNotIn("SLES-50330-T", loaded)
+            self.assertNotIn("SLPM-55221-2", loaded)
             self.assertNotIn("BADSERIAL", loaded)
+            self.assertNotIn("SNS-P-M4", loaded)
             self.assertNotIn("12AB-12345", loaded)
 
     # ------------------------------------------------------------------
