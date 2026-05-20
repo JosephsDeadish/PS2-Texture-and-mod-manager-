@@ -1019,6 +1019,20 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                     result[serial] = title
         except Exception:
             pass
+
+    # If a malformed 4-digit numeric variant exists alongside its canonical
+    # 5-digit counterpart (e.g. ALCH-0004 + ALCH-00004), keep only canonical.
+    typo_variants: list[str] = []
+    for serial in result.keys():
+        m = re.match(r"^([A-Z]{4})-(\d{4})$", serial)
+        if not m:
+            continue
+        canonical = f"{m.group(1)}-{m.group(2).zfill(5)}"
+        if canonical in result:
+            typo_variants.append(serial)
+    for serial in typo_variants:
+        result.pop(serial, None)
+
     return result
 
 

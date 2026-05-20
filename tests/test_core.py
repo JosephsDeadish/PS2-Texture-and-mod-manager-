@@ -1398,6 +1398,7 @@ class TestGameRegistry(unittest.TestCase):
             (info_dir / "PS2.data.json").write_text(
                 json.dumps({
                     "ABCD-12345": "Title From Flat Map",
+                    "ALCH-00004": "Canonical 5-digit Title",
                     "BADSERIAL": "ignored",
                 }),
                 encoding="utf-8",
@@ -1414,7 +1415,7 @@ class TestGameRegistry(unittest.TestCase):
                 encoding="utf-8",
             )
             (info_dir / "PS2 codes and name 4.txt").write_text(
-                "IJKL-11111\tTitle From TXT\nBADLINEWITHOUTTAB\n",
+                "IJKL-11111\tTitle From TXT\nALCH-0004\tTypo 4-digit Variant\nBADLINEWITHOUTTAB\n",
                 encoding="utf-8",
             )
             (info_dir / "PS2.ID.List.02.13.20.htm").write_text(
@@ -1435,6 +1436,8 @@ class TestGameRegistry(unittest.TestCase):
             self.assertEqual(loaded.get("IIDX16COMP"), "Title With Compact ID")
             self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
             self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
+            self.assertEqual(loaded.get("ALCH-00004"), "Canonical 5-digit Title")
+            self.assertNotIn("ALCH-0004", loaded)
             self.assertNotIn("BADSERIAL", loaded)
             self.assertNotIn("12AB-12345", loaded)
 
