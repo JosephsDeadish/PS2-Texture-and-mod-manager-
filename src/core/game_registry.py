@@ -1033,7 +1033,7 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
     # If a malformed 4-digit numeric variant exists alongside its canonical
     # 5-digit counterpart (e.g. ALCH-0004 + ALCH-00004), keep only canonical.
     typo_variants: list[str] = []
-    for serial in result.keys():
+    for serial in result:
         m = re.match(r"^([A-Z]{4})-(\d{4})$", serial)
         if not m:
             continue
