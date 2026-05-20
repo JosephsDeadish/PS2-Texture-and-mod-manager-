@@ -910,7 +910,18 @@ _GENERIC_COMPACT_SERIAL_PATTERN = re.compile(
 
 
 def _normalise_informative_serial(raw_serial: str) -> str:
-    """Normalise an informative-doc serial and return ``""`` when invalid."""
+    """Normalise an informative-doc serial and return ``""`` when invalid.
+
+    Supported forms:
+    - Strict PS2 style: ``XXXX-NNNNN`` (e.g. ``SLUS-20062``)
+    - Extended dashed IDs seen in source files: ``[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}``
+      (e.g. ``ARP2-01201``, ``DMP-P201``)
+    - Extended compact IDs seen in source files: ``[A-Z][A-Z0-9]{5,15}``
+      (e.g. ``IIDX16COMP``)
+
+    Also normalizes occasional 4-digit numeric suffix typos (``ALCH-0004`` →
+    ``ALCH-00004``) so duplicate malformed keys are not introduced.
+    """
     serial = str(raw_serial).strip().upper().replace("_", "-")
     if not serial:
         return ""
@@ -1003,6 +1014,9 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                 if not centers:
                     continue
                 serial = ""
+                # The informative HTML places the GAME ID in the final centered
+                # column; scan from the end so we pick that before earlier
+                # centered cells (region, media type, date, etc.).
                 for serial_raw in reversed(centers):
                     serial = _normalise_informative_serial(serial_raw)
                     if serial:
