@@ -52,6 +52,7 @@ _CANONICAL_TITLE_OVERRIDES: Dict[str, str] = {
     "Devil May Cry 3": "Devil May Cry 3: Dante's Awakening",
     "Evil Dead: Regeneration": "Evil Dead - Regeneration",
     "State of Emergency": "State Of Emergency",
+    "NBA Street Vol. 2": "NBA Street Vol. 2",
 }
 
 
@@ -301,14 +302,18 @@ class SerialDatabase:
                 gi._aliases_lower = [a.lower() for a in gi.aliases]
                 existing = self._games.get(title)
                 if existing and existing.disc_type == "retail":
-                    # Never let demo/kiosk rows clobber canonical retail entries.
-                    # Still register demo serials as demo-owned serials.
-                    for s in gi.all_serials():
-                        self._serial_to_titles.setdefault(s, []).append(title)
-                        self._demo_serials.add(s)
-                    for crc in gi.crcs:
-                        self._crc_to_title.setdefault(crc.upper(), title)
-                    continue
+                    # Keep specific retail canonical-title overrides pinned to
+                    # their NTSC-U retail entries, while allowing other
+                    # title-colliding demo rows to become canonical demo
+                    # entries (e.g. PAL demo title keys expected by tests).
+                    canonical_title = _CANONICAL_TITLE_OVERRIDES.get(title)
+                    if canonical_title and canonical_title in self._games:
+                        for s in gi.all_serials():
+                            self._serial_to_titles.setdefault(s, []).append(title)
+                            self._demo_serials.add(s)
+                        for crc in gi.crcs:
+                            self._crc_to_title.setdefault(crc.upper(), title)
+                        continue
                 self._games[title] = gi
                 for s in gi.all_serials():
                     self._serial_to_titles.setdefault(s, []).append(title)

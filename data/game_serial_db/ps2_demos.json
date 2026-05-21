@@ -431,6 +431,19 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
+    "Calpis Water Version (Trial)": {
+      "serial": "SCPM-85006",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
+    },
     "Crash Bandicoot: The Wrath of Cortex (Demo)": {
       "serial": "SCUS-97007",
       "alt_serials": [],
@@ -1035,6 +1048,32 @@
       "genre": "",
       "aliases": [],
       "src": "data/game_serial_db/ps2_demos.json"
+    },
+    "Fantasy Water Margin 3-Day": {
+      "serial": "SCPM-65074",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
+    },
+    "Fantasy Water Margin 4-Day": {
+      "serial": "SCPM-65600",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Fight Night Round 2": {
       "serial": "SLED-53126",
@@ -2147,6 +2186,19 @@
       "genre": "Demo",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
+    },
+    "Jumping Flash! (Trial)": {
+      "serial": "SCPM-86001",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Kane & Lynch: Dead Men (Sneak Preview)": {
       "serial": "SLUS-21654",
@@ -8721,6 +8773,32 @@
       "genre": "",
       "aliases": [],
       "src": "data/game_serial_db/ps2_demos.json"
+    },
+    "UNKNOWN": {
+      "serial": "SCPM-62115",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
+    },
+    "UNKNOWN (SCPM-62116)": {
+      "serial": "SCPM-62116",
+      "alt_serials": [],
+      "crcs": [],
+      "disc_type": "promo",
+      "region": "NTSC-J",
+      "release_date": "",
+      "developer": "",
+      "publisher": "",
+      "genre": "",
+      "aliases": [],
+      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Ufficiale PlayStation 2 Italia Kids Special 2005 Demo (PAL)": {
       "serial": "SCED-53798",
