@@ -53,6 +53,11 @@ _CANONICAL_TITLE_OVERRIDES: Dict[str, str] = {
     "Evil Dead: Regeneration": "Evil Dead - Regeneration",
     "State of Emergency": "State Of Emergency",
     "NBA Street Vol. 2": "NBA Street Vol. 2",
+    # These retail titles share exact names with demo-DB entries; the demo must
+    # NOT overwrite the retail entry loaded first from NTSC-U.
+    "Burnout 3: Takedown": "Burnout 3: Takedown",
+    "Prince of Persia: Warrior Within": "Prince of Persia: Warrior Within",
+    "Tekken 5": "Tekken 5",
 }
 
 

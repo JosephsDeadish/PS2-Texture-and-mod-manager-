@@ -183,39 +183,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "007: Everything or Nothing": {
-      "title": "007: Everything or Nothing",
-      "serial": "SLUS-29095",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-02-17",
-      "developer": "EA Redwood Shores",
-      "publisher": "Electronic Arts",
-      "genre": "Action, Adventure, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "007: From Russia with Love": {
       "title": "007: From Russia with Love",
       "serial": "SLUS-21282",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-01",
-      "developer": "EA Redwood Shores",
-      "publisher": "Electronic Arts",
-      "genre": "Action, Driving, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "007: From Russia with Love (SLUS-29168)": {
-      "title": "007: From Russia with Love (SLUS-29168)",
-      "serial": "SLUS-29168",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -315,21 +285,6 @@
       "crcs": [
         "C1B141D6"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-01-17",
-      "developer": "Avalanche Software, Ritual Entertainment",
-      "publisher": "Eidos Interactive",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "25 to Life": {
-      "title": "25 to Life",
-      "serial": "SLUS-29129",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -531,21 +486,6 @@
     "ATV Offroad Fury 3 (SCUS-97437)": {
       "title": "ATV Offroad Fury 3 (SCUS-97437)",
       "serial": "SCUS-97437",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-02",
-      "developer": "Climax Group",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "ATV Offroad Fury 3 (SLUS-97405)": {
-      "title": "ATV Offroad Fury 3 (SLUS-97405)",
-      "serial": "SLUS-97405",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -784,36 +724,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Aggressive Inline (SLUS-29021)": {
-      "title": "Aggressive Inline (SLUS-29021)",
-      "serial": "SLUS-29021",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-05-30",
-      "developer": "Z-Axis, Ltd",
-      "publisher": "Acclaim",
-      "genre": "Skateboarding",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "AirBlade": {
-      "title": "AirBlade",
-      "serial": "SLUS-29017",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-01-28",
-      "developer": "Criterion Games",
-      "publisher": "Namco",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Airblade": {
       "title": "Airblade",
       "serial": "SLUS-20346",
@@ -960,21 +870,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "All-Star Baseball 2003 featuring Derek Jeter (SLUS-28007)": {
-      "title": "All-Star Baseball 2003 featuring Derek Jeter (SLUS-28007)",
-      "serial": "SLUS-28007",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-02-28",
-      "developer": "Acclaim Studios Austin",
-      "publisher": "Acclaim Entertainment",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "All-Star Baseball 2004 featuring Derek Jeter": {
       "title": "All-Star Baseball 2004 featuring Derek Jeter",
       "serial": "SLUS-20569",
@@ -1029,21 +924,6 @@
       "crcs": [
         "7CDC2C16"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-12",
-      "developer": "Outrage Games",
-      "publisher": "THQ",
-      "genre": "Action-Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Alter Echo (SLUS-29056)": {
-      "title": "Alter Echo (SLUS-29056)",
-      "serial": "SLUS-29056",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -1445,21 +1325,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Arctic Thunder (SLUS-29007)": {
-      "title": "Arctic Thunder (SLUS-29007)",
-      "serial": "SLUS-29007",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-09-17",
-      "developer": "Inland Productions",
-      "publisher": "Midway",
-      "genre": "Action, Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Are You Smarter than a 5th Grader? Make the Grade": {
       "title": "Are You Smarter than a 5th Grader? Make the Grade",
       "serial": "SLUS-21755",
@@ -1792,21 +1657,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Asterix & Obelix: Kick Buttix (SLUS-29111)": {
-      "title": "Asterix & Obelix: Kick Buttix (SLUS-29111)",
-      "serial": "SLUS-29111",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-09-14",
-      "developer": "Etranges Libellules",
-      "publisher": "Atari",
-      "genre": "Action, Adventure, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Astro Boy": {
       "title": "Astro Boy",
       "serial": "SLUS-20867",
@@ -1961,21 +1811,6 @@
     "Auto Modellista (SLUS-20498)": {
       "title": "Auto Modellista (SLUS-20498)",
       "serial": "SLUS-20498",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-03-26",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Auto Modellista (SLUS-28031)": {
-      "title": "Auto Modellista (SLUS-28031)",
-      "serial": "SLUS-28031",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -2511,51 +2346,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Battlefield 2: Modern Combat": {
-      "title": "Battlefield 2: Modern Combat",
-      "serial": "SLUS-29117",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-24",
-      "developer": "Digital Illusions CE AB",
-      "publisher": "EA Games",
-      "genre": "Action, First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Battlefield 2: Modern Combat (SLUS-29152)": {
-      "title": "Battlefield 2: Modern Combat (SLUS-29152)",
-      "serial": "SLUS-29152",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-24",
-      "developer": "Digital Illusions CE AB",
-      "publisher": "EA Games",
-      "genre": "Action, First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Battlefield 2: Modern Combat (SLUS-29172)": {
-      "title": "Battlefield 2: Modern Combat (SLUS-29172)",
-      "serial": "SLUS-29172",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-24",
-      "developer": "Digital Illusions CE AB",
-      "publisher": "EA Games",
-      "genre": "Action, First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Battlestar Galactica": {
       "title": "Battlestar Galactica",
       "serial": "SLUS-20421",
@@ -2681,21 +2471,6 @@
     "Beyond Good & Evil": {
       "title": "Beyond Good & Evil",
       "serial": "SLUS-20763",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-11",
-      "developer": "Ubisoft Entertainment",
-      "publisher": "Ubi Soft Entertainment",
-      "genre": "Action-Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Beyond Good & Evil (SLUS-29082)": {
-      "title": "Beyond Good & Evil (SLUS-29082)",
-      "serial": "SLUS-29082",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -2890,51 +2665,6 @@
       "developer": "Digital Fiction, Inc.",
       "publisher": "Majesco",
       "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Black & Bruised (SLUS-28027)": {
-      "title": "Black & Bruised (SLUS-28027)",
-      "serial": "SLUS-28027",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-01-30",
-      "developer": "Digital Fiction, Inc.",
-      "publisher": "Majesco",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Black & Bruised (SLUS-29045)": {
-      "title": "Black & Bruised (SLUS-29045)",
-      "serial": "SLUS-29045",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-01-30",
-      "developer": "Digital Fiction, Inc.",
-      "publisher": "Majesco",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Black (SLUS-29180)": {
-      "title": "Black (SLUS-29180)",
-      "serial": "SLUS-29180",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-02-28",
-      "developer": "Criterion Games",
-      "publisher": "Electronic Arts",
-      "genre": "RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -3405,21 +3135,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Burnout (SLUS-28006)": {
-      "title": "Burnout (SLUS-28006)",
-      "serial": "SLUS-28006",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-11-02",
-      "developer": "Criterion Games",
-      "publisher": "Acclaim Entertainment",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Burnout 2: Point of Impact": {
       "title": "Burnout 2: Point of Impact",
       "serial": "SLUS-20497",
@@ -3461,21 +3176,6 @@
         "BO3",
         "Burnout 3"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Burnout 3: Takedown (SLUS-29113)": {
-      "title": "Burnout 3: Takedown (SLUS-29113)",
-      "serial": "SLUS-29113",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-09-07",
-      "developer": "Criterion Games",
-      "publisher": "Electronic Arts",
-      "genre": "Racing",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Burnout Anthology": {
@@ -3533,21 +3233,6 @@
       "aliases": [
         "BO Revenge"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Burnout Revenge (SLUS-29153)": {
-      "title": "Burnout Revenge (SLUS-29153)",
-      "serial": "SLUS-29153",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-13",
-      "developer": "Criterion Games",
-      "publisher": "Electronic Arts",
-      "genre": "Racing",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Butt-Ugly Martians: Zoom or Doom!": {
@@ -4363,36 +4048,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Champions of Norrath (SLUS-29088)": {
-      "title": "Champions of Norrath (SLUS-29088)",
-      "serial": "SLUS-29088",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-02-10",
-      "developer": "Snowblind Studios, Inc",
-      "publisher": "Sony",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Champions of Norrath: Realms of Everquest": {
-      "title": "Champions of Norrath: Realms of Everquest",
-      "serial": "SLUS-29085",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Champions: Return to Arms": {
       "title": "Champions: Return to Arms",
       "serial": "SLUS-20973",
@@ -4401,21 +4056,6 @@
         "4F44BCDE",
         "66CB9620"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-08",
-      "developer": "Snowblind Studios",
-      "publisher": "Sony Online Entertainment",
-      "genre": "Action-RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Champions: Return to Arms (SLUS-29126)": {
-      "title": "Champions: Return to Arms (SLUS-29126)",
-      "serial": "SLUS-29126",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -4495,21 +4135,6 @@
     "Choro Q": {
       "title": "Choro Q",
       "serial": "SLUS-20930",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-17",
-      "developer": "Barnhouse Effect",
-      "publisher": "Atlus",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Choro Q (SLUS-28044)": {
-      "title": "Choro Q (SLUS-28044)",
-      "serial": "SLUS-28044",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -4769,21 +4394,6 @@
     "Combat Elite: WWII Paratroopers": {
       "title": "Combat Elite: WWII Paratroopers",
       "serial": "SLUS-20715",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-21",
-      "developer": "BattleBorne",
-      "publisher": "SouthPeak Games",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Combat Elite: WWII Paratroopers (SLUS-28054)": {
-      "title": "Combat Elite: WWII Paratroopers (SLUS-28054)",
-      "serial": "SLUS-28054",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -5057,21 +4667,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Crash 'n' Burn": {
-      "title": "Crash 'n' Burn",
-      "serial": "SLUS-29130",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-15",
-      "developer": "Climax Group",
-      "publisher": "Eidos Interactive",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Crash Bandicoot: Action Pack": {
       "title": "Crash Bandicoot: Action Pack",
       "serial": "SLUS-27008",
@@ -5111,21 +4706,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Crash Bandicoot: The Wrath of Cortex (SLUS-29010)": {
-      "title": "Crash Bandicoot: The Wrath of Cortex (SLUS-29010)",
-      "serial": "SLUS-29010",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-10-31",
-      "developer": "Traveller's Tales",
-      "publisher": "Universal Interactive Studios",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Crash Nitro Kart": {
       "title": "Crash Nitro Kart",
       "serial": "SLUS-20649",
@@ -5133,21 +4713,6 @@
       "crcs": [
         "64DF0D3F"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-11",
-      "developer": "Vicarious Visions, Inc",
-      "publisher": "Vivendi Universal Games",
-      "genre": "Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Crash Nitro Kart (SLUS-29068)": {
-      "title": "Crash Nitro Kart (SLUS-29068)",
-      "serial": "SLUS-29068",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -5200,21 +4765,6 @@
       "aliases": [
         "Crash 5"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Crash Twinsanity / Spyro: A Hero's Tail": {
-      "title": "Crash Twinsanity / Spyro: A Hero's Tail",
-      "serial": "SLUS-29101",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Crash of the Titans": {
@@ -5432,39 +4982,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "DDRMAX2: Dance Dance Revolution (SLUS-29074)": {
-      "title": "DDRMAX2: Dance Dance Revolution (SLUS-29074)",
-      "serial": "SLUS-29074",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-09-23",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami of America",
-      "genre": "Rhythm",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "DDRMAX: Dance Dance Revolution": {
       "title": "DDRMAX: Dance Dance Revolution",
       "serial": "SLUS-20437",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-10-28",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami",
-      "genre": "Rhythm",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "DDRMAX: Dance Dance Revolution (SLUS-29037)": {
-      "title": "DDRMAX: Dance Dance Revolution (SLUS-29037)",
-      "serial": "SLUS-29037",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -5693,21 +5213,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Dance Factory (SLUS-28062)": {
-      "title": "Dance Factory (SLUS-28062)",
-      "serial": "SLUS-28062",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-08-22",
-      "developer": "Broadsword Interactive",
-      "publisher": "Codemasters",
-      "genre": "Rhythm",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Dancing with the Stars": {
       "title": "Dancing with the Stars",
       "serial": "SLUS-21676",
@@ -5818,21 +5323,6 @@
       "crcs": [
         "F26B83E0"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-11-29",
-      "developer": "Radical Entertainment",
-      "publisher": "THQ",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dark Summit (SLUS-29015)": {
-      "title": "Dark Summit (SLUS-29015)",
-      "serial": "SLUS-29015",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -6022,36 +5512,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Def Jam: Fight for NY (SLUS-29108)": {
-      "title": "Def Jam: Fight for NY (SLUS-29108)",
-      "serial": "SLUS-29108",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-09-20",
-      "developer": "Aki Corp",
-      "publisher": "EA Games",
-      "genre": "Action, Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Def Jam: Vendetta": {
-      "title": "Def Jam: Vendetta",
-      "serial": "SLUS-29047",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-04-01",
-      "developer": "AKI Corporation",
-      "publisher": "EA Sports Big",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Defender": {
       "title": "Defender",
       "serial": "SLUS-20191",
@@ -6136,21 +5596,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Destroy All Humans! (SLUS-29150)": {
-      "title": "Destroy All Humans! (SLUS-29150)",
-      "serial": "SLUS-29150",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-07-21",
-      "developer": "Pandemic Studio Pty. Ltd",
-      "publisher": "THQ",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Destroy All Humans! 2": {
       "title": "Destroy All Humans! 2",
       "serial": "SLUS-21439",
@@ -6159,21 +5604,6 @@
         "42DF8C8C",
         "D72B4CD3"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-10-17",
-      "developer": "Pandemic Studios",
-      "publisher": "THQ",
-      "genre": "Action-Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Destroy All Humans! 2 (SLUS-29196)": {
-      "title": "Destroy All Humans! 2 (SLUS-29196)",
-      "serial": "SLUS-29196",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -6259,21 +5689,6 @@
         "DMC1",
         "Devil May Cry 1"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Devil May Cry (SLUS-29009)": {
-      "title": "Devil May Cry (SLUS-29009)",
-      "serial": "SLUS-29009",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-10-16",
-      "developer": "Capcom Co., Ltd",
-      "publisher": "Capcom",
-      "genre": "Action, Shooter, Survival Horror",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Devil May Cry 2": {
@@ -6533,21 +5948,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Disaster Report (SLUS-28025)": {
-      "title": "Disaster Report (SLUS-28025)",
-      "serial": "SLUS-28025",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-15",
-      "developer": "Irem Software Engineering, Inc",
-      "publisher": "Agetec Inc",
-      "genre": "Action, Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Disgaea 2: Cursed Memories": {
       "title": "Disgaea 2: Cursed Memories",
       "serial": "SLUS-21397",
@@ -6589,21 +5989,6 @@
       "aliases": [
         "Disgaea 1"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Disgaea: Hour of Darkness (SLUS-28034)": {
-      "title": "Disgaea: Hour of Darkness (SLUS-28034)",
-      "serial": "SLUS-28034",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-26",
-      "developer": "Nippon Ichi Software",
-      "publisher": "Atlus",
-      "genre": "Strategy",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Disney G-Force": {
@@ -7325,96 +6710,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Dot Hack Part 1: Infection": {
-      "title": "Dot Hack Part 1: Infection",
-      "serial": "SLUS-28023",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-03-24",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai, Atari",
-      "genre": "Action/RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dot Hack Part 1: Infection (SLUS-29042)": {
-      "title": "Dot Hack Part 1: Infection (SLUS-29042)",
-      "serial": "SLUS-29042",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-03-24",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai, Atari",
-      "genre": "Action/RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dot Hack Part 2: Mutation": {
-      "title": "Dot Hack Part 2: Mutation",
-      "serial": "SLUS-28032",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-06-18",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dot Hack Part 2: Mutation (SLUS-29055)": {
-      "title": "Dot Hack Part 2: Mutation (SLUS-29055)",
-      "serial": "SLUS-29055",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-06-18",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dot Hack Part 3: Outbreak": {
-      "title": "Dot Hack Part 3: Outbreak",
-      "serial": "SLUS-29065",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-09-10",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dot Hack Part 4: Quarantine": {
-      "title": "Dot Hack Part 4: Quarantine",
-      "serial": "SLUS-29084",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-12-03",
-      "developer": "CyberConnect2",
-      "publisher": "Bandai",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Downforce": {
       "title": "Downforce",
       "serial": "SLUS-20405",
@@ -7471,21 +6766,6 @@
       "crcs": [
         "FF60D3ED"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-11-19",
-      "developer": "Midway Games West Inc",
-      "publisher": "Midway",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dr. Muto (SLUS-29040)": {
-      "title": "Dr. Muto (SLUS-29040)",
-      "serial": "SLUS-29040",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -7746,21 +7026,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Dragon Quest VIII: Journey of the Cursed King (SLUS-29157)": {
-      "title": "Dragon Quest VIII: Journey of the Cursed King (SLUS-29157)",
-      "serial": "SLUS-29157",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-15",
-      "developer": "Level-5",
-      "publisher": "Square Enix",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Dragon Rage": {
       "title": "Dragon Rage",
       "serial": "SLUS-20195",
@@ -7844,21 +7109,6 @@
       "developer": "Cavia",
       "publisher": "Ubisoft",
       "genre": "Action-RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "DreamWorks & Aardman Flushed Away": {
-      "title": "DreamWorks & Aardman Flushed Away",
-      "serial": "SLUS-29197",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-12-01",
-      "developer": "Monkey Bar Games",
-      "publisher": "D3 Publisher",
-      "genre": "Action/Platformer",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -8054,21 +7304,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Driver: Parallel Lines (SLUS-29185)": {
-      "title": "Driver: Parallel Lines (SLUS-29185)",
-      "serial": "SLUS-29185",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-03-14",
-      "developer": "Reflections Interactive",
-      "publisher": "Atari",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Driving Emotion Type-S": {
       "title": "Driving Emotion Type-S",
       "serial": "SLUS-20113",
@@ -8125,36 +7360,6 @@
       "crcs": [
         "62C92B67"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-25",
-      "developer": "Matrix",
-      "publisher": "Atlus U.S.A",
-      "genre": "Action, Adventure, Platform",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dual Hearts (SLUS-28013)": {
-      "title": "Dual Hearts (SLUS-28013)",
-      "serial": "SLUS-28013",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-25",
-      "developer": "Matrix",
-      "publisher": "Atlus U.S.A",
-      "genre": "Action, Adventure, Platform",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dual Hearts (SLUS-29033)": {
-      "title": "Dual Hearts (SLUS-29033)",
-      "serial": "SLUS-29033",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -8645,39 +7850,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "ESPN Winter X Games Snowboarding (SLUS-29001)": {
-      "title": "ESPN Winter X Games Snowboarding (SLUS-29001)",
-      "serial": "SLUS-29001",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-01-14",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "ESPN X Games Skateboarding": {
       "title": "ESPN X Games Skateboarding",
       "serial": "SLUS-20237",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-08-15",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "ESPN X Games Skateboarding (SLUS-29008)": {
-      "title": "ESPN X Games Skateboarding (SLUS-29008)",
-      "serial": "SLUS-29008",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -8771,21 +7946,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Egg Mania: Eggstreme Madness (SLUS-29032)": {
-      "title": "Egg Mania: Eggstreme Madness (SLUS-29032)",
-      "serial": "SLUS-29032",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-12",
-      "developer": "HotGen",
-      "publisher": "Kemco",
-      "genre": "Puzzle",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Endgame": {
       "title": "Endgame",
       "serial": "SLUS-20389",
@@ -8823,21 +7983,6 @@
       "crcs": [
         "81D233DC"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-05-03",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Enthusia: Professional Racing (SLUS-29151)": {
-      "title": "Enthusia: Professional Racing (SLUS-29151)",
-      "serial": "SLUS-29151",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -9009,84 +8154,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "EverQuest: Online Adventures (SLUS-28020)": {
-      "title": "EverQuest: Online Adventures (SLUS-28020)",
-      "serial": "SLUS-28020",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-09",
-      "developer": "Sony Online Entertainment",
-      "publisher": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "EverQuest: Online Adventures (SLUS-28021)": {
-      "title": "EverQuest: Online Adventures (SLUS-28021)",
-      "serial": "SLUS-28021",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-09",
-      "developer": "Sony Online Entertainment",
-      "publisher": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "EverQuest: Online Adventures (SLUS-28026)": {
-      "title": "EverQuest: Online Adventures (SLUS-28026)",
-      "serial": "SLUS-28026",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-09",
-      "developer": "Sony Online Entertainment",
-      "publisher": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "EverQuest: Online Adventures (SLUS-29050)": {
-      "title": "EverQuest: Online Adventures (SLUS-29050)",
-      "serial": "SLUS-29050",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-09",
-      "developer": "Sony Online Entertainment",
-      "publisher": "Sony Online Entertainment",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "EverQuest: Online Adventures: Frontiers": {
       "title": "EverQuest: Online Adventures: Frontiers",
       "serial": "SLUS-20744",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-17",
-      "developer": "Sony Online Entertainment",
-      "publisher": "Sony Computer Entertainment America",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "EverQuest: Online Adventures: Frontiers (SLUS-29063)": {
-      "title": "EverQuest: Online Adventures: Frontiers (SLUS-29063)",
-      "serial": "SLUS-29063",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -9258,21 +8328,6 @@
       "developer": "SCE London Studio",
       "publisher": "Sony Computer Entertainment America",
       "genre": "Party",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "EyeToy: AntiGrav": {
-      "title": "EyeToy: AntiGrav",
-      "serial": "SLUS-97414",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-09",
-      "developer": "Harmonix",
-      "publisher": "Sony Computer Entertainment America",
-      "genre": "Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -9490,21 +8545,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "FIFA 06": {
-      "title": "FIFA 06",
-      "serial": "SLUS-29160",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-27",
-      "developer": "Electronic Arts",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "FIFA 13": {
       "title": "FIFA 13",
       "serial": "SLUS-21954",
@@ -9580,39 +8620,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "FIFA Soccer 07 (SLUS-29194)": {
-      "title": "FIFA Soccer 07 (SLUS-29194)",
-      "serial": "SLUS-29194",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-10-03",
-      "developer": "Team Fusion",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "FIFA Soccer 08": {
       "title": "FIFA Soccer 08",
       "serial": "SLUS-21648",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-10-08",
-      "developer": "EA Canada",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "FIFA Soccer 08 (SLUS-29201)": {
-      "title": "FIFA Soccer 08 (SLUS-29201)",
-      "serial": "SLUS-29201",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -9751,21 +8761,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "FIFA Soccer 2005 (SLUS-29127)": {
-      "title": "FIFA Soccer 2005 (SLUS-29127)",
-      "serial": "SLUS-29127",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-10-12",
-      "developer": "EA Canada",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "FIFA Street": {
       "title": "FIFA Street",
       "serial": "SLUS-21147",
@@ -9803,21 +8798,6 @@
     "FIFA World Cup Germany 2006": {
       "title": "FIFA World Cup Germany 2006",
       "serial": "SLUS-21408",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-04-24",
-      "developer": "EA Canada",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "FIFA World Cup Germany 2006 (SLUS-29189)": {
-      "title": "FIFA World Cup Germany 2006 (SLUS-29189)",
-      "serial": "SLUS-29189",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -9957,21 +8937,6 @@
       "genre": "Puzzle",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Fantavision (SLUS-97015)": {
-      "title": "Fantavision (SLUS-97015)",
-      "serial": "SLUS-97015",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2000-10-26",
-      "developer": "SCEJ",
-      "publisher": "Sony",
-      "genre": "Puzzle.",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_ntsc_u.json"
     },
     "Far East of Eden": {
       "title": "Far East of Eden",
@@ -10142,21 +9107,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Fight Club (SLUS-29124)": {
-      "title": "Fight Club (SLUS-29124)",
-      "serial": "SLUS-29124",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-16",
-      "developer": "Genuine Games",
-      "publisher": "Vivendi Universal Games",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Fight Night 2004": {
       "title": "Fight Night 2004",
       "serial": "SLUS-20906",
@@ -10164,21 +9114,6 @@
       "crcs": [
         "DAEDDD63"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-04-05",
-      "developer": "EA Canada",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Fight Night 2004 (SLUS-29096)": {
-      "title": "Fight Night 2004 (SLUS-29096)",
-      "serial": "SLUS-29096",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -10204,39 +9139,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Fight Night Round 2 (SLUS-29145)": {
-      "title": "Fight Night Round 2 (SLUS-29145)",
-      "serial": "SLUS-29145",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-28",
-      "developer": "EA Sports",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Fight Night Round 3": {
       "title": "Fight Night Round 3",
       "serial": "SLUS-21383",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-03-20",
-      "developer": "EA Chicago",
-      "publisher": "Electronic Arts",
-      "genre": "Boxing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Fight Night Round 3 (SLUS-29183)": {
-      "title": "Fight Night Round 3 (SLUS-29183)",
-      "serial": "SLUS-29183",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -10447,21 +9352,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Final Fantasy XII (SLUS-29171)": {
-      "title": "Final Fantasy XII (SLUS-29171)",
-      "serial": "SLUS-29171",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-10-31",
-      "developer": "Square Enix",
-      "publisher": "Square Enix",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Final Fight: Streetwise": {
       "title": "Final Fight: Streetwise",
       "serial": "SLUS-21238",
@@ -10510,21 +9400,6 @@
     "FireBlade": {
       "title": "FireBlade",
       "serial": "SLUS-20198",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06-16",
-      "developer": "5000ft Inc.",
-      "publisher": "Midway",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "FireBlade (SLUS-29030)": {
-      "title": "FireBlade (SLUS-29030)",
-      "serial": "SLUS-29030",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -10622,21 +9497,6 @@
     "Flipnic: Ultimate Pinball": {
       "title": "Flipnic: Ultimate Pinball",
       "serial": "SLUS-21157",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-07-13",
-      "developer": "Sony Computer Entertainment Japan",
-      "publisher": "Capcom",
-      "genre": "Pinball",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Flipnic: Ultimate Pinball (SLUS-29149)": {
-      "title": "Flipnic: Ultimate Pinball (SLUS-29149)",
-      "serial": "SLUS-29149",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -10851,36 +9711,6 @@
       "crcs": [
         "9D1BA44D"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-04",
-      "developer": "Midway Studios - San Diego",
-      "publisher": "Midway Home Entertainment",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Freaky Flyers (Rating Pending version)": {
-      "title": "Freaky Flyers (Rating Pending version)",
-      "serial": "SLUS-29051",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-04",
-      "developer": "Midway Studios - San Diego",
-      "publisher": "Midway Home Entertainment",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_ntsc_u.json"
-    },
-    "Freaky Flyers (SLUS-29061)": {
-      "title": "Freaky Flyers (SLUS-29061)",
-      "serial": "SLUS-29061",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -11259,21 +10089,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Galactic Wrestling featuring Ultimate Muscle: The Kinnikuman Legacy (SLUS-29104)": {
-      "title": "Galactic Wrestling featuring Ultimate Muscle: The Kinnikuman Legacy (SLUS-29104)",
-      "serial": "SLUS-29104",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-06-29",
-      "developer": "AKI Corporation",
-      "publisher": "Bandai",
-      "genre": "Wrestling",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Galerians: Ash": {
       "title": "Galerians: Ash",
       "serial": "SLUS-20560",
@@ -11513,21 +10328,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Ghost in the Shell: Stand Alone Complex": {
-      "title": "Ghost in the Shell: Stand Alone Complex",
-      "serial": "SLUS-29123",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-08",
-      "developer": "Cavia",
-      "publisher": "Bandai",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Ghostbusters: The Video Game": {
       "title": "Ghostbusters: The Video Game",
       "serial": "SLUS-21882",
@@ -11616,21 +10416,6 @@
       "crcs": [
         "78ADCFB9"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-10-28",
-      "developer": "Lucasarts",
-      "publisher": "Lucasarts",
-      "genre": "Action, Tactical RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Gladius (SLUS-29060)": {
-      "title": "Gladius (SLUS-29060)",
-      "serial": "SLUS-29060",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -12495,21 +11280,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Guilty Gear Isuka (SLUS-28046)": {
-      "title": "Guilty Gear Isuka (SLUS-28046)",
-      "serial": "SLUS-28046",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-02",
-      "developer": "Sammy Studios",
-      "publisher": "Arc System Works",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Guilty Gear X": {
       "title": "Guilty Gear X",
       "serial": "SLUS-20287",
@@ -12663,21 +11433,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Guitar Hero II (SLUS-29198)": {
-      "title": "Guitar Hero II (SLUS-29198)",
-      "serial": "SLUS-29198",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-11-07",
-      "developer": "Harmonix Music Systems",
-      "publisher": "RedOctane",
-      "genre": "Rhythm",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Guitar Hero III: Legends of Rock": {
       "title": "Guitar Hero III: Legends of Rock",
       "serial": "SLUS-21672",
@@ -12810,21 +11565,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Gungrave (SLUS-28015)": {
-      "title": "Gungrave (SLUS-28015)",
-      "serial": "SLUS-28015",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-17",
-      "developer": "Positron Co., Ltd",
-      "publisher": "Sega",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Gungrave - Overdose": {
       "title": "Gungrave - Overdose",
       "serial": "SLUS-21020",
@@ -12898,21 +11638,6 @@
       "crcs": [
         "F9E3CF90"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-10-29",
-      "developer": "Gearbox Software, Valve L.L.C",
-      "publisher": "Sierra On-Line, Inc",
-      "genre": "First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Half-Life (SLUS-29014)": {
-      "title": "Half-Life (SLUS-29014)",
-      "serial": "SLUS-29014",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -13234,36 +11959,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Haven: Call of the King (SLUS-28019)": {
-      "title": "Haven: Call of the King (SLUS-28019)",
-      "serial": "SLUS-28019",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-11-17",
-      "developer": "Traveller's Tales",
-      "publisher": "Midway Home Entertainment",
-      "genre": "Action, Adventure, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Haven: Call of the King (SLUS-29038)": {
-      "title": "Haven: Call of the King (SLUS-29038)",
-      "serial": "SLUS-29038",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-11-17",
-      "developer": "Traveller's Tales",
-      "publisher": "Midway Home Entertainment",
-      "genre": "Action, Adventure, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Headhunter": {
       "title": "Headhunter",
       "serial": "SLUS-20416",
@@ -13441,39 +12136,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "High Heat Major League Baseball 2003 (SLUS-29019)": {
-      "title": "High Heat Major League Baseball 2003 (SLUS-29019)",
-      "serial": "SLUS-29019",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-02-12",
-      "developer": "3DO",
-      "publisher": "3DO",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "High Heat Major League Baseball 2004": {
       "title": "High Heat Major League Baseball 2004",
       "serial": "SLUS-20602",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-20",
-      "developer": "3DO",
-      "publisher": "3DO",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "High Heat Major League Baseball 2004 (SLUS-28029)": {
-      "title": "High Heat Major League Baseball 2004 (SLUS-28029)",
-      "serial": "SLUS-28029",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -13569,21 +12234,6 @@
       "aliases": [
         "Hitman 4"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Hitman: Blood Money / Urban Chaos: Riot Response": {
-      "title": "Hitman: Blood Money / Urban Chaos: Riot Response",
-      "serial": "SLUS-29191",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Hitman: Contracts": {
@@ -13849,21 +12499,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Hunter: The Reckoning: Wayward (SLUS-29059)": {
-      "title": "Hunter: The Reckoning: Wayward (SLUS-29059)",
-      "serial": "SLUS-29059",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-09-09",
-      "developer": "High Voltage Software, Inc",
-      "publisher": "Vivendi Universal Games",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "I-Ninja": {
       "title": "I-Ninja",
       "serial": "SLUS-20705",
@@ -13871,21 +12506,6 @@
       "crcs": [
         "C5FF7EFF"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-18",
-      "developer": "Argonaut Software Ltd",
-      "publisher": "Namco",
-      "genre": "Action, Platform",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "I-Ninja (SLUS-29077)": {
-      "title": "I-Ninja (SLUS-29077)",
-      "serial": "SLUS-29077",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -14560,21 +13180,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Jak and Daxter: The Precursor Legacy: Greatest Hits": {
-      "title": "Jak and Daxter: The Precursor Legacy: Greatest Hits",
-      "serial": "SLUS-97124",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-12-03",
-      "developer": "Naughty Dog",
-      "publisher": "Sony Computer Entertainment America",
-      "genre": "Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "James Cameron's Dark Angel": {
       "title": "James Cameron's Dark Angel",
       "serial": "SLUS-20379",
@@ -14773,21 +13378,6 @@
       "crcs": [
         "C186ACA9"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-06-14",
-      "developer": "Juice Games, Ltd",
-      "publisher": "THQ",
-      "genre": "Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Juiced (SLUS-29147)": {
-      "title": "Juiced (SLUS-29147)",
-      "serial": "SLUS-29147",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -15400,21 +13990,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Klonoa 2: Lunatea's Veil (SLUS-28004)": {
-      "title": "Klonoa 2: Lunatea's Veil (SLUS-28004)",
-      "serial": "SLUS-28004",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-07-31",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Knockout Kings 2001": {
       "title": "Knockout Kings 2001",
       "serial": "SLUS-20150",
@@ -15446,21 +14021,6 @@
       "developer": "EA Canada",
       "publisher": "Electronic Arts",
       "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Konami Kids Playground": {
-      "title": "Konami Kids Playground",
-      "serial": "SLUS-29200",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -15545,21 +14105,6 @@
     "Kya: Dark Lineage": {
       "title": "Kya: Dark Lineage",
       "serial": "SLUS-20440",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-18",
-      "developer": "Eden Studios",
-      "publisher": "Atari",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Kya: Dark Lineage (SLUS-28037)": {
-      "title": "Kya: Dark Lineage (SLUS-28037)",
-      "serial": "SLUS-28037",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -16759,21 +15304,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "MX 2002 featuring Ricky Carmichael": {
-      "title": "MX 2002 featuring Ricky Carmichael",
-      "serial": "SLUS-29006",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-07-03",
-      "developer": "Pacific Coast Power & Light Co.",
-      "publisher": "THQ",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "MX Rider": {
       "title": "MX Rider",
       "serial": "SLUS-20234",
@@ -16787,21 +15317,6 @@
       "release_date": "2001-08-01",
       "developer": "Climax Group",
       "publisher": "Infogrames",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "MX SuperFly": {
-      "title": "MX SuperFly",
-      "serial": "SLUS-29026",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06",
-      "developer": "Pacific Coast Power & Light Co.",
-      "publisher": "THQ",
       "genre": "Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
@@ -16840,21 +15355,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "MX Unleashed (SLUS-29091)": {
-      "title": "MX Unleashed (SLUS-29091)",
-      "serial": "SLUS-29091",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-02-10",
-      "developer": "Rainbow Studios",
-      "publisher": "THQ",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "MX Vs. ATV Unleashed": {
       "title": "MX Vs. ATV Unleashed",
       "serial": "SLUS-21104",
@@ -16881,21 +15381,6 @@
       "disc_type": "retail",
       "region": "NTSC-U",
       "release_date": "2005-03-29",
-      "developer": "Rainbow Studios",
-      "publisher": "THQ",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "MX vs. ATV Unleashed": {
-      "title": "MX vs. ATV Unleashed",
-      "serial": "SLUS-29140",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-03-16",
       "developer": "Rainbow Studios",
       "publisher": "THQ",
       "genre": "Racing",
@@ -17008,21 +15493,6 @@
       "developer": "EA Tiburon",
       "publisher": "EA Sports",
       "genre": "Football",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Madden NFL 08 (SLUS-26138)": {
-      "title": "Madden NFL 08 (SLUS-26138)",
-      "serial": "SLUS-26138",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-08-14",
-      "developer": "Tiburon",
-      "publisher": "EA Sports",
-      "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -17267,21 +15737,6 @@
         "C0AC5781",
         "C2272B2B"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-15",
-      "developer": "Softmax Co. Ltd",
-      "publisher": "Atlus",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Magna Carta: Tears of Blood (SLUS-28053)": {
-      "title": "Magna Carta: Tears of Blood (SLUS-28053)",
-      "serial": "SLUS-28053",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -17608,21 +16063,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Marvel Nemesis: Rise of the Imperfects (SLUS-29156)": {
-      "title": "Marvel Nemesis: Rise of the Imperfects (SLUS-29156)",
-      "serial": "SLUS-29156",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-20",
-      "developer": "Nihilistic Software",
-      "publisher": "Electronic Arts",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Marvel Super Hero Squad": {
       "title": "Marvel Super Hero Squad",
       "serial": "SLUS-21910",
@@ -17720,21 +16160,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Mat Hoffman's Pro BMX 2 (SLUS-28014)": {
-      "title": "Mat Hoffman's Pro BMX 2 (SLUS-28014)",
-      "serial": "SLUS-28014",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-08-12",
-      "developer": "Rainbow Studios",
-      "publisher": "Activision",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Matrix, The - Path of Neo": {
       "title": "Matrix, The - Path of Neo",
       "serial": "SLUS-21273",
@@ -17793,21 +16218,6 @@
       "crcs": [
         "8CF7CBC0"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-01-20",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Maximo vs Army of Zin": {
-      "title": "Maximo vs Army of Zin",
-      "serial": "SLUS-29083",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -18042,21 +16452,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Mercenaries": {
-      "title": "Mercenaries",
-      "serial": "SLUS-29137",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-18",
-      "developer": "Pandemic Studio Pty. Ltd",
-      "publisher": "Lucasarts",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Mercenaries - Playground of Destruction": {
       "title": "Mercenaries - Playground of Destruction",
       "serial": "SLUS-20932",
@@ -18136,21 +16531,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Metal Arms: Glitch in the System (SLUS-29081)": {
-      "title": "Metal Arms: Glitch in the System (SLUS-29081)",
-      "serial": "SLUS-29081",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-20",
-      "developer": "Swingin' Ape Studios",
-      "publisher": "Sierra",
-      "genre": "Third-person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Metal Gear Solid 2: Sons of Liberty": {
       "title": "Metal Gear Solid 2: Sons of Liberty",
       "serial": "SLUS-20144",
@@ -18180,21 +16560,6 @@
         "MGS2",
         "Metal Gear Solid 2"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Metal Gear Solid 2: Sons of Liberty: Trial Edition": {
-      "title": "Metal Gear Solid 2: Sons of Liberty: Trial Edition",
-      "serial": "SLUS-29003",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Metal Gear Solid 2: Substance": {
@@ -18308,21 +16673,6 @@
       "crcs": [
         "269F5DF5"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-04-25",
-      "developer": "Crea-Tech",
-      "publisher": "Atlus",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Metal Saga (SLUS-28059)": {
-      "title": "Metal Saga (SLUS-28059)",
-      "serial": "SLUS-28059",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -18825,21 +17175,6 @@
         "0EF16A99",
         "4B5E8A26"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-09-21",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Monster Hunter (SLUS-29110)": {
-      "title": "Monster Hunter (SLUS-29110)",
-      "serial": "SLUS-29110",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -19757,21 +18092,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "NBA Live 06 (SLUS-29162)": {
-      "title": "NBA Live 06 (SLUS-29162)",
-      "serial": "SLUS-29162",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-26",
-      "developer": "EA Canada",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "NBA Live 07": {
       "title": "NBA Live 07",
       "serial": "SLUS-21460",
@@ -20013,21 +18333,6 @@
       "developer": "NuFX, Inc",
       "publisher": "EA Sports Big",
       "genre": "Basketball",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "NBA Street V3": {
-      "title": "NBA Street V3",
-      "serial": "SLUS-29141",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-18",
-      "developer": "EA Canada",
-      "publisher": "EA Sports Big",
-      "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -20424,21 +18729,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "NCAA March Madness 06 (SLUS-29163)": {
-      "title": "NCAA March Madness 06 (SLUS-29163)",
-      "serial": "SLUS-29163",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-11",
-      "developer": "EA Canada",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "NCAA March Madness 07": {
       "title": "NCAA March Madness 07",
       "serial": "SLUS-21481",
@@ -20514,39 +18804,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "NCAA March Madness 2004 (SLUS-29079)": {
-      "title": "NCAA March Madness 2004 (SLUS-29079)",
-      "serial": "SLUS-29079",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-21",
-      "developer": "NuFX",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "NCAA March Madness 2005": {
       "title": "NCAA March Madness 2005",
       "serial": "SLUS-21100",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-16",
-      "developer": "EA Canada",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "NCAA March Madness 2005 (SLUS-29135)": {
-      "title": "NCAA March Madness 2005 (SLUS-29135)",
-      "serial": "SLUS-29135",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -20777,21 +19037,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "NFL Street (SLUS-29093)": {
-      "title": "NFL Street (SLUS-29093)",
-      "serial": "SLUS-29093",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-01-15",
-      "developer": "EA Tiburon",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "NFL Street 2": {
       "title": "NFL Street 2",
       "serial": "SLUS-21118",
@@ -20821,21 +19066,6 @@
       "region": "NTSC-U",
       "release_date": "2006-11-14",
       "developer": "EA Tiburon",
-      "publisher": "EA Sports",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "NHL 06": {
-      "title": "NHL 06",
-      "serial": "SLUS-29154",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-16",
-      "developer": "EA Canada",
       "publisher": "EA Sports",
       "genre": "Sports",
       "aliases": [],
@@ -21553,21 +19783,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Need for Speed: Carbon (SLUS-29193)": {
-      "title": "Need for Speed: Carbon (SLUS-29193)",
-      "serial": "SLUS-29193",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-10-31",
-      "developer": "EA Black Box",
-      "publisher": "EA Games",
-      "genre": "Driving, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Need for Speed: Carbon: Collector's Edition": {
       "title": "Need for Speed: Carbon: Collector's Edition",
       "serial": "SLUS-21494",
@@ -21640,21 +19855,6 @@
     "Need for Speed: Most Wanted (SLUS-21257)": {
       "title": "Need for Speed: Most Wanted (SLUS-21257)",
       "serial": "SLUS-21257",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-15",
-      "developer": "EA Black Box",
-      "publisher": "Electronic Arts",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Need for Speed: Most Wanted (SLUS-29155)": {
-      "title": "Need for Speed: Most Wanted (SLUS-29155)",
-      "serial": "SLUS-29155",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -22402,21 +20602,6 @@
         "7C8B4E5A",
         "FD5DEDEF"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-05-22",
-      "developer": "Vanillaware, Ltd",
-      "publisher": "Atlus, Inc",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Odin Sphere (SLUS-28065)": {
-      "title": "Odin Sphere (SLUS-28065)",
-      "serial": "SLUS-28065",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -23508,21 +21693,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Pride FC: Fighting Championships (SLUS-29044)": {
-      "title": "Pride FC: Fighting Championships (SLUS-29044)",
-      "serial": "SLUS-29044",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-02-12",
-      "developer": "Taito Corporation",
-      "publisher": "THQ",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Primal": {
       "title": "Primal",
       "serial": "SCUS-97142",
@@ -23543,21 +21713,6 @@
     "Primal (SCUS-97225)": {
       "title": "Primal (SCUS-97225)",
       "serial": "SCUS-97225",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-03-25",
-      "developer": "SCE Cambridge Studio",
-      "publisher": "Sony Computer Entertainment America",
-      "genre": "Action-Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Primal (SLUS-97142)": {
-      "title": "Primal (SLUS-97142)",
-      "serial": "SLUS-97142",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -23592,21 +21747,6 @@
         "PoP SoT",
         "Prince of Persia SoT"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Prince of Persia: The Sands of Time (SLUS-29069)": {
-      "title": "Prince of Persia: The Sands of Time (SLUS-29069)",
-      "serial": "SLUS-29069",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-15",
-      "developer": "Ubisoft",
-      "publisher": "Ubisoft",
-      "genre": "Action, Adventure, Platformer",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Prince of Persia: The Two Thrones": {
@@ -23745,21 +21885,6 @@
       "developer": "Core Design Ltd.",
       "publisher": "Eidos Interactive",
       "genre": "Action-Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Project: Snowblind": {
-      "title": "Project: Snowblind",
-      "serial": "SLUS-29131",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-23",
-      "developer": "Crystal Dynamics, Inc",
-      "publisher": "Eidos, Inc",
-      "genre": "First Person Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -24595,36 +22720,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Red Faction (SLUS-28002)": {
-      "title": "Red Faction (SLUS-28002)",
-      "serial": "SLUS-28002",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-05-22",
-      "developer": "Volition, Inc",
-      "publisher": "THQ",
-      "genre": "First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Red Faction (SLUS-29005)": {
-      "title": "Red Faction (SLUS-29005)",
-      "serial": "SLUS-29005",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-05-22",
-      "developer": "Volition, Inc",
-      "publisher": "THQ",
-      "genre": "First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Red Faction II": {
       "title": "Red Faction II",
       "serial": "SLUS-20442",
@@ -24632,21 +22727,6 @@
       "crcs": [
         "8E7FF6F8"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-10-15",
-      "developer": "Volition",
-      "publisher": "THQ",
-      "genre": "First-person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Red Faction II (SLUS-29027)": {
-      "title": "Red Faction II (SLUS-29027)",
-      "serial": "SLUS-29027",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -24760,21 +22840,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Resident Evil 4 (SLUS-29169)": {
-      "title": "Resident Evil 4 (SLUS-29169)",
-      "serial": "SLUS-29169",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-25",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Adventure, Survival Horror",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Resident Evil: Code Veronica X": {
       "title": "Resident Evil: Code Veronica X",
       "serial": "SLUS-20184",
@@ -24830,21 +22895,6 @@
       "developer": "Capcom",
       "publisher": "Capcom",
       "genre": "Action, Shooter, Survival Horror",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Resident Evil: Outbreak (SLUS-29089)": {
-      "title": "Resident Evil: Outbreak (SLUS-29089)",
-      "serial": "SLUS-29089",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-03-31",
-      "developer": "Capcom Production Studio 1",
-      "publisher": "Capcom",
-      "genre": "Survival Horror",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -24920,21 +22970,6 @@
       "alt_serials": [
         "SLUS-20914"
       ],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-06-10",
-      "developer": "Anthropomorphic Animals Jamsworks Co., Ltd",
-      "publisher": "Bandai",
-      "genre": "Golf",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Ribbit King (SLUS-29100)": {
-      "title": "Ribbit King (SLUS-29100)",
-      "serial": "SLUS-29100",
-      "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
@@ -25148,21 +23183,6 @@
     "Robot Alchemic Drive": {
       "title": "Robot Alchemic Drive",
       "serial": "SLUS-20445",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-11-06",
-      "developer": "Sandlot",
-      "publisher": "Enix America Inc",
-      "genre": "Action, Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Robot Alchemic Drive (SLUS-29025)": {
-      "title": "Robot Alchemic Drive (SLUS-29025)",
-      "serial": "SLUS-29025",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -25440,21 +23460,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Rogue Ops (SLUS-28039)": {
-      "title": "Rogue Ops (SLUS-28039)",
-      "serial": "SLUS-28039",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-10-28",
-      "developer": "BITS Studios",
-      "publisher": "Kemco",
-      "genre": "Action, Adventure, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Rogue Trooper": {
       "title": "Rogue Trooper",
       "serial": "SLUS-21320",
@@ -25696,21 +23701,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Rule of Rose (SLUS-28063)": {
-      "title": "Rule of Rose (SLUS-28063)",
-      "serial": "SLUS-28063",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-09-12",
-      "developer": "Punchline CG",
-      "publisher": "Atlus",
-      "genre": "Adventure, Survival Horror",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Rumble Racing": {
       "title": "Rumble Racing",
       "serial": "SLUS-20174",
@@ -25799,21 +23789,6 @@
     "S.L.A.I.: Steel Lancer Arena International": {
       "title": "S.L.A.I.: Steel Lancer Arena International",
       "serial": "SLUS-20969",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-21",
-      "developer": "Genki",
-      "publisher": "Konami",
-      "genre": "Simulation",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "S.L.A.I.: Steel Lancer Arena International (SLUS-29132)": {
-      "title": "S.L.A.I.: Steel Lancer Arena International (SLUS-29132)",
-      "serial": "SLUS-29132",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -26135,21 +24110,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "SSX on Tour": {
-      "title": "SSX on Tour",
-      "serial": "SLUS-29161",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-11",
-      "developer": "EA Canada",
-      "publisher": "EA Sports Big",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "SUPER NINTENDO ENTERTAINMENT SYSTEM": {
       "title": "SUPER NINTENDO ENTERTAINMENT SYSTEM",
       "serial": "SLUS-22233",
@@ -26389,21 +24349,6 @@
       "crcs": [
         "89D8ECCE"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-06-07",
-      "developer": "Acquire",
-      "publisher": "Atlus USA",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Samurai Western (SLUS-28051)": {
-      "title": "Samurai Western (SLUS-28051)",
-      "serial": "SLUS-28051",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -26956,21 +24901,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shadow of Rome (SLUS-29139)": {
-      "title": "Shadow of Rome (SLUS-29139)",
-      "serial": "SLUS-29139",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-02-08",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shadow of the Colossus": {
       "title": "Shadow of the Colossus",
       "serial": "SCUS-97472",
@@ -27160,21 +25090,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army": {
-      "title": "Shin Megami Tensei: Devil Summoner: Raidou Kuzunoha vs. the Soulless Army",
-      "serial": "SLUS-28064",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-04-27",
-      "developer": "Atlus",
-      "publisher": "Koei",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shin Megami Tensei: Digital Devil Saga": {
       "title": "Shin Megami Tensei: Digital Devil Saga",
       "serial": "SLUS-20974",
@@ -27198,21 +25113,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shin Megami Tensei: Digital Devil Saga (SLUS-28049)": {
-      "title": "Shin Megami Tensei: Digital Devil Saga (SLUS-28049)",
-      "serial": "SLUS-28049",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-04-05",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shin Megami Tensei: Digital Devil Saga 2": {
       "title": "Shin Megami Tensei: Digital Devil Saga 2",
       "serial": "SLUS-21152",
@@ -27232,21 +25132,6 @@
         "Digital Devil Saga 2",
         "SMT DDS2"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-28052)": {
-      "title": "Shin Megami Tensei: Digital Devil Saga 2 (SLUS-28052)",
-      "serial": "SLUS-28052",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-11",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "RPG",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Shin Megami Tensei: Nocturne": {
@@ -27269,66 +25154,6 @@
         "SMT Nocturne",
         "SMT3"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Megami Tensei: Nocturne (SLUS-28045)": {
-      "title": "Shin Megami Tensei: Nocturne (SLUS-28045)",
-      "serial": "SLUS-28045",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-10-12",
-      "developer": "Atlus",
-      "publisher": "Atlus U.S.A",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Megami Tensei: Persona 3": {
-      "title": "Shin Megami Tensei: Persona 3",
-      "serial": "SLUS-28067",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Megami Tensei: Persona 3 FES": {
-      "title": "Shin Megami Tensei: Persona 3 FES",
-      "serial": "SLUS-28068",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Megami Tensei: Persona 4": {
-      "title": "Shin Megami Tensei: Persona 4",
-      "serial": "SLUS-28069",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Shining Force EXA": {
@@ -27399,21 +25224,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shinobi (SLUS-28016)": {
-      "title": "Shinobi (SLUS-28016)",
-      "serial": "SLUS-28016",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-11-10",
-      "developer": "Overworks",
-      "publisher": "Sega",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shonen Jump's One Piece: Grand Adventure": {
       "title": "Shonen Jump's One Piece: Grand Adventure",
       "serial": "SLUS-21435",
@@ -27432,21 +25242,6 @@
     "Shonen Jump's One Piece: Grand Battle": {
       "title": "Shonen Jump's One Piece: Grand Battle",
       "serial": "SLUS-20975",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-07",
-      "developer": "Ganbarion Co. Ltd",
-      "publisher": "Bandai",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shonen Jump's One Piece: Grand Battle (SLUS-29159)": {
-      "title": "Shonen Jump's One Piece: Grand Battle (SLUS-29159)",
-      "serial": "SLUS-29159",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -28143,36 +25938,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "SkyGunner (SLUS-28008)": {
-      "title": "SkyGunner (SLUS-28008)",
-      "serial": "SLUS-28008",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06-26",
-      "developer": "Sony Computer Entertainment Inc. (Japan)",
-      "publisher": "Atlus USA",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "SkyGunner (SLUS-29020)": {
-      "title": "SkyGunner (SLUS-29020)",
-      "serial": "SLUS-29020",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06-26",
-      "developer": "Sony Computer Entertainment Inc. (Japan)",
-      "publisher": "Atlus USA",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Sled Storm": {
       "title": "Sled Storm",
       "serial": "SLUS-20363",
@@ -28559,21 +26324,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Sonic Riders (SLUS-29179)": {
-      "title": "Sonic Riders (SLUS-29179)",
-      "serial": "SLUS-29179",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-02-21",
-      "developer": "Sonic Team",
-      "publisher": "Sega",
-      "genre": "Action, Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Sonic Riders: Zero Gravity": {
       "title": "Sonic Riders: Zero Gravity",
       "serial": "SLUS-21642",
@@ -28677,21 +26427,6 @@
       "disc_type": "retail",
       "region": "NTSC-U",
       "release_date": "2005-10-25",
-      "developer": "Project Soul",
-      "publisher": "Namco",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Soulcalibur II": {
-      "title": "Soulcalibur II",
-      "serial": "SLUS-29058",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-27",
       "developer": "Project Soul",
       "publisher": "Namco",
       "genre": "Fighting",
@@ -28809,21 +26544,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Sphinx and the Shadow of Set": {
-      "title": "Sphinx and the Shadow of Set",
-      "serial": "SLUS-29057",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Spider-Man - Friend or Foe": {
       "title": "Spider-Man - Friend or Foe",
       "serial": "SLUS-21600",
@@ -28875,21 +26595,6 @@
       "developer": "Treyarch",
       "publisher": "Activision",
       "genre": "Action, Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Spider-Man 3 (SLUS-21617)": {
-      "title": "Spider-Man 3 (SLUS-21617)",
-      "serial": "SLUS-21617",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-05-04",
-      "developer": "Vicarious Visions",
-      "publisher": "Activision",
-      "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -28962,21 +26667,6 @@
     "Splashdown: Rides Gone Wild": {
       "title": "Splashdown: Rides Gone Wild",
       "serial": "SLUS-20686",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-08-05",
-      "developer": "Rainbow Studios",
-      "publisher": "THQ",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Splashdown: Rides Gone Wild (SLUS-29054)": {
-      "title": "Splashdown: Rides Gone Wild (SLUS-29054)",
-      "serial": "SLUS-29054",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -29362,21 +27052,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Star Wars: Battlefront II (SLUS-29164)": {
-      "title": "Star Wars: Battlefront II (SLUS-29164)",
-      "serial": "SLUS-29164",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-11-01",
-      "developer": "Pandemic Studios",
-      "publisher": "LucasArts",
-      "genre": "Third-person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Star Wars: Bounty Hunter": {
       "title": "Star Wars: Bounty Hunter",
       "serial": "SLUS-20420",
@@ -29395,21 +27070,6 @@
     "Star Wars: Jedi Starfighter": {
       "title": "Star Wars: Jedi Starfighter",
       "serial": "SLUS-20293",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-03-11",
-      "developer": "LucasArts Entertainment Company",
-      "publisher": "Lucasarts",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Star Wars: Jedi Starfighter (SLUS-28010)": {
-      "title": "Star Wars: Jedi Starfighter (SLUS-28010)",
-      "serial": "SLUS-28010",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -29562,21 +27222,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "State of Emergency 2 (SLUS-28056)": {
-      "title": "State of Emergency 2 (SLUS-28056)",
-      "serial": "SLUS-28056",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-02-14",
-      "developer": "DC Studios, Inc., VIS entertainment plc",
-      "publisher": "Southpeak Interactive",
-      "genre": "Action, Beat'em Up, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Steambot Chronicles": {
       "title": "Steambot Chronicles",
       "serial": "SLUS-21344",
@@ -29594,54 +27239,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Steambot Chronicles (SLUS-28061)": {
-      "title": "Steambot Chronicles (SLUS-28061)",
-      "serial": "SLUS-28061",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-05-23",
-      "developer": "Irem Software Engineering, Inc",
-      "publisher": "Atlus U.S.A., Inc",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Steambot Chronicles (SLUS-29188)": {
-      "title": "Steambot Chronicles (SLUS-29188)",
-      "serial": "SLUS-29188",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-05-23",
-      "developer": "Irem Software Engineering, Inc",
-      "publisher": "Atlus U.S.A., Inc",
-      "genre": "Action, RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Stella Deus: The Gate of Eternity": {
       "title": "Stella Deus: The Gate of Eternity",
       "serial": "SLUS-21132",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-04-26",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Stella Deus: The Gate of Eternity (SLUS-28050)": {
-      "title": "Stella Deus: The Gate of Eternity (SLUS-28050)",
-      "serial": "SLUS-28050",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -30048,21 +27648,6 @@
         "1C891FB7",
         "93551583"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-23",
-      "developer": "Volition",
-      "publisher": "THQ",
-      "genre": "Action-RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Summoner 2 (SLUS-29029)": {
-      "title": "Summoner 2 (SLUS-29029)",
-      "serial": "SLUS-29029",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -30539,21 +28124,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "TOCA Race Driver 3": {
-      "title": "TOCA Race Driver 3",
-      "serial": "SLUS-29178",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-02-24",
-      "developer": "Codemasters",
-      "publisher": "Codemasters",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "TOCA Race Driver 3: The Ultimate Racing Simulator": {
       "title": "TOCA Race Driver 3: The Ultimate Racing Simulator",
       "serial": "SLUS-21182",
@@ -30638,21 +28208,6 @@
       "crcs": [
         "17493C04"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-10-15",
-      "developer": "Avalanche Software",
-      "publisher": "THQ",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Tak and the Power of Juju": {
-      "title": "Tak and the Power of Juju",
-      "serial": "SLUS-29067",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -30857,36 +28412,6 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Tekken 4 (SLUS-28012)": {
-      "title": "Tekken 4 (SLUS-28012)",
-      "serial": "SLUS-28012",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-25",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Tekken 4 (SLUS-29034)": {
-      "title": "Tekken 4 (SLUS-29034)",
-      "serial": "SLUS-29034",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-25",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Tekken 5": {
       "title": "Tekken 5",
       "serial": "SLUS-21059",
@@ -31081,39 +28606,9 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Test Drive Unlimited (SLUS-29192)": {
-      "title": "Test Drive Unlimited (SLUS-29192)",
-      "serial": "SLUS-29192",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2007-03-20",
-      "developer": "Melbourne House",
-      "publisher": "Atari",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Test Drive: Eve of Destruction": {
       "title": "Test Drive: Eve of Destruction",
       "serial": "SLUS-20910",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-08-24",
-      "developer": "Monster Games, Inc.",
-      "publisher": "Atari",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Test Drive: Eve of Destruction (SLUS-28043)": {
-      "title": "Test Drive: Eve of Destruction (SLUS-28043)",
-      "serial": "SLUS-28043",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -31396,21 +28891,6 @@
       "release_date": "2008-06-05",
       "developer": "Edge of Reality",
       "publisher": "Sega",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "The Incredible Hulk: Ultimate Destruction": {
-      "title": "The Incredible Hulk: Ultimate Destruction",
-      "serial": "SLUS-29148",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-09",
-      "developer": "Marvel",
-      "publisher": "Sierra",
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
@@ -31762,21 +29242,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "The Punisher": {
-      "title": "The Punisher",
-      "serial": "SLUS-29138",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005",
-      "developer": "Volition",
-      "publisher": "THQ",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "The Red Star": {
       "title": "The Red Star",
       "serial": "SLUS-20885",
@@ -31795,21 +29260,6 @@
     "The Scorpion King: Rise of the Akkadian": {
       "title": "The Scorpion King: Rise of the Akkadian",
       "serial": "SLUS-20424",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-09-12",
-      "developer": "Point of View, Inc.",
-      "publisher": "Universal Interactive",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "The Scorpion King: Rise of the Akkadian (SLUS-29036)": {
-      "title": "The Scorpion King: Rise of the Akkadian (SLUS-29036)",
-      "serial": "SLUS-29036",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -31942,21 +29392,6 @@
         "3F9E2D59",
         "B67577F3"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-10-25",
-      "developer": "Maxis",
-      "publisher": "Electronic Arts",
-      "genre": "Simulation, Breeding, Constructing, Strategy",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "The Sims 2 (SLUS-29173)": {
-      "title": "The Sims 2 (SLUS-29173)",
-      "serial": "SLUS-29173",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",
@@ -32387,21 +29822,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Time Crisis II (w/ GunCon2)": {
-      "title": "Time Crisis II (w/ GunCon2)",
-      "serial": "SLUS-29999",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-10-01",
-      "developer": "Namco",
-      "publisher": "Namco",
-      "genre": "Light Gun Shooter",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_ntsc_u.json"
-    },
     "Time Crisis: Crisis Zone": {
       "title": "Time Crisis: Crisis Zone",
       "serial": "SLUS-20927",
@@ -32679,21 +30099,6 @@
         "SC1",
         "Splinter Cell 1"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Tom Clancy's Splinter Cell (SLUS-29048)": {
-      "title": "Tom Clancy's Splinter Cell (SLUS-29048)",
-      "serial": "SLUS-29048",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-04-08",
-      "developer": "Ubisoft Montreal",
-      "publisher": "Ubisoft Entertainment",
-      "genre": "Action, Adventure, Shooter",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Tom Clancy's Splinter Cell - Double Agent": {
@@ -33017,21 +30422,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Top Gun: Combat Zones (SLUS-29012)": {
-      "title": "Top Gun: Combat Zones (SLUS-29012)",
-      "serial": "SLUS-29012",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-06-26",
-      "developer": "Titus Software",
-      "publisher": "Digital Integration",
-      "genre": "Flight Simulator",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Top Spin": {
       "title": "Top Spin",
       "serial": "SLUS-21222",
@@ -33086,21 +30476,6 @@
     "Total Overdose: A Gunslinger's Tale in Mexico": {
       "title": "Total Overdose: A Gunslinger's Tale in Mexico",
       "serial": "SLUS-21283",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2005-09-27",
-      "developer": "Deadline Games",
-      "publisher": "Eidos Interactive",
-      "genre": "Action, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Total Overdose: A Gunslinger's Tale in Mexico (SLUS-29170)": {
-      "title": "Total Overdose: A Gunslinger's Tale in Mexico (SLUS-29170)",
-      "serial": "SLUS-29170",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -33174,36 +30549,6 @@
       "developer": "Angel Studios",
       "publisher": "Atari",
       "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Transformers": {
-      "title": "Transformers",
-      "serial": "SLUS-28040",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-05-11",
-      "developer": "Melbourne House Software",
-      "publisher": "Atari",
-      "genre": "Third-person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Transformers (SLUS-29107)": {
-      "title": "Transformers (SLUS-29107)",
-      "serial": "SLUS-29107",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-05-11",
-      "developer": "Melbourne House Software",
-      "publisher": "Atari",
-      "genre": "Third-person Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -33590,36 +30935,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "UFC: Throwdown": {
-      "title": "UFC: Throwdown",
-      "serial": "SLUS-28009",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06-05",
-      "developer": "Crave Entertainment",
-      "publisher": "Anchor Inc.",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "UFC: Throwdown (SLUS-29022)": {
-      "title": "UFC: Throwdown (SLUS-29022)",
-      "serial": "SLUS-29022",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-06-05",
-      "developer": "Crave Entertainment",
-      "publisher": "Anchor Inc.",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "UFC: Ultimate Fighting Championship: Sudden Impact": {
       "title": "UFC: Ultimate Fighting Championship: Sudden Impact",
       "serial": "SLUS-20596",
@@ -33966,21 +31281,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Victorious Boxers: Ippo's Road to Glory (SLUS-29013)": {
-      "title": "Victorious Boxers: Ippo's Road to Glory (SLUS-29013)",
-      "serial": "SLUS-29013",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-11-08",
-      "developer": "New Corporation",
-      "publisher": "Empire Interactive",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Vietcong: Purple Haze": {
       "title": "Vietcong: Purple Haze",
       "serial": "SLUS-21068",
@@ -34305,39 +31605,9 @@
       ],
       "src": "Informative doccument/PS2.data.json"
     },
-    "WWE SmackDown! vs. Raw": {
-      "title": "WWE SmackDown! vs. Raw",
-      "serial": "SLUS-29116",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2004-11-02",
-      "developer": "YUKE's Future Media Creator",
-      "publisher": "THQ",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "WWF SmackDown! Just Bring It": {
       "title": "WWF SmackDown! Just Bring It",
       "serial": "SLUS-20316",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2001-11-20",
-      "developer": "Yuke's",
-      "publisher": "THQ",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "WWF SmackDown! Just Bring It (SLUS-29011)": {
-      "title": "WWF SmackDown! Just Bring It (SLUS-29011)",
-      "serial": "SLUS-29011",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -34483,21 +31753,6 @@
     "Warhammer 40,000: Fire Warrior": {
       "title": "Warhammer 40,000: Fire Warrior",
       "serial": "SLUS-20597",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-17",
-      "developer": "Kuju Entertainment",
-      "publisher": "THQ",
-      "genre": "First-person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Warhammer 40,000: Fire Warrior (SLUS-29049)": {
-      "title": "Warhammer 40,000: Fire Warrior (SLUS-29049)",
-      "serial": "SLUS-29049",
       "alt_serials": [],
       "crcs": [],
       "crc_labels": {},
@@ -34691,21 +31946,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Whiplash (SLUS-29080)": {
-      "title": "Whiplash (SLUS-29080)",
-      "serial": "SLUS-29080",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-11-18",
-      "developer": "Crystal Dynamics, Inc",
-      "publisher": "Eidos Interactive",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Whirl Tour": {
       "title": "Whirl Tour",
       "serial": "SLUS-20489",
@@ -34800,21 +32040,6 @@
       "aliases": [
         "WA5"
       ],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Wild Arms 3": {
-      "title": "Wild Arms 3",
-      "serial": "SLUS-97203",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2002-10-15",
-      "developer": "Media.Vision",
-      "publisher": "Sony Computer Entertainment America",
-      "genre": "RPG",
-      "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
     "Wild Arms 3 (SCUS-97224)": {
@@ -35569,21 +32794,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "X-Games Winter SnoCross + ESPN International Winter Sports 2002 + Winter X Games Snowboarding 2002": {
-      "title": "X-Games Winter SnoCross + ESPN International Winter Sports 2002 + Winter X Games Snowboarding 2002",
-      "serial": "SLUS-29016",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "Unknown Date",
-      "developer": "Unknown Developer",
-      "publisher": "Unknown Publisher",
-      "genre": "Unknown Genre",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "X-Men - The Official Game": {
       "title": "X-Men - The Official Game",
       "serial": "SLUS-21107",
@@ -35743,21 +32953,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "XIII (SLUS-29070)": {
-      "title": "XIII (SLUS-29070)",
-      "serial": "SLUS-29070",
-      "alt_serials": [],
-      "crcs": [],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2003-10-28",
-      "developer": "Ubisoft Montreal",
-      "publisher": "Ubisoft",
-      "genre": "First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Xenosaga Episode I: Der Wille zur Macht": {
       "title": "Xenosaga Episode I: Der Wille zur Macht",
       "serial": "SLUS-20469",
@@ -35864,21 +33059,6 @@
         "388F687B",
         "CEEF2AC2"
       ],
-      "crc_labels": {},
-      "disc_type": "retail",
-      "region": "NTSC-U",
-      "release_date": "2006-09-08",
-      "developer": "Amusement Vision",
-      "publisher": "Sega",
-      "genre": "Action, Adventure, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Yakuza (SLUS-29195)": {
-      "title": "Yakuza (SLUS-29195)",
-      "serial": "SLUS-29195",
-      "alt_serials": [],
-      "crcs": [],
       "crc_labels": {},
       "disc_type": "retail",
       "region": "NTSC-U",

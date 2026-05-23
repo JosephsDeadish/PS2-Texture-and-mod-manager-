@@ -667,19 +667,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Adventure Island": {
-      "serial": "SLPM-64222",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Adventure of Tokyo Disney Sea: Ushinawareta Houseki no Himitsu (JP)": {
       "serial": "SLPM-65061",
       "alt_serials": [],
@@ -2411,19 +2398,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Baldur's Gate - Dark Alliance": {
-      "serial": "SLPS-25140",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-12-02",
-      "developer": "Snowblind Studios",
-      "publisher": "Interplay",
-      "genre": "Action-RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Baldur's Gate: Dark Alliance (JP)": {
       "serial": "SLPS-25139",
       "alt_serials": [
@@ -2572,19 +2546,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Batman - Vengeance (Cancelled)": {
-      "serial": "SLPS-25109",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-10-15",
-      "developer": "Ubisoft",
-      "publisher": "Ubisoft",
-      "genre": "Action, Beat'em up, Platform",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Battle Gear 2 (JP)": {
       "serial": "SLPM-62048",
       "alt_serials": [],
@@ -2662,19 +2623,6 @@
       "developer": "Digital Illusions CE AB",
       "publisher": "EA Games",
       "genre": "Action/First Person Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Beast Sapp": {
-      "serial": "SLPS-20346",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-05-27",
-      "developer": "Nippon Amuse",
-      "publisher": "Nippon Amuse",
-      "genre": "Gambling",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -3008,32 +2956,6 @@
       "genre": "Adventure/Simulation",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "BioHazard - 5th Anniversary Package - Nightmare Returns [Disc1of2]": {
-      "serial": "SLPM-65024",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "BioHazard - 5th Anniversary Package - Nightmare Returns [Disc2of2]": {
-      "serial": "SLPM-65025",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "BioHazard: Outbreak [PlayStation 2 the Best] (JP)": {
       "serial": "SLPM-74201",
@@ -3533,19 +3455,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Bomberman Jetters": {
-      "serial": "SLPS-65218",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-12-19",
-      "developer": "Hudson",
-      "publisher": "Hudson",
-      "genre": "Action.",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Bomberman Jetters (JP)": {
       "serial": "SLPM-65218",
       "alt_serials": [],
@@ -3725,45 +3634,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Bouken Jidai Katsugeki - Goemon": {
-      "serial": "SLPS-65014",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-07-01",
-      "developer": "KCEK (Konami Computer Entertaiment Kobe)",
-      "publisher": "Konami",
-      "genre": "Action/Beat'em Up/RPG/Platformer",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Bouken Jidai Katsugeki - Goemon (Dendou Collection)": {
-      "serial": "SLPS-65617",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-07-01",
-      "developer": "KCEK (Konami Computer Entertaiment Kobe)",
-      "publisher": "Konami",
-      "genre": "Action/Beat'em Up/RPG/Platformer",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Bouken Jidai Katsugeki - Goemon (Konami The Best)": {
-      "serial": "SLPS-65066",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-07-01",
-      "developer": "KCEK (Konami Computer Entertaiment Kobe)",
-      "publisher": "Konami",
-      "genre": "Action/Beat'em Up/RPG/Platformer",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Bouken Jidai Katsugeki Goemon [Konami Dendo Collection] (JP)": {
       "serial": "SLPM-65617",
       "alt_serials": [],
@@ -3831,19 +3701,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Boukoku no Aegis 2035 - Warship Gunner [KOEI the Best]": {
-      "serial": "SLPM-66529",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-07-21",
-      "developer": "Koei",
-      "publisher": "Koei",
-      "genre": "Simulation",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Boukoku no Aegis 2035: Warship Gunner (JP)": {
       "serial": "SLPS-66060",
       "alt_serials": [
@@ -3896,19 +3753,6 @@
       "developer": "Sims",
       "publisher": "Sony",
       "genre": "Action/RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Bravo Music": {
-      "serial": "SCPS-51004",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-04-03",
-      "developer": "Desert Productions, Inc",
-      "publisher": "Sony",
-      "genre": "Music",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -4609,32 +4453,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Castlevania (SLPM-61062)": {
-      "serial": "SLPM-61062",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-11-27",
-      "developer": "KCET",
-      "publisher": "Konami",
-      "genre": "Action, Beat'em Up, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Castlevania (SLPM-65406)": {
-      "serial": "SLPM-65406",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-11-27",
-      "developer": "KCET",
-      "publisher": "Konami",
-      "genre": "Action, Beat'em Up, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Castlevania: Lament of Innocence (JP)": {
       "serial": "SLPM-65444",
       "alt_serials": [],
@@ -5216,19 +5034,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Clock Tower 3 (SLPM-74416)": {
-      "serial": "SLPM-74416",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-12-12",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action/Adventure/Survival Horror",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Clock Zero: Shuuen no Ichibyou (JP)": {
       "serial": "SLPM-55281",
       "alt_serials": [],
@@ -5324,19 +5129,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Coloball 2002 (Enterbrain Collection)": {
-      "serial": "SLPS-20319",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001",
-      "developer": "Bigben Interactive",
-      "publisher": "Bigben Interactive",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Coloball 2002 (JP)": {
       "serial": "SLPS-20202",
@@ -5835,19 +5627,6 @@
       "genre": "Action/Puzzle",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Curry House CoCo Ichibanya (Best Version)": {
-      "serial": "SLPM-62741",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Cyber Jansou: Toufuusou-hen (JP)": {
       "serial": "SLPM-62140",
@@ -6523,19 +6302,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Dark Angel - Vampire no Mokushiroku": {
-      "serial": "SLPS-20189",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Dark Angel: Vampire Apocalypse (JP)": {
       "serial": "SLPM-64537",
       "alt_serials": [],
@@ -6565,19 +6331,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Dark Chronicle (Playstation 2 The Best)": {
-      "serial": "SCPS-19015",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-11-28",
-      "developer": "Level-5",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Dark Cloud (JP)": {
       "serial": "SCPS-15004",
@@ -7481,19 +7234,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Densha de Go! Final": {
-      "serial": "SLPM-60237",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-12-07",
-      "developer": "Taito",
-      "publisher": "Taito",
-      "genre": "Simulation.",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Densha de Go! Final (JP)": {
       "serial": "SLPM-65590",
       "alt_serials": [
@@ -7681,19 +7421,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Devil May Cry 2": {
-      "serial": "SLPM-61037",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-01-30",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action/Platformer/Beat'em Up/Survival Horror",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Devil May Cry 2 (Disc 2) (Lucia) (JP)": {
       "serial": "SLPM-65233",
       "alt_serials": [],
@@ -7717,19 +7444,6 @@
       "developer": "Capcom",
       "publisher": "Capcom",
       "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Devil May Cry 2 (SLPM-61043)": {
-      "serial": "SLPM-61043",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-01-30",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action/Platformer/Beat'em Up/Survival Horror",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -7883,19 +7597,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Diamond Dust": {
-      "serial": "SLPM-65435",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Diet Channel (JP)": {
       "serial": "SLPM-62472",
       "alt_serials": [],
@@ -8033,19 +7734,6 @@
       "genre": "Golf",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Disney Golf Classic [Trial]": {
-      "serial": "SLPM-60180",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-05-30",
-      "developer": "T&E Soft, Inc",
-      "publisher": "Capcom",
-      "genre": "Golf",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Disney Pirates of the Caribbean: At World's End (JP)": {
       "serial": "SLPM-66800",
@@ -8370,19 +8058,6 @@
       "alt_serials": [
         "SLPM-66207"
       ],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-09-09",
-      "developer": "Sega",
-      "publisher": "Sega",
-      "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Dororo (SLPM-60248)": {
-      "serial": "SLPM-60248",
-      "alt_serials": [],
       "crcs": [],
       "disc_type": "retail",
       "region": "NTSC-J",
@@ -9150,19 +8825,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "EGBrowser": {
-      "serial": "SLPM-86794",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001",
-      "developer": "I-O Data",
-      "publisher": "I-O Data",
-      "genre": "Other",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "EGBrowser (JP)": {
       "serial": "SLPM-62068",
       "alt_serials": [
@@ -9190,19 +8852,6 @@
       "genre": "Other",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "EGBrowser BB [Modem bundle]": {
-      "serial": "SLPM-69003",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001",
-      "developer": "I-O Data",
-      "publisher": "I-O Data",
-      "genre": "Other",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "EGBrowser Light for I-O Data Device, Inc. (JP)": {
       "serial": "SLPM-69004",
@@ -9619,19 +9268,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Energy Airforce": {
-      "serial": "SCPS-55044",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-07-10",
-      "developer": "Taito",
-      "publisher": "Taito Corporation",
-      "genre": "Flight Simulator",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Energy Airforce (JP)": {
       "serial": "SLPM-65177",
       "alt_serials": [
@@ -9644,19 +9280,6 @@
       "developer": "Taito",
       "publisher": "Taito Corporation",
       "genre": "Action/Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Energy Airforce (SLPM-60183)": {
-      "serial": "SLPM-60183",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-07-10",
-      "developer": "Taito",
-      "publisher": "Taito Corporation",
-      "genre": "Flight Simulator",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -9722,19 +9345,6 @@
       "developer": "Shiny Entertainment",
       "publisher": "Atari",
       "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Enthusia Professional Racing": {
-      "serial": "SLPM-61110",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-03-02",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Driving, Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -9941,19 +9551,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Ever 17 - The Out of Infinity [SuperLite 2000 Premium Edition]": {
-      "serial": "SLPS-65691",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-08-29",
-      "developer": "Kid",
-      "publisher": "Kid",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Ever 17: The Out of Infinity (JP)": {
       "serial": "SLPS-25138",
@@ -10476,19 +10073,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "FIFA Soccer 2003": {
-      "serial": "SLPM-65193",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-09-24",
-      "developer": "EA Canada",
-      "publisher": "Electronic Arts",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "FIFA Soccer 2003 (JP)": {
       "serial": "SLPM-67537",
       "alt_serials": [],
@@ -10675,19 +10259,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Fantavision": {
-      "serial": "SLPS-55032",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2000-03-09",
-      "developer": "SCEJ",
-      "publisher": "Sony",
-      "genre": "Puzzle.",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Fantavision (JP)": {
       "serial": "SCPS-11002",
       "alt_serials": [],
@@ -10826,19 +10397,6 @@
       "genre": "Gambling",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Fever 7 (Existence unconfirmed)": {
-      "serial": "SLPS-25211",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Fever 7: Sankyo Koushiki Pachinko Simulation (JP)": {
       "serial": "SLPS-20265",
@@ -11049,19 +10607,6 @@
       "genre": "RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Final Fantasy XI [Special Art Pack]": {
-      "serial": "SLPS-20232",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-06-15",
-      "developer": "Square PDD 3",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "MMORPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Final Fantasy XI: 2002 Special Art Box (JP)": {
       "serial": "SLPS-25160",
@@ -11660,19 +11205,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Friends - Seishun no Kagayaki [Best Version]": {
-      "serial": "SLPS-66201",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-09-30",
-      "developer": "Nex Entertainment",
-      "publisher": "NEC Interchannel",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Friends: Seishun no Kagayaki (JP)": {
       "serial": "SLPS-25385",
       "alt_serials": [],
@@ -11835,19 +11367,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Full House Kiss 2": {
-      "serial": "SLPM-60274",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Full House Kiss 2: Ren'ai Kaseifu Adventure (JP)": {
       "serial": "SLPM-66288",
       "alt_serials": [
@@ -11890,19 +11409,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Full Shot Golf (Cancelled)": {
-      "serial": "SLPS-20148",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Full Spectrum Warrior (JP)": {
       "serial": "SLPM-66263",
@@ -12152,19 +11658,6 @@
       "genre": "Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Fuun Bakumatsuden [PlayStation 2 The Best]": {
-      "serial": "SLPS-73228",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Fuuraiki (JP)": {
       "serial": "SLPM-66458",
@@ -12797,19 +12290,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Galaxy Angel [Trial]": {
-      "serial": "SLPM-61045",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-04-17",
-      "developer": "Seta Corporation",
-      "publisher": "Broccoli",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Galaxy Angel: Broccoli Best Quality (JP)": {
       "serial": "SLPM-66290",
       "alt_serials": [],
@@ -13327,19 +12807,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Gendai Daisenryaku - Isshoku Sokuhatsu - Gunji Balance Houkai [System Soft Selection]": {
-      "serial": "SLPS-25985",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2007",
-      "developer": "Systemsoft Alpha",
-      "publisher": "Systemsoft",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Gendai Daisenryaku: Isshoku Sokuhatsu Gunji Balance Houkai (JP)": {
       "serial": "SLPS-25940",
       "alt_serials": [],
@@ -13472,19 +12939,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Gensou Suikoden IV": {
-      "serial": "SLPM-65656",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-07-07",
-      "developer": "Konami Computer Entertainment Tokyo",
-      "publisher": "Konami",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Gensou Suikoden IV (JP)": {
       "serial": "SLPM-65600",
       "alt_serials": [
@@ -13542,19 +12996,6 @@
       "genre": "Beat 'Em Up",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "GetBackers - Dakkan'ya - Dakkan da yo! Zen'in Shuugou!!": {
-      "serial": "SLPM-62776",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-01-16",
-      "developer": "KCEJ",
-      "publisher": "Konami",
-      "genre": "Beat'em Up",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "GetBackers Dakkanya: Ubawareta Mugenjou: Konami the Best (JP)": {
       "serial": "SLPM-62377",
@@ -13889,19 +13330,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "God of War (SCPS-88887)": {
-      "serial": "SCPS-88887",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-11-17",
-      "developer": "SCE Santa Monica Studio",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "God of War II (JP)": {
       "serial": "SLPM-67013",
       "alt_serials": [],
@@ -13914,19 +13342,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "God of War II (SCPS-88888)": {
-      "serial": "SCPS-88888",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2007-11-29",
-      "developer": "SCE Santa Monica Studio",
-      "publisher": "Sony Computer Entertainment",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "God of War II: Shuuen No Jokyoku [Best Price] (JP)": {
       "serial": "SLPM-67017",
@@ -14410,19 +13825,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Grandia III (Disc 1) (SLPM-85976)": {
-      "serial": "SLPM-85976",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-08-04",
-      "developer": "Game Arts",
-      "publisher": "Square Enix",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Grandia III (Disc 2) (JP)": {
       "serial": "SLPM-65977",
       "alt_serials": [],
@@ -14435,19 +13837,6 @@
       "genre": "RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Grandia III (Disc 2) (SLPM-85977)": {
-      "serial": "SLPM-85977",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-08-04",
-      "developer": "Game Arts",
-      "publisher": "Square Enix",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Grandia III (JP)": {
       "serial": "SLPM-65976",
@@ -14488,19 +13877,6 @@
       "developer": "Tomy Corporation",
       "publisher": "Tomy Corporation",
       "genre": "Fighting",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Greatest Striker": {
-      "serial": "SLPM-60120",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -15012,19 +14388,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Gun-Heats": {
-      "serial": "SLPS-20089",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Gunbird 1 & 2 (JP)": {
       "serial": "SLPM-62469",
       "alt_serials": [],
@@ -15094,19 +14457,6 @@
       "developer": "BEC Co., Ltd",
       "publisher": "Bandai",
       "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Gungrave": {
-      "serial": "SCPS-55034",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-01-21",
-      "developer": "Positron Co., Ltd",
-      "publisher": "RED Entertaiment",
-      "genre": "Action, Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -15435,19 +14785,6 @@
       "genre": "Mahjong",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Hajime no Ippo - Victorious Boxers [Demo, Premium Disc]": {
-      "serial": "SLPM-61006",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2000-12-14",
-      "developer": "New Corporation",
-      "publisher": "ESP",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Hajime no Ippo 2: Victorious Road (JP)": {
       "serial": "SLPS-25287",
@@ -15969,32 +15306,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Harukanaru Toki no Naka Premium Boxset": {
-      "serial": "SLPM-66308",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Harukanaru Toki no Naka de - Maihitoyo (Premium Box)": {
-      "serial": "SLPM-66545",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2008-07-10",
-      "developer": "Ruby Party",
-      "publisher": "Koei",
-      "genre": "Adventure/RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Harukanaru Toki no Naka de 2 (JP)": {
       "serial": "SLPM-65091",
       "alt_serials": [
@@ -16013,19 +15324,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Harukanaru Toki no Naka de 3 & 2 Twin Pack": {
-      "serial": "SLPM-65850",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Harukanaru Toki no Naka de 3 (JP)": {
       "serial": "SLPM-65834",
       "alt_serials": [
@@ -16043,19 +15341,6 @@
       "genre": "Adventure/RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Harukanaru Toki no Naka de 3 - Unmei no Meikyuu": {
-      "serial": "SLPM-66347",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Harukanaru Toki no Naka de 3 [Premium Box] (JP)": {
       "serial": "SLPM-65849",
@@ -16403,19 +15688,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Higurashi no Naku Koro ni Matsuri": {
-      "serial": "SLPS-66620",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2007-02-22",
-      "developer": "07th Expansion",
-      "publisher": "Alchemist",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Higurashi no Naku Koro ni: Matsuri (JP)": {
       "serial": "SLPM-66620",
       "alt_serials": [],
@@ -16524,19 +15796,6 @@
       "developer": "Takuyo",
       "publisher": "Takuyo",
       "genre": "Adventure/Mini Games",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Hippa Linda": {
-      "serial": "SLPM-60158",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-12-06",
-      "developer": "Treasure",
-      "publisher": "Kadokawa Shoten",
-      "genre": "Action.",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -16696,19 +15955,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Hissatsu Pachinko Station V9": {
-      "serial": "SLPS-20390",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Hissatsu Pachinko Station V9: Osomatsu-kun (JP)": {
       "serial": "SLPS-20411",
       "alt_serials": [],
@@ -16747,19 +15993,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Hissatsu Ura-Kagyou": {
-      "serial": "SLPM-66120",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-09-22",
-      "developer": "Light Weight",
-      "publisher": "Genki",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Hisshou Pachinko Kouryaku Series Vol. 1: CR Shin Seiki Evangelion (JP)": {
       "serial": "SLPS-25565",
@@ -16978,19 +16211,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Hitman - Contracts (Eidos Best)": {
-      "serial": "SLPS-25563",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-04-22",
-      "developer": "IO Interactive",
-      "publisher": "Eidos",
-      "genre": "Action-Stealth",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Hitman: Contracts (JP)": {
       "serial": "SLPS-25406",
@@ -17297,19 +16517,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Hoshigari Empusa": {
-      "serial": "SLPS-25593",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2008-04-17",
-      "developer": "Takuyo",
-      "publisher": "Takuyo",
-      "genre": "Board",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Hoshigari Empusa (JP)": {
       "serial": "SLPM-66969",
       "alt_serials": [],
@@ -17322,19 +16529,6 @@
       "genre": "Board",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Hossi Furu": {
-      "serial": "SLPM-62920",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Hot Shots Golf 3 (JP)": {
       "serial": "SCPS-56007",
@@ -17798,19 +16992,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Idol Janshi R - Jan-Guru Project": {
-      "serial": "SLPS-25183",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006",
-      "developer": "Jaleco",
-      "publisher": "Jaleco",
-      "genre": "Mahjong",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Idol Janshi R: Jan-Guru Project (JP)": {
       "serial": "SCPS-25183",
       "alt_serials": [],
@@ -18089,19 +17270,6 @@
       "genre": "Mahjong",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Internet Omakase Romu": {
-      "serial": "SLPM-69005",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Internet Othello: Othello World 24 (JP)": {
       "serial": "SLPM-62132",
@@ -18598,19 +17766,6 @@
       "developer": "Naughty Dog",
       "publisher": "Sony",
       "genre": "Action/Adventure/Platform",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Jak x Daxter: Kyuu Sekai no Isan": {
-      "serial": "SCPS-15021",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-12-20",
-      "developer": "Naughty Dog",
-      "publisher": "Sony",
-      "genre": "Action, Adventure, Platform",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -19535,19 +18690,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Jissen Paci-Slot Hisho Kata - Fist of North Star Plus": {
-      "serial": "SLPM-62576",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Jitsumei Jikkyou Keiba: Dream Classic 2001 Spring (JP)": {
       "serial": "SLPS-25021",
       "alt_serials": [],
@@ -19738,19 +18880,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Juuni Kokuki - Guren no Shirube, Koujin no Michi (Konami Dendou Collection)": {
-      "serial": "SLPM-65992",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Juunikoku-ki: Guren no Shirube Koujin no Michi (JP)": {
       "serial": "SLPM-65338",
       "alt_serials": [
@@ -19791,19 +18920,6 @@
       "developer": "WOW Entertainment",
       "publisher": "Sega",
       "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "K-1 Premium 2004 Dynamite!!": {
-      "serial": "SLPM-65814",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-12-22",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami",
-      "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -20447,19 +19563,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Kanon [Best Version]": {
-      "serial": "SLPM-66983",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-02-28",
-      "developer": "Key",
-      "publisher": "NEC Interchannel",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Kanuchi: Kuroki Tsubasa no Shou (JP)": {
       "serial": "SLPM-55160",
       "alt_serials": [
@@ -21087,19 +20190,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Kenka Bancho 2 - Full Throttle (Playsattion 2 The Best)": {
-      "serial": "SLPM-73258",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Kenka Banchou (JP)": {
       "serial": "SLPM-65974",
       "alt_serials": [
@@ -21275,19 +20365,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Kessen III (SLPM-61103)": {
-      "serial": "SLPM-61103",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-02-22",
-      "developer": "Koei",
-      "publisher": "Koei",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Kessen III (Treasure Box) (JP)": {
       "serial": "SLPM-65780",
       "alt_serials": [],
@@ -21354,32 +20431,6 @@
       "genre": "Action/Beat'em Up/Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Kidou Senshi Gundam - Gihren no Yabou - Zeon Dokuritsu Sensouki [Kodansha Special Edition]": {
-      "serial": "SLPM-68506",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003",
-      "developer": "Bec",
-      "publisher": "Bandai",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Kidou Senshi Gundam - Meguriai Sora": {
-      "serial": "SLPS-25284",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-09-04",
-      "developer": "Bec",
-      "publisher": "Bandai",
-      "genre": "Third-person Shooter",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Kidou Senshi Gundam 00: Gundam Meisters (JP)": {
       "serial": "SLPS-25900",
@@ -21514,19 +20565,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Kidou Senshi Gundam Senki - Lost War Chronicles (Kodansha Special Edition)": {
-      "serial": "SLPM-68508",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Kidou Senshi Gundam: Ghiren no Yabou: Axis no Kyoui V: PlayStation 2 the Best (JP)": {
       "serial": "SLPS-73268",
@@ -23067,19 +22105,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Kunoichi (SLPM-61059)": {
-      "serial": "SLPM-61059",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-12-04",
-      "developer": "Sega Wow Entertainment, Inc",
-      "publisher": "Sega",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Kuon (JP)": {
       "serial": "SLPS-25329",
       "alt_serials": [],
@@ -23719,19 +22744,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Lego Indiana Jones - The Original Adventures (Cancelled)": {
-      "serial": "SLPS-25885",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2008-06-03",
-      "developer": "Traveller's Tales",
-      "publisher": "Lucasarts",
-      "genre": "Action, Adventure, Platformer",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Let's Bravo Music (JP)": {
       "serial": "SCPS-11028",
@@ -25463,19 +24475,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Maximo": {
-      "serial": "SLPM-60165",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-12-12",
-      "developer": "Capcom Production Studio 8",
-      "publisher": "Capcom",
-      "genre": "Action, Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Maximo (JP)": {
       "serial": "SLPM-62127",
       "alt_serials": [
@@ -25788,19 +24787,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Memories Off #6 T-Wave": {
-      "serial": "SLPM-88988",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2008-08-21",
-      "developer": "5pb",
-      "publisher": "5pb, Cyberfront",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Memories Off (JP)": {
       "serial": "SLPM-67535",
       "alt_serials": [
@@ -25841,19 +24827,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Memories Off Duet - 1st and 2nd Stories [Renai Game Selection]": {
-      "serial": "SCPS-55101",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-03-27",
-      "developer": "Kid",
-      "publisher": "Kid",
-      "genre": "Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Memories Off Duet: 1st & 2nd Stories (JP)": {
       "serial": "SLPS-25226",
@@ -26079,19 +25052,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Metal Gear & Metal Gear 2 - Solid Snake [20th Anniversary Collection]": {
-      "serial": "SLPM-66799",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2009-11-05",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Action/Adventure",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Metal Gear & Metal Gear 2: Solid Snake (JP)": {
       "serial": "SLPM-55237",
       "alt_serials": [
@@ -26184,19 +25144,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Metal Gear Solid 3 - Snake Eater (Playstation 2 The Best)": {
-      "serial": "SLPM-73257",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-12-16",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Metal Gear Solid 3: Snake Eater (JP)": {
       "serial": "SLPM-65790",
@@ -26848,19 +25795,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Moe Moe 2-ji Daisenryaku Deluxe": {
-      "serial": "SLPS-25896",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Moe Moe 2: Ji Daisenryaku 2 (JP)": {
       "serial": "SLPS-25956",
       "alt_serials": [],
@@ -27400,19 +26334,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Musashiden II - Blademaster [Trial]": {
-      "serial": "SLPM-61117",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-07-07",
-      "developer": "Square Enix",
-      "publisher": "Square Enix",
-      "genre": "Action-RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Musashiden II: Blademaster (JP)": {
       "serial": "SLPM-66008",
@@ -28185,19 +27106,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Nano Breaker": {
-      "serial": "SLPM-66154",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Nanobreaker (JP)": {
       "serial": "SLPM-65809",
       "alt_serials": [],
@@ -28845,19 +27753,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "NeoGeo Online Collection Complete Box Joukan": {
-      "serial": "SLPS-25963",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "NeoGeo Online Collection Vol. 10: The King of Fighters '98: Ultimate Match (JP)": {
       "serial": "SLPS-25935",
       "alt_serials": [
@@ -29338,45 +28233,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Nike - Gran Turismo [Limited Edition - 10 inch]": {
-      "serial": "SCPS-17010",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Nike - Gran Turismo [Limited Edition - 11 inch]": {
-      "serial": "SCPS-17011",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Nike - Gran Turismo [Limited Edition - 9 inch]": {
-      "serial": "SCPS-17009",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Ninja Assault (JP)": {
       "serial": "SLPS-20218",
       "alt_serials": [
@@ -29830,19 +28686,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "OZ (The Sword of Etheria)": {
-      "serial": "SLPM-66048",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-06-30",
-      "developer": "Atlus",
-      "publisher": "Atlus",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Odin Sphere (JP)": {
       "serial": "SLPM-66474",
       "alt_serials": [
@@ -29980,19 +28823,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Onimusha": {
-      "serial": "SLPM-61001",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-12-20",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Adventure, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Onimusha 2 (JP)": {
       "serial": "SLPM-65100",
       "alt_serials": [],
@@ -30099,19 +28929,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Online Games Daigururu Onsen": {
-      "serial": "SLPM-65195",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Online Games: Dai Guru Guru Onsen (JP)": {
       "serial": "SLPM-62195",
       "alt_serials": [],
@@ -30137,19 +28954,6 @@
       "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Online Pro Wrestling B Version": {
-      "serial": "SLPS-25285",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Only You: Rebel Cross (JP)": {
       "serial": "SLPS-25150",
@@ -30684,19 +29488,6 @@
       "genre": "Adventure/Simulation",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Otometeki Koi Kakumei * Love Revo [Love Revo Box]": {
-      "serial": "SLPM-66985",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2010-11-18",
-      "developer": "HuneX",
-      "publisher": "GungHo",
-      "genre": "Adventure/Simulation",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Otometeki Koi Kakumei: Love Revo!! [Best Edition] (JP)": {
       "serial": "SLPM-55279",
@@ -32241,19 +31032,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Power Smash 2": {
-      "serial": "SLPM-62265",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001",
-      "developer": "Sega AM3",
-      "publisher": "Sega",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Power Smash 2 (JP)": {
       "serial": "SLPM-62236",
       "alt_serials": [
@@ -33137,32 +31915,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Puyo Puyo Fever (SLPM-61072)": {
-      "serial": "SLPM-61072",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-02-04",
-      "developer": "Sonic Team",
-      "publisher": "Sega",
-      "genre": "Puzzle",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Puyo Puyo Fever 2": {
-      "serial": "SLPM-61139",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005",
-      "developer": "Sonic Team",
-      "publisher": "Sega",
-      "genre": "Puzzle",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Puyo Puyo Fever 2 (JP)": {
       "serial": "SLPM-66104",
       "alt_serials": [],
@@ -33430,19 +32182,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "ROCKY": {
-      "serial": "SLPM-62402",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-11-13",
-      "developer": "Rage Software",
-      "publisher": "Success",
-      "genre": "Boxing",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "RPG Tkool (JP)": {
       "serial": "SLPS-25404",
       "alt_serials": [],
@@ -33509,19 +32248,6 @@
       "genre": "Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Racing Game - Chuui!!!! [Trial]": {
-      "serial": "SLPM-61127",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-10-13",
-      "developer": "Bugbear Entertainment Ltd",
-      "publisher": "Konami",
-      "genre": "Driving/Racing",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Racing Game: Chuui!!!! (JP)": {
       "serial": "SLPM-66043",
@@ -33889,19 +32615,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Rayman Revolution": {
-      "serial": "SLPS-25029",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-05-31",
-      "developer": "Ubisoft",
-      "publisher": "Ubisoft",
-      "genre": "Platformer",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Rayman Revolution (JP)": {
       "serial": "SLPM-67519",
       "alt_serials": [],
@@ -34228,19 +32941,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Ribbit King (Trial)": {
-      "serial": "SLPM-80583",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-06-10",
-      "developer": "Anthropomorphic Animals Jamsworks Co., Ltd",
-      "publisher": "Bandai",
-      "genre": "Golf",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Richard Burns Rally (JP)": {
       "serial": "SLPM-66068",
       "alt_serials": [],
@@ -34378,19 +33078,6 @@
       "genre": "Sports",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Roadsters Trophy 2000": {
-      "serial": "SLPM-65007",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "RoboCop: Aratanaru Kiki (JP)": {
       "serial": "SLPM-62321",
@@ -34740,19 +33427,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Rumble Roses (SLPM-61106)": {
-      "serial": "SLPM-61106",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-11-09",
-      "developer": "KCET, Yuke's",
-      "publisher": "Konami",
-      "genre": "Wrestling",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Run Like Hell (JP)": {
       "serial": "SLPM-65603",
       "alt_serials": [],
@@ -34977,19 +33651,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "SD Gundam G Generation Neo (Kodansha Special Edition)": {
-      "serial": "SLPM-68510",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "SD Gundam G Generation Spirits: Gundam 30th Anniversary Collection (JP)": {
       "serial": "SLPS-25960",
       "alt_serials": [],
@@ -35071,19 +33732,6 @@
       "genre": "Gambling",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "SNK Slot Panic Vol.1": {
-      "serial": "SLPS-25536",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "SNK vs. Capcom: SVC Chaos (JP)": {
       "serial": "SLPS-25316",
@@ -35887,19 +34535,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Samurai Warriors - Xtreme Legends": {
-      "serial": "SLPM-62535",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-11-09",
-      "developer": "Omega Force",
-      "publisher": "Koei",
-      "genre": "Action",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Samurai Western: Katsugeki Samurai-dou (JP)": {
       "serial": "SLPM-61104",
       "alt_serials": [
@@ -36167,19 +34802,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Sangokushi VIII [with Power-Up Kit] [Koei The Best]": {
-      "serial": "SLPM-62641",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-04-19",
-      "developer": "Koei",
-      "publisher": "Koei",
-      "genre": "Strategy",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Sangokushi VIII with Power-Up Kit (JP)": {
       "serial": "SLPM-62762",
       "alt_serials": [],
@@ -36339,19 +34961,6 @@
       "genre": "Party",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Saru Get You! 2 [PlayStation 2 The Best]": {
-      "serial": "SCPS-19152",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-07-17",
-      "developer": "Sony",
-      "publisher": "Sony",
-      "genre": "Action/Platformer",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Saru Get You: Million Monkeys: PlayStation 2 the Best (JP)": {
       "serial": "SCPS-19325",
@@ -37198,19 +35807,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Sega Ages 2500 Series Vol.01 - Phantasy Star - Generation:1": {
-      "serial": "SLPM-62452",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Sega Ages 2500 Series Vol.03: Fantasy Zone [Rerelease] (JP)": {
       "serial": "SLPM-62668",
       "alt_serials": [],
@@ -37252,19 +35848,6 @@
     },
     "Sega Rally 2006 (JP)": {
       "serial": "SLPM-66212",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-01-09",
-      "developer": "Sega",
-      "publisher": "Sega",
-      "genre": "Racing/Driving",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Sega Rally 2006 (SLPM-61137)": {
-      "serial": "SLPM-61137",
       "alt_serials": [],
       "crcs": [],
       "disc_type": "retail",
@@ -37703,19 +36286,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Sengoku Tenka Touitsu [SystemSoft Selection]": {
-      "serial": "SLPS-25984",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2007",
-      "developer": "Ecode",
-      "publisher": "Ecode",
-      "genre": "Board Game",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Sengoku-hime 2: En: Hyakka, Senran Tatsukaze no Gotoku (JP)": {
       "serial": "SLPM-55277",
       "alt_serials": [],
@@ -38001,19 +36571,6 @@
       "developer": "Konami",
       "publisher": "Konami",
       "genre": "Action/Adventure",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Shadow of Rome": {
-      "serial": "SLPM-61109",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2007-05-24",
-      "developer": "Capcom",
-      "publisher": "Capcom",
-      "genre": "Action, Beat'em Up",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -38330,19 +36887,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shin Combat Choro Q": {
-      "serial": "SLPM-61029",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-02-16",
-      "developer": "Takara",
-      "publisher": "Takara",
-      "genre": "Driving, Mini Games, Racing, Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shin Combat Choro Q (JP)": {
       "serial": "SLPM-65105",
       "alt_serials": [
@@ -38482,19 +37026,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shin Onimusha": {
-      "serial": "SLPM-88806",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Shin Onimusha: Dawn of Dreams (Disc 1) (JP)": {
       "serial": "SLPM-66275",
       "alt_serials": [
@@ -38553,19 +37084,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shin Sangoku Musou": {
-      "serial": "SLPM-60117",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-08-26",
-      "developer": "Omega Force",
-      "publisher": "Koei",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shin Sangoku Musou (JP)": {
       "serial": "SLPM-62005",
       "alt_serials": [
@@ -38583,19 +37101,6 @@
       "genre": "Action",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Shin Sangoku Musou (SLPM-62162)": {
-      "serial": "SLPM-62162",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-08-26",
-      "developer": "Omega Force",
-      "publisher": "Koei",
-      "genre": "Action, Beat'em Up",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Shin Sangoku Musou 2 & Moushouden Saikyou Data (JP)": {
       "serial": "SLPM-62331",
@@ -39626,19 +38131,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Shutokou Battle 01 (SLPM-60206)": {
-      "serial": "SLPM-60206",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-07-24",
-      "developer": "Genki",
-      "publisher": "Genki Co. Ltd.",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Shutokou Battle 01: PlayStation 2 the Best (JP)": {
       "serial": "SLPM-74204",
       "alt_serials": [],
@@ -39777,19 +38269,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Silent Hill 2 (SLPM-61009)": {
-      "serial": "SLPM-61009",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-09-24",
-      "developer": "Konami Computer Entertainment Tokyo",
-      "publisher": "Konami",
-      "genre": "Action, Adventure, Survival Horror",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Silent Hill 2: Saigo no Uta (JP)": {
       "serial": "SLPM-65098",
       "alt_serials": [
@@ -39900,19 +38379,6 @@
       "developer": "Konami Computer Entertainment Tokyo (KCET)",
       "publisher": "Konami",
       "genre": "Gun",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Silent Scope 3": {
-      "serial": "SLPM-62246",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-10-17",
-      "developer": "Konami Computer Entertainment Japan",
-      "publisher": "Konami",
-      "genre": "Light Gun Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -42175,19 +40641,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Simple 2000 Series Vol.79 - Akko ni Omakase! The Party Quiz": {
-      "serial": "SLPM-62617",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-10-20",
-      "developer": "Tamsoft",
-      "publisher": "D3Publisher",
-      "genre": "Quiz",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Simple 2000 Series: Hello Kitty Vol. 1: Starlight Puzzle: Isogashi Cube Dossun Fuwawa (JP)": {
       "serial": "SLPM-62249",
       "alt_serials": [],
@@ -42994,19 +41447,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Soul Calibur 3in1": {
-      "serial": "SCPS-88806",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Soul Cradle: Sekai o Kurau Mono (JP)": {
       "serial": "SLPS-25738",
       "alt_serials": [
@@ -43144,19 +41584,6 @@
       "genre": "Dancing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Space Channel 5 - Part 2 [PlayStation 2 The Best]": {
-      "serial": "SLPM-74044",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-02-14",
-      "developer": "United Game Artists (Sega)",
-      "publisher": "Sony, Sega",
-      "genre": "Dancing",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Space Channel 5 Part 2 (JP)": {
       "serial": "SLPM-65096",
@@ -43390,19 +41817,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Splashdown [PlayStation 2 The Best]": {
-      "serial": "SLPM-65309",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-11-11",
-      "developer": "Rainbow Studios",
-      "publisher": "Atari",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Spy Fiction (JP)": {
       "serial": "SLPS-25311",
       "alt_serials": [],
@@ -43503,32 +41917,6 @@
       "genre": "Action-RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Star Wars - Battlefront II (EA Best Hits Edition, Cancelled)": {
-      "serial": "SLPM-66650",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-11-01",
-      "developer": "Pandemic Studios",
-      "publisher": "LucasArts",
-      "genre": "Third-person Shooter",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Star Wars - Jedi Starfighter": {
-      "serial": "SLPM-67543",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-08-29",
-      "developer": "LucasArts Entertainment Company",
-      "publisher": "Lucasarts",
-      "genre": "Action/Shooter",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Star Wars: Battlefront (JP)": {
       "serial": "SLPM-65687",
@@ -44245,19 +42633,6 @@
       "developer": "Amusement Vision",
       "publisher": "Sega",
       "genre": "Action",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Super Puzzle Bobble": {
-      "serial": "SLPM-60115",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003",
-      "developer": "Taito",
-      "publisher": "Taito",
-      "genre": "Puzzle",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -45678,19 +44053,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Taikyoku Mahjong - Net de Ron! [Demo]": {
-      "serial": "SLPM-60161",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-12-20",
-      "developer": "Arika",
-      "publisher": "Arika",
-      "genre": "Mahjong",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Taikyoku Mahjong: Net de Ron! (JP)": {
       "serial": "SLPS-20117",
       "alt_serials": [],
@@ -45904,19 +44266,6 @@
       "genre": "RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Tales of Destiny 2 (Mega Hits!)": {
-      "serial": "SLPS-75202",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-11-28",
-      "developer": "Namco Tales Studio",
-      "publisher": "Namco",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Tales of Destiny: Director's Cut (JP)": {
       "serial": "SLPS-25841",
@@ -46812,19 +45161,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Tenshi no Present - Marl Oukoku Monogatari [Trial]": {
-      "serial": "SLPM-60137",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2000-12-21",
-      "developer": "Nippon Ichi",
-      "publisher": "Nippon Ichi",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Tenshi no Present: Marl Oukoku Monogatari (JP)": {
       "serial": "SLPS-20053",
       "alt_serials": [
@@ -47621,19 +45957,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "The Sims": {
-      "serial": "SLPM-62240",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-08-31",
-      "developer": "Edge of Reality",
-      "publisher": "EA Games",
-      "genre": "Simulation",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "The Sims (JP)": {
       "serial": "SLPM-64540",
       "alt_serials": [
@@ -48043,19 +46366,6 @@
       "genre": "Data/Pictures/Mini Games",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Tokimeki Memorial 3 - Special Sound Track": {
-      "serial": "SLPM-68504",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Tokimeki Memorial 3: Yakusoku no Ano Basho de (JP)": {
       "serial": "SLPM-65080",
@@ -48682,19 +46992,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Touge 3": {
-      "serial": "SLPM-60154",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2001-10-11",
-      "developer": "Altus",
-      "publisher": "Atlus",
-      "genre": "Racing",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Touge 3 (JP)": {
       "serial": "SLPM-62087",
       "alt_serials": [],
@@ -48707,19 +47004,6 @@
       "genre": "Racing",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Tough - Dark Fight": {
-      "serial": "SLPM-66064",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-12-16",
-      "developer": "Konami",
-      "publisher": "Konami",
-      "genre": "Fighting",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Tough: Dark Fight (JP)": {
       "serial": "SLPM-62613",
@@ -49146,19 +47430,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Tsukiyo ni Saraba (SLPM-61102)": {
-      "serial": "SLPM-61102",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-02-24",
-      "developer": "Blue Moon",
-      "publisher": "Taito",
-      "genre": "Action/Shooter",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Tsukiyo ni Saraba [Taito Best] (JP)": {
       "serial": "SLPM-66599",
       "alt_serials": [],
@@ -49330,32 +47601,6 @@
       "genre": "Fighting",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "UNKNOWN (SCPS-20039)": {
-      "serial": "SCPS-20039",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "UNKNOWN (SLPM-68010)": {
-      "serial": "SLPM-68010",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "US Open 2002: A USTA Event (JP)": {
       "serial": "SLPM-62281",
@@ -49653,19 +47898,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Underwater Unit": {
-      "serial": "SLPS-21194",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Unison (JP)": {
       "serial": "SLPS-25010",
       "alt_serials": [],
@@ -49745,19 +47977,6 @@
       "genre": "Action/Beat'em Up",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Urban Reign [Trial]": {
-      "serial": "SLPM-60272",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-09-29",
-      "developer": "Namco Bandai",
-      "publisher": "Namco Bandai",
-      "genre": "Action/Beat'em Up",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Usagi: Yasei no Touhai: Dramatic Mahjong (JP)": {
       "serial": "SLPS-20207",
@@ -50102,19 +48321,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Virtua Cop Re-Birth": {
-      "serial": "SLPM-62215",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2002-08-15",
-      "developer": "Sega Am2, Riz",
-      "publisher": "Sega",
-      "genre": "Gun",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Virtua Cop Re-Birth (JP)": {
       "serial": "SLPM-62205",
       "alt_serials": [],
@@ -50456,19 +48662,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Wandaba Style [DX Mix Pack]": {
-      "serial": "SLPM-65351",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Wander to Kyozou (JP)": {
       "serial": "SCPS-19320",
@@ -51214,19 +49407,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "WinningPost6&ジーワンジョッキー3 2005年度版 プレミアムパック": {
-      "serial": "SLPM-65893",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Wizardry Empire III: Haou no Keifu (JP)": {
       "serial": "SLPM-62409",
       "alt_serials": [
@@ -51690,19 +49870,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Wrestle Kingdom": {
-      "serial": "SLPM-60278",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-07-20",
-      "developer": "Yuke's",
-      "publisher": "Yuke's",
-      "genre": "Sports",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
     "Wrestle Kingdom (JP)": {
       "serial": "SLPM-66401",
       "alt_serials": [],
@@ -51783,19 +49950,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "XIII (Trial)": {
-      "serial": "SLPM-60244",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2003-10-28",
-      "developer": "Ubisoft Montreal",
-      "publisher": "Ubisoft",
-      "genre": "First Person Shooter",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "XIII: Daitouryou o Koroshita Otoko (JP)": {
       "serial": "SLPS-25375",
       "alt_serials": [
@@ -51810,32 +49964,6 @@
       "genre": "First Person Shooter",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "Xenosaga Episode 1 Will to Power": {
-      "serial": "SLPS-25092",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Xenosaga Episode 1 Will to Power (Limited Edition)": {
-      "serial": "SLPS-25091",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     },
     "Xenosaga Episode I Reloaded: Der Wille zur Macht (JP)": {
       "serial": "SLPS-29005",
@@ -51907,19 +50035,6 @@
       "release_date": "2004-06-24",
       "developer": "Monolith Soft",
       "publisher": "Namco",
-      "genre": "RPG",
-      "aliases": [],
-      "src": "Informative doccument/PS2.data.json"
-    },
-    "Xenosaga Episode III: Also sprach Zarathustra": {
-      "serial": "SLPM-61147",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2006-07-06",
-      "developer": "Monolith Soft",
-      "publisher": "Namco Bandai",
       "genre": "RPG",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
@@ -52790,45 +50905,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "Zero - Akai Chou (Playstation 2 The Best Reprint)": {
-      "serial": "SLPM-73256",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-06-08",
-      "developer": "Tecmo",
-      "publisher": "Tecmo",
-      "genre": "Action/Survival Horror",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Zero - Akai Chou (Playstation 2 The Best)": {
-      "serial": "SLPM-73201",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2004-06-08",
-      "developer": "Tecmo",
-      "publisher": "Tecmo",
-      "genre": "Action/Survival Horror",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "Zero - Shisei no Koe (Playstation 2 The Best)": {
-      "serial": "SLPM-73245",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "2005-07-28",
-      "developer": "Tecmo",
-      "publisher": "Tecmo",
-      "genre": "Action/Survival Horror",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "Zero 4 Champ Series: Drift Champ (JP)": {
       "serial": "SLPM-65071",
       "alt_serials": [],
@@ -53223,32 +51299,6 @@
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
     },
-    "dot Hack - Vol.1": {
-      "serial": "SCPS-55029",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "dot Hack - Vol.2": {
-      "serial": "SCPS-55042",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
     "ef: A Fairy Tale of the Two. (JP)": {
       "serial": "SLPM-55240",
       "alt_serials": [
@@ -53315,188 +51365,6 @@
       "genre": "Adventure",
       "aliases": [],
       "src": "Informative doccument/PS2.data.json"
-    },
-    "サルアイトーイ 大騒ぎ!ウッキウキゲームてんこもりっ!!(ソフト単品版) ベスト": {
-      "serial": "SCPS-19314",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "ザ・ベスト・タカラモノ EXビリヤード": {
-      "serial": "SLPM-62187",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "スノーボード・スーパークロス": {
-      "serial": "SLPS-20014",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "チキチキマシン猛レース　ブラック魔王&ケンケン": {
-      "serial": "SLPM-62089",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "トランスワールドサーフ": {
-      "serial": "SLPM-65188",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "ドラマティックサッカーゲーム　日本代表選手になろう!": {
-      "serial": "SLPM-62173",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "パチスロ完全攻略　～ギガゾーン～": {
-      "serial": "SLPM-62152",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "ビベンディ ユニバーサル・ザ・ベスト ヴァン・ヘルシング": {
-      "serial": "SLPM-65983",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "フリントストーン　ビバ!ロックベガス　BOX": {
-      "serial": "SLPS-20049",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "ワールド フットボール クライマックス 通常版": {
-      "serial": "SLPM-66442",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "十二国記 赫々たる王道 紅緑の羽化(コナミ殿堂セレクション)": {
-      "serial": "SLPM-65993",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "夏色の砂時計(プリンセスソフトコレクション)": {
-      "serial": "SLPM-65293",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "無双の碁": {
-      "serial": "SLPM-62024",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
-    },
-    "真・三國無双3 TREASURY BOX": {
-      "serial": "SLPM-65251",
-      "alt_serials": [],
-      "crcs": [],
-      "disc_type": "retail",
-      "region": "NTSC-J",
-      "release_date": "",
-      "developer": "",
-      "publisher": "",
-      "genre": "",
-      "aliases": [],
-      "src": "data/game_serial_db/ps2_japan.json"
     }
   },
   "version": "2.0"
