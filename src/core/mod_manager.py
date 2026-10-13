@@ -143,7 +143,8 @@ class ModManager:
             from src.core.config_manager import get_data_dir
             from src.core.installed_scanner import scan_all
             from src.core.game_registry import normalise_serial
-        except Exception:
+        except Exception as exc:
+            logger.warning("Auto-import setup failed: %s", exc)
             return 0
 
         storage = (getattr(config, "mods_storage_path", "") or "").strip()
@@ -219,8 +220,8 @@ class ModManager:
                 )
                 known_signatures.add(sig)
                 imported += 1
-            except Exception:
-                # Best-effort import — ignore individual failures.
+            except Exception as exc:
+                logger.warning("Auto-import failed for %s: %s", item.path, exc)
                 continue
 
         return imported
@@ -475,7 +476,8 @@ class ModManager:
             from src.core.downloader import fetch_gametdb_art
             thumb_dir = str(_cfg.THUMBNAILS_DIR)
             return fetch_gametdb_art(game_id, thumb_dir, region)
-        except Exception:
+        except Exception as exc:
+            logger.warning("Thumbnail fetch failed for %s: %s", game_id, exc)
             return None
 
     @staticmethod

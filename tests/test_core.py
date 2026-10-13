@@ -963,6 +963,16 @@ class TestUpdateMetadata(unittest.TestCase):
             mgr.update_metadata("m4", game_id="SLUS-20062")
         self.assertEqual(db.get("m4").game_id, "SLUS-20062")
 
+    def test_fetch_thumbnail_logs_failure(self):
+        from src.core.mod_manager import ModManager
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as cm:
+            with patch("src.core.downloader.fetch_gametdb_art", side_effect=OSError("network down")):
+                result = ModManager._fetch_thumbnail("SLUS-20062")
+
+        self.assertIsNone(result)
+        self.assertTrue(any("Thumbnail fetch failed" in msg for msg in cm.output))
+
     def test_update_nonexistent_mod_is_noop(self):
         """Calling update_metadata on a missing id should not raise."""
         db, mgr = self._make_manager()
@@ -6612,6 +6622,26 @@ class TestModManagerAutoImportUnmanagedContent(unittest.TestCase):
         self.assertEqual(first, 4)
         self.assertEqual(second, 0)
         self.assertEqual(len(self.db.all()), 4)
+
+    def test_auto_import_logs_failed_item(self):
+        from types import SimpleNamespace
+        from src.models.mod import ModType
+
+        config = self._make_pcsx2_layout()
+        fake_item = SimpleNamespace(
+            item_type=ModType.TEXTURE_PACK,
+            serial="SLUS-20062",
+            path=Path(self.tmpdir) / "source",
+            name="Fake Pack",
+        )
+
+        with patch("src.core.installed_scanner.scan_all", return_value=[fake_item]):
+            with patch.object(self.mgr, "install_from_folder", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.core.mod_manager", level="WARNING") as cm:
+                    imported = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(imported, 0)
+        self.assertTrue(any("Auto-import failed" in msg for msg in cm.output))
 
 
 # ---------------------------------------------------------------------------
