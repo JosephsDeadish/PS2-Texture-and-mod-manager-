@@ -11,11 +11,14 @@ home on its own.
 
 from __future__ import annotations
 
+import logging
 import threading
 from typing import Callable, Dict, List, Optional, Tuple
 
 from src.core.mod_manager import ModDatabase
 from src.models.mod import ModInfo
+
+logger = logging.getLogger(__name__)
 
 
 def _check_single_mod(mod: ModInfo) -> Tuple[str, bool]:
@@ -43,7 +46,8 @@ def _check_single_mod(mod: ModInfo) -> Tuple[str, bool]:
             and parsed.hostname is not None
             and (parsed.hostname == "github.com" or parsed.hostname.endswith(".github.com"))
         )
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to inspect source URL for %s: %s", mod.id, exc)
         is_github = False
 
     if is_github:
@@ -67,8 +71,8 @@ def _check_single_mod(mod: ModInfo) -> Tuple[str, bool]:
                 current = mod.version.lstrip("v")
                 if latest_tag and current and latest_tag != current:
                     return mod.id, True
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to check GitHub releases for %s: %s", mod.id, exc)
 
     return mod.id, False
 
@@ -117,8 +121,8 @@ class UpdateChecker:
                     mod.has_update = True
                     try:
                         self.db.update(mod)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.warning("Failed to persist update flag for %s: %s", mod.id, exc)
                     updates += 1
                 if on_result:
                     on_result(mod_id, has_update)

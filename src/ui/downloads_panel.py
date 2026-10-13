@@ -7,6 +7,7 @@ pop-up dialog from the Browse panel.
 
 from __future__ import annotations
 
+import logging
 import threading as _threading
 from typing import List
 
@@ -28,6 +29,8 @@ from PyQt6.QtWidgets import (
 
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -314,6 +317,7 @@ class DownloadsPanel(BasePanel):
                 serial=serial_filter,
             )
         except Exception as exc:
+            logger.warning("Failed to load download history: %s", exc)
             self._history_entries = []
             self._detail_label.setText(f"<i>Could not read history: {exc}</i>")
 
@@ -341,7 +345,8 @@ class DownloadsPanel(BasePanel):
         try:
             from src.core.download_history import STATUS_COLOR
             color = STATUS_COLOR.get(e.status, "#555")
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to resolve download history status color: %s", exc)
             color = "#555"
 
         html = (
@@ -412,6 +417,7 @@ class DownloadsPanel(BasePanel):
             from src.core.download_history import export_history_csv
             result = export_history_csv(self.config, path=path)
         except Exception as exc:
+            logger.warning("Failed to export download history CSV: %s", exc)
             QMessageBox.critical(self, "Export Failed", str(exc))
             return
         QMessageBox.information(

@@ -1092,6 +1092,25 @@ class TestUpdateChecker(unittest.TestCase):
         self.assertEqual(mod_id, "no-url")
         self.assertFalse(has_update)
 
+    def test_checker_handles_github_fetch_failure(self):
+        """Network failures while checking GitHub releases should be ignored."""
+        from src.core.updater import _check_single_mod
+
+        mod = ModInfo(
+            id="git-fail",
+            name="GitHub Mod",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/tmp",
+            version="1.0",
+            source_url="https://github.com/example/repo",
+        )
+
+        with patch("urllib.request.urlopen", side_effect=OSError("network down")):
+            mod_id, has_update = _check_single_mod(mod)
+
+        self.assertEqual(mod_id, "git-fail")
+        self.assertFalse(has_update)
+
 
 class TestAssetPaths(unittest.TestCase):
     """Tests for src.core.assets path helpers."""

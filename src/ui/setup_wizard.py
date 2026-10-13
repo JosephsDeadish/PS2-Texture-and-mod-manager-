@@ -1,6 +1,7 @@
 """Initial Setup Wizard for PS2 Mod Manager."""
 
 import os
+import logging
 from pathlib import Path
 
 from PyQt6.QtCore import Qt, pyqtSignal
@@ -26,6 +27,8 @@ from src.core.app_info import APP_NAME
 from src.models.mod import AppConfig
 from src.core.config_manager import detect_pcsx2_paths, save_config
 from src.ui.widgets import PathChooser
+
+logger = logging.getLogger(__name__)
 
 
 class SetupWizard(QDialog):
@@ -504,8 +507,8 @@ class SetupWizard(QDialog):
                 self._auto_fill_from_path(found)
                 self._pcsx2_status.setText(f"✅ Found: {found}")
                 return
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Auto-detecting PCSX2 failed: %s", exc)
 
         # Fallback to legacy candidate list
         candidates = [
