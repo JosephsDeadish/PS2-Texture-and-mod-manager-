@@ -2049,6 +2049,14 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         ids = self._load_catalogue()
         self.assertGreaterEqual(len(ids), 40, f"Expected ≥40 entries, got {len(ids)}")
 
+    def test_catalogue_column_helper_is_responsive(self):
+        from src.core.browse_layout import calculate_catalogue_columns
+        self.assertEqual(calculate_catalogue_columns(0), 3)
+        self.assertEqual(calculate_catalogue_columns(200), 1)
+        self.assertEqual(calculate_catalogue_columns(600), 2)
+        self.assertEqual(calculate_catalogue_columns(900), 3)
+        self.assertEqual(calculate_catalogue_columns(1500), 4)
+
 
 # =============================================================================
 # PCSX2 Layout module

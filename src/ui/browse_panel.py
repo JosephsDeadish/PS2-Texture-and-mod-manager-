@@ -41,6 +41,7 @@ from PyQt6.QtWidgets import (
 )
 
 from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES
+from src.core.browse_layout import calculate_catalogue_columns
 from src.core.config_manager import THUMBNAILS_DIR, save_config
 from src.core.downloader import (
     DownloadError,
@@ -1969,6 +1970,7 @@ class _CatalogueTabContent(QWidget):
         self._all_filtered: list = []   # current filter-result set
         self._shown_count: int = 0      # how many cards are currently in the grid
         self._load_more_btn = None      # QPushButton or None
+        self._current_columns = 3
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -2068,7 +2070,7 @@ class _CatalogueTabContent(QWidget):
 
         self._populate(filtered)
 
-    def _populate(self, entries: list):
+    def _populate(self, entries: list, shown_count: Optional[int] = None):
         # Clear every widget currently in the grid (cards, spacers, load-more btn)
         while self._cards_layout.count():
             item = self._cards_layout.takeAt(0)
@@ -2079,7 +2081,8 @@ class _CatalogueTabContent(QWidget):
         self._shown_count = 0
         self._load_more_btn = None
 
-        self._append_cards(_PAGE_SIZE)
+        initial_count = _PAGE_SIZE if shown_count is None else shown_count
+        self._append_cards(initial_count)
 
         # Emit filter-match count (total entries that pass the filter, not how
         # many cards are rendered — the result-count label reflects the filter).
@@ -2090,7 +2093,8 @@ class _CatalogueTabContent(QWidget):
         entries = self._all_filtered
         start = self._shown_count
         end = min(start + count, len(entries))
-        cols = 3
+        cols = calculate_catalogue_columns(self._scroll.viewport().width())
+        self._current_columns = cols
 
         for i in range(start, end):
             entry = entries[i]
@@ -2132,6 +2136,14 @@ class _CatalogueTabContent(QWidget):
                     self._cards_layout.addWidget(
                         spacer, self._shown_count // cols, remainder + j
                     )
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if not self._all_filtered:
+            return
+        cols = calculate_catalogue_columns(self._scroll.viewport().width())
+        if cols != self._current_columns:
+            self._populate(self._all_filtered, shown_count=self._shown_count)
 
     def _load_more(self):
         """Append the next page of catalogue cards."""
