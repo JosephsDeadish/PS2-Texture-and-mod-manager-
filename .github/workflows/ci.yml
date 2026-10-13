@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Unit tests (Python ${{ matrix.python-version }})
@@ -40,4 +43,3 @@ jobs:
 
       - name: Run unit tests
         run: python -m unittest discover -q
-
