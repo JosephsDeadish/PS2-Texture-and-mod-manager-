@@ -45,6 +45,7 @@ from __future__ import annotations
 import csv
 import datetime
 import json
+import logging
 import os
 import tempfile
 import uuid
@@ -91,6 +92,8 @@ HISTORY_FILENAME = "download_history.json"
 
 # Maximum entries retained in the log before the oldest are pruned on save.
 MAX_HISTORY_ENTRIES = 500
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -228,7 +231,8 @@ def _load(config=None) -> List[HistoryEntry]:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
         return [HistoryEntry.from_dict(d) for d in raw if isinstance(d, dict)]
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to load download history from %s: %s", path, exc)
         return []
 
 

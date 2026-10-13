@@ -7636,6 +7636,16 @@ class TestDownloadHistory(unittest.TestCase):
         entries = list_history(self.cfg)
         self.assertEqual(entries, [])
 
+    def test_list_history_corrupt_file_returns_empty(self):
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text("not valid json", encoding="utf-8")
+
+        entries = list_history(self.cfg)
+
+        self.assertEqual(entries, [])
+
     # --- clear_history -----------------------------------------------------
 
     def test_clear_history_returns_count(self):
