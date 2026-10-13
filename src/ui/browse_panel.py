@@ -9,6 +9,7 @@ Features:
 - Rich catalogue entries with upscale info, author links, context
 """
 
+import logging
 import os
 import threading
 import tempfile
@@ -52,6 +53,8 @@ from src.core.downloader import (
 )
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -119,6 +122,13 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
     if action == "" and bool(entry.get("direct_download_url", "")):
         return True
     return False
+
+
+def _save_browse_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save browse panel config after %s: %s", context, exc)
 
 
 # Human-readable labels for each ModType in catalogue cards
@@ -540,10 +550,7 @@ class CatalogueCard(QFrame):
         else:
             favs.append(author)
         self.config.favorite_authors = favs
-        try:
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating favorites")
 
         new_fav = not is_fav
         self._fav_btn.setText("❤" if new_fav else "🤍")
@@ -605,7 +612,8 @@ class CatalogueCard(QFrame):
 
             QTimer.singleShot(0, _update)
             return True
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not fetch browse cover art from %s: %s", url, exc)
             return False
 
 
@@ -2019,8 +2027,8 @@ class _CatalogueTabContent(QWidget):
             try:
                 from src.core.serial_validator import SerialDatabase
                 _sdb = SerialDatabase()
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Could not load serial database for alias-aware browse filters: %s", exc)
 
         filtered = []
         for e in self._all_entries:
@@ -2436,51 +2444,31 @@ class BrowsePanel(BasePanel):
         """Persist the NSFW preference and re-apply filters."""
         show_nsfw = bool(state)
         self.config.show_nsfw = show_nsfw
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating NSFW preference")
         self._apply_filters()
 
     def _on_paid_toggled(self, state: int):
         """Persist the show-paid preference and re-apply filters."""
         self.config.show_paid = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating paid-content preference")
         self._apply_filters()
 
     def _on_acct_toggled(self, state: int):
         """Persist the show-account-required preference and re-apply filters."""
         self.config.show_account_required = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating account-required preference")
         self._apply_filters()
 
     def _on_incomplete_toggled(self, state: int):
         """Persist the show-incomplete preference and re-apply filters."""
         self.config.show_incomplete = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating incomplete-content preference")
         self._apply_filters()
 
     def _on_in_app_toggled(self, state: int):
         """Persist the in-app-only preference and re-apply filters."""
         self.config.in_app_only = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating in-app-only preference")
         self._apply_filters()
 
     def _on_result_count_changed(self, visible: int, total: int):

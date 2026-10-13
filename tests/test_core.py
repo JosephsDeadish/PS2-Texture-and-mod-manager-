@@ -18942,6 +18942,22 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         self.assertIn("title_matches_query", src,
                       "apply_filters must call title_matches_query for alias-aware search")
 
+    def test_browse_panel_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Could not save browse panel config after %s: %s",
+            "updating favorites",
+            "updating NSFW preference",
+            "updating paid-content preference",
+            "updating account-required preference",
+            "updating incomplete-content preference",
+            "updating in-app-only preference",
+            "Could not load serial database for alias-aware browse filters",
+            "Could not fetch browse cover art from",
+        ):
+            self.assertIn(snippet, src)
+
     def test_widgets_logs_best_effort_failures(self):
         from pathlib import Path
         src = (Path(__file__).parent.parent / "src" / "ui" / "widgets.py").read_text(encoding="utf-8")
