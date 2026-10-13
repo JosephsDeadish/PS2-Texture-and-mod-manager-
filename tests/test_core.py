@@ -8255,6 +8255,27 @@ class TestSerialDatabase(unittest.TestCase):
                 f"Found {len(issues)} remaining serial mismatches:\n{sample}"
             )
 
+    def test_validate_all_catalogues_skips_corrupt_files(self):
+        from pathlib import Path
+        from src.core.serial_validator import SerialDatabase
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cat_dir = Path(tmpdir)
+            (cat_dir / "texture_packs.json").write_text("{not valid json", encoding="utf-8")
+            with patch("src.core.serial_validator._CAT_DIR", cat_dir):
+                sdb = SerialDatabase()
+                self.assertEqual(sdb.validate_all_catalogues(), [])
+
+    def test_serial_database_skips_corrupt_primary_db(self):
+        from pathlib import Path
+        from src.core.serial_validator import SerialDatabase
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "ps2_ntsc_u.json"
+            bad_db.write_text("{not valid json", encoding="utf-8")
+            sdb = SerialDatabase(db_path=bad_db)
+            self.assertGreater(sdb.game_count(), 0)
+
     def test_validate_catalogue_detects_wrong_serial(self):
         """validate_catalogue() detects a manually-injected wrong serial."""
         from src.core.serial_validator import SerialDatabase
@@ -8529,6 +8550,15 @@ class TestCrcSerialConsistency(unittest.TestCase):
             self.assertIn("crc",    item)
             self.assertIn("serial", item)
             self.assertIn("issue",  item)
+
+    def test_crc_serial_consistency_skips_corrupt_db(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_path = Path(tmpdir) / "known_addresses.json"
+            bad_path.write_text("{not valid json", encoding="utf-8")
+            self.assertEqual(
+                self.sdb.validate_crc_serial_consistency(pnach_db_path=bad_path),
+                [],
+            )
 
 
 class TestCheatsCatalogue(unittest.TestCase):

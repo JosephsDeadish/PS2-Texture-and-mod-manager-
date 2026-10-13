@@ -28,6 +28,7 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 from dataclasses import dataclass, field
@@ -43,6 +44,7 @@ _DEMO_DB_FILE = _REPO_ROOT / "data" / "game_serial_db" / "ps2_demos.json"
 _CAT_DIR      = _REPO_ROOT / "data" / "catalogue"
 
 _SERIAL_RE = re.compile(r'^[A-Z]{4}-\d{5}$')
+logger = logging.getLogger(__name__)
 
 # Title aliases that should resolve to the NTSC-U canonical retail entry when
 # loading other regional DBs.  This prevents PAL/JP rows with shortened or
@@ -232,7 +234,8 @@ class SerialDatabase:
                 continue
             try:
                 raw = json.loads(path.read_text(encoding="utf-8"))
-            except Exception:
+            except Exception as exc:
+                logger.warning("Failed to load serial DB file %s: %s", path, exc)
                 continue
             for title, info in raw.get("games", {}).items():
                 if path != self._path:
@@ -298,7 +301,8 @@ class SerialDatabase:
         if self._demo_path.is_file():
             try:
                 raw = json.loads(self._demo_path.read_text(encoding="utf-8"))
-            except Exception:
+            except Exception as exc:
+                logger.warning("Failed to load demo serial DB file %s: %s", self._demo_path, exc)
                 raw = {}
             for title, info in raw.get("games", {}).items():
                 disc_type = info.get("disc_type") or "demo"
@@ -642,7 +646,8 @@ class SerialDatabase:
                 continue
             try:
                 data = json.loads(path.read_text(encoding="utf-8"))
-            except Exception:
+            except Exception as exc:
+                logger.warning("Failed to validate catalogue file %s: %s", path, exc)
                 continue
             issues.extend(self.validate_catalogue(data, source_file=name))
         return issues
@@ -677,7 +682,8 @@ class SerialDatabase:
             return []
         try:
             pnach_db = json.loads(pnach_path.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to load PNACH DB file %s: %s", pnach_path, exc)
             return []
 
         issues: List[dict] = []
