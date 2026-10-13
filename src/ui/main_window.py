@@ -1,5 +1,7 @@
 """Main application window for PS2 Mod Manager."""
 
+import logging
+
 from PyQt6.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import (
@@ -29,6 +31,8 @@ from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -89,8 +93,8 @@ class MainWindow(QMainWindow):
             x = max(available.left(), min(geo.x(), available.right() - geo.width()))
             y = max(available.top(), min(geo.y(), available.bottom() - geo.height()))
             self.move(x, y)
-        except Exception:
-            pass  # Never crash startup due to geometry calculation
+        except Exception as exc:
+            logger.warning("Failed to clamp main window to screen: %s", exc)
 
     # ------------------------------------------------------------------
     # UI Construction
@@ -292,12 +296,16 @@ class MainWindow(QMainWindow):
         ):
             try:
                 panel._apply_filter()
-            except Exception:
-                pass  # Never crash the UI if a panel isn't ready
+            except Exception as exc:
+                logger.warning(
+                    "Failed to refresh %s after mod install: %s",
+                    panel.__class__.__name__,
+                    exc,
+                )
         try:
             self._library_panel.refresh()
-        except Exception:
-            pass  # Never crash the UI if the library panel isn't ready
+        except Exception as exc:
+            logger.warning("Failed to refresh library panel after mod install: %s", exc)
 
     def _on_library_browse_game(self, serial: str):
         """Navigate to the Discover panel and pre-filter by *serial*."""
@@ -359,8 +367,8 @@ class MainWindow(QMainWindow):
             self._update_checker.start(
                 on_complete=self._update_signals.updates_found.emit
             )
-        except Exception:
-            pass  # Never crash the UI over an update check
+        except Exception as exc:
+            logger.warning("Failed to start update checker: %s", exc)
 
     def _on_updates_found(self, count: int):
         if count > 0:
@@ -376,9 +384,13 @@ class MainWindow(QMainWindow):
             ):
                 try:
                     panel._apply_filter()
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "Failed to refresh %s after update check: %s",
+                        panel.__class__.__name__,
+                        exc,
+                    )
             try:
                 self._library_panel.refresh()
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Failed to refresh library panel after update check: %s", exc)

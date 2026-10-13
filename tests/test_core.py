@@ -1246,6 +1246,23 @@ class TestPnachParser(unittest.TestCase):
         with self.assertRaises(ValueError):
             merge_pnach_files([], self.tmpdir)
 
+    def test_merge_skips_unreadable_files(self):
+        from src.core.pnach import merge_pnach_files, parse_pnach
+
+        valid = self._write_pnach("ABCD1234", [
+            "gametitle=Valid Game",
+            "patch=1,EE,00000001,word,11111111",
+        ])
+        missing = str(Path(self.tmpdir) / "missing.pnach")
+        out_dir = str(Path(self.tmpdir) / "merged4")
+
+        merged_path = merge_pnach_files([missing, valid], out_dir, game_crc="ABCD1234")
+        merged = parse_pnach(merged_path)
+
+        self.assertEqual(merged.game_crc, "ABCD1234")
+        self.assertEqual(len(merged.patches), 1)
+        self.assertEqual(merged.patches[0].value, "11111111")
+
     def test_merge_preserves_game_title(self):
         from src.core.pnach import merge_pnach_files, parse_pnach
         a = self._write_pnach("12345678", [
@@ -1290,6 +1307,16 @@ class TestPnachParser(unittest.TestCase):
         conflicts = find_pnach_conflicts([a, b])
         # Disabled patches should not generate conflicts
         self.assertEqual(len(conflicts), 0)
+
+    def test_conflicts_skip_unreadable_files(self):
+        from src.core.pnach import find_pnach_conflicts
+
+        valid = self._write_pnach("AACC2222", ["patch=1,EE,00001234,word,AAAA0000"])
+        missing = str(Path(self.tmpdir) / "missing_conflict.pnach")
+
+        conflicts = find_pnach_conflicts([missing, valid])
+
+        self.assertEqual(conflicts, [])
 
 
 
