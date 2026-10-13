@@ -14,6 +14,12 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QIcon
 
+from src.core.app_info import (
+    APP_NAME,
+    APP_ORGANIZATION,
+    APP_ORGANIZATION_DOMAIN,
+    APP_VERSION,
+)
 from src.core.config_manager import load_config
 from src.core.assets import icon_path, ico_path
 from src.ui.main_window import MainWindow
@@ -35,11 +41,10 @@ def main():
     os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 
     app = QApplication(sys.argv)
-    app.setApplicationName("PS2 Mod Manager")
-    from src import __version__
-    app.setApplicationVersion(__version__)
-    app.setOrganizationName("PS2ModManager")
-    app.setOrganizationDomain("ps2modmanager.github.io")
+    app.setApplicationName(APP_NAME)
+    app.setApplicationVersion(APP_VERSION)
+    app.setOrganizationName(APP_ORGANIZATION)
+    app.setOrganizationDomain(APP_ORGANIZATION_DOMAIN)
 
     # Set default font
     font = QFont("Segoe UI", 10)

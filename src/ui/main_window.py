@@ -18,6 +18,7 @@ from PyQt6.QtWidgets import (
 )
 
 from src.core.config_manager import load_config, save_config
+from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.browse_panel import BrowsePanel
@@ -28,8 +29,6 @@ from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
-
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
 
 
 # ---------------------------------------------------------------------------
@@ -66,7 +65,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.config = config
         self.db = ModDatabase()
-        self.setWindowTitle("PS2 Mod Manager")
+        self.setWindowTitle(APP_NAME)
         self.setMinimumSize(1100, 720)
         self._nav_buttons: list[NavButton] = []
         self._update_signals = _UpdateSignals()

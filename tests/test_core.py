@@ -8253,7 +8253,8 @@ class TestSerialDatabase(unittest.TestCase):
             path = os.path.join(cat_dir, fname)
             if not os.path.isfile(path):
                 continue
-            data = json.load(open(path, encoding="utf-8"))
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
             for entry in data:
                 if entry.get("game") == "Kingdom Hearts":
                     self.assertEqual(
@@ -8269,7 +8270,8 @@ class TestSerialDatabase(unittest.TestCase):
             path = os.path.join(cat_dir, fname)
             if not os.path.isfile(path):
                 continue
-            data = json.load(open(path, encoding="utf-8"))
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
             for entry in data:
                 if entry.get("game") == "God of War":
                     self.assertEqual(

@@ -13,11 +13,10 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
-
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
 
 
 class StatCard(QFrame):
@@ -66,7 +65,7 @@ class DashboardPanel(BasePanel):
         content = self._content_layout
 
         # ---- Welcome message ----
-        welcome = QLabel("Welcome to PS2 Mod Manager")
+        welcome = QLabel(f"Welcome to {APP_NAME}")
         welcome.setObjectName("section_title")
         content.addWidget(welcome)
 
@@ -261,7 +260,7 @@ class DashboardPanel(BasePanel):
 
         msg_col = QVBoxLayout()
         msg_col.setSpacing(4)
-        msg_title = QLabel("<b>PS2 Mod Manager is free!</b>")
+        msg_title = QLabel(f"<b>{APP_NAME} is free!</b>")
         msg_title.setStyleSheet("font-size: 14px; color: #f96854;")
         msg_col.addWidget(msg_title)
         msg_sub = QLabel(

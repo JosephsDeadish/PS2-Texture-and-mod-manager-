@@ -22,6 +22,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 
+from src.core.app_info import APP_NAME
 from src.models.mod import AppConfig
 from src.core.config_manager import detect_pcsx2_paths, save_config
 from src.ui.widgets import PathChooser
@@ -41,7 +42,7 @@ class SetupWizard(QDialog):
         # Use Qt.WindowType.Window so the wizard shows in the taskbar (issue #1)
         super().__init__(parent, Qt.WindowType.Window)
         self.config = config
-        self.setWindowTitle("PS2 Mod Manager — Setup")
+        self.setWindowTitle(f"{APP_NAME} — Setup")
         self.setMinimumSize(680, 520)
         self.setModal(True)
         self._page_index = 0
@@ -66,7 +67,7 @@ class SetupWizard(QDialog):
         tb_layout = QVBoxLayout(title_bar)
         tb_layout.setContentsMargins(28, 12, 28, 12)
 
-        title_lbl = QLabel("⚙️  PS2 Mod Manager Setup")
+        title_lbl = QLabel(f"⚙️  {APP_NAME} Setup")
         title_lbl.setStyleSheet("font-size: 22px; font-weight: bold; color: #ffffff;")
         tb_layout.addWidget(title_lbl)
 
@@ -126,13 +127,13 @@ class SetupWizard(QDialog):
         hero.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(hero)
 
-        title = QLabel("Welcome to PS2 Mod Manager")
+        title = QLabel(f"Welcome to {APP_NAME}")
         title.setStyleSheet("font-size: 24px; font-weight: bold; color: #ffffff;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
         desc = QLabel(
-            "This wizard will help you configure PS2 Mod Manager by locating your\n"
+            f"This wizard will help you configure {APP_NAME} by locating your\n"
             "PCSX2 installation and setting up mod folders.\n\n"
             "You can re-run this wizard at any time from Settings."
         )
@@ -153,7 +154,7 @@ class SetupWizard(QDialog):
         layout.addWidget(_h("PCSX2 Installation"))
         layout.addWidget(_p(
             "Select your PCSX2 installation or config directory.\n"
-            "PS2 Mod Manager will automatically detect sub-folders "
+            f"{APP_NAME} will automatically detect sub-folders "
             "(textures, covers, memory cards, etc.)."
         ))
 
@@ -216,7 +217,7 @@ class SetupWizard(QDialog):
 
         layout.addWidget(_h("Download Library & Staging Location"))
         layout.addWidget(_p(
-            "Choose a folder where PS2 Mod Manager will download and stage your files\n"
+            f"Choose a folder where {APP_NAME} will download and stage your files\n"
             "(texture packs, PNACH codes, cover art, and other content)\n"
             "before deploying them to PCSX2.\n\n"
             "When you enable a mod it is copied from this staging folder into PCSX2.\n"
@@ -246,7 +247,7 @@ class SetupWizard(QDialog):
 
         layout.addWidget(_h("Automatic Folder Creation"))
         layout.addWidget(_p(
-            "Let PS2 Mod Manager create any missing PCSX2 sub-folders\n"
+            f"Let {APP_NAME} create any missing PCSX2 sub-folders\n"
             "(textures/, covers/, cheats/, memcards/, etc.) right now."
         ))
 
@@ -267,7 +268,7 @@ class SetupWizard(QDialog):
 
         layout.addWidget(_h("Game Library  (optional)"))
         layout.addWidget(_p(
-            "Point PS2 Mod Manager to the folder where your PS2 disc images are stored\n"
+            f"Point {APP_NAME} to the folder where your PS2 disc images are stored\n"
             "(ISO, CHD, BIN, IMG …).  The app will scan for game serials so you can\n"
             "filter your mods to show only what's compatible with games you own.\n\n"
             "You can skip this step and configure the folder later in Settings."
@@ -356,7 +357,7 @@ class SetupWizard(QDialog):
         layout.addWidget(title)
 
         self._done_summary = QLabel(
-            "PS2 Mod Manager is ready to use.\n"
+            f"{APP_NAME} is ready to use.\n"
             "You can change these settings at any time from the Settings panel."
         )
         self._done_summary.setStyleSheet("color: #9090b0; font-size: 14px;")

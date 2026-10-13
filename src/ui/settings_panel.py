@@ -14,14 +14,12 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.app_info import APP_NAME, APP_VERSION, PATREON_URL
 from src.core.config_manager import save_config
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
 from src.ui.theme import THEME_KEYS, apply_theme
-
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
-APP_VERSION = "1.0.0"
 
 
 class SettingsPanel(BasePanel):
@@ -32,7 +30,7 @@ class SettingsPanel(BasePanel):
     theme_changed = pyqtSignal(str)  # emits the new theme key when changed
 
     def __init__(self, config: AppConfig, parent=None):
-        super().__init__("⚙️  Settings", "Configure PS2 Mod Manager", parent=parent)
+        super().__init__("⚙️  Settings", f"Configure {APP_NAME}", parent=parent)
         self.config = config
         self._build()
 
@@ -89,7 +87,7 @@ class SettingsPanel(BasePanel):
 
         game_lib_note = QLabel(
             "Select the folder where your PS2 disc images are stored\n"
-            "(ISO, CHD, BIN, IMG, MDF …).  PS2 Mod Manager will scan for game\n"
+            f"(ISO, CHD, BIN, IMG, MDF …).  {APP_NAME} will scan for game\n"
             "serials so you can filter mods to only show what you own."
         )
         game_lib_note.setStyleSheet("color: #7070a0; font-size: 12px;")
@@ -223,7 +221,7 @@ class SettingsPanel(BasePanel):
         layout.addWidget(_section("About"))
 
         about_lbl = QLabel(
-            f"<b>PS2 Mod Manager</b>  v{APP_VERSION}<br>"
+            f"<b>{APP_NAME}</b>  v{APP_VERSION}<br>"
             "A free mod manager for PCSX2.<br><br>"
             "Manage texture packs, PNACH patches, cover art, memory cards, and cheats "
             "all in one place.<br><br>"
