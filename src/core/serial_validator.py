@@ -56,8 +56,19 @@ _CANONICAL_TITLE_OVERRIDES: Dict[str, str] = {
     # These retail titles share exact names with demo-DB entries; the demo must
     # NOT overwrite the retail entry loaded first from NTSC-U.
     "Burnout 3: Takedown": "Burnout 3: Takedown",
+    "Fight Night Round 2": "Fight Night Round 2",
+    "Final Fantasy XII": "Final Fantasy XII",
+    "NCAA Final Four 2003": "NCAA Final Four 2003",
+    "Need for Speed: Underground": "Need for Speed: Underground",
+    "Need for Speed: Underground 2": "Need for Speed: Underground 2",
+    "Ratchet & Clank 3 (PAL)": "Ratchet & Clank 3 (PAL)",
+    "SOCOM: U.S. Navy SEALs": "SOCOM: U.S. Navy SEALs",
+    "Smash Court Tennis: Pro Tournament 2 (PAL)": "Smash Court Tennis: Pro Tournament 2 (PAL)",
     "Prince of Persia: Warrior Within": "Prince of Persia: Warrior Within",
     "Tekken 5": "Tekken 5",
+    "Tony Hawk's Underground": "Tony Hawk's Underground",
+    "Tony Hawk's Underground 2": "Tony Hawk's Underground 2",
+    "WWF SmackDown! Just Bring It (PAL)": "WWF SmackDown! Just Bring It (PAL)",
 }
 
 

@@ -8130,6 +8130,24 @@ class TestSerialDatabase(unittest.TestCase):
             self.sdb.get_serial("Crash Twinsanity"), "SLUS-20909"
         )
 
+    def test_demo_collisions_keep_retail_canonical(self):
+        """Exact-title demo collisions should not displace retail canonical entries."""
+        cases = [
+            ("Final Fantasy XII", "SLUS-20963"),
+            ("Need for Speed: Underground", "SLUS-20811"),
+            ("Need for Speed: Underground 2", "SLUS-21065"),
+            ("SOCOM: U.S. Navy SEALs", "SCUS-97134"),
+            ("Smash Court Tennis: Pro Tournament 2 (PAL)", "SCES-52423"),
+            ("Tony Hawk's Underground 2", "SLUS-20965"),
+            ("WWF SmackDown! Just Bring It (PAL)", "SLES-50477"),
+        ]
+        for title, serial in cases:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info)
+                self.assertEqual(info.serial, serial)
+                self.assertEqual(info.disc_type, "retail")
+
     # ------------------------------------------------------------------
     # is_valid / is_known helpers
     # ------------------------------------------------------------------
