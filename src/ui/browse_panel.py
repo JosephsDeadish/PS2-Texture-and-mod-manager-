@@ -1370,8 +1370,12 @@ class DownloadInstallDialog(QDialog):
                         status=STATUS_SUCCESS,
                         size_bytes=installed_size,
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "Could not record browse download history for %s: %s",
+                        mod.name,
+                        exc,
+                    )
 
                 def _done():
                     self._progress.setRange(0, 100)
@@ -1381,6 +1385,7 @@ class DownloadInstallDialog(QDialog):
                 QTimer.singleShot(0, _done)
             except DownloadError as exc:
                 _download_err_msg = str(exc)
+                logger.warning("Browse-panel download failed for %s: %s", raw_url, exc)
                 try:
                     from src.core.download_history import record_event, STATUS_FAILED
                     record_event(
@@ -1392,8 +1397,12 @@ class DownloadInstallDialog(QDialog):
                         status=STATUS_FAILED,
                         note=_download_err_msg,
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "Could not record failed browse download history for %s: %s",
+                        raw_url,
+                        exc,
+                    )
                 def _err():
                     self._status.setText(f"❌  Download failed: {_download_err_msg}")
                     self._progress.hide()
@@ -1401,6 +1410,7 @@ class DownloadInstallDialog(QDialog):
                 QTimer.singleShot(0, _err)
             except Exception as exc:
                 _general_err_msg = str(exc)
+                logger.warning("Unexpected browse-panel download error for %s: %s", raw_url, exc)
                 try:
                     from src.core.download_history import record_event, STATUS_FAILED
                     record_event(
@@ -1412,8 +1422,12 @@ class DownloadInstallDialog(QDialog):
                         status=STATUS_FAILED,
                         note=_general_err_msg,
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "Could not record failed browse download history for %s: %s",
+                        raw_url,
+                        exc,
+                    )
                 def _err2():
                     self._status.setText(f"❌  Error: {_general_err_msg}")
                     self._progress.hide()

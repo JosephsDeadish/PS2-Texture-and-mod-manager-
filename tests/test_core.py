@@ -19013,6 +19013,10 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             "updating account-required preference",
             "updating incomplete-content preference",
             "updating in-app-only preference",
+            "Browse-panel download failed for",
+            "Unexpected browse-panel download error for",
+            "Could not record browse download history for",
+            "Could not record failed browse download history for",
             "Could not load serial database for alias-aware browse filters",
             "Could not fetch browse cover art from",
         ):
