@@ -18942,6 +18942,24 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         self.assertIn("title_matches_query", src,
                       "apply_filters must call title_matches_query for alias-aware search")
 
+    def test_widgets_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "widgets.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Skipping unreadable PNACH file",
+            "Could not load library serials for PNACH picker",
+            "Could not load serial database for PNACH picker",
+            "Could not parse existing PNACH file",
+            "Could not determine backup directory",
+        ):
+            self.assertIn(snippet, src)
+
+    def test_splash_logs_icon_fallback(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "splash.py").read_text(encoding="utf-8")
+        self.assertIn("Splash screen controller icon not found", src)
+        self.assertIn("Splash screen controller icon could not be loaded", src)
+
     # ------------------------------------------------------------------
     # Games with aliases count
     # ------------------------------------------------------------------

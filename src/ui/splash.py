@@ -7,6 +7,7 @@ Uses only Qt primitives — no extra dependencies required.
 
 from __future__ import annotations
 
+import logging
 import math
 from typing import Optional
 
@@ -31,6 +32,8 @@ from PyQt6.QtGui import (
     QRadialGradient,
 )
 from PyQt6.QtWidgets import QApplication, QLabel, QSplashScreen, QWidget
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -73,8 +76,10 @@ class SplashWidget(QWidget):
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 )
-        except Exception:
-            pass
+            else:
+                logger.warning("Splash screen controller icon not found at %s; using fallback", p)
+        except Exception as exc:
+            logger.warning("Splash screen controller icon could not be loaded: %s", exc)
 
         # Animation timer — 30 fps
         self._timer = QTimer(self)

@@ -1,5 +1,6 @@
 """Reusable UI widgets for PS2 Mod Manager."""
 
+import logging
 import os
 import textwrap
 from pathlib import Path
@@ -37,6 +38,8 @@ from PyQt6.QtWidgets import (
 from src.core.game_registry import lookup_game_title
 from src.models.mod import ModInfo, ModType, ConflictInfo
 from src.ui.tooltips import get_tip
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # PnachCodePickerDialog
@@ -317,7 +320,13 @@ class PnachCodePickerDialog(QDialog):
             for pf_path in pnach_files:
                 try:
                     pf = parse_pnach(str(pf_path))
-                except Exception:
+                except Exception as exc:
+                    logger.warning(
+                        "Skipping unreadable PNACH file %s for mod %s: %s",
+                        pf_path,
+                        mod_id,
+                        exc,
+                    )
                     continue
                 crc = pf.game_crc
                 if crc not in crc_patches:
@@ -1801,8 +1810,8 @@ class PnachCodeBuilderDialog(QDialog):
             if lib_path:
                 from src.core.game_library import get_library_serials
                 library_serials = get_library_serials(lib_path)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not load library serials for PNACH picker: %s", exc)
 
         # ── Build full serial→title mapping from serial DB ────────────
         all_serials: dict[str, str] = {}
@@ -1813,8 +1822,8 @@ class PnachCodeBuilderDialog(QDialog):
                 info = sdb.get_info(title)
                 if info and info.serial:
                     all_serials[info.serial.upper()] = title
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not load serial database for PNACH picker: %s", exc)
         # Overlay pnach DB entries (may have CRC-only entries not in serial DB)
         for serial, title in list_all_serials_in_db():
             if serial not in all_serials:
@@ -2578,7 +2587,13 @@ class PnachCodeBuilderDialog(QDialog):
                         text = existing.to_text()
                     # else: overwrite — use text as-is
 
-            except Exception:
+            except Exception as exc:
+                logger.warning(
+                    "Could not parse existing PNACH file %s while installing %s: %s",
+                    dest,
+                    crc,
+                    exc,
+                )
                 # If parsing fails, fall back to simple overwrite prompt
                 reply = QMessageBox.question(
                     self, "File Exists",
@@ -3518,7 +3533,8 @@ class BackupManagerDialog(QDialog):
         try:
             from src.core.backup_manager import get_backup_dir
             backup_dir = get_backup_dir(self._config)
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not determine backup directory: %s", exc)
             return
 
         from PyQt6.QtGui import QDesktopServices
