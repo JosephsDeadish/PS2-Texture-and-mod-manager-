@@ -5,6 +5,7 @@ No copyrighted content is fetched — only metadata/thumbnails from
 open public APIs (GameTDB, GitHub, etc.) or user-provided URLs.
 """
 
+import logging
 import json
 import os
 import re
@@ -14,6 +15,8 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 # Common User-Agent header used across all requests from this module
 _USER_AGENT = "PS2ModManager/1.0 (+https://github.com/JosephsDeadish/PS2-Texture-and-mod-manager-)"
@@ -219,7 +222,8 @@ def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Option
     try:
         download_file(url, dest, timeout=10)
         return dest
-    except DownloadError:
+    except DownloadError as exc:
+        logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
         return None
 
 
@@ -274,7 +278,7 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
     GameTDB is a free, community-maintained database (https://www.gametdb.com).
 
     Returns the game title string, or ``""`` on any error or if not found.
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     if not serial:
         return ""
@@ -298,7 +302,8 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
             if title and title.lower() not in ("gametdb", "ps2", ""):
                 return title
         return ""
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up GameTDB title for %s: %s", serial_clean, exc)
         return ""
 
 
@@ -330,7 +335,8 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
         ``filename``     — e.g. ``F0A235B4.pnach``
         ``download_url`` — direct raw download URL
 
-    Returns an empty list on any network error.
+    Returns an empty list on any network error. Unexpected errors are logged
+    and suppressed.
     This function is designed to be called from a background thread.
     """
     try:
@@ -355,7 +361,8 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
                     ),
                 })
         return result
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to list PCSX2 widescreen patches: %s", exc)
         return []
 
 
@@ -374,7 +381,8 @@ def download_pcsx2_widescreen_patch(crc: str, dest_dir: str, timeout: int = 15) 
     try:
         download_file(url, dest, timeout=timeout)
         return dest
-    except DownloadError:
+    except DownloadError as exc:
+        logger.warning("Failed to download PCSX2 widescreen patch %s: %s", crc_upper, exc)
         return None
 
 
@@ -387,7 +395,8 @@ def search_pcsx2_patches_by_crc(
     for the given 8-digit CRC.
 
     Returns a dict ``{"crc": ..., "filename": ..., "download_url": ...}``
-    if found, or ``None`` if not found or on network error.
+    if found, or ``None`` if not found or on network error. Unexpected errors
+    are logged and suppressed.
     """
     crc_upper = crc.upper().strip()
     filename = f"{crc_upper}.pnach"
@@ -402,7 +411,8 @@ def search_pcsx2_patches_by_crc(
                 "download_url": url,
             }
         return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to check PCSX2 patch for %s: %s", crc_upper, exc)
         return None
 
 
@@ -436,7 +446,7 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
     page could not be fetched, no link was found, or *page_url* is not a
     MediaFire file page.
 
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     if not page_url:
         return None
@@ -448,7 +458,8 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         if "/file/" not in _parsed.path.lower():
             return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve MediaFire URL %s: %s", page_url, exc)
         return None
     try:
         resp = requests.get(
@@ -476,7 +487,8 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return m2.group(1)
 
         return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve MediaFire URL %s: %s", page_url, exc)
         return None
 
 
@@ -490,7 +502,7 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
 
     Uses Yandex's public API endpoint to obtain a temporary direct download
     ``href``. Returns ``None`` when the URL is not a supported Yandex share
-    page or cannot be resolved.
+    page or cannot be resolved. Unexpected errors are logged and suppressed.
     """
     if not page_url:
         return None
@@ -501,7 +513,8 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         if "/d/" not in parsed.path.lower() and "/i/" not in parsed.path.lower():
             return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
         return None
     try:
         api = "https://cloud-api.yandex.net/v1/disk/public/resources/download"
@@ -520,7 +533,8 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         try:
             href_netloc = urllib.parse.urlparse(href).netloc.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
             return None
         if not (
             href_netloc.endswith(".yandex.ru")
@@ -530,7 +544,8 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
         ):
             return None
         return href
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
         return None
 
 
@@ -643,7 +658,7 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
     * **source_url** — echoes back *thread_url*
 
     Returns a dict with the above keys (all empty/empty-list on failure).
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     result: Dict = {
         "title": "",
@@ -771,7 +786,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                 result["game_serial"] = m_ser.group(1).upper()
                 break
 
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to scrape GBAtemp page %s: %s", thread_url, exc)
         pass
 
     return result
@@ -794,7 +810,7 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
     * **source_url** — echoes back *post_url*
 
     Returns a dict with the above keys (all empty/empty-list on failure).
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     result: Dict = {
         "title": "",
@@ -900,7 +916,8 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 result["game_serial"] = m_ser.group(1).upper()
                 break
 
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to scrape PS2-Home post %s: %s", post_url, exc)
         pass
 
     return result

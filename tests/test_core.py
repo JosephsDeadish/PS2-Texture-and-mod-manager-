@@ -606,6 +606,66 @@ class TestDownloader(unittest.TestCase):
             self.assertFalse(Path(dest).exists())
 
 
+class TestDownloaderLogging(unittest.TestCase):
+    """Downloader helpers should log unexpected failures before falling back."""
+
+    @patch("src.core.downloader.download_file")
+    def test_fetch_gametdb_art_logs_failure(self, mock_download):
+        from src.core.downloader import fetch_gametdb_art, DownloadError
+
+        mock_download.side_effect = DownloadError("network down")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(fetch_gametdb_art("SLUS-20062", "/tmp"))
+        self.assertTrue(any("Failed to fetch GameTDB art" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_pcsx2_widescreen_patches_logs_failure(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(list_pcsx2_widescreen_patches(), [])
+        self.assertTrue(any("Failed to list PCSX2 widescreen patches" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_pcsx2_patches_by_crc_logs_failure(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_head.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+        self.assertTrue(any("Failed to check PCSX2 patch" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape PS2-Home post" in msg for msg in logs.output))
+
+
 class TestArchiveExtraction(unittest.TestCase):
     """Tests for archive extraction utilities."""
 
