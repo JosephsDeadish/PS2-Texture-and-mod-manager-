@@ -35,6 +35,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -42,6 +43,8 @@ from pathlib import Path
 from typing import List, Optional, Set
 
 from src.models.mod import ModType
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -70,8 +73,8 @@ def _dir_size_and_count(path: Path):
                     count += 1
                 except OSError:
                     pass
-    except PermissionError:
-        pass
+    except PermissionError as exc:
+        logger.warning("Could not read files under %s: %s", path, exc)
     return total, count
 
 
@@ -98,7 +101,8 @@ def _game_title(serial: str) -> str:
     try:
         from src.core.game_registry import lookup_game_title
         return lookup_game_title(serial.upper()) or ""
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up game title for serial %s: %s", serial, exc)
         return ""
 
 
@@ -196,7 +200,8 @@ def scan_pnach(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed PNACH directory %s: %s", root, exc)
         return []
 
     for f in files:
@@ -253,7 +258,8 @@ def scan_cheats(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed cheats directory %s: %s", root, exc)
         return []
 
     for f in files:
@@ -310,7 +316,8 @@ def scan_cover_art(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed cover art directory %s: %s", root, exc)
         return []
 
     for f in files:

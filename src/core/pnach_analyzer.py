@@ -17,11 +17,14 @@ that completely unknown addresses can receive a rough category guess.
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 import struct
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -41,8 +44,8 @@ def _load_db() -> Dict[str, dict]:
     try:
         if _DB_FILE.is_file():
             return json.loads(_DB_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to load PNACH analyzer DB %s: %s", _DB_FILE, exc)
     return {}
 
 
@@ -744,7 +747,8 @@ def get_version_label(game_crc: str) -> Optional[str]:
             from src.core.serial_validator import SerialDatabase as _SDB
             _SERIAL_DB = _SDB()
         return _SERIAL_DB.label_for_crc(game_crc)  # type: ignore[union-attr]
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up version label for %s: %s", game_crc, exc)
         return None
 
 

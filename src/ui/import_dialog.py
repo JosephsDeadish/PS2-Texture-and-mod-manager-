@@ -1,5 +1,6 @@
 """Import and Edit Mod Metadata dialogs for PS2 Mod Manager."""
 
+import logging
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
@@ -22,6 +23,8 @@ from PyQt6.QtWidgets import (
 )
 
 from src.models.mod import ModInfo, ModType
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -292,8 +295,8 @@ class ImportModDialog(QDialog):
                         QTimer.singleShot(0, _update)
 
                     threading.Thread(target=_online_lookup, daemon=True).start()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not inspect import source %s: %s", path, exc)
 
     def _check_replacement_pattern(self, path: str) -> None:
         """Show a hint if the selected path looks like a 'replacement'-named pack.
@@ -329,8 +332,8 @@ class ImportModDialog(QDialog):
                     top_names = {n.split("/")[0].lower() for n in names}
                     if "replacement" in top_names or "replacements" in top_names:
                         needs_hint = True
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Could not inspect archive %s for replacement folders: %s", p, exc)
 
         if needs_hint:
             self._replacement_hint.show()
@@ -361,7 +364,8 @@ class ImportModDialog(QDialog):
                 find_multipart_parts,
                 check_multipart_completeness,
             )
-        except ImportError:
+        except ImportError as exc:
+            logger.warning("Could not import archive helpers for multipart detection: %s", exc)
             return
 
         if not is_multipart_archive(path):
@@ -481,8 +485,8 @@ class EditModDialog(QDialog):
             from src.core.game_registry import serial_to_display
             if self.mod.game_id:
                 self._gameid_edit.setToolTip(serial_to_display(self.mod.game_id))
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.warning("Could not import game registry for edit dialog: %s", exc)
         form.addRow("Game ID:", self._gameid_edit)
 
         self._tags_edit = QLineEdit(", ".join(self.mod.tags))

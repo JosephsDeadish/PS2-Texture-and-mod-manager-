@@ -29,11 +29,14 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import datetime
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
+
+logger = logging.getLogger(__name__)
 
 # Sub-directory name (relative to the exe directory) used for all archives.
 BACKUP_SUBDIR = "backups"
@@ -189,7 +192,8 @@ def list_backups(config) -> List[BackupEntry]:
         try:
             with zipfile.ZipFile(zp) as zf:
                 size_bytes = sum(i.file_size for i in zf.infolist())
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to inspect backup archive %s: %s", zp, exc)
             size_bytes = stat.st_size
 
         entries.append(
@@ -284,5 +288,6 @@ def delete_backup(entry: BackupEntry) -> bool:
     try:
         Path(entry.path).unlink()
         return True
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to delete backup %s: %s", entry.path, exc)
         return False

@@ -185,7 +185,8 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
             m = _PNACH_PATCH_LINE_RE.match(line)
             if m:
                 addresses.add(m.group(1).upper())
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not read PNACH addresses from %s: %s", path, exc)
         pass
     return addresses
 
@@ -198,7 +199,8 @@ def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
     """
     try:
         from src.core.pnach import parse_pnach
-    except Exception:
+    except Exception as exc:
+        logger.warning("Could not import PNACH parser for %s: %s", path, exc)
         return set()
     try:
         parsed = parse_pnach(str(path))
@@ -227,7 +229,8 @@ def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
         return 0, 0
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not read PNACH file %s: %s", path, exc)
         return 0, 0
 
     removed = 0
@@ -249,7 +252,8 @@ def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
 
     try:
         path.write_text("\n".join(kept_lines) + ("\n" if kept_lines else ""), encoding="utf-8")
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not write PNACH file %s: %s", path, exc)
         return 0, 0
     return removed, remaining_patches
 
@@ -289,7 +293,8 @@ def _files_identical(p_file: Path, c_file: Path) -> bool:
     try:
         if p_file.stat().st_size != c_file.stat().st_size:
             return False
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not compare PNACH file sizes for %s and %s: %s", p_file, c_file, exc)
         pass
     p_hash = _hash_file(p_file)
     c_hash = _hash_file(c_file)
@@ -383,7 +388,8 @@ def resolve_pnach_conflicts(
                 crc = _crc_from_pnach_name(f)
                 if crc:
                     result[crc] = f
-        except PermissionError:
+        except PermissionError as exc:
+            logger.warning("Could not scan PNACH directory %s: %s", directory, exc)
             pass
         return result
 
@@ -479,7 +485,8 @@ def resolve_cover_art_conflicts(cover_art_path: str) -> List[Conflict]:
     serial_to_files: Dict[str, List[Path]] = {}
     try:
         files = sorted(covers_dir.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan cover art directory %s: %s", covers_dir, exc)
         return conflicts
 
     for f in files:
@@ -538,7 +545,8 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
 
     try:
         serial_dirs = [d for d in sorted(tex_dir.iterdir()) if d.is_dir()]
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan textures directory %s: %s", tex_dir, exc)
         return conflicts
 
     for serial_dir in serial_dirs:
@@ -560,7 +568,8 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
                     digest = _hash_file(path)
                     if digest:
                         hash_map.setdefault(digest, []).append(path)
-        except PermissionError:
+        except PermissionError as exc:
+            logger.warning("Could not walk replacements directory %s: %s", replacements, exc)
             continue
 
         for digest, files in sorted(hash_map.items()):
@@ -840,7 +849,8 @@ def resolve_texture_overwrite_conflicts(
             d for d in tex_dir.iterdir()
             if d.is_dir() and _is_ps2_serial(d.name)
         )
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan textures directory %s: %s", tex_dir, exc)
         return conflicts
 
     for serial_dir in serial_dirs:
@@ -854,7 +864,8 @@ def resolve_texture_overwrite_conflicts(
             pack_dirs = sorted(
                 d for d in replacements.iterdir() if d.is_dir()
             )
-        except PermissionError:
+        except PermissionError as exc:
+            logger.warning("Could not scan replacements directory %s: %s", replacements, exc)
             continue
 
         if len(pack_dirs) < 2:

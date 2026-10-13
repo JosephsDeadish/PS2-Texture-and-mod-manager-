@@ -1756,6 +1756,16 @@ class TestGameRegistryExpanded(unittest.TestCase):
         serials = [s for s, _ in hits]
         self.assertEqual(serials, sorted(serials))
 
+    def test_title_to_serials_logs_when_alias_lookup_fails(self):
+        from src.core.game_registry import title_to_serials
+
+        with patch("src.core.serial_validator.SerialDatabase", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.game_registry", level="WARNING") as cm:
+                hits = title_to_serials("God of War")
+
+        self.assertGreater(len(hits), 0)
+        self.assertTrue(any("Failed to resolve serial aliases" in msg for msg in cm.output))
+
     # ------------------------------------------------------------------
     # Expanded _KNOWN_SERIALS coverage
     # ------------------------------------------------------------------
@@ -4984,6 +4994,19 @@ class TestPnachAnalyzer(unittest.TestCase):
         n = reload_db()
         self.assertGreater(n, 0)
 
+    def test_reload_db_logs_when_database_is_invalid(self):
+        from src.core import pnach_analyzer as pa
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "known_addresses.json"
+            bad_db.write_text("{not-json", encoding="utf-8")
+            with patch.object(pa, "_DB_FILE", bad_db):
+                with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                    count = pa.reload_db()
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("Failed to load PNACH analyzer DB" in msg for msg in cm.output))
+
     def test_db_file_exists(self):
         db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
         self.assertTrue(db_path.is_file(), "known_addresses.json should exist")
@@ -6396,6 +6419,16 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         serials = [p.serial for p in result]
         self.assertEqual(serials, sorted(serials))
 
+    def test_permission_error_logs_warning(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+
+        with patch("src.core.texture_scanner.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.texture_scanner", level="WARNING") as cm:
+                result = scan_unmanaged_texture_packs(self.tmpdir)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("Could not scan texture pack root" in msg for msg in cm.output))
+
 
 # ---------------------------------------------------------------------------
 # Tests for installed_scanner
@@ -6456,6 +6489,16 @@ class TestInstalledScanner(unittest.TestCase):
         fp = self._make_pnach(self.tmpdir, "11223344")
         result = scan_pnach(self.tmpdir, managed_paths={str(fp.resolve())})
         self.assertEqual(result, [])
+
+    def test_scan_pnach_permission_error_logs_warning(self):
+        from src.core.installed_scanner import scan_pnach
+
+        with patch("src.core.installed_scanner.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as cm:
+                result = scan_pnach(self.tmpdir)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("Could not scan installed PNACH directory" in msg for msg in cm.output))
 
     # scan_cheats ---------------------------------------------------------
 
@@ -7431,6 +7474,36 @@ class TestBackupManager(unittest.TestCase):
         create_backup(self.cfg, note="second")
         entries = list_backups(self.cfg)
         self.assertEqual(len(entries), 2)
+
+    def test_list_backups_logs_when_archive_is_corrupt(self):
+        from src.core.backup_manager import get_backup_dir, list_backups
+
+        backup_dir = get_backup_dir(self.cfg)
+        archive = backup_dir / "backup_20250101_000000.zip"
+        archive.write_bytes(b"not-a-zip")
+
+        with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+            entries = list_backups(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        self.assertTrue(any("Failed to inspect backup archive" in msg for msg in cm.output))
+
+    def test_delete_backup_logs_when_unlink_fails(self):
+        from src.core.backup_manager import BackupEntry, delete_backup
+
+        entry = BackupEntry(
+            path="/tmp/missing.zip",
+            label="missing.zip",
+            created_at="2025-01-01T00:00:00",
+            size_bytes=0,
+        )
+
+        with patch("pathlib.Path.unlink", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+                ok = delete_backup(entry)
+
+        self.assertFalse(ok)
+        self.assertTrue(any("Failed to delete backup" in msg for msg in cm.output))
 
     def test_list_backups_newest_first(self):
         """list_backups must return entries newest-first."""
@@ -10831,6 +10904,16 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         tmp_files = [f for f in parent.iterdir() if "loadorder_tmp" in f.name]
         self.assertEqual(tmp_files, [])
 
+    def test_load_invalid_json_logs_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        Path(self.order_file).write_text("{not-json", encoding="utf-8")
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as cm:
+            lom = LoadOrderManager(self.order_file)
+
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+        self.assertTrue(any("Failed to load load-order file" in msg for msg in cm.output))
+
     def test_clear_removes_all(self):
         from src.core.load_order_manager import LoadOrderManager
         lom = LoadOrderManager(self.order_file)
@@ -11070,6 +11153,16 @@ class TestWave53ModProfiles(unittest.TestCase):
         parent = Path(self.profiles_file).parent
         tmp_files = [f for f in parent.iterdir() if "profiles_tmp" in f.name]
         self.assertEqual(tmp_files, [])
+
+    def test_load_invalid_json_logs_warning(self):
+        from src.core.mod_profile import ModProfileManager
+
+        Path(self.profiles_file).write_text("{not-json", encoding="utf-8")
+        with self.assertLogs("src.core.mod_profile", level="WARNING") as cm:
+            pm = ModProfileManager(self.profiles_file)
+
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertTrue(any("Failed to load mod profiles file" in msg for msg in cm.output))
 
     def test_reload_preserves_load_order(self):
         from src.core.mod_profile import ModProfileManager

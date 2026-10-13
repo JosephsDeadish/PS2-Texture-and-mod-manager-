@@ -51,11 +51,14 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import json
 import os
 import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class LoadOrderManager:
@@ -90,8 +93,8 @@ class LoadOrderManager:
                 for serial, lst in orders.items():
                     if isinstance(lst, list):
                         self._orders[serial] = [str(x) for x in lst]
-        except (json.JSONDecodeError, TypeError):
-            pass
+        except (json.JSONDecodeError, TypeError) as exc:
+            logger.warning("Failed to load load-order file %s: %s", self._path, exc)
 
     def save(self) -> None:
         """Persist the current load orders to disk atomically."""

@@ -47,12 +47,15 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import json
 import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -186,8 +189,8 @@ class ModProfileManager:
             active = raw.get("active_profile")
             if active and active in self._profiles:
                 self._active = active
-        except (json.JSONDecodeError, TypeError):
-            pass
+        except (json.JSONDecodeError, TypeError) as exc:
+            logger.warning("Failed to load mod profiles file %s: %s", self._path, exc)
 
     def save(self) -> None:
         """Persist all profiles to disk atomically."""

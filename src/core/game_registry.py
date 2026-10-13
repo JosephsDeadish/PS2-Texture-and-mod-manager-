@@ -48,9 +48,12 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -820,7 +823,8 @@ def _load_pal_serials() -> dict[str, str]:
         return {}
     try:
         raw = _json.loads(_pal_db.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to load PAL serial database %s: %s", _pal_db, exc)
         return {}
     result: dict[str, str] = {}
     for title, info in raw.get("games", {}).items():
@@ -841,7 +845,8 @@ def _load_japan_serials() -> dict[str, str]:
         return {}
     try:
         raw = _json.loads(_jp_db.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to load Japan serial database %s: %s", _jp_db, exc)
         return {}
     result: dict[str, str] = {}
     for title, info in raw.get("games", {}).items():
@@ -862,7 +867,8 @@ def _load_ntsc_u_serials() -> dict[str, str]:
         return {}
     try:
         raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to load NTSC-U serial database %s: %s", _db, exc)
         return {}
     result: dict[str, str] = {}
     for title, info in raw.get("games", {}).items():
@@ -883,7 +889,8 @@ def _load_demos_serials() -> dict[str, str]:
         return {}
     try:
         raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to load demo serial database %s: %s", _db, exc)
         return {}
     result: dict[str, str] = {}
     for title, info in raw.get("games", {}).items():
@@ -961,7 +968,8 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
             continue
         try:
             raw = _json.loads(fp.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to load informative serial JSON %s: %s", fp, exc)
             continue
         if not isinstance(raw, dict):
             continue
@@ -993,8 +1001,8 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                 title = parts[1].strip()
                 if serial and title and serial not in result:
                     result[serial] = title
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to parse informative serial TXT %s: %s", txt_fp, exc)
 
     # HTML table: first <td> is title, GAME ID appears in one of the <center> cells.
     htm_fp = root / "PS2.ID.List.02.13.20.htm"
@@ -1027,8 +1035,8 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                         break
                 if serial and serial not in result:
                     result[serial] = title
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to parse informative serial HTML %s: %s", htm_fp, exc)
 
     # If a malformed 4-digit numeric variant exists alongside its canonical
     # 5-digit counterpart (e.g. ALCH-0004 + ALCH-00004), keep only canonical.
@@ -1090,8 +1098,8 @@ def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> s
             serial = _parse_serial(text)
             if serial:
                 return serial
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to inspect serial content in %s: %s", filename, exc)
 
     return ""
 
@@ -1277,8 +1285,8 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
                 serial = _sdb.get_serial(title)
                 if serial:
                     pairs.add((serial, title))
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to resolve serial aliases for %r: %s", title_fragment, exc)
     return sorted(pairs, key=lambda x: x[0])
 
 

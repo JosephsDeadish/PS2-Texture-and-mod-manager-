@@ -27,11 +27,14 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Set
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # PS2 serial pattern
@@ -58,8 +61,8 @@ def _dir_size_and_count(path: Path):
                     count += 1
                 except OSError:
                     pass
-    except PermissionError:
-        pass
+    except PermissionError as exc:
+        logger.warning("Could not read files under %s: %s", path, exc)
     return total, count
 
 
@@ -154,14 +157,16 @@ def scan_unmanaged_texture_packs(
     # Try to import game registry for title lookup
     try:
         from src.core.game_registry import lookup_game_title as get_game_title
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to import game registry for texture scanning: %s", exc)
         get_game_title = None  # type: ignore[assignment]
 
     results: List[UnmanagedPack] = []
 
     try:
         candidates = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan texture pack root %s: %s", root, exc)
         return []
 
     for serial_dir in candidates:
@@ -187,7 +192,8 @@ def scan_unmanaged_texture_packs(
         if get_game_title is not None:
             try:
                 suggested = get_game_title(serial_dir.name.upper()) or ""
-            except Exception:
+            except Exception as exc:
+                logger.warning("Failed to look up game title for texture serial %s: %s", serial_dir.name, exc)
                 suggested = ""
 
         results.append(
