@@ -264,6 +264,14 @@ class TestModDatabase(unittest.TestCase):
         self.assertEqual(db.get("good").name, "Good Mod")
         self.assertIsNone(db.get("bad"))
 
+    def test_load_with_corrupted_json_returns_empty(self):
+        import src.core.config_manager as cm
+
+        cm.MODS_DB_FILE.write_text("{not valid json", encoding="utf-8")
+
+        db = self._make_db()
+        self.assertEqual(db.all(), [])
+
     def test_save_is_atomic(self):
         """ModDatabase.save() must not corrupt the DB file on failure."""
         import json

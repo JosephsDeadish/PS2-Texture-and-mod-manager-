@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import logging
 import os
 import re
 import shutil
@@ -13,6 +14,8 @@ from typing import Dict, List, Optional, Tuple
 import src.core.config_manager as _cfg
 from src.core.archive import ArchiveError, extract_archive, is_archive
 from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -82,10 +85,11 @@ class ModDatabase:
                 for k, v in raw.items():
                     try:
                         mods[k] = ModInfo.from_dict(v)
-                    except (KeyError, TypeError, ValueError):
-                        pass  # skip corrupt individual entries
+                    except (KeyError, TypeError, ValueError) as exc:
+                        logger.warning("Skipping corrupt mod entry %s: %s", k, exc)
                 self._mods = mods
-            except (json.JSONDecodeError, TypeError):
+            except (json.JSONDecodeError, TypeError) as exc:
+                logger.warning("Failed to load mod database %s: %s", db_file, exc)
                 self._mods = {}
 
     def save(self):
