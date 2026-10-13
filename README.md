@@ -172,11 +172,11 @@ The CI workflow (`.github/workflows/build.yml`) builds automatically when a `v*`
 ## 🧪 Running Tests
 
 ```bash
-pip install pytest
-python -m pytest tests/ -v
+pip install -r requirements.txt
+python -m unittest discover -q
 ```
 
-258 unit tests covering core logic, catalogue integrity, multi-part archive detection,
+Unit tests covering core logic, catalogue integrity, multi-part archive detection,
 texture structure normalization, PNACH merging, memory card operations, and more.
 
 ---
