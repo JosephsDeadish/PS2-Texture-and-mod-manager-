@@ -8131,22 +8131,31 @@ class TestSerialDatabase(unittest.TestCase):
         )
 
     def test_demo_collisions_keep_retail_canonical(self):
-        """Exact-title demo collisions should not displace retail canonical entries."""
+        """Exact-title demo collisions should resolve to the intended canonical entry."""
         cases = [
-            ("Final Fantasy XII", "SLUS-20963"),
-            ("Need for Speed: Underground", "SLUS-20811"),
-            ("Need for Speed: Underground 2", "SLUS-21065"),
-            ("SOCOM: U.S. Navy SEALs", "SCUS-97134"),
-            ("Smash Court Tennis: Pro Tournament 2 (PAL)", "SCES-52423"),
-            ("Tony Hawk's Underground 2", "SLUS-20965"),
-            ("WWF SmackDown! Just Bring It (PAL)", "SLES-50477"),
+            ("Ace Combat: Squadron Leader (PAL)", "SCED-53081", "demo"),
+            ("Burnout 3: Takedown", "SLUS-21050", "retail"),
+            ("Fight Night Round 2", "SLUS-21161", "retail"),
+            ("Final Fantasy XII", "SLUS-20963", "retail"),
+            ("NBA Street Vol. 2", "SLUS-20651", "retail"),
+            ("NCAA Final Four 2003", "SCUS-97204", "retail"),
+            ("Need for Speed: Underground", "SLUS-20811", "retail"),
+            ("Need for Speed: Underground 2", "SLUS-21065", "retail"),
+            ("Prince of Persia: Warrior Within", "SLUS-21022", "retail"),
+            ("Ratchet & Clank 3 (PAL)", "SCES-52456", "retail"),
+            ("SOCOM: U.S. Navy SEALs", "SCUS-97134", "retail"),
+            ("Smash Court Tennis: Pro Tournament 2 (PAL)", "SCES-52423", "retail"),
+            ("Tekken 5", "SLUS-21059", "retail"),
+            ("Tony Hawk's Underground", "SLUS-20731", "retail"),
+            ("Tony Hawk's Underground 2", "SLUS-20965", "retail"),
+            ("WWF SmackDown! Just Bring It (PAL)", "SLES-50477", "retail"),
         ]
-        for title, serial in cases:
+        for title, serial, disc_type in cases:
             with self.subTest(title=title):
                 info = self.sdb.get_info(title)
                 self.assertIsNotNone(info)
                 self.assertEqual(info.serial, serial)
-                self.assertEqual(info.disc_type, "retail")
+                self.assertEqual(info.disc_type, disc_type)
 
     # ------------------------------------------------------------------
     # is_valid / is_known helpers
