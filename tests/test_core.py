@@ -7265,8 +7265,10 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
 
     def test_nonexistent_root_returns_empty(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
-        result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
+        with self.assertLogs("src.core.texture_scanner", level="WARNING") as logs:
+            result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
         self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
 
     def test_finds_texture_pack_with_replacements_subdir(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
@@ -7428,6 +7430,13 @@ class TestInstalledScanner(unittest.TestCase):
         from src.core.installed_scanner import scan_pnach
         self.assertEqual(scan_pnach(""), [])
 
+    def test_scan_pnach_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_pnach
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_pnach("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
+
     def test_scan_pnach_finds_crc_file(self):
         from src.core.installed_scanner import scan_pnach
         self._make_pnach(self.tmpdir, "AABBCCDD")
@@ -7464,6 +7473,13 @@ class TestInstalledScanner(unittest.TestCase):
         from src.core.installed_scanner import scan_cheats
         self.assertEqual(scan_cheats(""), [])
 
+    def test_scan_cheats_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_cheats
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_cheats("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
+
     def test_scan_cheats_finds_widescreen_pnach(self):
         from src.core.installed_scanner import scan_cheats
         from src.models.mod import ModType
@@ -7478,6 +7494,13 @@ class TestInstalledScanner(unittest.TestCase):
     def test_scan_cover_art_empty_path(self):
         from src.core.installed_scanner import scan_cover_art
         self.assertEqual(scan_cover_art(""), [])
+
+    def test_scan_cover_art_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_cover_art
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_cover_art("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
 
     def test_scan_cover_art_finds_png(self):
         from src.core.installed_scanner import scan_cover_art

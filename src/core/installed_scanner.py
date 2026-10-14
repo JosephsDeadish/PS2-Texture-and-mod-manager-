@@ -198,6 +198,7 @@ def scan_pnach(
         return []
     root = Path(pnach_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed PNACH directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
@@ -256,6 +257,7 @@ def scan_cheats(
         return []
     root = Path(cheats_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed cheats directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
@@ -314,6 +316,7 @@ def scan_cover_art(
         return []
     root = Path(cover_art_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed cover art directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}

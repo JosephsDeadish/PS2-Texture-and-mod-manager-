@@ -154,6 +154,7 @@ def scan_unmanaged_texture_packs(
 
     root = Path(textures_root)
     if not root.is_dir():
+        logger.warning("Could not scan texture pack root %s: not a directory", root)
         return []
 
     managed = set()
