@@ -173,8 +173,8 @@ class TextureHashDB:
             for rec in raw.get("entries", []):
                 entry = TextureEntry.from_dict(rec)
                 self._index(entry)
-        except (json.JSONDecodeError, KeyError, TypeError):
-            pass  # corrupt DB — start fresh
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
+            logger.warning("Failed to load texture hash DB %s: %s", self._db_path, exc)
 
     def save(self) -> None:
         """Persist all entries to disk atomically."""

@@ -1106,6 +1106,16 @@ class TestMultipartArchive(unittest.TestCase):
         Path(p).write_bytes(b"data")
         self.assertEqual(find_multipart_parts(p), [])
 
+    def test_find_logs_permission_errors_and_returns_partial_results(self):
+        from src.core.archive import find_multipart_parts
+
+        with patch("pathlib.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                parts = find_multipart_parts(str(Path(self.tmpdir) / "Pack_Part1.zip"))
+
+        self.assertEqual(parts, [])
+        self.assertTrue(any("Could not inspect multipart archive parts" in msg for msg in logs.output))
+
     # -- check_multipart_completeness ----------------------------------------
 
     def test_complete_set_reports_no_missing(self):
@@ -7924,6 +7934,24 @@ class TestCustomCardBuilder(unittest.TestCase):
         data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
         self.assertEqual(len(data), 2)
 
+    def test_save_entry_logs_and_recovers_from_corrupt_catalogue(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+
+        bad_catalogue = Path(self.tmpdir) / "my_cards.json"
+        bad_catalogue.write_text("{not valid json", encoding="utf-8")
+        entry = build_entry(
+            mod_type="texture_pack", name="Recovering Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+
+        with self.assertLogs("src.core.custom_card_builder", level="WARNING") as logs:
+            path = save_entry(entry, user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(path, bad_catalogue)
+        data = json.loads(bad_catalogue.read_text())
+        self.assertEqual(len(data), 1)
+        self.assertTrue(any("Failed to load custom card catalogue" in msg for msg in logs.output))
+
     def test_save_entry_duplicate_id_gets_new_id(self):
         from src.core.custom_card_builder import build_entry, save_entry
         e = build_entry(
@@ -11742,6 +11770,17 @@ class TestWave53TextureHashDB(unittest.TestCase):
         self.assertEqual(s["broken_count"], 0)
         self.assertEqual(s["duplicate_groups"], 0)
         self.assertEqual(s["overwrite_conflicts"], 0)
+
+    def test_corrupt_db_logs_warning_and_starts_fresh(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        Path(self.db_path).write_text("{not valid json", encoding="utf-8")
+
+        with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+            db = TextureHashDB(self.db_path)
+
+        self.assertEqual(db.stats()["total_entries"], 0)
+        self.assertTrue(any("Failed to load texture hash DB" in msg for msg in logs.output))
 
     def test_all_entries_empty(self):
         from src.core.texture_hash_db import TextureHashDB
