@@ -11810,8 +11810,24 @@ class TestWave53TextureHashDB(unittest.TestCase):
     def test_register_missing_file_marked_broken(self):
         from src.core.texture_hash_db import TextureHashDB
         db = TextureHashDB(self.db_path)
-        entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
+        with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+            entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
         self.assertTrue(entry.broken)
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
+    def test_register_file_logs_hash_failure(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "hashfail.png"
+        tex.write_bytes(b"\x89PNG" + b"\x00" * 200)
+
+        with patch.object(TextureHashDB, "_hash_file", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                entry = db.register_file("hashfail.png", "pack-1", str(tex))
+
+        self.assertTrue(entry.broken)
+        self.assertTrue(any("Could not hash texture file" in msg for msg in logs.output))
 
     def test_register_pack_scans_directory(self):
         from src.core.texture_hash_db import TextureHashDB
@@ -11981,6 +11997,7 @@ class TestWave53TextureHashDB(unittest.TestCase):
                 with self.assertRaises(OSError):
                     db.save()
 
+        self.assertTrue(any("Failed to save texture hash DB" in msg for msg in logs.output))
         self.assertTrue(
             any("Could not remove temporary texture hash file" in msg for msg in logs.output)
         )

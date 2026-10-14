@@ -197,7 +197,8 @@ class TextureHashDB:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.write(data)
             os.replace(tmp, str(self._db_path))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to save texture hash DB %s: %s", self._db_path, exc)
             try:
                 os.unlink(tmp)
             except OSError as exc:
@@ -255,7 +256,8 @@ class TextureHashDB:
         p = Path(file_path)
         try:
             size = p.stat().st_size
-        except OSError:
+        except OSError as exc:
+            logger.warning("Could not stat texture file %s: %s", p, exc)
             size = 0
 
         broken = size < MIN_TEXTURE_BYTES
@@ -265,7 +267,8 @@ class TextureHashDB:
         else:
             try:
                 content_hash = self._hash_file(p)
-            except OSError:
+            except OSError as exc:
+                logger.warning("Could not hash texture file %s: %s", p, exc)
                 content_hash = hashlib.sha256(b"").hexdigest()
                 broken = True
 
