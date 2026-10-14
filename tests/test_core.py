@@ -683,6 +683,18 @@ class TestDownloaderLogging(unittest.TestCase):
         self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_http_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
     def test_list_pcsx2_widescreen_patches_logs_failure(self, mock_get):
         from src.core.downloader import list_pcsx2_widescreen_patches
 
@@ -708,6 +720,18 @@ class TestDownloaderLogging(unittest.TestCase):
         from src.core.downloader import search_pcsx2_patches_by_crc
 
         mock_head.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+        self.assertTrue(any("Failed to check PCSX2 patch" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_pcsx2_patches_by_crc_logs_http_failure(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_head.return_value = mock_resp
+
         with self.assertLogs("src.core.downloader", level="WARNING") as logs:
             self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
         self.assertTrue(any("Failed to check PCSX2 patch" in msg for msg in logs.output))
@@ -8022,6 +8046,16 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].severity, ConflictSeverity.INFO)
         self.assertEqual(conflicts[0].conflict_type, "texture_duplicate_hash")
         self.assertIn("SLUS-20062", conflicts[0].title)
+
+    def test_texture_hash_logs_read_failure(self):
+        from src.core.conflict_resolver import _hash_file
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                digest = _hash_file(Path("/tmp/missing-file"))
+
+        self.assertEqual(digest, "")
+        self.assertTrue(any("Could not hash file" in msg for msg in logs.output))
 
     def test_texture_missing_dir(self):
         from src.core.conflict_resolver import resolve_texture_conflicts

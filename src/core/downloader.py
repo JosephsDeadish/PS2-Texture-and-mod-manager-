@@ -298,6 +298,11 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to look up GameTDB title for %s: HTTP %s",
+                serial_clean,
+                resp.status_code,
+            )
             return ""
         # Parse game title from HTML (GameTDB page title follows pattern "<title>SERIAL - Game Title | GameTDB</title>")
         import re
@@ -421,6 +426,12 @@ def search_pcsx2_patches_by_crc(
                 "filename": filename,
                 "download_url": url,
             }
+        if resp.status_code != 404:
+            logger.warning(
+                "Failed to check PCSX2 patch for %s: HTTP %s",
+                crc_upper,
+                resp.status_code,
+            )
         return None
     except Exception as exc:
         logger.warning("Failed to check PCSX2 patch for %s: %s", crc_upper, exc)

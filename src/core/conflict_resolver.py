@@ -792,7 +792,7 @@ def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
             for chunk in iter(lambda: handle.read(chunk_size), b""):
                 hasher.update(chunk)
     except OSError as exc:
-        logger.debug("Failed to hash file %s: %s", path, exc)
+        logger.warning("Could not hash file %s: %s", path, exc)
         return ""
     return hasher.hexdigest()
 
