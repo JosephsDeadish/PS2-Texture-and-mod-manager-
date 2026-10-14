@@ -3782,7 +3782,20 @@ class TestYandexDiskResolver(unittest.TestCase):
         mock_resp.status_code = 200
         mock_resp.json.return_value = {"href": "https://evil.example.com/file.bin"}
         mock_get.return_value = mock_resp
-        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("untrusted href" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_missing_href_returns_none_and_logs_warning(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {}
+        mock_get.return_value = mock_resp
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("unusable href" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
     def test_network_error_returns_none(self, mock_get):

@@ -564,6 +564,11 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
         data = resp.json()
         href = data.get("href", "")
         if not (isinstance(href, str) and href.startswith(("http://", "https://"))):
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: unusable href %r",
+                page_url,
+                href,
+            )
             return None
         try:
             href_netloc = urllib.parse.urlparse(href).netloc.lower()
@@ -576,6 +581,11 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             or href_netloc == "yandex.ru"
             or href_netloc == "yandex.net"
         ):
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: untrusted href %s",
+                page_url,
+                href,
+            )
             return None
         return href
     except Exception as exc:
