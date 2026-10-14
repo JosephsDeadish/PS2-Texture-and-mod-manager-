@@ -1861,6 +1861,46 @@ class TestWidgetsLogging(unittest.TestCase):
         fake._list_widget.clear.assert_called_once()
         fake._title_label.setText.assert_called()
 
+    def test_pnach_builder_logs_invalid_custom_value_and_falls_back(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import PnachCodeBuilderDialog
+
+            fake = SimpleNamespace(
+                _patch_widgets=[{
+                    "check": MagicMock(),
+                    "value_combo": MagicMock(),
+                    "custom_edit": MagicMock(),
+                    "value_type": "int",
+                    "crc": "AABBCCDD",
+                    "proc": "EE",
+                    "addr": "00123456",
+                    "description": "Test patch",
+                    "value_map": {"00000006": "Option"},
+                    "exclusion_group": "",
+                    "exclusion_note": "",
+                    "patch_type": "word",
+                    "verification_status": "estimated",
+                    "code_method": "static_write",
+                }]
+            )
+            fake._patch_widgets[0]["check"].isChecked.return_value = True
+            fake._patch_widgets[0]["custom_edit"].text.return_value = "not-a-number"
+            fake._patch_widgets[0]["value_combo"].isEnabled.return_value = True
+            fake._patch_widgets[0]["value_combo"].currentData.return_value = "00000006"
+
+            with patch("src.core.pnach_analyzer.value_to_pnach_hex", return_value=(None, "invalid int")):
+                with patch("src.core.pnach_analyzer.check_exclusion_conflicts", return_value=[]):
+                    with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                        selected, conflicts = PnachCodeBuilderDialog._collect_selected_patches(fake)
+
+        self.assertEqual(conflicts, [])
+        self.assertEqual(selected[0]["value"], "00000006")
+        self.assertTrue(any("Could not convert custom PNACH value" in msg for msg in logs.output))
+
 
 class TestAssetPaths(unittest.TestCase):
     """Tests for src.core.assets path helpers."""

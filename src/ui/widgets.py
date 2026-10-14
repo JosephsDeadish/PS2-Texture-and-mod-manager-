@@ -2366,8 +2366,12 @@ class PnachCodeBuilderDialog(QDialog):
                     if hx:
                         hex_val = hx
                     else:
-                        # Invalid custom input — fall through to dropdown
-                        pass
+                        logger.warning(
+                            "Could not convert custom PNACH value for %s (%s): %s",
+                            pw.get("description", ""),
+                            pw.get("addr", ""),
+                            err or raw,
+                        )
 
             # 2. Dropdown option (used when custom is empty or invalid)
             if hex_val == "00000000":
