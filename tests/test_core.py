@@ -7073,6 +7073,32 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         self.assertEqual(result, [])
         self.assertTrue(any("Could not scan texture pack root" in msg for msg in cm.output))
 
+    def test_path_resolution_failures_are_skipped(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+
+        good = self._create_texture_pack("SLUS-20062", ["good.png"])
+        bad_root = Path(self.tmpdir) / "SLES-50000" / "replacements"
+        bad_root.mkdir(parents=True, exist_ok=True)
+        managed_path = Path(self.tmpdir) / "BROKEN-MANAGED"
+
+        orig_resolve = Path.resolve
+
+        def resolve_side_effect(self):
+            if self == bad_root or self == managed_path:
+                raise OSError("resolve failed")
+            return orig_resolve(self)
+
+        with patch("pathlib.Path.resolve", autospec=True, side_effect=resolve_side_effect):
+            with self.assertLogs("src.core.texture_scanner", level="WARNING") as cm:
+                result = scan_unmanaged_texture_packs(
+                    self.tmpdir,
+                    managed_paths={str(managed_path)},
+                )
+
+        self.assertEqual([p.serial for p in result], ["SLUS-20062"])
+        self.assertTrue(any("Could not resolve managed texture path" in msg for msg in cm.output))
+        self.assertTrue(any("Could not resolve texture pack path" in msg for msg in cm.output))
+
 
 # ---------------------------------------------------------------------------
 # Tests for installed_scanner

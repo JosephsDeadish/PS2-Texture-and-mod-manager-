@@ -156,7 +156,12 @@ def scan_unmanaged_texture_packs(
     if not root.is_dir():
         return []
 
-    managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
+    managed = set()
+    for p in (managed_paths or set()):
+        try:
+            managed.add(str(Path(p).resolve()))
+        except Exception as exc:
+            logger.warning("Could not resolve managed texture path %s: %s", p, exc)
 
     # Try to import game registry for title lookup
     try:
@@ -184,7 +189,11 @@ def scan_unmanaged_texture_packs(
             # Some packs store textures directly under the serial folder
             replacements = serial_dir
 
-        resolved = str(replacements.resolve())
+        try:
+            resolved = str(replacements.resolve())
+        except Exception as exc:
+            logger.warning("Could not resolve texture pack path %s: %s", replacements, exc)
+            continue
         if resolved in managed:
             continue
 
