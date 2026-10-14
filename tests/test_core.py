@@ -1830,6 +1830,46 @@ class TestWidgetsLogging(unittest.TestCase):
         critical.assert_called_once()
         fake.accept.assert_not_called()
 
+    def test_custom_card_validation_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import CustomCardDialog
+
+            fake = SimpleNamespace(
+                _type_combo=MagicMock(),
+                _name_edit=MagicMock(),
+                _game_edit=MagicMock(),
+                _serial_edit=MagicMock(),
+                _author_edit=MagicMock(),
+                _url_edit=MagicMock(),
+                _desc_edit=MagicMock(),
+                _source_edit=MagicMock(),
+                _size_edit=MagicMock(),
+                _status=MagicMock(),
+                card_created=MagicMock(),
+                accept=MagicMock(),
+            )
+            fake._type_combo.currentData.return_value = "texture_pack"
+            fake._name_edit.text.return_value = "Pack"
+            fake._game_edit.text.return_value = "Game"
+            fake._serial_edit.text.return_value = "SLUS-20062"
+            fake._author_edit.text.return_value = "Author"
+            fake._url_edit.text.return_value = ""
+            fake._desc_edit.toPlainText.return_value = ""
+            fake._source_edit.text.return_value = ""
+            fake._size_edit.text.return_value = ""
+
+            with patch("src.core.custom_card_builder.build_entry", side_effect=ValueError("bad entry")):
+                with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                    CustomCardDialog._on_accept(fake)
+
+        self.assertTrue(any("Could not build custom catalogue card" in msg for msg in logs.output))
+        fake._status.setText.assert_called_once_with("bad entry")
+        fake.accept.assert_not_called()
+
     def test_mod_notes_refresh_failure_logs_warning(self):
         import sys
         from types import SimpleNamespace

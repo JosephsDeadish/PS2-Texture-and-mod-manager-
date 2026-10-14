@@ -2809,6 +2809,7 @@ class CustomCardDialog(QDialog):
                 size_label=size_label,
             )
         except ValueError as exc:
+            logger.warning("Could not build custom catalogue card: %s", exc)
             self._status.setText(str(exc))
             return
 
