@@ -2257,6 +2257,12 @@ class TestGameRegistryExpanded(unittest.TestCase):
         serials = [s for s, _ in hits]
         self.assertEqual(serials, sorted(serials))
 
+    def test_title_to_serials_punctuation_insensitive(self):
+        from src.core.game_registry import title_to_serials
+        hits = title_to_serials("Baldurs Gate")
+        self.assertTrue(any("baldur's gate" in title.lower() for _, title in hits),
+                        f"Expected Baldur's Gate hits, got: {hits}")
+
     def test_title_to_serials_logs_when_alias_lookup_fails(self):
         from src.core.game_registry import title_to_serials
 
@@ -19661,6 +19667,13 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         results = self.sdb.search_titles("SotC")
         self.assertTrue(any("shadow of the colossus" in r.lower() for r in results))
 
+    def test_search_titles_punctuation_insensitive(self):
+        results = self.sdb.search_titles("Baldurs Gate")
+        self.assertTrue(
+            any("baldur's gate: dark alliance" in r.lower() for r in results),
+            f"Expected Baldur's Gate results, got: {results}",
+        )
+
     def test_search_titles_dq8(self):
         results = self.sdb.search_titles("DQ8")
         self.assertTrue(any("dragon quest viii" in r.lower() for r in results))
@@ -19732,6 +19745,11 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
 
     def test_title_matches_query_regional_bully(self):
         self.assertTrue(self.sdb.title_matches_query("Bully", "canis canem"))
+
+    def test_title_matches_query_punctuation_insensitive(self):
+        self.assertTrue(
+            self.sdb.title_matches_query("Baldur's Gate: Dark Alliance", "Baldurs Gate")
+        )
 
     def test_title_matches_query_false_when_no_match(self):
         self.assertFalse(self.sdb.title_matches_query("Kingdom Hearts", "DMC3"))

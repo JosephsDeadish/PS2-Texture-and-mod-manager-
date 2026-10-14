@@ -46,6 +46,11 @@ _CAT_DIR      = _REPO_ROOT / "data" / "catalogue"
 _SERIAL_RE = re.compile(r'^[A-Z]{4}-\d{5}$')
 logger = logging.getLogger(__name__)
 
+
+def _normalise_search_text(text: str) -> str:
+    """Return a punctuation-insensitive search key for title/alias matching."""
+    return "".join(ch for ch in text.lower() if ch.isalnum())
+
 # Title aliases that should resolve to the NTSC-U canonical retail entry when
 # loading other regional DBs.  This prevents PAL/JP rows with shortened or
 # punctuation-variant names from becoming the canonical title used by
@@ -105,6 +110,8 @@ class GameInfo:
     # Pre-computed lowercase aliases for fast case-insensitive substring search.
     # Populated automatically by SerialDatabase._load(); not stored in JSON.
     _aliases_lower: List[str] = field(default_factory=list, compare=False, repr=False)
+    # Pre-computed punctuation-insensitive alias keys for broader search matches.
+    _aliases_search_key: List[str] = field(default_factory=list, compare=False, repr=False)
     # Disc classification: "retail" for commercial releases, "demo" for demo/
     # promo discs (SCCD/SLCD, SCED/SLED, SCPD/SLPD, etc.), "kiosk" for store
     # kiosk discs.  Sourced from ps2_demos.json; retail DBs default to "retail".
@@ -259,6 +266,7 @@ class SerialDatabase:
                 existing = self._games.get(title)
                 if existing is None:
                     incoming._aliases_lower = [a.lower() for a in incoming.aliases]
+                    incoming._aliases_search_key = [_normalise_search_text(a) for a in incoming.aliases]
                     self._games[title] = incoming
                     for s in incoming.all_serials():
                         self._serial_to_titles.setdefault(s, []).append(title)
@@ -290,6 +298,7 @@ class SerialDatabase:
                     existing.crc_labels = merged_labels
 
                 existing._aliases_lower = [a.lower() for a in existing.aliases]
+                existing._aliases_search_key = [_normalise_search_text(a) for a in existing.aliases]
 
                 for s in set(existing.all_serials()) - old_serials:
                     self._serial_to_titles.setdefault(s, []).append(title)
@@ -320,6 +329,7 @@ class SerialDatabase:
                     disc_type=disc_type,
                 )
                 gi._aliases_lower = [a.lower() for a in gi.aliases]
+                gi._aliases_search_key = [_normalise_search_text(a) for a in gi.aliases]
                 existing = self._games.get(title)
                 if existing and existing.disc_type == "retail":
                     # Keep specific retail canonical-title overrides pinned to
@@ -436,9 +446,10 @@ class SerialDatabase:
         """Return all game titles whose title *or* any alias contains *query*.
 
         The match is a case-insensitive substring check against the canonical
-        title and every alias stored for that game.  Useful for resolving
-        abbreviations (e.g. "GoW" → ["God of War"]) and regional variant
-        names (e.g. "Dark Chronicle" → ["Dark Cloud 2"]).
+        title and every alias stored for that game, with punctuation removed as
+        a fallback.  Useful for resolving abbreviations (e.g. "GoW" →
+        ["God of War"]) and regional variant names (e.g. "Dark Chronicle" →
+        ["Dark Cloud 2"]).
 
         Examples::
 
@@ -447,14 +458,23 @@ class SerialDatabase:
             sdb.search_titles("gta iii")        # ["Grand Theft Auto III"]
         """
         q = query.strip().lower()
-        if not q:
+        q_key = _normalise_search_text(q)
+        if not q_key:
             return []
         seen: set = set()
         results: List[str] = []
         for title, gi in self._games.items():
             if title in seen:
                 continue
-            if q in title.lower() or any(q in a for a in gi._aliases_lower):
+            title_key = _normalise_search_text(title)
+            if q in title.lower() or q_key in title_key:
+                results.append(title)
+                seen.add(title)
+                continue
+            if any(
+                q in alias_lower or q_key in alias_key
+                for alias_lower, alias_key in zip(gi._aliases_lower, gi._aliases_search_key)
+            ):
                 results.append(title)
                 seen.add(title)
         return sorted(results)
@@ -475,13 +495,19 @@ class SerialDatabase:
             # True — "Dante" appears in the title itself
         """
         q = query.strip().lower()
+        q_key = _normalise_search_text(q)
         if not q:
             return True
-        if q in game_title.lower():
+        if not q_key:
+            return False
+        if q in game_title.lower() or q_key in _normalise_search_text(game_title):
             return True
         gi = self._games.get(game_title)
         if gi:
-            return any(q in a for a in gi._aliases_lower)
+            return any(
+                q in alias_lower or q_key in alias_key
+                for alias_lower, alias_key in zip(gi._aliases_lower, gi._aliases_search_key)
+            )
         return False
 
     def serial_for_crc(self, crc: str) -> Optional[str]:
