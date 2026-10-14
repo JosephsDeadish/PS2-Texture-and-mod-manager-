@@ -312,6 +312,7 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
             # Filter out "GameTDB" itself
             if title and title.lower() not in ("gametdb", "ps2", ""):
                 return title
+        logger.warning("Failed to parse GameTDB title for %s", serial_clean)
         return ""
     except Exception as exc:
         logger.warning("Failed to look up GameTDB title for %s: %s", serial_clean, exc)
@@ -513,6 +514,7 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
         if m2:
             return m2.group(1)
 
+        logger.warning("Failed to resolve MediaFire URL %s: no download link found", page_url)
         return None
     except Exception as exc:
         logger.warning("Failed to resolve MediaFire URL %s: %s", page_url, exc)

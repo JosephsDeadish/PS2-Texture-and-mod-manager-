@@ -695,6 +695,19 @@ class TestDownloaderLogging(unittest.TestCase):
         self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_parse_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><head><title>GameTDB</title></head><body>no title</body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to parse GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
     def test_list_pcsx2_widescreen_patches_logs_failure(self, mock_get):
         from src.core.downloader import list_pcsx2_widescreen_patches
 
@@ -3567,10 +3580,12 @@ class TestMediaFireResolver(unittest.TestCase):
         mock_resp.text = "<html><body><p>No download link here.</p></body></html>"
         mock_get.return_value = mock_resp
 
-        result = resolve_mediafire_url(
-            "https://www.mediafire.com/file/abc/texture.zip/file"
-        )
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = resolve_mediafire_url(
+                "https://www.mediafire.com/file/abc/texture.zip/file"
+            )
         self.assertIsNone(result)
+        self.assertTrue(any("no download link found" in msg for msg in logs.output))
 
 
 # =============================================================================
