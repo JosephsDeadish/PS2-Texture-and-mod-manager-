@@ -41,7 +41,8 @@ def convert_share_url(url: str) -> str:
 
     try:
         parsed = urllib.parse.urlparse(url)
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to inspect share URL %s: %s", url, exc)
         return url
 
     netloc = parsed.netloc.lower()

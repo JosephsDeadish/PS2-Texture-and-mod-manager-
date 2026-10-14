@@ -1,5 +1,6 @@
 """Dashboard panel — overview and quick stats."""
 
+import logging
 import time
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -17,6 +18,8 @@ from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
+
+logger = logging.getLogger(__name__)
 
 
 class StatCard(QFrame):
@@ -226,7 +229,8 @@ class DashboardPanel(BasePanel):
                     try:
                         dt = datetime.fromtimestamp(ts)
                         time_str = dt.strftime("%b %d, %H:%M")
-                    except Exception:
+                    except Exception as exc:
+                        logger.warning("Failed to format recent activity timestamp for %s: %s", mod.id, exc)
                         time_str = ""
                     if time_str:
                         time_lbl = QLabel(time_str)
