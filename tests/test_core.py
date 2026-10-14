@@ -1956,6 +1956,31 @@ class TestWidgetsLogging(unittest.TestCase):
         self.assertEqual(selected[0]["value"], "00000006")
         self.assertTrue(any("Could not convert custom PNACH value" in msg for msg in logs.output))
 
+    def test_pnach_install_logs_write_error(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import PnachCodeBuilderDialog
+
+            fake = SimpleNamespace(
+                _get_pnach_text=MagicMock(return_value=("patch=1,EE,00123456,word,12345678\n", "AABBCCDD")),
+                _dir_edit=MagicMock(),
+            )
+            fake._dir_edit.text.return_value = "/tmp/cheats"
+
+            with patch("os.makedirs") as makedirs:
+                with patch("os.path.exists", return_value=False):
+                    with patch("builtins.open", side_effect=OSError("disk full")):
+                        with patch("src.ui.widgets.QMessageBox.critical") as critical:
+                            with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                                PnachCodeBuilderDialog._install_pnach(fake)
+
+        makedirs.assert_called_once()
+        critical.assert_called_once()
+        self.assertTrue(any("Could not write PNACH file" in msg for msg in logs.output))
+
 
 class TestAssetPaths(unittest.TestCase):
     """Tests for src.core.assets path helpers."""

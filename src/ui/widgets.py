@@ -2617,6 +2617,7 @@ class PnachCodeBuilderDialog(QDialog):
                 "💡 Make sure 'Enable Cheats' is checked in PCSX2 → Game Properties."
             )
         except OSError as exc:
+            logger.warning("Could not write PNACH file %s while installing %s: %s", dest, crc, exc)
             QMessageBox.critical(self, "Write Error", f"Could not write PNACH:\n{exc}")
 
     def _browse_dir(self):
