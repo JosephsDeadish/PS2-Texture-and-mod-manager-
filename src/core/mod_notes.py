@@ -206,8 +206,8 @@ def _save(notes: List[NoteEntry], config=None) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary notes file %s: %s", tmp_path, exc)
         raise
 
 

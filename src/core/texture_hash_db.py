@@ -39,6 +39,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import hashlib
 import json
 import os
@@ -46,6 +47,8 @@ import tempfile
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -197,8 +200,8 @@ class TextureHashDB:
         except Exception:
             try:
                 os.unlink(tmp)
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.warning("Could not remove temporary texture hash file %s: %s", tmp, exc)
             raise
 
     # ------------------------------------------------------------------

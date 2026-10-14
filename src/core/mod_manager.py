@@ -57,8 +57,8 @@ def _atomic_json_write(path: Path, data) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary mod database file %s: %s", tmp_path, exc)
         raise
 
 
@@ -389,6 +389,7 @@ class ModManager:
             return 0, []
 
         target = Path(target_path)
+        cleanup_warnings: List[str] = []
         if target.exists():
             # Remove files that belong to this mod from the target folder
             mod_src = Path(mod.path)
@@ -400,18 +401,23 @@ class ModManager:
                         if deployed_file.exists():
                             try:
                                 deployed_file.unlink()
-                            except OSError:
-                                pass
+                            except OSError as exc:
+                                msg = f"Could not remove deployed file {deployed_file}: {exc}"
+                                logger.warning(msg)
+                                cleanup_warnings.append(msg)
             elif mod_src.is_file():
                 deployed_file = target / mod_src.name
                 if deployed_file.exists():
                     try:
                         deployed_file.unlink()
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        msg = f"Could not remove deployed file {deployed_file}: {exc}"
+                        logger.warning(msg)
+                        cleanup_warnings.append(msg)
 
         # Re-deploy remaining enabled mods so priority ordering is honoured
-        return self.deploy(mod.mod_type, target_path)
+        deployed, warnings = self.deploy(mod.mod_type, target_path)
+        return deployed, cleanup_warnings + warnings
 
     def set_priority(self, mod_id: str, priority: int):
         mod = self.db.get(mod_id)
@@ -560,8 +566,13 @@ class ModManager:
                     shutil.rmtree(str(outer), ignore_errors=True)
                 else:
                     replacements_src.rmdir()
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.warning(
+                    "Could not remove temporary texture folder %s for serial %s: %s",
+                    replacements_src.parent,
+                    serial,
+                    exc,
+                )
         else:
             # Flat structure: move all top-level items into target
             for item in list(dest_dir.iterdir()):

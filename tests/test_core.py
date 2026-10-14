@@ -307,6 +307,21 @@ class TestModDatabase(unittest.TestCase):
         tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
         self.assertEqual(tmp_files, [])
 
+    def test_save_logs_cleanup_warning(self):
+        """Temp-file cleanup failures should be logged before the error escapes."""
+        from src.core.mod_manager import ModDatabase
+
+        db = self._make_db()
+
+        with patch("src.core.mod_manager.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.mod_manager.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    db.save()
+
+        self.assertTrue(any("Could not remove temporary mod database file" in msg for msg in logs.output))
+
 
 class TestModManager(unittest.TestCase):
     """Test ModManager operations."""
@@ -3397,6 +3412,24 @@ class TestSetEnabledAutoDeployBehaviour(unittest.TestCase):
         # After disabling the only mod, no .pnach files should remain
         remaining = [f for f in deploy_dir.iterdir() if f.suffix == ".pnach"]
         self.assertEqual(len(remaining), 0, f"Stale pnach files remain: {remaining}")
+
+    def test_set_enabled_false_logs_cleanup_warning(self):
+        """Undeploy cleanup failures should surface as warnings, not crashes."""
+        deploy_dir = Path(self.tmpdir) / "pcsx2_cheats3"
+        deploy_dir.mkdir()
+
+        db, mgr, mod = self._make_pnach_mod("CAFEBABE")
+        config = AppConfig(pnach_path=str(deploy_dir))
+
+        mgr.set_enabled(mod.id, True, config)
+
+        with patch("pathlib.Path.unlink", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                count, warnings = mgr.set_enabled(mod.id, False, config)
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("Could not remove deployed file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove deployed file" in msg for msg in warnings))
 
     def test_set_enabled_no_path_returns_warning(self):
         """When config path is empty, a warning is returned (no crash)."""
@@ -8985,6 +9018,24 @@ class TestDownloadHistory(unittest.TestCase):
         data = json.loads(history_path.read_text(encoding="utf-8"))
         self.assertEqual(data, original_json)
 
+    def test_save_logs_cleanup_warning(self):
+        from src.core.download_history import HistoryEntry, _save
+
+        entries = [
+            HistoryEntry(id="1", timestamp="t", mod_name="A", mod_type="pnach"),
+        ]
+
+        with patch("src.core.download_history.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.download_history.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    _save(entries, self.cfg)
+
+        self.assertTrue(
+            any("Could not remove temporary download history file" in msg for msg in logs.output)
+        )
+
 
 
 class TestModNotes(unittest.TestCase):
@@ -9249,6 +9300,22 @@ class TestModNotes(unittest.TestCase):
                     mod_type="pnach", text="x")
         clear_notes(self.cfg)
         self.assertEqual(list_notes(self.cfg), [])
+
+    def test_save_logs_cleanup_warning(self):
+        from src.core.mod_notes import NoteEntry, _save
+
+        notes = [
+            NoteEntry(id="1", entry_id="e1", entry_title="Entry", mod_type="pnach", text="note"),
+        ]
+
+        with patch("src.core.mod_notes.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.mod_notes.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    _save(notes, self.cfg)
+
+        self.assertTrue(any("Could not remove temporary notes file" in msg for msg in logs.output))
 
     # --- export_notes_csv --------------------------------------------------
 
@@ -11752,6 +11819,22 @@ class TestWave53TextureHashDB(unittest.TestCase):
         parent = Path(self.db_path).parent
         tmp_files = [f for f in parent.iterdir() if "texhash_tmp" in f.name]
         self.assertEqual(tmp_files, [])
+
+    def test_save_logs_cleanup_warning(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        db = TextureHashDB(self.db_path)
+
+        with patch("src.core.texture_hash_db.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.texture_hash_db.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    db.save()
+
+        self.assertTrue(
+            any("Could not remove temporary texture hash file" in msg for msg in logs.output)
+        )
 
     def test_stats_reflect_registered_entries(self):
         from src.core.texture_hash_db import TextureHashDB

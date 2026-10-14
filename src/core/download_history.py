@@ -249,8 +249,8 @@ def _save(entries: List[HistoryEntry], config=None) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary download history file %s: %s", tmp_path, exc)
         raise
 
 
