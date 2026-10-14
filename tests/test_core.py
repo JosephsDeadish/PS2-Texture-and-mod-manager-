@@ -1344,8 +1344,54 @@ class TestImportDialogLogging(unittest.TestCase):
                         ImportModDialog._check_replacement_pattern(fake, str(archive))
 
         self.assertTrue(any("Could not inspect archive" in msg for msg in logs.output))
-        fake._replacement_hint.hide.assert_called()
-        fake._gameid_edit.setStyleSheet.assert_called_with("")
+        fake._replacement_hint.show.assert_called()
+        fake._replacement_hint.setText.assert_called()
+        fake._replacement_hint.setStyleSheet.assert_called()
+
+    def test_multipart_archive_failure_logs_and_shows_warning(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+        qtcore.QTimer = type("QTimer", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+            "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QIcon = type("QIcon", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.import_dialog import ImportModDialog
+
+            fake = type("FakeDialog", (), {})()
+            fake._multipart_hint = MagicMock()
+
+            with patch("src.core.archive.is_multipart_archive", return_value=True):
+                with patch(
+                    "src.core.archive.check_multipart_completeness",
+                    side_effect=RuntimeError("boom"),
+                ):
+                    with self.assertLogs("src.ui.import_dialog", level="WARNING") as logs:
+                        ImportModDialog._check_multipart_archive(fake, "/tmp/archive.zip")
+
+        self.assertTrue(any("Could not inspect multipart archive" in msg for msg in logs.output))
+        fake._multipart_hint.setText.assert_called()
+        fake._multipart_hint.show.assert_called()
 
 
 class TestSettingsDialogSaveFailures(unittest.TestCase):

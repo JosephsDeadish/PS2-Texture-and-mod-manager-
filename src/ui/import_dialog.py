@@ -334,6 +334,16 @@ class ImportModDialog(QDialog):
                         needs_hint = True
             except Exception as exc:
                 logger.warning("Could not inspect archive %s for replacement folders: %s", p, exc)
+                self._replacement_hint.setStyleSheet(
+                    "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
+                    "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+                )
+                self._replacement_hint.setText(
+                    "⚠  Could not inspect this archive for replacement folders.\n"
+                    "If this is a texture pack, please verify the archive contents manually or select the extracted folder."
+                )
+                self._replacement_hint.show()
+                return
 
         if needs_hint:
             self._replacement_hint.show()
@@ -361,18 +371,40 @@ class ImportModDialog(QDialog):
         try:
             from src.core.archive import (
                 is_multipart_archive,
-                find_multipart_parts,
                 check_multipart_completeness,
             )
         except ImportError as exc:
             logger.warning("Could not import archive helpers for multipart detection: %s", exc)
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+            self._multipart_hint.setText(
+                "⚠  Could not inspect this archive for multipart parts.\n"
+                "If this is a split archive, make sure all parts are in the same folder."
+            )
+            self._multipart_hint.show()
             return
 
-        if not is_multipart_archive(path):
-            self._multipart_hint.hide()
+        try:
+            if not is_multipart_archive(path):
+                self._multipart_hint.hide()
+                return
+
+            is_complete, parts, missing = check_multipart_completeness(path)
+        except Exception as exc:
+            logger.warning("Could not inspect multipart archive %s: %s", path, exc)
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+            self._multipart_hint.setText(
+                "⚠  Could not inspect this archive for multipart parts.\n"
+                "If this looks like a split archive, make sure all parts are in the same folder."
+            )
+            self._multipart_hint.show()
             return
 
-        is_complete, parts, missing = check_multipart_completeness(path)
         count = len(parts)
 
         part_names = [Path(p).name for p in parts]
