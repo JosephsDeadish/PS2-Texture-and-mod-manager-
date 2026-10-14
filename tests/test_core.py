@@ -5505,6 +5505,26 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertTrue(ann["inferred"])
         self.assertIn("category", ann)
 
+    def test_infer_category_logs_float_parse_failure(self):
+        from src.core import pnach_analyzer as pa
+
+        with patch.object(pa.struct, "pack", side_effect=pa.struct.error("boom")):
+            with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                cat = pa.infer_category("003B2340", "3FAB851F", "word")
+
+        self.assertEqual(cat, "physics")
+        self.assertTrue(any("Could not interpret PNACH value" in msg for msg in cm.output))
+
+    def test_interpret_value_logs_float_parse_failure(self):
+        from src.core import pnach_analyzer as pa
+
+        with patch.object(pa.struct, "unpack", side_effect=pa.struct.error("boom")):
+            with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                note = pa._interpret_value("3FAB851F", "word")
+
+        self.assertTrue(note.startswith("hex: 0x3FAB851F"))
+        self.assertTrue(any("Could not interpret PNACH value" in msg for msg in cm.output))
+
     def test_group_conflicts_by_function(self):
         from src.core.pnach_analyzer import group_conflicts_by_function
         conflicts = [

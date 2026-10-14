@@ -272,8 +272,12 @@ def _guess_from_value(value: str, size: str, default: str = "gameplay") -> str:
             if 0.01 < abs(fval) < 100.0:
                 # Likely a float multiplier/constant — physics or gameplay
                 return "physics"
-        except (struct.error, OverflowError):
-            pass
+        except (struct.error, OverflowError) as exc:
+            logger.warning(
+                "Could not interpret PNACH value %s as a float for category inference: %s",
+                value,
+                exc,
+            )
 
     # Suspiciously large integers → probably cheat codes (infinite ammo etc.)
     if raw in (0x7FFFFFFF, 0xFFFFFFFF, 0x63, 0x9999, 0x270F):
@@ -310,8 +314,12 @@ def _interpret_value(value: str, size: str, value_map: Optional[dict] = None) ->
             fval = struct.unpack(">f", struct.pack(">I", raw))[0]
             if not _math.isnan(fval) and abs(fval) < 1e10:
                 notes.append(f"float: {fval:.4g}")
-        except (struct.error, OverflowError):
-            pass
+        except (struct.error, OverflowError) as exc:
+            logger.warning(
+                "Could not interpret PNACH value %s as a float note: %s",
+                value,
+                exc,
+            )
 
     return "  |  ".join(notes)
 
