@@ -773,6 +773,20 @@ class TestDownloaderLogging(unittest.TestCase):
         self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_title_parse_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>no title here</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to parse GBAtemp page title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
     def test_resolve_mediafire_url_logs_http_failure(self, mock_get):
         from src.core.downloader import resolve_mediafire_url
 
@@ -806,6 +820,20 @@ class TestDownloaderLogging(unittest.TestCase):
             result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
         self.assertEqual(result["title"], "")
         self.assertTrue(any("Failed to scrape PS2-Home post" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_title_parse_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>no title here</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to parse PS2-Home post title" in msg for msg in logs.output))
 
     def test_convert_share_url_logs_parse_failure(self):
         from src.core.downloader import convert_share_url

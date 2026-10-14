@@ -728,6 +728,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
         )
         if m:
             result["title"] = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        if not result["title"]:
+            logger.warning("Failed to parse GBAtemp page title for %s", thread_url)
 
         # ── Author name ─────────────────────────────────────────────────────
         # XenForo: itemprop="name" inside first message — works for threads
@@ -893,6 +895,8 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 if " - " in raw:
                     raw = raw.split(" - ", 1)[-1].strip()
                 result["title"] = raw
+        if not result["title"]:
+            logger.warning("Failed to parse PS2-Home post title for %s", post_url)
 
         # ── Author (first post) ─────────────────────────────────────────────
         # phpBB: <p class="author"> or <strong class="postauthor">
