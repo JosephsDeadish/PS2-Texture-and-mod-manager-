@@ -322,7 +322,7 @@ class TextureHashDB:
                     )
                     registered.append(entry)
         except PermissionError:
-            pass
+            logger.warning("Could not scan texture pack directory %s: permission denied", root)
         return registered
 
     def remove_pack(self, pack_id: str) -> int:

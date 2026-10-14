@@ -11839,6 +11839,20 @@ class TestWave53TextureHashDB(unittest.TestCase):
         result = db.register_pack("pack-x", "/nonexistent/path")
         self.assertEqual(result, [])
 
+    def test_register_pack_permission_error_logs_warning(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        pack_dir = os.path.join(self.tmpdir, "PackDenied")
+        os.makedirs(pack_dir)
+        db = TextureHashDB(self.db_path)
+
+        with patch("src.core.texture_hash_db.os.walk", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                entries = db.register_pack("pack-denied", pack_dir)
+
+        self.assertEqual(entries, [])
+        self.assertTrue(any("Could not scan texture pack directory" in msg for msg in logs.output))
+
     def test_no_conflict_different_texture_ids(self):
         from src.core.texture_hash_db import TextureHashDB
         db = TextureHashDB(self.db_path)
