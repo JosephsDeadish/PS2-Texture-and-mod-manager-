@@ -1296,6 +1296,34 @@ class TestUpdateChecker(unittest.TestCase):
         self.assertFalse(has_update)
         self.assertTrue(any("Failed to inspect source URL" in msg for msg in logs.output))
 
+    def test_checker_logs_callback_failure_but_completes(self):
+        """Callback failures must not abort the update-check thread."""
+        import threading
+        from src.core.updater import UpdateChecker
+
+        db = ModDatabase()
+        db.add(
+            ModInfo(
+                id="cb-fail",
+                name="Callback Fail Mod",
+                mod_type=ModType.TEXTURE_PACK,
+                path="/tmp",
+                source_url="",
+            )
+        )
+        checker = UpdateChecker(db)
+        done = threading.Event()
+
+        def _on_result(*_args):
+            raise RuntimeError("callback boom")
+
+        with self.assertLogs("src.core.updater", level="WARNING") as logs:
+            checker.start(on_result=_on_result, on_complete=lambda n: done.set())
+            done.wait(timeout=2)
+
+        self.assertTrue(done.is_set(), "UpdateChecker did not complete after callback failure")
+        self.assertTrue(any("Update-check result callback failed" in msg for msg in logs.output))
+
 
 class TestImportDialogLogging(unittest.TestCase):
     """Import dialog fallback paths should log recoverable failures."""
@@ -19747,6 +19775,15 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             f"Expected Baldur's Gate results, got: {results}",
         )
 
+    def test_title_to_serials_punctuation_insensitive(self):
+        from src.core.game_registry import title_to_serials
+
+        results = title_to_serials("Baldurs Gate")
+        self.assertTrue(
+            any(title.lower().startswith("baldur's gate") for _, title in results),
+            f"Expected Baldur's Gate serial results, got: {results}",
+        )
+
     def test_search_titles_dq8(self):
         results = self.sdb.search_titles("DQ8")
         self.assertTrue(any("dragon quest viii" in r.lower() for r in results))
@@ -19834,6 +19871,19 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         """Unknown title (not in DB) falls back to substring check only."""
         self.assertTrue(self.sdb.title_matches_query("Some Unknown Game", "unknown"))
         self.assertFalse(self.sdb.title_matches_query("Some Unknown Game", "DMC3"))
+
+    def test_load_pal_serials_logs_invalid_root(self):
+        from src.core import game_registry as gr
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "ps2_pal.json"
+            bad_db.write_text("[]", encoding="utf-8")
+            with patch.object(gr, "_PAL_DB_FILE", bad_db):
+                with self.assertLogs("src.core.game_registry", level="WARNING") as logs:
+                    result = gr._load_pal_serials()
+
+        self.assertEqual(result, {})
+        self.assertTrue(any("Expected JSON object" in msg for msg in logs.output))
 
     # ------------------------------------------------------------------
     # Alias data correctness in NTSC-U JSON

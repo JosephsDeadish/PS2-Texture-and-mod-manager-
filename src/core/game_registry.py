@@ -55,6 +55,54 @@ from typing import List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
+_GAME_SERIAL_DB_DIR = Path(__file__).parent.parent.parent / "data" / "game_serial_db"
+_PAL_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_pal.json"
+_JP_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_japan.json"
+_NTSC_U_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_ntsc_u.json"
+_DEMO_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_demos.json"
+
+
+def _normalise_search_text(text: str) -> str:
+    """Return a punctuation-insensitive search key for title matching."""
+    return "".join(ch for ch in text.lower() if ch.isalnum())
+
+
+def _load_serial_title_map(db_file: Path, label: str) -> dict[str, str]:
+    """Load a serial→title mapping from a curated JSON database."""
+    import json as _json
+
+    if not db_file.is_file():
+        return {}
+    try:
+        raw = _json.loads(db_file.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("Failed to load %s serial database %s: %s", label, db_file, exc)
+        return {}
+    if not isinstance(raw, dict):
+        logger.warning("Expected JSON object in %s serial database %s", label, db_file)
+        return {}
+    games = raw.get("games", {})
+    if not isinstance(games, dict):
+        logger.warning("Expected 'games' object in %s serial database %s", label, db_file)
+        return {}
+
+    result: dict[str, str] = {}
+    for title, info in games.items():
+        if not isinstance(info, dict):
+            continue
+        title = str(title)
+        serial = str(info.get("serial", "")).strip()
+        if serial:
+            result[serial] = title
+        alt_serials = info.get("alt_serials", [])
+        if not isinstance(alt_serials, list):
+            alt_serials = []
+        for alt in alt_serials:
+            alt = str(alt).strip()
+            if alt and alt not in result:
+                result[alt] = title
+    return result
+
 
 # ---------------------------------------------------------------------------
 # All valid PS2 serial prefix strings (exported for UI validation)
@@ -817,90 +865,22 @@ _KNOWN_SERIALS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 def _load_pal_serials() -> dict[str, str]:
     """Load PAL serial → title mappings from ps2_pal.json."""
-    import json as _json
-    _pal_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
-    if not _pal_db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_pal_db.read_text(encoding="utf-8"))
-    except Exception as exc:
-        logger.warning("Failed to load PAL serial database %s: %s", _pal_db, exc)
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_PAL_DB_FILE, "PAL")
 
 
 def _load_japan_serials() -> dict[str, str]:
     """Load Japan (NTSC-J) serial → title mappings from ps2_japan.json."""
-    import json as _json
-    _jp_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-    if not _jp_db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_jp_db.read_text(encoding="utf-8"))
-    except Exception as exc:
-        logger.warning("Failed to load Japan serial database %s: %s", _jp_db, exc)
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_JP_DB_FILE, "Japan")
 
 
 def _load_ntsc_u_serials() -> dict[str, str]:
     """Load NTSC-U serial → title mappings from ps2_ntsc_u.json (issue #23)."""
-    import json as _json
-    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
-    if not _db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception as exc:
-        logger.warning("Failed to load NTSC-U serial database %s: %s", _db, exc)
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_NTSC_U_DB_FILE, "NTSC-U")
 
 
 def _load_demos_serials() -> dict[str, str]:
     """Load PS2 demo serial → title mappings from ps2_demos.json."""
-    import json as _json
-    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_demos.json"
-    if not _db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception as exc:
-        logger.warning("Failed to load demo serial database %s: %s", _db, exc)
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_DEMO_DB_FILE, "demo")
 
 
 _STRICT_SERIAL_RE = re.compile(r"^[A-Z]{4}-\d{5}$")
@@ -972,6 +952,7 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
             logger.warning("Failed to load informative serial JSON %s: %s", fp, exc)
             continue
         if not isinstance(raw, dict):
+            logger.warning("Expected JSON object in informative serial file %s", fp)
             continue
         for key, value in raw.items():
             serial = _normalise_informative_serial(str(key))
@@ -1271,9 +1252,12 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     if not title_fragment:
         return []
     frag = title_fragment.lower()
+    frag_key = _normalise_search_text(frag)
+    if not frag_key:
+        return []
     pairs = {
         (serial, title) for serial, title in _KNOWN_SERIALS.items()
-        if frag in title.lower()
+        if frag in title.lower() or frag_key in _normalise_search_text(title)
     }
     # Also resolve via serial DB aliases so abbreviations like "GoW" work.
     try:

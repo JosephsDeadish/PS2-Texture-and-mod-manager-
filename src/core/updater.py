@@ -110,12 +110,26 @@ class UpdateChecker:
         self._stop_event.clear()
 
         def _run():
-            mods = self.db.all()
+            try:
+                mods = self.db.all()
+            except Exception as exc:
+                logger.warning("Failed to enumerate mods for update check: %s", exc)
+                if on_complete:
+                    try:
+                        on_complete(0)
+                    except Exception as callback_exc:
+                        logger.warning("Update-check completion callback failed: %s", callback_exc)
+                return
+
             updates = 0
             for mod in mods:
                 if self._stop_event.is_set():
                     break
-                mod_id, has_update = _check_single_mod(mod)
+                try:
+                    mod_id, has_update = _check_single_mod(mod)
+                except Exception as exc:
+                    logger.warning("Unexpected update-check failure for %s: %s", mod.id, exc)
+                    mod_id, has_update = mod.id, False
                 if has_update:
                     # Persist the flag
                     mod.has_update = True
@@ -125,9 +139,15 @@ class UpdateChecker:
                         logger.warning("Failed to persist update flag for %s: %s", mod.id, exc)
                     updates += 1
                 if on_result:
-                    on_result(mod_id, has_update)
+                    try:
+                        on_result(mod_id, has_update)
+                    except Exception as exc:
+                        logger.warning("Update-check result callback failed for %s: %s", mod_id, exc)
             if on_complete:
-                on_complete(updates)
+                try:
+                    on_complete(updates)
+                except Exception as exc:
+                    logger.warning("Update-check completion callback failed: %s", exc)
 
         self._thread = threading.Thread(target=_run, daemon=True)
         self._thread.start()
