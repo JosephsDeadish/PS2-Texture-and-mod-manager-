@@ -202,7 +202,11 @@ def list_backups(config) -> List[BackupEntry]:
     entries: List[BackupEntry] = []
 
     for zp in sorted(backup_dir.glob("backup_*.zip"), reverse=True):
-        stat = zp.stat()
+        try:
+            stat = zp.stat()
+        except OSError as exc:
+            logger.warning("Failed to inspect backup archive metadata %s: %s", zp, exc)
+            continue
         try:
             with zipfile.ZipFile(zp) as zf:
                 size_bytes = sum(i.file_size for i in zf.infolist())

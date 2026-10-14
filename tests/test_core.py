@@ -8178,6 +8178,29 @@ class TestBackupManager(unittest.TestCase):
         self.assertEqual(len(entries), 1)
         self.assertTrue(any("Failed to inspect backup archive" in msg for msg in cm.output))
 
+    def test_list_backups_skips_when_stat_fails(self):
+        from src.core.backup_manager import create_backup, list_backups
+
+        first = create_backup(self.cfg, note="first")
+        second = create_backup(self.cfg, note="second")
+        target = Path(second.path)
+        orig_stat = Path.stat
+
+        def stat_side_effect(self):
+            if self == target:
+                raise OSError("vanished")
+            return orig_stat(self)
+
+        with patch("pathlib.Path.stat", autospec=True, side_effect=stat_side_effect):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+                entries = list_backups(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        labels = [e.label for e in entries]
+        self.assertIn(first.label, labels)
+        self.assertNotIn(target.name, labels)
+        self.assertTrue(any("Failed to inspect backup archive metadata" in msg for msg in cm.output))
+
     def test_delete_backup_logs_when_unlink_fails(self):
         from src.core.backup_manager import BackupEntry, delete_backup
 
