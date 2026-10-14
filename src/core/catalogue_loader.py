@@ -172,7 +172,8 @@ def _load_from_dir(
         # User catalogue: each .json file may contain mixed types
         try:
             json_files = sorted(base.glob("*.json"))
-        except Exception:
+        except Exception as exc:
+            log.warning("Could not list catalogue files under %s: %s", base, exc)
             json_files = []
         file_iter = [(f.name, None) for f in json_files]
 
@@ -282,7 +283,7 @@ def load_catalogue(
                 from src.core.config_manager import get_user_catalogue_dir
                 user_catalogue_dir = get_user_catalogue_dir()
             except Exception as exc:
-                log.debug("Could not resolve user_catalogue_dir: %s", exc)
+                log.warning("Could not resolve user catalogue directory: %s", exc)
                 user_catalogue_dir = None
 
         if user_catalogue_dir is not None:

@@ -421,6 +421,46 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(len(conflicts), 1)
         self.assertIn("shared.png", conflicts[0].conflicting_files)
 
+    def test_folder_has_serial_structure_logs_permission_error(self):
+        from src.core.mod_manager import _folder_has_serial_structure
+        folder = Path(self.tmpdir) / "pack"
+        folder.mkdir()
+
+        with patch("pathlib.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                self.assertFalse(_folder_has_serial_structure(folder))
+
+        self.assertTrue(any("Could not inspect folder structure" in msg for msg in logs.output))
+
+    def test_validate_all_pnach_logs_validation_failure(self):
+        db, mgr = self._make_manager()
+        pnach = Path(self.tmpdir) / "bad.pnach"
+        pnach.write_text("patch=1,EE,00123456,word,00000001", encoding="utf-8")
+        db.add(ModInfo(
+            id="bad-pnach",
+            name="Bad PNACH",
+            mod_type=ModType.PNACH,
+            path=str(pnach),
+            enabled=True,
+        ))
+
+        with patch("src.core.pnach.validate_pnach_file", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                result = mgr.validate_all_pnach()
+
+        self.assertEqual(result, {})
+        self.assertTrue(any("Could not validate PNACH file" in msg for msg in logs.output))
+
+    def test_file_hash_logs_read_failure(self):
+        from src.core.mod_manager import ModManager
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                digest = ModManager.file_hash("/tmp/missing-file")
+
+        self.assertEqual(digest, "")
+        self.assertTrue(any("Could not hash file" in msg for msg in logs.output))
+
     def test_disabled_mod_no_conflict(self):
         db, mgr = self._make_manager()
         db.add(ModInfo(id="x", name="X", mod_type=ModType.TEXTURE_PACK, path="/p",
@@ -6441,6 +6481,23 @@ class TestUserCatalogueLoader(unittest.TestCase):
         # Should only appear once
         count = sum(1 for e in result if e["id"] == existing_id)
         self.assertEqual(count, 1)
+
+    def test_load_catalogue_logs_when_user_glob_fails(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch("src.core.catalogue_loader.Path.glob", side_effect=OSError("denied")):
+                with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                    result = load_catalogue(catalogue_dir=CATALOGUE_DIR, user_catalogue_dir=Path(tmpdir))
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Could not list catalogue files under" in msg for msg in logs.output))
+
+    def test_load_catalogue_logs_when_user_dir_lookup_fails(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        with patch("src.core.config_manager.get_user_catalogue_dir", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(catalogue_dir=CATALOGUE_DIR)
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Could not resolve user catalogue directory" in msg for msg in logs.output))
 
 
 # ---------------------------------------------------------------------------

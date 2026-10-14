@@ -36,7 +36,8 @@ def _folder_has_serial_structure(folder: Path) -> bool:
             child.is_dir() and _PS2_SERIAL_RE.match(child.name) is not None
             for child in folder.iterdir()
         )
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not inspect folder structure for %s: %s", folder, exc)
         return False
 
 
@@ -185,8 +186,8 @@ class ModManager:
                             m = crc_re.match(pf.name)
                             if m:
                                 _add_sig(mod.mod_type.value, m.group(1))
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        logger.warning("Could not scan PNACH directory for %s: %s", p, exc)
 
         imported = 0
         for item in unmanaged:
@@ -989,8 +990,8 @@ class ModManager:
                     try:
                         issues = validate_pnach_file(str(pf))
                         all_issues.extend(issues)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.warning("Could not validate PNACH file %s: %s", pf, exc)
                 if all_issues:
                     results[mod.id] = all_issues
         return results
@@ -1086,6 +1087,7 @@ class ModManager:
         try:
             with open(path, "rb") as f:
                 h.update(f.read(65536))
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not hash file %s: %s", path, exc)
+            return ""
         return h.hexdigest()
