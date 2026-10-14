@@ -691,6 +691,18 @@ class TestDownloaderLogging(unittest.TestCase):
             self.assertEqual(list_pcsx2_widescreen_patches(), [])
         self.assertTrue(any("Failed to list PCSX2 widescreen patches" in msg for msg in logs.output))
 
+    @patch("src.core.downloader.requests.get")
+    def test_list_pcsx2_widescreen_patches_logs_http_failure(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(list_pcsx2_widescreen_patches(), [])
+        self.assertTrue(any("Failed to list PCSX2 widescreen patches" in msg for msg in logs.output))
+
     @patch("src.core.downloader.requests.head")
     def test_search_pcsx2_patches_by_crc_logs_failure(self, mock_head):
         from src.core.downloader import search_pcsx2_patches_by_crc
@@ -711,10 +723,48 @@ class TestDownloaderLogging(unittest.TestCase):
         self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_http_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolve_mediafire_url_logs_http_failure(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_mediafire_url("https://www.mediafire.com/file/abc"))
+        self.assertTrue(any("Failed to resolve MediaFire URL" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
     def test_scrape_ps2home_post_logs_failure(self, mock_get):
         from src.core.downloader import scrape_ps2home_post
 
         mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape PS2-Home post" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_http_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
         with self.assertLogs("src.core.downloader", level="WARNING") as logs:
             result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
         self.assertEqual(result["title"], "")
@@ -1420,6 +1470,49 @@ class TestImportDialogLogging(unittest.TestCase):
         self.assertTrue(any("Could not inspect multipart archive" in msg for msg in logs.output))
         fake._multipart_hint.setText.assert_called()
         fake._multipart_hint.show.assert_called()
+
+    def test_auto_detect_game_id_failure_shows_manual_entry_hint(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+        qtcore.QTimer = type("QTimer", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+            "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QIcon = type("QIcon", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.import_dialog import ImportModDialog
+
+            fake = type("FakeDialog", (), {})()
+            fake._gameid_edit = MagicMock()
+            fake._gameid_edit.text.return_value = ""
+
+            with patch("src.core.game_registry.detect_game_serial_from_file", side_effect=ValueError("bad source")):
+                with self.assertLogs("src.ui.import_dialog", level="WARNING") as logs:
+                    ImportModDialog._auto_detect_game_id(fake, "/tmp/bad-source.zip")
+
+        self.assertTrue(any("Could not inspect import source" in msg for msg in logs.output))
+        fake._gameid_edit.setToolTip.assert_called()
+        fake._gameid_edit.setPlaceholderText.assert_called()
+        fake._gameid_edit.setStyleSheet.assert_called()
 
 
 class TestSettingsDialogSaveFailures(unittest.TestCase):
@@ -3498,7 +3591,9 @@ class TestYandexDiskResolver(unittest.TestCase):
         mock_resp = MagicMock()
         mock_resp.status_code = 403
         mock_get.return_value = mock_resp
-        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("Failed to resolve Yandex Disk URL" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
     def test_untrusted_href_domain_returns_none(self, mock_get):
@@ -8174,6 +8269,32 @@ class TestBackupManager(unittest.TestCase):
         backup_dir = get_backup_dir(self.cfg)
         self.assertEqual(list(backup_dir.iterdir()), [])
         self.assertTrue(any("Failed to create backup archive" in msg for msg in logs.output))
+
+    def test_create_backup_skips_recoverable_write_failure(self):
+        import zipfile
+        from src.core.backup_manager import create_backup
+
+        good_path = Path(os.path.join(self.covers_dir, "SLUS-20062.png"))
+        bad_path = Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach"))
+        good_path.write_bytes(b"PNG")
+        bad_path.write_text("patch=1,EE,0,word,0")
+        orig_write = zipfile.ZipFile.write
+
+        def _write(zf, filename, arcname=None, *args, **kwargs):
+            if Path(filename).name == bad_path.name:
+                raise OSError("disk full")
+            return orig_write(zf, filename, arcname, *args, **kwargs)
+
+        with patch("zipfile.ZipFile.write", autospec=True, side_effect=_write):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                entry = create_backup(self.cfg)
+
+        self.assertTrue(os.path.isfile(entry.path))
+        with zipfile.ZipFile(entry.path) as zf:
+            names = zf.namelist()
+        self.assertTrue(any("SLUS-20062.png" in n for n in names))
+        self.assertFalse(any("AABBCCDD.pnach" in n for n in names))
+        self.assertTrue(any("recoverable failure" in msg for msg in logs.output))
 
     # -----------------------------------------------------------------------
     # list_backups

@@ -297,6 +297,14 @@ class ImportModDialog(QDialog):
                     threading.Thread(target=_online_lookup, daemon=True).start()
         except Exception as exc:
             logger.warning("Could not inspect import source %s: %s", path, exc)
+            self._gameid_edit.setToolTip(
+                "Could not inspect the selected source path. Enter the Game ID manually."
+            )
+            self._gameid_edit.setPlaceholderText("Could not inspect source path")
+            self._gameid_edit.setStyleSheet(
+                "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
+                "border-radius: 4px; padding: 6px 8px;"
+            )
 
     def _check_replacement_pattern(self, path: str) -> None:
         """Show a hint if the selected path looks like a 'replacement'-named pack.

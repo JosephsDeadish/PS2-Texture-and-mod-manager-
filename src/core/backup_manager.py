@@ -163,14 +163,47 @@ def create_backup(config, note: str = "") -> BackupEntry:
     os.close(fd)
     tmp_path = Path(tmp_name)
     try:
+        failures = 0
+        written_files = 0
+        first_error: Exception | None = None
         with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
             for folder in paths_to_include:
                 folder_name = folder.name
-                for item in sorted(folder.rglob("*")):
+                try:
+                    items = sorted(folder.rglob("*"))
+                except OSError as exc:
+                    failures += 1
+                    if first_error is None:
+                        first_error = exc
+                    logger.warning("Failed to enumerate backup folder %s: %s", folder, exc)
+                    continue
+                for item in items:
                     if item.is_file():
                         arcname = folder_name + "/" + str(item.relative_to(folder))
-                        zf.write(item, arcname)
-                        total_size += item.stat().st_size
+                        try:
+                            zf.write(item, arcname)
+                            written_files += 1
+                        except OSError as exc:
+                            failures += 1
+                            if first_error is None:
+                                first_error = exc
+                            logger.warning("Failed to add backup file %s: %s", item, exc)
+                            continue
+                        try:
+                            total_size += item.stat().st_size
+                        except OSError as exc:
+                            failures += 1
+                            if first_error is None:
+                                first_error = exc
+                            logger.warning("Failed to inspect backup file %s after archiving: %s", item, exc)
+        if failures and written_files:
+            logger.warning(
+                "Created backup archive %s with %s recoverable failure(s)",
+                zip_path,
+                failures,
+            )
+        if first_error is not None and written_files == 0:
+            raise first_error
         os.replace(tmp_path, zip_path)
     except Exception as exc:
         logger.warning("Failed to create backup archive %s: %s", zip_path, exc)

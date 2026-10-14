@@ -351,7 +351,12 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
             timeout=timeout,
             headers=_GITHUB_HEADERS,
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            logger.warning(
+                "Failed to list PCSX2 widescreen patches: HTTP %s",
+                resp.status_code,
+            )
+            return []
         entries = resp.json()
         result = []
         for entry in entries:
@@ -475,6 +480,11 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to resolve MediaFire URL %s: HTTP %s",
+                page_url,
+                resp.status_code,
+            )
             return None
         html = resp.text
 
@@ -532,6 +542,11 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: HTTP %s",
+                page_url,
+                resp.status_code,
+            )
             return None
         data = resp.json()
         href = data.get("href", "")
@@ -683,6 +698,11 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to scrape GBAtemp page %s: HTTP %s",
+                thread_url,
+                resp.status_code,
+            )
             return result
         html = resp.text
 
@@ -834,6 +854,11 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to scrape PS2-Home post %s: HTTP %s",
+                post_url,
+                resp.status_code,
+            )
             return result
         html = resp.text
 
