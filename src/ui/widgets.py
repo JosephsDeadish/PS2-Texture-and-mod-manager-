@@ -4381,7 +4381,12 @@ class LoadOrderDialog(QDialog):
             if mid:
                 order.append(mid)
         self._lom.set_order(self._serial, order)
-        self._lom.save()
+        try:
+            self._lom.save()
+        except Exception as exc:
+            logger.warning("Could not save load order for %s: %s", self._serial, exc)
+            QMessageBox.critical(self, "Error", str(exc))
+            return
         self.accept()
 
 
@@ -4617,6 +4622,7 @@ class ModProfilesDialog(QDialog):
             self._pm.set_active(name)
             self._pm.save()
         except Exception as exc:
+            logger.warning("Could not save profile %s: %s", name, exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
 
@@ -4650,7 +4656,14 @@ class ModProfilesDialog(QDialog):
                 self._db.update(m)
 
         self._pm.set_active(name)
-        self._pm.save()
+        try:
+            self._pm.save()
+        except Exception as exc:
+            logger.warning("Could not apply profile %s: %s", name, exc)
+            QMessageBox.critical(self, "Error", str(exc))
+            self._refresh()
+            self.profile_applied.emit(name)
+            return
         self._refresh()
         self.profile_applied.emit(name)
         QMessageBox.information(
@@ -4673,6 +4686,7 @@ class ModProfilesDialog(QDialog):
             self._pm.rename_profile(old, new_name.strip())
             self._pm.save()
         except (ValueError, KeyError) as exc:
+            logger.warning("Could not rename profile %s to %s: %s", old, new_name.strip(), exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
         self._refresh()
@@ -4691,6 +4705,7 @@ class ModProfilesDialog(QDialog):
             self._pm.duplicate_profile(src, new_name.strip())
             self._pm.save()
         except (ValueError, KeyError) as exc:
+            logger.warning("Could not duplicate profile %s to %s: %s", src, new_name.strip(), exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
         self._refresh()
@@ -4710,6 +4725,7 @@ class ModProfilesDialog(QDialog):
             self._pm.delete_profile(name)
             self._pm.save()
         except (ValueError, KeyError) as exc:
+            logger.warning("Could not delete profile %s: %s", name, exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
         self._refresh()

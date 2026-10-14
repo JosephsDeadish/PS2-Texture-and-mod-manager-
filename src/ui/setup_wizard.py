@@ -480,13 +480,23 @@ class SetupWizard(QDialog):
     def _finish(self):
         self._collect_current_page()
         self.config.first_run = False
-        save_config(self.config)
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save setup wizard configuration: %s", exc)
+            QMessageBox.critical(self, "Error", f"Could not save configuration: {exc}")
+            return
         self.setup_complete.emit(self.config)
         self.accept()
 
     def _skip(self):
         self.config.first_run = False
-        save_config(self.config)
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save skipped setup configuration: %s", exc)
+            QMessageBox.critical(self, "Error", f"Could not save configuration: {exc}")
+            return
         self.setup_complete.emit(self.config)
         self.reject()
 

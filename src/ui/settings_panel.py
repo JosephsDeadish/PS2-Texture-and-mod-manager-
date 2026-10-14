@@ -1,5 +1,6 @@
 """Settings panel for PS2 Mod Manager."""
 
+import logging
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -20,6 +21,8 @@ from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
 from src.ui.theme import THEME_KEYS, apply_theme
+
+logger = logging.getLogger(__name__)
 
 
 class SettingsPanel(BasePanel):
@@ -269,7 +272,12 @@ class SettingsPanel(BasePanel):
             line.strip() for line in raw.splitlines() if line.strip()
         ]
 
-        save_config(self.config)
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save settings: %s", exc)
+            QMessageBox.critical(self, "Error", f"Could not save settings: {exc}")
+            return
         self.settings_saved.emit(self.config)
         self.emit_status("Settings saved ✅")
         QMessageBox.information(self, "Saved", "Settings have been saved.")

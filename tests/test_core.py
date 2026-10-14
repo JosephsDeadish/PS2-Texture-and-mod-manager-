@@ -136,6 +136,21 @@ class TestConfigManager(unittest.TestCase):
         finally:
             cm.CONFIG_FILE = orig_file
 
+    def test_load_config_invalid_json_logs_warning(self):
+        import src.core.config_manager as cm
+        orig_file = cm.CONFIG_FILE
+        cfg_file = Path(self.tmpdir) / "config.json"
+        cfg_file.write_text("{not-json", encoding="utf-8")
+        cm.CONFIG_FILE = cfg_file
+        try:
+            with self.assertLogs("src.core.config_manager", level="WARNING") as logs:
+                cfg = load_config()
+            self.assertIsInstance(cfg, AppConfig)
+            self.assertTrue(cfg.first_run)
+            self.assertTrue(any("Failed to load config file" in msg for msg in logs.output))
+        finally:
+            cm.CONFIG_FILE = orig_file
+
     def test_detect_pcsx2_paths_existing(self):
         root = Path(self.tmpdir) / "pcsx2"
         (root / "textures").mkdir(parents=True)
@@ -1331,6 +1346,162 @@ class TestImportDialogLogging(unittest.TestCase):
         self.assertTrue(any("Could not inspect archive" in msg for msg in logs.output))
         fake._replacement_hint.hide.assert_called()
         fake._gameid_edit.setStyleSheet.assert_called_with("")
+
+
+class TestSettingsDialogSaveFailures(unittest.TestCase):
+    """Settings/setup dialogs should log and surface save failures."""
+
+    def _stub_ui_modules(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.Qt = types.SimpleNamespace()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QDialogButtonBox", "QFileDialog",
+            "QFrame", "QFormLayout", "QHBoxLayout", "QLabel", "QLineEdit",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSizePolicy",
+            "QStackedWidget", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            cls = type(name, (), {})
+            if name == "QMessageBox":
+                cls.critical = staticmethod(lambda *args, **kwargs: None)
+                cls.information = staticmethod(lambda *args, **kwargs: None)
+                cls.question = staticmethod(lambda *args, **kwargs: None)
+            setattr(qtwidgets, name, cls)
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        widgets_stub = types.ModuleType("src.ui.widgets")
+        widgets_stub.PathChooser = type("PathChooser", (), {})
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+        theme_stub = types.ModuleType("src.ui.theme")
+        theme_stub.THEME_KEYS = {}
+        theme_stub.apply_theme = lambda *args, **kwargs: None
+
+        return patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.widgets": widgets_stub,
+                "src.ui.base_panel": base_panel_stub,
+                "src.ui.theme": theme_stub,
+            },
+        )
+
+    def test_settings_panel_save_failure_logs_and_shows_error(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+                _storage_chooser=MagicMock(),
+                _game_lib_chooser=MagicMock(),
+                _conflicts_check=MagicMock(),
+                _updates_check=MagicMock(),
+                _theme_combo=MagicMock(),
+                _tooltip_combo=MagicMock(),
+                _fav_authors_edit=MagicMock(),
+                settings_saved=MagicMock(),
+                emit_status=MagicMock(),
+            )
+            for chooser, value in (
+                (fake._pcsx2_chooser, "/pcsx2"),
+                (fake._tex_chooser, "/textures"),
+                (fake._pnach_chooser, "/pnach"),
+                (fake._covers_chooser, "/covers"),
+                (fake._memcards_chooser, "/memcards"),
+                (fake._partial_tex_chooser, "/partial"),
+                (fake._storage_chooser, "/mods"),
+                (fake._game_lib_chooser, "/games"),
+            ):
+                chooser.get_path.return_value = value
+            fake._conflicts_check.isChecked.return_value = True
+            fake._updates_check.isChecked.return_value = False
+            fake._theme_combo.currentData.return_value = "dark"
+            fake._tooltip_combo.currentData.return_value = "normal"
+            fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+
+            with patch("src.ui.settings_panel.save_config", side_effect=OSError("denied")):
+                with patch("src.ui.settings_panel.QMessageBox.critical") as critical:
+                    with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                        SettingsPanel._save(fake)
+
+        self.assertTrue(any("Could not save settings" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.settings_saved.emit.assert_not_called()
+        fake.emit_status.assert_not_called()
+        self.assertEqual(fake.config.pcsx2_path, "/pcsx2")
+        self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
+
+    def test_setup_wizard_finish_failure_logs_and_blocks_close(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                _collect_current_page=MagicMock(),
+                setup_complete=MagicMock(),
+                accept=MagicMock(),
+                reject=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.save_config", side_effect=OSError("denied")):
+                with patch("src.ui.setup_wizard.QMessageBox.critical") as critical:
+                    with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                        SetupWizard._finish(fake)
+
+        self.assertTrue(any("Could not save setup wizard configuration" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake._collect_current_page.assert_called_once()
+        fake.setup_complete.emit.assert_not_called()
+        fake.accept.assert_not_called()
+
+    def test_setup_wizard_skip_failure_logs_and_blocks_close(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                setup_complete=MagicMock(),
+                accept=MagicMock(),
+                reject=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.save_config", side_effect=OSError("denied")):
+                with patch("src.ui.setup_wizard.QMessageBox.critical") as critical:
+                    with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                        SetupWizard._skip(fake)
+
+        self.assertTrue(any("Could not save skipped setup configuration" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.setup_complete.emit.assert_not_called()
+        fake.reject.assert_not_called()
 
 
 class TestAssetPaths(unittest.TestCase):
@@ -11120,6 +11291,21 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         tmp_files = [f for f in parent.iterdir() if "loadorder_tmp" in f.name]
         self.assertEqual(tmp_files, [])
 
+    def test_save_failure_logs_cleanup_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-1")
+
+        with patch("os.replace", side_effect=RuntimeError("boom")), patch(
+            "os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.load_order_manager", level="WARNING") as logs:
+                with self.assertRaises(RuntimeError):
+                    lom.save()
+
+        self.assertTrue(any("Failed to save load-order file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove temporary load-order file" in msg for msg in logs.output))
+
     def test_load_invalid_json_logs_warning(self):
         from src.core.load_order_manager import LoadOrderManager
 
@@ -11369,6 +11555,21 @@ class TestWave53ModProfiles(unittest.TestCase):
         parent = Path(self.profiles_file).parent
         tmp_files = [f for f in parent.iterdir() if "profiles_tmp" in f.name]
         self.assertEqual(tmp_files, [])
+
+    def test_save_failure_logs_cleanup_warning(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+
+        with patch("os.replace", side_effect=RuntimeError("boom")), patch(
+            "os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_profile", level="WARNING") as logs:
+                with self.assertRaises(RuntimeError):
+                    pm.save()
+
+        self.assertTrue(any("Failed to save mod profiles file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove temporary profiles file" in msg for msg in logs.output))
 
     def test_load_invalid_json_logs_warning(self):
         from src.core.mod_profile import ModProfileManager

@@ -211,11 +211,16 @@ class ModProfileManager:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.write(payload)
             os.replace(tmp, str(self._path))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to save mod profiles file %s: %s", self._path, exc)
             try:
                 os.unlink(tmp)
-            except OSError:
-                pass
+            except OSError as cleanup_exc:
+                logger.warning(
+                    "Could not remove temporary profiles file %s after save failure: %s",
+                    tmp,
+                    cleanup_exc,
+                )
             raise
 
     # ------------------------------------------------------------------

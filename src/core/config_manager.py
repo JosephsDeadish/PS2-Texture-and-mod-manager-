@@ -1,10 +1,13 @@
 """Configuration manager for PS2 Mod Manager."""
 
 import json
+import logging
 import os
 import sys
 from pathlib import Path
 from src.models.mod import AppConfig
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # README content placed in the user_catalogue directory
@@ -137,8 +140,8 @@ def load_config() -> AppConfig:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
             return AppConfig.from_dict(data)
-        except (json.JSONDecodeError, KeyError, TypeError):
-            pass
+        except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+            logger.warning("Failed to load config file %s: %s", CONFIG_FILE, exc)
     return AppConfig()
 
 
@@ -171,4 +174,3 @@ def auto_detect_pcsx2() -> str:
     """
     from src.core.pcsx2_layout import auto_detect_pcsx2 as _detect
     return _detect()
-
