@@ -197,6 +197,11 @@ class AsyncDownloader:
                 if on_complete:
                     on_complete(path)
             except DownloadError as exc:
+                logger.warning("Async download failed for %s: %s", url, exc)
+                if on_error:
+                    on_error(str(exc))
+            except Exception as exc:
+                logger.warning("Unexpected async download failure for %s: %s", url, exc)
                 if on_error:
                     on_error(str(exc))
 

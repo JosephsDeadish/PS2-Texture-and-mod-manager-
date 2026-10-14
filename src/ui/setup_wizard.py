@@ -455,6 +455,7 @@ class SetupWizard(QDialog):
                 else:
                     summary_lines.append("📁 All PCSX2 folders already exist.")
             except Exception as exc:
+                logger.warning("Could not create PCSX2 folders during setup: %s", exc)
                 summary_lines.append(f"⚠️  Could not create folders: {exc}")
 
         if self.config.pcsx2_path:

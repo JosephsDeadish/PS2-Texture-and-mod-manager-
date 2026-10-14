@@ -176,6 +176,7 @@ def _download_cover_by_url_async(
                 f"Cover art saved to:\n{dest}"
             ))
         except Exception as exc:
+            logger.warning("Could not download browse cover art from %s: %s", url, exc)
             err = str(exc)
             QTimer.singleShot(0, lambda: QMessageBox.warning(
                 parent_widget, "Download Failed",
@@ -1164,7 +1165,8 @@ class DownloadInstallDialog(QDialog):
             _psd = _up.urlparse(url)
             _netloc = _psd.netloc.lower()
             _path = _psd.path.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not inspect browse download URL %s: %s", url, exc)
             return url
 
         # Google Drive folder pages are not direct file downloads.
@@ -1211,7 +1213,8 @@ class DownloadInstallDialog(QDialog):
             _nl2 = _psd2.netloc.lower()
             _is_mf_raw = (_nl2 in ("www.mediafire.com", "mediafire.com")
                           and "/file/" in _psd2.path.lower())
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not inspect MediaFire browse URL %s: %s", raw_url, exc)
             _is_mf_raw = False
         if _is_mf_raw:
             self._dl_btn.setEnabled(False)
@@ -1245,7 +1248,8 @@ class DownloadInstallDialog(QDialog):
             _psd3 = _up.urlparse(raw_url)
             _nl3 = _psd3.netloc.lower()
             _is_yandex_raw = _nl3 in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk")
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not inspect Yandex browse URL %s: %s", raw_url, exc)
             _is_yandex_raw = False
         if _is_yandex_raw:
             self._dl_btn.setEnabled(False)
@@ -1355,7 +1359,8 @@ class DownloadInstallDialog(QDialog):
                     installed_size = sum(
                         f.stat().st_size for f in Path(dest).rglob('*') if f.is_file()
                     ) if Path(dest).exists() else 0
-                except Exception:
+                except Exception as exc:
+                    logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
                     installed_size = 0
                 shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -1694,11 +1699,18 @@ class PnachGitHubDialog(QDialog):
                                     status=STATUS_SUCCESS,
                                     size_bytes=_sz,
                                 )
-                            except Exception:
-                                pass
+                            except Exception as exc:
+                                logger.warning(
+                                    "Could not record PNACH download history for %s: %s",
+                                    patch["crc"],
+                                    exc,
+                                )
                         except Exception as _reg_exc:  # DB registration is best-effort
-                            import sys
-                            print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)
+                            logger.warning(
+                                "PNACH DB registration warning for %s: %s",
+                                patch["crc"],
+                                _reg_exc,
+                            )
                 else:
                     btn.setText("⬇ Install")
                     self._status.setText(f"❌  Download failed for {patch['filename']}.")
@@ -1710,8 +1722,12 @@ class PnachGitHubDialog(QDialog):
                             mod_type="pnach",
                             status=STATUS_FAILED,
                         )
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.warning(
+                            "Could not record failed PNACH download history for %s: %s",
+                            patch["crc"],
+                            exc,
+                        )
 
             QTimer.singleShot(0, _done)
 

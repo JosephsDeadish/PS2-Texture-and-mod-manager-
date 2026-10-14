@@ -411,8 +411,8 @@ class ModPanel(BasePanel):
                     errors = sum(1 for iss in issues if iss.severity == "error")
                     warnings = sum(1 for iss in issues if iss.severity == "warning")
                     pnach_validation[mid] = {"errors": errors, "warnings": warnings}
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Could not validate PNACH status for %s: %s", self.mod_type.value, exc)
 
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
@@ -685,8 +685,8 @@ class ModPanel(BasePanel):
             if mt in (ModType.PNACH, ModType.CHEAT):
                 try:
                     pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("Could not detect PNACH conflicts for %s: %s", mt.value, exc)
 
         if not conflicts and not pnach_conflicts:
             QMessageBox.information(
@@ -711,8 +711,8 @@ class ModPanel(BasePanel):
                 from src.core.pcsx2_layout import detect_pcsx2_subfolders
                 paths = detect_pcsx2_subfolders(pcsx2_root)
                 cheats_dir = paths.get("pnach_path", "")
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not determine cheats folder for PNACH code builder: %s", exc)
 
         # Try to pre-fill the game serial from the current library filter
         serial = ""
@@ -723,8 +723,8 @@ class ModPanel(BasePanel):
                 enabled_serials = {m.game_id for m in mods if m.enabled and m.game_id}
                 if len(enabled_serials) == 1:
                     serial = enabled_serials.pop()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not infer current game serial for PNACH code builder: %s", exc)
 
         dlg = PnachCodeBuilderDialog(
             game_serial=serial,

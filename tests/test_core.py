@@ -674,6 +674,28 @@ class TestDownloaderLogging(unittest.TestCase):
 
         self.assertTrue(any("Failed to inspect share URL" in msg for msg in logs.output))
 
+    @patch("src.core.downloader.download_file")
+    def test_async_downloader_surfaces_unexpected_errors(self, mock_download):
+        from src.core.downloader import AsyncDownloader
+        import threading
+
+        mock_download.side_effect = OSError("boom")
+        done = threading.Event()
+        messages = []
+
+        def _on_error(msg):
+            messages.append(msg)
+            done.set()
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            downloader = AsyncDownloader()
+            downloader.start("https://example.com/file.zip", "/tmp/out.zip", on_error=_on_error)
+            self.assertTrue(done.wait(timeout=2), "AsyncDownloader did not report the failure")
+
+        self.assertTrue(messages)
+        self.assertIn("boom", messages[0])
+        self.assertTrue(any("Unexpected async download failure" in msg for msg in logs.output))
+
 
 class TestArchiveExtraction(unittest.TestCase):
     """Tests for archive extraction utilities."""
@@ -19193,6 +19215,14 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             "Could not record failed browse download history for",
             "Could not load serial database for alias-aware browse filters",
             "Could not fetch browse cover art from",
+            "Could not download browse cover art from",
+            "Could not inspect browse download URL",
+            "Could not inspect MediaFire browse URL",
+            "Could not inspect Yandex browse URL",
+            "Could not determine downloaded size for",
+            "Could not record PNACH download history for",
+            "Could not record failed PNACH download history for",
+            "PNACH DB registration warning for",
         ):
             self.assertIn(snippet, src)
 
@@ -19527,6 +19557,22 @@ class TestWave91And92And93(unittest.TestCase):
                       "mod_panel must use QPushButton for count label (clickable)")
         self.assertIn("_on_count_lbl_clicked", src,
                       "mod_panel must have _on_count_lbl_clicked handler")
+
+    def test_mod_panel_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "mod_panel.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Could not validate PNACH status for",
+            "Could not detect PNACH conflicts for",
+            "Could not determine cheats folder for PNACH code builder",
+            "Could not infer current game serial for PNACH code builder",
+        ):
+            self.assertIn(snippet, src)
+
+    def test_setup_wizard_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "setup_wizard.py").read_text(encoding="utf-8")
+        self.assertIn("Could not create PCSX2 folders during setup", src)
 
     # ------------------------------------------------------------------
     # ValidationIssue dataclass structure (Wave 92)
