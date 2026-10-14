@@ -540,6 +540,41 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(count, 0)
         self.assertFalse((Path(target) / "tex.png").exists())
 
+    def test_resolve_conflict_logs_missing_mod(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        db.add(ModInfo(id="winner", name="Winner", mod_type=ModType.TEXTURE_PACK, path="/p"))
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict(conflict, "winner"))
+
+        self.assertTrue(any("missing mod(s)" in msg for msg in logs.output))
+
+    def test_resolve_conflict_disable_loser_logs_missing_loser(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        db.add(ModInfo(id="winner", name="Winner", mod_type=ModType.TEXTURE_PACK, path="/p"))
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict_disable_loser(conflict, "winner"))
+
+        self.assertTrue(any("missing mod" in msg for msg in logs.output))
+
+    def test_resolve_conflict_disable_loser_logs_invalid_winner(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict_disable_loser(conflict, "not-in-conflict"))
+
+        self.assertTrue(any("not part of the conflict" in msg for msg in logs.output))
+
 
 class TestMemoryCard(unittest.TestCase):
     """Test memory card utilities."""

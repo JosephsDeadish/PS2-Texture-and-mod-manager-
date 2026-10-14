@@ -1019,12 +1019,31 @@ class ModManager:
         Returns ``True`` if the resolution was applied, ``False`` if either
         mod is not found in the database.
         """
+        if winner_id not in (conflict.mod_a_id, conflict.mod_b_id):
+            logger.warning(
+                "Could not resolve conflict between %s and %s: winner %s is not part of the conflict",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                winner_id,
+            )
+            return False
         loser_id = (
             conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
         )
         winner = self.db.get(winner_id)
         loser = self.db.get(loser_id)
         if not winner or not loser:
+            missing = []
+            if not winner:
+                missing.append(winner_id)
+            if not loser:
+                missing.append(loser_id)
+            logger.warning(
+                "Could not resolve conflict between %s and %s: missing mod(s) %s",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                ", ".join(missing),
+            )
             return False
         winner.priority = max(winner.priority, loser.priority) + 1
         self.db.update(winner)
@@ -1041,11 +1060,25 @@ class ModManager:
         Returns ``True`` if the resolution was applied, ``False`` if either
         mod is not found.
         """
+        if winner_id not in (conflict.mod_a_id, conflict.mod_b_id):
+            logger.warning(
+                "Could not disable conflict loser between %s and %s: winner %s is not part of the conflict",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                winner_id,
+            )
+            return False
         loser_id = (
             conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
         )
         loser = self.db.get(loser_id)
         if not loser:
+            logger.warning(
+                "Could not disable conflict loser between %s and %s: missing mod %s",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                loser_id,
+            )
             return False
         loser.enabled = False
         self.db.update(loser)
