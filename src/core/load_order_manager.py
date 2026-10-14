@@ -88,6 +88,13 @@ class LoadOrderManager:
             return
         try:
             raw = json.loads(self._path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                logger.warning(
+                    "Failed to load load-order file %s: expected JSON object, got %s",
+                    self._path,
+                    type(raw).__name__,
+                )
+                return
             orders = raw.get("orders", {})
             if isinstance(orders, dict):
                 for serial, lst in orders.items():

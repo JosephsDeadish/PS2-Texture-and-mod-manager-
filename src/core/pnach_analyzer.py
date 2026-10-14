@@ -43,7 +43,14 @@ def _load_db() -> Dict[str, dict]:
     """Load the known-address database from disk.  Returns empty dict on error."""
     try:
         if _DB_FILE.is_file():
-            return json.loads(_DB_FILE.read_text(encoding="utf-8"))
+            raw = json.loads(_DB_FILE.read_text(encoding="utf-8"))
+            if isinstance(raw, dict):
+                return raw
+            logger.warning(
+                "Failed to load PNACH analyzer DB %s: expected JSON object, got %s",
+                _DB_FILE,
+                type(raw).__name__,
+            )
     except Exception as exc:
         logger.warning("Failed to load PNACH analyzer DB %s: %s", _DB_FILE, exc)
     return {}

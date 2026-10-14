@@ -5573,6 +5573,19 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertEqual(count, 0)
         self.assertTrue(any("Failed to load PNACH analyzer DB" in msg for msg in cm.output))
 
+    def test_reload_db_logs_when_database_root_is_invalid(self):
+        from src.core import pnach_analyzer as pa
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "known_addresses.json"
+            bad_db.write_text("[]", encoding="utf-8")
+            with patch.object(pa, "_DB_FILE", bad_db):
+                with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                    count = pa.reload_db()
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
+
     def test_db_file_exists(self):
         db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
         self.assertTrue(db_path.is_file(), "known_addresses.json should exist")
@@ -7196,6 +7209,26 @@ class TestInstalledScanner(unittest.TestCase):
         self.assertIn("pnach", types)
         self.assertIn("cheat", types)
         self.assertIn("cover_art", types)
+
+    def test_scan_all_logs_and_continues_when_one_scanner_fails(self):
+        from src.core.installed_scanner import scan_all
+        from src.models.mod import ModType
+
+        pnach_root = Path(self.tmpdir) / "cheats"
+        self._make_pnach(str(pnach_root), "F0A235B4")
+
+        class FakeConfig:
+            textures_path = str(Path(self.tmpdir) / "textures")
+            pnach_path = str(pnach_root)
+            cheats_path = ""
+            cover_art_path = ""
+
+        with patch("src.core.installed_scanner.scan_textures", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+                result = scan_all(FakeConfig())
+
+        self.assertTrue(any("Could not scan unmanaged texture packs" in msg for msg in logs.output))
+        self.assertTrue(any(item.item_type == ModType.PNACH for item in result))
 
     def test_scan_all_empty_config(self):
         from src.core.installed_scanner import scan_all
@@ -11621,6 +11654,16 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         self.assertEqual(lom.get_order("SLUS-20062"), [])
         self.assertTrue(any("Failed to load load-order file" in msg for msg in cm.output))
 
+    def test_load_non_object_json_logs_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        Path(self.order_file).write_text("[]", encoding="utf-8")
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as cm:
+            lom = LoadOrderManager(self.order_file)
+
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
+
     def test_clear_removes_all(self):
         from src.core.load_order_manager import LoadOrderManager
         lom = LoadOrderManager(self.order_file)
@@ -11885,6 +11928,16 @@ class TestWave53ModProfiles(unittest.TestCase):
 
         self.assertEqual(pm.list_profiles(), [])
         self.assertTrue(any("Failed to load mod profiles file" in msg for msg in cm.output))
+
+    def test_load_non_object_json_logs_warning(self):
+        from src.core.mod_profile import ModProfileManager
+
+        Path(self.profiles_file).write_text("[]", encoding="utf-8")
+        with self.assertLogs("src.core.mod_profile", level="WARNING") as cm:
+            pm = ModProfileManager(self.profiles_file)
+
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
 
     def test_reload_preserves_load_order(self):
         from src.core.mod_profile import ModProfileManager

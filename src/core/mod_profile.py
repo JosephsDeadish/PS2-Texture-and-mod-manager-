@@ -183,6 +183,13 @@ class ModProfileManager:
             return
         try:
             raw = json.loads(self._path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                logger.warning(
+                    "Failed to load mod profiles file %s: expected JSON object, got %s",
+                    self._path,
+                    type(raw).__name__,
+                )
+                return
             for pname, pdata in raw.get("profiles", {}).items():
                 if isinstance(pdata, dict):
                     self._profiles[pname] = ModProfile.from_dict(pname, pdata)

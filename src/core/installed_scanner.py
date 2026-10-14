@@ -417,10 +417,16 @@ def scan_all(config, managed_paths: Optional[Set[str]] = None) -> List[Unmanaged
     cheats_path   = getattr(config, "cheats_path", "")   or ""
     cover_art_path = getattr(config, "cover_art_path", "") or ""
 
-    results.extend(scan_textures(textures_path, managed_paths))
-    results.extend(scan_pnach(pnach_path, managed_paths))
-    results.extend(scan_cheats(cheats_path, managed_paths))
-    results.extend(scan_cover_art(cover_art_path, managed_paths))
+    def _extend_scan(label: str, scanner, *args) -> None:
+        try:
+            results.extend(scanner(*args))
+        except Exception as exc:
+            logger.warning("Could not scan unmanaged %s: %s", label, exc)
+
+    _extend_scan("texture packs", scan_textures, textures_path, managed_paths)
+    _extend_scan("PNACH files", scan_pnach, pnach_path, managed_paths)
+    _extend_scan("cheats", scan_cheats, cheats_path, managed_paths)
+    _extend_scan("cover art", scan_cover_art, cover_art_path, managed_paths)
 
     return results
 
