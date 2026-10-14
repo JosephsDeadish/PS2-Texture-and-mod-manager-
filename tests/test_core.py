@@ -12127,12 +12127,50 @@ class TestWave54ConflictVisualizer(unittest.TestCase):
         p = Path(self.tmpdir, "nonexistent.png")
         self.assertEqual(_detect_alpha_type(p), "unknown")
 
+    def test_detect_alpha_type_unreadable_file_logs_warning(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+
+        p = Path(self.tmpdir, "broken.png")
+        p.write_bytes(b"not used")
+
+        with patch("pathlib.Path.read_bytes", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                result = _detect_alpha_type(p)
+
+        self.assertEqual(result, "unknown")
+        self.assertTrue(any("Could not read texture file" in msg for msg in logs.output))
+
     def test_detect_alpha_type_truncated_png_returns_unknown(self):
         from src.core.conflict_resolver import _detect_alpha_type
         p = Path(self.tmpdir, "short.png")
         # Valid magic but not enough bytes for IHDR
         p.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 10)
         self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_file_size_bytes_missing_file_logs_warning(self):
+        from src.core.conflict_resolver import _file_size_bytes
+
+        p = Path(self.tmpdir, "missing.png")
+        with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+            size = _file_size_bytes(p)
+
+        self.assertEqual(size, 0)
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
+    def test_files_have_same_content_unreadable_logs_warning(self):
+        from src.core.conflict_resolver import _files_have_same_content
+
+        a = Path(self.tmpdir, "a.png")
+        b = Path(self.tmpdir, "b.png")
+        a.write_bytes(b"abc")
+        b.write_bytes(b"xyz")
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                same = _files_have_same_content(a, b)
+
+        self.assertFalse(same)
+        self.assertTrue(any("Could not compare texture file contents" in msg for msg in logs.output))
 
     # ------------------------------------------------------------------
     # TextureOverwriteConflict new fields

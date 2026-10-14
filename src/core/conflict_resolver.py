@@ -720,7 +720,13 @@ def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192
     try:
         with open(path_a, "rb") as fa, open(path_b, "rb") as fb:
             return fa.read(check_bytes) == fb.read(check_bytes)
-    except OSError:
+    except OSError as exc:
+        logger.warning(
+            "Could not compare texture file contents %s and %s: %s",
+            path_a,
+            path_b,
+            exc,
+        )
         return False
 
 
@@ -747,7 +753,8 @@ def _detect_alpha_type(path: Path) -> str:
     """
     try:
         data = path.read_bytes()
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not read texture file %s for alpha detection: %s", path, exc)
         return "unknown"
 
     if path.suffix.lower() == ".png":
@@ -772,7 +779,8 @@ def _file_size_bytes(path: Path) -> int:
     """Return the size of *path* in bytes, or 0 on error."""
     try:
         return path.stat().st_size
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not stat texture file %s: %s", path, exc)
         return 0
 
 
