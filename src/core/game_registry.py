@@ -1143,8 +1143,8 @@ def detect_game_serial_from_file(path: str) -> str:
             serial = detect_game_serial(str(p), content)
             if serial:
                 return serial
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not inspect file content while detecting serial from %s: %s", p, exc)
 
     return ""
 

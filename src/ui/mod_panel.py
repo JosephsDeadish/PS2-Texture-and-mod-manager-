@@ -1,5 +1,6 @@
 """Generic mod management panel for texture packs, pnach, cover art, saves, cheats."""
 
+import logging
 import os
 from pathlib import Path
 from typing import List
@@ -29,6 +30,8 @@ from src.ui.widgets import (
     ModDetailsDialog,
     ModItemWidget,
 )
+
+logger = logging.getLogger(__name__)
 
 
 _TYPE_META = {
@@ -598,7 +601,8 @@ class ModPanel(BasePanel):
         try:
             from src.core.game_library import get_library_serials
             return get_library_serials(path)
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not load library serials for mod panel: %s", exc)
             return frozenset()
 
     def _filter_by_author(self, author: str):
@@ -851,4 +855,5 @@ class ModPanel(BasePanel):
                 )
             self._apply_filter()
         except Exception as exc:
+            logger.warning("Could not import mod in mod panel: %s", exc)
             QMessageBox.critical(self, "Import Error", str(exc))

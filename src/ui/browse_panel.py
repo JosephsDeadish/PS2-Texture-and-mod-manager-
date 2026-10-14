@@ -608,8 +608,8 @@ class CatalogueCard(QFrame):
                     loaded[0] = True
                 try:
                     os.unlink(tmp)
-                except OSError:
-                    pass
+                except OSError as exc:
+                    logger.warning("Could not remove temporary browse cover art file %s: %s", tmp, exc)
 
             QTimer.singleShot(0, _update)
             return True

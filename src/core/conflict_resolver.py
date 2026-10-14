@@ -809,8 +809,8 @@ def _scan_replacements_dir(
                 if Path(fname).suffix.lower() in _TEXTURE_EXTS:
                     # Key on the basename — this is what PCSX2 matches against.
                     result.setdefault(fname, Path(dirpath) / fname)
-    except PermissionError:
-        pass
+    except PermissionError as exc:
+        logger.warning("Could not scan replacements directory %s: %s", replacements, exc)
     return result
 
 

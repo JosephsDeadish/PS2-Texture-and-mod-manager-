@@ -1822,6 +1822,21 @@ class TestGameRegistryExpanded(unittest.TestCase):
         from src.core.game_registry import detect_serial_from_path
         self.assertEqual(detect_serial_from_path("SLUS-20672.png"), "SLUS-20672")
 
+    def test_detect_game_serial_logs_file_read_failure(self):
+        from src.core.game_registry import detect_game_serial_from_file
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            path = tmp.name
+        try:
+            with patch("builtins.open", side_effect=OSError("denied")):
+                with self.assertLogs("src.core.game_registry", level="WARNING") as logs:
+                    self.assertEqual(detect_game_serial_from_file(path), "")
+            self.assertTrue(any("Could not inspect file content while detecting serial" in msg for msg in logs.output))
+        finally:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+
     # ------------------------------------------------------------------
     # title_to_serials
     # ------------------------------------------------------------------
@@ -11383,6 +11398,16 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         result = resolve_texture_overwrite_conflicts("/nonexistent/path")
         self.assertEqual(result, [])
 
+    def test_permission_error_logs_warning(self):
+        from src.core.conflict_resolver import _scan_replacements_dir
+        repl = Path(self.tmpdir) / "textures" / "SLUS-20062" / "replacements"
+        repl.mkdir(parents=True, exist_ok=True)
+        with patch("src.core.conflict_resolver.os.walk", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                result = _scan_replacements_dir(repl)
+        self.assertEqual(result, {})
+        self.assertTrue(any("Could not scan replacements directory" in msg for msg in logs.output))
+
     def test_conflict_summary_readable(self):
         from src.core.conflict_resolver import TextureOverwriteConflict
         c = TextureOverwriteConflict(
@@ -19216,6 +19241,7 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             "Could not load serial database for alias-aware browse filters",
             "Could not fetch browse cover art from",
             "Could not download browse cover art from",
+            "Could not remove temporary browse cover art file",
             "Could not inspect browse download URL",
             "Could not inspect MediaFire browse URL",
             "Could not inspect Yandex browse URL",
@@ -19564,8 +19590,10 @@ class TestWave91And92And93(unittest.TestCase):
         for snippet in (
             "Could not validate PNACH status for",
             "Could not detect PNACH conflicts for",
+            "Could not load library serials for mod panel",
             "Could not determine cheats folder for PNACH code builder",
             "Could not infer current game serial for PNACH code builder",
+            "Could not import mod in mod panel",
         ):
             self.assertIn(snippet, src)
 
