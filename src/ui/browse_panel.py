@@ -1816,7 +1816,8 @@ class GBATempScraperDialog(QDialog):
         import urllib.parse as _up
         try:
             netloc = _up.urlparse(url).netloc.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not classify browse URL %s: %s", url, exc)
             return ""
         # Match exact domain or subdomain (e.g. www.gbatemp.net)
         if netloc == "gbatemp.net" or netloc.endswith(".gbatemp.net"):

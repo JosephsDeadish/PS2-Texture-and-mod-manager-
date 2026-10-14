@@ -263,6 +263,11 @@ def restore_backup(entry: BackupEntry, config) -> int:
             try:
                 dest_file.resolve().relative_to(dest_root.resolve())
             except ValueError:
+                logger.warning(
+                    "Skipping backup archive entry outside destination %s: %s",
+                    dest_root,
+                    info.filename,
+                )
                 continue
             dest_file.parent.mkdir(parents=True, exist_ok=True)
             with zf.open(info) as src, open(dest_file, "wb") as dst:

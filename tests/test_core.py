@@ -3708,6 +3708,45 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "",
         )
 
+    def test_invalid_url_logs_warning_and_returns_empty(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import GBATempScraperDialog
+
+            with patch("urllib.parse.urlparse", side_effect=ValueError("boom")):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = GBATempScraperDialog._classify_url("not a url")
+
+        self.assertEqual(result, "")
+        self.assertTrue(any("Could not classify browse URL" in msg for msg in logs.output))
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
@@ -7783,12 +7822,14 @@ class TestBackupManager(unittest.TestCase):
             created_at="1999-01-01T00:00:00",
             size_bytes=0,
         )
-        count = restore_backup(entry, self.cfg)
+        with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+            count = restore_backup(entry, self.cfg)
         # The evil file must NOT have been written outside cheats_dir
         evil_file = os.path.join(self.tmpdir, "evil.txt")
         self.assertFalse(os.path.exists(evil_file), "Zip-slip path traversal was not blocked")
         # And nothing should have been restored (the entry was skipped)
         self.assertEqual(count, 0)
+        self.assertTrue(any("Skipping backup archive entry outside destination" in msg for msg in logs.output))
 
 
 # ===========================================================================
