@@ -2811,6 +2811,7 @@ class CustomCardDialog(QDialog):
         try:
             out_path = save_entry(entry)
         except Exception as exc:
+            logger.warning("Could not save custom catalogue card: %s", exc)
             QMessageBox.critical(self, "Save Error", f"Could not save card:\n{exc}")
             return
 
@@ -2944,6 +2945,7 @@ class InstalledScannerDialog(QDialog):
             from src.core.installed_scanner import scan_all, find_catalogue_matches
             from src.core.catalogue_loader import CATALOGUE
         except Exception as exc:
+            logger.warning("Could not import unmanaged-content scan helpers: %s", exc)
             self._detail_label.setText(f"Scan failed: {exc}")
             return
 
@@ -3174,6 +3176,7 @@ class ConflictResolverDialog(QDialog):
         try:
             from src.core.conflict_resolver import resolve_all_conflicts
         except Exception as exc:
+            logger.warning("Could not import conflict scan helpers: %s", exc)
             self._detail_label.setText(f"Scan failed: {exc}")
             return
 
@@ -3257,6 +3260,7 @@ class ConflictResolverDialog(QDialog):
             from src.core.conflict_resolver import auto_fix_conflict
             ok, message = auto_fix_conflict(conflict)
         except Exception as exc:
+            logger.warning("Could not auto-fix conflict %s: %s", conflict.conflict_type, exc)
             QMessageBox.critical(self, "Auto-Fix Error", str(exc))
             return
 
@@ -3417,6 +3421,7 @@ class BackupManagerDialog(QDialog):
             from src.core.backup_manager import list_backups
             self._entries = list_backups(self._config)
         except Exception as exc:
+            logger.warning("Could not list backups: %s", exc)
             self._entries = []
             self._detail_label.setText(f"<i>Could not read backups: {exc}</i>")
             return
@@ -3459,6 +3464,7 @@ class BackupManagerDialog(QDialog):
             from src.core.backup_manager import create_backup
             entry = create_backup(self._config, note=note)
         except Exception as exc:
+            logger.warning("Could not create backup: %s", exc)
             QMessageBox.critical(self, "Backup Failed", str(exc))
             return
 
@@ -3496,6 +3502,7 @@ class BackupManagerDialog(QDialog):
             self._refresh_list()
             return
         except Exception as exc:
+            logger.warning("Could not restore backup %s: %s", entry.label, exc)
             QMessageBox.critical(self, "Restore Failed", str(exc))
             return
 
@@ -3726,6 +3733,7 @@ class DownloadHistoryDialog(QDialog):
                 serial=serial_filter,
             )
         except Exception as exc:
+            logger.warning("Could not load download history: %s", exc)
             self._entries = []
             self._detail_label.setText(f"<i>Could not read history: {exc}</i>")
 
@@ -3831,6 +3839,7 @@ class DownloadHistoryDialog(QDialog):
             from src.core.download_history import export_history_csv
             result = export_history_csv(self._config, path=path)
         except Exception as exc:
+            logger.warning("Could not export download history CSV to %s: %s", path, exc)
             QMessageBox.critical(self, "Export Failed", str(exc))
             return
 
@@ -4024,6 +4033,7 @@ class ModNotesDialog(QDialog):
                 query=query_text if query_text else None,
             )
         except Exception as exc:
+            logger.warning("Could not refresh mod notes list: %s", exc)
             self._notes = []
             self._meta_label.setText(f"<i>Could not read notes: {exc}</i>")
 
@@ -4086,6 +4096,7 @@ class ModNotesDialog(QDialog):
                 text        = new_text,
             )
         except Exception as exc:
+            logger.warning("Could not save mod note %s: %s", note.entry_id, exc)
             QMessageBox.critical(self, "Save Failed", str(exc))
             return
 
@@ -4139,6 +4150,7 @@ class ModNotesDialog(QDialog):
                 mod_type    = mod_type,
             )
         except Exception as exc:
+            logger.warning("Could not create mod note %s: %s", slug, exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
 
@@ -4186,6 +4198,7 @@ class ModNotesDialog(QDialog):
             from src.core.mod_notes import export_notes_csv
             result = export_notes_csv(self._config, path=path)
         except Exception as exc:
+            logger.warning("Could not export mod notes CSV to %s: %s", path, exc)
             QMessageBox.critical(self, "Export Failed", str(exc))
             return
 

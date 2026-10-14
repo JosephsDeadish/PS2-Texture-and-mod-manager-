@@ -1504,6 +1504,132 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         fake.reject.assert_not_called()
 
 
+class TestWidgetsLogging(unittest.TestCase):
+    """Widgets with recoverable failures should log before surfacing errors."""
+
+    def _stub_widget_modules(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AlignmentFlag=types.SimpleNamespace(AlignRight=0),
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            TextFormat=types.SimpleNamespace(RichText=0),
+            CursorShape=types.SimpleNamespace(PointingHandCursor=0),
+            ItemDataRole=types.SimpleNamespace(UserRole=256),
+            ItemFlag=types.SimpleNamespace(ItemIsEnabled=1),
+        )
+        qtcore.QSize = type("QSize", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.QThread = type("QThread", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QApplication", "QCheckBox", "QComboBox", "QDialog", "QDialogButtonBox",
+            "QFileDialog", "QFrame", "QGridLayout", "QHBoxLayout", "QLabel",
+            "QLineEdit", "QListWidget", "QListWidgetItem", "QProgressBar",
+            "QPushButton", "QScrollArea", "QSizePolicy", "QSpacerItem",
+            "QSplitter", "QTabWidget", "QTextEdit", "QVBoxLayout", "QWidget",
+            "QMessageBox",
+        ):
+            cls = type(name, (), {})
+            if name == "QMessageBox":
+                cls.critical = staticmethod(lambda *args, **kwargs: None)
+                cls.information = staticmethod(lambda *args, **kwargs: None)
+                cls.warning = staticmethod(lambda *args, **kwargs: None)
+                cls.question = staticmethod(lambda *args, **kwargs: None)
+            setattr(qtwidgets, name, cls)
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        for name in ("QPixmap", "QFont", "QIcon"):
+            setattr(qtgui, name, type(name, (), {}))
+
+        return patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        )
+
+    def test_custom_card_save_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import CustomCardDialog
+
+            fake = SimpleNamespace(
+                _type_combo=MagicMock(),
+                _name_edit=MagicMock(),
+                _game_edit=MagicMock(),
+                _serial_edit=MagicMock(),
+                _author_edit=MagicMock(),
+                _url_edit=MagicMock(),
+                _desc_edit=MagicMock(),
+                _source_edit=MagicMock(),
+                _size_edit=MagicMock(),
+                _status=MagicMock(),
+                card_created=MagicMock(),
+                accept=MagicMock(),
+            )
+            fake._type_combo.currentData.return_value = "texture_pack"
+            fake._name_edit.text.return_value = "Pack"
+            fake._game_edit.text.return_value = "Game"
+            fake._serial_edit.text.return_value = "SLUS-20062"
+            fake._author_edit.text.return_value = "Author"
+            fake._url_edit.text.return_value = ""
+            fake._desc_edit.toPlainText.return_value = ""
+            fake._source_edit.text.return_value = ""
+            fake._size_edit.text.return_value = ""
+
+            entry = object()
+            with patch("src.core.custom_card_builder.build_entry", return_value=entry):
+                with patch("src.core.custom_card_builder.save_entry", side_effect=OSError("denied")):
+                    with patch("src.ui.widgets.QMessageBox.critical") as critical:
+                        with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                            CustomCardDialog._on_accept(fake)
+
+        self.assertTrue(any("Could not save custom catalogue card" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_mod_notes_refresh_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import ModNotesDialog
+
+            fake = SimpleNamespace(
+                _type_combo=MagicMock(),
+                _search_edit=MagicMock(),
+                _config=AppConfig(),
+                _TYPE_MAP=ModNotesDialog._TYPE_MAP,
+                _meta_label=MagicMock(),
+                _list_widget=MagicMock(),
+                _title_label=MagicMock(),
+                _text_edit=MagicMock(),
+                _save_btn=MagicMock(),
+                _delete_btn=MagicMock(),
+            )
+            fake._type_combo.currentText.return_value = "All"
+            fake._search_edit.text.return_value = ""
+
+            with patch("src.core.mod_notes.list_notes", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                    ModNotesDialog._refresh(fake)
+
+        self.assertTrue(any("Could not refresh mod notes list" in msg for msg in logs.output))
+        fake._list_widget.clear.assert_called_once()
+        fake._title_label.setText.assert_called()
+
+
 class TestAssetPaths(unittest.TestCase):
     """Tests for src.core.assets path helpers."""
 
