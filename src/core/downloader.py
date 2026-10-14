@@ -794,7 +794,6 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
 
     except Exception as exc:
         logger.warning("Failed to scrape GBAtemp page %s: %s", thread_url, exc)
-        pass
 
     return result
 
@@ -924,6 +923,5 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
 
     except Exception as exc:
         logger.warning("Failed to scrape PS2-Home post %s: %s", post_url, exc)
-        pass
 
     return result

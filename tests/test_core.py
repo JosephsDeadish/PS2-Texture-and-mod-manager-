@@ -6796,6 +6796,26 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         label = result[0].size_label
         self.assertTrue(label, "size_label should not be empty")
 
+    def test_dir_size_and_count_logs_warning_on_stat_failure(self):
+        from src.core.texture_scanner import _dir_size_and_count
+
+        rep = self._create_texture_pack("SLUS-20062", ["tex.png"])
+        file_path = rep / "tex.png"
+        orig_stat = Path.stat
+
+        def stat_side_effect(self):
+            if self == file_path:
+                raise OSError("denied")
+            return orig_stat(self)
+
+        with patch("os.walk", return_value=[(str(rep), [], ["tex.png"])]):
+            with patch("pathlib.Path.stat", autospec=True, side_effect=stat_side_effect):
+                with self.assertLogs("src.core.texture_scanner", level="WARNING") as logs:
+                    total, count = _dir_size_and_count(rep)
+
+        self.assertEqual((total, count), (0, 0))
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
     def test_results_sorted_by_serial(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
         self._create_texture_pack("SLUS-20999", ["a.png"])
@@ -6927,6 +6947,18 @@ class TestInstalledScanner(unittest.TestCase):
         fp = self._make_cover(self.tmpdir, "SCUS-97199")
         result = scan_cover_art(self.tmpdir, managed_paths={str(fp.resolve())})
         self.assertEqual(result, [])
+
+    def test_file_size_logs_warning_on_stat_failure(self):
+        from src.core.installed_scanner import _file_size
+
+        fp = self._make_cover(self.tmpdir, "SCUS-97199")
+
+        with patch("pathlib.Path.stat", autospec=True, side_effect=OSError("denied")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+                size = _file_size(fp)
+
+        self.assertEqual(size, 0)
+        self.assertTrue(any("Could not stat installed file" in msg for msg in logs.output))
 
     # scan_textures -------------------------------------------------------
 

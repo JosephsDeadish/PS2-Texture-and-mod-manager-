@@ -187,7 +187,6 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
                 addresses.add(m.group(1).upper())
     except OSError as exc:
         logger.warning("Could not read PNACH addresses from %s: %s", path, exc)
-        pass
     return addresses
 
 
@@ -295,7 +294,6 @@ def _files_identical(p_file: Path, c_file: Path) -> bool:
             return False
     except OSError as exc:
         logger.warning("Could not compare PNACH file sizes for %s and %s: %s", p_file, c_file, exc)
-        pass
     p_hash = _hash_file(p_file)
     c_hash = _hash_file(c_file)
     return bool(p_hash) and p_hash == c_hash
@@ -390,7 +388,6 @@ def resolve_pnach_conflicts(
                     result[crc] = f
         except PermissionError as exc:
             logger.warning("Could not scan PNACH directory %s: %s", directory, exc)
-            pass
         return result
 
     pnach_files  = _crc_map(pnach_dir)

@@ -59,8 +59,12 @@ def _dir_size_and_count(path: Path):
                 try:
                     total += (Path(root) / fname).stat().st_size
                     count += 1
-                except OSError:
-                    pass
+                except OSError as exc:
+                    logger.warning(
+                        "Could not stat texture file %s: %s",
+                        Path(root) / fname,
+                        exc,
+                    )
     except PermissionError as exc:
         logger.warning("Could not read files under %s: %s", path, exc)
     return total, count

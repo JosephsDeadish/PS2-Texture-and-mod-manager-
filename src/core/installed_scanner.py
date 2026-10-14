@@ -71,8 +71,12 @@ def _dir_size_and_count(path: Path):
                 try:
                     total += (Path(root) / fname).stat().st_size
                     count += 1
-                except OSError:
-                    pass
+                except OSError as exc:
+                    logger.warning(
+                        "Could not stat installed file %s: %s",
+                        Path(root) / fname,
+                        exc,
+                    )
     except PermissionError as exc:
         logger.warning("Could not read files under %s: %s", path, exc)
     return total, count
@@ -81,7 +85,8 @@ def _dir_size_and_count(path: Path):
 def _file_size(path: Path) -> int:
     try:
         return path.stat().st_size
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not stat installed file %s: %s", path, exc)
         return 0
 
 
