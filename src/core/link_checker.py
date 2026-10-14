@@ -18,11 +18,14 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
@@ -206,6 +209,7 @@ class LinkChecker:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except Exception as exc:
+            logger.warning("Could not parse catalogue link file %s: %s", path, exc)
             return [LinkIssue(
                 source_file=label,
                 entry_index=-1,

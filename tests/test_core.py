@@ -8002,6 +8002,20 @@ class TestBackupManager(unittest.TestCase):
         entry = create_backup(self.cfg)
         self.assertTrue(os.path.isfile(entry.path))
 
+    def test_create_backup_logs_and_cleans_up_on_failure(self):
+        from src.core.backup_manager import create_backup, get_backup_dir
+
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+
+        with patch("zipfile.ZipFile.write", side_effect=OSError("disk full")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    create_backup(self.cfg)
+
+        backup_dir = get_backup_dir(self.cfg)
+        self.assertEqual(list(backup_dir.iterdir()), [])
+        self.assertTrue(any("Failed to create backup archive" in msg for msg in logs.output))
+
     # -----------------------------------------------------------------------
     # list_backups
     # -----------------------------------------------------------------------
@@ -8088,6 +8102,41 @@ class TestBackupManager(unittest.TestCase):
         entry = create_backup(self.cfg)
         count = restore_backup(entry, self.cfg)
         self.assertEqual(count, 2)
+
+    def test_restore_backup_continues_after_file_write_error(self):
+        from src.core.backup_manager import restore_backup, BackupEntry, get_backup_dir
+        import builtins
+        import zipfile
+
+        backup_dir = get_backup_dir(self.cfg)
+        archive = backup_dir / "backup_20250101_000001.zip"
+        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("cheats_ws/DEADBEEF.pnach", "patch=1,EE,0,word,1")
+            zf.writestr("covers/SLUS-20062.png", b"PNG")
+
+        entry = BackupEntry(
+            path=str(archive),
+            label=archive.name,
+            created_at="2025-01-01T00:00:01",
+            size_bytes=0,
+        )
+        failing_dest = os.path.join(self.covers_dir, "SLUS-20062.png")
+        original_open = builtins.open
+
+        def flaky_open(file, mode="r", *args, **kwargs):
+            if os.fspath(file) == failing_dest and "w" in mode:
+                raise OSError("disk full")
+            return original_open(file, mode, *args, **kwargs)
+
+        with patch("builtins.open", side_effect=flaky_open):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                count = restore_backup(entry, self.cfg)
+
+        self.assertEqual(count, 1)
+        self.assertTrue(os.path.exists(os.path.join(self.cheats_ws_dir, "DEADBEEF.pnach")))
+        self.assertFalse(os.path.exists(failing_dest))
+        self.assertTrue(any("Failed to restore backup entry" in msg for msg in logs.output))
+        self.assertTrue(any("with 1 failure(s)" in msg for msg in logs.output))
 
     def test_restore_missing_archive_raises(self):
         from src.core.backup_manager import BackupEntry, restore_backup
@@ -8642,6 +8691,18 @@ class TestModNotes(unittest.TestCase):
     def test_list_notes_empty_when_no_file(self):
         from src.core.mod_notes import list_notes
         self.assertEqual(list_notes(self.cfg), [])
+
+    def test_list_notes_invalid_json_logs_warning(self):
+        from src.core.mod_notes import list_notes
+
+        notes_path = Path(self.tmpdir) / "mod_notes.json"
+        notes_path.write_text("{not valid json", encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+            notes = list_notes(self.cfg)
+
+        self.assertEqual(notes, [])
+        self.assertTrue(any("Could not load mod notes" in msg for msg in logs.output))
 
     def test_list_notes_filter_mod_type(self):
         from src.core.mod_notes import upsert_note, list_notes
@@ -9381,6 +9442,20 @@ class TestLinkChecker(unittest.TestCase):
         )
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "malformed")
+
+    def test_check_file_logs_parse_error(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text("{not valid json", encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "parse_error")
+        self.assertTrue(any("Could not parse catalogue link file" in msg for msg in logs.output))
 
     def test_bad_domain_flagged(self):
         from src.core.link_checker import LinkChecker
@@ -19696,6 +19771,7 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             "Could not record browse download history for",
             "Could not record failed browse download history for",
             "Could not load serial database for alias-aware browse filters",
+            "Could not scan game library for browse bulk download",
             "Could not fetch browse cover art from",
             "Could not download browse cover art from",
             "Could not remove temporary browse cover art file",

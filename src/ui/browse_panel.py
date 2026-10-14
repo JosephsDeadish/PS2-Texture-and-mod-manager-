@@ -903,6 +903,7 @@ class CoverDownloadDialog(QDialog):
             try:
                 games = scan_library(lib_path)
             except Exception as exc:
+                logger.warning("Could not scan game library for browse bulk download: %s", exc)
                 err = str(exc)
 
                 def _err():
