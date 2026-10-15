@@ -183,7 +183,13 @@ def scan_library(
     entries: List[GameEntry] = []
     seen_paths: set = set()
 
-    walk_fn = os.walk if recursive else _flat_walk
+    def _walk_with_errors(root_dir: str):
+        def _onerror(exc: OSError) -> None:
+            log.warning("Could not scan game library folder %s: %s", exc.filename or root_dir, exc)
+
+        yield from os.walk(root_dir, onerror=_onerror)
+
+    walk_fn = _walk_with_errors if recursive else _flat_walk
     for dirpath, _dirs, filenames in walk_fn(str(root)):
         for fname in filenames:
             ext = Path(fname).suffix.lower()
@@ -223,7 +229,8 @@ def scan_library(
 
             try:
                 size = Path(full).stat().st_size
-            except OSError:
+            except OSError as exc:
+                log.warning("Could not determine file size for %s: %s", full, exc)
                 size = 0
 
             entries.append(GameEntry(
@@ -263,7 +270,8 @@ def _flat_walk(root: str):
     p = Path(root)
     try:
         names = list(os.scandir(root))
-    except PermissionError:
+    except PermissionError as exc:
+        log.warning("Could not scan game library folder %s: %s", root, exc)
         return
     files = [e.name for e in names if e.is_file(follow_symlinks=True)]
     dirs = [e.name for e in names if e.is_dir(follow_symlinks=True)]

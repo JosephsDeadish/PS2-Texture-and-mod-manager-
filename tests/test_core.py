@@ -8200,6 +8200,37 @@ class TestGameLibrary(unittest.TestCase):
         self.assertEqual(games[0].crcs, [])
         self.assertTrue(any("Failed to resolve CRCs" in msg for msg in logs.output))
 
+    def test_scan_library_logs_permission_error_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+
+            with patch("src.core.game_library.os.scandir", side_effect=PermissionError("denied")):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(games, [])
+        self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+
+    def test_scan_library_logs_size_lookup_failure_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d, "SLUS-20891.iso")
+            path.write_bytes(b"\x00")
+
+            real_stat = Path.stat
+
+            def fake_stat(self):
+                if self.name == "SLUS-20891.iso":
+                    raise OSError("stale handle")
+                return real_stat(self)
+
+            with patch.object(Path, "stat", fake_stat):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(len(games), 1)
+        self.assertEqual(games[0].size_bytes, 0)
+        self.assertTrue(any("Could not determine file size" in msg for msg in logs.output))
+
 
 # =============================================================================
 # AppConfig game_library_path field
