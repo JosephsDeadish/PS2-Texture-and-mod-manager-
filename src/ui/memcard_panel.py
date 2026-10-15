@@ -1,5 +1,6 @@
 """Memory Card / Save File manager panel."""
 
+import logging
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
@@ -31,9 +32,12 @@ from src.core.memory_card import (
     list_memcard_files,
     list_saves,
 )
+from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import EmptyStateWidget
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryCardPanel(BasePanel):
@@ -44,6 +48,16 @@ class MemoryCardPanel(BasePanel):
         self.config = config
         self._current_card: str = ""
         self._build()
+
+    def _last_paths_bucket(self) -> dict:
+        return ui_state_bucket(self.config, "last_paths")
+
+    def _remember_last_path(self, key: str, path: str) -> None:
+        self._last_paths_bucket()[key] = path
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card panel state after %s: %s", key, exc)
 
     def _build(self):
         content = self._content_layout
@@ -173,13 +187,15 @@ class MemoryCardPanel(BasePanel):
         self._load_saves()
 
     def _browse_card(self):
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Open Memory Card",
-            self.config.memcards_path or "",
+            last_paths.get("memcard_card_dir", self.config.memcards_path or ""),
             "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
         )
         if path:
+            self._remember_last_path("memcard_card_dir", str(Path(path).parent))
             # Add to combo if not already there
             for i in range(self._card_combo.count()):
                 if self._card_combo.itemData(i) == path:
@@ -233,11 +249,15 @@ class MemoryCardPanel(BasePanel):
         # Get destination folder — prefer configured memcards dir
         cards_dir = self.config.memcards_path
         if not cards_dir:
+            last_paths = self._last_paths_bucket()
             cards_dir = QFileDialog.getExistingDirectory(
-                self, "Choose folder for new memory card"
+                self,
+                "Choose folder for new memory card",
+                last_paths.get("memcard_new_card_dir", ""),
             )
             if not cards_dir:
                 return
+            self._remember_last_path("memcard_new_card_dir", cards_dir)
 
         name, ok = QInputDialog.getText(
             self,
@@ -277,9 +297,15 @@ class MemoryCardPanel(BasePanel):
         if not save_name:
             return
 
-        dest = QFileDialog.getExistingDirectory(self, "Export Save To…")
+        last_paths = self._last_paths_bucket()
+        dest = QFileDialog.getExistingDirectory(
+            self,
+            "Export Save To…",
+            last_paths.get("memcard_export_dir", ""),
+        )
         if not dest:
             return
+        self._remember_last_path("memcard_export_dir", dest)
 
         try:
             path = export_save(self._current_card, save_name, dest)
@@ -294,9 +320,15 @@ class MemoryCardPanel(BasePanel):
             QMessageBox.information(self, "No Card", "Please select a memory card first.")
             return
 
-        dest = QFileDialog.getExistingDirectory(self, "Export All Saves To…")
+        last_paths = self._last_paths_bucket()
+        dest = QFileDialog.getExistingDirectory(
+            self,
+            "Export All Saves To…",
+            last_paths.get("memcard_export_dir", ""),
+        )
         if not dest:
             return
+        self._remember_last_path("memcard_export_dir", dest)
 
         try:
             saves = list_saves(self._current_card)
@@ -328,12 +360,14 @@ class MemoryCardPanel(BasePanel):
             QMessageBox.information(self, "No Card", "Please select a memory card first.")
             return
 
+        last_paths = self._last_paths_bucket()
         dest_dir = QFileDialog.getExistingDirectory(
             self, "Choose backup destination folder",
-            self.config.memcards_path or "",
+            last_paths.get("memcard_backup_dir", self.config.memcards_path or ""),
         )
         if not dest_dir:
             return
+        self._remember_last_path("memcard_backup_dir", dest_dir)
 
         try:
             backup_path = backup_memcard(self._current_card, dest_dir)
@@ -355,14 +389,16 @@ class MemoryCardPanel(BasePanel):
             QMessageBox.information(self, "No Card", "Please select a memory card first.")
             return
 
+        last_paths = self._last_paths_bucket()
         src_path, _ = QFileDialog.getOpenFileName(
             self,
             "Select Save File to Import",
-            "",
+            last_paths.get("memcard_import_file_dir", self.config.memcards_path or ""),
             "Save Dumps (*.bin);;All Files (*)",
         )
         if not src_path:
             return
+        self._remember_last_path("memcard_import_file_dir", str(Path(src_path).parent))
 
         save_name, ok = QInputDialog.getText(
             self,
@@ -413,14 +449,16 @@ class MemoryCardPanel(BasePanel):
         if not save_name:
             return
 
+        last_paths = self._last_paths_bucket()
         dest_card, _ = QFileDialog.getOpenFileName(
             self,
             "Select Destination Memory Card",
-            self.config.memcards_path or "",
+            last_paths.get("memcard_copy_card_dir", self.config.memcards_path or ""),
             "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
         )
         if not dest_card:
             return
+        self._remember_last_path("memcard_copy_card_dir", str(Path(dest_card).parent))
 
         if dest_card == self._current_card:
             QMessageBox.warning(self, "Same Card", "Source and destination are the same card.")
@@ -440,4 +478,3 @@ class MemoryCardPanel(BasePanel):
             self.emit_status(f"Copied '{save_name}' → {Path(dest_card).name}")
         except MemoryCardError as exc:
             QMessageBox.critical(self, "Copy Error", str(exc))
-

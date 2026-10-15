@@ -16,7 +16,7 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from src.models.mod import AppConfig, ConflictInfo, ModInfo, ModStatus, ModType
-from src.core.config_manager import detect_pcsx2_paths, load_config, save_config
+from src.core.config_manager import detect_pcsx2_paths, load_config, save_config, ui_state_bucket
 from src.core.mod_manager import ModDatabase, ModManager
 
 
@@ -3621,6 +3621,15 @@ class TestAppConfigFieldChanges(unittest.TestCase):
             },
         )
 
+    def test_ui_state_bucket_round_trip(self):
+        cfg = AppConfig()
+        ui_state_bucket(cfg, "main_window")["selected_nav_index"] = 3
+        ui_state_bucket(cfg, "last_paths")["import_folder"] = "/tmp/imports"
+
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(restored.ui_state["main_window"]["selected_nav_index"], 3)
+        self.assertEqual(restored.ui_state["last_paths"]["import_folder"], "/tmp/imports")
+
     def test_old_config_without_browse_filter_fields_uses_defaults(self):
         """Configs saved before the browse-filter fields were added should load fine."""
         old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
@@ -5183,6 +5192,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             browse_favorites_only=True,
             browse_sort_mode="game",
             browse_selected_tab=5,
+            ui_state={"browse_panel": {"in_app_only": True}},
         )
         panel._search = FakeLineEdit()
         panel._source_filter = FakeComboBox([
@@ -5202,6 +5212,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         ])
         panel._sort_filter.index = 2
         panel._favs_check = FakeCheckBox()
+        panel._in_app_check = FakeCheckBox()
         panel._tabs = FakeTabs(count=3)
 
         panel._restore_browse_state()
@@ -5211,6 +5222,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._author_filter.currentData(), "Curse_Arms")
         self.assertEqual(panel._sort_filter.currentData(), "game")
         self.assertTrue(panel._favs_check.checked)
+        self.assertTrue(panel._in_app_check.checked)
         self.assertEqual(panel._tabs.currentIndex(), 2)
 
     def test_active_tab_index_logs_when_tabs_fail(self):
@@ -5243,6 +5255,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         panel._author_filter = types.SimpleNamespace(currentData=lambda: "Curse_Arms")
         panel._sort_filter = types.SimpleNamespace(currentData=lambda: "name")
         panel._favs_check = types.SimpleNamespace(isChecked=lambda: True)
+        panel._in_app_check = types.SimpleNamespace(isChecked=lambda: True)
         panel._tabs = types.SimpleNamespace(count=lambda: 4, currentIndex=lambda: 2)
 
         with patch.object(browse_panel, "_save_browse_config") as save_mock:
@@ -5254,7 +5267,95 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertTrue(panel.config.browse_favorites_only)
         self.assertEqual(panel.config.browse_sort_mode, "name")
         self.assertEqual(panel.config.browse_selected_tab, 2)
+        self.assertTrue(panel.config.ui_state["browse_panel"]["in_app_only"])
         save_mock.assert_called_once_with(panel.config, "persisting browse state")
+
+    def test_clear_filters_resets_defaults_and_persists_ui_state(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeWidget:
+            def __init__(self):
+                self.blocked = False
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit(FakeWidget):
+            def __init__(self):
+                super().__init__()
+                self.value = "gta"
+
+            def text(self):
+                return self.value
+
+            def clear(self):
+                self.value = ""
+
+        class FakeComboBox(FakeWidget):
+            def __init__(self):
+                super().__init__()
+                self.index = 1
+                self.values = ["", "value"]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                return self.values[self.index]
+
+        class FakeCheckBox(FakeWidget):
+            def __init__(self, checked=False):
+                super().__init__()
+                self.checked = checked
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            show_nsfw=True,
+            show_paid=True,
+            show_account_required=True,
+            show_incomplete=False,
+            ui_state={"browse_panel": {"in_app_only": True}},
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox()
+        panel._author_filter = FakeComboBox()
+        panel._sort_filter = FakeComboBox()
+        panel._favs_check = FakeCheckBox(True)
+        panel._nsfw_check = FakeCheckBox(True)
+        panel._paid_check = FakeCheckBox(True)
+        panel._acct_check = FakeCheckBox(True)
+        panel._incomplete_check = FakeCheckBox(False)
+        panel._in_app_check = FakeCheckBox(True)
+        panel._tabs = types.SimpleNamespace(count=lambda: 1, currentIndex=lambda: 0)
+        panel._apply_filters = lambda: None
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            panel._clear_filters()
+
+        self.assertEqual(panel._search.value, "")
+        self.assertEqual(panel._source_filter.index, 0)
+        self.assertEqual(panel._author_filter.index, 0)
+        self.assertEqual(panel._sort_filter.index, 0)
+        self.assertFalse(panel._favs_check.checked)
+        self.assertTrue(panel._nsfw_check.checked)
+        self.assertFalse(panel._paid_check.checked)
+        self.assertFalse(panel._acct_check.checked)
+        self.assertTrue(panel._incomplete_check.checked)
+        self.assertFalse(panel._in_app_check.checked)
+        self.assertFalse(panel.config.show_paid)
+        self.assertFalse(panel.config.show_account_required)
+        self.assertTrue(panel.config.show_incomplete)
+        self.assertFalse(panel.config.ui_state["browse_panel"]["in_app_only"])
+        save_mock.assert_called_once_with(panel.config, "clearing browse filters")
 
     def test_sort_catalogue_entries_orders_by_requested_field(self):
         browse_panel = self._import_browse_panel()
@@ -5626,19 +5727,21 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._detail_label = types.SimpleNamespace(setText=lambda value: None)
         panel._delete_btn = types.SimpleNamespace(setEnabled=lambda value: None)
 
-        panel._restore_history_filters()
-        self.assertEqual(panel._status_combo.currentText(), "❌ Failed")
-        self.assertEqual(panel._type_combo.currentText(), "🖼 Cover Art")
-        self.assertEqual(panel._serial_edit.value, "SLUS-20228")
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._restore_history_filters()
+            self.assertEqual(panel._status_combo.currentText(), "❌ Failed")
+            self.assertEqual(panel._type_combo.currentText(), "🖼 Cover Art")
+            self.assertEqual(panel._serial_edit.value, "SLUS-20228")
 
-        panel._status_combo.index = 1
-        panel._type_combo.index = 4
-        panel._serial_edit.value = "SCUS-97399"
-        panel._save_history_filters()
+            panel._status_combo.index = 1
+            panel._type_combo.index = 4
+            panel._serial_edit.value = "SCUS-97399"
+            panel._save_history_filters()
 
         self.assertEqual(panel.config.download_history_status_filter, "✅ Success")
         self.assertEqual(panel.config.download_history_type_filter, "💾 Game Save")
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
+        save_mock.assert_called_once_with(panel.config)
 
     def test_history_details_escape_html(self):
         import types
@@ -5712,6 +5815,156 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
 
         critical.assert_called_once()
         panel._refresh_history.assert_not_called()
+
+
+class TestMainWindowNavigationState(unittest.TestCase):
+    """Tests for main-window panel selection persistence."""
+
+    def _import_main_window(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            CursorShape=types.SimpleNamespace(PointingHandCursor=1),
+            AlignmentFlag=types.SimpleNamespace(),
+        )
+        qtcore.QSize = type("QSize", (), {})
+
+        class _Signal:
+            def connect(self, *args, **kwargs):
+                return None
+
+            def emit(self, *args, **kwargs):
+                return None
+
+        qtcore.pyqtSignal = lambda *args, **kwargs: _Signal()
+        qtcore.QObject = type("QObject", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QFrame", "QHBoxLayout", "QLabel", "QMainWindow", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QSpacerItem", "QStackedWidget",
+            "QStatusBar", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QFont = type("QFont", (), {})
+        qtgui.QIcon = type("QIcon", (), {})
+        stub_panel = type("StubPanel", (), {})
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.dashboard": types.SimpleNamespace(DashboardPanel=stub_panel),
+                "src.ui.browse_panel": types.SimpleNamespace(BrowsePanel=stub_panel),
+                "src.ui.downloads_panel": types.SimpleNamespace(DownloadsPanel=stub_panel),
+                "src.ui.library_panel": types.SimpleNamespace(LibraryPanel=stub_panel),
+                "src.ui.memcard_panel": types.SimpleNamespace(MemoryCardPanel=stub_panel),
+                "src.ui.mod_panel": types.SimpleNamespace(ModPanel=stub_panel),
+                "src.ui.settings_panel": types.SimpleNamespace(SettingsPanel=stub_panel),
+                "src.ui.setup_wizard": types.SimpleNamespace(SetupWizard=stub_panel),
+            },
+        ):
+            return importlib.import_module("src.ui.main_window")
+
+    def test_activate_nav_persists_selected_panel(self):
+        main_window = self._import_main_window()
+        MainWindow = main_window.MainWindow
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = None
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakePanel:
+            def __init__(self):
+                self.refresh_count = 0
+
+            def refresh(self):
+                self.refresh_count += 1
+
+        class FakeStack:
+            def __init__(self, panel):
+                self.index = None
+                self.panel = panel
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentWidget(self):
+                return self.panel
+
+        panel = MainWindow.__new__(MainWindow)
+        panel.config = AppConfig()
+        panel._nav_buttons = [FakeButton(), FakeButton(), FakeButton()]
+        panel._stack = FakeStack(FakePanel())
+
+        with patch.object(main_window, "save_config") as save_mock:
+            panel._activate_nav(1)
+
+        self.assertEqual(panel._stack.index, 1)
+        self.assertEqual([btn.checked for btn in panel._nav_buttons], [False, True, False])
+        self.assertEqual(panel._stack.panel.refresh_count, 1)
+        self.assertEqual(panel.config.ui_state["main_window"]["selected_nav_index"], 1)
+        save_mock.assert_called_once_with(panel.config)
+
+
+class TestMemoryCardPanelStatePersistence(unittest.TestCase):
+    """Tests for memory-card panel last-path persistence."""
+
+    def _import_memcard_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QComboBox", "QFileDialog", "QFrame", "QHBoxLayout", "QInputDialog",
+            "QLabel", "QListWidget", "QListWidgetItem", "QMessageBox", "QPushButton",
+            "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+        widgets_stub = types.ModuleType("src.ui.widgets")
+        widgets_stub.EmptyStateWidget = type("EmptyStateWidget", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "src.ui.base_panel": base_panel_stub,
+                "src.ui.widgets": widgets_stub,
+            },
+        ):
+            return importlib.import_module("src.ui.memcard_panel")
+
+    def test_remember_last_path_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._remember_last_path(panel, "memcard_export_dir", "/tmp/export")
+
+        self.assertEqual(panel.config.ui_state["last_paths"]["memcard_export_dir"], "/tmp/export")
+        save_mock.assert_called_once_with(panel.config)
 
 
 class TestModPanelEmptyState(unittest.TestCase):

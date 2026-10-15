@@ -43,7 +43,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES, is_placeholder_author
 from src.core.browse_layout import calculate_catalogue_columns
-from src.core.config_manager import THUMBNAILS_DIR, save_config
+from src.core.config_manager import THUMBNAILS_DIR, save_config, ui_state_bucket
 from src.core.downloader import (
     DownloadError,
     download_file,
@@ -2527,6 +2527,8 @@ class BrowsePanel(BasePanel):
             self._sort_filter.setCurrentIndex(sort_index)
 
         self._favs_check.setChecked(favs_only)
+        browse_state = ui_state_bucket(self.config, "browse_panel")
+        self._in_app_check.setChecked(bool(browse_state.get("in_app_only", False)))
 
         if getattr(self, "_tabs", None) is not None:
             tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
@@ -2535,12 +2537,14 @@ class BrowsePanel(BasePanel):
 
     def _save_browse_state(self, context: str) -> None:
         query, source, author, favs_only, sort_mode, tab_index = self._browse_state()
+        browse_state = ui_state_bucket(self.config, "browse_panel")
         self.config.browse_query = query
         self.config.browse_source_filter = source
         self.config.browse_author_filter = author
         self.config.browse_favorites_only = favs_only
         self.config.browse_sort_mode = _normalise_sort_mode(sort_mode)
         self.config.browse_selected_tab = tab_index
+        browse_state["in_app_only"] = self._in_app_check.isChecked()
         _save_browse_config(self.config, context)
 
     def _build(self):
@@ -2693,7 +2697,9 @@ class BrowsePanel(BasePanel):
 
         # In-app download toggle
         self._in_app_check = QCheckBox("📥 In-App Downloads Only")
-        self._in_app_check.setChecked(getattr(self.config, "in_app_only", False))
+        self._in_app_check.setChecked(
+            bool(ui_state_bucket(self.config, "browse_panel").get("in_app_only", False))
+        )
         self._in_app_check.setStyleSheet("color: #50d090; font-size: 12px;")
         self._in_app_check.setToolTip(
             "Show only entries that can be downloaded and installed directly\n"
@@ -2869,7 +2875,6 @@ class BrowsePanel(BasePanel):
 
     def _on_in_app_toggled(self, state: int):
         """Persist the in-app-only preference and re-apply filters."""
-        self.config.in_app_only = bool(state)
         self._save_browse_state("updating in-app-only preference")
         self._apply_filters()
 
@@ -2910,9 +2915,13 @@ class BrowsePanel(BasePanel):
         self._favs_check.setChecked(False)
         self._nsfw_check.setChecked(getattr(self.config, "show_nsfw", False))
         self._paid_check.setChecked(False)
-        self._acct_check.setChecked(True)
+        self.config.show_paid = False
+        self._acct_check.setChecked(False)
+        self.config.show_account_required = False
         self._incomplete_check.setChecked(True)
+        self.config.show_incomplete = True
         self._in_app_check.setChecked(False)
+        ui_state_bucket(self.config, "browse_panel")["in_app_only"] = False
 
         for widget in (
             self._search,

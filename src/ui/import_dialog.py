@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import ModInfo, ModType
 
 logger = logging.getLogger(__name__)
@@ -193,12 +194,36 @@ class ImportModDialog(QDialog):
     # Source pickers
     # ------------------------------------------------------------------
 
+    def _dialog_config(self):
+        parent = self.parent()
+        return getattr(parent, "config", None)
+
+    def _last_paths_bucket(self) -> dict:
+        config = self._dialog_config()
+        if config is None:
+            return {}
+        return ui_state_bucket(config, "last_paths")
+
+    def _remember_last_path(self, key: str, path: str) -> None:
+        config = self._dialog_config()
+        if config is None:
+            return
+        ui_state_bucket(config, "last_paths")[key] = path
+        try:
+            save_config(config)
+        except Exception as exc:
+            logger.warning("Could not save import dialog state after %s: %s", key, exc)
+
     def _choose_folder(self):
+        last_paths = self._last_paths_bucket()
         d = QFileDialog.getExistingDirectory(
-            self, f"Select {_type_label(self.mod_type)} Folder"
+            self,
+            f"Select {_type_label(self.mod_type)} Folder",
+            last_paths.get("import_folder", ""),
         )
         if d:
             self._src_edit.setText(d)
+            self._remember_last_path("import_folder", d)
             # Auto-fill name from folder
             if not self._name_edit.text():
                 self._name_edit.setText(Path(d).name)
@@ -209,14 +234,16 @@ class ImportModDialog(QDialog):
                 self._check_replacement_pattern(d)
 
     def _choose_archive(self):
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getOpenFileName(
             self,
             f"Select {_type_label(self.mod_type)} Archive",
-            "",
+            last_paths.get("import_archive", ""),
             "Archives (*.zip *.7z *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
         )
         if path:
             self._src_edit.setText(path)
+            self._remember_last_path("import_archive", str(Path(path).parent))
             if not self._name_edit.text():
                 # Strip extension for default name; handle .7z.001 → stem up to first .7z
                 stem = Path(path).stem
@@ -236,11 +263,13 @@ class ImportModDialog(QDialog):
         ext_filter = _TYPE_META.get(self.mod_type, {}).get(
             "ext_filter", "All Files (*)"
         )
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getOpenFileName(
-            self, f"Select {_type_label(self.mod_type)}", "", ext_filter
+            self, f"Select {_type_label(self.mod_type)}", last_paths.get("import_file", ""), ext_filter
         )
         if path:
             self._src_edit.setText(path)
+            self._remember_last_path("import_file", str(Path(path).parent))
             if not self._name_edit.text():
                 self._name_edit.setText(Path(path).stem)
             # Auto-detect game serial

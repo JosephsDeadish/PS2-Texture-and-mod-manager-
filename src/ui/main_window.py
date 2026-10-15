@@ -19,7 +19,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from src.core.config_manager import load_config, save_config
+from src.core.config_manager import load_config, save_config, ui_state_bucket
 from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
@@ -41,6 +41,17 @@ logger = logging.getLogger(__name__)
 
 class _UpdateSignals(QObject):
     updates_found = pyqtSignal(int)   # number of mods with updates
+
+
+def _main_window_state(config: AppConfig) -> dict:
+    return ui_state_bucket(config, "main_window")
+
+
+def _save_main_window_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save main window config after %s: %s", context, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -252,7 +263,12 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self._status_bar)
 
         # Activate first nav button
-        self._activate_nav(0)
+        state = _main_window_state(self.config)
+        try:
+            initial_index = int(state.get("selected_nav_index", 0) or 0)
+        except (TypeError, ValueError):
+            initial_index = 0
+        self._activate_nav(max(0, min(initial_index, len(self._nav_buttons) - 1)), persist=False)
 
     # ------------------------------------------------------------------
     # Navigation
@@ -263,7 +279,7 @@ class MainWindow(QMainWindow):
             self._activate_nav(index)
         return _handler
 
-    def _activate_nav(self, index: int):
+    def _activate_nav(self, index: int, *, persist: bool = True):
         for i, btn in enumerate(self._nav_buttons):
             btn.setChecked(i == index)
         self._stack.setCurrentIndex(index)
@@ -271,6 +287,9 @@ class MainWindow(QMainWindow):
         panel = self._stack.currentWidget()
         if hasattr(panel, "refresh"):
             panel.refresh()
+        if persist:
+            _main_window_state(self.config)["selected_nav_index"] = index
+            _save_main_window_config(self.config, f"switching to panel {index}")
 
     def _navigate_to_author_type(self, author: str, mod_type, nav_index: dict):
         """Navigate to the target mod panel and pre-filter by *author*."""

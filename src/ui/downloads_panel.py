@@ -10,6 +10,7 @@ from __future__ import annotations
 import html
 import logging
 import threading as _threading
+from pathlib import Path
 from typing import List
 
 from PyQt6.QtCore import Qt, QTimer
@@ -28,6 +29,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 
@@ -127,6 +129,15 @@ class DownloadsPanel(BasePanel):
         self._poll_timer = QTimer(self)
         self._poll_timer.setInterval(1000)
         self._poll_timer.timeout.connect(self._refresh_active)
+
+    def _last_paths_bucket(self) -> dict:
+        return ui_state_bucket(self.config, "last_paths")
+
+    def _save_panel_config(self, context: str) -> None:
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save downloads panel config after %s: %s", context, exc)
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -278,6 +289,7 @@ class DownloadsPanel(BasePanel):
         self.config.download_history_status_filter = status or "All"
         self.config.download_history_type_filter = mod_type or "All"
         self.config.download_history_serial_filter = serial
+        self._save_panel_config("updating download history filters")
 
     def _restore_history_filters(self) -> None:
         status = getattr(self.config, "download_history_status_filter", "All") or "All"
@@ -477,14 +489,17 @@ class DownloadsPanel(BasePanel):
 
     def _on_export_csv(self):
         from PyQt6.QtWidgets import QFileDialog
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getSaveFileName(
             self,
             "Export History CSV",
-            "download_history.csv",
+            last_paths.get("download_history_export_dir", "download_history.csv"),
             "CSV files (*.csv)",
         )
         if not path:
             return
+        self._last_paths_bucket()["download_history_export_dir"] = str(Path(path).parent)
+        self._save_panel_config("updating history export folder")
         try:
             from src.core.download_history import export_history_csv
             result = export_history_csv(self.config, path=path)
