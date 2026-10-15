@@ -10,11 +10,13 @@ from __future__ import annotations
 import html
 import logging
 import threading as _threading
+import webbrowser
 from pathlib import Path
 from typing import List
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
+    QApplication,
     QComboBox,
     QFrame,
     QHBoxLayout,
@@ -124,6 +126,7 @@ class DownloadsPanel(BasePanel):
         super().__init__("📥  Downloads", "Active downloads and installation history", parent)
         self.config = config
         self._history_entries: list = []
+        self._selected_source_url: str = ""
         self._build()
         # Poll active downloads when the panel is visible
         self._poll_timer = QTimer(self)
@@ -141,6 +144,13 @@ class DownloadsPanel(BasePanel):
             save_config(self.config)
         except Exception as exc:
             logger.warning("Could not save downloads panel config after %s: %s", context, exc)
+
+    def _notify_status(self, message: str) -> None:
+        emitter = getattr(getattr(self, "status_message", None), "emit", None)
+        if callable(emitter):
+            emitter(message)
+        else:
+            logger.info(message)
 
     def _save_history_splitter(self, *_args) -> None:
         splitter = getattr(self, "_history_splitter", None)
@@ -304,6 +314,19 @@ class DownloadsPanel(BasePanel):
         self._delete_btn.setEnabled(False)
         self._delete_btn.clicked.connect(self._on_delete_entry)
         btn_row.addWidget(self._delete_btn)
+
+        self._open_source_btn = QPushButton("🌐 Open Source")
+        self._open_source_btn.setToolTip("Open the selected entry's source page in your browser")
+        self._open_source_btn.setEnabled(False)
+        self._open_source_btn.clicked.connect(self._open_selected_source)
+        btn_row.addWidget(self._open_source_btn)
+
+        self._copy_source_btn = QPushButton("📋 Copy Source URL")
+        self._copy_source_btn.setToolTip("Copy the selected entry's source URL to the clipboard")
+        self._copy_source_btn.setEnabled(False)
+        self._copy_source_btn.clicked.connect(self._copy_selected_source)
+        btn_row.addWidget(self._copy_source_btn)
+
         btn_row.addStretch()
         rl.addLayout(btn_row)
 
@@ -354,6 +377,14 @@ class DownloadsPanel(BasePanel):
         self.config.download_history_type_filter = mod_type or "All"
         self.config.download_history_serial_filter = serial
         self._save_panel_config("updating download history filters")
+
+    def _update_history_source_actions(self) -> None:
+        enabled = bool(self._selected_source_url.strip())
+        for attr in ("_open_source_btn", "_copy_source_btn"):
+            button = getattr(self, attr, None)
+            setter = getattr(button, "setEnabled", None)
+            if callable(setter):
+                setter(enabled)
 
     def _restore_history_filters(self) -> None:
         status = getattr(self.config, "download_history_status_filter", "All") or "All"
@@ -428,6 +459,8 @@ class DownloadsPanel(BasePanel):
         serial_filter = serial_text if serial_text else None
         self._list_widget.clear()
         self._history_entries = []
+        self._selected_source_url = ""
+        self._update_history_source_actions()
 
         try:
             from src.core.download_history import list_history
@@ -459,6 +492,8 @@ class DownloadsPanel(BasePanel):
                 empty_msg = "No history entries match the current filters."
             self._list_widget.addItem(empty_msg)
             self._detail_label.setText(f"<i>{empty_msg}</i>")
+            self._selected_source_url = ""
+            self._update_history_source_actions()
 
         self._delete_btn.setEnabled(False)
 
@@ -466,9 +501,13 @@ class DownloadsPanel(BasePanel):
         if row < 0 or row >= len(self._history_entries):
             self._detail_label.setText("← Select an entry to see details")
             self._delete_btn.setEnabled(False)
+            self._selected_source_url = ""
+            self._update_history_source_actions()
             return
 
         e = self._history_entries[row]
+        self._selected_source_url = str(getattr(e, "source_url", "") or "").strip()
+        self._update_history_source_actions()
 
         try:
             from src.core.download_history import STATUS_COLOR
@@ -482,7 +521,7 @@ class DownloadsPanel(BasePanel):
         status_label = html.escape(str(e.status_label))
         timestamp = html.escape(str(e.timestamp))
         serial = html.escape(str(e.serial))
-        source_url = html.escape(str(e.source_url))
+        source_url = html.escape(str(getattr(e, "source_url", "")))
         size_label = html.escape(str(e.size_label))
         note = html.escape(str(e.note))
         entry_id = html.escape(str(e.id))
@@ -495,7 +534,7 @@ class DownloadsPanel(BasePanel):
         )
         if e.serial:
             details_html += f"<b>Serial:</b> {serial}<br>"
-        if e.source_url:
+        if getattr(e, "source_url", ""):
             details_html += f"<b>Source:</b> <code>{source_url}</code><br>"
         if e.size_bytes > 0:
             details_html += f"<b>Size:</b> {size_label}<br>"
@@ -505,6 +544,39 @@ class DownloadsPanel(BasePanel):
 
         self._detail_label.setText(details_html)
         self._delete_btn.setEnabled(True)
+
+    def _open_selected_source(self) -> None:
+        url = self._selected_source_url.strip()
+        if not url:
+            self._notify_status("No source URL is available for this history entry.")
+            return
+        try:
+            opened = webbrowser.open(url, new=2)
+        except Exception as exc:
+            logger.warning("Failed to open download history source URL %s: %s", url, exc)
+            self._notify_status("Could not open the selected source URL.")
+            return
+        if not opened:
+            logger.warning("Failed to open download history source URL %s: browser refused", url)
+            self._notify_status("Could not open the selected source URL.")
+            return
+        self._notify_status("Opened the selected source URL in your browser.")
+
+    def _copy_selected_source(self) -> None:
+        url = self._selected_source_url.strip()
+        if not url:
+            self._notify_status("No source URL is available to copy.")
+            return
+        try:
+            clipboard = QApplication.clipboard()
+            if clipboard is None:
+                raise RuntimeError("clipboard unavailable")
+            clipboard.setText(url)
+        except Exception as exc:
+            logger.warning("Failed to copy download history source URL %s: %s", url, exc)
+            self._notify_status("Could not copy the selected source URL.")
+            return
+        self._notify_status("Copied the selected source URL to the clipboard.")
 
     def _on_delete_entry(self):
         row = self._list_widget.currentRow()

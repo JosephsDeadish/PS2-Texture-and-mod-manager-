@@ -5580,7 +5580,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
-            "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QApplication", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QMessageBox", "QPushButton", "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
@@ -5913,6 +5913,72 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertIn("&lt;b&gt;Danger &amp; Mod&lt;/b&gt;", panel._detail_label.value)
         self.assertIn("&lt;Ready&gt;", panel._detail_label.value)
         self.assertNotIn("<b>Danger & Mod</b>", panel._detail_label.value)
+
+    def test_history_selection_enables_source_actions(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._history_entries = [
+            types.SimpleNamespace(
+                mod_name="Source Mod",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 12:00",
+                serial="SLUS-12345",
+                source_url="https://example.com/source",
+                size_bytes=12,
+                size_label="12 B",
+                note="",
+                id="entry-1",
+            )
+        ]
+
+        panel._on_selection_changed(0)
+
+        self.assertEqual(panel._selected_source_url, "https://example.com/source")
+        self.assertTrue(panel._open_source_btn.enabled)
+        self.assertTrue(panel._copy_source_btn.enabled)
+
+    def test_history_source_actions_open_and_copy(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeClipboard:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel._selected_source_url = "https://example.com/source"
+        panel._notify_status = MagicMock()
+
+        clipboard = FakeClipboard()
+        with patch.object(downloads_panel.webbrowser, "open", return_value=True) as open_mock:
+            with patch.object(downloads_panel.QApplication, "clipboard", return_value=clipboard, create=True):
+                panel._open_selected_source()
+                panel._copy_selected_source()
+
+        open_mock.assert_called_once_with("https://example.com/source", new=2)
+        self.assertEqual(clipboard.text, "https://example.com/source")
+        self.assertTrue(any("Opened the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
+        self.assertTrue(any("Copied the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
 
     def test_delete_history_failure_shows_error_dialog(self):
         import types
