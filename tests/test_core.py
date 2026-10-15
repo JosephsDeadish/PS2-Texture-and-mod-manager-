@@ -5223,7 +5223,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         panel._in_app_check = FakeCheckBox()
         panel._tabs = FakeTabs(count=3)
 
-        panel._restore_browse_state()
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            panel._restore_browse_state()
 
         self.assertEqual(panel._search.value, "gta")
         self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
@@ -5232,6 +5233,105 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertTrue(panel._favs_check.checked)
         self.assertTrue(panel._in_app_check.checked)
         self.assertEqual(panel._tabs.currentIndex(), 2)
+        self.assertTrue(any("tab index" in msg for msg in logs.output))
+
+    def test_restore_browse_state_warns_on_stale_values(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item[0] == value or item[1] == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            browse_query="gta",
+            browse_source_filter="Missing Source",
+            browse_author_filter="Missing Author",
+            browse_sort_mode="not_a_valid_sort",
+            browse_selected_tab=99,
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("Curse_Arms", "Curse_Arms"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._sort_filter = FakeComboBox([
+            ("Featured", "featured"),
+            ("Name", "name"),
+            ("Game", "game"),
+        ])
+        panel._favs_check = FakeCheckBox()
+        panel._in_app_check = FakeCheckBox()
+        panel._tabs = FakeTabs(count=2)
+
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            panel._restore_browse_state()
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._source_filter.currentData(), "")
+        self.assertEqual(panel._author_filter.currentData(), "")
+        self.assertEqual(panel._sort_filter.currentData(), "featured")
+        self.assertEqual(panel._tabs.currentIndex(), 1)
+        self.assertTrue(any("source filter" in msg for msg in logs.output))
+        self.assertTrue(any("author filter" in msg for msg in logs.output))
+        self.assertTrue(any("sort mode" in msg for msg in logs.output))
+        self.assertTrue(any("tab index" in msg for msg in logs.output))
 
     def test_cover_dialog_auto_fills_single_serial_match(self):
         browse_panel = self._import_browse_panel()
