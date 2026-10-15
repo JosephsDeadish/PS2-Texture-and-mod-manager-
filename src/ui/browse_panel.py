@@ -2297,6 +2297,73 @@ class BrowsePanel(BasePanel):
     def set_db(self, db):
         self._db = db
 
+    def _browse_state(self) -> tuple[str, str, str, bool, int]:
+        tabs = getattr(self, "_tabs", None)
+        tab_count = tabs.count() if tabs and hasattr(tabs, "count") else 0
+        tab_index = tabs.currentIndex() if tabs and hasattr(tabs, "currentIndex") else 0
+        if tab_count > 0:
+            tab_index = max(0, min(tab_index, tab_count - 1))
+        else:
+            tab_index = 0
+        return (
+            getattr(self._search, "text", lambda: "")(),
+            getattr(self._source_filter, "currentData", lambda: "")() or "",
+            getattr(self._author_filter, "currentData", lambda: "")() or "",
+            bool(getattr(self._favs_check, "isChecked", lambda: False)()),
+            tab_index,
+        )
+
+    def _restore_browse_state(self) -> None:
+        query = getattr(self.config, "browse_query", "")
+        if query is None:
+            query = ""
+        elif not isinstance(query, str):
+            query = str(query)
+
+        source = getattr(self.config, "browse_source_filter", "")
+        if source is None:
+            source = ""
+        elif not isinstance(source, str):
+            source = str(source)
+
+        author = getattr(self.config, "browse_author_filter", "")
+        if author is None:
+            author = ""
+        elif not isinstance(author, str):
+            author = str(author)
+
+        favs_only = bool(getattr(self.config, "browse_favorites_only", False))
+        try:
+            selected_tab = int(getattr(self.config, "browse_selected_tab", 0) or 0)
+        except (TypeError, ValueError):
+            selected_tab = 0
+
+        self._search.setText(query)
+
+        source_index = self._source_filter.findData(source) if source else -1
+        if source_index >= 0:
+            self._source_filter.setCurrentIndex(source_index)
+
+        author_index = self._author_filter.findData(author) if author else -1
+        if author_index >= 0:
+            self._author_filter.setCurrentIndex(author_index)
+
+        self._favs_check.setChecked(favs_only)
+
+        if getattr(self, "_tabs", None) is not None:
+            tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
+            if tab_count > 0:
+                self._tabs.setCurrentIndex(max(0, min(selected_tab, tab_count - 1)))
+
+    def _save_browse_state(self, context: str) -> None:
+        query, source, author, favs_only, tab_index = self._browse_state()
+        self.config.browse_query = query
+        self.config.browse_source_filter = source
+        self.config.browse_author_filter = author
+        self.config.browse_favorites_only = favs_only
+        self.config.browse_selected_tab = tab_index
+        _save_browse_config(self.config, context)
+
     def _build(self):
         content = self._content_layout
 
@@ -2307,7 +2374,6 @@ class BrowsePanel(BasePanel):
         self._search = QLineEdit()
         self._search.setPlaceholderText("🔍  Search by name, game, author, tag…")
         self._search.setObjectName("search_bar")
-        self._search.textChanged.connect(self._apply_filters)
         toolbar.addWidget(self._search, 1)
 
         dl_btn = QPushButton("⬇ Download from URL")
@@ -2371,7 +2437,6 @@ class BrowsePanel(BasePanel):
         self._source_filter.addItem("All Sources", "")
         for src in ALL_SOURCES:
             self._source_filter.addItem(src, src)
-        self._source_filter.currentIndexChanged.connect(self._apply_filters)
         filter_row.addWidget(self._source_filter)
 
         # Author filter — only shows named (non-hub) authors with a real profile
@@ -2384,13 +2449,11 @@ class BrowsePanel(BasePanel):
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
-        self._author_filter.currentIndexChanged.connect(self._apply_filters)
         filter_row.addWidget(self._author_filter)
 
         # Favorites only checkbox
         self._favs_check = QCheckBox("❤ Favorites Only")
         self._favs_check.setStyleSheet("color: #c08090; font-size: 12px;")
-        self._favs_check.stateChanged.connect(self._apply_filters)
         filter_row.addWidget(self._favs_check)
 
         # NSFW toggle — hidden by default; LoversLab results etc. are NSFW-adjacent
@@ -2401,7 +2464,6 @@ class BrowsePanel(BasePanel):
             "LoversLab and similar sources may contain adult content.\n"
             "Enable this to show those results in the browser."
         )
-        self._nsfw_check.stateChanged.connect(self._on_nsfw_toggled)
         filter_row.addWidget(self._nsfw_check)
 
         filter_row.addStretch()
@@ -2419,7 +2481,6 @@ class BrowsePanel(BasePanel):
             "By default only free content is shown.\n"
             "Enable this to also see paid / subscription-only texture packs and mods."
         )
-        self._paid_check.stateChanged.connect(self._on_paid_toggled)
         type_filter_row.addWidget(self._paid_check)
 
         # Account-required toggle
@@ -2431,7 +2492,6 @@ class BrowsePanel(BasePanel):
             "require a free or paid account to download files.\n"
             "Uncheck to hide those entries and only show account-free sources."
         )
-        self._acct_check.stateChanged.connect(self._on_acct_toggled)
         type_filter_row.addWidget(self._acct_check)
 
         # Incomplete / partial packs toggle
@@ -2444,7 +2504,6 @@ class BrowsePanel(BasePanel):
             "or body types rather than covering the whole game.\n"
             "Uncheck to show only complete, whole-game texture packs."
         )
-        self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
         type_filter_row.addWidget(self._incomplete_check)
 
         # In-app download toggle
@@ -2460,7 +2519,6 @@ class BrowsePanel(BasePanel):
             "\n"
             "When unchecked, all entries (including manual downloads) are shown."
         )
-        self._in_app_check.stateChanged.connect(self._on_in_app_toggled)
         type_filter_row.addWidget(self._in_app_check)
 
         type_filter_row.addStretch()
@@ -2517,10 +2575,24 @@ class BrowsePanel(BasePanel):
             self._tab_contents.append(tab)
             self._tabs.addTab(tab, label)
 
-        self._tabs.currentChanged.connect(self._on_tab_changed)
         content.addWidget(self._tabs, 1)
 
-    def _apply_filters(self):
+        self._restore_browse_state()
+
+        self._search.textChanged.connect(self._on_search_changed)
+        self._source_filter.currentIndexChanged.connect(self._on_source_filter_changed)
+        self._author_filter.currentIndexChanged.connect(self._on_author_filter_changed)
+        self._favs_check.stateChanged.connect(self._on_favs_only_toggled)
+        self._nsfw_check.stateChanged.connect(self._on_nsfw_toggled)
+        self._paid_check.stateChanged.connect(self._on_paid_toggled)
+        self._acct_check.stateChanged.connect(self._on_acct_toggled)
+        self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
+        self._in_app_check.stateChanged.connect(self._on_in_app_toggled)
+        self._tabs.currentChanged.connect(self._on_tab_changed)
+
+        self._apply_filters()
+
+    def _filter_args(self):
         query = self._search.text()
         source = self._source_filter.currentData() or ""
         author = self._author_filter.currentData() or ""
@@ -2530,42 +2602,81 @@ class BrowsePanel(BasePanel):
         show_account_required = self._acct_check.isChecked()
         show_incomplete = self._incomplete_check.isChecked()
         in_app_only = self._in_app_check.isChecked()
-        for tab in self._tab_contents:
-            tab.apply_filters(
-                query, source, author, favs_only, show_nsfw,
-                show_paid, show_account_required, show_incomplete,
-                in_app_only=in_app_only,
-            )
+        return (
+            query, source, author, favs_only, show_nsfw,
+            show_paid, show_account_required, show_incomplete,
+            in_app_only,
+        )
+
+    def _active_tab_index(self) -> int:
+        tabs = getattr(self, "_tabs", None)
+        if tabs is None or not hasattr(tabs, "currentIndex"):
+            return -1
+        try:
+            return tabs.currentIndex()
+        except Exception:
+            return -1
+
+    def _refresh_active_tab(self):
+        args = self._filter_args()
+        index = self._active_tab_index()
+        if 0 <= index < len(self._tab_contents):
+            self._tab_contents[index].apply_filters(*args)
+
+    def _apply_filters(self):
+        args = self._filter_args()
+        active_index = self._active_tab_index()
+        for index, tab in enumerate(self._tab_contents):
+            if index == active_index:
+                continue
+            tab.apply_filters(*args)
+        self._refresh_active_tab()
+
+    def _on_search_changed(self, _text: str):
+        self._save_browse_state("updating search filter")
+        self._apply_filters()
+
+    def _on_source_filter_changed(self, _index: int):
+        self._save_browse_state("updating source filter")
+        self._apply_filters()
+
+    def _on_author_filter_changed(self, _index: int):
+        self._save_browse_state("updating author filter")
+        self._apply_filters()
+
+    def _on_favs_only_toggled(self, _state: int):
+        self._save_browse_state("updating favorites filter")
+        self._apply_filters()
 
     def _on_nsfw_toggled(self, state: int):
         """Persist the NSFW preference and re-apply filters."""
         show_nsfw = bool(state)
         self.config.show_nsfw = show_nsfw
-        _save_browse_config(self.config, "updating NSFW preference")
+        self._save_browse_state("updating NSFW preference")
         self._apply_filters()
 
     def _on_paid_toggled(self, state: int):
         """Persist the show-paid preference and re-apply filters."""
         self.config.show_paid = bool(state)
-        _save_browse_config(self.config, "updating paid-content preference")
+        self._save_browse_state("updating paid-content preference")
         self._apply_filters()
 
     def _on_acct_toggled(self, state: int):
         """Persist the show-account-required preference and re-apply filters."""
         self.config.show_account_required = bool(state)
-        _save_browse_config(self.config, "updating account-required preference")
+        self._save_browse_state("updating account-required preference")
         self._apply_filters()
 
     def _on_incomplete_toggled(self, state: int):
         """Persist the show-incomplete preference and re-apply filters."""
         self.config.show_incomplete = bool(state)
-        _save_browse_config(self.config, "updating incomplete-content preference")
+        self._save_browse_state("updating incomplete-content preference")
         self._apply_filters()
 
     def _on_in_app_toggled(self, state: int):
         """Persist the in-app-only preference and re-apply filters."""
         self.config.in_app_only = bool(state)
-        _save_browse_config(self.config, "updating in-app-only preference")
+        self._save_browse_state("updating in-app-only preference")
         self._apply_filters()
 
     def _on_result_count_changed(self, visible: int, total: int):
@@ -2578,21 +2689,8 @@ class BrowsePanel(BasePanel):
     def _on_tab_changed(self, index: int):
         """Sync the result count label when the user switches tabs."""
         if 0 <= index < len(self._tab_contents):
-            tab = self._tab_contents[index]
-            # Ask the tab to re-emit its count by retrieving from its private state
-            total = len(tab._all_entries)
-            # Count visible by running the filter logic again (cheaply via signal)
-            tab.apply_filters(
-                self._search.text(),
-                self._source_filter.currentData() or "",
-                self._author_filter.currentData() or "",
-                self._favs_check.isChecked(),
-                self._nsfw_check.isChecked(),
-                self._paid_check.isChecked(),
-                self._acct_check.isChecked(),
-                self._incomplete_check.isChecked(),
-                in_app_only=self._in_app_check.isChecked(),
-            )
+            self._save_browse_state("switching browse tabs")
+            self._refresh_active_tab()
 
     def _clear_filters(self):
         """Reset all search and filter controls to their default state."""
@@ -2633,6 +2731,7 @@ class BrowsePanel(BasePanel):
         ):
             widget.blockSignals(False)
 
+        self._save_browse_state("clearing browse filters")
         self._apply_filters()
 
     def _on_favorite_toggled(self, author: str, is_fav: bool):

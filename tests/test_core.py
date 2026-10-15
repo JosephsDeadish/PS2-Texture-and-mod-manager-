@@ -3309,6 +3309,35 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertFalse(restored.show_account_required)
         self.assertFalse(restored.show_incomplete)
 
+    def test_browse_state_fields_default_and_round_trip(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.browse_query, "")
+        self.assertEqual(cfg.browse_source_filter, "")
+        self.assertEqual(cfg.browse_author_filter, "")
+        self.assertFalse(cfg.browse_favorites_only)
+        self.assertEqual(cfg.browse_selected_tab, 0)
+
+        cfg = AppConfig(
+            browse_query="gta",
+            browse_source_filter="GBAtemp",
+            browse_author_filter="Curse_Arms",
+            browse_favorites_only=True,
+            browse_selected_tab=3,
+        )
+        d = cfg.to_dict()
+        self.assertEqual(d["browse_query"], "gta")
+        self.assertEqual(d["browse_source_filter"], "GBAtemp")
+        self.assertEqual(d["browse_author_filter"], "Curse_Arms")
+        self.assertTrue(d["browse_favorites_only"])
+        self.assertEqual(d["browse_selected_tab"], 3)
+
+        restored = AppConfig.from_dict(d)
+        self.assertEqual(restored.browse_query, "gta")
+        self.assertEqual(restored.browse_source_filter, "GBAtemp")
+        self.assertEqual(restored.browse_author_filter, "Curse_Arms")
+        self.assertTrue(restored.browse_favorites_only)
+        self.assertEqual(restored.browse_selected_tab, 3)
+
     def test_old_config_without_browse_filter_fields_uses_defaults(self):
         """Configs saved before the browse-filter fields were added should load fine."""
         old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
@@ -3320,6 +3349,11 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertFalse(cfg.show_paid)
         self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
+        self.assertEqual(cfg.browse_query, "")
+        self.assertEqual(cfg.browse_source_filter, "")
+        self.assertEqual(cfg.browse_author_filter, "")
+        self.assertFalse(cfg.browse_favorites_only)
+        self.assertEqual(cfg.browse_selected_tab, 0)
 
 
 # =============================================================================
@@ -4727,6 +4761,156 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "game": "",
             "tags": [],
         }, "missing"))
+
+
+class TestBrowsePanelStatePersistence(unittest.TestCase):
+    """Tests for browse-panel filter state persistence helpers."""
+
+    def _import_browse_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            return importlib.import_module("src.ui.browse_panel")
+
+    def test_restore_browse_state_applies_saved_values(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def count(self):
+                return len(self.items)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            browse_query="gta",
+            browse_source_filter="GBAtemp",
+            browse_author_filter="Curse_Arms",
+            browse_favorites_only=True,
+            browse_selected_tab=5,
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("Curse_Arms", "Curse_Arms"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._favs_check = FakeCheckBox()
+        panel._tabs = FakeTabs(count=3)
+
+        panel._restore_browse_state()
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
+        self.assertEqual(panel._author_filter.currentData(), "Curse_Arms")
+        self.assertTrue(panel._favs_check.checked)
+        self.assertEqual(panel._tabs.currentIndex(), 2)
+
+    def test_save_browse_state_updates_config(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig()
+        panel._search = types.SimpleNamespace(text=lambda: "gta")
+        panel._source_filter = types.SimpleNamespace(currentData=lambda: "GBAtemp")
+        panel._author_filter = types.SimpleNamespace(currentData=lambda: "Curse_Arms")
+        panel._favs_check = types.SimpleNamespace(isChecked=lambda: True)
+        panel._tabs = types.SimpleNamespace(count=lambda: 4, currentIndex=lambda: 2)
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            panel._save_browse_state("persisting browse state")
+
+        self.assertEqual(panel.config.browse_query, "gta")
+        self.assertEqual(panel.config.browse_source_filter, "GBAtemp")
+        self.assertEqual(panel.config.browse_author_filter, "Curse_Arms")
+        self.assertTrue(panel.config.browse_favorites_only)
+        self.assertEqual(panel.config.browse_selected_tab, 2)
+        save_mock.assert_called_once_with(panel.config, "persisting browse state")
 
 
 class TestCatalogueIntegrity(unittest.TestCase):
