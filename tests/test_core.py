@@ -5966,6 +5966,81 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel.config.ui_state["last_paths"]["memcard_export_dir"], "/tmp/export")
         save_mock.assert_called_once_with(panel.config)
 
+    def test_card_selection_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = [
+                    ("— Select a memory card —", ""),
+                    ("Card A", "/cards/a.ps2"),
+                ]
+
+            def itemData(self, idx):
+                return self.items[idx][1]
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig()
+        panel._card_combo = FakeComboBox()
+        panel._current_card = ""
+        panel._load_saves = MagicMock()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._on_card_selected(panel, 1)
+
+        self.assertEqual(panel._current_card, "/cards/a.ps2")
+        self.assertEqual(panel.config.ui_state["memcard_panel"]["selected_card"], "/cards/a.ps2")
+        panel._load_saves.assert_called_once()
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_refresh_restores_last_selected_card(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = []
+                self.current_index = -1
+                self.blocked = False
+
+            def blockSignals(self, blocked):
+                self.blocked = blocked
+
+            def clear(self):
+                self.items = []
+                self.current_index = -1
+
+            def addItem(self, label, data=""):
+                self.items.append((label, data))
+                if self.current_index < 0:
+                    self.current_index = 0
+
+            def findData(self, value):
+                for idx, (_label, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.current_index = index
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(
+            memcards_path="/cards",
+            ui_state={"memcard_panel": {"selected_card": "/cards/beta.ps2"}},
+        )
+        panel._card_combo = FakeComboBox()
+        panel._current_card = ""
+        panel._load_saves = MagicMock()
+
+        with patch.object(memcard_panel, "list_memcard_files", return_value=["/cards/alpha.ps2", "/cards/beta.ps2"]):
+            MemoryCardPanel.refresh(panel)
+
+        self.assertEqual(panel._current_card, "/cards/beta.ps2")
+        self.assertEqual(panel._card_combo.current_index, 2)
+        panel._load_saves.assert_called_once()
+
 
 class TestModPanelEmptyState(unittest.TestCase):
     """Tests for mod-panel empty-state copy."""

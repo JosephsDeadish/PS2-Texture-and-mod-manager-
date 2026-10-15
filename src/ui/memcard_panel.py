@@ -52,12 +52,37 @@ class MemoryCardPanel(BasePanel):
     def _last_paths_bucket(self) -> dict:
         return ui_state_bucket(self.config, "last_paths")
 
+    def _panel_state_bucket(self) -> dict:
+        return ui_state_bucket(self.config, "memcard_panel")
+
     def _remember_last_path(self, key: str, path: str) -> None:
         self._last_paths_bucket()[key] = path
         try:
             save_config(self.config)
         except Exception as exc:
             logger.warning("Could not save memory card panel state after %s: %s", key, exc)
+
+    def _remember_selected_card(self, path: str) -> None:
+        self._panel_state_bucket()["selected_card"] = path
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card selection: %s", exc)
+
+    def _restore_selected_card(self) -> None:
+        selected = self._current_card or self._panel_state_bucket().get("selected_card", "") or ""
+        if not selected:
+            self._current_card = ""
+            return
+
+        idx = self._card_combo.findData(selected)
+        if idx >= 0:
+            self._card_combo.setCurrentIndex(idx)
+            self._current_card = selected
+            return
+
+        self._current_card = ""
+        self._card_combo.setCurrentIndex(0)
 
     def _build(self):
         content = self._content_layout
@@ -178,12 +203,14 @@ class MemoryCardPanel(BasePanel):
             for path in list_memcard_files(cards_dir):
                 self._card_combo.addItem(Path(path).name, path)
 
+        self._restore_selected_card()
         self._card_combo.blockSignals(False)
         self._load_saves()
 
     def _on_card_selected(self, idx: int):
         path = self._card_combo.itemData(idx)
         self._current_card = path or ""
+        self._remember_selected_card(self._current_card)
         self._load_saves()
 
     def _browse_card(self):
