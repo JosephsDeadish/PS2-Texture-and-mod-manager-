@@ -92,7 +92,8 @@ class DashboardPanel(BasePanel):
         enabled_mods = [m for m in all_mods if m.enabled]
         conflicts = ModManager(self.db).detect_conflicts()
 
-        self._card_total = StatCard("📦", "Total Mods", str(len(all_mods)), "#6080d0")
+        self._card_total = StatCard("📦", "Installed Mods", str(len(all_mods)), "#6080d0")
+        self._card_total.setToolTip("All installed mods across every mod type")
         self._card_enabled = StatCard("✅", "Enabled", str(len(enabled_mods)), "#22c870")
         self._card_texture = StatCard(
             "🎨", "Texture Packs",
