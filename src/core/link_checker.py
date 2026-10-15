@@ -30,6 +30,7 @@ from src.core.catalogue_loader import (
     VALID_DOWNLOAD_ACTIONS,
     _infer_author,
     _is_placeholder_thumbnail_url,
+    _placeholder_thumbnail_reason,
     _normalise_source,
     is_placeholder_author,
 )
@@ -407,6 +408,19 @@ class LinkChecker:
                         detail=f"domain {bad_dom!r} is known fake/deprecated",
                     ))
                     continue
+                if field_name == "thumbnail_url" and _is_placeholder_thumbnail_url(raw):
+                    reason = _placeholder_thumbnail_reason(raw)
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url=raw,
+                        issue_type="generic_thumbnail_url",
+                        detail=(
+                            f"thumbnail_url uses a {reason or 'generic placeholder'} instead of cover art"
+                        ),
+                    ))
+                    continue
                 suspicious_dom = self._is_suspicious_domain(raw)
                 if suspicious_dom:
                     issues.append(LinkIssue(
@@ -441,17 +455,8 @@ class LinkChecker:
                                 field_name=field_name,
                                 url=raw,
                                 issue_type="generic_author_url",
-                                detail="author_url points to a member search page instead of a direct profile",
+                                detail=                                "author_url points to a member search page instead of a direct profile",
                             ))
-                elif field_name == "thumbnail_url" and _is_placeholder_thumbnail_url(raw):
-                    issues.append(LinkIssue(
-                        source_file=source_file,
-                        entry_index=idx,
-                        field_name=field_name,
-                        url=raw,
-                        issue_type="generic_thumbnail_url",
-                        detail="thumbnail_url uses a generic favicon placeholder instead of cover art",
-                    ))
         return issues
 
     # ------------------------------------------------------------------

@@ -9767,6 +9767,22 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(result[0]["thumbnail_url"], "")
         self.assertTrue(any("generic favicon placeholder" in msg for msg in logs.output))
 
+    def test_load_user_catalogue_strips_placeholder_thumbnail_host(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["thumbnail_url"] = "https://placehold.co/60x88.png"
+        (Path(self.tmpdir) / "placeholder_host.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["thumbnail_url"], "")
+        self.assertTrue(any("generic placeholder image host" in msg for msg in logs.output))
+
     def test_load_user_catalogue_rejects_non_string_url(self):
         from src.core.catalogue_loader import load_user_catalogue
 
@@ -13105,6 +13121,27 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "generic_thumbnail_url")
         self.assertEqual(issues[0].field_name, "thumbnail_url")
+
+    def test_generic_thumbnail_host_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "thumbnail_url": "https://placehold.co/60x88.png",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_thumbnail_url")
+        self.assertEqual(issues[0].field_name, "thumbnail_url")
+        self.assertIn("placeholder image host", issues[0].detail)
 
     def test_invalid_download_action_flagged_for_catalogue_entries(self):
         from src.core.link_checker import LinkChecker

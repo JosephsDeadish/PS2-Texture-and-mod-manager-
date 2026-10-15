@@ -125,6 +125,13 @@ _SOURCE_ALIASES = {
     "personal": "Personal",
 }
 
+_PLACEHOLDER_THUMBNAIL_HOSTS = frozenset({
+    "dummyimage.com",
+    "placehold.co",
+    "placehold.it",
+    "via.placeholder.com",
+})
+
 # Catalogue names often use em dashes to separate variant labels, so only
 # explicit "by <name>" suffixes and matching profile URLs are treated as
 # author cues.
@@ -174,18 +181,27 @@ def _normalise_url(url: str, *, preserve_fragment: bool = False) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
 
 
-def _is_placeholder_thumbnail_url(url: str) -> bool:
-    """Return True for generic favicon-style thumbnail placeholders."""
+def _placeholder_thumbnail_reason(url: str) -> str:
+    """Return a human-readable reason when *url* is obviously placeholder art."""
     if not url:
-        return False
+        return ""
     try:
         parts = urlsplit(url)
     except ValueError:
-        return False
+        return ""
     host = parts.netloc.lower()
     if host.startswith("www."):
         host = host[4:]
-    return host == "github.githubassets.com" and parts.path.lower().startswith("/favicons/favicon")
+    if host == "github.githubassets.com" and parts.path.lower().startswith("/favicons/favicon"):
+        return "generic favicon placeholder"
+    if host in _PLACEHOLDER_THUMBNAIL_HOSTS:
+        return "generic placeholder image host"
+    return ""
+
+
+def _is_placeholder_thumbnail_url(url: str) -> bool:
+    """Return True for generic placeholder thumbnail URLs."""
+    return bool(_placeholder_thumbnail_reason(url))
 
 
 def _infer_author(name: str, author_url: str) -> str:
@@ -268,12 +284,14 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
     if isinstance(entry.get("thumbnail_url"), str) and _is_placeholder_thumbnail_url(entry["thumbnail_url"]):
-        # Generic favicons are not useful cover art and only add noise when the
-        # game-specific cover lookup fails, so treat them as absent.
+        # Generic placeholder images are not useful cover art and only add
+        # noise when the game-specific cover lookup fails, so treat them as absent.
+        reason = _placeholder_thumbnail_reason(entry["thumbnail_url"])
         log.warning(
-            "[%s] entry %r: thumbnail_url uses a generic favicon placeholder; clearing it",
+            "[%s] entry %r: thumbnail_url uses a %s; clearing it",
             source_file.name,
             entry.get("id", "?"),
+            reason or "generic placeholder",
         )
         entry["thumbnail_url"] = ""
     if isinstance(entry.get("direct_download_url"), str):
