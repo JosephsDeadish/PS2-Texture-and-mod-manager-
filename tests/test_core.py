@@ -5729,6 +5729,33 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertEqual(by_id["profile_inferred"]["author"], "profile_user")
         self.assertEqual(by_id["profile_inferred"]["source"], "GitHub")
 
+    def test_dash_variant_titles_keep_placeholder_authors(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "dash_variant",
+                    "name": "Curse: The Eye of Isis HD Texture Pack — Lights On",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "author_url": "https://gbatemp.net/threads/curse-the-eye-of-isis-hd-texture-pack.665990/",
+                    "url": "https://example.com/variant",
+                    "source": "gbatemp.net",
+                    "game": "Curse: The Eye of Isis",
+                    "game_serial": "SLES-51934",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        entry = result[0]
+        self.assertEqual(entry["author"], "Unknown")
+        self.assertEqual(entry["source"], "GBAtemp")
+
     # ── Strict mode ─────────────────────────────────────────────────────────
 
     def test_strict_mode_raises_on_bad_json(self):

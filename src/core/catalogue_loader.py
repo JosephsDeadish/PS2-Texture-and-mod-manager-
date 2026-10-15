@@ -106,13 +106,19 @@ _SOURCE_ALIASES = {
     "personal": "Personal",
 }
 
+# Catalogue names often use em dashes to separate variant labels, so only
+# explicit "by <name>" suffixes and matching profile URLs are treated as
+# author cues.
 _AUTHOR_BY_RE = re.compile(r"\bby\s+(.+?)\s*$", re.IGNORECASE)
-_AUTHOR_PREFIX_RE = re.compile(r"^\s*(.+?)\s+[–—]\s+")
 _GBATEMP_MEMBER_RE = re.compile(r"gbatemp\.net/members/([^./#?]+)", re.IGNORECASE)
 _PLACEHOLDER_AUTHORS = {
     "unknown": "Unknown",
     "anonymous": "Anonymous",
 }
+
+
+def _normalise_author_token(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", text.casefold())
 
 
 def _normalise_mod_type(type_str: str) -> str:
@@ -141,16 +147,21 @@ def _normalise_url(url: str) -> str:
 
 
 def _infer_author(name: str, author_url: str) -> str:
-    for pattern in (_AUTHOR_BY_RE, _AUTHOR_PREFIX_RE):
-        match = pattern.search(name)
-        if match:
-            author = match.group(1).strip()
-            if author:
-                return author
+    match = _AUTHOR_BY_RE.search(name)
+    if match:
+        author = match.group(1).strip()
+        if author:
+            return author
 
     match = _GBATEMP_MEMBER_RE.search(author_url)
     if match:
-        return match.group(1)
+        author = match.group(1).strip()
+        prefix_match = re.match(r"^\s*(.+?)\s+[–—]\s+", name)
+        if prefix_match:
+            prefix = prefix_match.group(1).strip()
+            if prefix and _normalise_author_token(prefix) == _normalise_author_token(author):
+                return prefix
+        return author
 
     return ""
 
