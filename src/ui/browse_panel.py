@@ -1016,6 +1016,20 @@ class CoverDownloadDialog(QDialog):
     # Game-name search helpers
     # ------------------------------------------------------------------
 
+    def _apply_serial_selection(self, serial: str):
+        """Fill the serial field and show the download hint for *serial*."""
+        if not serial:
+            return
+        self._id_edit.setText(serial)
+        self._suggestions.hide()
+        if hasattr(self, "_status"):
+            self._status.setText(
+                f"Serial set to <b>{serial}</b> — click Download to fetch cover art."
+            )
+            rich_text = getattr(getattr(Qt, "TextFormat", None), "RichText", None)
+            if rich_text is not None and hasattr(self._status, "setTextFormat"):
+                self._status.setTextFormat(rich_text)
+
     def _on_search_changed(self, text: str):
         """Populate the suggestions list from the game registry."""
         self._suggestions.clear()
@@ -1027,6 +1041,10 @@ class CoverDownloadDialog(QDialog):
         if not hits:
             self._suggestions.hide()
             return
+        if len(hits) == 1:
+            serial, _title = hits[0]
+            self._apply_serial_selection(serial)
+            return
         for serial, title in hits[:20]:
             item = QListWidgetItem(f"{serial}  —  {title}")
             item.setData(Qt.ItemDataRole.UserRole, serial)
@@ -1037,12 +1055,7 @@ class CoverDownloadDialog(QDialog):
         """Fill the serial field when the user clicks a suggestion."""
         serial = item.data(Qt.ItemDataRole.UserRole)
         if serial:
-            self._id_edit.setText(serial)
-            self._suggestions.hide()
-            self._status.setText(
-                f"Serial set to <b>{serial}</b> — click Download to fetch cover art."
-            )
-            self._status.setTextFormat(Qt.TextFormat.RichText)
+            self._apply_serial_selection(serial)
 
     # ------------------------------------------------------------------
     # Single download

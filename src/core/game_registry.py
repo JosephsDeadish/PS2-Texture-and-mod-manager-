@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import logging
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -1204,6 +1205,12 @@ def lookup_game_title_with_online_fallback(serial: str, timeout: int = 5) -> str
     return lookup_game_title_online(serial, timeout=timeout)
 
 
+@lru_cache(maxsize=4)
+def _serial_database_for_title_lookup(serial_db_factory):
+    """Return a cached SerialDatabase instance for title/alias lookups."""
+    return serial_db_factory()
+
+
 def all_known_serials() -> list[tuple[str, str]]:
     """Return a sorted list of (serial, title) tuples from the built-in registry."""
     return sorted(_KNOWN_SERIALS.items(), key=lambda x: x[0])
@@ -1262,7 +1269,7 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     # Also resolve via serial DB aliases so abbreviations like "GoW" work.
     try:
         from src.core.serial_validator import SerialDatabase
-        _sdb = SerialDatabase()
+        _sdb = _serial_database_for_title_lookup(SerialDatabase)
         seen_titles = {t for _, t in pairs}
         for title in _sdb.search_titles(title_fragment):
             if title not in seen_titles:

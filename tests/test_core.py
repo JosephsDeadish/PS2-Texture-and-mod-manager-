@@ -5225,6 +5225,54 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertTrue(panel._in_app_check.checked)
         self.assertEqual(panel._tabs.currentIndex(), 2)
 
+    def test_cover_dialog_auto_fills_single_serial_match(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeSuggestions:
+            def __init__(self):
+                self.cleared = False
+                self.hidden = False
+
+            def clear(self):
+                self.cleared = True
+
+            def hide(self):
+                self.hidden = True
+
+            def show(self):
+                self.hidden = False
+
+        class FakeStatus:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, value):
+                self.text = value
+
+            def setTextFormat(self, _value):
+                pass
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg._title_to_serials = lambda text: [("SLUS-20062", "Grand Theft Auto III")]
+        dlg._suggestions = FakeSuggestions()
+        dlg._id_edit = FakeLineEdit()
+        dlg._status = FakeStatus()
+
+        dlg._on_search_changed("Grand Theft Auto III")
+
+        self.assertTrue(dlg._suggestions.cleared)
+        self.assertTrue(dlg._suggestions.hidden)
+        self.assertEqual(dlg._id_edit.value, "SLUS-20062")
+        self.assertIn("Serial set to", dlg._status.text)
+
     def test_active_tab_index_logs_when_tabs_fail(self):
         browse_panel = self._import_browse_panel()
         BrowsePanel = browse_panel.BrowsePanel
