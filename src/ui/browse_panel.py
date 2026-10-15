@@ -74,6 +74,11 @@ _ACCOUNT_REQUIRED_SOURCES: frozenset = frozenset({
     "Patreon",
 })
 
+_PLACEHOLDER_AUTHORS = frozenset({
+    "unknown",
+    "anonymous",
+})
+
 
 def _entry_is_free(entry: dict) -> bool:
     """Return True if this entry's content is freely available (no payment needed).
@@ -180,6 +185,21 @@ def _save_browse_config(config: AppConfig, context: str) -> None:
         save_config(config)
     except Exception as exc:
         logger.warning("Could not save browse panel config after %s: %s", context, exc)
+
+
+def _browse_authors(entries: List[dict]) -> List[str]:
+    """Return browse-filter author names, skipping placeholder values."""
+    authors = {
+        author.strip()
+        for author in (
+            entry.get("author", "")
+            for entry in entries
+        )
+        if isinstance(author, str)
+        and author.strip()
+        and author.strip().casefold() not in _PLACEHOLDER_AUTHORS
+    }
+    return sorted(authors, key=str.casefold)
 
 
 # Human-readable labels for each ModType in catalogue cards
@@ -2444,8 +2464,7 @@ class BrowsePanel(BasePanel):
         self._author_filter = QComboBox()
         self._author_filter.setMinimumWidth(150)
         self._author_filter.addItem("All Authors", "")
-        # Only include non-empty author values (hub entries have author="")
-        named_authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        named_authors = _browse_authors(CATALOGUE)
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
@@ -2740,8 +2759,7 @@ class BrowsePanel(BasePanel):
         current = self._author_filter.currentData() or ""
         self._author_filter.clear()
         self._author_filter.addItem("All Authors", "")
-        # Only show named (non-hub) authors — hub entries have author=""
-        named_authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        named_authors = _browse_authors(CATALOGUE)
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)

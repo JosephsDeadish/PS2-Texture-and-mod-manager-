@@ -4912,6 +4912,18 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel.config.browse_selected_tab, 2)
         save_mock.assert_called_once_with(panel.config, "persisting browse state")
 
+    def test_browse_authors_skip_placeholders(self):
+        browse_panel = self._import_browse_panel()
+        authors = browse_panel._browse_authors([
+            {"author": "Unknown"},
+            {"author": "Anonymous"},
+            {"author": "Curse_Arms"},
+            {"author": "TexMaster"},
+            {"author": ""},
+        ])
+
+        self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
