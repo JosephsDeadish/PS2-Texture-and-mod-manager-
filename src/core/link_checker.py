@@ -26,7 +26,13 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from typing import Dict, List, Optional
 
-from src.core.catalogue_loader import VALID_DOWNLOAD_ACTIONS, _infer_author, is_placeholder_author
+from src.core.catalogue_loader import (
+    VALID_DOWNLOAD_ACTIONS,
+    _infer_author,
+    _is_placeholder_thumbnail_url,
+    _normalise_source,
+    is_placeholder_author,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +128,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author", "invalid_download_action"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author", "invalid_download_action", "noncanonical_source", "generic_author_url", "generic_thumbnail_url"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -248,6 +254,22 @@ class LinkChecker:
                 ))
                 continue
             entry_kind = str(entry.get("type", "")).lower() or source_kind
+
+            raw_source = entry.get("source", "")
+            if isinstance(raw_source, str):
+                source_label = raw_source.strip()
+                if source_label:
+                    canonical_source = _normalise_source(source_label)
+                    if canonical_source != source_label:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="source",
+                            url=source_label,
+                            issue_type="noncanonical_source",
+                            detail=f"normalize source label to {canonical_source!r}",
+                        ))
+
             if (entry_kind in _CATALOGUE_KINDS or source_kind in _CATALOGUE_KINDS) and not entry.get("is_hub", False):
                 author = entry.get("author", "")
                 if not isinstance(author, str) or not author.strip():
@@ -281,6 +303,7 @@ class LinkChecker:
                                 "or a more specific source-page label"
                             ),
                         ))
+
             raw_action = entry.get("download_action", "")
             if raw_action not in ("", None):
                 if not isinstance(raw_action, str):
@@ -303,6 +326,7 @@ class LinkChecker:
                             issue_type="invalid_download_action",
                             detail=f"unrecognised download action {raw_action!r}",
                         ))
+
             if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
                 for field_name in required_url_fields:
                     raw_required = entry.get(field_name, "")
@@ -316,6 +340,7 @@ class LinkChecker:
                         issue_type="empty_required",
                         detail=f"missing required {field_name!r} for {entry_kind} entry",
                     ))
+
             for field_name in _URL_FIELDS:
                 raw = entry.get(field_name, "")
                 if raw in ("", None):
@@ -368,6 +393,38 @@ class LinkChecker:
                             f"host {suspicious_dom!r} is not on the trusted catalogue "
                             "domain list"
                         ),
+                    ))
+                    continue
+
+                if field_name == "author_url" and not entry.get("is_hub", False):
+                    host, path = _split_url_host_path(raw)
+                    if host and self._is_trusted_domain(raw):
+                        if not path or path == "/":
+                            issues.append(LinkIssue(
+                                source_file=source_file,
+                                entry_index=idx,
+                                field_name=field_name,
+                                url=raw,
+                                issue_type="generic_author_url",
+                                detail="author_url points to a bare homepage instead of a profile or thread page",
+                            ))
+                        elif "search/members" in path:
+                            issues.append(LinkIssue(
+                                source_file=source_file,
+                                entry_index=idx,
+                                field_name=field_name,
+                                url=raw,
+                                issue_type="generic_author_url",
+                                detail="author_url points to a member search page instead of a direct profile",
+                            ))
+                elif field_name == "thumbnail_url" and _is_placeholder_thumbnail_url(raw):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url=raw,
+                        issue_type="generic_thumbnail_url",
+                        detail="thumbnail_url uses a generic favicon placeholder instead of cover art",
                     ))
         return issues
 

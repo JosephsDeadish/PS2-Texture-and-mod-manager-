@@ -12406,7 +12406,7 @@ class TestLinkChecker(unittest.TestCase):
                 "name": "Example Pack by ExampleName",
                 "author": "",
                 "url": "https://gbatemp.net/threads/example.123/",
-                "source": "gbatemp.net",
+                "source": "GBAtemp",
                 "game": "Example Game",
                 "game_serial": "SLUS-12345",
             },
@@ -12415,13 +12415,73 @@ class TestLinkChecker(unittest.TestCase):
                 "author": "Anonymous",
                 "author_url": "https://gbatemp.net/members/profile_user.12345/#latest-activity",
                 "url": "https://github.com/PCSX2/pcsx2",
-                "source": "GitHub.com",
+                "source": "GitHub",
                 "game": "Example Game 2",
                 "game_serial": "SCUS-54321",
             }],
             source_file="texture_packs.json",
         )
         self.assertEqual(issues, [])
+
+    def test_noncanonical_source_label_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "gbatemp.net",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "noncanonical_source")
+        self.assertEqual(issues[0].field_name, "source")
+        self.assertIn("GBAtemp", issues[0].detail)
+
+    def test_generic_author_url_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "author_url": "https://gbatemp.net/",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_author_url")
+        self.assertEqual(issues[0].field_name, "author_url")
+
+    def test_generic_thumbnail_url_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_thumbnail_url")
+        self.assertEqual(issues[0].field_name, "thumbnail_url")
 
     def test_invalid_download_action_flagged_for_catalogue_entries(self):
         from src.core.link_checker import LinkChecker
@@ -12568,6 +12628,9 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(report["issue_count_by_type"].get("bad_domain", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("suspicious_domain", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("invalid_download_action", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("noncanonical_source", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("generic_author_url", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("generic_thumbnail_url", 0), 0)
         self.assertGreater(report["issue_count_by_type"].get("placeholder_author", 0), 0)
 
     def test_check_all_catalogues_returns_dict(self):

@@ -361,6 +361,14 @@ class SettingsPanel(BasePanel):
             return
 
         lines = [summary, ""]
+        issue_counts = report.get("issue_count_by_type", {}) or {}
+        if issue_counts:
+            breakdown = ", ".join(
+                f"{issue_type}×{count}"
+                for issue_type, count in sorted(issue_counts.items())
+            )
+            lines.append(f"Breakdown: {breakdown}")
+            lines.append("")
         shown = 0
         for source_file, issues in report.get("issues_by_file", {}).items():
             if not issues:
