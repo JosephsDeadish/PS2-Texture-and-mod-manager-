@@ -1795,6 +1795,33 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         fake.setup_complete.emit.assert_not_called()
         fake.reject.assert_not_called()
 
+    def test_setup_wizard_auto_detect_failure_shows_status(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _pcsx2_status=MagicMock(),
+                _auto_fill_from_path=MagicMock(),
+            )
+
+            with patch("src.core.pcsx2_layout.auto_detect_pcsx2", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._auto_detect(fake)
+
+        self.assertTrue(any("Auto-detecting PCSX2 failed" in msg for msg in logs.output))
+        fake._pcsx2_status.setText.assert_called()
+        self.assertTrue(
+            any(
+                "Please browse for the folder manually" in call.args[0]
+                for call in fake._pcsx2_status.setText.call_args_list
+            )
+        )
+
 
 class TestWidgetsLogging(unittest.TestCase):
     """Widgets with recoverable failures should log before surfacing errors."""

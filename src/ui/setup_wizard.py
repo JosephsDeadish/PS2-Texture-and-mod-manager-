@@ -520,6 +520,10 @@ class SetupWizard(QDialog):
                 return
         except Exception as exc:
             logger.warning("Auto-detecting PCSX2 failed: %s", exc)
+            self._pcsx2_status.setText(
+                f"⚠ Auto-detecting PCSX2 failed: {exc}\n"
+                "Please browse for the folder manually."
+            )
 
         # Fallback to legacy candidate list
         candidates = [
