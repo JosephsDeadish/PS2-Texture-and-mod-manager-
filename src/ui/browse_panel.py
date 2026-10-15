@@ -585,11 +585,23 @@ class CatalogueCard(QFrame):
                 data = resp.read()
             if len(data) < 512:
                 # Too small — likely a 404 placeholder or empty response
+                logger.warning(
+                    "Browse cover art response from %s was too small (%d bytes); "
+                    "keeping placeholder icon",
+                    url,
+                    len(data),
+                )
+                try:
+                    os.unlink(tmp)
+                except OSError as exc:
+                    logger.warning(
+                        "Could not remove temporary browse cover art file %s: %s",
+                        tmp,
+                        exc,
+                    )
                 return False
             with open(tmp, "wb") as f:
                 f.write(data)
-
-            loaded = [False]
 
             def _update():
                 if not self._cover_lbl:
@@ -605,7 +617,12 @@ class CatalogueCard(QFrame):
                     self._cover_lbl.setStyleSheet(
                         "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
                     )
-                    loaded[0] = True
+                else:
+                    logger.warning(
+                        "Browse cover art from %s was not a valid image; "
+                        "keeping placeholder icon",
+                        url,
+                    )
                 try:
                     os.unlink(tmp)
                 except OSError as exc:

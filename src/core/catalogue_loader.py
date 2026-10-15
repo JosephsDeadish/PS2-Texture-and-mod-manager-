@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -95,6 +96,27 @@ _OPTIONAL_DEFAULTS: Dict[str, object] = {
     "size_label":         "",
 }
 
+_SOURCE_ALIASES = {
+    "gbatemp": "GBAtemp",
+    "gbatempnet": "GBAtemp",
+    "github": "GitHub",
+    "githubcom": "GitHub",
+    "pcsx2cheatdb": "PCSX2 CheatDB",
+    "personal": "Personal",
+}
+
+
+def _normalise_mod_type(type_str: str) -> str:
+    return re.sub(r"[\s\-]+", "_", type_str.strip().lower())
+
+
+def _normalise_source(source: str) -> str:
+    source = source.strip()
+    if not source:
+        return "Personal"
+    key = re.sub(r"[^a-z0-9]+", "", source.casefold())
+    return _SOURCE_ALIASES.get(key, source)
+
 
 def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     """Validate *entry* from *source_file*, inject *type_str*, fill defaults.
@@ -103,6 +125,36 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     early rather than causing mysterious runtime errors.
     """
     entry = dict(entry)  # shallow copy — don't mutate the caller's dict
+
+    # Normalise common text fields before validation so user catalogue files
+    # can recover from stray whitespace and older naming conventions.
+    for field in (
+        "id",
+        "name",
+        "description",
+        "author",
+        "url",
+        "game",
+        "game_serial",
+        "context",
+        "author_url",
+        "thumbnail_url",
+        "download_action",
+        "direct_download_url",
+        "upscale_tech",
+        "size_label",
+    ):
+        if isinstance(entry.get(field), str):
+            entry[field] = entry[field].strip()
+    if isinstance(entry.get("game_serial"), str):
+        entry["game_serial"] = entry["game_serial"].upper()
+    if isinstance(entry.get("download_action"), str):
+        entry["download_action"] = entry["download_action"].lower()
+    if isinstance(entry.get("source"), str):
+        entry["source"] = _normalise_source(entry["source"])
+    if isinstance(entry.get("tags"), list):
+        entry["tags"] = [tag.strip() for tag in entry["tags"] if isinstance(tag, str) and tag.strip()]
+    type_str = _normalise_mod_type(type_str)
 
     # Inject type from the file name as a ModType enum (callers do not need
     # to repeat it in every record, and the UI compares against enum values).

@@ -4509,6 +4509,57 @@ class TestScraperDialogClassifier(unittest.TestCase):
         self.assertEqual(result, "")
         self.assertTrue(any("Could not classify browse URL" in msg for msg in logs.output))
 
+    def test_cover_art_preview_logs_when_payload_too_small(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"abc")):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = CatalogueCard._fetch_and_display(
+                        card,
+                        "https://example.com/thumb.jpg",
+                    )
+
+        self.assertFalse(result)
+        self.assertTrue(any("too small" in msg for msg in logs.output))
+        card._cover_lbl.setPixmap.assert_not_called()
+        card._cover_lbl.setText.assert_not_called()
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
@@ -7246,6 +7297,46 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["id"], "user-tp-001")
         self.assertEqual(result[0]["type"], ModType.TEXTURE_PACK)
+
+    def test_load_user_catalogue_normalizes_common_fields(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+
+        entry = self._make_user_entry()
+        entry.update({
+            "name": "  My Custom Pack  ",
+            "description": "  A personal texture pack  ",
+            "author": "  Tester  ",
+            "source": " gbatemp ",
+            "type": " texture pack ",
+            "game": "  Ratchet & Clank  ",
+            "game_serial": " scus-97199 ",
+            "url": " https://example.com/my-pack ",
+            "author_url": " https://example.com/author ",
+            "thumbnail_url": " https://example.com/thumb.png ",
+            "direct_download_url": " https://example.com/direct.zip ",
+            "download_action": " MANUAL ",
+            "tags": [" one ", "", "Two "],
+        })
+        (Path(self.tmpdir) / "normalised.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        loaded = result[0]
+        self.assertEqual(loaded["type"], ModType.TEXTURE_PACK)
+        self.assertEqual(loaded["source"], "GBAtemp")
+        self.assertEqual(loaded["name"], "My Custom Pack")
+        self.assertEqual(loaded["description"], "A personal texture pack")
+        self.assertEqual(loaded["author"], "Tester")
+        self.assertEqual(loaded["game"], "Ratchet & Clank")
+        self.assertEqual(loaded["game_serial"], "SCUS-97199")
+        self.assertEqual(loaded["url"], "https://example.com/my-pack")
+        self.assertEqual(loaded["author_url"], "https://example.com/author")
+        self.assertEqual(loaded["thumbnail_url"], "https://example.com/thumb.png")
+        self.assertEqual(loaded["direct_download_url"], "https://example.com/direct.zip")
+        self.assertEqual(loaded["download_action"], "manual")
+        self.assertEqual(loaded["tags"], ["one", "Two"])
 
     def test_load_user_catalogue_multiple_types(self):
         from src.core.catalogue_loader import load_user_catalogue
