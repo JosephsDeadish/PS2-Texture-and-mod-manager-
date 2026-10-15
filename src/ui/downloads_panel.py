@@ -133,11 +133,65 @@ class DownloadsPanel(BasePanel):
     def _last_paths_bucket(self) -> dict:
         return ui_state_bucket(self.config, "last_paths")
 
+    def _history_panel_bucket(self) -> dict:
+        return ui_state_bucket(self.config, "downloads_panel")
+
     def _save_panel_config(self, context: str) -> None:
         try:
             save_config(self.config)
         except Exception as exc:
             logger.warning("Could not save downloads panel config after %s: %s", context, exc)
+
+    def _save_history_splitter(self, *_args) -> None:
+        splitter = getattr(self, "_history_splitter", None)
+        if splitter is None:
+            return
+        sizes = getattr(splitter, "sizes", lambda: [])()
+        if not isinstance(sizes, (list, tuple)):
+            return
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError):
+            return
+        if not cleaned:
+            return
+        self._history_panel_bucket()["history_splitter_sizes"] = cleaned
+        self._save_panel_config("updating download history splitter")
+
+    def _restore_history_splitter(self) -> None:
+        splitter = getattr(self, "_history_splitter", None)
+        if splitter is None:
+            return
+        sizes = self._history_panel_bucket().get("history_splitter_sizes", [])
+        if not isinstance(sizes, (list, tuple)):
+            return
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError):
+            return
+        if len(cleaned) >= 2 and hasattr(splitter, "setSizes"):
+            splitter.setSizes(cleaned)
+
+    def _clear_history_filters(self) -> None:
+        for widget in (self._status_combo, self._type_combo, self._serial_edit):
+            setter = getattr(widget, "blockSignals", None)
+            if callable(setter):
+                setter(True)
+        try:
+            status_idx = self._status_combo.findText("All")
+            if status_idx >= 0:
+                self._status_combo.setCurrentIndex(status_idx)
+            type_idx = self._type_combo.findText("All")
+            if type_idx >= 0:
+                self._type_combo.setCurrentIndex(type_idx)
+            self._serial_edit.setText("")
+        finally:
+            for widget in (self._status_combo, self._type_combo, self._serial_edit):
+                setter = getattr(widget, "blockSignals", None)
+                if callable(setter):
+                    setter(False)
+        self._save_history_filters()
+        self._refresh_history()
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -211,6 +265,11 @@ class DownloadsPanel(BasePanel):
         refresh_hist_btn.clicked.connect(self._refresh_history)
         filter_row.addWidget(refresh_hist_btn)
 
+        clear_hist_btn = QPushButton("✖ Clear Filters")
+        clear_hist_btn.setToolTip("Reset the history status, type, and serial filters")
+        clear_hist_btn.clicked.connect(self._clear_history_filters)
+        filter_row.addWidget(clear_hist_btn)
+
         filter_row.addStretch()
         content.addLayout(filter_row)
 
@@ -251,6 +310,10 @@ class DownloadsPanel(BasePanel):
         splitter.addWidget(right)
         splitter.setStretchFactor(0, 3)
         splitter.setStretchFactor(1, 2)
+        self._history_splitter = splitter
+        splitter_moved = getattr(splitter, "splitterMoved", None)
+        if callable(getattr(splitter_moved, "connect", None)):
+            splitter_moved.connect(self._save_history_splitter)
         content.addWidget(splitter, 1)
 
         # Bottom actions
@@ -269,6 +332,7 @@ class DownloadsPanel(BasePanel):
         content.addLayout(bottom_row)
 
         self._restore_history_filters()
+        self._restore_history_splitter()
 
         # Initial load
         self._refresh_history()

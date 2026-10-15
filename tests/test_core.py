@@ -5791,6 +5791,98 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
         save_mock.assert_called_once_with(panel.config)
 
+    def test_clear_history_filters_resets_widgets_and_refreshes(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value="SLUS-20228"):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            download_history_status_filter="❌ Failed",
+            download_history_type_filter="🖼 Cover Art",
+            download_history_serial_filter="SLUS-20228",
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=2)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ], index=3)
+        panel._serial_edit = FakeLineEdit()
+        panel._refresh_history = MagicMock()
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._clear_history_filters()
+
+        self.assertEqual(panel._status_combo.index, 0)
+        self.assertEqual(panel._type_combo.index, 0)
+        self.assertEqual(panel._serial_edit.value, "")
+        self.assertEqual(panel.config.download_history_status_filter, "All")
+        self.assertEqual(panel.config.download_history_type_filter, "All")
+        self.assertEqual(panel.config.download_history_serial_filter, "")
+        panel._refresh_history.assert_called_once()
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_history_splitter_state_restores_and_saves(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": [280, 520]}})
+        panel._history_splitter = FakeSplitter([120, 680])
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._restore_history_splitter()
+            self.assertEqual(panel._history_splitter._sizes, [280, 520])
+            panel._history_splitter._sizes = [360, 440]
+            panel._save_history_splitter()
+
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["history_splitter_sizes"], [360, 440])
+        save_mock.assert_called_once_with(panel.config)
+
     def test_history_details_escape_html(self):
         import types
 
@@ -6088,6 +6180,33 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._current_card, "/cards/beta.ps2")
         self.assertEqual(panel._card_combo.current_index, 2)
         panel._load_saves.assert_called_once()
+
+    def test_splitter_state_restores_and_saves(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": [260, 420]}})
+        panel._splitter = FakeSplitter([180, 500])
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._restore_splitter_sizes(panel)
+            self.assertEqual(panel._splitter._sizes, [260, 420])
+            panel._splitter._sizes = [300, 380]
+            MemoryCardPanel._save_splitter_sizes(panel)
+
+        self.assertEqual(panel.config.ui_state["memcard_panel"]["splitter_sizes"], [300, 380])
+        save_mock.assert_called_once_with(panel.config)
 
 
 class TestModPanelEmptyState(unittest.TestCase):

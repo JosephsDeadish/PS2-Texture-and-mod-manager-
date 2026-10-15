@@ -69,6 +69,39 @@ class MemoryCardPanel(BasePanel):
         except Exception as exc:
             logger.warning("Could not save memory card selection: %s", exc)
 
+    def _save_splitter_sizes(self, *_args) -> None:
+        splitter = getattr(self, "_splitter", None)
+        if splitter is None:
+            return
+        sizes = getattr(splitter, "sizes", lambda: [])()
+        if not isinstance(sizes, (list, tuple)):
+            return
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError):
+            return
+        if not cleaned:
+            return
+        self._panel_state_bucket()["splitter_sizes"] = cleaned
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card splitter sizes: %s", exc)
+
+    def _restore_splitter_sizes(self) -> None:
+        splitter = getattr(self, "_splitter", None)
+        if splitter is None:
+            return
+        sizes = self._panel_state_bucket().get("splitter_sizes", [])
+        if not isinstance(sizes, (list, tuple)):
+            return
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError):
+            return
+        if len(cleaned) >= 2 and hasattr(splitter, "setSizes"):
+            splitter.setSizes(cleaned)
+
     def _restore_selected_card(self) -> None:
         selected = self._current_card or self._panel_state_bucket().get("selected_card", "") or ""
         if not selected:
@@ -187,6 +220,11 @@ class MemoryCardPanel(BasePanel):
 
         splitter.addWidget(right_widget)
         splitter.setSizes([240, 460])
+        self._splitter = splitter
+        splitter_moved = getattr(splitter, "splitterMoved", None)
+        if callable(getattr(splitter_moved, "connect", None)):
+            splitter_moved.connect(self._save_splitter_sizes)
+        self._restore_splitter_sizes()
 
         content.addWidget(splitter, 1)
 
