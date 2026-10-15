@@ -5658,6 +5658,26 @@ class TestCatalogueLoader(unittest.TestCase):
             result = load_catalogue(catalogue_dir=d, strict=False)
             self.assertEqual(result, [])
 
+    def test_lenient_mode_skips_unreadable_files(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        original_read_text = Path.read_text
+
+        def _read_text(path_obj, *args, **kwargs):
+            if path_obj.name == "texture_packs.json":
+                raise OSError("denied")
+            return original_read_text(path_obj, *args, **kwargs)
+
+        with patch.object(Path, "read_text", autospec=True, side_effect=_read_text):
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(
+                    catalogue_dir=CATALOGUE_DIR,
+                    strict=False,
+                    user_catalogue_dir=False,
+                )
+
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Failed to read catalogue file" in msg for msg in logs.output))
+
     def test_empty_dir_returns_empty_list(self):
         import tempfile
         from src.core.catalogue_loader import load_catalogue
@@ -10350,6 +10370,17 @@ class TestLinkChecker(unittest.TestCase):
             [{"url": "https://gamesavedfiles.com/some/page"}],
             source_file="test",
         )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_bad_domain_normalization_only_strips_literal_www_prefix(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        with patch("src.core.link_checker._BAD_DOMAINS", frozenset({"wtest.com"})):
+            issues = lc.check_entries(
+                [{"url": "https://www.wtest.com/some/page"}],
+                source_file="test",
+            )
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "bad_domain")
 

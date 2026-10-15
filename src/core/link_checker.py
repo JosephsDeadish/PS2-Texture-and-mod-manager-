@@ -135,7 +135,9 @@ class LinkChecker:
         m = re.match(r'^https?://([^/]+)', url, re.IGNORECASE)
         if not m:
             return None
-        host = m.group(1).lower().lstrip("www.")
+        host = m.group(1).lower()
+        if host.startswith("www."):
+            host = host[4:]
         for bad in _BAD_DOMAINS:
             if host == bad or host.endswith("." + bad):
                 return bad

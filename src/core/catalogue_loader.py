@@ -277,7 +277,16 @@ def _load_from_dir(
             continue
 
         try:
-            raw: List[dict] = json.loads(path.read_text(encoding="utf-8"))
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            msg = f"Failed to read catalogue file {path}: {exc}"
+            if strict:
+                raise ValueError(msg) from exc
+            log.warning(msg)
+            continue
+
+        try:
+            raw: List[dict] = json.loads(text)
         except json.JSONDecodeError as exc:
             msg = f"Failed to parse catalogue file {path}: {exc}"
             if strict:
@@ -344,8 +353,9 @@ def load_catalogue(
     strict:
         When *True*, any schema violation (missing required field, duplicate ID,
         unparseable JSON) raises ``ValueError`` immediately and stops loading.
-        When *False* (the default), bad entries are logged via the module
-        logger and silently skipped so the rest of the catalogue still loads.
+        When *False* (the default), bad entries or unreadable files are logged
+        via the module logger and skipped so the rest of the catalogue still
+        loads.
     user_catalogue_dir:
         Override the user catalogue directory.  When ``None`` the default
         ``user_catalogue/`` folder next to the exe is used (via
