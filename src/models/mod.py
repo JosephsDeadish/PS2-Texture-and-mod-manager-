@@ -126,6 +126,7 @@ class AppConfig:
     browse_source_filter: str = ""
     browse_author_filter: str = ""
     browse_favorites_only: bool = False
+    browse_sort_mode: str = "featured"
     browse_selected_tab: int = 0
     tooltip_mode: str = "normal"  # "normal", "dumbed_down", "no_filter"
 
@@ -153,6 +154,7 @@ class AppConfig:
             "browse_source_filter": self.browse_source_filter,
             "browse_author_filter": self.browse_author_filter,
             "browse_favorites_only": self.browse_favorites_only,
+            "browse_sort_mode": self.browse_sort_mode,
             "browse_selected_tab": self.browse_selected_tab,
             "tooltip_mode": self.tooltip_mode,
         }

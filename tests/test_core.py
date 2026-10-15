@@ -4864,6 +4864,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             browse_source_filter="GBAtemp",
             browse_author_filter="Curse_Arms",
             browse_favorites_only=True,
+            browse_sort_mode="game",
             browse_selected_tab=5,
         )
         panel._search = FakeLineEdit()
@@ -4877,6 +4878,12 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             ("Curse_Arms", "Curse_Arms"),
             ("Panda_Venom", "Panda_Venom"),
         ])
+        panel._sort_filter = FakeComboBox([
+            ("Featured", "featured"),
+            ("Name", "name"),
+            ("Game", "game"),
+        ])
+        panel._sort_filter.index = 2
         panel._favs_check = FakeCheckBox()
         panel._tabs = FakeTabs(count=3)
 
@@ -4885,6 +4892,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._search.value, "gta")
         self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
         self.assertEqual(panel._author_filter.currentData(), "Curse_Arms")
+        self.assertEqual(panel._sort_filter.currentData(), "game")
         self.assertTrue(panel._favs_check.checked)
         self.assertEqual(panel._tabs.currentIndex(), 2)
 
@@ -4899,6 +4907,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         panel._search = types.SimpleNamespace(text=lambda: "gta")
         panel._source_filter = types.SimpleNamespace(currentData=lambda: "GBAtemp")
         panel._author_filter = types.SimpleNamespace(currentData=lambda: "Curse_Arms")
+        panel._sort_filter = types.SimpleNamespace(currentData=lambda: "name")
         panel._favs_check = types.SimpleNamespace(isChecked=lambda: True)
         panel._tabs = types.SimpleNamespace(count=lambda: 4, currentIndex=lambda: 2)
 
@@ -4909,8 +4918,52 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel.config.browse_source_filter, "GBAtemp")
         self.assertEqual(panel.config.browse_author_filter, "Curse_Arms")
         self.assertTrue(panel.config.browse_favorites_only)
+        self.assertEqual(panel.config.browse_sort_mode, "name")
         self.assertEqual(panel.config.browse_selected_tab, 2)
         save_mock.assert_called_once_with(panel.config, "persisting browse state")
+
+    def test_sort_catalogue_entries_orders_by_requested_field(self):
+        browse_panel = self._import_browse_panel()
+
+        entries = [
+            {"name": "Zulu", "game": "Game Z", "author": "B", "source": "GitHub", "game_serial": "SLUS-00002"},
+            {"name": "Alpha", "game": "Game A", "author": "A", "source": "GBAtemp", "game_serial": "SLUS-00001"},
+            {"name": "Bravo", "game": "", "author": "C", "source": "Patreon", "game_serial": ""},
+        ]
+
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "name")],
+            ["Alpha", "Bravo", "Zulu"],
+        )
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "game")],
+            ["Alpha", "Zulu", "Bravo"],
+        )
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "featured")],
+            ["Zulu", "Alpha", "Bravo"],
+        )
+
+    def test_catalogue_empty_state_message_mentions_filters(self):
+        browse_panel = self._import_browse_panel()
+
+        message = browse_panel._catalogue_empty_state_message(
+            query="gta",
+            source="GBAtemp",
+            author="",
+            favs_only=True,
+            show_nsfw=False,
+            show_paid=False,
+            show_account_required=True,
+            show_incomplete=False,
+            in_app_only=True,
+        )
+
+        self.assertIn("No catalogue entries match", message)
+        self.assertIn("search text", message)
+        self.assertIn("source", message)
+        self.assertIn("favorites only", message)
+        self.assertIn("in-app downloads only", message)
 
     def test_browse_authors_skip_placeholders(self):
         browse_panel = self._import_browse_panel()

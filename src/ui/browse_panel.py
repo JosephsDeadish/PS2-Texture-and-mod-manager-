@@ -79,6 +79,15 @@ _PLACEHOLDER_AUTHORS = frozenset({
     "anonymous",
 })
 
+_SORT_OPTIONS = [
+    ("⭐ Featured order", "featured"),
+    ("🅰 Name (A→Z)", "name"),
+    ("🎮 Game (A→Z)", "game"),
+    ("👤 Author (A→Z)", "author"),
+    ("🌐 Source (A→Z)", "source"),
+    ("🆔 Serial (A→Z)", "serial"),
+]
+
 
 def _entry_is_free(entry: dict) -> bool:
     """Return True if this entry's content is freely available (no payment needed).
@@ -200,6 +209,80 @@ def _browse_authors(entries: List[dict]) -> List[str]:
         and author.strip().casefold() not in _PLACEHOLDER_AUTHORS
     }
     return sorted(authors, key=str.casefold)
+
+
+def _normalise_sort_mode(sort_mode: object) -> str:
+    if not isinstance(sort_mode, str):
+        return "featured"
+    sort_mode = sort_mode.strip().casefold()
+    valid = {value for _, value in _SORT_OPTIONS}
+    return sort_mode if sort_mode in valid else "featured"
+
+
+def _sort_catalogue_entries(entries: List[dict], sort_mode: object) -> List[dict]:
+    """Return *entries* sorted according to the browse sort mode."""
+    sort_mode = _normalise_sort_mode(sort_mode)
+    if sort_mode == "featured":
+        return list(entries)
+
+    def _field_key(entry: dict, field: str) -> tuple[bool, str]:
+        value = entry.get(field, "")
+        if not isinstance(value, str):
+            value = "" if value is None else str(value)
+        value = value.strip().casefold()
+        return (value == "", value)
+
+    sort_fields = {
+        "name": ("name", "game", "author"),
+        "game": ("game", "name", "author"),
+        "author": ("author", "name", "game"),
+        "source": ("source", "name", "author"),
+        "serial": ("game_serial", "name", "author"),
+    }
+    fields = sort_fields.get(sort_mode)
+    if not fields:
+        return list(entries)
+    return sorted(entries, key=lambda entry: tuple(_field_key(entry, field) for field in fields))
+
+
+def _catalogue_empty_state_message(
+    query: str,
+    source: str,
+    author: str,
+    favs_only: bool,
+    show_nsfw: bool,
+    show_paid: bool,
+    show_account_required: bool,
+    show_incomplete: bool,
+    in_app_only: bool,
+) -> str:
+    filters = []
+    if query.strip():
+        filters.append("search text")
+    if source:
+        filters.append("source")
+    if author:
+        filters.append("author")
+    if favs_only:
+        filters.append("favorites only")
+    if not show_nsfw:
+        filters.append("NSFW hidden")
+    if not show_paid:
+        filters.append("paid content hidden")
+    if not show_account_required:
+        filters.append("account-required hidden")
+    if not show_incomplete:
+        filters.append("partial packs hidden")
+    if in_app_only:
+        filters.append("in-app downloads only")
+
+    if not filters:
+        return "No catalogue entries are available in this tab."
+
+    return (
+        "No catalogue entries match the current filters. "
+        "Try clearing search or loosening: " + ", ".join(filters) + "."
+    )
 
 
 # Human-readable labels for each ModType in catalogue cards
@@ -2104,6 +2187,7 @@ class _CatalogueTabContent(QWidget):
         self._current_query = ""
         self._current_source = ""
         self._current_author = ""
+        self._current_sort = "featured"
         self._show_favs_only = False
         self._show_nsfw = False
         self._show_paid = False
@@ -2141,10 +2225,12 @@ class _CatalogueTabContent(QWidget):
                       show_paid: bool = False,
                       show_account_required: bool = False,
                       show_incomplete: bool = True,
-                      in_app_only: bool = False):
+                      in_app_only: bool = False,
+                      sort_mode: str = "featured"):
         self._current_query = query
         self._current_source = source
         self._current_author = author
+        self._current_sort = sort_mode
         self._show_favs_only = favs_only
         self._show_nsfw = show_nsfw
         self._show_paid = show_paid
@@ -2193,6 +2279,7 @@ class _CatalogueTabContent(QWidget):
                 continue
             filtered.append(e)
 
+        filtered = _sort_catalogue_entries(filtered, sort_mode)
         self._populate(filtered)
 
     def set_entries(self, entries: list) -> None:
@@ -2211,6 +2298,29 @@ class _CatalogueTabContent(QWidget):
         self._load_more_btn = None
 
         initial_count = _PAGE_SIZE if shown_count is None else shown_count
+        if not entries:
+            cols = calculate_catalogue_columns(self._scroll.viewport().width())
+            empty_lbl = QLabel(
+                _catalogue_empty_state_message(
+                    self._current_query,
+                    self._current_source,
+                    self._current_author,
+                    self._show_favs_only,
+                    self._show_nsfw,
+                    self._show_paid,
+                    self._show_account_required,
+                    self._show_incomplete,
+                    self._in_app_only,
+                )
+            )
+            empty_lbl.setWordWrap(True)
+            empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            empty_lbl.setStyleSheet(
+                "color: #7080a0; font-size: 13px; padding: 30px 20px;"
+            )
+            self._cards_layout.addWidget(empty_lbl, 0, 0, 1, cols)
+            self.result_count_changed.emit(0, len(self._all_entries))
+            return
         self._append_cards(initial_count)
 
         # Emit filter-match count (total entries that pass the filter, not how
@@ -2321,7 +2431,7 @@ class BrowsePanel(BasePanel):
     def set_db(self, db):
         self._db = db
 
-    def _browse_state(self) -> tuple[str, str, str, bool, int]:
+    def _browse_state(self) -> tuple[str, str, str, bool, str, int]:
         tabs = getattr(self, "_tabs", None)
         tab_count = tabs.count() if tabs and hasattr(tabs, "count") else 0
         tab_index = tabs.currentIndex() if tabs and hasattr(tabs, "currentIndex") else 0
@@ -2334,6 +2444,7 @@ class BrowsePanel(BasePanel):
             getattr(self._source_filter, "currentData", lambda: "")() or "",
             getattr(self._author_filter, "currentData", lambda: "")() or "",
             bool(getattr(self._favs_check, "isChecked", lambda: False)()),
+            getattr(self._sort_filter, "currentData", lambda: "featured")() or "featured",
             tab_index,
         )
 
@@ -2356,6 +2467,7 @@ class BrowsePanel(BasePanel):
         elif not isinstance(author, str):
             author = str(author)
 
+        sort_mode = _normalise_sort_mode(getattr(self.config, "browse_sort_mode", "featured"))
         favs_only = bool(getattr(self.config, "browse_favorites_only", False))
         try:
             selected_tab = int(getattr(self.config, "browse_selected_tab", 0) or 0)
@@ -2372,6 +2484,10 @@ class BrowsePanel(BasePanel):
         if author_index >= 0:
             self._author_filter.setCurrentIndex(author_index)
 
+        sort_index = self._sort_filter.findData(sort_mode) if sort_mode else -1
+        if sort_index >= 0:
+            self._sort_filter.setCurrentIndex(sort_index)
+
         self._favs_check.setChecked(favs_only)
 
         if getattr(self, "_tabs", None) is not None:
@@ -2380,11 +2496,12 @@ class BrowsePanel(BasePanel):
                 self._tabs.setCurrentIndex(max(0, min(selected_tab, tab_count - 1)))
 
     def _save_browse_state(self, context: str) -> None:
-        query, source, author, favs_only, tab_index = self._browse_state()
+        query, source, author, favs_only, sort_mode, tab_index = self._browse_state()
         self.config.browse_query = query
         self.config.browse_source_filter = source
         self.config.browse_author_filter = author
         self.config.browse_favorites_only = favs_only
+        self.config.browse_sort_mode = _normalise_sort_mode(sort_mode)
         self.config.browse_selected_tab = tab_index
         _save_browse_config(self.config, context)
 
@@ -2473,6 +2590,13 @@ class BrowsePanel(BasePanel):
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
         filter_row.addWidget(self._author_filter)
+
+        filter_row.addWidget(QLabel("⇅ Sort:"))
+        self._sort_filter = QComboBox()
+        self._sort_filter.setMinimumWidth(150)
+        for label, value in _SORT_OPTIONS:
+            self._sort_filter.addItem(label, value)
+        filter_row.addWidget(self._sort_filter)
 
         # Favorites only checkbox
         self._favs_check = QCheckBox("❤ Favorites Only")
@@ -2607,6 +2731,7 @@ class BrowsePanel(BasePanel):
         self._search.textChanged.connect(self._on_search_changed)
         self._source_filter.currentIndexChanged.connect(self._on_source_filter_changed)
         self._author_filter.currentIndexChanged.connect(self._on_author_filter_changed)
+        self._sort_filter.currentIndexChanged.connect(self._on_sort_changed)
         self._favs_check.stateChanged.connect(self._on_favs_only_toggled)
         self._nsfw_check.stateChanged.connect(self._on_nsfw_toggled)
         self._paid_check.stateChanged.connect(self._on_paid_toggled)
@@ -2621,6 +2746,7 @@ class BrowsePanel(BasePanel):
         query = self._search.text()
         source = self._source_filter.currentData() or ""
         author = self._author_filter.currentData() or ""
+        sort_mode = self._sort_filter.currentData() or "featured"
         favs_only = self._favs_check.isChecked()
         show_nsfw = self._nsfw_check.isChecked()
         show_paid = self._paid_check.isChecked()
@@ -2630,7 +2756,7 @@ class BrowsePanel(BasePanel):
         return (
             query, source, author, favs_only, show_nsfw,
             show_paid, show_account_required, show_incomplete,
-            in_app_only,
+            in_app_only, sort_mode,
         )
 
     def _active_tab_index(self) -> int:
@@ -2667,6 +2793,10 @@ class BrowsePanel(BasePanel):
 
     def _on_author_filter_changed(self, _index: int):
         self._save_browse_state("updating author filter")
+        self._apply_filters()
+
+    def _on_sort_changed(self, _index: int):
+        self._save_browse_state("updating sort order")
         self._apply_filters()
 
     def _on_favs_only_toggled(self, _state: int):
@@ -2724,6 +2854,7 @@ class BrowsePanel(BasePanel):
             self._search,
             self._source_filter,
             self._author_filter,
+            self._sort_filter,
             self._favs_check,
             self._nsfw_check,
             self._paid_check,
@@ -2736,6 +2867,7 @@ class BrowsePanel(BasePanel):
         self._search.clear()
         self._source_filter.setCurrentIndex(0)
         self._author_filter.setCurrentIndex(0)
+        self._sort_filter.setCurrentIndex(0)
         self._favs_check.setChecked(False)
         self._nsfw_check.setChecked(getattr(self.config, "show_nsfw", False))
         self._paid_check.setChecked(False)
@@ -2747,6 +2879,7 @@ class BrowsePanel(BasePanel):
             self._search,
             self._source_filter,
             self._author_filter,
+            self._sort_filter,
             self._favs_check,
             self._nsfw_check,
             self._paid_check,
