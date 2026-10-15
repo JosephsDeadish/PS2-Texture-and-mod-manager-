@@ -4935,6 +4935,23 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertTrue(panel._favs_check.checked)
         self.assertEqual(panel._tabs.currentIndex(), 2)
 
+    def test_active_tab_index_logs_when_tabs_fail(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class BrokenTabs:
+            def currentIndex(self):
+                raise RuntimeError("tab lookup failed")
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel._tabs = BrokenTabs()
+
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            index = panel._active_tab_index()
+
+        self.assertEqual(index, -1)
+        self.assertTrue(any("Could not read active browse tab index" in msg for msg in logs.output))
+
     def test_save_browse_state_updates_config(self):
         import types
 
@@ -8694,6 +8711,25 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(loaded["direct_download_url"], "https://example.com/direct.zip")
         self.assertEqual(loaded["download_action"], "manual")
         self.assertEqual(loaded["tags"], ["one", "Two"])
+
+    def test_load_user_catalogue_preserves_mega_direct_download_fragment(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["direct_download_url"] = (
+            " https://mega.nz/file/Qds2kQAR#H0axHO4bIWOciSqh0jNkkzwpfHMiZ8AukDQfFClLMuI "
+        )
+        (Path(self.tmpdir) / "mega.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(
+            result[0]["direct_download_url"],
+            "https://mega.nz/file/Qds2kQAR#H0axHO4bIWOciSqh0jNkkzwpfHMiZ8AukDQfFClLMuI",
+        )
 
     def test_load_user_catalogue_invalid_game_serial_logs_warning(self):
         from src.core.catalogue_loader import load_user_catalogue

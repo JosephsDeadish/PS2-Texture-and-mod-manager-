@@ -2765,7 +2765,8 @@ class BrowsePanel(BasePanel):
             return -1
         try:
             return tabs.currentIndex()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not read active browse tab index: %s", exc)
             return -1
 
     def _refresh_active_tab(self):

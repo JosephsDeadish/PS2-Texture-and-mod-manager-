@@ -133,7 +133,7 @@ def _normalise_source(source: str) -> str:
     return _SOURCE_ALIASES.get(key, source)
 
 
-def _normalise_url(url: str) -> str:
+def _normalise_url(url: str, *, preserve_fragment: bool = False) -> str:
     url = url.strip()
     if not url:
         return ""
@@ -141,7 +141,7 @@ def _normalise_url(url: str) -> str:
         parts = urlsplit(url)
     except ValueError:
         return url
-    if not parts.fragment:
+    if preserve_fragment or not parts.fragment:
         return url
     return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
 
@@ -198,9 +198,16 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     ):
         if isinstance(entry.get(field), str):
             entry[field] = entry[field].strip()
-    for field in ("url", "author_url", "thumbnail_url", "direct_download_url"):
+    for field in ("url", "author_url", "thumbnail_url"):
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
+    if isinstance(entry.get("direct_download_url"), str):
+        # Preserve fragments for hosts such as MEGA where the file key lives in
+        # the URL fragment and is required for the link to keep working.
+        entry["direct_download_url"] = _normalise_url(
+            entry["direct_download_url"],
+            preserve_fragment=True,
+        )
     if isinstance(entry.get("game_serial"), str):
         from src.core.game_registry import is_valid_serial, normalise_serial
         entry["game_serial"] = normalise_serial(entry["game_serial"])
