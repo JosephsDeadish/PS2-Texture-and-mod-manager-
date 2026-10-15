@@ -124,7 +124,7 @@ class SettingsPanel(BasePanel):
         layout.addWidget(_section("Catalogue Quality"))
 
         catalogue_note = QLabel(
-            "Validate the built-in catalogue URLs and report malformed, deprecated, or suspicious links."
+            "Validate catalogue URLs, placeholder authors, and user-imported JSON entries."
         )
         catalogue_note.setStyleSheet("color: #7070a0; font-size: 12px;")
         catalogue_note.setWordWrap(True)
@@ -132,7 +132,7 @@ class SettingsPanel(BasePanel):
 
         catalogue_btn = QPushButton("🔗 Check Catalogue Links")
         catalogue_btn.setToolTip(
-            "Run the static catalogue link checker and report malformed, deprecated, or suspicious URLs."
+            "Run the static catalogue metadata checker and report malformed, deprecated, suspicious, or placeholder metadata."
         )
         catalogue_btn.clicked.connect(self._check_catalogue_links)
         layout.addWidget(catalogue_btn)

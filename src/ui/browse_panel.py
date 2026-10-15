@@ -41,7 +41,7 @@ from PyQt6.QtWidgets import (
     QCheckBox,
 )
 
-from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES
+from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES, is_placeholder_author
 from src.core.browse_layout import calculate_catalogue_columns
 from src.core.config_manager import THUMBNAILS_DIR, save_config
 from src.core.downloader import (
@@ -73,11 +73,6 @@ _ACCOUNT_REQUIRED_SOURCES: frozenset = frozenset({
     "Discord",
     "ScreenScraper",
     "Patreon",
-})
-
-_PLACEHOLDER_AUTHORS = frozenset({
-    "unknown",
-    "anonymous",
 })
 
 _SORT_OPTIONS = [
@@ -112,6 +107,11 @@ def _entry_is_complete(entry: dict) -> bool:
 
     Defaults to True — only explicitly False for incomplete or partial-coverage packs."""
     return bool(entry.get("is_complete", True))
+
+
+def _entry_has_named_author(entry: dict) -> bool:
+    author = entry.get("author", "")
+    return isinstance(author, str) and bool(author.strip()) and not is_placeholder_author(author)
 
 
 def _entry_is_in_app_downloadable(entry: dict) -> bool:
@@ -200,14 +200,9 @@ def _save_browse_config(config: AppConfig, context: str) -> None:
 def _browse_authors(entries: List[dict]) -> List[str]:
     """Return browse-filter author names, skipping placeholder values."""
     authors = {
-        author.strip()
-        for author in (
-            entry.get("author", "")
-            for entry in entries
-        )
-        if isinstance(author, str)
-        and author.strip()
-        and author.strip().casefold() not in _PLACEHOLDER_AUTHORS
+        entry["author"].strip()
+        for entry in entries
+        if _entry_has_named_author(entry)
     }
     return sorted(authors, key=str.casefold)
 
@@ -516,27 +511,36 @@ class CatalogueCard(QFrame):
             )
             author_row.addWidget(author_lbl, 1)
         else:
-            # Specific person: show their name with profile link
-            author_lbl = QLabel(f"👤 {self.entry['author']}")
-            author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+            author_name = self.entry.get("author", "")
+            has_named_author = _entry_has_named_author(self.entry)
+            if has_named_author:
+                # Specific person: show their name with a generic linked-page button.
+                author_lbl = QLabel(f"👤 {author_name}")
+                author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+            else:
+                # Placeholder/unknown author: treat the linked page as the source entry.
+                author_lbl = QLabel("🔍 Source page" if self.entry.get("author_url") else f"👤 {author_name or 'Unknown'}")
+                author_lbl.setStyleSheet(
+                    "color: #607090; font-size: 11px; font-style: italic;"
+                )
             author_row.addWidget(author_lbl)
             author_row.addStretch()
 
-            # Favorite author button (only for known individuals)
-            is_fav = self.entry["author"] in getattr(self.config, "favorite_authors", [])
-            self._fav_btn = QPushButton("❤" if is_fav else "🤍")
-            self._fav_btn.setFixedSize(26, 22)
-            self._fav_btn.setStyleSheet(
-                "border: none; background: transparent; font-size: 14px;"
-                + ("color: #e94560;" if is_fav else "color: #505080;")
-            )
-            self._fav_btn.setToolTip(
-                "Remove from favorites" if is_fav else "Add author to favorites"
-            )
-            self._fav_btn.clicked.connect(self._toggle_favorite)
-            author_row.addWidget(self._fav_btn)
+            if has_named_author:
+                # Favorite author button (only for known individuals)
+                is_fav = author_name in getattr(self.config, "favorite_authors", [])
+                self._fav_btn = QPushButton("❤" if is_fav else "🤍")
+                self._fav_btn.setFixedSize(26, 22)
+                self._fav_btn.setStyleSheet(
+                    "border: none; background: transparent; font-size: 14px;"
+                    + ("color: #e94560;" if is_fav else "color: #505080;")
+                )
+                self._fav_btn.setToolTip(
+                    "Remove from favorites" if is_fav else "Add author to favorites"
+                )
+                self._fav_btn.clicked.connect(self._toggle_favorite)
+                author_row.addWidget(self._fav_btn)
 
-            # Profile link button
             if self.entry.get("author_url"):
                 author_link = QPushButton("🔗")
                 author_link.setFixedSize(26, 22)
@@ -544,7 +548,7 @@ class CatalogueCard(QFrame):
                     "border: none; background: transparent; font-size: 14px; color: #5080d0;"
                 )
                 author_link.setToolTip(
-                    f"View {self.entry['author']}'s profile on {self.entry.get('source', 'source site')}"
+                    f"Open the linked page for this entry on {self.entry.get('source', 'the source site')}"
                 )
                 author_link.clicked.connect(
                     lambda: self.open_url.emit(self.entry["author_url"])

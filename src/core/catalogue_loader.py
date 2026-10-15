@@ -123,6 +123,13 @@ _PLACEHOLDER_AUTHORS = {
 }
 
 
+def is_placeholder_author(author: object) -> bool:
+    """Return True when *author* is one of the generic placeholder labels."""
+    if not isinstance(author, str):
+        return False
+    return author.strip().casefold() in _PLACEHOLDER_AUTHORS
+
+
 def _normalise_author_token(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "", text.casefold())
 

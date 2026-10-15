@@ -26,6 +26,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from typing import Dict, List, Optional
 
+from src.core.catalogue_loader import is_placeholder_author
+
 logger = logging.getLogger(__name__)
 
 
@@ -103,6 +105,12 @@ def _split_url_host_path(url: str) -> tuple[str, str]:
     return host, parts.path.lower()
 
 
+def _user_catalogue_dir() -> Path:
+    from src.core.config_manager import get_exe_dir
+
+    return get_exe_dir() / "user_catalogue"
+
+
 # ---------------------------------------------------------------------------
 # Public types
 # ---------------------------------------------------------------------------
@@ -114,7 +122,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -250,6 +258,18 @@ class LinkChecker:
                         url="",
                         issue_type="empty_author",
                         detail="missing author credit",
+                    ))
+                elif is_placeholder_author(author):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="author",
+                        url="",
+                        issue_type="placeholder_author",
+                        detail=(
+                            "generic placeholder author; replace with a credited author "
+                            "or a more specific source-page label"
+                        ),
                     ))
             if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
                 for field_name in required_url_fields:
@@ -396,6 +416,25 @@ class LinkChecker:
                     required_url_fields=["direct_download_url"],
                 )
             )
+
+        if self._cat_dir == _CAT_DIR:
+            user_dir = _user_catalogue_dir()
+            if user_dir.is_dir():
+                try:
+                    user_files = sorted(user_dir.glob("*.json"))
+                except Exception as exc:
+                    logger.warning("Could not list user catalogue files under %s: %s", user_dir, exc)
+                    user_files = []
+                for path in user_files:
+                    label = f"user_catalogue/{path.name}"
+                    checked.append(label)
+                    all_issues.extend(
+                        self.check_file(
+                            path,
+                            source_file=label,
+                            required_url_fields=["direct_download_url"],
+                        )
+                    )
 
         # Count by type
         type_counts: Dict[str, int] = {}

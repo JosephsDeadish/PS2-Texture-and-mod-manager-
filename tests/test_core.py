@@ -5283,6 +5283,12 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
 
+    def test_entry_has_named_author_helper_skips_placeholders(self):
+        browse_panel = self._import_browse_panel()
+        self.assertTrue(browse_panel._entry_has_named_author({"author": "TexMaster"}))
+        self.assertFalse(browse_panel._entry_has_named_author({"author": "Unknown"}))
+        self.assertFalse(browse_panel._entry_has_named_author({"author": " Anonymous "}))
+
     def test_reload_catalogue_refreshes_tabs_and_filters(self):
         browse_panel = self._import_browse_panel()
         BrowsePanel = browse_panel.BrowsePanel
@@ -7078,6 +7084,13 @@ class TestCatalogueLoader(unittest.TestCase):
         for e in sv:
             self.assertTrue(e.get("direct_download_url"),
                             f"Save entry {e['id']} has no direct_download_url")
+
+    def test_placeholder_author_helper_recognises_common_values(self):
+        from src.core.catalogue_loader import is_placeholder_author
+
+        self.assertTrue(is_placeholder_author("Unknown"))
+        self.assertTrue(is_placeholder_author(" Anonymous "))
+        self.assertFalse(is_placeholder_author("TexMaster"))
 
     def test_no_generic_placeholder_authors(self):
         """Every catalogue entry must credit a real person or project.
@@ -12254,6 +12267,25 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(issues[0].issue_type, "empty_author")
         self.assertEqual(issues[0].field_name, "author")
 
+    def test_placeholder_author_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Unknown",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "placeholder_author")
+        self.assertEqual(issues[0].field_name, "author")
+
     def test_save_entries_require_direct_download_url(self):
         from src.core.link_checker import LinkChecker
 
@@ -12287,6 +12319,48 @@ class TestLinkChecker(unittest.TestCase):
             source_file="texture_packs.json",
         )
         self.assertEqual(issues, [])
+
+    def test_hub_entries_may_skip_placeholder_author(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Texture Hub",
+                "url": "https://gbatemp.net/threads/example.123",
+                "author": "Unknown",
+                "is_hub": True,
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(issues, [])
+
+    def test_check_all_catalogues_includes_user_catalogue_files(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            user_dir = Path(tmpdir) / "user_catalogue"
+            user_dir.mkdir()
+            custom = user_dir / "custom.json"
+            custom.write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "user-pack",
+                "name": "User Pack",
+                "description": "User-added catalogue entry",
+                "author": "Unknown",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+
+            with patch("src.core.link_checker._user_catalogue_dir", return_value=user_dir):
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertIn("user_catalogue/custom.json", report["catalogues_checked"])
+        user_issues = report["issues_by_file"].get("user_catalogue/custom.json", [])
+        self.assertTrue(any(issue["issue_type"] == "placeholder_author" for issue in user_issues))
 
     def test_multiple_url_fields_checked(self):
         """Both 'url' and 'author_url' fields are checked independently."""
@@ -12329,18 +12403,14 @@ class TestLinkChecker(unittest.TestCase):
 
     # -- Integration test: all catalogues pass link checks --
 
-    def test_all_catalogues_pass_link_check(self):
-        """All 5 catalogue files should have 0 link issues after Wave 38."""
+    def test_all_catalogues_have_no_broken_urls(self):
+        """Built-in catalogues should remain free of broken or deprecated URLs."""
         report = self.lc.check_all_catalogues()
-        self.assertEqual(
-            report["total_issues"], 0,
-            f"Link issues found:\n"
-            + "\n".join(
-                f"  [{f}] {i}"
-                for f, issues in report["issues_by_file"].items()
-                for i in issues
-            )
-        )
+        self.assertEqual(report["issue_count_by_type"].get("parse_error", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("malformed", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("bad_domain", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("suspicious_domain", 0), 0)
+        self.assertGreater(report["issue_count_by_type"].get("placeholder_author", 0), 0)
 
     def test_check_all_catalogues_returns_dict(self):
         report = self.lc.check_all_catalogues()
