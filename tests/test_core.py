@@ -670,6 +670,53 @@ class TestDownloader(unittest.TestCase):
                 self.assertEqual(f.read(), b"hello")
 
     @patch("src.core.downloader.requests.get")
+    def test_download_ignores_invalid_content_length(self, mock_get):
+        from src.core.downloader import download_file
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "not-a-number"}
+        mock_resp.iter_content.return_value = [b"hello"]
+        mock_get.return_value = mock_resp
+
+        progress = []
+
+        def _progress(received, total):
+            progress.append((received, total))
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            result = download_file("https://example.com/file.bin", dest, progress_callback=_progress)
+            self.assertEqual(result, dest)
+            with open(dest, "rb") as f:
+                self.assertEqual(f.read(), b"hello")
+
+        self.assertEqual(progress, [(5, 0)])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_wraps_write_errors(self, mock_get):
+        import tempfile
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "5"}
+        mock_resp.iter_content.return_value = [b"hello"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with patch("builtins.open", side_effect=OSError("disk full")):
+                with self.assertRaises(DownloadError):
+                    download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
     def test_download_removes_partial_file_on_network_error(self, mock_get):
         """A failed mid-download must not leave a partial file on disk."""
         import tempfile
@@ -731,6 +778,15 @@ class TestDownloaderLogging(unittest.TestCase):
         from src.core.downloader import fetch_gametdb_art, DownloadError
 
         mock_download.side_effect = DownloadError("network down")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(fetch_gametdb_art("SLUS-20062", "/tmp"))
+        self.assertTrue(any("Failed to fetch GameTDB art" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.download_file")
+    def test_fetch_gametdb_art_logs_unexpected_failure(self, mock_download):
+        from src.core.downloader import fetch_gametdb_art
+
+        mock_download.side_effect = OSError("boom")
         with self.assertLogs("src.core.downloader", level="WARNING") as logs:
             self.assertIsNone(fetch_gametdb_art("SLUS-20062", "/tmp"))
         self.assertTrue(any("Failed to fetch GameTDB art" in msg for msg in logs.output))
@@ -14374,6 +14430,23 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertTrue(result[0].same_content)
 
+    def test_conflict_same_content_requires_full_file_match(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+
+        prefix = b"\x89PNG" + (b"A" * (8192 - 4))
+        Path(pa, "same.png").write_bytes(prefix + b"pack-a-tail")
+        Path(pb, "same.png").write_bytes(prefix + b"pack-b-tail")
+
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertFalse(result[0].same_content)
+
     def test_multiple_conflicts_sorted_by_texture_id(self):
         from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
         tex = os.path.join(self.tmpdir, "textures")
@@ -14402,6 +14475,23 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
                 result = _scan_replacements_dir(repl)
         self.assertEqual(result, {})
         self.assertTrue(any("Could not scan replacements directory" in msg for msg in logs.output))
+
+    def test_scan_replacements_dir_prefers_lexicographic_subdir(self):
+        from src.core.conflict_resolver import _scan_replacements_dir
+
+        repl = Path(self.tmpdir) / "textures" / "SLUS-20062" / "replacements" / "PackRoot"
+        repl.mkdir(parents=True, exist_ok=True)
+
+        def fake_walk(root):
+            dirnames = ["PackB", "PackA"]
+            yield str(root), dirnames, []
+            for dirname in dirnames:
+                yield str(Path(root) / dirname), [], ["shared.png"]
+
+        with patch("src.core.conflict_resolver.os.walk", side_effect=fake_walk):
+            result = _scan_replacements_dir(repl)
+
+        self.assertEqual(result["shared.png"], repl / "PackA" / "shared.png")
 
     def test_conflict_summary_readable(self):
         from src.core.conflict_resolver import TextureOverwriteConflict

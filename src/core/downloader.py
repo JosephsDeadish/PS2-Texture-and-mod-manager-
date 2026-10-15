@@ -114,7 +114,14 @@ def download_file(
     if parsed.scheme not in ("http", "https"):
         raise DownloadError(f"Only http/https URLs are supported, got: {url!r}")
 
+    def _remove_partial_file() -> None:
+        try:
+            dest.unlink(missing_ok=True)
+        except OSError as cleanup_exc:
+            logger.warning("Could not remove partial download %s: %s", dest, cleanup_exc)
+
     try:
+        dest.parent.mkdir(parents=True, exist_ok=True)
         with requests.get(
             url,
             stream=True,
@@ -128,33 +135,38 @@ def download_file(
             content_type = resp.headers.get("Content-Type", "").lower()
             content_disp = resp.headers.get("Content-Disposition", "").lower()
             has_attachment = "attachment" in content_disp
-            total = int(resp.headers.get("Content-Length", 0))
-            received = 0
+            content_length = resp.headers.get("Content-Length", 0)
             try:
-                with open(dest, "wb") as f:
-                    first_chunk = True
-                    for chunk in resp.iter_content(chunk_size=65536):
-                        if not chunk:
-                            continue
-                        if first_chunk:
-                            first_chunk = False
-                            if "text/html" in content_type and not has_attachment:
-                                if _looks_like_html(chunk):
-                                    raise DownloadError(
-                                        f"Server returned an HTML page instead of a file.\n"
-                                        f"The URL may require a login or the file may no longer be available.\n"
-                                        f"URL: {url}"
-                                    )
-                        f.write(chunk)
-                        received += len(chunk)
-                        if progress_callback:
-                            progress_callback(received, total)
-            except BaseException:
-                # Remove any partially-written file so callers never see a
-                # truncated download artifact.
-                dest.unlink(missing_ok=True)
-                raise
+                total = int(content_length)
+            except (TypeError, ValueError) as exc:
+                logger.warning("Invalid Content-Length for %s: %r (%s)", url, content_length, exc)
+                total = 0
+            received = 0
+            with open(dest, "wb") as f:
+                first_chunk = True
+                for chunk in resp.iter_content(chunk_size=65536):
+                    if not chunk:
+                        continue
+                    if first_chunk:
+                        first_chunk = False
+                        if "text/html" in content_type and not has_attachment:
+                            if _looks_like_html(chunk):
+                                raise DownloadError(
+                                    f"Server returned an HTML page instead of a file.\n"
+                                    f"The URL may require a login or the file may no longer be available.\n"
+                                    f"URL: {url}"
+                                )
+                    f.write(chunk)
+                    received += len(chunk)
+                    if progress_callback:
+                        progress_callback(received, total)
     except requests.RequestException as exc:
+        _remove_partial_file()
+        raise DownloadError(f"Download failed: {exc}") from exc
+    except Exception as exc:
+        _remove_partial_file()
+        if isinstance(exc, DownloadError):
+            raise
         raise DownloadError(f"Download failed: {exc}") from exc
 
     return str(dest)
@@ -229,6 +241,9 @@ def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Option
         download_file(url, dest, timeout=10)
         return dest
     except DownloadError as exc:
+        logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
+        return None
+    except Exception as exc:
         logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
         return None
 

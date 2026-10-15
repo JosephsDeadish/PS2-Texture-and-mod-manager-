@@ -716,10 +716,13 @@ class TextureOverwriteConflict:
 
 
 def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192) -> bool:
-    """Return True if the first *check_bytes* of both files are identical."""
+    """Return True if both files have identical contents."""
     try:
-        with open(path_a, "rb") as fa, open(path_b, "rb") as fb:
-            return fa.read(check_bytes) == fb.read(check_bytes)
+        hash_a = _hash_file(path_a)
+        hash_b = _hash_file(path_b)
+        if not hash_a or not hash_b:
+            return False
+        return hash_a == hash_b
     except OSError as exc:
         logger.warning(
             "Could not compare texture file contents %s and %s: %s",
@@ -809,8 +812,9 @@ def _scan_replacements_dir(
     """Return a dict of {filename → Path} for all texture files under *replacements*."""
     result: Dict[str, Path] = {}
     try:
-        for dirpath, _dirs, files in os.walk(replacements):
-            for fname in files:
+        for dirpath, dirnames, files in os.walk(replacements):
+            dirnames.sort()
+            for fname in sorted(files):
                 if Path(fname).suffix.lower() in _TEXTURE_EXTS:
                     # Key on the basename — this is what PCSX2 matches against.
                     result.setdefault(fname, Path(dirpath) / fname)
