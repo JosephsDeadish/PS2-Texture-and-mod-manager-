@@ -7,6 +7,7 @@ pop-up dialog from the Browse panel.
 
 from __future__ import annotations
 
+import html
 import logging
 import threading as _threading
 from typing import List
@@ -398,23 +399,33 @@ class DownloadsPanel(BasePanel):
             logger.warning("Failed to resolve download history status color: %s", exc)
             color = "#555"
 
-        html = (
-            f"<b>{e.mod_name}</b><br><br>"
-            f"<b>Type:</b> {e.type_label}<br>"
-            f"<b>Status:</b> <span style='color:{color}'>{e.status_label}</span><br>"
-            f"<b>Timestamp:</b> {e.timestamp}<br>"
+        mod_name = html.escape(str(e.mod_name))
+        type_label = html.escape(str(e.type_label))
+        status_label = html.escape(str(e.status_label))
+        timestamp = html.escape(str(e.timestamp))
+        serial = html.escape(str(e.serial))
+        source_url = html.escape(str(e.source_url))
+        size_label = html.escape(str(e.size_label))
+        note = html.escape(str(e.note))
+        entry_id = html.escape(str(e.id))
+
+        details_html = (
+            f"<b>{mod_name}</b><br><br>"
+            f"<b>Type:</b> {type_label}<br>"
+            f"<b>Status:</b> <span style='color:{color}'>{status_label}</span><br>"
+            f"<b>Timestamp:</b> {timestamp}<br>"
         )
         if e.serial:
-            html += f"<b>Serial:</b> {e.serial}<br>"
+            details_html += f"<b>Serial:</b> {serial}<br>"
         if e.source_url:
-            html += f"<b>Source:</b> <code>{e.source_url}</code><br>"
+            details_html += f"<b>Source:</b> <code>{source_url}</code><br>"
         if e.size_bytes > 0:
-            html += f"<b>Size:</b> {e.size_label}<br>"
+            details_html += f"<b>Size:</b> {size_label}<br>"
         if e.note:
-            html += f"<b>Note:</b> {e.note}<br>"
-        html += f"<br><small><i>ID: {e.id}</i></small>"
+            details_html += f"<b>Note:</b> {note}<br>"
+        details_html += f"<br><small><i>ID: {entry_id}</i></small>"
 
-        self._detail_label.setText(html)
+        self._detail_label.setText(details_html)
         self._delete_btn.setEnabled(True)
 
     def _on_delete_entry(self):
@@ -431,7 +442,12 @@ class DownloadsPanel(BasePanel):
         if reply != QMessageBox.StandardButton.Yes:
             return
         from src.core.download_history import delete_entry
-        delete_entry(entry, self.config)
+        try:
+            delete_entry(entry, self.config)
+        except Exception as exc:
+            logger.warning("Failed to delete download history entry: %s", exc)
+            QMessageBox.critical(self, "Delete Failed", str(exc))
+            return
         self._refresh_history()
 
     def _on_clear(self):
@@ -444,7 +460,12 @@ class DownloadsPanel(BasePanel):
         if reply != QMessageBox.StandardButton.Yes:
             return
         from src.core.download_history import clear_history
-        count = clear_history(self.config)
+        try:
+            count = clear_history(self.config)
+        except Exception as exc:
+            logger.warning("Failed to clear download history: %s", exc)
+            QMessageBox.critical(self, "Clear Failed", str(exc))
+            return
         self._refresh_history()
         QMessageBox.information(
             self,

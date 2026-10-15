@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+from urllib.parse import urlparse
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -461,18 +462,54 @@ class ImportModDialog(QDialog):
 
     def _accept(self):
         """Collect metadata and accept the dialog."""
-        if not self._src_edit.text():
+        source = self._src_edit.text().strip()
+        if not source:
             from PyQt6.QtWidgets import QMessageBox
             QMessageBox.warning(self, "No Source", "Please select a source folder or file.")
             return
-        self.source_path = self._src_edit.text()
+
+        if not Path(source).exists():
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(
+                self,
+                "Missing Source",
+                "The selected source folder or file no longer exists.\nPlease choose it again.",
+            )
+            return
+
+        game_id = self._gameid_edit.text().strip()
+        if self.mod_type == ModType.TEXTURE_PACK:
+            from PyQt6.QtWidgets import QMessageBox
+            from src.core.game_registry import is_valid_serial
+
+            if not is_valid_serial(game_id):
+                QMessageBox.warning(
+                    self,
+                    "Game ID Required",
+                    "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
+                )
+                return
+
+        source_url = self._url_edit.text().strip()
+        if source_url:
+            parsed = urlparse(source_url)
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                from PyQt6.QtWidgets import QMessageBox
+                QMessageBox.warning(
+                    self,
+                    "Invalid Source URL",
+                    "Please enter a valid http(s) source page URL, or leave the field blank.",
+                )
+                return
+
+        self.source_path = source
         self.meta = {
             "name": self._name_edit.text().strip(),
             "author": self._author_edit.text().strip(),
             "version": self._version_edit.text().strip(),
-            "game_id": self._gameid_edit.text().strip(),
+            "game_id": game_id,
             "description": self._desc_edit.toPlainText().strip(),
-            "source_url": self._url_edit.text().strip(),
+            "source_url": source_url,
         }
         self.accept()
 
@@ -628,15 +665,40 @@ class EditModDialog(QDialog):
         super().accept()
 
     def _save(self):
+        game_id = self._gameid_edit.text().strip()
+        if self.mod.mod_type == ModType.TEXTURE_PACK:
+            from PyQt6.QtWidgets import QMessageBox
+            from src.core.game_registry import is_valid_serial
+
+            if not is_valid_serial(game_id):
+                QMessageBox.warning(
+                    self,
+                    "Game ID Required",
+                    "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
+                )
+                return
+
+        source_url = self._url_edit.text().strip()
+        if source_url:
+            parsed = urlparse(source_url)
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                from PyQt6.QtWidgets import QMessageBox
+                QMessageBox.warning(
+                    self,
+                    "Invalid Source URL",
+                    "Please enter a valid http(s) source page URL, or leave the field blank.",
+                )
+                return
+
         tags_raw = self._tags_edit.text().strip()
         tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
         self.updated_meta = {
             "name": self._name_edit.text().strip() or self.mod.name,
             "author": self._author_edit.text().strip(),
             "version": self._version_edit.text().strip(),
-            "game_id": self._gameid_edit.text().strip(),
+            "game_id": game_id,
             "description": self._desc_edit.toPlainText().strip(),
-            "source_url": self._url_edit.text().strip(),
+            "source_url": source_url,
             "tags": tags,
         }
         # Attach thumbnail path if we just fetched one

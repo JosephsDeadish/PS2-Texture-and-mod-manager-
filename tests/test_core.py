@@ -649,6 +649,11 @@ class TestDownloader(unittest.TestCase):
         with self.assertRaises(DownloadError):
             download_file("file:///etc/passwd", "/tmp/out.zip")
 
+    def test_download_rejects_missing_host(self):
+        from src.core.downloader import download_file, DownloadError
+        with self.assertRaises(DownloadError):
+            download_file("https:///file.zip", "/tmp/out.zip")
+
     @patch("src.core.downloader.requests.get")
     def test_download_success(self, mock_get):
         from src.core.downloader import download_file
@@ -668,6 +673,47 @@ class TestDownloader(unittest.TestCase):
             self.assertEqual(result, dest)
             with open(dest, "rb") as f:
                 self.assertEqual(f.read(), b"hello")
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_rejects_empty_response(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "0"}
+        mock_resp.iter_content.return_value = []
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_rejects_mislabeled_html(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {
+            "Content-Length": "32",
+            "Content-Type": "application/octet-stream",
+        }
+        mock_resp.iter_content.return_value = [b"<html><body>login</body></html>"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
 
     @patch("src.core.downloader.requests.get")
     def test_download_ignores_invalid_content_length(self, mock_get):
@@ -1571,6 +1617,43 @@ class TestUpdateChecker(unittest.TestCase):
 class TestImportDialogLogging(unittest.TestCase):
     """Import dialog fallback paths should log recoverable failures."""
 
+    def _import_dialog_module(self):
+        import importlib
+        import sys
+        import types
+        from contextlib import contextmanager
+
+        @contextmanager
+        def _ctx():
+            pyqt_pkg = types.ModuleType("PyQt6")
+            pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+            qtcore = types.ModuleType("PyQt6.QtCore")
+            qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+            qtcore.QTimer = type("QTimer", (), {})
+            qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+            for name in (
+                "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+                "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+                "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+            ):
+                setattr(qtwidgets, name, type(name, (), {}))
+            qtwidgets.QMessageBox = type("QMessageBox", (), {})
+            qtgui = types.ModuleType("PyQt6.QtGui")
+            qtgui.QIcon = type("QIcon", (), {})
+
+            with patch.dict(
+                sys.modules,
+                {
+                    "PyQt6": pyqt_pkg,
+                    "PyQt6.QtCore": qtcore,
+                    "PyQt6.QtWidgets": qtwidgets,
+                    "PyQt6.QtGui": qtgui,
+                },
+            ):
+                yield importlib.import_module("src.ui.import_dialog"), qtwidgets.QMessageBox
+
+        return _ctx()
+
     def test_replacement_pattern_logs_archive_failure(self):
         import sys
         import types
@@ -1706,6 +1789,74 @@ class TestImportDialogLogging(unittest.TestCase):
         fake._gameid_edit.setToolTip.assert_called()
         fake._gameid_edit.setPlaceholderText.assert_called()
         fake._gameid_edit.setStyleSheet.assert_called()
+
+    def test_import_accept_rejects_missing_source_path(self):
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            fake = types.SimpleNamespace()
+            fake.mod_type = import_dialog.ModType.TEXTURE_PACK
+            fake._src_edit = types.SimpleNamespace(text=lambda: "")
+            fake._gameid_edit = types.SimpleNamespace(text=lambda: "SLUS-20062")
+            fake._url_edit = types.SimpleNamespace(text=lambda: "")
+            fake._name_edit = types.SimpleNamespace(text=lambda: "")
+            fake._author_edit = types.SimpleNamespace(text=lambda: "")
+            fake._version_edit = types.SimpleNamespace(text=lambda: "")
+            fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "")
+            fake.accept = MagicMock()
+
+            with patch.object(QMessageBox, "warning", create=True) as warning:
+                import_dialog.ImportModDialog._accept(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_import_accept_rejects_invalid_texture_game_id(self):
+        import tempfile
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                src = Path(tmpdir) / "pack.zip"
+                src.write_text("placeholder", encoding="utf-8")
+
+                fake = types.SimpleNamespace()
+                fake.mod_type = import_dialog.ModType.TEXTURE_PACK
+                fake._src_edit = types.SimpleNamespace(text=lambda: str(src))
+                fake._gameid_edit = types.SimpleNamespace(text=lambda: "BAD-ID")
+                fake._url_edit = types.SimpleNamespace(text=lambda: "")
+                fake._name_edit = types.SimpleNamespace(text=lambda: "")
+                fake._author_edit = types.SimpleNamespace(text=lambda: "")
+                fake._version_edit = types.SimpleNamespace(text=lambda: "")
+                fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "")
+                fake.accept = MagicMock()
+
+                with patch.object(QMessageBox, "warning", create=True) as warning:
+                    import_dialog.ImportModDialog._accept(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_edit_save_rejects_invalid_source_url(self):
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            fake = types.SimpleNamespace()
+            fake.mod = types.SimpleNamespace(name="Example Mod", mod_type=import_dialog.ModType.TEXTURE_PACK)
+            fake._name_edit = types.SimpleNamespace(text=lambda: "Example Mod")
+            fake._author_edit = types.SimpleNamespace(text=lambda: "Author")
+            fake._version_edit = types.SimpleNamespace(text=lambda: "1.0")
+            fake._gameid_edit = types.SimpleNamespace(text=lambda: "SLUS-20062")
+            fake._tags_edit = types.SimpleNamespace(text=lambda: "")
+            fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "Desc")
+            fake._url_edit = types.SimpleNamespace(text=lambda: "not-a-url")
+            fake.accept = MagicMock()
+
+            with patch.object(QMessageBox, "warning", create=True) as warning:
+                import_dialog.EditModDialog._save(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
 
 
 class TestSettingsDialogSaveFailures(unittest.TestCase):
@@ -4652,6 +4803,7 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
             "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter",
             "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
@@ -4697,7 +4849,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
             "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
-            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -4753,7 +4906,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
             "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
-            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -4808,7 +4962,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
             "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
-            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -4915,7 +5070,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
             "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
             "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
-            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -5447,6 +5603,79 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_status_filter, "✅ Success")
         self.assertEqual(panel.config.download_history_type_filter, "💾 Game Save")
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
+
+    def test_history_details_escape_html(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
+        panel._delete_btn = types.SimpleNamespace(enabled=False, setEnabled=lambda value: setattr(panel._delete_btn, "enabled", bool(value)))
+        panel._history_entries = [
+            types.SimpleNamespace(
+                mod_name="<b>Danger & Mod</b>",
+                type_label="Game <Save>",
+                status="success",
+                status_label="<Ready>",
+                timestamp="2026-10-15 <noon>",
+                serial="SCUS-12345",
+                source_url="https://example.com/?q=<x>",
+                size_bytes=12,
+                size_label="12 <KB>",
+                note="5 < 6",
+                id="<id>",
+            )
+        ]
+
+        panel._on_selection_changed(0)
+
+        self.assertIn("&lt;b&gt;Danger &amp; Mod&lt;/b&gt;", panel._detail_label.value)
+        self.assertIn("&lt;Ready&gt;", panel._detail_label.value)
+        self.assertNotIn("<b>Danger & Mod</b>", panel._detail_label.value)
+
+    def test_delete_history_failure_shows_error_dialog(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+        downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
+        panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]
+        panel._refresh_history = MagicMock()
+
+        with patch.object(downloads_panel.QMessageBox, "question", return_value=1, create=True):
+            with patch.object(downloads_panel.QMessageBox, "critical", create=True) as critical:
+                with patch("src.core.download_history.delete_entry", side_effect=RuntimeError("locked")):
+                    panel._on_delete_entry()
+
+        critical.assert_called_once()
+        panel._refresh_history.assert_not_called()
+
+    def test_clear_history_failure_shows_error_dialog(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+        downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
+        panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]
+        panel._refresh_history = MagicMock()
+
+        with patch.object(downloads_panel.QMessageBox, "question", return_value=1, create=True):
+            with patch.object(downloads_panel.QMessageBox, "critical", create=True) as critical:
+                with patch("src.core.download_history.clear_history", side_effect=RuntimeError("locked")):
+                    panel._on_clear()
+
+        critical.assert_called_once()
+        panel._refresh_history.assert_not_called()
 
 
 class TestModPanelEmptyState(unittest.TestCase):
@@ -8826,6 +9055,35 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(loaded["download_action"], "manual")
         self.assertEqual(loaded["tags"], ["one", "Two"])
 
+    def test_load_user_catalogue_rejects_non_string_url(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["url"] = 123
+        (Path(self.tmpdir) / "bad_url.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("must be a string" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_copies_default_tags_lists(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entries = [self._make_user_entry("one"), self._make_user_entry("two")]
+        (Path(self.tmpdir) / "tags.json").write_text(
+            json.dumps(entries), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        result[0]["tags"].append("new-tag")
+
+        self.assertEqual(result[1]["tags"], [])
+        self.assertIsNot(result[0]["tags"], result[1]["tags"])
+
     def test_load_user_catalogue_preserves_mega_direct_download_fragment(self):
         from src.core.catalogue_loader import load_user_catalogue
 
@@ -11966,6 +12224,18 @@ class TestLinkChecker(unittest.TestCase):
         )
         self.assertEqual(issues, [])
 
+    def test_non_string_url_value_is_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": 123}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed")
+        self.assertIn("expected a string URL", issues[0].detail)
+
     def test_no_url_field_not_flagged(self):
         """Entries without URL fields should not produce issues."""
         from src.core.link_checker import LinkChecker
@@ -11983,6 +12253,26 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "empty_author")
         self.assertEqual(issues[0].field_name, "author")
+
+    def test_save_entries_require_direct_download_url(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Save",
+                "author": "Test Author",
+                "url": "https://example.com/save",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="saves.json",
+            required_url_fields=["direct_download_url"],
+        )
+        self.assertEqual(len(issues), 2)
+        self.assertEqual({issue.issue_type for issue in issues}, {"empty_required", "suspicious_domain"})
+        self.assertTrue(any(issue.field_name == "direct_download_url" for issue in issues))
 
     def test_hub_entries_may_skip_author_credit(self):
         from src.core.link_checker import LinkChecker

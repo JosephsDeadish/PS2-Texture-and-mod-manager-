@@ -251,9 +251,10 @@ class LinkChecker:
                         issue_type="empty_author",
                         detail="missing author credit",
                     ))
-            if required_url_fields and entry_kind in {"pnach", "cheat"}:
+            if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
                 for field_name in required_url_fields:
-                    if entry.get(field_name, ""):
+                    raw_required = entry.get(field_name, "")
+                    if isinstance(raw_required, str) and raw_required.strip():
                         continue
                     issues.append(LinkIssue(
                         source_file=source_file,
@@ -265,6 +266,19 @@ class LinkChecker:
                     ))
             for field_name in _URL_FIELDS:
                 raw = entry.get(field_name, "")
+                if raw in ("", None):
+                    continue
+                if not isinstance(raw, str):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url="",
+                        issue_type="malformed",
+                        detail="expected a string URL",
+                    ))
+                    continue
+                raw = raw.strip()
                 if not raw:
                     continue
                 # Malformed URL check

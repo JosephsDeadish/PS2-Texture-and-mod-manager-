@@ -53,6 +53,7 @@ from src.core.downloader import (
 )
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
+from src.ui.downloads_panel import ActiveDownloads
 
 logger = logging.getLogger(__name__)
 
@@ -1514,6 +1515,10 @@ class DownloadInstallDialog(QDialog):
         _source_url_text = self._source_url_edit.text().strip()
 
         def _run():
+            tmpdir = None
+            download_id = uuid.uuid4().hex
+            download_name = _name_text or Path(unquote(urlparse(url).path)).name or "downloaded_mod"
+            ActiveDownloads.register(download_id, download_name)
             try:
                 parsed = urlparse(url)
                 fname = Path(unquote(parsed.path)).name or "downloaded_mod"
@@ -1523,6 +1528,7 @@ class DownloadInstallDialog(QDialog):
                 dest = str(Path(tmpdir) / fname)
 
                 def _progress(recv, total):
+                    ActiveDownloads.update(download_id, recv, total)
                     if total > 0:
                         pct = int(recv / total * 100)
                         QTimer.singleShot(0, lambda: self._progress.setValue(pct))
@@ -1542,15 +1548,11 @@ class DownloadInstallDialog(QDialog):
                     name=name, author=author, game_id=game,
                     description=description, source_url=source_url,
                 )
-                import shutil
                 try:
-                    installed_size = sum(
-                        f.stat().st_size for f in Path(dest).rglob('*') if f.is_file()
-                    ) if Path(dest).exists() else 0
+                    installed_size = Path(dest).stat().st_size if Path(dest).exists() else 0
                 except Exception as exc:
                     logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
                     installed_size = 0
-                shutil.rmtree(tmpdir, ignore_errors=True)
 
                 try:
                     from src.core.download_history import record_event, STATUS_SUCCESS
@@ -1575,6 +1577,16 @@ class DownloadInstallDialog(QDialog):
                     self._progress.setValue(100)
                     self._status.setText(f"✅  Installed: {mod.name}")
                     self._dl_btn.setEnabled(True)
+                    parent = self.parent()
+                    while parent is not None:
+                        installed_signal = getattr(parent, "mod_installed", None)
+                        if installed_signal is not None:
+                            try:
+                                installed_signal.emit()
+                            except Exception as exc:
+                                logger.warning("Could not emit browse install signal: %s", exc)
+                            break
+                        parent = parent.parent() if hasattr(parent, "parent") else None
                 QTimer.singleShot(0, _done)
             except DownloadError as exc:
                 _download_err_msg = str(exc)
@@ -1626,6 +1638,11 @@ class DownloadInstallDialog(QDialog):
                     self._progress.hide()
                     self._dl_btn.setEnabled(True)
                 QTimer.singleShot(0, _err2)
+            finally:
+                ActiveDownloads.finish(download_id)
+                if tmpdir:
+                    import shutil
+                    shutil.rmtree(tmpdir, ignore_errors=True)
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -1893,6 +1910,16 @@ class PnachGitHubDialog(QDialog):
                                     patch["crc"],
                                     exc,
                                 )
+                            parent = self.parent()
+                            while parent is not None:
+                                installed_signal = getattr(parent, "mod_installed", None)
+                                if installed_signal is not None:
+                                    try:
+                                        installed_signal.emit()
+                                    except Exception as exc:
+                                        logger.warning("Could not emit browse install signal: %s", exc)
+                                    break
+                                parent = parent.parent() if hasattr(parent, "parent") else None
                         except Exception as _reg_exc:  # DB registration is best-effort
                             logger.warning(
                                 "PNACH DB registration warning for %s: %s",
@@ -2199,6 +2226,7 @@ class _CatalogueTabContent(QWidget):
         self._shown_count: int = 0      # how many cards are currently in the grid
         self._load_more_btn = None      # QPushButton or None
         self._current_columns = 3
+        self._serial_db = None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -2244,13 +2272,16 @@ class _CatalogueTabContent(QWidget):
         # Resolve alias-aware game title matching via the serial database.
         # This lets users search "DMC3", "GoW", "GTA III" etc. and find entries
         # whose catalogue "game" field uses the full canonical title.
-        _sdb = None
-        if q:
+        _sdb = self._serial_db
+        if q and _sdb is None:
             try:
                 from src.core.serial_validator import SerialDatabase
                 _sdb = SerialDatabase()
+                self._serial_db = _sdb
             except Exception as exc:
                 logger.warning("Could not load serial database for alias-aware browse filters: %s", exc)
+                self._serial_db = False
+                _sdb = None
 
         filtered = []
         for e in self._all_entries:
@@ -2416,7 +2447,7 @@ class _CatalogueTabContent(QWidget):
 class BrowsePanel(BasePanel):
     """Panel for discovering and downloading mods from public sources."""
 
-    mod_installed = pyqtSignal()   # emitted after any install dialog closes
+    mod_installed = pyqtSignal()   # emitted after a successful browse-triggered install
 
     def __init__(self, config: AppConfig, parent=None):
         super().__init__(
@@ -2946,7 +2977,6 @@ class BrowsePanel(BasePanel):
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _install_catalogue_entry(self, entry: dict):
         """Open the appropriate download dialog pre-filled from a catalogue entry."""
@@ -2968,7 +2998,6 @@ class BrowsePanel(BasePanel):
                     "Texture Packs panel to install it."
                 )
                 dlg.exec()
-                self.mod_installed.emit()
             else:
                 # No direct MEGA link — send user to the source page
                 msg = (
@@ -3016,7 +3045,6 @@ class BrowsePanel(BasePanel):
                 hint += f"\n\nSource page: {source_url}"
             dlg._status.setText(hint)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _prefill_dialog(self, dlg, entry: dict):
         """Prefill a DownloadInstallDialog with metadata from a catalogue entry."""
@@ -3040,12 +3068,10 @@ class BrowsePanel(BasePanel):
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _open_gbatemp_scraper(self):
         dlg = GBATempScraperDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _open_cover_art_dialog(self):
         """Open the Cover Art download dialog from the toolbar."""

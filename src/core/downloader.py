@@ -107,12 +107,17 @@ def download_file(
     Returns the destination path on success.
     Raises DownloadError on failure.
     """
+    if not isinstance(url, str) or not url.strip():
+        raise DownloadError(f"Invalid download URL: {url!r}")
+
     dest = Path(dest_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme not in ("http", "https"):
         raise DownloadError(f"Only http/https URLs are supported, got: {url!r}")
+    if not parsed.netloc:
+        raise DownloadError(f"Download URL must include a host, got: {url!r}")
 
     def _remove_partial_file() -> None:
         try:
@@ -149,17 +154,20 @@ def download_file(
                         continue
                     if first_chunk:
                         first_chunk = False
-                        if "text/html" in content_type and not has_attachment:
-                            if _looks_like_html(chunk):
-                                raise DownloadError(
-                                    f"Server returned an HTML page instead of a file.\n"
-                                    f"The URL may require a login or the file may no longer be available.\n"
-                                    f"URL: {url}"
-                                )
+                        if not has_attachment and _looks_like_html(chunk):
+                            raise DownloadError(
+                                f"Server returned an HTML page instead of a file.\n"
+                                f"The URL may require a login or the file may no longer be available.\n"
+                                f"URL: {url}"
+                            )
                     f.write(chunk)
                     received += len(chunk)
                     if progress_callback:
                         progress_callback(received, total)
+            if received == 0:
+                raise DownloadError(
+                    f"Server returned an empty response instead of a file.\nURL: {url}"
+                )
     except requests.RequestException as exc:
         _remove_partial_file()
         raise DownloadError(f"Download failed: {exc}") from exc

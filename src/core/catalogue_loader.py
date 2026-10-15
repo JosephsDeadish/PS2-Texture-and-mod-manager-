@@ -97,6 +97,12 @@ _OPTIONAL_DEFAULTS: Dict[str, object] = {
     "size_label":         "",
 }
 
+
+def _clone_default(value: object) -> object:
+    if isinstance(value, list):
+        return list(value)
+    return value
+
 _SOURCE_ALIASES = {
     "gbatemp": "GBAtemp",
     "gbatempnet": "GBAtemp",
@@ -198,6 +204,30 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     ):
         if isinstance(entry.get(field), str):
             entry[field] = entry[field].strip()
+
+    for field in (
+        "id",
+        "name",
+        "description",
+        "author",
+        "url",
+        "source",
+        "game",
+        "game_serial",
+        "context",
+        "author_url",
+        "thumbnail_url",
+        "download_action",
+        "direct_download_url",
+        "upscale_tech",
+        "size_label",
+    ):
+        if field in entry and entry[field] is not None and not isinstance(entry[field], str):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"{field!r} must be a string"
+            )
+
     for field in ("url", "author_url", "thumbnail_url"):
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
@@ -208,6 +238,15 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
             entry["direct_download_url"],
             preserve_fragment=True,
         )
+    for field in ("url", "author_url", "thumbnail_url", "direct_download_url"):
+        value = entry.get(field, "")
+        if value and isinstance(value, str):
+            lowered = value.lower()
+            if not lowered.startswith(("http://", "https://")):
+                raise ValueError(
+                    f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                    f"{field!r} must be an http(s) URL"
+                )
     if isinstance(entry.get("game_serial"), str):
         from src.core.game_registry import is_valid_serial, normalise_serial
         entry["game_serial"] = normalise_serial(entry["game_serial"])
@@ -260,27 +299,53 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     # Fill optional fields with defaults
     for field, default in _OPTIONAL_DEFAULTS.items():
         if field not in entry:
-            entry[field] = default
+            entry[field] = _clone_default(default)
 
     # Basic type checks on critical fields
-    if not isinstance(entry["id"], str) or not entry["id"]:
+    if not entry["id"].strip():
         raise ValueError(
             f"[{source_file.name}] 'id' must be a non-empty string; "
             f"got {entry['id']!r}"
         )
-    if not isinstance(entry["name"], str) or not entry["name"]:
+    if not entry["name"].strip():
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: "
             f"'name' must be a non-empty string"
+        )
+    if not entry["description"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'description' must be a non-empty string"
+        )
+    if not entry["url"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'url' must be a non-empty string"
+        )
+    if not entry["source"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'source' must be a non-empty string"
+        )
+    if not entry["author"].strip() and not entry.get("is_hub", False):
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'author' must be a non-empty string for non-hub entries"
         )
     if not isinstance(entry.get("tags", []), list):
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: 'tags' must be a list"
         )
-    if not isinstance(entry.get("is_hub", False), bool):
+    for flag in ("is_hub", "nsfw", "is_free", "requires_account", "is_complete"):
+        if not isinstance(entry.get(flag, False), bool):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry['id']!r}: "
+                f"'{flag}' must be a bool"
+            )
+    if not isinstance(entry.get("download_action", ""), str):
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: "
-            f"'is_hub' must be a bool"
+            f"'download_action' must be a string"
         )
 
     return entry
