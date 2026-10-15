@@ -281,7 +281,7 @@ def _load_from_dir(
     base: Path,
     type_files: Optional[Dict[str, str]],
     entries: List[dict],
-    seen_ids: set,
+    seen_entries: Dict[str, dict],
     *,
     strict: bool = False,
 ) -> None:
@@ -361,14 +361,24 @@ def _load_from_dir(
                 continue
 
             eid = entry["id"]
-            if eid in seen_ids:
+            if eid in seen_entries:
                 msg = f"Duplicate catalogue ID {eid!r} found in {path.name}"
+                existing = seen_entries[eid]
+                differing_fields = sorted(
+                    field for field in set(existing) | set(entry)
+                    if existing.get(field) != entry.get(field)
+                )
+                if differing_fields:
+                    preview = ", ".join(differing_fields[:8])
+                    if len(differing_fields) > 8:
+                        preview += ", ..."
+                    msg += f" — fields differ: {preview}"
                 if strict:
                     raise ValueError(msg)
                 log.warning(msg + " — keeping first occurrence")
                 continue
 
-            seen_ids.add(eid)
+            seen_entries[eid] = entry
             entries.append(entry)
 
 
@@ -408,10 +418,10 @@ def load_catalogue(
     """
     base = Path(catalogue_dir) if catalogue_dir else CATALOGUE_DIR
     entries: List[dict] = []
-    seen_ids: set = set()
+    seen_entries: dict[str, dict] = {}
 
     # 1. Load built-in catalogue files
-    _load_from_dir(base, _TYPE_FILES, entries, seen_ids, strict=strict)
+    _load_from_dir(base, _TYPE_FILES, entries, seen_entries, strict=strict)
 
     # 2. Load user catalogue files (next to exe)
     if user_catalogue_dir is not False:  # False means "skip entirely" (tests)
@@ -428,7 +438,7 @@ def load_catalogue(
                 Path(user_catalogue_dir),
                 None,  # type comes from each entry
                 entries,
-                seen_ids,
+                seen_entries,
                 strict=False,  # user files never cause strict failures
             )
 
@@ -461,12 +471,12 @@ def load_user_catalogue(
         user_catalogue_dir = get_user_catalogue_dir()
 
     entries: List[dict] = []
-    seen_ids: set = set()
+    seen_entries: dict[str, dict] = {}
     _load_from_dir(
         Path(user_catalogue_dir),
         None,
         entries,
-        seen_ids,
+        seen_entries,
         strict=strict,
     )
     return entries

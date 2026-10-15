@@ -8779,6 +8779,21 @@ class TestUserCatalogueLoader(unittest.TestCase):
         count = sum(1 for e in result if e["id"] == existing_id)
         self.assertEqual(count, 1)
 
+    def test_load_user_catalogue_duplicate_id_logs_differing_fields(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry_a = self._make_user_entry("dup-id")
+        entry_b = self._make_user_entry("dup-id")
+        entry_b["author"] = "Different Author"
+        (Path(self.tmpdir) / "a.json").write_text(json.dumps([entry_a]), encoding="utf-8")
+        (Path(self.tmpdir) / "b.json").write_text(json.dumps([entry_b]), encoding="utf-8")
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(sum(1 for e in result if e["id"] == "dup-id"), 1)
+        self.assertTrue(any("fields differ" in msg for msg in logs.output))
+
     def test_load_catalogue_logs_when_user_glob_fails(self):
         from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
         with tempfile.TemporaryDirectory() as tmpdir:
