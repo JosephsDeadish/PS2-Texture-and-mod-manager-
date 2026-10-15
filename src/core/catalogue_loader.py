@@ -97,6 +97,19 @@ _OPTIONAL_DEFAULTS: Dict[str, object] = {
     "size_label":         "",
 }
 
+# Valid download actions used by the shipped catalogue and supported by the UI.
+VALID_DOWNLOAD_ACTIONS = frozenset({
+    "",
+    "cover_by_id",
+    "cover_by_url",
+    "download_save",
+    "gdrive",
+    "manual",
+    "manual_mega",
+    "pnach_crc",
+    "yandex",
+})
+
 
 def _clone_default(value: object) -> object:
     if isinstance(value, list):
@@ -135,6 +148,8 @@ def _normalise_author_token(text: str) -> str:
 
 
 def _normalise_mod_type(type_str: str) -> str:
+    if not isinstance(type_str, str):
+        raise ValueError(f"mod type must be a string, got {type(type_str).__name__}")
     return re.sub(r"[\s\-]+", "_", type_str.strip().lower())
 
 
@@ -282,6 +297,11 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
             )
     if isinstance(entry.get("download_action"), str):
         entry["download_action"] = entry["download_action"].lower()
+        if entry["download_action"] not in VALID_DOWNLOAD_ACTIONS:
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"unknown download_action {entry['download_action']!r}"
+            )
     if isinstance(entry.get("source"), str):
         entry["source"] = _normalise_source(entry["source"])
     if isinstance(entry.get("tags"), list):

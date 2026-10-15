@@ -122,6 +122,8 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
 
     * ``cover_by_id``  — cover art fetched automatically from GameTDB by serial.
     * ``cover_by_url`` — cover art fetched directly from a known URL.
+    * ``pnach_crc``, ``gdrive`` and ``yandex`` — the app can resolve the direct
+      download automatically when a ``direct_download_url`` is present.
     * empty action **with** a ``direct_download_url`` — the app can download the
       file directly (MediaFire and Google Drive links are resolved automatically).
 
@@ -133,6 +135,8 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
     """
     action = entry.get("download_action", "")
     if action in ("cover_by_id", "cover_by_url"):
+        return True
+    if action in ("pnach_crc", "gdrive", "yandex") and bool(entry.get("direct_download_url", "")):
         return True
     if action == "" and bool(entry.get("direct_download_url", "")):
         return True

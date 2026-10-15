@@ -6570,6 +6570,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
 
         An entry is in-app downloadable when:
         - download_action is 'cover_by_id' or 'cover_by_url', OR
+        - download_action is 'pnach_crc', 'gdrive', or 'yandex' AND direct_download_url is non-empty, OR
         - download_action is '' AND direct_download_url is non-empty.
         All other entries (manual, download_save, manual_mega without direct
         URL, or empty action without direct URL) must be hidden.
@@ -6578,11 +6579,19 @@ class TestCatalogueIntegrity(unittest.TestCase):
             action = entry.get("download_action", "")
             if action in ("cover_by_id", "cover_by_url"):
                 return True
+            if action in ("pnach_crc", "gdrive", "yandex"):
+                return bool(entry.get("direct_download_url", ""))
             return action == "" and bool(entry.get("direct_download_url", ""))
 
         must_be_true = [
             {"download_action": "cover_by_id", "direct_download_url": ""},
             {"download_action": "cover_by_url", "direct_download_url": ""},
+            {
+                "download_action": "pnach_crc",
+                "direct_download_url": "https://raw.githubusercontent.com/PCSX2/cheatdb/master/cheats/0F6B6315.pnach",
+            },
+            {"download_action": "gdrive", "direct_download_url": "https://drive.google.com/uc?id=ABCDEF"},
+            {"download_action": "yandex", "direct_download_url": "https://downloader.disk.yandex.ru/disk/abc123"},
             {
                 "download_action": "",
                 "direct_download_url": "https://www.mediafire.com/file/abc/mod.zip/file",
@@ -6599,6 +6608,9 @@ class TestCatalogueIntegrity(unittest.TestCase):
             {"download_action": "manual", "direct_download_url": ""},
             {"download_action": "download_save", "direct_download_url": ""},
             {"download_action": "manual_mega", "direct_download_url": ""},
+            {"download_action": "pnach_crc", "direct_download_url": ""},
+            {"download_action": "gdrive", "direct_download_url": ""},
+            {"download_action": "yandex", "direct_download_url": ""},
             {"download_action": "manual_mega",
              "direct_download_url": "https://mega.nz/file/ABCDEF"},
             {"download_action": "", "direct_download_url": ""},
@@ -6613,6 +6625,8 @@ class TestCatalogueIntegrity(unittest.TestCase):
             action = entry.get("download_action", "")
             if action in ("cover_by_id", "cover_by_url"):
                 return True
+            if action in ("pnach_crc", "gdrive", "yandex"):
+                return bool(entry.get("direct_download_url", ""))
             return action == "" and bool(entry.get("direct_download_url", ""))
 
         in_app = [e for e in self.catalogue if is_in_app(e)]
@@ -7329,6 +7343,31 @@ class TestCatalogueLoader(unittest.TestCase):
             p.write_text(json.dumps([entry, entry]))
             with self.assertRaises(ValueError):
                 load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_lenient_mode_skips_invalid_download_action(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "bad-action",
+                "name": "Bad Action",
+                "description": "D",
+                "author": "A",
+                "url": "https://example.com",
+                "source": "S",
+                "game": "G",
+                "game_serial": "SLUS-00001",
+                "download_action": "manual_meg",
+            }
+            p.write_text(json.dumps([entry]))
+
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(catalogue_dir=d, strict=False, user_catalogue_dir=False)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("unknown download_action" in msg for msg in logs.output))
 
     # ── ALL_SOURCES ──────────────────────────────────────────────────────────
 
@@ -9133,6 +9172,21 @@ class TestUserCatalogueLoader(unittest.TestCase):
 
         self.assertEqual(result, [])
         self.assertTrue(any("must be a string" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_rejects_non_string_type(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["type"] = 5
+        (Path(self.tmpdir) / "bad_type.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("mod type must be a string" in msg for msg in logs.output))
 
     def test_load_user_catalogue_copies_default_tags_lists(self):
         from src.core.catalogue_loader import load_user_catalogue
@@ -12337,6 +12391,26 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(issues[0].issue_type, "placeholder_author")
         self.assertEqual(issues[0].field_name, "author")
 
+    def test_invalid_download_action_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+                "download_action": "manual_meg",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "invalid_download_action")
+        self.assertEqual(issues[0].field_name, "download_action")
+
     def test_save_entries_require_direct_download_url(self):
         from src.core.link_checker import LinkChecker
 
@@ -12461,6 +12535,7 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(report["issue_count_by_type"].get("malformed", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("bad_domain", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("suspicious_domain", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("invalid_download_action", 0), 0)
         self.assertGreater(report["issue_count_by_type"].get("placeholder_author", 0), 0)
 
     def test_check_all_catalogues_returns_dict(self):

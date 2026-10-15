@@ -26,7 +26,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from typing import Dict, List, Optional
 
-from src.core.catalogue_loader import is_placeholder_author
+from src.core.catalogue_loader import VALID_DOWNLOAD_ACTIONS, is_placeholder_author
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author", "invalid_download_action"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -271,6 +271,28 @@ class LinkChecker:
                             "or a more specific source-page label"
                         ),
                     ))
+            raw_action = entry.get("download_action", "")
+            if raw_action not in ("", None):
+                if not isinstance(raw_action, str):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="download_action",
+                        url="",
+                        issue_type="malformed",
+                        detail="expected a string action",
+                    ))
+                else:
+                    action = raw_action.strip().lower()
+                    if action and action not in VALID_DOWNLOAD_ACTIONS:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="download_action",
+                            url="",
+                            issue_type="invalid_download_action",
+                            detail=f"unrecognised download action {raw_action!r}",
+                        ))
             if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
                 for field_name in required_url_fields:
                     raw_required = entry.get(field_name, "")
