@@ -5166,6 +5166,138 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertFalse(panel._delete_btn.enabled)
         self.assertTrue(any("Failed to load download history" in msg for msg in logs.output))
 
+    def test_history_empty_state_shows_placeholder(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.items = []
+
+            def clear(self):
+                self.cleared = True
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = True
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+
+        with patch("src.core.download_history.list_history", return_value=[]):
+            panel._refresh_history()
+
+        self.assertTrue(panel._list_widget.items)
+        self.assertIn("No download history entries recorded yet.", panel._list_widget.items[0])
+        self.assertIn("No download history entries recorded yet.", panel._detail_label.value)
+
+    def test_history_filters_restore_and_save(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            download_history_status_filter="❌ Failed",
+            download_history_type_filter="🖼 Cover Art",
+            download_history_serial_filter="SLUS-20228",
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=0)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ])
+        panel._serial_edit = FakeLineEdit()
+        panel._history_entries = []
+        panel._list_widget = types.SimpleNamespace(clear=lambda: None, addItem=lambda value: None)
+        panel._detail_label = types.SimpleNamespace(setText=lambda value: None)
+        panel._delete_btn = types.SimpleNamespace(setEnabled=lambda value: None)
+
+        panel._restore_history_filters()
+        self.assertEqual(panel._status_combo.currentText(), "❌ Failed")
+        self.assertEqual(panel._type_combo.currentText(), "🖼 Cover Art")
+        self.assertEqual(panel._serial_edit.value, "SLUS-20228")
+
+        panel._status_combo.index = 1
+        panel._type_combo.index = 4
+        panel._serial_edit.value = "SCUS-97399"
+        panel._save_history_filters()
+
+        self.assertEqual(panel.config.download_history_status_filter, "✅ Success")
+        self.assertEqual(panel.config.download_history_type_filter, "💾 Game Save")
+        self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.

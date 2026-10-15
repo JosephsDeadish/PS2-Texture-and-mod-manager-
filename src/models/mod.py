@@ -128,6 +128,9 @@ class AppConfig:
     browse_favorites_only: bool = False
     browse_sort_mode: str = "featured"
     browse_selected_tab: int = 0
+    download_history_status_filter: str = "All"
+    download_history_type_filter: str = "All"
+    download_history_serial_filter: str = ""
     tooltip_mode: str = "normal"  # "normal", "dumbed_down", "no_filter"
 
     def to_dict(self) -> dict:
@@ -156,6 +159,9 @@ class AppConfig:
             "browse_favorites_only": self.browse_favorites_only,
             "browse_sort_mode": self.browse_sort_mode,
             "browse_selected_tab": self.browse_selected_tab,
+            "download_history_status_filter": self.download_history_status_filter,
+            "download_history_type_filter": self.download_history_type_filter,
+            "download_history_serial_filter": self.download_history_serial_filter,
             "tooltip_mode": self.tooltip_mode,
         }
 

@@ -175,7 +175,7 @@ class DownloadsPanel(BasePanel):
         filter_row.addWidget(QLabel("Status:"))
         self._status_combo = QComboBox()
         self._status_combo.addItems(["All", "✅ Success", "❌ Failed", "⏭ Skipped"])
-        self._status_combo.currentIndexChanged.connect(self._refresh_history)
+        self._status_combo.currentIndexChanged.connect(self._on_history_filter_changed)
         filter_row.addWidget(self._status_combo)
 
         filter_row.addWidget(QLabel("Type:"))
@@ -184,14 +184,14 @@ class DownloadsPanel(BasePanel):
             "All", "🎨 Texture Pack", "🔧 PNACH Patch",
             "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
         ])
-        self._type_combo.currentIndexChanged.connect(self._refresh_history)
+        self._type_combo.currentIndexChanged.connect(self._on_history_filter_changed)
         filter_row.addWidget(self._type_combo)
 
         filter_row.addWidget(QLabel("Serial:"))
         self._serial_edit = QLineEdit()
         self._serial_edit.setPlaceholderText("e.g. SLUS-20228")
         self._serial_edit.setMaximumWidth(130)
-        self._serial_edit.textChanged.connect(self._refresh_history)
+        self._serial_edit.textChanged.connect(self._on_history_filter_changed)
         filter_row.addWidget(self._serial_edit)
 
         refresh_hist_btn = QPushButton("🔄 Refresh")
@@ -256,7 +256,49 @@ class DownloadsPanel(BasePanel):
         bottom_row.addStretch()
         content.addLayout(bottom_row)
 
+        self._restore_history_filters()
+
         # Initial load
+        self._refresh_history()
+
+    # ------------------------------------------------------------------
+    # History filter state
+    # ------------------------------------------------------------------
+
+    def _history_filter_state(self) -> tuple[str, str, str]:
+        return (
+            self._status_combo.currentText(),
+            self._type_combo.currentText(),
+            self._serial_edit.text().strip(),
+        )
+
+    def _save_history_filters(self) -> None:
+        status, mod_type, serial = self._history_filter_state()
+        self.config.download_history_status_filter = status or "All"
+        self.config.download_history_type_filter = mod_type or "All"
+        self.config.download_history_serial_filter = serial
+
+    def _restore_history_filters(self) -> None:
+        status = getattr(self.config, "download_history_status_filter", "All") or "All"
+        mod_type = getattr(self.config, "download_history_type_filter", "All") or "All"
+        serial = getattr(self.config, "download_history_serial_filter", "") or ""
+
+        for widget in (self._status_combo, self._type_combo, self._serial_edit):
+            widget.blockSignals(True)
+
+        idx = self._status_combo.findText(status)
+        if idx >= 0:
+            self._status_combo.setCurrentIndex(idx)
+        idx = self._type_combo.findText(mod_type)
+        if idx >= 0:
+            self._type_combo.setCurrentIndex(idx)
+        self._serial_edit.setText(serial)
+
+        for widget in (self._status_combo, self._type_combo, self._serial_edit):
+            widget.blockSignals(False)
+
+    def _on_history_filter_changed(self, *_args):
+        self._save_history_filters()
         self._refresh_history()
 
     # ------------------------------------------------------------------
@@ -332,7 +374,12 @@ class DownloadsPanel(BasePanel):
             self._list_widget.addItem(label)
 
         if not self._history_entries:
-            self._detail_label.setText("<i>No entries found.</i>")
+            if status_filter is None and type_filter is None and serial_filter is None:
+                empty_msg = "No download history entries recorded yet."
+            else:
+                empty_msg = "No history entries match the current filters."
+            self._list_widget.addItem(empty_msg)
+            self._detail_label.setText(f"<i>{empty_msg}</i>")
 
         self._delete_btn.setEnabled(False)
 
