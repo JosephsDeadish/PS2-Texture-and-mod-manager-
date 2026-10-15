@@ -2530,9 +2530,9 @@
     ]
   },
   {
-    "id": "cheat_cabelas_big_game_hunter_2005_adventures_slus21011",
+    "id": "cheat_cabelas_big_game_hunter_2005_adventures_slus21021",
     "name": "Cabela's Big Game Hunter 2005 Adventures — PCSX2 Cheat Codes",
-    "description": "PCSX2 cheat codes for Cabela's Big Game Hunter 2005 Adventures (SLUS-21011). Known CRCs: DF6BC54F. Includes widescreen patches, 60fps fixes, and gameplay enhancements. Install via the PNACH manager by CRC.",
+    "description": "PCSX2 cheat codes for Cabela's Big Game Hunter 2005 Adventures (SLUS-21021). Known CRCs: DF6BC54F. Includes widescreen patches, 60fps fixes, and gameplay enhancements. Install via the PNACH manager by CRC.",
     "context": "Use the '🔧 Fetch PNACH from GitHub' button and enter one of the game’s CRCs: DF6BC54F. Patches are in PNACH format and install to the cheats_ws folder.",
     "author": "PCSX2 Community",
     "author_url": "https://github.com/PCSX2/cheatdb/graphs/contributors",
@@ -2540,7 +2540,7 @@
     "nsfw": false,
     "url": "https://github.com/PCSX2/cheatdb/tree/master/cheats",
     "type": "cheat",
-    "game_serial": "SLUS-21011",
+    "game_serial": "SLUS-21021",
     "source": "GitHub",
     "game": "Cabela's Big Game Hunter 2005 Adventures",
     "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
