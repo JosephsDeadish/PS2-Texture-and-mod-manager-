@@ -14612,6 +14612,16 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
         self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
 
+    def test_set_order_logs_duplicates(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        lom = LoadOrderManager(self.order_file)
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as logs:
+            lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
+
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+        self.assertTrue(any("duplicate pack id" in msg.lower() for msg in logs.output))
+
     def test_get_order_returns_copy(self):
         from src.core.load_order_manager import LoadOrderManager
         lom = LoadOrderManager(self.order_file)

@@ -145,15 +145,29 @@ class LoadOrderManager:
     def set_order(self, serial: str, order: List[str]) -> None:
         """Replace the load order for *serial* with *order*.
 
-        Duplicate pack IDs in *order* are silently deduplicated while
-        preserving the first occurrence.
+        Duplicate pack IDs in *order* are deduplicated while preserving the
+        first occurrence. A warning is logged when duplicates are dropped so
+        the caller can surface the correction if needed.
         """
         seen: set = set()
         deduped: List[str] = []
+        dropped: List[str] = []
         for item in order:
             if item not in seen:
                 seen.add(item)
                 deduped.append(item)
+            else:
+                dropped.append(item)
+        if dropped:
+            preview = ", ".join(repr(item) for item in dropped[:5])
+            if len(dropped) > 5:
+                preview += ", ..."
+            logger.warning(
+                "Ignored %d duplicate pack id(s) while setting load order for %s: %s",
+                len(dropped),
+                serial,
+                preview,
+            )
         self._orders[serial] = deduped
 
     def add_pack(self, serial: str, pack_id: str) -> None:
