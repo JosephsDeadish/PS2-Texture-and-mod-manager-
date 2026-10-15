@@ -5455,6 +5455,25 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertIn("source", message)
         self.assertIn("favorites only", message)
         self.assertIn("in-app downloads only", message)
+        self.assertIn("Clear Filters", message)
+
+    def test_catalogue_empty_state_message_mentions_reload(self):
+        browse_panel = self._import_browse_panel()
+
+        message = browse_panel._catalogue_empty_state_message(
+            query="",
+            source="",
+            author="",
+            favs_only=False,
+            show_nsfw=True,
+            show_paid=True,
+            show_account_required=True,
+            show_incomplete=True,
+            in_app_only=False,
+        )
+
+        self.assertIn("No catalogue entries are available in this tab.", message)
+        self.assertIn("Reload", message)
 
     def test_browse_authors_skip_placeholders(self):
         browse_panel = self._import_browse_panel()

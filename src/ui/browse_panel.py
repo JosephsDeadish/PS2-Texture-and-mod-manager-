@@ -276,11 +276,15 @@ def _catalogue_empty_state_message(
         filters.append("in-app downloads only")
 
     if not filters:
-        return "No catalogue entries are available in this tab."
+        return (
+            "No catalogue entries are available in this tab. "
+            "Use Reload to re-read the catalogue files."
+        )
 
     return (
         "No catalogue entries match the current filters. "
-        "Try clearing search or loosening: " + ", ".join(filters) + "."
+        "Use Clear Filters to reset the search and filters, or loosen: "
+        + ", ".join(filters) + "."
     )
 
 
