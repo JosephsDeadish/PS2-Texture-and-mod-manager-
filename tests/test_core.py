@@ -6016,6 +6016,40 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.ui_state["downloads_panel"]["history_splitter_sizes"], [360, 440])
         save_mock.assert_called_once_with(panel.config)
 
+    def test_history_splitter_state_invalid_values_are_logged(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+                self.set_calls = 0
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+                self.set_calls += 1
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": "broken"}})
+        panel._history_splitter = FakeSplitter([120, 680])
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._restore_history_splitter()
+                panel._history_splitter._sizes = [360, "oops"]
+                panel._save_history_splitter()
+
+        self.assertEqual(panel._history_splitter.set_calls, 0)
+        self.assertFalse(save_mock.called)
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["history_splitter_sizes"], "broken")
+        self.assertTrue(
+            any("history splitter" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_history_details_escape_html(self):
         import types
 
@@ -6088,6 +6122,9 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertTrue(panel._copy_source_btn.enabled)
 
     def test_history_source_actions_open_and_copy(self):
+        import sys
+        import types
+
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
 
@@ -6103,8 +6140,25 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._notify_status = MagicMock()
 
         clipboard = FakeClipboard()
-        with patch.object(downloads_panel.webbrowser, "open", return_value=True) as open_mock:
-            with patch.object(downloads_panel.QApplication, "clipboard", return_value=clipboard, create=True):
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+        class _QApplication:
+            @staticmethod
+            def clipboard():
+                return clipboard
+
+        qtwidgets.QApplication = _QApplication
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            with patch.object(downloads_panel.webbrowser, "open", return_value=True) as open_mock:
                 panel._open_selected_source()
                 panel._copy_selected_source()
 

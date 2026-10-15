@@ -144,6 +144,32 @@ class DownloadsPanel(BasePanel):
         except Exception as exc:
             logger.warning("Could not save downloads panel config after %s: %s", context, exc)
 
+    def _validated_splitter_sizes(self, sizes, *, action: str):
+        if not isinstance(sizes, (list, tuple)):
+            logger.warning(
+                "Ignoring invalid download history splitter state while %s: expected a list, got %r",
+                action,
+                sizes,
+            )
+            return None
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError) as exc:
+            logger.warning(
+                "Ignoring invalid download history splitter state while %s: %s",
+                action,
+                exc,
+            )
+            return None
+        if len(cleaned) < 2:
+            logger.warning(
+                "Ignoring invalid download history splitter state while %s: expected at least 2 sizes, got %r",
+                action,
+                cleaned,
+            )
+            return None
+        return cleaned
+
     def _notify_status(self, message: str) -> None:
         emitter = getattr(getattr(self, "status_message", None), "emit", None)
         if callable(emitter):
@@ -155,31 +181,27 @@ class DownloadsPanel(BasePanel):
         splitter = getattr(self, "_history_splitter", None)
         if splitter is None:
             return
-        sizes = getattr(splitter, "sizes", lambda: [])()
-        if not isinstance(sizes, (list, tuple)):
+        sizes = self._validated_splitter_sizes(
+            getattr(splitter, "sizes", lambda: [])(),
+            action="saving",
+        )
+        if sizes is None:
             return
-        try:
-            cleaned = [int(size) for size in sizes]
-        except (TypeError, ValueError):
-            return
-        if not cleaned:
-            return
-        self._history_panel_bucket()["history_splitter_sizes"] = cleaned
+        self._history_panel_bucket()["history_splitter_sizes"] = sizes
         self._save_panel_config("updating download history splitter")
 
     def _restore_history_splitter(self) -> None:
         splitter = getattr(self, "_history_splitter", None)
         if splitter is None:
             return
-        sizes = self._history_panel_bucket().get("history_splitter_sizes", [])
-        if not isinstance(sizes, (list, tuple)):
+        sizes = self._validated_splitter_sizes(
+            self._history_panel_bucket().get("history_splitter_sizes", []),
+            action="restoring",
+        )
+        if sizes is None:
             return
-        try:
-            cleaned = [int(size) for size in sizes]
-        except (TypeError, ValueError):
-            return
-        if len(cleaned) >= 2 and hasattr(splitter, "setSizes"):
-            splitter.setSizes(cleaned)
+        if hasattr(splitter, "setSizes"):
+            splitter.setSizes(sizes)
 
     def _clear_history_filters(self) -> None:
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
