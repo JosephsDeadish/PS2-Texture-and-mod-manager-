@@ -307,6 +307,8 @@ class DownloadsPanel(BasePanel):
         type_filter = self._TYPE_MAP.get(self._type_combo.currentText())
         serial_text = self._serial_edit.text().strip()
         serial_filter = serial_text if serial_text else None
+        self._list_widget.clear()
+        self._history_entries = []
 
         try:
             from src.core.download_history import list_history
@@ -318,10 +320,10 @@ class DownloadsPanel(BasePanel):
             )
         except Exception as exc:
             logger.warning("Failed to load download history: %s", exc)
-            self._history_entries = []
             self._detail_label.setText(f"<i>Could not read history: {exc}</i>")
+            self._delete_btn.setEnabled(False)
+            return
 
-        self._list_widget.clear()
         for entry in self._history_entries:
             label = (
                 f"{entry.timestamp[:10]}  {entry.status_label}  "

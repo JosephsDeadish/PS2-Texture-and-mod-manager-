@@ -2195,6 +2195,10 @@ class _CatalogueTabContent(QWidget):
 
         self._populate(filtered)
 
+    def set_entries(self, entries: list) -> None:
+        """Replace the backing catalogue entries for this tab."""
+        self._all_entries = entries
+
     def _populate(self, entries: list, shown_count: Optional[int] = None):
         # Clear every widget currently in the grid (cards, spacers, load-more btn)
         while self._cards_layout.count():
@@ -2582,6 +2586,7 @@ class BrowsePanel(BasePanel):
         ]
 
         self._tab_contents: List[_CatalogueTabContent] = []
+        self._tab_mod_types: List[Optional[ModType]] = []
         for label, mod_type in tab_defs:
             entries = (
                 CATALOGUE if mod_type is None
@@ -2592,6 +2597,7 @@ class BrowsePanel(BasePanel):
             tab.install_direct.connect(self._install_catalogue_entry)
             tab.result_count_changed.connect(self._on_result_count_changed)
             self._tab_contents.append(tab)
+            self._tab_mod_types.append(mod_type)
             self._tabs.addTab(tab, label)
 
         content.addWidget(self._tabs, 1)
@@ -2755,18 +2761,53 @@ class BrowsePanel(BasePanel):
 
     def _on_favorite_toggled(self, author: str, is_fav: bool):
         """Rebuild author dropdown when favorites change."""
-        self._author_filter.blockSignals(True)
         current = self._author_filter.currentData() or ""
+        self._refresh_author_filter(CATALOGUE, current)
+
+    def _refresh_source_filter(self, sources: List[str], selected: str = "") -> None:
+        """Rebuild the source filter dropdown from the supplied source list."""
+        self._source_filter.blockSignals(True)
+        self._source_filter.clear()
+        self._source_filter.addItem("All Sources", "")
+        for src in sources:
+            self._source_filter.addItem(src, src)
+        if selected:
+            idx = self._source_filter.findData(selected)
+            if idx >= 0:
+                self._source_filter.setCurrentIndex(idx)
+        self._source_filter.blockSignals(False)
+
+    def _refresh_author_filter(self, entries: List[dict], selected: str = "") -> None:
+        """Rebuild the author filter dropdown from the supplied entries."""
+        self._author_filter.blockSignals(True)
         self._author_filter.clear()
         self._author_filter.addItem("All Authors", "")
-        named_authors = _browse_authors(CATALOGUE)
+        named_authors = _browse_authors(entries)
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
-        idx = self._author_filter.findData(current)
-        if idx >= 0:
-            self._author_filter.setCurrentIndex(idx)
+        if selected:
+            idx = self._author_filter.findData(selected)
+            if idx >= 0:
+                self._author_filter.setCurrentIndex(idx)
         self._author_filter.blockSignals(False)
+
+    def _refresh_catalogue_data(self, entries: List[dict]) -> None:
+        """Replace the in-memory catalogue data and refresh all browse tabs."""
+        selected_source = self._source_filter.currentData() or ""
+        selected_author = self._author_filter.currentData() or ""
+
+        CATALOGUE[:] = list(entries)
+        ALL_SOURCES[:] = sorted({e["source"] for e in CATALOGUE})
+
+        self._refresh_source_filter(ALL_SOURCES, selected_source)
+        self._refresh_author_filter(CATALOGUE, selected_author)
+
+        for tab, mod_type in zip(self._tab_contents, self._tab_mod_types):
+            tab_entries = CATALOGUE if mod_type is None else [e for e in CATALOGUE if e["type"] == mod_type]
+            tab.set_entries(tab_entries)
+
+        self._apply_filters()
 
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
@@ -2928,23 +2969,17 @@ class BrowsePanel(BasePanel):
         import importlib
         import src.core.catalogue_loader as _cl
 
-        # Reload the module from disk so freshly-added JSON entries are picked up
-        # even if Python has already cached the old catalogue in memory.
-        importlib.reload(_cl)
-        new_entries = _cl.CATALOGUE
+        try:
+            # Reload the module from disk so freshly-added JSON entries are picked up
+            # even if Python has already cached the old catalogue in memory.
+            importlib.reload(_cl)
+        except Exception as exc:
+            logger.warning("Could not reload catalogue from disk: %s", exc)
+            self.emit_status(f"Could not reload catalogue: {exc}")
+            return
 
-        # Sync the module-level lists so all other references in this module
-        # see the updated data without needing to re-import.
-        _cl.CATALOGUE[:] = new_entries
-        _cl.ALL_SOURCES[:] = sorted({e["source"] for e in new_entries})
-
-        # Rebuild source filter options
-        self._source_filter.clear()
-        self._source_filter.addItem("All Sources", "")
-        for src in _cl.ALL_SOURCES:
-            self._source_filter.addItem(src, src)
-
-        self._clear_filters()
+        new_entries = list(_cl.CATALOGUE)
+        self._refresh_catalogue_data(new_entries)
         self.emit_status(f"Catalogue reloaded — {len(new_entries)} entries")
 
     def refresh(self):

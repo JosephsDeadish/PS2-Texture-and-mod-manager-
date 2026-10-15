@@ -4924,6 +4924,195 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
 
+    def test_reload_catalogue_refreshes_tabs_and_filters(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+            def clear(self):
+                self.items = []
+                self.index = 0
+
+            def addItem(self, label, data):
+                self.items.append((label, data))
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        class FakeTab:
+            def __init__(self):
+                self.entries = None
+
+            def set_entries(self, entries):
+                self.entries = list(entries)
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(favorite_authors=["TexMaster"])
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ], index=1)
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+            ("Curse_Arms", "Curse_Arms"),
+        ], index=1)
+        panel._tab_contents = [FakeTab(), FakeTab()]
+        panel._tab_mod_types = [None, browse_panel.ModType.TEXTURE_PACK]
+        applied = []
+        panel._apply_filters = lambda: applied.append(True)
+
+        original_catalogue = list(browse_panel.CATALOGUE)
+        original_sources = list(browse_panel.ALL_SOURCES)
+        new_entries = [
+            {
+                "id": "new_texture",
+                "type": browse_panel.ModType.TEXTURE_PACK,
+                "source": "GBAtemp",
+                "author": "TexMaster",
+            },
+            {
+                "id": "new_save",
+                "type": browse_panel.ModType.SAVE_FILE,
+                "source": "GitHub",
+                "author": "Curse_Arms",
+            },
+        ]
+
+        try:
+            browse_panel.CATALOGUE[:] = original_catalogue[:1]
+            browse_panel.ALL_SOURCES[:] = ["Old"]
+            panel._refresh_catalogue_data(new_entries)
+            updated_catalogue = list(browse_panel.CATALOGUE)
+            updated_sources = list(browse_panel.ALL_SOURCES)
+        finally:
+            browse_panel.CATALOGUE[:] = original_catalogue
+            browse_panel.ALL_SOURCES[:] = original_sources
+
+        self.assertEqual(updated_catalogue, new_entries)
+        self.assertEqual(updated_sources, ["GBAtemp", "GitHub"])
+        self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
+        self.assertEqual(panel._author_filter.currentData(), "TexMaster")
+        self.assertEqual(panel._tab_contents[0].entries, new_entries)
+        self.assertEqual(panel._tab_contents[1].entries, [new_entries[0]])
+        self.assertEqual(applied, [True])
+
+
+class TestDownloadsPanelHistoryHandling(unittest.TestCase):
+    """Tests for DownloadsPanel history error handling."""
+
+    def _import_downloads_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            AlignmentFlag=types.SimpleNamespace(AlignTop=0),
+            TextFormat=types.SimpleNamespace(RichText=0),
+        )
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            return importlib.import_module("src.ui.downloads_panel")
+
+    def test_history_load_failure_keeps_error_message(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def text(self):
+                return ""
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.items = []
+
+            def clear(self):
+                self.cleared = True
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = True
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+
+        with patch("src.core.download_history.list_history", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._refresh_history()
+
+        self.assertTrue(panel._list_widget.cleared)
+        self.assertEqual(panel._history_entries, [])
+        self.assertIn("Could not read history: boom", panel._detail_label.value)
+        self.assertFalse(panel._delete_btn.enabled)
+        self.assertTrue(any("Failed to load download history" in msg for msg in logs.output))
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
