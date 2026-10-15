@@ -5299,6 +5299,56 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
 
 
+class TestModPanelEmptyState(unittest.TestCase):
+    """Tests for mod-panel empty-state copy."""
+
+    def _import_mod_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            CursorShape=types.SimpleNamespace(ArrowCursor=0, PointingHandCursor=1),
+            AlignmentFlag=types.SimpleNamespace(AlignCenter=0),
+        )
+        qtcore.QSize = type("QSize", (), {})
+        qtcore.QThread = type("QThread", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QMessageBox",
+            "QPushButton", "QScrollArea", "QVBoxLayout", "QWidget", "QComboBox",
+            "QSizePolicy", "QSpacerItem", "QProgressBar", "QFileDialog", "QDialog",
+            "QDialogButtonBox", "QGridLayout", "QTextEdit", "QListWidget", "QListWidgetItem",
+            "QSplitter", "QTabWidget", "QFormLayout", "QApplication",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        for name in ("QPixmap", "QFont", "QIcon"):
+            setattr(qtgui, name, type(name, (), {}))
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            return importlib.import_module("src.ui.mod_panel")
+
+    def test_empty_state_message_mentions_active_filters(self):
+        mod_panel = self._import_mod_panel()
+        message = mod_panel._mod_panel_empty_message("Texture Packs", "gta", "TexMaster", True)
+        self.assertIn("search 'gta'", message)
+        self.assertIn("author 'TexMaster'", message)
+        self.assertIn("library-only filter", message)
+
+
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
 

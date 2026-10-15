@@ -78,6 +78,22 @@ _TYPE_META = {
 }
 
 
+def _mod_panel_empty_message(label: str, query: str, author: str, library_only: bool) -> str:
+    active = []
+    if query.strip():
+        active.append(f"search {query!r}")
+    if author:
+        active.append(f"author {author!r}")
+    if library_only:
+        active.append("library-only filter")
+    if not active:
+        return f"No {label} yet.\nClick ➕ Import to add some."
+    return (
+        f"No {label.lower()} match the current filters.\n"
+        "Try clearing: " + ", ".join(active) + "."
+    )
+
+
 class ModPanel(BasePanel):
     """
     Unified panel for managing mods of a specific type.
@@ -207,6 +223,11 @@ class ModPanel(BasePanel):
         disable_all = QPushButton("🚫 Disable All")
         disable_all.clicked.connect(self._disable_all)
         author_row.addWidget(disable_all)
+
+        clear_filters = QPushButton("✖ Clear Filters")
+        clear_filters.setToolTip("Reset search, sort, author, and library filters")
+        clear_filters.clicked.connect(self._clear_filters)
+        author_row.addWidget(clear_filters)
 
         # Status / conflict label — acts as a clickable link when conflicts exist
         # Issue #20: placed on its own row below the toolbar to avoid triggering a scrollbar
@@ -426,7 +447,12 @@ class ModPanel(BasePanel):
         if not mods:
             empty = EmptyStateWidget(
                 _TYPE_META[self.mod_type]["icon"],
-                f"No {_TYPE_META[self.mod_type]['label']} yet.\nClick ➕ Import to add some."
+                _mod_panel_empty_message(
+                    _TYPE_META[self.mod_type]["label"],
+                    query,
+                    author_filter,
+                    library_only,
+                ),
             )
             self._list_layout.insertWidget(0, empty)
         else:
@@ -475,6 +501,21 @@ class ModPanel(BasePanel):
             if has_any_issue else
             "color: #7070a0; font-size: 12px; text-align: left; border: none;"
         )
+
+    def _clear_filters(self):
+        """Reset the mod search, sort, author, and library-only filters."""
+        for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
+            widget.blockSignals(True)
+
+        self._search.clear()
+        self._sort_combo.setCurrentIndex(0)
+        self._author_filter.setCurrentIndex(0)
+        self._library_filter_check.setChecked(False)
+
+        for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
+            widget.blockSignals(False)
+
+        self._apply_filter()
 
     # ------------------------------------------------------------------
     # Handlers
