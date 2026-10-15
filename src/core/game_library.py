@@ -195,19 +195,31 @@ def scan_library(
                 continue
             seen_paths.add(full)
 
-            serial = detect_game_serial(fname)
-            if not serial:
-                # Try detecting from the full path (e.g. if folder name contains serial)
-                serial = detect_game_serial(full)
+            try:
+                serial = detect_game_serial(fname)
+                if not serial:
+                    # Try detecting from the full path (e.g. if folder name contains serial)
+                    serial = detect_game_serial(full)
+            except Exception as exc:
+                log.warning("Failed to detect game serial for %s: %s", full, exc)
+                serial = ""
 
             title = ""
             crcs: List[str] = []
             if serial:
-                display = serial_to_display(serial)
+                try:
+                    display = serial_to_display(serial)
+                except Exception as exc:
+                    log.warning("Failed to resolve game title for %s: %s", serial, exc)
+                    display = serial
                 # serial_to_display returns "SERIAL — Title" or just "SERIAL"
                 if " — " in display:
                     title = display.split(" — ", 1)[1]
-                crcs = _get_sdb().crcs_for_serial(serial)
+                try:
+                    crcs = _get_sdb().crcs_for_serial(serial)
+                except Exception as exc:
+                    log.warning("Failed to resolve CRCs for %s (%s): %s", serial, full, exc)
+                    crcs = []
 
             try:
                 size = Path(full).stat().st_size

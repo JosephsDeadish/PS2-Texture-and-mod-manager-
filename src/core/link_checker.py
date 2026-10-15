@@ -23,6 +23,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,8 @@ _TRUSTED_DOMAINS = frozenset({
     "drive.google.com",
     "docs.google.com",
     "archive.org",
+    "disk.yandex.ru",
+    "mega.nz",
     "pcsx2.net",
     "youtube.com",
     "youtu.be",
@@ -82,6 +85,15 @@ _URL_RE = re.compile(
 )
 
 
+def _split_url_host_path(url: str) -> tuple[str, str]:
+    """Return the host/path pair for *url* (normalising ``www.`` prefixes)."""
+    parts = urlsplit(url)
+    host = parts.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    return host, parts.path.lower()
+
+
 # ---------------------------------------------------------------------------
 # Public types
 # ---------------------------------------------------------------------------
@@ -93,7 +105,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "empty_required"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -132,13 +144,9 @@ class LinkChecker:
         """Return the offending domain if *url* uses a known-bad domain, else None."""
         # Extract host and path from URL so path-scoped bad-domain rules can
         # match entries like ``gamefaqs.gamespot.com/ps2/invalid``.
-        m = re.match(r'^https?://([^/]+)(/[^\s]*)?', url, re.IGNORECASE)
-        if not m:
+        host, path = _split_url_host_path(url)
+        if not host:
             return None
-        host = m.group(1).lower()
-        if host.startswith("www."):
-            host = host[4:]
-        path = (m.group(2) or "").lower()
         host_and_path = host + path
         for bad in _BAD_DOMAINS:
             if "/" in bad:
@@ -148,6 +156,27 @@ class LinkChecker:
             if host == bad or host.endswith("." + bad):
                 return bad
         return None
+
+    def _is_trusted_domain(self, url: str) -> bool:
+        """Return True if *url* uses one of the known trusted domains."""
+        host, _path = _split_url_host_path(url)
+        if not host:
+            return False
+        for trusted in _TRUSTED_DOMAINS:
+            if host == trusted or host.endswith("." + trusted):
+                return True
+        return False
+
+    def _is_suspicious_domain(self, url: str) -> Optional[str]:
+        """Return the host if *url* looks valid but points to an untrusted domain."""
+        if self._is_malformed(url):
+            return None
+        if self._is_bad_domain(url):
+            return None
+        if self._is_trusted_domain(url):
+            return None
+        host, _path = _split_url_host_path(url)
+        return host or None
 
     # ------------------------------------------------------------------
     # Entry-level checking
@@ -239,6 +268,20 @@ class LinkChecker:
                         url=raw,
                         issue_type="bad_domain",
                         detail=f"domain {bad_dom!r} is known fake/deprecated",
+                    ))
+                    continue
+                suspicious_dom = self._is_suspicious_domain(raw)
+                if suspicious_dom:
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url=raw,
+                        issue_type="suspicious_domain",
+                        detail=(
+                            f"host {suspicious_dom!r} is not on the trusted catalogue "
+                            "domain list"
+                        ),
                     ))
         return issues
 

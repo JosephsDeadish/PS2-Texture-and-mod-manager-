@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.app_info import APP_NAME, APP_VERSION, PATREON_URL
 from src.core.config_manager import save_config
+from src.core.link_checker import LinkChecker
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
@@ -116,6 +117,25 @@ class SettingsPanel(BasePanel):
         # Update label if library is already set
         if self.config.game_library_path:
             self._update_game_lib_label(self.config.game_library_path)
+
+        layout.addWidget(_sep())
+
+        # ---- Catalogue Quality ----
+        layout.addWidget(_section("Catalogue Quality"))
+
+        catalogue_note = QLabel(
+            "Validate the built-in catalogue URLs and report dead or suspicious links."
+        )
+        catalogue_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        catalogue_note.setWordWrap(True)
+        layout.addWidget(catalogue_note)
+
+        catalogue_btn = QPushButton("🔗 Check Catalogue Links")
+        catalogue_btn.setToolTip(
+            "Run the static catalogue link checker and report any URL issues."
+        )
+        catalogue_btn.clicked.connect(self._check_catalogue_links)
+        layout.addWidget(catalogue_btn)
 
         layout.addWidget(_sep())
 
@@ -308,7 +328,12 @@ class SettingsPanel(BasePanel):
 
     def _update_game_lib_label(self, path: str):
         from src.core.game_library import scan_library
-        games = scan_library(path)
+        try:
+            games = scan_library(path)
+        except Exception as exc:
+            logger.warning("Could not scan game library %s: %s", path, exc)
+            self._game_lib_count_lbl.setText("  Could not scan that folder")
+            return
         identified = sum(1 for g in games if g.serial)
         if games:
             self._game_lib_count_lbl.setText(
@@ -316,6 +341,52 @@ class SettingsPanel(BasePanel):
             )
         else:
             self._game_lib_count_lbl.setText("  No disc images found in that folder")
+
+    def _check_catalogue_links(self):
+        try:
+            report = LinkChecker().check_all_catalogues()
+        except Exception as exc:
+            logger.warning("Could not check catalogue links: %s", exc)
+            QMessageBox.critical(
+                self,
+                "Catalogue Link Check Failed",
+                f"Could not check catalogue links:\n{exc}",
+            )
+            return
+
+        total = int(report.get("total_issues", 0) or 0)
+        summary = report.get("summary", "Catalogue link check completed.")
+        if total == 0:
+            QMessageBox.information(self, "Catalogue Link Check", summary)
+            return
+
+        lines = [summary, ""]
+        shown = 0
+        for source_file, issues in report.get("issues_by_file", {}).items():
+            if not issues:
+                continue
+            lines.append(f"{source_file}:")
+            for issue in issues:
+                idx = issue.get("entry_index", -1)
+                field = issue.get("field", "(field)")
+                issue_type = issue.get("issue_type", "issue")
+                url = issue.get("url", "")
+                detail = issue.get("detail", "")
+                line = f"  • [{idx}] {field}: {issue_type}"
+                if url:
+                    line += f" — {url}"
+                if detail:
+                    line += f" ({detail})"
+                lines.append(line)
+                shown += 1
+                if shown >= 10:
+                    break
+            if shown >= 10:
+                break
+        if total > shown:
+            lines.append(f"... and {total - shown} more issue(s).")
+
+        QMessageBox.warning(self, "Catalogue Link Check", "\n".join(lines))
 
     def _auto_detect(self):
         from src.core.config_manager import detect_pcsx2_paths

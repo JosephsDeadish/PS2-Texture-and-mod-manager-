@@ -1731,6 +1731,7 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
             if name == "QMessageBox":
                 cls.critical = staticmethod(lambda *args, **kwargs: None)
                 cls.information = staticmethod(lambda *args, **kwargs: None)
+                cls.warning = staticmethod(lambda *args, **kwargs: None)
                 cls.question = staticmethod(lambda *args, **kwargs: None)
             setattr(qtwidgets, name, cls)
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -1810,6 +1811,43 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         fake.emit_status.assert_not_called()
         self.assertEqual(fake.config.pcsx2_path, "/pcsx2")
         self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
+
+    def test_settings_panel_catalogue_check_reports_issues(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace()
+            report = {
+                "catalogues_checked": ["cheats.json"],
+                "total_issues": 1,
+                "summary": "⚠ 1 link issue(s) found across 1 catalogues: suspicious_domain×1",
+                "issues_by_file": {
+                    "cheats.json": [
+                        {
+                            "entry_index": 2,
+                            "field": "url",
+                            "url": "https://example.com/abc",
+                            "issue_type": "suspicious_domain",
+                            "detail": "host 'example.com' is not on the trusted catalogue domain list",
+                        }
+                    ]
+                },
+                "issue_count_by_type": {"suspicious_domain": 1},
+            }
+
+            with patch("src.ui.settings_panel.LinkChecker") as checker_cls:
+                checker_cls.return_value.check_all_catalogues.return_value = report
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                    SettingsPanel._check_catalogue_links(fake)
+
+        checker_cls.return_value.check_all_catalogues.assert_called_once()
+        warning.assert_called_once()
+        self.assertIn("suspicious_domain", warning.call_args.args[2])
+        self.assertIn("cheats.json", warning.call_args.args[2])
 
     def test_setup_wizard_finish_failure_logs_and_blocks_close(self):
         import sys
@@ -7192,6 +7230,20 @@ class TestGameLibrary(unittest.TestCase):
             games = self.scan_library(d)
             self.assertEqual(games[0].size_bytes, 256)
 
+    def test_scan_library_logs_crc_lookup_failure_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+
+            with patch("src.core.game_library._get_sdb", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(len(games), 1)
+        self.assertEqual(games[0].serial, "SLUS-20891")
+        self.assertIn("God of War", games[0].title)
+        self.assertEqual(games[0].crcs, [])
+        self.assertTrue(any("Failed to resolve CRCs" in msg for msg in logs.output))
+
 
 # =============================================================================
 # AppConfig game_library_path field
@@ -11878,6 +11930,25 @@ class TestLinkChecker(unittest.TestCase):
             )
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_trusted_domain_not_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://mega.nz/file/ABCDEF#frag"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_suspicious_domain_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://example.com/some/page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "suspicious_domain")
 
     def test_empty_url_not_flagged(self):
         """Empty URL fields should not produce issues."""
