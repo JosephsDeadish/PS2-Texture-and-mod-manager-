@@ -414,6 +414,8 @@ class ModPanel(BasePanel):
         dismiss_btn = QPushButton("✕")
         dismiss_btn.setFixedSize(22, 22)
         dismiss_btn.setToolTip("Dismiss this hint")
+        dismiss_btn.setAccessibleName("Dismiss hint")
+        dismiss_btn.setAccessibleDescription("Hide this informational message")
         dismiss_btn.setStyleSheet(
             "QPushButton { background: transparent; color: #60a060; "
             "border: none; font-size: 12px; }"

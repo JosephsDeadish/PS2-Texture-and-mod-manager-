@@ -1621,6 +1621,8 @@ class DownloadProgressWidget(QWidget):
         cancel_btn = QPushButton("✕")
         cancel_btn.setFixedSize(28, 28)
         cancel_btn.setObjectName("danger_btn")
+        cancel_btn.setAccessibleName("Cancel download")
+        cancel_btn.setAccessibleDescription("Cancel this download task")
         cancel_btn.clicked.connect(self.cancelled.emit)
         layout.addWidget(cancel_btn)
 

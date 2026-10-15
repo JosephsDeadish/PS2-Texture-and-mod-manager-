@@ -16,7 +16,6 @@ from typing import List
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
-    QApplication,
     QComboBox,
     QFrame,
     QHBoxLayout,
@@ -568,6 +567,7 @@ class DownloadsPanel(BasePanel):
             self._notify_status("No source URL is available to copy.")
             return
         try:
+            from PyQt6.QtWidgets import QApplication
             clipboard = QApplication.clipboard()
             if clipboard is None:
                 raise RuntimeError("clipboard unavailable")

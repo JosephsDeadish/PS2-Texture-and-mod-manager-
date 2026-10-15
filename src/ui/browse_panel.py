@@ -541,6 +541,10 @@ class CatalogueCard(QFrame):
                 self._fav_btn.setToolTip(
                     "Remove from favorites" if is_fav else "Add author to favorites"
                 )
+                self._fav_btn.setAccessibleName("Toggle favorite author")
+                self._fav_btn.setAccessibleDescription(
+                    f"{'Remove' if is_fav else 'Add'} {author_name} {'from' if is_fav else 'to'} favorite authors"
+                )
                 self._fav_btn.clicked.connect(self._toggle_favorite)
                 author_row.addWidget(self._fav_btn)
 
@@ -551,6 +555,10 @@ class CatalogueCard(QFrame):
                     "border: none; background: transparent; font-size: 14px; color: #5080d0;"
                 )
                 author_link.setToolTip(
+                    f"Open the linked page for this entry on {self.entry.get('source', 'the source site')}"
+                )
+                author_link.setAccessibleName("Open author link")
+                author_link.setAccessibleDescription(
                     f"Open the linked page for this entry on {self.entry.get('source', 'the source site')}"
                 )
                 author_link.clicked.connect(
@@ -567,6 +575,10 @@ class CatalogueCard(QFrame):
                 "color: #507090; text-decoration: underline;"
             )
             browse_link.setToolTip(
+                f"Browse all mods on {self.entry.get('source', 'this source')}"
+            )
+            browse_link.setAccessibleName("Browse source entries")
+            browse_link.setAccessibleDescription(
                 f"Browse all mods on {self.entry.get('source', 'this source')}"
             )
             browse_link.clicked.connect(
@@ -722,6 +734,9 @@ class CatalogueCard(QFrame):
             + ("color: #e94560;" if new_fav else "color: #505080;")
         )
         self._fav_btn.setToolTip("Remove from favorites" if new_fav else "Add author to favorites")
+        self._fav_btn.setAccessibleDescription(
+            f"{'Remove' if new_fav else 'Add'} {author} {'from' if new_fav else 'to'} favorite authors"
+        )
         self.favorite_toggled.emit(author, new_fav)
 
     def _load_cover_with_fallback(self, primary_url: str, fallback_url: str):
@@ -879,6 +894,8 @@ class CoverDownloadDialog(QDialog):
         clear_search_btn = QPushButton("✕")
         clear_search_btn.setFixedWidth(28)
         clear_search_btn.setToolTip("Clear search")
+        clear_search_btn.setAccessibleName("Clear search field")
+        clear_search_btn.setAccessibleDescription("Clear the browse search query")
         clear_search_btn.clicked.connect(self._search_edit.clear)
         search_row.addWidget(clear_search_btn)
         single_layout.addLayout(search_row)
