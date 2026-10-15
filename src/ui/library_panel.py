@@ -29,6 +29,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.config_manager import save_config
 from src.core.game_library import GameEntry, scan_library
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
@@ -64,6 +65,31 @@ def _fmt_size(size_bytes: int) -> str:
     if size_bytes < 1024 ** 3:
         return f"{size_bytes / 1024 ** 2:.1f} MB"
     return f"{size_bytes / 1024 ** 3:.2f} GB"
+
+
+def _block_signals(widget, blocked: bool) -> None:
+    setter = getattr(widget, "blockSignals", None)
+    if callable(setter):
+        setter(blocked)
+
+
+def _library_ui_state(config: AppConfig) -> dict:
+    ui_state = getattr(config, "ui_state", None)
+    if not isinstance(ui_state, dict):
+        ui_state = {}
+        config.ui_state = ui_state
+    library_state = ui_state.setdefault("library_panel", {})
+    if not isinstance(library_state, dict):
+        library_state = {}
+        ui_state["library_panel"] = library_state
+    return library_state
+
+
+def _save_library_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save library panel config after %s: %s", context, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -535,9 +561,11 @@ class _GameCard(QFrame):
 class _AllModsPane(QWidget):
     """Flat list of every mod in the database with search/filter controls."""
 
-    def __init__(self, db: ModDatabase, parent=None):
+    def __init__(self, db: ModDatabase, config: AppConfig, parent=None):
         super().__init__(parent)
         self.db = db
+        self.config = config
+        self._state_persistence_enabled = False
         self._rows: list[_ModRow] = []
         self._build()
         self.refresh()
@@ -603,6 +631,49 @@ class _AllModsPane(QWidget):
         scroll.setWidget(self._list_container)
         layout.addWidget(scroll, 1)
 
+    def _state_bucket(self) -> dict:
+        state = _library_ui_state(self.config)
+        pane_state = state.setdefault("all_mods", {})
+        if not isinstance(pane_state, dict):
+            pane_state = {}
+            state["all_mods"] = pane_state
+        return pane_state
+
+    def restore_filter_state(self, state: dict) -> None:
+        if not isinstance(state, dict):
+            return
+
+        _block_signals(self._search_edit, True)
+        _block_signals(self._type_combo, True)
+        _block_signals(self._status_combo, True)
+        try:
+            self._search_edit.setText(str(state.get("search", "")))
+
+            type_filter = str(state.get("type", "") or "")
+            type_idx = self._type_combo.findData(type_filter)
+            self._type_combo.setCurrentIndex(type_idx if type_idx >= 0 else 0)
+
+            status_filter = str(state.get("status", "all") or "all")
+            status_idx = self._status_combo.findData(status_filter)
+            self._status_combo.setCurrentIndex(status_idx if status_idx >= 0 else 0)
+        finally:
+            _block_signals(self._search_edit, False)
+            _block_signals(self._type_combo, False)
+            _block_signals(self._status_combo, False)
+
+    def current_filter_state(self) -> dict:
+        return {
+            "search": self._search_edit.text(),
+            "type": self._type_combo.currentData() or "",
+            "status": self._status_combo.currentData() or "all",
+        }
+
+    def _save_filter_state(self, context: str) -> None:
+        if not getattr(self, "_state_persistence_enabled", False):
+            return
+        self._state_bucket().update(self.current_filter_state())
+        _save_library_config(self.config, context)
+
     # ------------------------------------------------------------------
     def refresh(self):
         """Reload all mods from the DB and re-apply the filter."""
@@ -666,6 +737,7 @@ class _AllModsPane(QWidget):
             f"Showing {shown} of {total} tracked mod(s) in library"
             + (" — no mods installed yet" if total == 0 else "")
         )
+        self._save_filter_state("updating all-mods filters")
 
 
 # ---------------------------------------------------------------------------
@@ -688,6 +760,7 @@ class LibraryPanel(BasePanel):
         self.manager = ModManager(self.db)
         self._cards: list[_GameCard] = []
         self._selected_card: Optional[_GameCard] = None
+        self._state_persistence_enabled = False
         self._build()
 
     # ------------------------------------------------------------------
@@ -801,7 +874,7 @@ class LibraryPanel(BasePanel):
         self._mode_stack.addWidget(by_game_widget)
 
         # ── All-Mods widget ───────────────────────────────────────────────
-        self._all_mods_pane = _AllModsPane(self.db)
+        self._all_mods_pane = _AllModsPane(self.db, self.config)
         self._mode_stack.addWidget(self._all_mods_pane)
 
         content.addWidget(self._mode_stack, 1)
@@ -811,6 +884,9 @@ class LibraryPanel(BasePanel):
 
         # Initial populate (By Game mode)
         self._populate()
+        self._restore_view_state()
+        self._all_mods_pane._state_persistence_enabled = True
+        self._state_persistence_enabled = True
 
     # ------------------------------------------------------------------
     # View mode switching
@@ -821,6 +897,7 @@ class LibraryPanel(BasePanel):
         self._all_mods_btn.setChecked(False)
         self._mode_stack.setCurrentIndex(0)
         self._populate()
+        self._save_view_state("switching library view to by-game")
 
     def _switch_to_all_mods(self):
         self._by_game_btn.setChecked(False)
@@ -832,6 +909,27 @@ class LibraryPanel(BasePanel):
         self._count_lbl.setText(
             f"Tracked mods in library: {total} total  •  {enabled} enabled"
         )
+        self._save_view_state("switching library view to all-mods")
+
+    def _restore_view_state(self):
+        state = _library_ui_state(self.config)
+        all_mods_state = state.get("all_mods", {})
+        if isinstance(all_mods_state, dict):
+            self._all_mods_pane.restore_filter_state(all_mods_state)
+
+        mode = str(state.get("mode", "by_game") or "by_game")
+        if mode == "all_mods":
+            self._switch_to_all_mods()
+        else:
+            self._switch_to_by_game()
+
+    def _save_view_state(self, context: str):
+        if not getattr(self, "_state_persistence_enabled", False):
+            return
+        state = _library_ui_state(self.config)
+        state["mode"] = "all_mods" if self._mode_stack.currentIndex() == 1 else "by_game"
+        state["all_mods"] = self._all_mods_pane.current_filter_state()
+        _save_library_config(self.config, context)
 
     # ------------------------------------------------------------------
     # Populate game list

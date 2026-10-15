@@ -20,6 +20,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
 )
 
+from src.core.config_manager import save_config
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
@@ -94,6 +95,35 @@ def _mod_panel_empty_message(label: str, query: str, author: str, library_only: 
     )
 
 
+def _block_signals(widget, blocked: bool) -> None:
+    setter = getattr(widget, "blockSignals", None)
+    if callable(setter):
+        setter(blocked)
+
+
+def _mod_panel_state_bucket(config: AppConfig, mod_type: ModType) -> dict:
+    ui_state = getattr(config, "ui_state", None)
+    if not isinstance(ui_state, dict):
+        ui_state = {}
+        config.ui_state = ui_state
+    mod_panels = ui_state.setdefault("mod_panels", {})
+    if not isinstance(mod_panels, dict):
+        mod_panels = {}
+        ui_state["mod_panels"] = mod_panels
+    panel_state = mod_panels.setdefault(mod_type.value, {})
+    if not isinstance(panel_state, dict):
+        panel_state = {}
+        mod_panels[mod_type.value] = panel_state
+    return panel_state
+
+
+def _save_mod_panel_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save mod panel config after %s: %s", context, exc)
+
+
 class ModPanel(BasePanel):
     """
     Unified panel for managing mods of a specific type.
@@ -119,6 +149,7 @@ class ModPanel(BasePanel):
         self.db = db
         self.config = config
         self.manager = ModManager(db)
+        self._state_persistence_enabled = False
         self._build()
 
     def _all_mods(self) -> list:
@@ -260,7 +291,9 @@ class ModPanel(BasePanel):
         self._apply_panel_tooltips(import_btn, conflict_btn, enable_all, disable_all)
 
         self._refresh_author_filter()
+        self._restore_filter_state()
         self.refresh()
+        self._state_persistence_enabled = True
 
     def _apply_panel_tooltips(
         self,
@@ -348,7 +381,7 @@ class ModPanel(BasePanel):
     def _refresh_author_filter(self):
         """Rebuild the author dropdown from the current mod list."""
         current = self._author_filter.currentData() or ""
-        self._author_filter.blockSignals(True)
+        _block_signals(self._author_filter, True)
         self._author_filter.clear()
         self._author_filter.addItem("All Authors", "")
 
@@ -369,7 +402,55 @@ class ModPanel(BasePanel):
         idx = self._author_filter.findData(current)
         if idx >= 0:
             self._author_filter.setCurrentIndex(idx)
-        self._author_filter.blockSignals(False)
+        _block_signals(self._author_filter, False)
+
+    def _restore_filter_state(self):
+        """Restore the saved search/sort/author/library filter state."""
+        state = _mod_panel_state_bucket(self.config, self.mod_type)
+        if not state:
+            return
+
+        _block_signals(self._search, True)
+        _block_signals(self._sort_combo, True)
+        _block_signals(self._author_filter, True)
+        _block_signals(self._library_filter_check, True)
+        try:
+            self._search.setText(str(state.get("query", "")))
+
+            sort_idx = state.get("sort_index", 0)
+            try:
+                sort_idx = int(sort_idx)
+            except (TypeError, ValueError):
+                sort_idx = 0
+            if 0 <= sort_idx < self._sort_combo.count():
+                self._sort_combo.setCurrentIndex(sort_idx)
+
+            author = str(state.get("author", "") or "")
+            if author:
+                idx = self._author_filter.findData(author)
+                if idx >= 0:
+                    self._author_filter.setCurrentIndex(idx)
+            else:
+                self._author_filter.setCurrentIndex(0)
+
+            self._library_filter_check.setChecked(bool(state.get("library_only", False)))
+        finally:
+            _block_signals(self._search, False)
+            _block_signals(self._sort_combo, False)
+            _block_signals(self._author_filter, False)
+            _block_signals(self._library_filter_check, False)
+
+    def _save_filter_state(self, context: str):
+        if not getattr(self, "_state_persistence_enabled", False):
+            return
+        state = _mod_panel_state_bucket(self.config, self.mod_type)
+        state.update({
+            "query": self._search.text(),
+            "sort_index": self._sort_combo.currentIndex(),
+            "author": self._author_filter.currentData() or "",
+            "library_only": self._library_filter_check.isChecked(),
+        })
+        _save_mod_panel_config(self.config, context)
 
     def _apply_filter(self):
         query = self._search.text().lower()
@@ -501,11 +582,12 @@ class ModPanel(BasePanel):
             if has_any_issue else
             "color: #7070a0; font-size: 12px; text-align: left; border: none;"
         )
+        self._save_filter_state("updating mod panel filters")
 
     def _clear_filters(self):
         """Reset the mod search, sort, author, and library-only filters."""
         for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
-            widget.blockSignals(True)
+            _block_signals(widget, True)
 
         self._search.clear()
         self._sort_combo.setCurrentIndex(0)
@@ -513,8 +595,9 @@ class ModPanel(BasePanel):
         self._library_filter_check.setChecked(False)
 
         for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
-            widget.blockSignals(False)
+            _block_signals(widget, False)
 
+        self._save_filter_state("clearing mod panel filters")
         self._apply_filter()
 
     # ------------------------------------------------------------------

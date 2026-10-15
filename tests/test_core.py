@@ -3338,6 +3338,32 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertTrue(restored.browse_favorites_only)
         self.assertEqual(restored.browse_selected_tab, 3)
 
+    def test_ui_state_round_trip(self):
+        cfg = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 2,
+                        "author": "TexMaster",
+                        "library_only": True,
+                    }
+                }
+            }
+        )
+        self.assertEqual(cfg.ui_state["mod_panels"]["texture_pack"]["query"], "gta")
+
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(
+            restored.ui_state["mod_panels"]["texture_pack"],
+            {
+                "query": "gta",
+                "sort_index": 2,
+                "author": "TexMaster",
+                "library_only": True,
+            },
+        )
+
     def test_old_config_without_browse_filter_fields_uses_defaults(self):
         """Configs saved before the browse-filter fields were added should load fine."""
         old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
@@ -3354,6 +3380,7 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertEqual(cfg.browse_author_filter, "")
         self.assertFalse(cfg.browse_favorites_only)
         self.assertEqual(cfg.browse_selected_tab, 0)
+        self.assertEqual(cfg.ui_state, {})
 
 
 # =============================================================================
@@ -5347,6 +5374,430 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertIn("search 'gta'", message)
         self.assertIn("author 'TexMaster'", message)
         self.assertIn("library-only filter", message)
+
+    def test_restore_filter_state_applies_saved_values(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+                self.blocked = False
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+                self.blocked = False
+
+            def count(self):
+                return len(self.items)
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+                self.blocked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.config = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 3,
+                        "author": "TexMaster",
+                        "library_only": True,
+                    }
+                }
+            }
+        )
+        panel._search = FakeLineEdit()
+        panel._sort_combo = FakeComboBox([
+            ("Name ↑", 0),
+            ("Name ↓", 1),
+            ("Priority ↑", 2),
+            ("Priority ↓", 3),
+            ("Size", 4),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._library_filter_check = FakeCheckBox()
+
+        ModPanel._restore_filter_state(panel)
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._sort_combo.currentIndex(), 3)
+        self.assertEqual(panel._author_filter.currentData(), "TexMaster")
+        self.assertTrue(panel._library_filter_check.isChecked())
+
+    def test_save_filter_state_updates_config(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, index, current_data):
+                self.index = index
+                self.data = current_data
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                return self.data
+
+        class FakeCheckBox:
+            def __init__(self, checked):
+                self.checked = checked
+
+            def isChecked(self):
+                return self.checked
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._search = FakeLineEdit("gta")
+        panel._sort_combo = FakeComboBox(2, None)
+        panel._author_filter = FakeComboBox(0, "Curse_Arms")
+        panel._library_filter_check = FakeCheckBox(False)
+
+        with patch.object(mod_panel, "save_config") as save_mock:
+            ModPanel._save_filter_state(panel, "updating mod panel filters")
+
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["pnach"],
+            {
+                "query": "gta",
+                "sort_index": 2,
+                "author": "Curse_Arms",
+                "library_only": False,
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+
+class TestLibraryPanelStatePersistence(unittest.TestCase):
+    """Tests for library-panel mode/filter state persistence helpers."""
+
+    def _import_library_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            AlignmentFlag=types.SimpleNamespace(AlignCenter=0),
+        )
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSizePolicy", "QSplitter",
+            "QStackedWidget", "QToolButton", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.base_panel": base_panel_stub,
+            },
+        ):
+            return importlib.import_module("src.ui.library_panel")
+
+    def test_all_mods_filter_state_round_trip(self):
+        library_panel = self._import_library_panel()
+        AllModsPane = library_panel._AllModsPane
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, _blocked):
+                pass
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, _blocked):
+                pass
+
+        pane = AllModsPane.__new__(AllModsPane)
+        pane._search_edit = FakeLineEdit()
+        pane._type_combo = FakeComboBox([
+            ("All types", ""),
+            ("pnach", "pnach"),
+            ("texture_pack", "texture_pack"),
+        ])
+        pane._status_combo = FakeComboBox([
+            ("All", "all"),
+            ("Enabled", "enabled"),
+            ("Disabled", "disabled"),
+        ])
+
+        pane.restore_filter_state({
+            "search": "gta",
+            "type": "texture_pack",
+            "status": "enabled",
+        })
+
+        self.assertEqual(pane._search_edit.text(), "gta")
+        self.assertEqual(pane._type_combo.currentData(), "texture_pack")
+        self.assertEqual(pane._status_combo.currentData(), "enabled")
+        self.assertEqual(
+            pane.current_filter_state(),
+            {"search": "gta", "type": "texture_pack", "status": "enabled"},
+        )
+
+    def test_restore_view_state_defaults_to_by_game(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakePane:
+            def __init__(self):
+                self.restored = None
+                self._state_persistence_enabled = False
+
+            def restore_filter_state(self, state):
+                self.restored = dict(state)
+
+        class FakeStack:
+            def __init__(self):
+                self.index = 0
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = False
+        panel._all_mods_pane = FakePane()
+        panel._mode_stack = FakeStack()
+        panel._by_game_btn = FakeButton()
+        panel._all_mods_btn = FakeButton()
+        panel._count_lbl = FakeLabel()
+        panel._populate = lambda: setattr(panel, "populate_called", True)
+        panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
+        panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
+
+        LibraryPanel._restore_view_state(panel)
+
+        self.assertTrue(getattr(panel, "populate_called", False))
+        self.assertEqual(panel._mode_stack.currentIndex(), 0)
+        self.assertTrue(panel._by_game_btn.checked)
+        self.assertFalse(panel._all_mods_btn.checked)
+        self.assertEqual(panel._all_mods_pane.restored, {})
+
+    def test_restore_view_state_switches_to_all_mods(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakePane:
+            def __init__(self):
+                self.restored = None
+                self.refreshed = False
+                self._state_persistence_enabled = False
+
+            def restore_filter_state(self, state):
+                self.restored = dict(state)
+
+            def refresh(self):
+                self.refreshed = True
+
+        class FakeStack:
+            def __init__(self):
+                self.index = 0
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "mode": "all_mods",
+                    "all_mods": {"search": "gta", "type": "pnach", "status": "enabled"},
+                }
+            }
+        )
+        panel.db = types.SimpleNamespace(all=lambda: [
+            types.SimpleNamespace(enabled=True),
+            types.SimpleNamespace(enabled=False),
+        ])
+        panel._state_persistence_enabled = False
+        panel._all_mods_pane = FakePane()
+        panel._mode_stack = FakeStack()
+        panel._by_game_btn = FakeButton()
+        panel._all_mods_btn = FakeButton()
+        panel._count_lbl = FakeLabel()
+        panel._populate = lambda: setattr(panel, "populate_called", True)
+        panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
+        panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
+
+        LibraryPanel._restore_view_state(panel)
+
+        self.assertTrue(panel._all_mods_pane.refreshed)
+        self.assertEqual(panel._mode_stack.currentIndex(), 1)
+        self.assertFalse(panel._by_game_btn.checked)
+        self.assertTrue(panel._all_mods_btn.checked)
+        self.assertEqual(
+            panel._all_mods_pane.restored,
+            {"search": "gta", "type": "pnach", "status": "enabled"},
+        )
+
+    def test_save_view_state_updates_config(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeStack:
+            def __init__(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+        class FakePane:
+            def current_filter_state(self):
+                return {"search": "gta", "type": "pnach", "status": "enabled"}
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._mode_stack = FakeStack(1)
+        panel._all_mods_pane = FakePane()
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            LibraryPanel._save_view_state(panel, "switching library view to all-mods")
+
+        self.assertEqual(
+            panel.config.ui_state["library_panel"],
+            {
+                "mode": "all_mods",
+                "all_mods": {"search": "gta", "type": "pnach", "status": "enabled"},
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
 
 
 class TestCatalogueIntegrity(unittest.TestCase):

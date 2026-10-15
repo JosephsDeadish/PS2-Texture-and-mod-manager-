@@ -131,6 +131,7 @@ class AppConfig:
     download_history_status_filter: str = "All"
     download_history_type_filter: str = "All"
     download_history_serial_filter: str = ""
+    ui_state: dict = field(default_factory=dict)
     tooltip_mode: str = "normal"  # "normal", "dumbed_down", "no_filter"
 
     def to_dict(self) -> dict:
@@ -162,6 +163,7 @@ class AppConfig:
             "download_history_status_filter": self.download_history_status_filter,
             "download_history_type_filter": self.download_history_type_filter,
             "download_history_serial_filter": self.download_history_serial_filter,
+            "ui_state": self.ui_state,
             "tooltip_mode": self.tooltip_mode,
         }
 
