@@ -188,7 +188,27 @@ def _load(config=None) -> List[NoteEntry]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
-        return [NoteEntry.from_dict(d) for d in raw if isinstance(d, dict)]
+        if not isinstance(raw, list):
+            logger.warning(
+                "Could not load mod notes from %s: expected a JSON array at the top level",
+                path,
+            )
+            return []
+        notes: List[NoteEntry] = []
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "Skipping malformed mod note %s[%s]: expected a JSON object, got %r",
+                    path,
+                    idx,
+                    item,
+                )
+                continue
+            try:
+                notes.append(NoteEntry.from_dict(item))
+            except Exception as exc:
+                logger.warning("Skipping malformed mod note %s[%s]: %s", path, idx, exc)
+        return notes
     except Exception as exc:
         logger.warning("Could not load mod notes from %s: %s", path, exc)
         return []

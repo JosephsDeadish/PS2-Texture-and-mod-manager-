@@ -287,6 +287,18 @@ class TestModDatabase(unittest.TestCase):
         db = self._make_db()
         self.assertEqual(db.all(), [])
 
+    def test_load_with_non_object_root_returns_empty(self):
+        import json
+        import src.core.config_manager as cm
+
+        cm.MODS_DB_FILE.write_text(json.dumps(["not", "an", "object"]), encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            db = self._make_db()
+
+        self.assertEqual(db.all(), [])
+        self.assertTrue(any("expected a JSON object at the top level" in msg for msg in logs.output))
+
     def test_save_is_atomic(self):
         """ModDatabase.save() must not corrupt the DB file on failure."""
         import json
@@ -8683,6 +8695,21 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(loaded["download_action"], "manual")
         self.assertEqual(loaded["tags"], ["one", "Two"])
 
+    def test_load_user_catalogue_invalid_game_serial_logs_warning(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["game_serial"] = "SLUS-20A62"
+        (Path(self.tmpdir) / "bad_serial.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("invalid game_serial" in msg for msg in logs.output))
+
     def test_load_user_catalogue_multiple_types(self):
         from src.core.catalogue_loader import load_user_catalogue
         from src.models.mod import ModType
@@ -10491,6 +10518,51 @@ class TestDownloadHistory(unittest.TestCase):
 
         self.assertEqual(entries, [])
 
+    def test_list_history_non_array_root_returns_empty(self):
+        import json
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+        with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+            entries = list_history(self.cfg)
+
+        self.assertEqual(entries, [])
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
+    def test_list_history_skips_malformed_entries(self):
+        import json
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text(
+            json.dumps([
+                {
+                    "id": "good",
+                    "timestamp": "2025-01-01T00:00:00+00:00",
+                    "mod_name": "Valid Entry",
+                    "mod_type": "pnach",
+                    "size_bytes": 10,
+                },
+                {
+                    "id": "bad",
+                    "timestamp": "2025-01-01T00:00:00+00:00",
+                    "mod_name": "Broken Entry",
+                    "mod_type": "pnach",
+                    "size_bytes": "oops",
+                },
+            ]),
+            encoding="utf-8",
+        )
+
+        with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+            entries = list_history(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].mod_name, "Valid Entry")
+        self.assertTrue(any("Skipping malformed download history entry" in msg for msg in logs.output))
+
     # --- clear_history -----------------------------------------------------
 
     def test_clear_history_returns_count(self):
@@ -10801,6 +10873,19 @@ class TestModNotes(unittest.TestCase):
 
         self.assertEqual(notes, [])
         self.assertTrue(any("Could not load mod notes" in msg for msg in logs.output))
+
+    def test_list_notes_non_array_root_returns_empty(self):
+        import json
+        from src.core.mod_notes import get_notes_file, list_notes
+
+        notes_path = get_notes_file(self.cfg)
+        notes_path.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+            notes = list_notes(self.cfg)
+
+        self.assertEqual(notes, [])
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
 
     def test_list_notes_filter_mod_type(self):
         from src.core.mod_notes import upsert_note, list_notes
@@ -11577,6 +11662,13 @@ class TestLinkChecker(unittest.TestCase):
         from src.core.link_checker import LinkChecker
         self.lc = LinkChecker()
 
+    def test_url_fields_match_catalogue_schema(self):
+        from src.core import link_checker
+        self.assertEqual(
+            link_checker._URL_FIELDS,
+            ("url", "author_url", "direct_download_url", "thumbnail_url"),
+        )
+
     # -- Unit tests for URL validators --
 
     def test_valid_https_url_passes(self):
@@ -11625,6 +11717,20 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "parse_error")
         self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
+    def test_check_file_logs_malformed_entry(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text(json.dumps(["oops", {"url": "https://github.com/PCSX2/pcsx2"}]), encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed_entry")
+        self.assertTrue(any("Skipping malformed catalogue entry" in msg for msg in logs.output))
 
     def test_bad_domain_flagged(self):
         from src.core.link_checker import LinkChecker

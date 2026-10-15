@@ -230,7 +230,32 @@ def _load(config=None) -> List[HistoryEntry]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
-        return [HistoryEntry.from_dict(d) for d in raw if isinstance(d, dict)]
+        if not isinstance(raw, list):
+            logger.warning(
+                "Failed to load download history from %s: expected a JSON array at the top level",
+                path,
+            )
+            return []
+        entries: List[HistoryEntry] = []
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "Skipping malformed download history entry %s[%s]: expected a JSON object, got %r",
+                    path,
+                    idx,
+                    item,
+                )
+                continue
+            try:
+                entries.append(HistoryEntry.from_dict(item))
+            except Exception as exc:
+                logger.warning(
+                    "Skipping malformed download history entry %s[%s]: %s",
+                    path,
+                    idx,
+                    exc,
+                )
+        return entries
     except Exception as exc:
         logger.warning("Failed to load download history from %s: %s", path, exc)
         return []

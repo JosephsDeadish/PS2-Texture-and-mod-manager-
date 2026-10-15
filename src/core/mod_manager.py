@@ -80,6 +80,13 @@ class ModDatabase:
             try:
                 with open(db_file, "r", encoding="utf-8") as f:
                     raw = json.load(f)
+                if not isinstance(raw, dict):
+                    logger.warning(
+                        "Failed to load mod database %s: expected a JSON object at the top level",
+                        db_file,
+                    )
+                    self._mods = {}
+                    return
                 # Load entries individually so a single corrupt record does not
                 # wipe the entire mod database.
                 mods: Dict[str, ModInfo] = {}
@@ -89,7 +96,7 @@ class ModDatabase:
                     except (KeyError, TypeError, ValueError) as exc:
                         logger.warning("Skipping corrupt mod entry %s: %s", k, exc)
                 self._mods = mods
-            except (json.JSONDecodeError, TypeError) as exc:
+            except (OSError, json.JSONDecodeError, TypeError) as exc:
                 logger.warning("Failed to load mod database %s: %s", db_file, exc)
                 self._mods = {}
 

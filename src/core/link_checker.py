@@ -32,8 +32,7 @@ _REPO_ROOT = Path(__file__).parent.parent.parent
 _CAT_DIR   = _REPO_ROOT / "data" / "catalogue"
 
 # URL fields that may appear in a catalogue entry
-_URL_FIELDS = ("url", "author_url", "download_url", "direct_download_url",
-               "thumbnail_url", "cover_url")
+_URL_FIELDS = ("url", "author_url", "direct_download_url", "thumbnail_url")
 
 # Domains known to be fake/deprecated in this project's history
 _BAD_DOMAINS = frozenset({
@@ -186,6 +185,22 @@ class LinkChecker:
             "cover_art": "cover_art",
         }.get(Path(source_file).stem.lower(), Path(source_file).stem.lower())
         for idx, entry in enumerate(entries):
+            if not isinstance(entry, dict):
+                logger.warning(
+                    "Skipping malformed catalogue entry in %s[%s]: expected a JSON object, got %r",
+                    source_file,
+                    idx,
+                    entry,
+                )
+                issues.append(LinkIssue(
+                    source_file=source_file,
+                    entry_index=idx,
+                    field_name="(entry)",
+                    url="",
+                    issue_type="malformed_entry",
+                    detail="catalogue entry must be a JSON object",
+                ))
+                continue
             entry_kind = str(entry.get("type", "")).lower() or source_kind
             if required_url_fields and entry_kind in {"pnach", "cheat"}:
                 for field_name in required_url_fields:

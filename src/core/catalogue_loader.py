@@ -202,7 +202,13 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
     if isinstance(entry.get("game_serial"), str):
-        entry["game_serial"] = entry["game_serial"].upper()
+        from src.core.game_registry import is_valid_serial, normalise_serial
+        entry["game_serial"] = normalise_serial(entry["game_serial"])
+        if entry["game_serial"] and not is_valid_serial(entry["game_serial"]):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"invalid game_serial {entry['game_serial']!r}"
+            )
     if isinstance(entry.get("download_action"), str):
         entry["download_action"] = entry["download_action"].lower()
     if isinstance(entry.get("source"), str):
