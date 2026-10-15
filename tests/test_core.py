@@ -10541,6 +10541,20 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(issues[0].issue_type, "parse_error")
         self.assertTrue(any("Could not parse catalogue link file" in msg for msg in logs.output))
 
+    def test_check_file_logs_non_array_root(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "parse_error")
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
     def test_bad_domain_flagged(self):
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()

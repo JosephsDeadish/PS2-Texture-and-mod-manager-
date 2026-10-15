@@ -253,7 +253,18 @@ class LinkChecker:
                 detail=str(exc),
             )]
         if not isinstance(data, list):
-            return []
+            logger.warning(
+                "Could not parse catalogue link file %s: expected a JSON array at the top level",
+                path,
+            )
+            return [LinkIssue(
+                source_file=label,
+                entry_index=-1,
+                field_name="(file)",
+                url="",
+                issue_type="parse_error",
+                detail="expected a JSON array at the top level",
+            )]
         return self.check_entries(
             data,
             source_file=label,
