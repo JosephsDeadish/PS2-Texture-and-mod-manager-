@@ -317,6 +317,7 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     else:
         author = ""
     placeholder_author = _placeholder_author(author) if author else ""
+    is_hub = bool(entry.get("is_hub", False))
     if placeholder_author:
         author = ""
     if not author:
@@ -324,7 +325,7 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
             entry.get("name", ""),
             entry.get("author_url", ""),
         )
-        if not author:
+        if not author and not is_hub:
             author = placeholder_author
     entry["author"] = author
     type_str = _normalise_mod_type(type_str)

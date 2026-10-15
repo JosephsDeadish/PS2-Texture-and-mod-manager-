@@ -7256,6 +7256,34 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertEqual(entry["author"], "Unknown")
         self.assertEqual(entry["source"], "GBAtemp")
 
+    def test_hub_placeholder_authors_are_cleared(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "hub_placeholder",
+                    "name": "Texture Hub",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "author_url": "https://gbatemp.net/threads/example.123/",
+                    "is_hub": True,
+                    "url": "https://example.com/hub",
+                    "source": "gbatemp.net",
+                    "game": "Example Game",
+                    "game_serial": "SLUS-12345",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        entry = result[0]
+        self.assertEqual(entry["author"], "")
+        self.assertTrue(entry["is_hub"])
+
     # ── Strict mode ─────────────────────────────────────────────────────────
 
     def test_strict_mode_raises_on_bad_json(self):
@@ -12664,7 +12692,7 @@ class TestLinkChecker(unittest.TestCase):
     # -- Integration test: all catalogues pass link checks --
 
     def test_all_catalogues_have_no_broken_urls(self):
-        """Built-in catalogues should remain free of broken or deprecated URLs."""
+        """Built-in catalogues should remain free of broken URLs and placeholder authors."""
         report = self.lc.check_all_catalogues()
         self.assertEqual(report["issue_count_by_type"].get("parse_error", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("malformed", 0), 0)
@@ -12674,7 +12702,7 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(report["issue_count_by_type"].get("noncanonical_source", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("generic_author_url", 0), 0)
         self.assertEqual(report["issue_count_by_type"].get("generic_thumbnail_url", 0), 0)
-        self.assertGreater(report["issue_count_by_type"].get("placeholder_author", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("placeholder_author", 0), 0)
 
     def test_check_all_catalogues_returns_dict(self):
         report = self.lc.check_all_catalogues()
