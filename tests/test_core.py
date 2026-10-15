@@ -5281,6 +5281,112 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(dlg._id_edit.value, "SLUS-20062")
         self.assertIn("Serial set to", dlg._status.text)
 
+    def test_cover_dialog_restore_applies_saved_state(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig(
+            ui_state={
+                browse_panel._COVER_DOWNLOAD_STATE_KEY: {
+                    "selected_tab": 1,
+                    "single_region": "JP",
+                    "bulk_region": "EU",
+                    "skip_existing": False,
+                }
+            }
+        )
+        dlg._tabs = FakeTabs(count=2)
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._skip_existing_check = FakeCheckBox()
+
+        dlg._restore_state()
+
+        self.assertEqual(dlg._tabs.currentIndex(), 1)
+        self.assertEqual(dlg._region_combo.currentText(), "JP")
+        self.assertEqual(dlg._bulk_region_combo.currentText(), "EU")
+        self.assertFalse(dlg._skip_existing_check.isChecked())
+
+    def test_cover_dialog_save_persists_state(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self, checked=False):
+                self.checked = checked
+
+            def isChecked(self):
+                return self.checked
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig()
+        dlg._tabs = types.SimpleNamespace(currentIndex=lambda: 1, count=lambda: 2)
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=3)
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=2)
+        dlg._skip_existing_check = FakeCheckBox(False)
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            dlg._save_state("updating cover download dialog state")
+
+        state = dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]
+        self.assertEqual(state["selected_tab"], 1)
+        self.assertEqual(state["single_region"], "JP")
+        self.assertEqual(state["bulk_region"], "EU")
+        self.assertFalse(state["skip_existing"])
+        save_mock.assert_called_once_with(dlg.config, "updating cover download dialog state")
+
     def test_active_tab_index_logs_when_tabs_fail(self):
         browse_panel = self._import_browse_panel()
         BrowsePanel = browse_panel.BrowsePanel

@@ -853,7 +853,10 @@ class CoverDownloadDialog(QDialog):
         self.setMinimumWidth(560)
         self.setMinimumHeight(480)
         self._build()
+        self._restore_state()
+        self._wire_state_persistence()
         if initial_serial:
+            self._tabs.setCurrentIndex(0)
             self._id_edit.setText(initial_serial)
 
     def _build(self):
@@ -1032,6 +1035,56 @@ class CoverDownloadDialog(QDialog):
         self._title_to_serials = title_to_serials
         # Cache for bulk scan results: list of (serial, display_name)
         self._bulk_serials: list = []
+
+    def _cover_state_bucket(self) -> dict:
+        return ui_state_bucket(self.config, _COVER_DOWNLOAD_STATE_KEY)
+
+    def _cover_state(self) -> dict:
+        try:
+            selected_tab = int(getattr(self._tabs, "currentIndex", lambda: 0)() or 0)
+        except (TypeError, ValueError):
+            selected_tab = 0
+        single_region = getattr(self._region_combo, "currentText", lambda: "EN")() or "EN"
+        bulk_region = getattr(self._bulk_region_combo, "currentText", lambda: "EN")() or "EN"
+        skip_existing = bool(getattr(self._skip_existing_check, "isChecked", lambda: True)())
+        return {
+            "selected_tab": selected_tab,
+            "single_region": single_region,
+            "bulk_region": bulk_region,
+            "skip_existing": skip_existing,
+        }
+
+    def _save_state(self, *_args) -> None:
+        bucket = self._cover_state_bucket()
+        bucket.update(self._cover_state())
+        _save_browse_config(self.config, "updating cover download dialog state")
+
+    def _restore_state(self) -> None:
+        bucket = self._cover_state_bucket()
+        self._set_combo_text(self._region_combo, bucket.get("single_region", "EN"))
+        self._set_combo_text(self._bulk_region_combo, bucket.get("bulk_region", "EN"))
+        self._skip_existing_check.setChecked(bool(bucket.get("skip_existing", True)))
+        try:
+            selected_tab = int(bucket.get("selected_tab", 0) or 0)
+        except (TypeError, ValueError):
+            selected_tab = 0
+        tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
+        if tab_count > 0:
+            self._tabs.setCurrentIndex(max(0, min(selected_tab, tab_count - 1)))
+
+    def _wire_state_persistence(self) -> None:
+        self._tabs.currentChanged.connect(self._save_state)
+        self._region_combo.currentIndexChanged.connect(self._save_state)
+        self._bulk_region_combo.currentIndexChanged.connect(self._save_state)
+        self._skip_existing_check.stateChanged.connect(self._save_state)
+
+    @staticmethod
+    def _set_combo_text(combo, value: object) -> None:
+        text = value if isinstance(value, str) else str(value or "")
+        finder = getattr(combo, "findText", None)
+        index = finder(text) if callable(finder) else -1
+        if index >= 0:
+            combo.setCurrentIndex(index)
 
     # ------------------------------------------------------------------
     # Game-name search helpers
@@ -2241,6 +2294,7 @@ class GBATempScraperDialog(QDialog):
 #: Limiting the initial render to _PAGE_SIZE cards keeps startup instant while
 #: the user can still load more entries on demand.
 _PAGE_SIZE = 30
+_COVER_DOWNLOAD_STATE_KEY = "cover_download_dialog"
 
 
 class _CatalogueTabContent(QWidget):
