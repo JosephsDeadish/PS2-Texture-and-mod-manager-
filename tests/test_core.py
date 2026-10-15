@@ -5002,6 +5002,18 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "tags": [],
         }, "gbatemp"))
         self.assertTrue(_entry_matches_query({
+            "name": "Final Fantasy X HD Texture Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "finalfantasyx"))
+        self.assertTrue(_entry_matches_query({
             "name": "Some Pack",
             "description": "",
             "author": "",
@@ -5025,6 +5037,22 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "game": "",
             "tags": [],
         }, "4x"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "url": "",
+            "author_url": "",
+            "direct_download_url": "https://example.com/direct.zip",
+            "thumbnail_url": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "directzip"))
         self.assertTrue(_entry_matches_query({
             "name": "Some Pack",
             "description": "",
@@ -6270,6 +6298,16 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     val.startswith("http://") or val.startswith("https://"),
                     f"Entry {entry['id']} has non-empty but invalid direct_download_url: {val!r}"
                 )
+
+    def test_thumbnail_urls_do_not_use_generic_favicon_placeholders(self):
+        """Catalogue entries should not keep the generic GitHub favicon as a thumbnail."""
+        placeholder = "https://github.githubassets.com/favicons/favicon.png"
+        for entry in self.catalogue:
+            self.assertNotEqual(
+                entry.get("thumbnail_url", ""),
+                placeholder,
+                f"Entry {entry['id']} should not use a generic favicon as thumbnail_url",
+            )
 
     def test_no_duplicate_names(self):
         names = [e["name"] for e in self.catalogue]
@@ -9067,6 +9105,19 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(loaded["direct_download_url"], "https://example.com/direct.zip")
         self.assertEqual(loaded["download_action"], "manual")
         self.assertEqual(loaded["tags"], ["one", "Two"])
+
+    def test_load_user_catalogue_strips_placeholder_thumbnail_url(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["thumbnail_url"] = "https://github.githubassets.com/favicons/favicon.png"
+        (Path(self.tmpdir) / "placeholder_thumb.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["thumbnail_url"], "")
 
     def test_load_user_catalogue_rejects_non_string_url(self):
         from src.core.catalogue_loader import load_user_catalogue

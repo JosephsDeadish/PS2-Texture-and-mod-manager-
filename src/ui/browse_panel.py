@@ -147,45 +147,44 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
 
     compact = "".join(ch for ch in needle if ch.isalnum())
 
-    def _contains(field_name: str) -> bool:
-        value = entry.get(field_name, "")
-        return isinstance(value, str) and needle in value.casefold()
+    def _matches_text(value: object) -> bool:
+        if not isinstance(value, str):
+            return False
+        lowered = value.casefold()
+        if needle in lowered:
+            return True
+        if compact:
+            value_compact = "".join(ch for ch in lowered if ch.isalnum())
+            if compact in value_compact:
+                return True
+        return False
 
     for field_name in (
         "name", "description", "author", "context", "source",
-        "upscale_tech", "size_label",
+        "upscale_tech", "size_label", "url", "author_url",
+        "direct_download_url", "thumbnail_url",
     ):
-        if _contains(field_name):
+        if _matches_text(entry.get(field_name, "")):
             return True
 
-    game_serial = entry.get("game_serial", "")
-    if isinstance(game_serial, str):
-        serial_lower = game_serial.casefold()
-        if needle in serial_lower:
-            return True
-        if compact:
-            serial_compact = "".join(ch for ch in serial_lower if ch.isalnum())
-            if compact in serial_compact:
-                return True
+    if _matches_text(entry.get("game_serial", "")):
+        return True
 
     tags = entry.get("tags", [])
-    if isinstance(tags, list) and any(
-        isinstance(tag, str) and needle in tag.casefold()
-        for tag in tags
-    ):
+    if isinstance(tags, list) and any(_matches_text(tag) for tag in tags):
         return True
 
     game_field = entry.get("game", "")
-    if isinstance(game_field, str):
-        if needle in game_field.casefold():
-            return True
-        title_matches_query = getattr(serial_db, "title_matches_query", None)
-        if (
-            callable(title_matches_query)
-            and game_field
-            and title_matches_query(game_field, needle)
-        ):
-            return True
+    if _matches_text(game_field):
+        return True
+    title_matches_query = getattr(serial_db, "title_matches_query", None)
+    if (
+        callable(title_matches_query)
+        and isinstance(game_field, str)
+        and game_field
+        and title_matches_query(game_field, needle)
+    ):
+        return True
 
     return False
 

@@ -159,6 +159,20 @@ def _normalise_url(url: str, *, preserve_fragment: bool = False) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
 
 
+def _is_placeholder_thumbnail_url(url: str) -> bool:
+    """Return True for generic favicon-style thumbnail placeholders."""
+    if not url:
+        return False
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return False
+    host = parts.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    return host == "github.githubassets.com" and parts.path.lower().startswith("/favicons/favicon")
+
+
 def _infer_author(name: str, author_url: str) -> str:
     match = _AUTHOR_BY_RE.search(name)
     if match:
@@ -238,6 +252,10 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     for field in ("url", "author_url", "thumbnail_url"):
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
+    if isinstance(entry.get("thumbnail_url"), str) and _is_placeholder_thumbnail_url(entry["thumbnail_url"]):
+        # Generic favicons are not useful cover art and only add noise when the
+        # game-specific cover lookup fails, so treat them as absent.
+        entry["thumbnail_url"] = ""
     if isinstance(entry.get("direct_download_url"), str):
         # Preserve fragments for hosts such as MEGA where the file key lives in
         # the URL fragment and is required for the link to keep working.
