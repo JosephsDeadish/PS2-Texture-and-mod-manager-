@@ -9790,7 +9790,8 @@ class TestUserCatalogueLoader(unittest.TestCase):
         (Path(self.tmpdir) / "normalised.json").write_text(
             json.dumps([entry]), encoding="utf-8"
         )
-        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
         self.assertEqual(len(result), 1)
         loaded = result[0]
         self.assertEqual(loaded["type"], ModType.TEXTURE_PACK)
@@ -9806,6 +9807,10 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(loaded["direct_download_url"], "https://example.com/direct.zip")
         self.assertEqual(loaded["download_action"], "manual")
         self.assertEqual(loaded["tags"], ["one", "Two"])
+        self.assertTrue(
+            any("source" in msg and "GBAtemp" in msg for msg in logs.output),
+            logs.output,
+        )
 
     def test_load_user_catalogue_strips_placeholder_thumbnail_url(self):
         from src.core.catalogue_loader import load_user_catalogue

@@ -326,7 +326,17 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
                 f"unknown download_action {entry['download_action']!r}"
             )
     if isinstance(entry.get("source"), str):
-        entry["source"] = _normalise_source(entry["source"])
+        raw_source = entry["source"]
+        normalised_source = _normalise_source(raw_source)
+        if raw_source and normalised_source != raw_source:
+            log.warning(
+                "[%s] entry %r: source %r normalized to %r",
+                source_file.name,
+                entry.get("id", "?"),
+                raw_source,
+                normalised_source,
+            )
+        entry["source"] = normalised_source
     if isinstance(entry.get("tags"), list):
         entry["tags"] = [tag.strip() for tag in entry["tags"] if isinstance(tag, str) and tag.strip()]
     author = entry.get("author", "")
