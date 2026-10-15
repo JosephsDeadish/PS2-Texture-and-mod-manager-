@@ -10524,6 +10524,25 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "bad_domain")
 
+    def test_bad_domain_with_path_segment_is_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamefaqs.gamespot.com/ps2/invalid/old-page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_gamefaqs_other_paths_not_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamefaqs.gamespot.com/ps2/564423-game/faqs"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
     def test_bad_domain_normalization_only_strips_literal_www_prefix(self):
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()

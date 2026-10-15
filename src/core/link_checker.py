@@ -131,14 +131,21 @@ class LinkChecker:
 
     def _is_bad_domain(self, url: str) -> Optional[str]:
         """Return the offending domain if *url* uses a known-bad domain, else None."""
-        # Extract host from URL
-        m = re.match(r'^https?://([^/]+)', url, re.IGNORECASE)
+        # Extract host and path from URL so path-scoped bad-domain rules can
+        # match entries like ``gamefaqs.gamespot.com/ps2/invalid``.
+        m = re.match(r'^https?://([^/]+)(/[^\s]*)?', url, re.IGNORECASE)
         if not m:
             return None
         host = m.group(1).lower()
         if host.startswith("www."):
             host = host[4:]
+        path = (m.group(2) or "").lower()
+        host_and_path = host + path
         for bad in _BAD_DOMAINS:
+            if "/" in bad:
+                if host_and_path == bad or host_and_path.startswith(bad + "/"):
+                    return bad
+                continue
             if host == bad or host.endswith("." + bad):
                 return bad
         return None
