@@ -109,6 +109,10 @@ _SOURCE_ALIASES = {
 _AUTHOR_BY_RE = re.compile(r"\bby\s+(.+?)\s*$", re.IGNORECASE)
 _AUTHOR_PREFIX_RE = re.compile(r"^\s*(.+?)\s+[–—]\s+")
 _GBATEMP_MEMBER_RE = re.compile(r"gbatemp\.net/members/([^./#?]+)", re.IGNORECASE)
+_PLACEHOLDER_AUTHORS = {
+    "unknown": "Unknown",
+    "anonymous": "Anonymous",
+}
 
 
 def _normalise_mod_type(type_str: str) -> str:
@@ -151,6 +155,10 @@ def _infer_author(name: str, author_url: str) -> str:
     return ""
 
 
+def _placeholder_author(author: str) -> str:
+    return _PLACEHOLDER_AUTHORS.get(author.strip().casefold(), "")
+
+
 def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     """Validate *entry* from *source_file*, inject *type_str*, fill defaults.
 
@@ -190,11 +198,20 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         entry["source"] = _normalise_source(entry["source"])
     if isinstance(entry.get("tags"), list):
         entry["tags"] = [tag.strip() for tag in entry["tags"] if isinstance(tag, str) and tag.strip()]
-    if not entry.get("author"):
-        entry["author"] = _infer_author(
+    author = entry.get("author", "")
+    if isinstance(author, str):
+        author = author.strip()
+    else:
+        author = ""
+    placeholder_author = _placeholder_author(author) if author else ""
+    if placeholder_author:
+        author = ""
+    if not author:
+        author = _infer_author(
             entry.get("name", ""),
             entry.get("author_url", ""),
-        )
+        ) or placeholder_author
+    entry["author"] = author
     type_str = _normalise_mod_type(type_str)
 
     # Inject type from the file name as a ModType enum (callers do not need

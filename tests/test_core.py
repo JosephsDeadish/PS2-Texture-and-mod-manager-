@@ -5619,6 +5619,45 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertNotIn("#", by_id["cckrizalid_mega_library"]["author_url"])
         self.assertNotIn("#", by_id["crash_twinsanity_hd_durindragon"]["author_url"])
 
+    def test_placeholder_authors_are_normalized_before_inference(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "title_inferred",
+                    "name": "Example Pack by ExampleName",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "url": "https://example.com/title",
+                    "source": "gbatemp.net",
+                    "game": "Example Game",
+                    "game_serial": "SLUS-12345",
+                },
+                {
+                    "id": "profile_inferred",
+                    "name": "Profile Pack",
+                    "description": "Test entry",
+                    "author": "Anonymous",
+                    "author_url": "https://gbatemp.net/members/profile_user.12345/#latest-activity",
+                    "url": "https://example.com/profile",
+                    "source": "GitHub.com",
+                    "game": "Example Game 2",
+                    "game_serial": "SCUS-54321",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        by_id = {e["id"]: e for e in result}
+        self.assertEqual(by_id["title_inferred"]["author"], "ExampleName")
+        self.assertEqual(by_id["title_inferred"]["source"], "GBAtemp")
+        self.assertEqual(by_id["profile_inferred"]["author"], "profile_user")
+        self.assertEqual(by_id["profile_inferred"]["source"], "GitHub")
+
     # ── Strict mode ─────────────────────────────────────────────────────────
 
     def test_strict_mode_raises_on_bad_json(self):
