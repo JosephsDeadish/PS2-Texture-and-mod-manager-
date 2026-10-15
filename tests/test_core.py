@@ -5501,6 +5501,8 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
                 panel._refresh_history()
 
         self.assertTrue(panel._list_widget.cleared)
+        self.assertTrue(panel._list_widget.items)
+        self.assertIn("Could not read history: boom", panel._list_widget.items[0])
         self.assertEqual(panel._history_entries, [])
         self.assertIn("Could not read history: boom", panel._detail_label.value)
         self.assertFalse(panel._delete_btn.enabled)
@@ -6637,7 +6639,11 @@ class TestCatalogueIntegrity(unittest.TestCase):
         for e in in_app:
             action = e.get("download_action", "")
             direct = e.get("direct_download_url", "")
-            ok = action in ("cover_by_id", "cover_by_url") or (action == "" and bool(direct))
+            ok = (
+                action in ("cover_by_id", "cover_by_url")
+                or (action in ("pnach_crc", "gdrive", "yandex") and bool(direct))
+                or (action == "" and bool(direct))
+            )
             self.assertTrue(ok, f"Entry {e['id']} wrongly classified as in-app")
 
     def test_no_serial_shared_across_unrelated_games(self):
@@ -12390,6 +12396,32 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "placeholder_author")
         self.assertEqual(issues[0].field_name, "author")
+
+    def test_placeholder_author_inference_matches_loader_fallbacks(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack by ExampleName",
+                "author": "",
+                "url": "https://gbatemp.net/threads/example.123/",
+                "source": "gbatemp.net",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            },
+            {
+                "name": "Profile Pack",
+                "author": "Anonymous",
+                "author_url": "https://gbatemp.net/members/profile_user.12345/#latest-activity",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub.com",
+                "game": "Example Game 2",
+                "game_serial": "SCUS-54321",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(issues, [])
 
     def test_invalid_download_action_flagged_for_catalogue_entries(self):
         from src.core.link_checker import LinkChecker

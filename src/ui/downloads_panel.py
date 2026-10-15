@@ -363,7 +363,9 @@ class DownloadsPanel(BasePanel):
             )
         except Exception as exc:
             logger.warning("Failed to load download history: %s", exc)
-            self._detail_label.setText(f"<i>Could not read history: {exc}</i>")
+            empty_msg = f"Could not read history: {exc}"
+            self._list_widget.addItem(empty_msg)
+            self._detail_label.setText(f"<i>{empty_msg}</i>")
             self._delete_btn.setEnabled(False)
             return
 

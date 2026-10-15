@@ -26,7 +26,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from typing import Dict, List, Optional
 
-from src.core.catalogue_loader import VALID_DOWNLOAD_ACTIONS, is_placeholder_author
+from src.core.catalogue_loader import VALID_DOWNLOAD_ACTIONS, _infer_author, is_placeholder_author
 
 logger = logging.getLogger(__name__)
 
@@ -251,26 +251,36 @@ class LinkChecker:
             if (entry_kind in _CATALOGUE_KINDS or source_kind in _CATALOGUE_KINDS) and not entry.get("is_hub", False):
                 author = entry.get("author", "")
                 if not isinstance(author, str) or not author.strip():
-                    issues.append(LinkIssue(
-                        source_file=source_file,
-                        entry_index=idx,
-                        field_name="author",
-                        url="",
-                        issue_type="empty_author",
-                        detail="missing author credit",
-                    ))
+                    inferred_author = _infer_author(
+                        str(entry.get("name", "")),
+                        str(entry.get("author_url", "")),
+                    )
+                    if not inferred_author:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="author",
+                            url="",
+                            issue_type="empty_author",
+                            detail="missing author credit",
+                        ))
                 elif is_placeholder_author(author):
-                    issues.append(LinkIssue(
-                        source_file=source_file,
-                        entry_index=idx,
-                        field_name="author",
-                        url="",
-                        issue_type="placeholder_author",
-                        detail=(
-                            "generic placeholder author; replace with a credited author "
-                            "or a more specific source-page label"
-                        ),
-                    ))
+                    inferred_author = _infer_author(
+                        str(entry.get("name", "")),
+                        str(entry.get("author_url", "")),
+                    )
+                    if not inferred_author:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="author",
+                            url="",
+                            issue_type="placeholder_author",
+                            detail=(
+                                "generic placeholder author; replace with a credited author "
+                                "or a more specific source-page label"
+                            ),
+                        ))
             raw_action = entry.get("download_action", "")
             if raw_action not in ("", None):
                 if not isinstance(raw_action, str):
