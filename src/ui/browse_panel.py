@@ -19,7 +19,7 @@ from typing import List, Optional
 from urllib.parse import unquote, urlparse
 
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -641,6 +641,22 @@ class CatalogueCard(QFrame):
                     "keeping placeholder icon",
                     url,
                     len(data),
+                )
+                try:
+                    os.unlink(tmp)
+                except OSError as exc:
+                    logger.warning(
+                        "Could not remove temporary browse cover art file %s: %s",
+                        tmp,
+                        exc,
+                    )
+                return False
+            image = QImage.fromData(data)
+            if image.isNull():
+                logger.warning(
+                    "Browse cover art from %s was not a valid image; "
+                    "keeping placeholder icon",
+                    url,
                 )
                 try:
                     os.unlink(tmp)

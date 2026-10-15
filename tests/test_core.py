@@ -4490,6 +4490,11 @@ class TestScraperDialogClassifier(unittest.TestCase):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
         qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
 
         with patch.dict(
             sys.modules,
@@ -4530,6 +4535,11 @@ class TestScraperDialogClassifier(unittest.TestCase):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
         qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
 
         with patch.dict(
             sys.modules,
@@ -4560,6 +4570,62 @@ class TestScraperDialogClassifier(unittest.TestCase):
         card._cover_lbl.setPixmap.assert_not_called()
         card._cover_lbl.setText.assert_not_called()
 
+    def test_cover_art_preview_logs_when_payload_is_not_image(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"X" * 600)):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = CatalogueCard._fetch_and_display(
+                        card,
+                        "https://example.com/thumb.jpg",
+                    )
+
+        self.assertFalse(result)
+        self.assertTrue(any("not a valid image" in msg for msg in logs.output))
+        card._cover_lbl.setPixmap.assert_not_called()
+        card._cover_lbl.setText.assert_not_called()
+
     def test_browse_search_helper_matches_source_serial_and_alias(self):
         import sys
         import types
@@ -4580,6 +4646,11 @@ class TestScraperDialogClassifier(unittest.TestCase):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
         qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
 
         with patch.dict(
             sys.modules,
