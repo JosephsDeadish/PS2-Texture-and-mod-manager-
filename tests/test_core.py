@@ -7117,10 +7117,22 @@ class TestGametdbCoverUrl(unittest.TestCase):
         url = self.gcu("SCES-52400")
         self.assertIn("/EN/", url)
 
+    def test_pal_demo_sced_gives_en_region(self):
+        url = self.gcu("SCED-52246")
+        self.assertIn("/EN/", url)
+
     def test_japan_slps_gives_ja_region(self):
         url = self.gcu("SLPS-25302")
         self.assertIn("/JA/", url)
         self.assertIn("SLPS25302", url)
+
+    def test_japan_demo_scpd_gives_ja_region(self):
+        url = self.gcu("SCPD-10002")
+        self.assertIn("/JA/", url)
+
+    def test_north_america_demo_sccd_gives_us_region(self):
+        url = self.gcu("SCCD-10001")
+        self.assertIn("/US/", url)
 
     def test_hyphen_stripped_from_serial(self):
         url = self.gcu("SLUS-20312")

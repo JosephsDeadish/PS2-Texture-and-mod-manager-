@@ -262,9 +262,11 @@ def gametdb_cover_url(serial: str) -> str:
     Infers the correct region code from the serial prefix so callers do not
     need to know the region:
 
-    * ``SLUS`` / ``SCUS`` → ``US``
-    * ``SLES`` / ``SCES`` / ``SLEH`` / ``SCEH`` → ``EN``
-    * ``SLPS`` / ``SCPS`` / ``SLPM`` / ``SCPM`` → ``JA``
+    * ``SLUS`` / ``SCUS`` / ``SLCD`` / ``SCCD`` → ``US``
+    * ``SLES`` / ``SCES`` / ``SLEH`` / ``SCEH`` / ``SLED`` / ``SCED`` → ``EN``
+    * ``SLPS`` / ``SCPS`` / ``SLPM`` / ``SCPM`` / ``SLPD`` / ``SCPD`` → ``JA``
+    * ``SLAJ`` / ``SCAJ`` → ``ZHCN``
+    * ``SLKA`` / ``SCKA`` → ``KO``
     * Everything else → ``US`` (safe fallback)
 
     The serial is stripped of hyphens/underscores to match GameTDB's filename
@@ -279,11 +281,11 @@ def gametdb_cover_url(serial: str) -> str:
         return ""
     clean = serial.upper().replace("-", "").replace("_", "")
     prefix = clean[:4]
-    if prefix in ("SLUS", "SCUS"):
+    if prefix in ("SLUS", "SCUS", "SLCD", "SCCD"):
         region = "US"
-    elif prefix in ("SLES", "SCES", "SLEH", "SCEH"):
+    elif prefix in ("SLES", "SCES", "SLEH", "SCEH", "SLED", "SCED"):
         region = "EN"
-    elif prefix in ("SLPS", "SCPS", "SLPM", "SCPM"):
+    elif prefix in ("SLPS", "SCPS", "SLPM", "SCPM", "SLPD", "SCPD"):
         region = "JA"
     elif prefix in ("SLKA", "SCKA"):
         region = "KO"
