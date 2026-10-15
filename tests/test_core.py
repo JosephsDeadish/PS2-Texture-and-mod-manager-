@@ -13260,6 +13260,19 @@ class TestLinkChecker(unittest.TestCase):
         user_issues = report["issues_by_file"].get("user_catalogue/custom.json", [])
         self.assertTrue(any(issue["issue_type"] == "placeholder_author" for issue in user_issues))
 
+    def test_check_all_catalogues_logs_user_catalogue_resolution_failure(self):
+        from src.core.link_checker import LinkChecker
+
+        with patch("src.core.link_checker._user_catalogue_dir", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertEqual(report["total_issues"], 0)
+        self.assertTrue(
+            any("Could not resolve user catalogue directory" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_multiple_url_fields_checked(self):
         """Both 'url' and 'author_url' fields are checked independently."""
         from src.core.link_checker import LinkChecker

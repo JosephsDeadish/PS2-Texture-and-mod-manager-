@@ -538,23 +538,27 @@ class LinkChecker:
             )
 
         if self._cat_dir == _CAT_DIR:
-            user_dir = _user_catalogue_dir()
-            if user_dir.is_dir():
-                try:
-                    user_files = sorted(user_dir.glob("*.json"))
-                except Exception as exc:
-                    logger.warning("Could not list user catalogue files under %s: %s", user_dir, exc)
-                    user_files = []
-                for path in user_files:
-                    label = f"user_catalogue/{path.name}"
-                    checked.append(label)
-                    all_issues.extend(
-                        self.check_file(
-                            path,
-                            source_file=label,
-                            required_url_fields=["direct_download_url"],
+            try:
+                user_dir = _user_catalogue_dir()
+            except Exception as exc:
+                logger.warning("Could not resolve user catalogue directory: %s", exc)
+            else:
+                if user_dir.is_dir():
+                    try:
+                        user_files = sorted(user_dir.glob("*.json"))
+                    except Exception as exc:
+                        logger.warning("Could not list user catalogue files under %s: %s", user_dir, exc)
+                        user_files = []
+                    for path in user_files:
+                        label = f"user_catalogue/{path.name}"
+                        checked.append(label)
+                        all_issues.extend(
+                            self.check_file(
+                                path,
+                                source_file=label,
+                                required_url_fields=["direct_download_url"],
+                            )
                         )
-                    )
 
         # Count by type
         type_counts: Dict[str, int] = {}
