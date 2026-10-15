@@ -35,6 +35,15 @@ _CAT_DIR   = _REPO_ROOT / "data" / "catalogue"
 # URL fields that may appear in a catalogue entry
 _URL_FIELDS = ("url", "author_url", "direct_download_url", "thumbnail_url")
 
+# File/type kinds where missing author credits are data-quality problems.
+_CATALOGUE_KINDS = frozenset({
+    "texture_pack",
+    "save_file",
+    "cheat",
+    "cover_art",
+    "pnach",
+})
+
 # Domains known to be fake/deprecated in this project's history
 _BAD_DOMAINS = frozenset({
     "gamesavedfiles.com",
@@ -105,7 +114,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -231,6 +240,17 @@ class LinkChecker:
                 ))
                 continue
             entry_kind = str(entry.get("type", "")).lower() or source_kind
+            if (entry_kind in _CATALOGUE_KINDS or source_kind in _CATALOGUE_KINDS) and not entry.get("is_hub", False):
+                author = entry.get("author", "")
+                if not isinstance(author, str) or not author.strip():
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="author",
+                        url="",
+                        issue_type="empty_author",
+                        detail="missing author credit",
+                    ))
             if required_url_fields and entry_kind in {"pnach", "cheat"}:
                 for field_name in required_url_fields:
                     if entry.get(field_name, ""):

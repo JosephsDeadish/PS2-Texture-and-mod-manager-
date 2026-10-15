@@ -234,7 +234,9 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         author = _infer_author(
             entry.get("name", ""),
             entry.get("author_url", ""),
-        ) or placeholder_author
+        )
+        if not author:
+            author = placeholder_author
     entry["author"] = author
     type_str = _normalise_mod_type(type_str)
 

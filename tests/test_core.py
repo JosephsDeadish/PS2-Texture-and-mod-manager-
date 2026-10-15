@@ -6180,15 +6180,21 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     f"LoversLab entry {entry['id']} must have nsfw=True"
                 )
 
-    def test_hub_entries_have_empty_author(self):
-        """Hub entries (is_hub=True) must have an empty author string.
-        Individual posters on community search pages are not known ahead of time,
-        so we never pre-fill a fake community name as the 'author'."""
+    def test_hub_entries_do_not_use_generic_author_placeholders(self):
+        """Hub entries may infer a specific author, but never a generic placeholder."""
+        generic_authors = {
+            "GBAtemp Community",
+            "PS2Wide Community",
+            "GitHub Community",
+            "PS2-Home Community",
+            "Unknown (GBAtemp member)",
+        }
         for entry in self.catalogue:
             if entry.get("is_hub", False):
-                self.assertEqual(
-                    entry.get("author", ""), "",
-                    f"Hub entry {entry['id']} should have author='' (got {entry.get('author')!r})"
+                self.assertNotIn(
+                    entry.get("author", ""),
+                    generic_authors,
+                    f"Hub entry {entry['id']} should not use a generic placeholder author",
                 )
 
     def test_named_author_entries_have_non_empty_author(self):
@@ -11955,7 +11961,7 @@ class TestLinkChecker(unittest.TestCase):
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
         issues = lc.check_entries(
-            [{"url": "", "author_url": ""}],
+            [{"url": "", "author_url": "", "author": "Test Author"}],
             source_file="test",
         )
         self.assertEqual(issues, [])
@@ -11964,7 +11970,32 @@ class TestLinkChecker(unittest.TestCase):
         """Entries without URL fields should not produce issues."""
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
-        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000"}])
+        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000", "author": "Test Author"}])
+        self.assertEqual(issues, [])
+
+    def test_empty_author_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"name": "Test Pack", "url": "https://github.com/PCSX2/pcsx2", "author": ""}],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_author")
+        self.assertEqual(issues[0].field_name, "author")
+
+    def test_hub_entries_may_skip_author_credit(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Texture Hub",
+                "url": "https://gbatemp.net/threads/example.123",
+                "author": "",
+                "is_hub": True,
+            }],
+            source_file="texture_packs.json",
+        )
         self.assertEqual(issues, [])
 
     def test_multiple_url_fields_checked(self):
@@ -11982,7 +12013,7 @@ class TestLinkChecker(unittest.TestCase):
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
         issues = lc.check_entries(
-            [{"type": "cheat", "name": "Test", "game": "Game"}],
+            [{"type": "cheat", "name": "Test", "game": "Game", "author": "Test Author"}],
             source_file="cheats.json",
             required_url_fields=["direct_download_url"],
         )
@@ -11995,7 +12026,7 @@ class TestLinkChecker(unittest.TestCase):
         from src.core.link_checker import LinkChecker
         with tempfile.TemporaryDirectory() as tmpdir:
             p = Path(tmpdir) / "cheats.json"
-            p.write_text(json.dumps([{}]), encoding="utf-8")
+            p.write_text(json.dumps([{"author": "Test Author"}]), encoding="utf-8")
 
             issues = LinkChecker(cat_dir=tmpdir).check_file(
                 p,
