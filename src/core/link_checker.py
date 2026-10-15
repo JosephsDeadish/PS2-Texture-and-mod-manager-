@@ -170,7 +170,26 @@ class LinkChecker:
             All issues found.
         """
         issues: List[LinkIssue] = []
+        source_kind = {
+            "cheats": "cheat",
+            "saves": "save_file",
+            "texture_packs": "texture_pack",
+            "cover_art": "cover_art",
+        }.get(Path(source_file).stem.lower(), Path(source_file).stem.lower())
         for idx, entry in enumerate(entries):
+            entry_kind = str(entry.get("type", "")).lower() or source_kind
+            if required_url_fields and entry_kind in {"pnach", "cheat"}:
+                for field_name in required_url_fields:
+                    if entry.get(field_name, ""):
+                        continue
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url="",
+                        issue_type="empty_required",
+                        detail=f"missing required {field_name!r} for {entry_kind} entry",
+                    ))
             for field_name in _URL_FIELDS:
                 raw = entry.get(field_name, "")
                 if not raw:
@@ -203,7 +222,13 @@ class LinkChecker:
     # Catalogue-level checking
     # ------------------------------------------------------------------
 
-    def check_file(self, path: Path, source_file: Optional[str] = None) -> List[LinkIssue]:
+    def check_file(
+        self,
+        path: Path,
+        source_file: Optional[str] = None,
+        *,
+        required_url_fields: Optional[List[str]] = None,
+    ) -> List[LinkIssue]:
         """Check all URL fields in a single JSON catalogue file."""
         label = source_file or path.name
         try:
@@ -220,7 +245,11 @@ class LinkChecker:
             )]
         if not isinstance(data, list):
             return []
-        return self.check_entries(data, source_file=label)
+        return self.check_entries(
+            data,
+            source_file=label,
+            required_url_fields=required_url_fields,
+        )
 
     def check_all_catalogues(self) -> Dict:
         """Check all standard catalogue files and return a structured report.
@@ -248,7 +277,13 @@ class LinkChecker:
             if not path.is_file():
                 continue
             checked.append(fname)
-            all_issues.extend(self.check_file(path, source_file=fname))
+            all_issues.extend(
+                self.check_file(
+                    path,
+                    source_file=fname,
+                    required_url_fields=["direct_download_url"],
+                )
+            )
 
         # Count by type
         type_counts: Dict[str, int] = {}

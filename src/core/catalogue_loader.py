@@ -35,6 +35,7 @@ import json
 import logging
 import re
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 from typing import Dict, List, Optional
 
 from src.models.mod import ModType
@@ -105,6 +106,10 @@ _SOURCE_ALIASES = {
     "personal": "Personal",
 }
 
+_AUTHOR_BY_RE = re.compile(r"\bby\s+(.+?)\s*$", re.IGNORECASE)
+_AUTHOR_PREFIX_RE = re.compile(r"^\s*(.+?)\s+[–—]\s+")
+_GBATEMP_MEMBER_RE = re.compile(r"gbatemp\.net/members/([^./#?]+)", re.IGNORECASE)
+
 
 def _normalise_mod_type(type_str: str) -> str:
     return re.sub(r"[\s\-]+", "_", type_str.strip().lower())
@@ -116,6 +121,34 @@ def _normalise_source(source: str) -> str:
         return "Personal"
     key = re.sub(r"[^a-z0-9]+", "", source.casefold())
     return _SOURCE_ALIASES.get(key, source)
+
+
+def _normalise_url(url: str) -> str:
+    url = url.strip()
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return url
+    if not parts.fragment:
+        return url
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
+
+
+def _infer_author(name: str, author_url: str) -> str:
+    for pattern in (_AUTHOR_BY_RE, _AUTHOR_PREFIX_RE):
+        match = pattern.search(name)
+        if match:
+            author = match.group(1).strip()
+            if author:
+                return author
+
+    match = _GBATEMP_MEMBER_RE.search(author_url)
+    if match:
+        return match.group(1)
+
+    return ""
 
 
 def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
@@ -146,6 +179,9 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     ):
         if isinstance(entry.get(field), str):
             entry[field] = entry[field].strip()
+    for field in ("url", "author_url", "thumbnail_url", "direct_download_url"):
+        if isinstance(entry.get(field), str):
+            entry[field] = _normalise_url(entry[field])
     if isinstance(entry.get("game_serial"), str):
         entry["game_serial"] = entry["game_serial"].upper()
     if isinstance(entry.get("download_action"), str):
@@ -154,6 +190,11 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         entry["source"] = _normalise_source(entry["source"])
     if isinstance(entry.get("tags"), list):
         entry["tags"] = [tag.strip() for tag in entry["tags"] if isinstance(tag, str) and tag.strip()]
+    if not entry.get("author"):
+        entry["author"] = _infer_author(
+            entry.get("name", ""),
+            entry.get("author_url", ""),
+        )
     type_str = _normalise_mod_type(type_str)
 
     # Inject type from the file name as a ModType enum (callers do not need

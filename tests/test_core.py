@@ -5502,6 +5502,26 @@ class TestCatalogueLoader(unittest.TestCase):
         self.assertEqual(bad, [],
                          f"Entries still using generic placeholder author: {bad}")
 
+    def test_blank_authors_are_inferred_from_titles_and_profiles(self):
+        """Common hub/list entries should load with usable author metadata."""
+        by_id = {e["id"]: e for e in self.catalogue}
+
+        expected_authors = {
+            "bl4ckh4nd_ps2_packs": "Bl4ckH4nd",
+            "cckrizalid_mega_library": "CCKrizalid",
+            "curse_arms_hd_remaster_pack": "Curse_Arms",
+            "pandavenom_packs_list": "Panda_Venom",
+            "retrogenerica_packs_list": "RetroGenerica",
+            "teodormax_packs_list": "TEODOR_MAX",
+            "josephsdeadish_hd_ps2_hub": "JosephsDeadish",
+        }
+        for entry_id, author in expected_authors.items():
+            with self.subTest(entry_id=entry_id):
+                self.assertEqual(by_id[entry_id]["author"], author)
+
+        self.assertNotIn("#", by_id["cckrizalid_mega_library"]["author_url"])
+        self.assertNotIn("#", by_id["crash_twinsanity_hd_durindragon"]["author_url"])
+
     # ── Strict mode ─────────────────────────────────────────────────────────
 
     def test_strict_mode_raises_on_bad_json(self):
@@ -10262,6 +10282,35 @@ class TestLinkChecker(unittest.TestCase):
             source_file="test",
         )
         self.assertEqual(len(issues), 2)
+
+    def test_required_download_url_fields_flagged_for_cheats(self):
+        """Cheat and PNACH entries should report missing required download URLs."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"type": "cheat", "name": "Test", "game": "Game"}],
+            source_file="cheats.json",
+            required_url_fields=["direct_download_url"],
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
+        self.assertEqual(issues[0].field_name, "direct_download_url")
+
+    def test_check_file_flags_missing_required_download_url(self):
+        """check_file should apply required field validation for cheats.json."""
+        from src.core.link_checker import LinkChecker
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "cheats.json"
+            p.write_text(json.dumps([{}]), encoding="utf-8")
+
+            issues = LinkChecker(cat_dir=tmpdir).check_file(
+                p,
+                source_file="cheats.json",
+                required_url_fields=["direct_download_url"],
+            )
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
 
     # -- Integration test: all catalogues pass link checks --
 
