@@ -6534,6 +6534,39 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._card_combo.current_index, 2)
         panel._load_saves.assert_called_once()
 
+    def test_restore_selected_card_warns_when_missing(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = [
+                    ("— Select a memory card —", ""),
+                    ("Card A", "/cards/a.ps2"),
+                ]
+                self.current_index = -1
+
+            def findData(self, value):
+                for idx, (_label, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.current_index = index
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"selected_card": "/cards/missing.ps2"}})
+        panel._current_card = ""
+        panel._card_combo = FakeComboBox()
+
+        with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+            MemoryCardPanel._restore_selected_card(panel)
+
+        self.assertEqual(panel._current_card, "")
+        self.assertEqual(panel._card_combo.current_index, 0)
+        self.assertTrue(any("memory card selection" in msg for msg in logs.output))
+
     def test_splitter_state_restores_and_saves(self):
         memcard_panel = self._import_memcard_panel()
         MemoryCardPanel = memcard_panel.MemoryCardPanel
@@ -6560,6 +6593,27 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(panel.config.ui_state["memcard_panel"]["splitter_sizes"], [300, 380])
         save_mock.assert_called_once_with(panel.config)
+
+    def test_restore_splitter_sizes_warns_on_invalid_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeSplitter:
+            def __init__(self):
+                self._sizes = [180, 500]
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": "broken"}})
+        panel._splitter = FakeSplitter()
+
+        with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+            MemoryCardPanel._restore_splitter_sizes(panel)
+
+        self.assertEqual(panel._splitter._sizes, [180, 500])
+        self.assertTrue(any("splitter state" in msg for msg in logs.output))
 
 
 class TestModPanelEmptyState(unittest.TestCase):

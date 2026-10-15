@@ -69,18 +69,41 @@ class MemoryCardPanel(BasePanel):
         except Exception as exc:
             logger.warning("Could not save memory card selection: %s", exc)
 
+    def _validated_splitter_sizes(self, sizes, *, action: str):
+        if not isinstance(sizes, (list, tuple)):
+            logger.warning(
+                "Ignoring invalid memory card splitter state while %s: expected a list, got %r",
+                action,
+                sizes,
+            )
+            return None
+        try:
+            cleaned = [int(size) for size in sizes]
+        except (TypeError, ValueError) as exc:
+            logger.warning(
+                "Ignoring invalid memory card splitter state while %s: %s",
+                action,
+                exc,
+            )
+            return None
+        if len(cleaned) < 2:
+            logger.warning(
+                "Ignoring invalid memory card splitter state while %s: expected at least 2 sizes, got %r",
+                action,
+                cleaned,
+            )
+            return None
+        return cleaned
+
     def _save_splitter_sizes(self, *_args) -> None:
         splitter = getattr(self, "_splitter", None)
         if splitter is None:
             return
-        sizes = getattr(splitter, "sizes", lambda: [])()
-        if not isinstance(sizes, (list, tuple)):
-            return
-        try:
-            cleaned = [int(size) for size in sizes]
-        except (TypeError, ValueError):
-            return
-        if not cleaned:
+        cleaned = self._validated_splitter_sizes(
+            getattr(splitter, "sizes", lambda: [])(),
+            action="saving",
+        )
+        if cleaned is None:
             return
         self._panel_state_bucket()["splitter_sizes"] = cleaned
         try:
@@ -92,14 +115,13 @@ class MemoryCardPanel(BasePanel):
         splitter = getattr(self, "_splitter", None)
         if splitter is None:
             return
-        sizes = self._panel_state_bucket().get("splitter_sizes", [])
-        if not isinstance(sizes, (list, tuple)):
+        cleaned = self._validated_splitter_sizes(
+            self._panel_state_bucket().get("splitter_sizes", []),
+            action="restoring",
+        )
+        if cleaned is None:
             return
-        try:
-            cleaned = [int(size) for size in sizes]
-        except (TypeError, ValueError):
-            return
-        if len(cleaned) >= 2 and hasattr(splitter, "setSizes"):
+        if hasattr(splitter, "setSizes"):
             splitter.setSizes(cleaned)
 
     def _restore_selected_card(self) -> None:
@@ -114,6 +136,10 @@ class MemoryCardPanel(BasePanel):
             self._current_card = selected
             return
 
+        logger.warning(
+            "Saved memory card selection %r is no longer available; using the default entry",
+            selected,
+        )
         self._current_card = ""
         self._card_combo.setCurrentIndex(0)
 
