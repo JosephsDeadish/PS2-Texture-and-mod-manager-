@@ -2000,6 +2000,30 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         self.assertIn("suspicious_domain", warning.call_args.args[2])
         self.assertIn("cheats.json", warning.call_args.args[2])
 
+    def test_settings_panel_patreon_button_uses_shared_helper(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace()
+            with patch("src.ui.settings_panel.open_external_url", return_value=False) as open_mock:
+                SettingsPanel._open_patreon(fake)
+
+        from src.core.app_info import PATREON_URL
+
+        open_mock.assert_called_once_with(
+            PATREON_URL,
+            parent=fake,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
+
     def test_setup_wizard_finish_failure_logs_and_blocks_close(self):
         import sys
         from types import SimpleNamespace
@@ -2213,6 +2237,30 @@ class TestWidgetsLogging(unittest.TestCase):
         self.assertTrue(any("Could not build custom catalogue card" in msg for msg in logs.output))
         fake._status.setText.assert_called_once_with("bad entry")
         fake.accept.assert_not_called()
+
+    def test_open_external_url_failure_logs_warning_and_warns(self):
+        import sys
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.url_helpers", None)
+            from src.ui.url_helpers import open_external_url
+
+            with patch("src.ui.url_helpers.webbrowser.open", return_value=False):
+                with patch("PyQt6.QtWidgets.QMessageBox.warning") as warning:
+                    with self.assertLogs("src.ui.url_helpers", level="WARNING") as logs:
+                        ok = open_external_url(
+                            "https://patreon.com/ps2modmanager",
+                            parent=object(),
+                            context="Patreon page",
+                            title="Patreon Link Unavailable",
+                            failure_message=(
+                                "Could not open the Patreon page. Please copy the URL into your browser."
+                            ),
+                        )
+
+        self.assertFalse(ok)
+        warning.assert_called_once()
+        self.assertTrue(any("Failed to open Patreon page" in msg for msg in logs.output))
 
     def test_mod_notes_refresh_failure_logs_warning(self):
         import sys

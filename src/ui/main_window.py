@@ -31,6 +31,7 @@ from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
+from src.ui.url_helpers import open_external_url
 
 logger = logging.getLogger(__name__)
 
@@ -349,9 +350,15 @@ class MainWindow(QMainWindow):
         self._status_bar.showMessage(msg, 5000)
 
     def _open_patreon(self):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(PATREON_URL))
+        open_external_url(
+            PATREON_URL,
+            parent=self,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
 
     # ------------------------------------------------------------------
     # First-run / Setup Wizard

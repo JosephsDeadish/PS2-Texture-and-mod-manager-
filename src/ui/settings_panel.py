@@ -21,6 +21,7 @@ from src.core.link_checker import LinkChecker
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
+from src.ui.url_helpers import open_external_url
 from src.ui.theme import THEME_KEYS, apply_theme
 
 logger = logging.getLogger(__name__)
@@ -410,9 +411,15 @@ class SettingsPanel(BasePanel):
         self._partial_tex_chooser.set_path(paths.get("partial_textures_path", ""))
 
     def _open_patreon(self):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(PATREON_URL))
+        open_external_url(
+            PATREON_URL,
+            parent=self,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
 
     def reload_config(self, config: AppConfig):
         """Update displayed values when config changes."""
