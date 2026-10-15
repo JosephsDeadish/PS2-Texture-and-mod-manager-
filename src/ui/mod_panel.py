@@ -124,6 +124,52 @@ def _save_mod_panel_config(config: AppConfig, context: str) -> None:
         logger.warning("Could not save mod panel config after %s: %s", context, exc)
 
 
+def _mod_matches_query(mod: ModInfo, query: object) -> bool:
+    """Return True when *mod* matches the free-text search query."""
+    if not isinstance(query, str):
+        return False
+
+    needle = query.strip().casefold()
+    if not needle:
+        return True
+
+    compact = "".join(ch for ch in needle if ch.isalnum())
+
+    def _matches_text(value: object) -> bool:
+        if not isinstance(value, str):
+            return False
+        lowered = value.casefold()
+        if needle in lowered:
+            return True
+        if compact:
+            value_compact = "".join(ch for ch in lowered if ch.isalnum())
+            if compact in value_compact:
+                return True
+        return False
+
+    for value in (
+        mod.id,
+        mod.name,
+        mod.author,
+        mod.description,
+        mod.game_id,
+        mod.version,
+        mod.source_url,
+        mod.thumbnail_url,
+        mod.path,
+        getattr(mod.mod_type, "value", ""),
+    ):
+        if _matches_text(value):
+            return True
+
+    if any(_matches_text(tag) for tag in getattr(mod, "tags", []) if isinstance(tag, str)):
+        return True
+    if any(_matches_text(rel_path) for rel_path in getattr(mod, "files", []) if isinstance(rel_path, str)):
+        return True
+
+    return False
+
+
 class ModPanel(BasePanel):
     """
     Unified panel for managing mods of a specific type.
@@ -460,13 +506,7 @@ class ModPanel(BasePanel):
         sort_idx = self._sort_combo.currentIndex()
 
         if query:
-            mods = [
-                m for m in mods
-                if query in m.name.lower()
-                or (m.author and query in m.author.lower())
-                or (m.game_id and query in m.game_id.lower())
-                or (m.description and query in m.description.lower())
-            ]
+            mods = [m for m in mods if _mod_matches_query(m, query)]
 
         if author_filter:
             mods = [m for m in mods if m.author == author_filter]

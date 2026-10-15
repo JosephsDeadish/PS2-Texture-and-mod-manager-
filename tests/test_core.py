@@ -6421,6 +6421,30 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertEqual(panel._author_filter.currentData(), "TexMaster")
         self.assertTrue(panel._library_filter_check.isChecked())
 
+    def test_search_helper_matches_tags_source_url_files_and_type(self):
+        mod_panel = self._import_mod_panel()
+        mod = ModInfo(
+            id="mod-123",
+            name="High Res Pack",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/mods/high-res-pack",
+            author="TexMaster",
+            description="Improves textures",
+            game_id="SLUS-20062",
+            version="1.2.3",
+            source_url="https://github.com/example/high-res-pack",
+            tags=["HD", "4k"],
+            files=["textures/intro.dds", "pnach/SLUS-20062.pnach"],
+        )
+
+        self.assertTrue(mod_panel._mod_matches_query(mod, "hd"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "github"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "slus20062"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "intro.dds"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "1.2"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "texture"))
+        self.assertFalse(mod_panel._mod_matches_query(mod, "yakuza"))
+
     def test_save_filter_state_updates_config(self):
         mod_panel = self._import_mod_panel()
         ModPanel = mod_panel.ModPanel
