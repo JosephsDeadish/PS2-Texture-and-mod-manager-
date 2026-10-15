@@ -2892,6 +2892,14 @@ class TestGameRegistryExpanded(unittest.TestCase):
         serials = [s for s, _ in hits]
         self.assertEqual(serials, sorted(serials))
 
+    def test_title_to_serials_prefers_retail_over_demo_collisions(self):
+        from src.core.game_registry import title_to_serials
+
+        hits = title_to_serials("Ace Combat: Squadron Leader (PAL)")
+        self.assertGreater(len(hits), 1)
+        self.assertEqual(hits[0][0], "SCES-52424")
+        self.assertTrue(any(serial.startswith("SCED-") for serial, _ in hits))
+
     def test_title_to_serials_punctuation_insensitive(self):
         from src.core.game_registry import title_to_serials
         hits = title_to_serials("Baldurs Gate")

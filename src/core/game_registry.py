@@ -1266,6 +1266,10 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
         (serial, title) for serial, title in _KNOWN_SERIALS.items()
         if frag in title.lower() or frag_key in _normalise_search_text(title)
     }
+    exact_titles = {
+        _normalise_search_text(title) for _, title in pairs
+        if _normalise_search_text(title) == frag_key
+    }
     # Also resolve via serial DB aliases so abbreviations like "GoW" work.
     try:
         from src.core.serial_validator import SerialDatabase
@@ -1276,9 +1280,34 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
                 serial = _sdb.get_serial(title)
                 if serial:
                     pairs.add((serial, title))
+                    if _normalise_search_text(title) == frag_key:
+                        exact_titles.add(_normalise_search_text(title))
     except Exception as exc:
         logger.warning("Failed to resolve serial aliases for %r: %s", title_fragment, exc)
-    return sorted(pairs, key=lambda x: x[0])
+    if exact_titles:
+        try:
+            from src.core.serial_validator import SerialDatabase
+            _sdb = _serial_database_for_title_lookup(SerialDatabase)
+            exact_matches = sorted(
+                [
+                    (serial, title)
+                    for serial, title in pairs
+                    if _normalise_search_text(title) in exact_titles
+                ],
+                key=lambda x: (_sdb.is_demo_serial(x[0]), x[0], x[1]),
+            )
+            other_matches = sorted(
+                [
+                    (serial, title)
+                    for serial, title in pairs
+                    if _normalise_search_text(title) not in exact_titles
+                ],
+                key=lambda x: (x[0], x[1]),
+            )
+            return exact_matches + other_matches
+        except Exception as exc:
+            logger.warning("Failed to prioritise exact title matches for %r: %s", title_fragment, exc)
+    return sorted(pairs, key=lambda x: (x[0], x[1]))
 
 
 def is_valid_serial(text: str) -> bool:
