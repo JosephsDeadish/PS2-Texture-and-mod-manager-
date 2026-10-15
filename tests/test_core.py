@@ -4560,6 +4560,103 @@ class TestScraperDialogClassifier(unittest.TestCase):
         card._cover_lbl.setPixmap.assert_not_called()
         card._cover_lbl.setText.assert_not_called()
 
+    def test_browse_search_helper_matches_source_serial_and_alias(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import _entry_matches_query
+
+        class DummySerialDB:
+            def title_matches_query(self, title, query):
+                return title == "Grand Theft Auto III" and query == "gta iii"
+
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "GBAtemp",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "gbatemp"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "SLUS-20370",
+            "game": "",
+            "tags": [],
+        }, "slus20370"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "4x AI upscale",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "4x"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Grand Theft Auto III",
+            "tags": [],
+        }, "gta iii", DummySerialDB()))
+        self.assertFalse(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "missing"))
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
@@ -20717,11 +20814,13 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         self.assertTrue(hasattr(SerialDatabase, "title_matches_query"))
 
     def test_browse_panel_uses_title_matches_query(self):
-        """browse_panel.apply_filters must use title_matches_query for alias expansion."""
+        """browse_panel.apply_filters must use the shared search helper."""
         from pathlib import Path
         src = (Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py").read_text(encoding="utf-8")
-        self.assertIn("title_matches_query", src,
-                      "apply_filters must call title_matches_query for alias-aware search")
+        self.assertIn("_entry_matches_query", src,
+                      "apply_filters must call the shared browse search helper")
+        for snippet in ("title_matches_query", "game_serial", "source"):
+            self.assertIn(snippet, src)
 
     def test_browse_panel_logs_best_effort_failures(self):
         from pathlib import Path

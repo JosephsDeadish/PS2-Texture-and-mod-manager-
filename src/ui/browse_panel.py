@@ -2,7 +2,7 @@
 
 Features:
 - Tabbed browsing per mod type (All / Textures / PNACH / Covers / Saves / Cheats)
-- Live search across catalogue entries (name, game, author, tags)
+- Live search across catalogue entries (name, game, serial, source, author, tags)
 - Source filter dropdown (filter by hosting site)
 - Author filter / favorite authors (❤ toggle to mark favorite)
 - "Download from URL" dialog with Google Drive conversion
@@ -121,6 +121,57 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
         return True
     if action == "" and bool(entry.get("direct_download_url", "")):
         return True
+    return False
+
+
+def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = None) -> bool:
+    """Return True when *entry* matches the browse search query."""
+    needle = query.strip().casefold()
+    if not needle:
+        return True
+
+    compact = "".join(ch for ch in needle if ch.isalnum())
+
+    def _contains(field_name: str) -> bool:
+        value = entry.get(field_name, "")
+        return isinstance(value, str) and needle in value.casefold()
+
+    for field_name in (
+        "name", "description", "author", "context", "source",
+        "upscale_tech", "size_label",
+    ):
+        if _contains(field_name):
+            return True
+
+    game_serial = entry.get("game_serial", "")
+    if isinstance(game_serial, str):
+        serial_lower = game_serial.casefold()
+        if needle in serial_lower:
+            return True
+        if compact:
+            serial_compact = "".join(ch for ch in serial_lower if ch.isalnum())
+            if compact in serial_compact:
+                return True
+
+    tags = entry.get("tags", [])
+    if isinstance(tags, list) and any(
+        isinstance(tag, str) and needle in tag.casefold()
+        for tag in tags
+    ):
+        return True
+
+    game_field = entry.get("game", "")
+    if isinstance(game_field, str):
+        if needle in game_field.casefold():
+            return True
+        title_matches_query = getattr(serial_db, "title_matches_query", None)
+        if (
+            callable(title_matches_query)
+            and game_field
+            and title_matches_query(game_field, needle)
+        ):
+            return True
+
     return False
 
 
@@ -2065,7 +2116,7 @@ class _CatalogueTabContent(QWidget):
         self._show_incomplete = show_incomplete
         self._in_app_only = in_app_only
 
-        q = query.lower()
+        q = query.strip()
         fav_authors = getattr(self.config, "favorite_authors", [])
 
         # Resolve alias-aware game title matching via the serial database.
@@ -2096,27 +2147,8 @@ class _CatalogueTabContent(QWidget):
             # In-app download filter — hide entries that require a browser or external tool
             if in_app_only and not _entry_is_in_app_downloadable(e):
                 continue
-            if q:
-                game_field = e.get("game", "")
-                # Alias-aware game field matching: if the query doesn't match
-                # the raw game string, check via SerialDatabase aliases.
-                game_matches = (
-                    q in game_field.lower()
-                    or (
-                        _sdb is not None
-                        and game_field
-                        and _sdb.title_matches_query(game_field, q)
-                    )
-                )
-                if not (
-                    q in e.get("name", "").lower()
-                    or q in e.get("description", "").lower()
-                    or q in e.get("author", "").lower()
-                    or game_matches
-                    or q in e.get("context", "").lower()
-                    or any(q in t.lower() for t in e.get("tags", []))
-                ):
-                    continue
+            if q and not _entry_matches_query(e, q, _sdb):
+                continue
             if source and e.get("source", "") != source:
                 continue
             if author and e.get("author", "") != author:
