@@ -9160,9 +9160,11 @@ class TestUserCatalogueLoader(unittest.TestCase):
             json.dumps([entry]), encoding="utf-8"
         )
 
-        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["thumbnail_url"], "")
+        self.assertTrue(any("generic favicon placeholder" in msg for msg in logs.output))
 
     def test_load_user_catalogue_rejects_non_string_url(self):
         from src.core.catalogue_loader import load_user_catalogue
@@ -11758,6 +11760,26 @@ class TestSerialDatabase(unittest.TestCase):
             self.sdb.get_serial("Crash Twinsanity"), "SLUS-20909"
         )
 
+    def test_catalogue_title_variants_resolve_through_normalized_aliases(self):
+        cases = [
+            ("Killer 7", "Killer7"),
+            ("Wild Arms 3", "Wild ARMs 3"),
+            ("Star Wars Battlefront II", "Star Wars: Battlefront II"),
+            ("Dark Chronicle (Dark Cloud 2)", "Dark Cloud 2"),
+            ("Fahrenheit / Indigo Prophecy", "Indigo Prophecy"),
+        ]
+
+        for query, canonical in cases:
+            with self.subTest(query=query):
+                info = self.sdb.get_info(query)
+                self.assertIsNotNone(info)
+                self.assertEqual(info.title, canonical)
+                self.assertEqual(self.sdb.get_serial(query), self.sdb.get_serial(canonical))
+
+        for ambiguous in ("Prince of Persia Trilogy", "Silent Hill series"):
+            with self.subTest(query=ambiguous):
+                self.assertIsNone(self.sdb.get_info(ambiguous))
+
     def test_demo_collisions_keep_retail_canonical(self):
         """Exact-title demo collisions should resolve to the intended canonical entry."""
         cases = [
@@ -12502,6 +12524,27 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "invalid_download_action")
         self.assertEqual(issues[0].field_name, "download_action")
+
+    def test_automatic_download_actions_require_direct_download_url(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+                "download_action": "gdrive",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
+        self.assertEqual(issues[0].field_name, "direct_download_url")
+        self.assertIn("download_action", issues[0].detail)
 
     def test_save_entries_require_direct_download_url(self):
         from src.core.link_checker import LinkChecker

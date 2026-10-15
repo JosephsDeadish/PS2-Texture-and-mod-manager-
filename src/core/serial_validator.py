@@ -193,6 +193,7 @@ class SerialDatabase:
         self._serial_to_titles: Dict[str, List[str]] = {}  # serial → game titles
         self._crc_to_title: Dict[str, str] = {}            # CRC (upper) → game title
         self._alias_to_titles: Dict[str, List[str]] = {}   # alias lower → game titles
+        self._normalized_to_titles: Dict[str, List[str]] = {}
         self._demo_serials: Set[str] = set()               # serials that belong to demo/kiosk discs
         self._load()
 
@@ -217,6 +218,7 @@ class SerialDatabase:
         self._serial_to_titles = {}
         self._crc_to_title = {}
         self._alias_to_titles = {}
+        self._normalized_to_titles = {}
         self._demo_serials = set()
         def _merge_optional_text(current: Optional[str], incoming: Optional[str]) -> Optional[str]:
             """Keep current non-empty value; otherwise take incoming non-empty value."""
@@ -233,6 +235,21 @@ class SerialDatabase:
                     out.append(item)
                     seen.add(item)
             return out
+
+        def _register_normalized_title(title: str, *terms: str) -> None:
+            """Map normalized title or alias strings back to *title*.
+
+            The lookup is intentionally conservative: only exact normalized
+            matches are registered, and callers still need to resolve any
+            ambiguous collisions explicitly.
+            """
+            for term in (title, *terms):
+                key = _normalise_search_text(term)
+                if not key:
+                    continue
+                titles = self._normalized_to_titles.setdefault(key, [])
+                if title not in titles:
+                    titles.append(title)
 
         # Retail databases first (NTSC-U, PAL, Japan), then demos
         retail_paths = (self._path, self._pal_path, self._jp_path)
@@ -274,6 +291,7 @@ class SerialDatabase:
                         self._crc_to_title[crc.upper()] = title
                     for alias in incoming.aliases:
                         self._alias_to_titles.setdefault(alias.lower(), []).append(title)
+                    _register_normalized_title(title, *incoming.aliases)
                     continue
 
                 old_serials = set(existing.all_serials())
@@ -306,6 +324,7 @@ class SerialDatabase:
                     self._crc_to_title[crc] = title
                 for alias in ({a.lower() for a in existing.aliases} - old_aliases):
                     self._alias_to_titles.setdefault(alias, []).append(title)
+                _register_normalized_title(title, *existing.aliases)
         # Demo / kiosk / promo database
         if self._demo_path.is_file():
             try:
@@ -352,6 +371,7 @@ class SerialDatabase:
                     self._crc_to_title[crc.upper()] = title
                 for alias in gi.aliases:
                     self._alias_to_titles.setdefault(alias.lower(), []).append(title)
+                _register_normalized_title(title, *gi.aliases)
 
     def reload(self) -> None:
         """Reload the database from disk (picks up on-disk changes)."""
@@ -361,19 +381,62 @@ class SerialDatabase:
     # Lookup helpers
     # ------------------------------------------------------------------
 
+    def _resolve_title(self, title: str) -> Optional[str]:
+        """Return the canonical database key for *title* when it can be inferred."""
+        if not title:
+            return None
+        if title in self._games:
+            return title
+
+        def _title_candidates(text: str) -> List[str]:
+            seen: Set[str] = set()
+            candidates: List[str] = []
+
+            def _add(candidate: str) -> None:
+                candidate = candidate.strip()
+                if candidate and candidate not in seen:
+                    seen.add(candidate)
+                    candidates.append(candidate)
+
+            _add(text)
+            stripped = re.sub(r"\s*\([^)]*\)", "", text).strip()
+            _add(stripped)
+
+            # Only split on spaced slash separators so title-internal ``//``
+            # markers (e.g. ``.hack//G.U.``) remain intact.
+            if " / " in text:
+                for part in (piece.strip() for piece in text.split(" / ") if piece.strip()):
+                    _add(part)
+                    _add(re.sub(r"\s*\([^)]*\)", "", part).strip())
+
+            return candidates
+
+        for candidate in _title_candidates(title):
+            if candidate in self._games:
+                return candidate
+            key = _normalise_search_text(candidate)
+            if not key:
+                continue
+            matches = self._normalized_to_titles.get(key, [])
+            if len(matches) == 1:
+                return matches[0]
+
+        return None
+
     def get_info(self, title: str) -> Optional[GameInfo]:
-        """Return the :class:`GameInfo` for *title*, or ``None``."""
-        return self._games.get(title)
+        """Return the :class:`GameInfo` for *title* or a unique alias match."""
+        resolved = self._resolve_title(title)
+        return self._games.get(resolved) if resolved else None
 
     def get_serial(self, title: str) -> Optional[str]:
-        """Return the primary canonical serial for *title*, or ``None``."""
-        gi = self._games.get(title)
+        """Return the primary canonical serial for *title* or a unique alias."""
+        gi = self.get_info(title)
         return gi.serial if gi else None
 
 
     def get_alt_serials(self, title: str) -> List[str]:
         """Return the list of known alt/legacy serials for *title*."""
-        gi = self._games.get(title)
+        gi = self.get_info(title)
         return list(gi.alt_serials) if gi else []
 
     def is_valid(self, title: str, serial: str) -> bool:
@@ -382,12 +445,12 @@ class SerialDatabase:
         Note: alt/legacy serials return ``False`` here — they are known but
         not the preferred canonical value.
         """
-        gi = self._games.get(title)
+        gi = self.get_info(title)
         return bool(gi and gi.serial == serial)
 
     def is_known(self, title: str, serial: str) -> bool:
         """Return ``True`` if *serial* is any known serial (primary or alt)."""
-        gi = self._games.get(title)
+        gi = self.get_info(title)
         return bool(gi and serial in gi.all_serials())
 
     def titles_for_serial(self, serial: str) -> List[str]:

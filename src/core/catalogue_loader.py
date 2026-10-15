@@ -270,6 +270,11 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     if isinstance(entry.get("thumbnail_url"), str) and _is_placeholder_thumbnail_url(entry["thumbnail_url"]):
         # Generic favicons are not useful cover art and only add noise when the
         # game-specific cover lookup fails, so treat them as absent.
+        log.warning(
+            "[%s] entry %r: thumbnail_url uses a generic favicon placeholder; clearing it",
+            source_file.name,
+            entry.get("id", "?"),
+        )
         entry["thumbnail_url"] = ""
     if isinstance(entry.get("direct_download_url"), str):
         # Preserve fragments for hosts such as MEGA where the file key lives in

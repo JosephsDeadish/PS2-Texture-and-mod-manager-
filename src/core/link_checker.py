@@ -304,6 +304,7 @@ class LinkChecker:
                             ),
                         ))
 
+            action = ""
             raw_action = entry.get("download_action", "")
             if raw_action not in ("", None):
                 if not isinstance(raw_action, str):
@@ -327,8 +328,18 @@ class LinkChecker:
                             detail=f"unrecognised download action {raw_action!r}",
                         ))
 
+            direct_download_required = (
+                bool(required_url_fields)
+                and entry_kind in {"pnach", "cheat", "save_file"}
+                and "direct_download_url" in required_url_fields
+            )
+            if action in {"pnach_crc", "gdrive", "yandex"}:
+                direct_download_required = True
+
             if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
                 for field_name in required_url_fields:
+                    if field_name == "direct_download_url":
+                        continue
                     raw_required = entry.get(field_name, "")
                     if isinstance(raw_required, str) and raw_required.strip():
                         continue
@@ -339,6 +350,21 @@ class LinkChecker:
                         url="",
                         issue_type="empty_required",
                         detail=f"missing required {field_name!r} for {entry_kind} entry",
+                    ))
+
+            if direct_download_required:
+                raw_required = entry.get("direct_download_url", "")
+                if not (isinstance(raw_required, str) and raw_required.strip()):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="direct_download_url",
+                        url="",
+                        issue_type="empty_required",
+                        detail=(
+                            f"missing required 'direct_download_url' for {entry_kind} entry"
+                            + (f" with {action!r} download_action" if action else "")
+                        ),
                     ))
 
             for field_name in _URL_FIELDS:
