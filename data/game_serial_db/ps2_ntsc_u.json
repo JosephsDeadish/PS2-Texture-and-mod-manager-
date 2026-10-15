@@ -1219,7 +1219,8 @@
       "aliases": [
         "AT2",
         "Ar Tonelico 2",
-        "Ar tonelico 2"
+        "Ar tonelico 2",
+        "Ar tonelico 2: Melody of Metafalica"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -5738,7 +5739,9 @@
       "developer": "Capcom",
       "publisher": "Capcom",
       "genre": "Action, Platformer, Beat'em Up, Survival Horror",
-      "aliases": [],
+      "aliases": [
+        "Devil May Cry 2 (alt serial)"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "Devil May Cry 3: Dante's Awakening": {
@@ -12740,7 +12743,8 @@
       "publisher": "Atari",
       "genre": "Action, Adventure",
       "aliases": [
-        "Fahrenheit"
+        "Fahrenheit",
+        "Fahrenheit / Indigo Prophecy"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -14223,7 +14227,9 @@
       "developer": "Nippon Ichi",
       "publisher": "Mastiff, LLC",
       "genre": "Tactical RPG",
-      "aliases": [],
+      "aliases": [
+        "La Pucelle: Ragnarok"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "Lara Croft Tomb Raider - Anniversary": {
@@ -21745,7 +21751,8 @@
       "aliases": [
         "PoP",
         "PoP SoT",
-        "Prince of Persia SoT"
+        "Prince of Persia SoT",
+        "Prince of Persia Trilogy"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -21766,7 +21773,8 @@
       "publisher": "Ubisoft",
       "genre": "Action, Adventure, Platform",
       "aliases": [
-        "PoP TT"
+        "PoP TT",
+        "Prince of Persia Trilogy"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -21787,7 +21795,8 @@
       "publisher": "Ubisoft",
       "genre": "Action, Adventure, Platform",
       "aliases": [
-        "PoP WW"
+        "PoP WW",
+        "Prince of Persia Trilogy"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -22572,7 +22581,9 @@
       "developer": "Ubisoft Entertainment",
       "publisher": "Ubisoft Entertainment SA",
       "genre": "Platformer",
-      "aliases": [],
+      "aliases": [
+        "Rayman 2: The Great Escape"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "Rayman 3: Hoodlum Havoc": {
@@ -25407,7 +25418,8 @@
       "genre": "Action, Adventure, Survival Horror",
       "aliases": [
         "SH 2",
-        "SH2"
+        "SH2",
+        "Silent Hill series"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -25438,7 +25450,8 @@
       "genre": "Action, Adventure, Survival Horror",
       "aliases": [
         "SH 3",
-        "SH3"
+        "SH3",
+        "Silent Hill series"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -25468,7 +25481,8 @@
       "aliases": [
         "SH 4",
         "SH4",
-        "The Room"
+        "The Room",
+        "Silent Hill series"
       ],
       "src": "Informative doccument/PS2.data.json"
     },
@@ -25487,7 +25501,9 @@
       "developer": "Climax Group",
       "publisher": "Konami",
       "genre": "Survival Horror",
-      "aliases": [],
+      "aliases": [
+        "Silent Hill series"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "Silent Hill: Shattered Memories": {
@@ -25502,7 +25518,9 @@
       "developer": "Climax Studios Ltd",
       "publisher": "Konami",
       "genre": "Survival Horror",
-      "aliases": [],
+      "aliases": [
+        "Silent Hill series"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "Silent Scope": {
@@ -29381,7 +29399,9 @@
       "developer": "Maxis",
       "publisher": "Electronic Arts",
       "genre": "Simulation",
-      "aliases": [],
+      "aliases": [
+        "Sims, The"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "The Sims 2": {

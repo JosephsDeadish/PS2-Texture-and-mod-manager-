@@ -9972,6 +9972,47 @@ class TestSerialDatabase(unittest.TestCase):
             self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20873"
         )
 
+    def test_catalogue_title_variants_resolve_through_aliases(self):
+        from src.core.game_registry import title_to_serials
+
+        cases = [
+            ("Fahrenheit / Indigo Prophecy", ("SLUS-21196", "Indigo Prophecy")),
+            ("Ar tonelico 2: Melody of Metafalica", ("SLUS-21788", "Ar tonelico II: Melody of Metafalica")),
+            ("La Pucelle: Ragnarok", ("SLUS-20847", "La Pucelle: Tactics")),
+            ("Rayman 2: The Great Escape", ("SLUS-20138", "Rayman 2: Revolution")),
+            ("Sims, The", ("SLUS-20573", "The Sims")),
+            ("Devil May Cry 2 (alt serial)", ("SLUS-20627", "Devil May Cry 2 (Disc 2)")),
+            ("Incredibles, The", ("SLES-52812", "The Incredibles (PAL)")),
+        ]
+        for query, expected in cases:
+            with self.subTest(query=query):
+                self.assertIn(expected, title_to_serials(query))
+
+        series_cases = [
+            (
+                "Prince of Persia Trilogy",
+                {
+                    "Prince of Persia: The Sands of Time",
+                    "Prince of Persia: Warrior Within",
+                    "Prince of Persia: The Two Thrones",
+                },
+            ),
+            (
+                "Silent Hill series",
+                {
+                    "Silent Hill 2",
+                    "Silent Hill 3",
+                    "Silent Hill 4: The Room",
+                    "Silent Hill: Origins",
+                    "Silent Hill: Shattered Memories",
+                },
+            ),
+        ]
+        for query, expected_titles in series_cases:
+            with self.subTest(query=query):
+                titles = {title for _, title in title_to_serials(query)}
+                self.assertTrue(expected_titles.issubset(titles))
+
     def test_hack_infection_serial(self):
         # CRC D3C7A0A3 confirms SLUS-20267
         self.assertEqual(self.sdb.get_serial(".hack//Infection"), "SLUS-20267")

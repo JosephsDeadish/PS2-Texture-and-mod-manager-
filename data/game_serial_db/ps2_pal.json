@@ -35814,7 +35814,9 @@
       "publisher": "THQ",
       "genre": "Action, Adventure, Platformer",
       "language": "English",
-      "aliases": [],
+      "aliases": [
+        "Incredibles, The"
+      ],
       "src": "Informative doccument/PS2.data.json"
     },
     "The Incredibles: Os Super-Heróis (PAL)": {
