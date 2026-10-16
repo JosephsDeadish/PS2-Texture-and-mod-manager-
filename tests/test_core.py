@@ -5867,6 +5867,9 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             def text(self):
                 return self.value
 
+            def text(self):
+                return self.value
+
         class FakeComboBox:
             def __init__(self, items):
                 self.items = list(items)
@@ -5978,18 +5981,6 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
             def setText(self, value):
                 self.value = value
-
-            def text(self):
-                return self.value
-
-            def text(self):
-                return self.value
-
-            def text(self):
-                return self.value
-
-            def text(self):
-                return self.value
 
             def text(self):
                 return self.value
@@ -6368,6 +6359,105 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(dlg._region_combo.currentText(), "JP")
         self.assertEqual(dlg._bulk_region_combo.currentText(), "EU")
         self.assertFalse(dlg._skip_existing_check.isChecked())
+
+    def test_cover_dialog_restore_sanitizes_invalid_state(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig(
+            ui_state={
+                browse_panel._COVER_DOWNLOAD_STATE_KEY: {
+                    "selected_tab": 99,
+                    "search_query": "  God of War  ",
+                    "single_region": "Not a region",
+                    "bulk_region": "Still not a region",
+                    "skip_existing": False,
+                }
+            }
+        )
+        dlg._tabs = FakeTabs(count=2)
+        dlg._search_edit = FakeLineEdit()
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._skip_existing_check = FakeCheckBox()
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            dlg._restore_state()
+
+        self.assertEqual(dlg._tabs.currentIndex(), 1)
+        self.assertEqual(dlg._search_edit.value, "God of War")
+        self.assertEqual(dlg._region_combo.currentText(), "EN")
+        self.assertEqual(dlg._bulk_region_combo.currentText(), "EN")
+        self.assertFalse(dlg._skip_existing_check.isChecked())
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["selected_tab"],
+            1,
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["search_query"],
+            "God of War",
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["single_region"],
+            "EN",
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["bulk_region"],
+            "EN",
+        )
+        save_mock.assert_called_once_with(dlg.config, "sanitizing cover download dialog state")
 
     def test_cover_dialog_save_persists_state(self):
         import types
@@ -8382,15 +8472,25 @@ class TestModPanelEmptyState(unittest.TestCase):
         ])
         panel._library_filter_check = FakeCheckBox()
 
-        with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
-            ModPanel._restore_filter_state(panel)
+        with patch.object(mod_panel, "_save_mod_panel_config") as save_mock:
+            with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
+                ModPanel._restore_filter_state(panel)
 
         self.assertEqual(panel._search.value, "gta")
         self.assertEqual(panel._sort_combo.currentIndex(), 0)
         self.assertEqual(panel._author_filter.currentData(), "")
         self.assertFalse(panel._library_filter_check.isChecked())
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["texture_pack"]["sort_index"],
+            0,
+        )
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["texture_pack"]["author"],
+            "",
+        )
         self.assertTrue(any("sort index" in msg for msg in logs.output), logs.output)
         self.assertTrue(any("author filter" in msg for msg in logs.output), logs.output)
+        save_mock.assert_called_once_with(panel.config, "sanitizing mod panel filter state")
 
     def test_search_helper_matches_tags_source_url_files_and_type(self):
         mod_panel = self._import_mod_panel()

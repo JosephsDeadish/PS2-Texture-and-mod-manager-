@@ -1101,28 +1101,41 @@ class CoverDownloadDialog(QDialog):
             "skip_existing": skip_existing,
         }
 
-    def _save_state(self, *_args) -> None:
+    def _save_state(self, *_args, context: str = "updating cover download dialog state") -> None:
         bucket = self._cover_state_bucket()
         bucket.update(self._cover_state())
-        _save_browse_config(self.config, "updating cover download dialog state")
+        _save_browse_config(self.config, context)
 
     def _restore_state(self) -> None:
         bucket = self._cover_state_bucket()
+        state_changed = False
         search_query = str(bucket.get("search_query", "") or "")
+        stripped_query = search_query.strip()
+        if stripped_query != search_query:
+            state_changed = True
+        search_query = stripped_query
         if hasattr(self, "_search_edit") and hasattr(self._search_edit, "setText"):
             self._search_edit.setText(search_query)
-        self._set_combo_text(self._region_combo, bucket.get("single_region", "EN"))
-        self._set_combo_text(self._bulk_region_combo, bucket.get("bulk_region", "EN"))
+        if not self._set_combo_text(self._region_combo, bucket.get("single_region", "EN")):
+            state_changed = True
+        if not self._set_combo_text(self._bulk_region_combo, bucket.get("bulk_region", "EN")):
+            state_changed = True
         self._skip_existing_check.setChecked(bool(bucket.get("skip_existing", True)))
         try:
             selected_tab = int(bucket.get("selected_tab", 0) or 0)
         except (TypeError, ValueError):
             selected_tab = 0
+            state_changed = True
         tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
         if tab_count > 0:
-            self._tabs.setCurrentIndex(max(0, min(selected_tab, tab_count - 1)))
+            clamped_tab = max(0, min(selected_tab, tab_count - 1))
+            if clamped_tab != selected_tab:
+                state_changed = True
+            self._tabs.setCurrentIndex(clamped_tab)
+        elif selected_tab != 0:
+            state_changed = True
         if state_changed:
-            self._save_state("sanitizing cover download dialog state")
+            self._save_state(context="sanitizing cover download dialog state")
 
     def _wire_state_persistence(self) -> None:
         self._tabs.currentChanged.connect(self._save_state)
@@ -1131,12 +1144,14 @@ class CoverDownloadDialog(QDialog):
         self._skip_existing_check.stateChanged.connect(self._save_state)
 
     @staticmethod
-    def _set_combo_text(combo, value: object) -> None:
+    def _set_combo_text(combo, value: object) -> bool:
         text = value if isinstance(value, str) else str(value or "")
         finder = getattr(combo, "findText", None)
         index = finder(text) if callable(finder) else -1
         if index >= 0:
             combo.setCurrentIndex(index)
+            return True
+        return False
 
     # ------------------------------------------------------------------
     # Game-name search helpers

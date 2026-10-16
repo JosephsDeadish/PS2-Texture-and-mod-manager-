@@ -523,12 +523,15 @@ class ModPanel(BasePanel):
         if not state:
             return
 
+        should_save = False
         _block_signals(self._search, True)
         _block_signals(self._sort_combo, True)
         _block_signals(self._author_filter, True)
         _block_signals(self._library_filter_check, True)
         try:
-            self._search.setText(str(state.get("query", "")))
+            query = str(state.get("query", ""))
+            self._search.setText(query)
+            state["query"] = query
 
             sort_idx = state.get("sort_index", 0)
             try:
@@ -537,31 +540,45 @@ class ModPanel(BasePanel):
                 sort_idx = 0
             if 0 <= sort_idx < self._sort_combo.count():
                 self._sort_combo.setCurrentIndex(sort_idx)
+                state["sort_index"] = sort_idx
             else:
                 logger.warning(
                     "Saved mod-panel sort index %r is no longer available; using the default sort order",
                     sort_idx,
                 )
+                self._sort_combo.setCurrentIndex(0)
+                state["sort_index"] = 0
+                should_save = True
 
             author = str(state.get("author", "") or "")
             if author:
                 idx = self._author_filter.findData(author)
                 if idx >= 0:
                     self._author_filter.setCurrentIndex(idx)
+                    state["author"] = author
                 else:
                     logger.warning(
                         "Saved mod-panel author filter %r is no longer available; using All Authors",
                         author,
                     )
+                    self._author_filter.setCurrentIndex(0)
+                    state["author"] = ""
+                    should_save = True
             else:
                 self._author_filter.setCurrentIndex(0)
+                state["author"] = ""
 
-            self._library_filter_check.setChecked(bool(state.get("library_only", False)))
+            library_only = bool(state.get("library_only", False))
+            self._library_filter_check.setChecked(library_only)
+            state["library_only"] = library_only
         finally:
             _block_signals(self._search, False)
             _block_signals(self._sort_combo, False)
             _block_signals(self._author_filter, False)
             _block_signals(self._library_filter_check, False)
+
+        if should_save:
+            _save_mod_panel_config(self.config, "sanitizing mod panel filter state")
 
     def _save_filter_state(self, context: str):
         if not getattr(self, "_state_persistence_enabled", False):
