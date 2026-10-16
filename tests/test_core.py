@@ -17442,6 +17442,23 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         self.assertEqual(result[0].serial, "SLUS-20062")
         self.assertFalse(result[0].same_content)
 
+    def test_conflict_detected_case_insensitive_shared_filename(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "abc.png").write_bytes(b"\x89PNG" + b"\x03" * 200)
+        Path(pb, "ABC.PNG").write_bytes(b"\x89PNG" + b"\x04" * 200)
+
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].texture_id, "abc.png")
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertFalse(result[0].same_content)
+
     def test_conflict_same_content_detected(self):
         from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
         tex = os.path.join(self.tmpdir, "textures")

@@ -806,6 +806,11 @@ _TEXTURE_EXTS: frozenset[str] = frozenset({
 })
 
 
+def _texture_key(name: str) -> str:
+    """Return a case-insensitive key for a texture filename."""
+    return name.casefold()
+
+
 def _scan_replacements_dir(
     replacements: Path,
 ) -> Dict[str, Path]:
@@ -816,8 +821,10 @@ def _scan_replacements_dir(
             dirnames.sort()
             for fname in sorted(files):
                 if Path(fname).suffix.lower() in _TEXTURE_EXTS:
-                    # Key on the basename — this is what PCSX2 matches against.
-                    result.setdefault(fname, Path(dirpath) / fname)
+                    # Key on a case-insensitive basename — PCSX2 filename
+                    # matching is effectively case-insensitive on the common
+                    # Windows install path, so case-only variants still clash.
+                    result.setdefault(_texture_key(fname), Path(dirpath) / fname)
     except PermissionError as exc:
         logger.warning("Could not scan replacements directory %s: %s", replacements, exc)
     return result
@@ -902,7 +909,7 @@ def resolve_texture_overwrite_conflicts(
                     path_b = map_b[tid]
                     same = _files_have_same_content(path_a, path_b)
                     conflicts.append(TextureOverwriteConflict(
-                        texture_id=tid,
+                        texture_id=path_a.name,
                         serial=serial,
                         pack_a_id=pack_a_id,
                         pack_a_path=path_a,
