@@ -193,6 +193,14 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
     ):
         return True
 
+    get_info = getattr(serial_db, "get_info", None)
+    if callable(get_info) and isinstance(game_field, str) and game_field:
+        game_info = get_info(game_field)
+        if game_info is not None:
+            for field_name in ("release_date", "developer", "publisher", "genre"):
+                if _matches_text(getattr(game_info, field_name, "")):
+                    return True
+
     return False
 
 

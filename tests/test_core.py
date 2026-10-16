@@ -5054,6 +5054,17 @@ class TestScraperDialogClassifier(unittest.TestCase):
             def title_matches_query(self, title, query):
                 return title == "Grand Theft Auto III" and query == "gta iii"
 
+            def get_info(self, title):
+                if title == "Final Fantasy X":
+                    from types import SimpleNamespace
+                    return SimpleNamespace(
+                        release_date="2001-12-17",
+                        developer="Square Product Development Division 1",
+                        publisher="Square",
+                        genre="Role-playing",
+                    )
+                return None
+
         self.assertTrue(_entry_matches_query({
             "name": "Some Pack",
             "description": "",
@@ -5130,6 +5141,42 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "game": "Grand Theft Auto III",
             "tags": [],
         }, "gta iii", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "square", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "roleplaying", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "2001-12-17", DummySerialDB()))
         self.assertFalse(_entry_matches_query({
             "name": "Some Pack",
             "description": "",
