@@ -6409,6 +6409,73 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
         save_mock.assert_called_once_with(panel.config)
 
+    def test_history_filters_restore_invalid_values_are_logged(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            download_history_status_filter="Archived",
+            download_history_type_filter=object(),
+            download_history_serial_filter=12345,
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=2)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ], index=4)
+        panel._serial_edit = FakeLineEdit("SLUS-20228")
+
+        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+            panel._restore_history_filters()
+
+        self.assertEqual(panel._status_combo.currentText(), "All")
+        self.assertEqual(panel._type_combo.currentText(), "All")
+        self.assertEqual(panel._serial_edit.value, "12345")
+        self.assertTrue(
+            any("status filter" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("type filter" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_clear_history_filters_resets_widgets_and_refreshes(self):
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
@@ -6639,6 +6706,41 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             "entry-2",
         )
         save_mock.assert_not_called()
+
+    def test_history_selection_restore_warns_when_entry_missing(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeListWidget:
+            def __init__(self):
+                self.current_row = -1
+                self.set_calls = 0
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                self.set_calls += 1
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": "missing-entry"}}
+        )
+        panel._history_entries = [
+            types.SimpleNamespace(id="entry-1"),
+            types.SimpleNamespace(id="entry-2"),
+        ]
+        panel._list_widget = FakeListWidget()
+
+        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+            panel._restore_history_selection()
+
+        self.assertEqual(panel._list_widget.set_calls, 0)
+        self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertTrue(
+            any("no longer available" in msg for msg in logs.output),
+            logs.output,
+        )
 
     def test_history_selection_change_saves_entry_id(self):
         import types

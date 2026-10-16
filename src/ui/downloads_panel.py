@@ -241,6 +241,10 @@ class DownloadsPanel(BasePanel):
             finally:
                 self._history_state_syncing = False
             return
+        logger.warning(
+            "Saved download history entry %r is no longer available; clearing selection",
+            entry_id,
+        )
 
     def _clear_history_filters(self) -> None:
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
@@ -450,16 +454,38 @@ class DownloadsPanel(BasePanel):
         status = getattr(self.config, "download_history_status_filter", "All") or "All"
         mod_type = getattr(self.config, "download_history_type_filter", "All") or "All"
         serial = getattr(self.config, "download_history_serial_filter", "") or ""
+        if not isinstance(status, str):
+            status = str(status)
+        if not isinstance(mod_type, str):
+            mod_type = str(mod_type)
+        if not isinstance(serial, str):
+            serial = str(serial)
 
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
             widget.blockSignals(True)
 
+        all_status_idx = self._status_combo.findText("All")
         idx = self._status_combo.findText(status)
         if idx >= 0:
             self._status_combo.setCurrentIndex(idx)
+        elif status != "All":
+            logger.warning(
+                "Saved download history status filter %r is no longer available; using All",
+                status,
+            )
+            if all_status_idx >= 0:
+                self._status_combo.setCurrentIndex(all_status_idx)
+        all_type_idx = self._type_combo.findText("All")
         idx = self._type_combo.findText(mod_type)
         if idx >= 0:
             self._type_combo.setCurrentIndex(idx)
+        elif mod_type != "All":
+            logger.warning(
+                "Saved download history type filter %r is no longer available; using All",
+                mod_type,
+            )
+            if all_type_idx >= 0:
+                self._type_combo.setCurrentIndex(all_type_idx)
         self._serial_edit.setText(serial)
 
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
