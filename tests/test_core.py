@@ -8267,6 +8267,90 @@ class TestModPanelEmptyState(unittest.TestCase):
         )
         save_mock.assert_called_once_with(panel.config)
 
+    def test_enable_all_confirms_before_bulk_deploy(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        mods = [
+            types.SimpleNamespace(id="one", enabled=False),
+            types.SimpleNamespace(id="two", enabled=True),
+        ]
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.extra_types = []
+        panel.config = AppConfig(textures_path="/pcsx2/textures")
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel.manager.deploy.return_value = (2, [])
+        panel._all_mods = MagicMock(return_value=mods)
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+
+        fake_box = types.SimpleNamespace(
+            StandardButton=types.SimpleNamespace(Yes=1, No=0),
+            question=MagicMock(return_value=1),
+        )
+
+        with patch.object(mod_panel, "QMessageBox", fake_box):
+            ModPanel._enable_all(panel)
+
+        self.assertTrue(mods[0].enabled)
+        self.assertTrue(mods[1].enabled)
+        panel.db.update.assert_called_once_with(mods[0])
+        panel.manager.deploy.assert_called_once_with(ModType.TEXTURE_PACK, "/pcsx2/textures")
+        self.assertTrue(
+            any("Enabling 1 texture packs" in call.args[0] for call in panel.emit_status.call_args_list),
+            panel.emit_status.call_args_list,
+        )
+        self.assertTrue(
+            any("Enabled 1 texture packs" in call.args[0] for call in panel.emit_status.call_args_list),
+            panel.emit_status.call_args_list,
+        )
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_disable_all_cancelled_leaves_mods_unchanged(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        mods = [
+            types.SimpleNamespace(id="one", enabled=True),
+            types.SimpleNamespace(id="two", enabled=True),
+        ]
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.extra_types = []
+        panel.config = AppConfig(textures_path="/pcsx2/textures")
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel._all_mods = MagicMock(return_value=mods)
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+
+        fake_box = types.SimpleNamespace(
+            StandardButton=types.SimpleNamespace(Yes=1, No=0),
+            question=MagicMock(return_value=0),
+        )
+
+        with patch.object(mod_panel, "QMessageBox", fake_box):
+            ModPanel._disable_all(panel)
+
+        self.assertTrue(all(mod.enabled for mod in mods))
+        panel.db.update.assert_not_called()
+        panel.manager.deploy.assert_not_called()
+        self.assertTrue(
+            any("Disable all texture packs cancelled" in call.args[0] for call in panel.emit_status.call_args_list),
+            panel.emit_status.call_args_list,
+        )
+        panel._invalidate_issue_state_cache.assert_not_called()
+        panel._apply_filter.assert_not_called()
+
     def test_issue_state_cache_reuses_expensive_checks_until_invalidated(self):
         import types
 

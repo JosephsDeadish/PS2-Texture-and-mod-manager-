@@ -881,16 +881,40 @@ class ModPanel(BasePanel):
         meta = _TYPE_META[self.mod_type]
         target_path = getattr(self.config, meta["deploy_key"], "")
         all_types = [self.mod_type] + self.extra_types
-        for mod in self._all_mods():
-            if not mod.enabled:
-                mod.enabled = True
-                self.db.update(mod)
+        pending = [mod for mod in self._all_mods() if not mod.enabled]
+        if not pending:
+            self.emit_status(f"All {meta['label'].lower()} are already enabled")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            f"Enable All {meta['label']}",
+            (
+                f"Enable all {len(pending)} disabled {meta['label'].lower()}?\n\n"
+                "They will be deployed to PCSX2 immediately."
+            ),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            self.emit_status(f"Enable all {meta['label'].lower()} cancelled")
+            return
+
+        self.emit_status(f"Enabling {len(pending)} {meta['label'].lower()}…")
+        for mod in pending:
+            mod.enabled = True
+            self.db.update(mod)
         # Single bulk deploy after all flags are set
         if target_path:
             total = sum(self.manager.deploy(mt, target_path)[0] for mt in all_types)
-            self.emit_status(f"All {meta['label'].lower()} enabled — deployed {total} to PCSX2")
+            self.emit_status(
+                f"Enabled {len(pending)} {meta['label'].lower()} — deployed {total} to PCSX2"
+            )
         else:
-            self.emit_status(f"All {meta['label'].lower()} enabled (configure path in Settings to deploy)")
+            self.emit_status(
+                f"Enabled {len(pending)} {meta['label'].lower()} "
+                "(configure path in Settings to deploy)"
+            )
         self._invalidate_issue_state_cache()
         self._apply_filter()
 
@@ -898,15 +922,38 @@ class ModPanel(BasePanel):
         meta = _TYPE_META[self.mod_type]
         target_path = getattr(self.config, meta["deploy_key"], "")
         all_types = [self.mod_type] + self.extra_types
-        for mod in self._all_mods():
-            if mod.enabled:
-                mod.enabled = False
-                self.db.update(mod)
+        pending = [mod for mod in self._all_mods() if mod.enabled]
+        if not pending:
+            self.emit_status(f"No {meta['label'].lower()} are currently enabled")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            f"Disable All {meta['label']}",
+            (
+                f"Disable all {len(pending)} enabled {meta['label'].lower()}?\n\n"
+                "They will be removed from PCSX2 immediately."
+            ),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            self.emit_status(f"Disable all {meta['label'].lower()} cancelled")
+            return
+
+        self.emit_status(f"Disabling {len(pending)} {meta['label'].lower()}…")
+        for mod in pending:
+            mod.enabled = False
+            self.db.update(mod)
         # Re-deploy (nothing enabled → clears deployed files via empty deploy)
         if target_path:
             for mt in all_types:
                 self.manager.deploy(mt, target_path)
-        self.emit_status(f"All {meta['label'].lower()} disabled")
+            self.emit_status(
+                f"Disabled {len(pending)} {meta['label'].lower()} — removed from PCSX2"
+            )
+        else:
+            self.emit_status(f"Disabled {len(pending)} {meta['label'].lower()}")
         self._invalidate_issue_state_cache()
         self._apply_filter()
 
