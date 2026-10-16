@@ -7657,6 +7657,105 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertEqual(panel._author_filter.currentData(), "TexMaster")
         self.assertTrue(panel._library_filter_check.isChecked())
 
+    def test_restore_filter_state_warns_on_stale_values(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+                self.blocked = False
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+                self.blocked = False
+
+            def count(self):
+                return len(self.items)
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+                self.blocked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.config = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 99,
+                        "author": "Missing Author",
+                        "library_only": False,
+                    }
+                }
+            }
+        )
+        panel._search = FakeLineEdit()
+        panel._sort_combo = FakeComboBox([
+            ("Name ↑", 0),
+            ("Name ↓", 1),
+            ("Priority ↑", 2),
+            ("Priority ↓", 3),
+            ("Size", 4),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+        ])
+        panel._library_filter_check = FakeCheckBox()
+
+        with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
+            ModPanel._restore_filter_state(panel)
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._sort_combo.currentIndex(), 0)
+        self.assertEqual(panel._author_filter.currentData(), "")
+        self.assertFalse(panel._library_filter_check.isChecked())
+        self.assertTrue(any("sort index" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("author filter" in msg for msg in logs.output), logs.output)
+
     def test_search_helper_matches_tags_source_url_files_and_type(self):
         mod_panel = self._import_mod_panel()
         mod = ModInfo(
@@ -7732,6 +7831,56 @@ class TestModPanelEmptyState(unittest.TestCase):
             },
         )
         save_mock.assert_called_once_with(panel.config)
+
+    def test_issue_state_cache_reuses_expensive_checks_until_invalidated(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.extra_types = [ModType.CHEAT]
+        panel.manager = MagicMock()
+        panel.manager.detect_conflicts.return_value = [
+            ConflictInfo(mod_a_id="mod-a", mod_b_id="mod-b", conflicting_files=["code.pnach"])
+        ]
+        panel.manager.validate_all_pnach.return_value = {
+            "mod-a": [
+                types.SimpleNamespace(severity="error"),
+                types.SimpleNamespace(severity="warning"),
+            ]
+        }
+        panel._issue_state_cache = None
+
+        first = ModPanel._issue_state(panel)
+        second = ModPanel._issue_state(panel)
+        panel._invalidate_issue_state_cache()
+        third = ModPanel._issue_state(panel)
+
+        self.assertIs(first, second)
+        self.assertIsNot(first, third)
+        self.assertEqual(panel.manager.detect_conflicts.call_count, 4)
+        self.assertEqual(panel.manager.validate_all_pnach.call_count, 2)
+        self.assertEqual(first["conflicting_ids"], {"mod-a", "mod-b"})
+        self.assertEqual(first["pnach_validation"]["mod-a"], {"errors": 1, "warnings": 1})
+
+    def test_refresh_invalidates_issue_state_cache(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel._invalidate_library_serial_cache = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._refresh_author_filter = MagicMock()
+        panel._apply_filter = MagicMock()
+
+        ModPanel.refresh(panel)
+
+        panel._invalidate_library_serial_cache.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._refresh_author_filter.assert_called_once()
+        panel._apply_filter.assert_called_once()
 
     def test_get_library_serials_caches_until_path_changes(self):
         mod_panel = self._import_mod_panel()

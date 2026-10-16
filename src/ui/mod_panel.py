@@ -198,6 +198,7 @@ class ModPanel(BasePanel):
         self._state_persistence_enabled = False
         self._library_serials_cache_path = ""
         self._library_serials_cache = frozenset()
+        self._issue_state_cache = None
         self._build()
 
     def _all_mods(self) -> list:
@@ -366,12 +367,65 @@ class ModPanel(BasePanel):
 
     def refresh(self):
         self._invalidate_library_serial_cache()
+        self._invalidate_issue_state_cache()
         self._refresh_author_filter()
         self._apply_filter()
 
     def _invalidate_library_serial_cache(self) -> None:
         self._library_serials_cache_path = ""
         self._library_serials_cache = frozenset()
+
+    def _invalidate_issue_state_cache(self) -> None:
+        self._issue_state_cache = None
+
+    def _issue_state(self) -> dict:
+        cache = getattr(self, "_issue_state_cache", None)
+        if isinstance(cache, dict):
+            return cache
+
+        conflicts = []
+        for mt in [self.mod_type] + self.extra_types:
+            try:
+                conflicts.extend(self.manager.detect_conflicts(mt))
+            except Exception as exc:
+                logger.warning("Could not detect conflicts for %s: %s", mt.value, exc)
+
+        conflicting_ids = set()
+        for conflict in conflicts:
+            conflicting_ids.add(conflict.mod_a_id)
+            conflicting_ids.add(conflict.mod_b_id)
+
+        shadowed_ids: set = set()
+        if self.mod_type == ModType.TEXTURE_PACK:
+            try:
+                shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
+                shadowed_ids = set(shadowed_map.keys())
+            except Exception as exc:
+                logger.warning(
+                    "Could not detect shadowed texture packs for %s: %s",
+                    self.mod_type.value,
+                    exc,
+                )
+
+        pnach_validation: dict = {}
+        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+            try:
+                raw = self.manager.validate_all_pnach()
+                for mid, issues in raw.items():
+                    errors = sum(1 for iss in issues if iss.severity == "error")
+                    warnings = sum(1 for iss in issues if iss.severity == "warning")
+                    pnach_validation[mid] = {"errors": errors, "warnings": warnings}
+            except Exception as exc:
+                logger.warning("Could not validate PNACH status for %s: %s", self.mod_type.value, exc)
+
+        cache = {
+            "conflicts": conflicts,
+            "conflicting_ids": conflicting_ids,
+            "shadowed_ids": shadowed_ids,
+            "pnach_validation": pnach_validation,
+        }
+        self._issue_state_cache = cache
+        return cache
 
     def _make_guidance_banner(self) -> QWidget:
         """Build a dismissable PCSX2 guidance banner for texture/pnach/cheat panels."""
@@ -479,12 +533,22 @@ class ModPanel(BasePanel):
                 sort_idx = 0
             if 0 <= sort_idx < self._sort_combo.count():
                 self._sort_combo.setCurrentIndex(sort_idx)
+            else:
+                logger.warning(
+                    "Saved mod-panel sort index %r is no longer available; using the default sort order",
+                    sort_idx,
+                )
 
             author = str(state.get("author", "") or "")
             if author:
                 idx = self._author_filter.findData(author)
                 if idx >= 0:
                     self._author_filter.setCurrentIndex(idx)
+                else:
+                    logger.warning(
+                        "Saved mod-panel author filter %r is no longer available; using All Authors",
+                        author,
+                    )
             else:
                 self._author_filter.setCurrentIndex(0)
 
@@ -541,32 +605,11 @@ class ModPanel(BasePanel):
         reverse = [False, True, False, True, True]
         mods = sorted(mods, key=sort_keys[sort_idx], reverse=reverse[sort_idx])
 
-        # Conflict info — aggregate across all managed types
-        conflicts = []
-        for mt in [self.mod_type] + self.extra_types:
-            conflicts.extend(self.manager.detect_conflicts(mt))
-        conflicting_ids = set()
-        for c in conflicts:
-            conflicting_ids.add(c.mod_a_id)
-            conflicting_ids.add(c.mod_b_id)
-
-        # Shadowed mod detection (only for texture packs where file-level tracking matters)
-        shadowed_ids: set = set()
-        if self.mod_type == ModType.TEXTURE_PACK:
-            shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
-            shadowed_ids = set(shadowed_map.keys())
-
-        # PNACH/Cheat validation — automatic, no button needed
-        pnach_validation: dict = {}  # mod_id → {"errors": int, "warnings": int}
-        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
-            try:
-                raw = self.manager.validate_all_pnach()
-                for mid, issues in raw.items():
-                    errors = sum(1 for iss in issues if iss.severity == "error")
-                    warnings = sum(1 for iss in issues if iss.severity == "warning")
-                    pnach_validation[mid] = {"errors": errors, "warnings": warnings}
-            except Exception as exc:
-                logger.warning("Could not validate PNACH status for %s: %s", self.mod_type.value, exc)
+        issue_state = self._issue_state()
+        conflicts = issue_state["conflicts"]
+        conflicting_ids = issue_state["conflicting_ids"]
+        shadowed_ids = issue_state["shadowed_ids"]
+        pnach_validation = issue_state["pnach_validation"]
 
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
@@ -682,6 +725,7 @@ class ModPanel(BasePanel):
         if enabled and self.mod_type == ModType.COVER_ART:
             self._check_cover_art_duplicates(mod_id)
 
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _check_cover_art_duplicates(self, newly_enabled_id: str):
@@ -730,18 +774,21 @@ class ModPanel(BasePanel):
         if reply == QMessageBox.StandardButton.Yes:
             self.manager.remove_mod(mod_id)
             self.emit_status(f"Removed '{mod.name}'")
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_priority_up(self, mod_id: str):
         mod = self.db.get(mod_id)
         if mod:
             self.manager.set_priority(mod_id, mod.priority + 1)
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_priority_down(self, mod_id: str):
         mod = self.db.get(mod_id)
         if mod and mod.priority > 0:
             self.manager.set_priority(mod_id, mod.priority - 1)
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_details(self, mod_id: str):
@@ -840,6 +887,7 @@ class ModPanel(BasePanel):
             self.emit_status(f"All {meta['label'].lower()} enabled — deployed {total} to PCSX2")
         else:
             self.emit_status(f"All {meta['label'].lower()} enabled (configure path in Settings to deploy)")
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _disable_all(self):
@@ -855,6 +903,7 @@ class ModPanel(BasePanel):
             for mt in all_types:
                 self.manager.deploy(mt, target_path)
         self.emit_status(f"All {meta['label'].lower()} disabled")
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _on_count_lbl_clicked(self):
@@ -863,9 +912,8 @@ class ModPanel(BasePanel):
 
     def _show_conflicts(self):
         all_types = [self.mod_type] + self.extra_types
-        conflicts = []
-        for mt in all_types:
-            conflicts.extend(self.manager.detect_conflicts(mt))
+        issue_state = self._issue_state()
+        conflicts = list(issue_state["conflicts"])
         pnach_conflicts = []
         for mt in all_types:
             if mt in (ModType.PNACH, ModType.CHEAT):
@@ -881,6 +929,7 @@ class ModPanel(BasePanel):
             return
         dlg = ConflictDialog(conflicts, self.db, self, pnach_conflicts=pnach_conflicts)
         dlg.exec()
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _open_code_builder(self):
@@ -1035,6 +1084,7 @@ class ModPanel(BasePanel):
                 self.emit_status(
                     f"Imported '{mod.name}' (configure PCSX2 path in Settings to deploy)"
                 )
+            self._invalidate_issue_state_cache()
             self._apply_filter()
         except Exception as exc:
             logger.warning("Could not import mod in mod panel: %s", exc)
