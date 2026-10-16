@@ -208,18 +208,24 @@ class DownloadsPanel(BasePanel):
             return
         if row < 0 or row >= len(self._history_entries):
             return
+        config = getattr(self, "config", None)
+        if config is None:
+            return
         entry = self._history_entries[row]
         entry_id = getattr(entry, "id", "")
         if not entry_id:
             return
-        bucket = self._history_panel_bucket()
+        bucket = ui_state_bucket(config, "downloads_panel")
         if bucket.get("history_selected_entry_id") == entry_id:
             return
         bucket["history_selected_entry_id"] = str(entry_id)
         self._save_panel_config("updating download history selection")
 
     def _restore_history_selection(self) -> None:
-        entry_id = self._history_panel_bucket().get("history_selected_entry_id", "")
+        config = getattr(self, "config", None)
+        if config is None:
+            return
+        entry_id = ui_state_bucket(config, "downloads_panel").get("history_selected_entry_id", "")
         if not isinstance(entry_id, str) or not entry_id:
             return
         for row, entry in enumerate(self._history_entries):
