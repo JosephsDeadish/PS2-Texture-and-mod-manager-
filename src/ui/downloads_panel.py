@@ -143,6 +143,7 @@ class DownloadsPanel(BasePanel):
             save_config(self.config)
         except Exception as exc:
             logger.warning("Could not save downloads panel config after %s: %s", context, exc)
+            self._notify_status("Could not save downloads panel settings right now.")
 
     def _validated_splitter_sizes(self, sizes, *, action: str):
         if not isinstance(sizes, (list, tuple)):

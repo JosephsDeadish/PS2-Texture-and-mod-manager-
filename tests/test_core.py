@@ -6483,6 +6483,21 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
         save_mock.assert_called_once_with(panel.config)
 
+    def test_save_panel_config_failure_logs_and_notifies_status(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel, "save_config", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._save_panel_config("saving test state")
+
+        self.assertTrue(any("Could not save downloads panel config" in msg for msg in logs.output))
+        panel._notify_status.assert_called_once_with("Could not save downloads panel settings right now.")
+
     def test_history_filters_restore_invalid_values_are_logged(self):
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
