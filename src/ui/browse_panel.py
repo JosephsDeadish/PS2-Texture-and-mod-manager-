@@ -1055,11 +1055,13 @@ class CoverDownloadDialog(QDialog):
             selected_tab = int(getattr(self._tabs, "currentIndex", lambda: 0)() or 0)
         except (TypeError, ValueError):
             selected_tab = 0
+        search_query = getattr(self._search_edit, "text", lambda: "")() or ""
         single_region = getattr(self._region_combo, "currentText", lambda: "EN")() or "EN"
         bulk_region = getattr(self._bulk_region_combo, "currentText", lambda: "EN")() or "EN"
         skip_existing = bool(getattr(self._skip_existing_check, "isChecked", lambda: True)())
         return {
             "selected_tab": selected_tab,
+            "search_query": search_query.strip(),
             "single_region": single_region,
             "bulk_region": bulk_region,
             "skip_existing": skip_existing,
@@ -1072,6 +1074,9 @@ class CoverDownloadDialog(QDialog):
 
     def _restore_state(self) -> None:
         bucket = self._cover_state_bucket()
+        search_query = str(bucket.get("search_query", "") or "")
+        if hasattr(self, "_search_edit") and hasattr(self._search_edit, "setText"):
+            self._search_edit.setText(search_query)
         self._set_combo_text(self._region_combo, bucket.get("single_region", "EN"))
         self._set_combo_text(self._bulk_region_combo, bucket.get("bulk_region", "EN"))
         self._skip_existing_check.setChecked(bool(bucket.get("skip_existing", True)))

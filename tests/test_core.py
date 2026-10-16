@@ -5679,6 +5679,13 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         browse_panel = self._import_browse_panel()
         CoverDownloadDialog = browse_panel.CoverDownloadDialog
 
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
         class FakeComboBox:
             def __init__(self, items):
                 self.items = list(items)
@@ -5725,6 +5732,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             ui_state={
                 browse_panel._COVER_DOWNLOAD_STATE_KEY: {
                     "selected_tab": 1,
+                    "search_query": "God of War",
                     "single_region": "JP",
                     "bulk_region": "EU",
                     "skip_existing": False,
@@ -5732,6 +5740,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             }
         )
         dlg._tabs = FakeTabs(count=2)
+        dlg._search_edit = FakeLineEdit()
         dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
         dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
         dlg._skip_existing_check = FakeCheckBox()
@@ -5739,6 +5748,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         dlg._restore_state()
 
         self.assertEqual(dlg._tabs.currentIndex(), 1)
+        self.assertEqual(dlg._search_edit.value, "God of War")
         self.assertEqual(dlg._region_combo.currentText(), "JP")
         self.assertEqual(dlg._bulk_region_combo.currentText(), "EU")
         self.assertFalse(dlg._skip_existing_check.isChecked())
@@ -5764,9 +5774,17 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             def isChecked(self):
                 return self.checked
 
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+
+            def text(self):
+                return self.value
+
         dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
         dlg.config = AppConfig()
         dlg._tabs = types.SimpleNamespace(currentIndex=lambda: 1, count=lambda: 2)
+        dlg._search_edit = FakeLineEdit("God of War")
         dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=3)
         dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=2)
         dlg._skip_existing_check = FakeCheckBox(False)
@@ -5776,6 +5794,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
         state = dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]
         self.assertEqual(state["selected_tab"], 1)
+        self.assertEqual(state["search_query"], "God of War")
         self.assertEqual(state["single_region"], "JP")
         self.assertEqual(state["bulk_region"], "EU")
         self.assertFalse(state["skip_existing"])
