@@ -552,6 +552,46 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(count, 0)
         self.assertFalse((Path(target) / "tex.png").exists())
 
+    def test_deploy_pnach_merge_failure_logs_warning(self):
+        db, mgr = self._make_manager()
+
+        high_dir = Path(self.tmpdir) / "pnach_high"
+        high_dir.mkdir()
+        (high_dir / "ABCDEF12.pnach").write_text("high priority", encoding="utf-8")
+
+        low_dir = Path(self.tmpdir) / "pnach_low"
+        low_dir.mkdir()
+        (low_dir / "ABCDEF12.pnach").write_text("low priority", encoding="utf-8")
+
+        db.add(ModInfo(
+            id="pnach-high",
+            name="High Priority Patch",
+            mod_type=ModType.PNACH,
+            path=str(high_dir),
+            enabled=True,
+            priority=10,
+        ))
+        db.add(ModInfo(
+            id="pnach-low",
+            name="Low Priority Patch",
+            mod_type=ModType.PNACH,
+            path=str(low_dir),
+            enabled=True,
+            priority=0,
+        ))
+
+        target = str(Path(self.tmpdir) / "pcsx2_cheats")
+        with patch("src.core.pnach.merge_pnach_files", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                count, warnings = mgr.deploy(ModType.PNACH, target)
+
+        output = Path(target) / "ABCDEF12.pnach"
+        self.assertEqual(count, 1)
+        self.assertTrue(output.exists())
+        self.assertEqual(output.read_text(encoding="utf-8"), "high priority")
+        self.assertTrue(any("Failed to merge PNACH for CRC ABCDEF12" in msg for msg in warnings))
+        self.assertTrue(any("Failed to merge PNACH for CRC ABCDEF12" in msg for msg in logs.output))
+
     def test_resolve_conflict_logs_missing_mod(self):
         from src.core.mod_manager import ConflictInfo
 

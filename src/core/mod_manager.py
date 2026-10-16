@@ -822,6 +822,11 @@ class ModManager:
                         shutil.copy2(merged, str(target / f"{crc}.pnach"))
                     deployed += 1
                 except Exception as exc:
+                    logger.warning(
+                        "Failed to merge PNACH for CRC %s: %s. Using highest-priority file instead.",
+                        crc,
+                        exc,
+                    )
                     warnings.append(
                         f"Failed to merge PNACH for CRC {crc}: {exc}. "
                         "Using highest-priority file instead."
