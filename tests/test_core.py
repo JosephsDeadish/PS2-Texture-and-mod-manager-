@@ -5552,6 +5552,24 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(index, -1)
         self.assertTrue(any("Could not read active browse tab index" in msg for msg in logs.output))
 
+    def test_catalogue_card_open_url_uses_shared_helper(self):
+        browse_panel = self._import_browse_panel()
+        CatalogueTabContent = browse_panel._CatalogueTabContent
+
+        tab = CatalogueTabContent.__new__(CatalogueTabContent)
+
+        with patch.object(browse_panel, "open_external_url", return_value=True) as open_mock:
+            ok = tab._open_url("https://example.com/mod")
+
+        self.assertTrue(ok)
+        open_mock.assert_called_once_with(
+            "https://example.com/mod",
+            parent=tab,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
+
     def test_save_browse_state_updates_config(self):
         import types
 

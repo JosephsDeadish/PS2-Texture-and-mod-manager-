@@ -54,6 +54,7 @@ from src.core.downloader import (
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
 from src.ui.downloads_panel import ActiveDownloads
+from src.ui.url_helpers import open_external_url
 
 logger = logging.getLogger(__name__)
 
@@ -2244,10 +2245,14 @@ class GBATempScraperDialog(QDialog):
             open_btn.setToolTip("Open in browser")
             open_btn.setStyleSheet("border: none; background: transparent; font-size: 14px;")
             dl_url = dl["url"]  # capture for lambda
-            from PyQt6.QtGui import QDesktopServices
-            from PyQt6.QtCore import QUrl
             open_btn.clicked.connect(
-                lambda _checked, u=dl_url: QDesktopServices.openUrl(QUrl(u))
+                lambda _checked, u=dl_url: open_external_url(
+                    u,
+                    parent=self,
+                    context="download link",
+                    title="Download Link Unavailable",
+                    failure_message="Could not open this download link. Please copy the URL into your browser.",
+                )
             )
             row_layout.addWidget(open_btn)
 
@@ -2515,9 +2520,13 @@ class _CatalogueTabContent(QWidget):
         self._append_cards(_PAGE_SIZE)
 
     def _open_url(self, url: str):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(url))
+        return open_external_url(
+            url,
+            parent=self,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
 
     def _download_cover(self, entry: dict):
         download_action = entry.get("download_action", "")
@@ -3253,9 +3262,13 @@ class BrowsePanel(BasePanel):
         dlg.exec()
 
     def _open_url(self, url: str):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(url))
+        return open_external_url(
+            url,
+            parent=self,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
 
     def _reload_catalogue(self):
         """Reload catalogue from disk, refresh filters and cards.
