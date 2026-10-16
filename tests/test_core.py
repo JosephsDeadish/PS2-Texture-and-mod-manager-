@@ -1270,6 +1270,16 @@ class TestMultipartArchive(unittest.TestCase):
         self.assertEqual(parts, [])
         self.assertTrue(any("Could not inspect multipart archive parts" in msg for msg in logs.output))
 
+    def test_find_logs_os_errors_and_returns_partial_results(self):
+        from src.core.archive import find_multipart_parts
+
+        with patch("pathlib.Path.iterdir", side_effect=FileNotFoundError("missing")):
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                parts = find_multipart_parts(str(Path(self.tmpdir) / "Pack_Part1.zip"))
+
+        self.assertEqual(parts, [])
+        self.assertTrue(any("Could not inspect multipart archive parts" in msg for msg in logs.output))
+
     # -- check_multipart_completeness ----------------------------------------
 
     def test_complete_set_reports_no_missing(self):

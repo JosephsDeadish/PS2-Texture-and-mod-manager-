@@ -128,7 +128,7 @@ def find_multipart_parts(path: str) -> List[str]:
             if final.exists():
                 # Use a high number so it sorts last
                 found.append((9999, str(final)))
-    except PermissionError as exc:
+    except OSError as exc:
         logger.warning("Could not inspect multipart archive parts for %s: %s", path, exc)
 
     found.sort(key=lambda x: x[0])
