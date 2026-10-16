@@ -545,7 +545,12 @@ class LinkChecker:
             else:
                 if user_dir.is_dir():
                     try:
-                        user_files = sorted(user_dir.glob("*.json"))
+                        user_files = [
+                            path
+                            for path in sorted(user_dir.glob("*.json"))
+                            # Ignore helper manifests like _index.json.
+                            if not path.name.startswith("_")
+                        ]
                     except Exception as exc:
                         logger.warning("Could not list user catalogue files under %s: %s", user_dir, exc)
                         user_files = []

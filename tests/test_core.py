@@ -11433,6 +11433,22 @@ class TestUserCatalogueLoader(unittest.TestCase):
         result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
         self.assertEqual(len(result), 1)
 
+    def test_load_user_catalogue_skips_helper_json_files(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        helper_entry = self._make_user_entry("helper-index")
+        custom_entry = self._make_user_entry("custom-entry")
+        (Path(self.tmpdir) / "_index.json").write_text(
+            json.dumps([helper_entry]), encoding="utf-8"
+        )
+        (Path(self.tmpdir) / "custom.json").write_text(
+            json.dumps([custom_entry]), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual([entry["id"] for entry in result], ["custom-entry"])
+
     def test_load_user_catalogue_missing_type_skipped(self):
         from src.core.catalogue_loader import load_user_catalogue
         entry = self._make_user_entry()
@@ -14806,6 +14822,41 @@ class TestLinkChecker(unittest.TestCase):
         self.assertIn("user_catalogue/custom.json", report["catalogues_checked"])
         user_issues = report["issues_by_file"].get("user_catalogue/custom.json", [])
         self.assertTrue(any(issue["issue_type"] == "placeholder_author" for issue in user_issues))
+
+    def test_check_all_catalogues_skips_helper_user_files(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            user_dir = Path(tmpdir) / "user_catalogue"
+            user_dir.mkdir()
+            (user_dir / "_index.json").write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "helper-index",
+                "name": "Helper Index",
+                "description": "Helper metadata file",
+                "author": "Tester",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+            (user_dir / "custom.json").write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "user-pack",
+                "name": "User Pack",
+                "description": "User-added catalogue entry",
+                "author": "Tester",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+
+            with patch("src.core.link_checker._user_catalogue_dir", return_value=user_dir):
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertIn("user_catalogue/custom.json", report["catalogues_checked"])
+        self.assertNotIn("user_catalogue/_index.json", report["catalogues_checked"])
 
     def test_check_all_catalogues_logs_user_catalogue_resolution_failure(self):
         from src.core.link_checker import LinkChecker

@@ -451,7 +451,12 @@ def _load_from_dir(
     else:
         # User catalogue: each .json file may contain mixed types
         try:
-            json_files = sorted(base.glob("*.json"))
+            json_files = [
+                path
+                for path in sorted(base.glob("*.json"))
+                # Ignore helper manifests like _index.json; only actual entry files belong here.
+                if not path.name.startswith("_")
+            ]
         except Exception as exc:
             log.warning("Could not list catalogue files under %s: %s", base, exc)
             json_files = []
