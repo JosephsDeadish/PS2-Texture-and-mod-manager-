@@ -1031,6 +1031,25 @@ class LibraryPanel(BasePanel):
             self._populate_db_games()
             return
 
+        library_root = Path(library_path)
+        if not library_root.is_dir():
+            logger.warning("Game library folder not found: %s", library_path)
+            msg = QLabel(
+                "Game library folder not found.\n\n"
+                "Go to ⚙ Settings and set your Game Library folder\n"
+                "(the folder where you keep your .iso / .chd files)."
+            )
+            msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            msg.setStyleSheet("color: #b07070; font-size: 13px;")
+            msg.setWordWrap(True)
+            self._list_layout.addWidget(msg)
+            self._count_lbl.setText("Folder not found")
+            self.emit_status(f"Game library folder not found: {library_path}")
+
+            # Still show DB-tracked games even if the configured folder is invalid.
+            self._populate_db_games()
+            return
+
         games = self._scan_library(library_path)
 
         if not games:

@@ -1,6 +1,7 @@
 """Settings panel for PS2 Mod Manager."""
 
 import logging
+from pathlib import Path
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -329,6 +330,10 @@ class SettingsPanel(BasePanel):
 
     def _update_game_lib_label(self, path: str):
         from src.core.game_library import scan_library
+        if path and not Path(path).is_dir():
+            logger.warning("Game library folder not found: %s", path)
+            self._game_lib_count_lbl.setText("  Folder not found")
+            return
         try:
             games = scan_library(path)
         except Exception as exc:

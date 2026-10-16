@@ -177,7 +177,7 @@ def scan_library(
     """
     root = Path(directory)
     if not root.is_dir():
-        log.debug("game_library: directory not found: %s", directory)
+        log.warning("game_library: directory not found: %s", directory)
         return []
 
     entries: List[GameEntry] = []

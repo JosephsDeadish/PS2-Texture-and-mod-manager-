@@ -2003,6 +2003,21 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         self.assertEqual(fake.config.pcsx2_path, "/pcsx2")
         self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
 
+    def test_settings_panel_missing_game_library_logs_and_shows_fallback(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(_game_lib_count_lbl=MagicMock())
+            with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                SettingsPanel._update_game_lib_label(fake, "/definitely/not/a/real/folder")
+
+        fake._game_lib_count_lbl.setText.assert_called_once_with("  Folder not found")
+        self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
+
     def test_settings_panel_catalogue_check_reports_issues(self):
         import sys
         from types import SimpleNamespace
@@ -7625,6 +7640,72 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertEqual(third, ["second"])
         self.assertEqual(scan_mock.call_count, 2)
 
+    def test_populate_missing_game_library_path_shows_fallback(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeLabel:
+            def __init__(self, text=""):
+                self.text = text
+                self.alignment = None
+                self.stylesheet = ""
+                self.word_wrap = False
+
+            def setAlignment(self, value):
+                self.alignment = value
+
+            def setStyleSheet(self, value):
+                self.stylesheet = value
+
+            def setWordWrap(self, value):
+                self.word_wrap = value
+
+            def setText(self, value):
+                self.text = value
+
+        class FakeLayout:
+            def __init__(self):
+                self.widgets = []
+                self.stretch_calls = 0
+
+            def count(self):
+                return 0
+
+            def takeAt(self, _index):
+                return None
+
+            def addWidget(self, widget, *_args):
+                self.widgets.append(widget)
+
+            def addStretch(self):
+                self.stretch_calls += 1
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(game_library_path="/definitely/not/a/real/folder")
+        panel._list_layout = FakeLayout()
+        panel._cards = []
+        panel._selected_card = None
+        panel._count_lbl = FakeLabel()
+        panel._populate_db_games = MagicMock()
+        panel.emit_status = MagicMock()
+
+        with patch.object(library_panel, "QLabel", FakeLabel):
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                LibraryPanel._populate(panel)
+
+        self.assertEqual(panel._count_lbl.text, "Folder not found")
+        self.assertTrue(
+            any(
+                getattr(widget, "text", "").startswith("Game library folder not found.")
+                for widget in panel._list_layout.widgets
+            )
+        )
+        panel._populate_db_games.assert_called_once()
+        panel.emit_status.assert_called_once_with(
+            "Game library folder not found: /definitely/not/a/real/folder"
+        )
+        self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
+
     def test_save_library_config_logs_warning_on_failure(self):
         library_panel = self._import_library_panel()
         with patch.object(library_panel, "save_config", side_effect=RuntimeError("boom")):
@@ -8964,8 +9045,10 @@ class TestGameLibrary(unittest.TestCase):
     # ── Non-existent directory ───────────────────────────────────────────────
 
     def test_nonexistent_dir_returns_empty(self):
-        result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
+        with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+            result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
         self.assertEqual(result, [])
+        self.assertTrue(any("directory not found" in msg for msg in logs.output))
 
     def test_empty_dir_returns_empty(self):
         with tempfile.TemporaryDirectory() as d:
