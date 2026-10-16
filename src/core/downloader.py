@@ -169,9 +169,11 @@ def download_file(
                     f"Server returned an empty response instead of a file.\nURL: {url}"
                 )
     except requests.RequestException as exc:
+        logger.warning("Download failed for %s: %s", url, exc)
         _remove_partial_file()
         raise DownloadError(f"Download failed: {exc}") from exc
     except Exception as exc:
+        logger.warning("Download failed for %s: %s", url, exc)
         _remove_partial_file()
         if isinstance(exc, DownloadError):
             raise

@@ -895,6 +895,33 @@ class TestDownloader(unittest.TestCase):
 class TestDownloaderLogging(unittest.TestCase):
     """Downloader helpers should log unexpected failures before falling back."""
 
+    @patch("src.core.downloader.requests.get")
+    def test_download_file_logs_and_cleans_up_on_unexpected_failure(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+
+        def _iter_content(chunk_size=None):
+            yield b"partial"
+            raise RuntimeError("boom")
+
+        mock_resp.iter_content.side_effect = _iter_content
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+                with self.assertRaises(DownloadError):
+                    download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+        self.assertTrue(any("Download failed for https://example.com/file.bin" in msg for msg in logs.output))
+
     @patch("src.core.downloader.download_file")
     def test_fetch_gametdb_art_logs_failure(self, mock_download):
         from src.core.downloader import fetch_gametdb_art, DownloadError
