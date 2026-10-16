@@ -8507,6 +8507,24 @@ class TestCatalogueIntegrity(unittest.TestCase):
         self.assertTrue(expected.exists())
         self.assertEqual(len(list(expected.iterdir())), 2)
 
+    def test_texture_structure_inspection_failure_logs_and_keeps_layout(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "hash.png").write_bytes(b"A")
+
+        with patch("pathlib.Path.iterdir", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                ModManager._normalize_texture_structure(dest, "SLUS-21228")
+
+        self.assertTrue((dest / "replacement").exists())
+        self.assertTrue((dest / "replacement" / "hash.png").exists())
+        self.assertFalse((dest / "SLUS-21228").exists())
+        self.assertTrue(
+            any("Could not inspect" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_already_correct_structure_unchanged(self):
         from src.core.mod_manager import ModManager
         dest = self._make_dest()

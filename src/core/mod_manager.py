@@ -36,7 +36,7 @@ def _folder_has_serial_structure(folder: Path) -> bool:
             child.is_dir() and _PS2_SERIAL_RE.match(child.name) is not None
             for child in folder.iterdir()
         )
-    except PermissionError as exc:
+    except OSError as exc:
         logger.warning("Could not inspect folder structure for %s: %s", folder, exc)
         return False
 
@@ -549,7 +549,13 @@ class ModManager:
         if replacements_src is None:
             try:
                 subdirs = [d for d in dest_dir.iterdir() if d.is_dir()]
-            except PermissionError:
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture pack contents in %s for serial %s: %s",
+                    dest_dir,
+                    serial,
+                    exc,
+                )
                 return
             if len(subdirs) == 1:
                 for sub_name in ("replacements", "replacement"):
@@ -558,14 +564,73 @@ class ModManager:
                         replacements_src = p
                         break
 
-        # ── Move files into <serial>/replacements/ ─────────────────────────
-        target = dest_dir / serial / "replacements"
-        target.mkdir(parents=True, exist_ok=True)
-
+        items = None
         if replacements_src is not None:
             # Move each item from the replacement folder into the target
-            for item in list(replacements_src.iterdir()):
-                shutil.move(str(item), str(target / item.name))
+            try:
+                items = list(replacements_src.iterdir())
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture replacement folder %s for serial %s: %s",
+                    replacements_src,
+                    serial,
+                    exc,
+                )
+                return
+        else:
+            # Flat structure: move all top-level items into target
+            try:
+                items = list(dest_dir.iterdir())
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture pack contents in %s for serial %s: %s",
+                    dest_dir,
+                    serial,
+                    exc,
+                )
+                return
+
+        target = dest_dir / serial / "replacements"
+        try:
+            target.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            logger.warning(
+                "Could not create normalized texture folder %s for serial %s: %s",
+                target,
+                serial,
+                exc,
+            )
+            return
+
+        if replacements_src is not None:
+            for item in items:
+                try:
+                    shutil.move(str(item), str(target / item.name))
+                except (OSError, shutil.Error) as exc:
+                    logger.warning(
+                        "Could not move texture pack item %s into %s for serial %s: %s",
+                        item,
+                        target,
+                        serial,
+                        exc,
+                    )
+                    continue
+        else:
+            for item in items:
+                if item.name != serial:  # don't move the serial folder we just created
+                    try:
+                        shutil.move(str(item), str(target / item.name))
+                    except (OSError, shutil.Error) as exc:
+                        logger.warning(
+                            "Could not move texture pack item %s into %s for serial %s: %s",
+                            item,
+                            target,
+                            serial,
+                            exc,
+                        )
+                        continue
+
+        if replacements_src is not None:
             # Clean up the now-empty wrapper/replacement folder
             try:
                 outer = replacements_src.parent
@@ -580,11 +645,6 @@ class ModManager:
                     serial,
                     exc,
                 )
-        else:
-            # Flat structure: move all top-level items into target
-            for item in list(dest_dir.iterdir()):
-                if item.name != serial:  # don't move the serial folder we just created
-                    shutil.move(str(item), str(target / item.name))
 
     def refresh_thumbnail(self, mod_id: str, region: str = "EN") -> bool:
         """Re-fetch the thumbnail for *mod_id* from GameTDB. Returns True on success."""
