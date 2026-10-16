@@ -2123,6 +2123,78 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
 
     def test_settings_panel_save_failure_logs_and_shows_error(self):
         import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                valid_paths = {}
+                for name in (
+                    "pcsx2",
+                    "textures",
+                    "pnach",
+                    "covers",
+                    "memcards",
+                    "partial",
+                    "mods",
+                    "games",
+                ):
+                    path = Path(tmpdir) / name
+                    path.mkdir()
+                    valid_paths[name] = str(path)
+
+                fake = SimpleNamespace(
+                    config=AppConfig(),
+                    _pcsx2_chooser=MagicMock(),
+                    _tex_chooser=MagicMock(),
+                    _pnach_chooser=MagicMock(),
+                    _covers_chooser=MagicMock(),
+                    _memcards_chooser=MagicMock(),
+                    _partial_tex_chooser=MagicMock(),
+                    _storage_chooser=MagicMock(),
+                    _game_lib_chooser=MagicMock(),
+                    _conflicts_check=MagicMock(),
+                    _updates_check=MagicMock(),
+                    _theme_combo=MagicMock(),
+                    _tooltip_combo=MagicMock(),
+                    _fav_authors_edit=MagicMock(),
+                    settings_saved=MagicMock(),
+                    emit_status=MagicMock(),
+                )
+                for chooser, value in (
+                    (fake._pcsx2_chooser, valid_paths["pcsx2"]),
+                    (fake._tex_chooser, valid_paths["textures"]),
+                    (fake._pnach_chooser, valid_paths["pnach"]),
+                    (fake._covers_chooser, valid_paths["covers"]),
+                    (fake._memcards_chooser, valid_paths["memcards"]),
+                    (fake._partial_tex_chooser, valid_paths["partial"]),
+                    (fake._storage_chooser, valid_paths["mods"]),
+                    (fake._game_lib_chooser, valid_paths["games"]),
+                ):
+                    chooser.get_path.return_value = value
+                fake._conflicts_check.isChecked.return_value = True
+                fake._updates_check.isChecked.return_value = False
+                fake._theme_combo.currentData.return_value = "dark"
+                fake._tooltip_combo.currentData.return_value = "normal"
+                fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+
+                with patch("src.ui.settings_panel.save_config", side_effect=OSError("denied")):
+                    with patch("src.ui.settings_panel.QMessageBox.critical") as critical:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._save(fake)
+
+        self.assertTrue(any("Could not save settings" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.settings_saved.emit.assert_not_called()
+        fake.emit_status.assert_not_called()
+        self.assertEqual(fake.config.pcsx2_path, valid_paths["pcsx2"])
+        self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
+
+    def test_settings_panel_rejects_invalid_paths_before_saving(self):
+        import sys
         from types import SimpleNamespace
 
         with self._stub_ui_modules():
@@ -2148,14 +2220,14 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
                 emit_status=MagicMock(),
             )
             for chooser, value in (
-                (fake._pcsx2_chooser, "/pcsx2"),
-                (fake._tex_chooser, "/textures"),
-                (fake._pnach_chooser, "/pnach"),
-                (fake._covers_chooser, "/covers"),
-                (fake._memcards_chooser, "/memcards"),
-                (fake._partial_tex_chooser, "/partial"),
-                (fake._storage_chooser, "/mods"),
-                (fake._game_lib_chooser, "/games"),
+                (fake._pcsx2_chooser, "/definitely/not/a/real/folder"),
+                (fake._tex_chooser, ""),
+                (fake._pnach_chooser, ""),
+                (fake._covers_chooser, ""),
+                (fake._memcards_chooser, ""),
+                (fake._partial_tex_chooser, ""),
+                (fake._storage_chooser, ""),
+                (fake._game_lib_chooser, ""),
             ):
                 chooser.get_path.return_value = value
             fake._conflicts_check.isChecked.return_value = True
@@ -2164,17 +2236,17 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
             fake._tooltip_combo.currentData.return_value = "normal"
             fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
 
-            with patch("src.ui.settings_panel.save_config", side_effect=OSError("denied")):
-                with patch("src.ui.settings_panel.QMessageBox.critical") as critical:
+            with patch("src.ui.settings_panel.save_config") as save_mock:
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
                     with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
                         SettingsPanel._save(fake)
 
-        self.assertTrue(any("Could not save settings" in msg for msg in logs.output))
-        critical.assert_called_once()
+        save_mock.assert_not_called()
+        warning.assert_called_once()
         fake.settings_saved.emit.assert_not_called()
         fake.emit_status.assert_not_called()
-        self.assertEqual(fake.config.pcsx2_path, "/pcsx2")
-        self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
+        self.assertEqual(fake.config.pcsx2_path, "")
+        self.assertTrue(any("invalid" in msg.lower() for msg in logs.output))
 
     def test_settings_panel_missing_game_library_logs_and_shows_fallback(self):
         import sys

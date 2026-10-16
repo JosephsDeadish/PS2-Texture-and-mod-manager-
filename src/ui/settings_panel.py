@@ -275,15 +275,50 @@ class SettingsPanel(BasePanel):
         content.addWidget(save_btn)
 
     def _save(self):
-        self.config.pcsx2_path = self._pcsx2_chooser.get_path()
-        self.config.textures_path = self._tex_chooser.get_path()
-        self.config.pnach_path = self._pnach_chooser.get_path()
+        path_fields = [
+            ("PCSX2 Config Dir", self._pcsx2_chooser.get_path()),
+            ("Textures Folder", self._tex_chooser.get_path()),
+            ("PNACH / Cheats Folder", self._pnach_chooser.get_path()),
+            ("Cover Art Folder", self._covers_chooser.get_path()),
+            ("Memory Cards Folder", self._memcards_chooser.get_path()),
+            ("Partial Textures Folder", self._partial_tex_chooser.get_path()),
+            ("Mod Storage Folder", self._storage_chooser.get_path()),
+            ("Game Library Folder", self._game_lib_chooser.get_path()),
+        ]
+
+        invalid_paths = []
+        for label, raw_path in path_fields:
+            if not raw_path:
+                continue
+            try:
+                if not Path(raw_path).is_dir():
+                    invalid_paths.append((label, raw_path))
+            except Exception as exc:
+                logger.warning("Could not validate %s path %r: %s", label, raw_path, exc)
+                invalid_paths.append((label, raw_path))
+
+        if invalid_paths:
+            logger.warning(
+                "Not saving settings because these paths are invalid: %s",
+                "; ".join(f"{label}={path}" for label, path in invalid_paths),
+            )
+            QMessageBox.warning(
+                self,
+                "Invalid Settings Paths",
+                "Please choose existing folders before saving:\n\n"
+                + "\n".join(f"• {label}: {path}" for label, path in invalid_paths),
+            )
+            return
+
+        self.config.pcsx2_path = path_fields[0][1]
+        self.config.textures_path = path_fields[1][1]
+        self.config.pnach_path = path_fields[2][1]
         self.config.cheats_path = self.config.pnach_path  # same folder in PCSX2
-        self.config.cover_art_path = self._covers_chooser.get_path()
-        self.config.memcards_path = self._memcards_chooser.get_path()
-        self.config.partial_textures_path = self._partial_tex_chooser.get_path()
-        self.config.mods_storage_path = self._storage_chooser.get_path()
-        self.config.game_library_path = self._game_lib_chooser.get_path()
+        self.config.cover_art_path = path_fields[3][1]
+        self.config.memcards_path = path_fields[4][1]
+        self.config.partial_textures_path = path_fields[5][1]
+        self.config.mods_storage_path = path_fields[6][1]
+        self.config.game_library_path = path_fields[7][1]
         self.config.show_conflict_warnings = self._conflicts_check.isChecked()
         self.config.check_updates_on_start = self._updates_check.isChecked()
         self.config.theme = self._theme_combo.currentData() or "dark"
