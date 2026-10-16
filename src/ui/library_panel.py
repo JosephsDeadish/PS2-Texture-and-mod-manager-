@@ -32,7 +32,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.config_manager import save_config
 from src.core.game_library import GameEntry, scan_library
-from src.core.game_registry import lookup_game_title
+from src.core.game_registry import lookup_game_title, serial_matches_query
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
@@ -143,6 +143,9 @@ def _mod_matches_query(mod: ModInfo, query: object) -> bool:
 
     files = getattr(mod, "files", [])
     if isinstance(files, list) and any(_matches_text(rel_path) for rel_path in files if isinstance(rel_path, str)):
+        return True
+
+    if serial_matches_query(mod.game_id, query):
         return True
 
     return False

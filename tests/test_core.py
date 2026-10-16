@@ -3380,6 +3380,11 @@ class TestGameRegistryExpanded(unittest.TestCase):
         from src.core.game_registry import detect_serial_from_path
         self.assertEqual(detect_serial_from_path("SLUS-20672.png"), "SLUS-20672")
 
+    def test_serial_matches_query_uses_title_aliases(self):
+        from src.core.game_registry import serial_matches_query
+        self.assertTrue(serial_matches_query("SLUS-20062", "gta iii"))
+        self.assertFalse(serial_matches_query("SLUS-20062", "yakuza"))
+
     def test_detect_game_serial_logs_file_read_failure(self):
         from src.core.game_registry import detect_game_serial_from_file
         with tempfile.NamedTemporaryFile(delete=False) as tmp:
@@ -8206,6 +8211,7 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertTrue(mod_panel._mod_matches_query(mod, "slus20062"))
         self.assertTrue(mod_panel._mod_matches_query(mod, "intro.dds"))
         self.assertTrue(mod_panel._mod_matches_query(mod, "1.2"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "gta iii"))
         self.assertTrue(mod_panel._mod_matches_query(mod, "texture"))
         self.assertFalse(mod_panel._mod_matches_query(mod, "yakuza"))
 
@@ -8927,6 +8933,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertTrue(library_panel._mod_matches_query(mod, "example.com"))
         self.assertTrue(library_panel._mod_matches_query(mod, "4k"))
         self.assertTrue(library_panel._mod_matches_query(mod, "1.2"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "gta iii"))
         self.assertFalse(library_panel._mod_matches_query(mod, "yakuza"))
 
 

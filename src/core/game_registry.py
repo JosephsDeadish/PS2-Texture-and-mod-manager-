@@ -1310,6 +1310,27 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     return sorted(pairs, key=lambda x: (x[0], x[1]))
 
 
+@lru_cache(maxsize=256)
+def _serials_for_title_query(query: str) -> frozenset[str]:
+    """Return the set of serials that match *query* by title or alias."""
+    return frozenset(serial.upper() for serial, _title in title_to_serials(query))
+
+
+def serial_matches_query(serial: str, query: str) -> bool:
+    """Return True when *serial* matches a title/alias query string.
+
+    This is a lightweight helper for UI search fields that need to match a
+    game serial when the user types a title alias such as ``"GTA III"`` or
+    ``"DMC3"``.  The query lookup is cached so repeated filtering stays fast.
+    """
+    if not serial or not query:
+        return False
+    query = query.strip().casefold()
+    if not query:
+        return False
+    return normalise_serial(serial).upper() in _serials_for_title_query(query)
+
+
 def is_valid_serial(text: str) -> bool:
     """
     Return ``True`` if *text* is a syntactically valid PS2 disc serial.
