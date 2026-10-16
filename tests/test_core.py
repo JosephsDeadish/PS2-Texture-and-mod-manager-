@@ -7420,6 +7420,73 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertTrue(any("Opened the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
         self.assertTrue(any("Copied the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
 
+    def test_history_source_actions_missing_source_url_notify(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel._selected_source_url = ""
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel.webbrowser, "open") as open_mock:
+            panel._open_selected_source()
+            panel._copy_selected_source()
+
+        open_mock.assert_not_called()
+        self.assertEqual(
+            [call.args[0] for call in panel._notify_status.call_args_list],
+            [
+                "No source URL is available for this history entry.",
+                "No source URL is available to copy.",
+            ],
+        )
+
+    def test_history_source_actions_backend_failures_log_and_notify(self):
+        import sys
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeClipboard:
+            def setText(self, _text):
+                raise RuntimeError("clipboard boom")
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel._selected_source_url = "https://example.com/source"
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel.webbrowser, "open", return_value=False) as open_mock:
+            pyqt_pkg = types.ModuleType("PyQt6")
+            pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+            qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+            class _QApplication:
+                @staticmethod
+                def clipboard():
+                    return FakeClipboard()
+
+            qtwidgets.QApplication = _QApplication
+
+            with patch.dict(sys.modules, {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            }):
+                with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                    panel._open_selected_source()
+                    panel._copy_selected_source()
+
+        open_mock.assert_called_once_with("https://example.com/source", new=2)
+        self.assertEqual(
+            [call.args[0] for call in panel._notify_status.call_args_list],
+            [
+                "Could not open the selected source URL.",
+                "Could not copy the selected source URL.",
+            ],
+        )
+        self.assertTrue(any("browser refused" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("Failed to copy download history source URL" in msg for msg in logs.output), logs.output)
+
     def test_delete_history_failure_shows_error_dialog(self):
         import types
 
