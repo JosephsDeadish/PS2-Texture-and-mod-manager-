@@ -2177,6 +2177,9 @@ class TestWidgetsLogging(unittest.TestCase):
             ItemDataRole=types.SimpleNamespace(UserRole=256),
             ItemFlag=types.SimpleNamespace(ItemIsEnabled=1),
         )
+        qtcore.QUrl = type("QUrl", (), {
+            "fromLocalFile": staticmethod(lambda path: path),
+        })
         qtcore.QSize = type("QSize", (), {})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtcore.QThread = type("QThread", (), {})
@@ -2199,6 +2202,9 @@ class TestWidgetsLogging(unittest.TestCase):
         qtgui = types.ModuleType("PyQt6.QtGui")
         for name in ("QPixmap", "QFont", "QIcon"):
             setattr(qtgui, name, type(name, (), {}))
+        qtgui.QDesktopServices = type("QDesktopServices", (), {
+            "openUrl": staticmethod(lambda *args, **kwargs: True),
+        })
 
         return patch.dict(
             sys.modules,
@@ -2316,6 +2322,54 @@ class TestWidgetsLogging(unittest.TestCase):
         self.assertFalse(ok)
         warning.assert_called_once()
         self.assertTrue(any("Failed to open Patreon page" in msg for msg in logs.output))
+
+    def test_conflict_folder_open_failure_logs_warning_and_warns(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import ConflictResolverDialog
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                conflict_file = Path(tmpdir) / "conflict" / "texture.png"
+                conflict_file.parent.mkdir(parents=True)
+                conflict_file.write_text("data", encoding="utf-8")
+
+                fake = SimpleNamespace(
+                    _list_widget=MagicMock(),
+                    _conflicts=[SimpleNamespace(items=[conflict_file])],
+                )
+                fake._list_widget.currentRow.return_value = 0
+
+                with patch("PyQt6.QtGui.QDesktopServices.openUrl", return_value=False):
+                    with patch("src.ui.widgets.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                            ConflictResolverDialog._on_open_folder(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not open conflict folder" in msg for msg in logs.output))
+
+    def test_backup_folder_open_failure_logs_warning_and_warns(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import BackupManagerDialog
+
+            fake = SimpleNamespace(_config=AppConfig())
+            with tempfile.TemporaryDirectory() as tmpdir:
+                backup_dir = Path(tmpdir) / "backups"
+
+                with patch("src.core.backup_manager.get_backup_dir", return_value=backup_dir):
+                    with patch("PyQt6.QtGui.QDesktopServices.openUrl", return_value=False):
+                        with patch("src.ui.widgets.QMessageBox.warning") as warning:
+                            with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                                BackupManagerDialog._on_open_dir(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not open backup folder" in msg for msg in logs.output))
 
     def test_mod_notes_refresh_failure_logs_warning(self):
         import sys

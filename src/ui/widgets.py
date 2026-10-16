@@ -41,6 +41,41 @@ from src.ui.tooltips import get_tip
 
 logger = logging.getLogger(__name__)
 
+
+def _open_local_folder(
+    folder: Path,
+    parent: QWidget,
+    *,
+    context: str,
+    failure_title: str,
+    failure_message: str,
+) -> bool:
+    """Open *folder* in the system file manager, warning on failure."""
+    from PyQt6.QtCore import QUrl
+    from PyQt6.QtGui import QDesktopServices
+
+    try:
+        opened = QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+    except Exception as exc:
+        logger.warning("Could not open %s folder %s: %s", context, folder, exc)
+        QMessageBox.warning(
+            parent,
+            failure_title,
+            f"{failure_message}\n\nPath:\n{folder}\n\nError: {exc}",
+        )
+        return False
+
+    if not opened:
+        logger.warning("Could not open %s folder %s: file manager refused", context, folder)
+        QMessageBox.warning(
+            parent,
+            failure_title,
+            f"{failure_message}\n\nPath:\n{folder}\n\nPlease open it manually.",
+        )
+        return False
+
+    return True
+
 # ---------------------------------------------------------------------------
 # PnachCodePickerDialog
 # ---------------------------------------------------------------------------
@@ -3288,13 +3323,16 @@ class ConflictResolverDialog(QDialog):
         if not conflict.items:
             return
 
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-
         folder = conflict.items[0]
         if folder.is_file():
             folder = folder.parent
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+        _open_local_folder(
+            folder,
+            self,
+            context="conflict",
+            failure_title="Folder Unavailable",
+            failure_message="Could not open the folder for the selected conflict.",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -3552,9 +3590,13 @@ class BackupManagerDialog(QDialog):
             logger.warning("Could not determine backup directory: %s", exc)
             return
 
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(backup_dir)))
+        _open_local_folder(
+            backup_dir,
+            self,
+            context="backup",
+            failure_title="Backup Folder Unavailable",
+            failure_message="Could not open the backup folder.",
+        )
 
 
 # ---------------------------------------------------------------------------
