@@ -226,7 +226,13 @@ class DownloadsPanel(BasePanel):
         if config is None:
             return
         entry_id = ui_state_bucket(config, "downloads_panel").get("history_selected_entry_id", "")
-        if not isinstance(entry_id, str) or not entry_id:
+        if not isinstance(entry_id, str):
+            logger.warning(
+                "Saved download history entry %r is invalid; clearing selection",
+                entry_id,
+            )
+            return
+        if not entry_id:
             return
         for row, entry in enumerate(self._history_entries):
             if getattr(entry, "id", "") != entry_id:

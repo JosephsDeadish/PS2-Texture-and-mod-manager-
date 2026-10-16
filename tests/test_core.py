@@ -6742,6 +6742,41 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             logs.output,
         )
 
+    def test_history_selection_restore_warns_on_invalid_entry_id(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeListWidget:
+            def __init__(self):
+                self.current_row = -1
+                self.set_calls = 0
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                self.set_calls += 1
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": 12345}}
+        )
+        panel._history_entries = [
+            types.SimpleNamespace(id="entry-1"),
+            types.SimpleNamespace(id="entry-2"),
+        ]
+        panel._list_widget = FakeListWidget()
+
+        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+            panel._restore_history_selection()
+
+        self.assertEqual(panel._list_widget.set_calls, 0)
+        self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertTrue(
+            any("invalid" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_history_selection_change_saves_entry_id(self):
         import types
 
