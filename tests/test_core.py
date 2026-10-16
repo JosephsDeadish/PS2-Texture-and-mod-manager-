@@ -655,10 +655,30 @@ class TestMemoryCard(unittest.TestCase):
         p.write_bytes(MC_SUPERBLOCK_MAGIC + b"\x00" * 512)
         self.assertTrue(is_valid_memcard(str(p)))
 
+    def test_is_valid_memcard_logs_warning_on_io_error(self):
+        from src.core.memory_card import is_valid_memcard
+
+        with patch.object(Path, "is_file", return_value=True), \
+             patch.object(Path, "stat", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertFalse(is_valid_memcard(str(Path(self.tmpdir) / "card.ps2")))
+
+        self.assertTrue(any("Could not inspect memory card" in msg for msg in logs.output))
+
     def test_list_memcard_files_empty_dir(self):
         from src.core.memory_card import list_memcard_files
         result = list_memcard_files(self.tmpdir)
         self.assertEqual(result, [])
+
+    def test_list_memcard_files_logs_warning_on_io_error(self):
+        from src.core.memory_card import list_memcard_files
+
+        with patch.object(Path, "is_dir", return_value=True), \
+             patch.object(Path, "iterdir", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertEqual(list_memcard_files(self.tmpdir), [])
+
+        self.assertTrue(any("Could not list memory card files under" in msg for msg in logs.output))
 
     def test_list_memcard_files_finds_ps2_files(self):
         from src.core.memory_card import list_memcard_files
@@ -672,8 +692,24 @@ class TestMemoryCard(unittest.TestCase):
         from src.core.memory_card import list_saves, MemoryCardError
         p = Path(self.tmpdir) / "bad.ps2"
         p.write_bytes(b"BADDATA" + b"\x00" * 512)
-        with self.assertRaises(MemoryCardError):
-            list_saves(str(p))
+        with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+            with self.assertRaises(MemoryCardError):
+                list_saves(str(p))
+        self.assertTrue(any("invalid header" in msg for msg in logs.output))
+
+    def test_list_saves_logs_warning_on_parse_error(self):
+        from src.core.memory_card import create_memcard, list_saves, MemoryCardError
+        import struct
+
+        card = Path(self.tmpdir) / "card.ps2"
+        create_memcard(str(card), size_mb=1)
+
+        with patch("src.core.memory_card.struct.unpack_from", side_effect=struct.error("boom")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                with self.assertRaises(MemoryCardError):
+                    list_saves(str(card))
+
+        self.assertTrue(any("Could not parse memory card" in msg for msg in logs.output))
 
 
 class TestDownloader(unittest.TestCase):
@@ -1536,7 +1572,6 @@ class TestMemoryCardWrite(unittest.TestCase):
         from src.core.memory_card import (
             copy_save_between_cards,
             MemoryCardError,
-            export_save,
         )
         src_card = self._make_card("SrcCard.ps2")
         dst_card = self._make_card("DstCard.ps2")
@@ -1547,6 +1582,17 @@ class TestMemoryCardWrite(unittest.TestCase):
             copy_save_between_cards(src_card, "FAKE-00001", dst_card, self.tmpdir)
         except MemoryCardError:
             pass  # Expected — save not found in blank card
+
+    def test_copy_save_between_cards_logs_cleanup_failure(self):
+        from src.core.memory_card import copy_save_between_cards
+
+        with patch("src.core.memory_card.export_save", return_value=str(Path(self.tmpdir) / "export.bin")), \
+             patch("src.core.memory_card.import_raw_save", return_value=True), \
+             patch("src.core.memory_card.Path.unlink", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertTrue(copy_save_between_cards("/src.ps2", "SAVE-00001", "/dst.ps2", self.tmpdir))
+
+        self.assertTrue(any("Could not remove temporary exported save" in msg for msg in logs.output))
 
 
 class TestUpdateChecker(unittest.TestCase):
