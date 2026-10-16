@@ -185,6 +185,17 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
     if _matches_text(game_field):
         return True
     title_matches_query = getattr(serial_db, "title_matches_query", None)
+    get_info = getattr(serial_db, "get_info", None)
+    titles_for_serial = getattr(serial_db, "titles_for_serial", None)
+
+    def _matches_game_info(game_info: object) -> bool:
+        if game_info is None:
+            return False
+        for field_name in ("release_date", "developer", "publisher", "genre"):
+            if _matches_text(getattr(game_info, field_name, "")):
+                return True
+        return False
+
     if (
         callable(title_matches_query)
         and isinstance(game_field, str)
@@ -193,13 +204,40 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
     ):
         return True
 
-    get_info = getattr(serial_db, "get_info", None)
     if callable(get_info) and isinstance(game_field, str) and game_field:
-        game_info = get_info(game_field)
-        if game_info is not None:
-            for field_name in ("release_date", "developer", "publisher", "genre"):
-                if _matches_text(getattr(game_info, field_name, "")):
+        try:
+            game_info = get_info(game_field)
+        except Exception as exc:
+            logger.warning("Could not inspect browse game metadata for %s: %s", game_field, exc)
+        else:
+            if _matches_game_info(game_info):
+                return True
+
+    serial = entry.get("game_serial", "")
+    if callable(titles_for_serial) and isinstance(serial, str) and serial.strip():
+        try:
+            serial_titles = titles_for_serial(serial)
+        except Exception as exc:
+            logger.warning("Could not resolve browse game titles for serial %s: %s", serial, exc)
+        else:
+            for title in serial_titles:
+                if _matches_text(title):
                     return True
+                if (
+                    callable(title_matches_query)
+                    and isinstance(title, str)
+                    and title
+                    and title_matches_query(title, needle)
+                ):
+                    return True
+                if callable(get_info) and isinstance(title, str) and title:
+                    try:
+                        game_info = get_info(title)
+                    except Exception as exc:
+                        logger.warning("Could not inspect browse game metadata for %s: %s", title, exc)
+                        continue
+                    if _matches_game_info(game_info):
+                        return True
 
     return False
 

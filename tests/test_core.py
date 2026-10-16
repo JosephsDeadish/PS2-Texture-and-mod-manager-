@@ -5237,6 +5237,13 @@ class TestScraperDialogClassifier(unittest.TestCase):
             def title_matches_query(self, title, query):
                 return title == "Grand Theft Auto III" and query == "gta iii"
 
+            def titles_for_serial(self, serial):
+                if serial == "SLUS-20370":
+                    return ["Grand Theft Auto III"]
+                if serial == "SLUS-12345":
+                    return ["Final Fantasy X"]
+                return []
+
             def get_info(self, title):
                 if title == "Final Fantasy X":
                     from types import SimpleNamespace
@@ -5332,6 +5339,18 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "source": "",
             "upscale_tech": "",
             "size_label": "",
+            "game_serial": "SLUS-20370",
+            "game": "",
+            "tags": [],
+        }, "gta iii", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
             "game_serial": "",
             "game": "Final Fantasy X",
             "tags": [],
@@ -5346,6 +5365,18 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "size_label": "",
             "game_serial": "",
             "game": "Final Fantasy X",
+            "tags": [],
+        }, "roleplaying", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "SLUS-12345",
+            "game": "",
             "tags": [],
         }, "roleplaying", DummySerialDB()))
         self.assertTrue(_entry_matches_query({
