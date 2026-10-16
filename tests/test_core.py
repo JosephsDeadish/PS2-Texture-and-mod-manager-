@@ -5381,6 +5381,150 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertTrue(any("sort mode" in msg for msg in logs.output))
         self.assertTrue(any("tab index" in msg for msg in logs.output))
 
+    def test_download_install_dialog_state_restores_and_saves(self):
+        browse_panel = self._import_browse_panel()
+        DownloadInstallDialog = browse_panel.DownloadInstallDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def count(self):
+                return len(self.items)
+
+            def itemData(self, index):
+                return self.items[index][1]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        dialog = DownloadInstallDialog.__new__(DownloadInstallDialog)
+        dialog.config = AppConfig(
+            ui_state={
+                "download_install_dialog": {
+                    "url": "https://example.com/download.zip",
+                    "type": "cheat",
+                    "name": "Last Used Name",
+                    "author": "Last Used Author",
+                    "game": "SLUS-20062",
+                    "description": "Last used description",
+                    "source_url": "https://example.com/source",
+                }
+            }
+        )
+        dialog._url_edit = FakeLineEdit()
+        dialog._type_combo = FakeComboBox([
+            ("Texture Pack", ModType.TEXTURE_PACK),
+            ("PNACH Patch", ModType.PNACH),
+            ("Cover Art", ModType.COVER_ART),
+            ("Save File", ModType.SAVE_FILE),
+            ("Cheat", ModType.CHEAT),
+        ])
+        dialog._name_edit = FakeLineEdit()
+        dialog._author_edit = FakeLineEdit()
+        dialog._game_edit = FakeLineEdit()
+        dialog._desc_edit = FakeLineEdit()
+        dialog._source_url_edit = FakeLineEdit()
+
+        with patch.object(browse_panel, "save_config") as save_mock:
+            dialog._restore_state()
+            self.assertEqual(dialog._url_edit.value, "https://example.com/download.zip")
+            self.assertEqual(dialog._name_edit.value, "Last Used Name")
+            self.assertEqual(dialog._author_edit.value, "Last Used Author")
+            self.assertEqual(dialog._game_edit.value, "SLUS-20062")
+            self.assertEqual(dialog._desc_edit.value, "Last used description")
+            self.assertEqual(dialog._source_url_edit.value, "https://example.com/source")
+            self.assertEqual(dialog._type_combo.currentData(), ModType.CHEAT)
+
+            dialog._save_state("closing direct download dialog")
+
+        self.assertEqual(
+            dialog.config.ui_state["download_install_dialog"]["type"],
+            "cheat",
+        )
+        self.assertEqual(
+            dialog.config.ui_state["download_install_dialog"]["url"],
+            "https://example.com/download.zip",
+        )
+        save_mock.assert_called_once_with(dialog.config)
+
+    def test_download_install_dialog_logs_stale_saved_type(self):
+        browse_panel = self._import_browse_panel()
+        DownloadInstallDialog = browse_panel.DownloadInstallDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def count(self):
+                return len(self.items)
+
+            def itemData(self, index):
+                return self.items[index][1]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        dialog = DownloadInstallDialog.__new__(DownloadInstallDialog)
+        dialog.config = AppConfig(
+            ui_state={
+                "download_install_dialog": {
+                    "type": "not-a-real-mod-type",
+                }
+            }
+        )
+        dialog._url_edit = FakeLineEdit()
+        dialog._type_combo = FakeComboBox([
+            ("Texture Pack", ModType.TEXTURE_PACK),
+            ("PNACH Patch", ModType.PNACH),
+            ("Cover Art", ModType.COVER_ART),
+            ("Save File", ModType.SAVE_FILE),
+            ("Cheat", ModType.CHEAT),
+        ])
+        dialog._name_edit = FakeLineEdit()
+        dialog._author_edit = FakeLineEdit()
+        dialog._game_edit = FakeLineEdit()
+        dialog._desc_edit = FakeLineEdit()
+        dialog._source_url_edit = FakeLineEdit()
+
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            dialog._restore_state()
+
+        self.assertEqual(dialog._type_combo.currentData(), ModType.TEXTURE_PACK)
+        self.assertTrue(
+            any("Saved direct-download mod type" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_cover_dialog_auto_fills_single_serial_match(self):
         browse_panel = self._import_browse_panel()
         CoverDownloadDialog = browse_panel.CoverDownloadDialog

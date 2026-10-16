@@ -76,6 +76,8 @@ _ACCOUNT_REQUIRED_SOURCES: frozenset = frozenset({
     "Patreon",
 })
 
+_DOWNLOAD_INSTALL_STATE_KEY = "download_install_dialog"
+
 _SORT_OPTIONS = [
     ("⭐ Featured order", "featured"),
     ("🅰 Name (A→Z)", "name"),
@@ -1325,6 +1327,7 @@ class DownloadInstallDialog(QDialog):
         self.setWindowTitle("Download & Install Mod from URL")
         self.setMinimumSize(580, 440)
         self._build()
+        self._restore_state()
 
     def _build(self):
         layout = QVBoxLayout(self)
@@ -1419,6 +1422,77 @@ class DownloadInstallDialog(QDialog):
         btns.addWidget(close_btn)
         layout.addLayout(btns)
 
+    def _dialog_state_bucket(self) -> dict:
+        return ui_state_bucket(self.config, _DOWNLOAD_INSTALL_STATE_KEY)
+
+    def _dialog_state(self) -> dict:
+        mod_type = self._type_combo.currentData()
+        if hasattr(mod_type, "value"):
+            mod_type = mod_type.value
+        elif mod_type is None:
+            mod_type = ""
+        else:
+            mod_type = str(mod_type)
+        return {
+            "url": self._url_edit.text().strip(),
+            "type": mod_type,
+            "name": self._name_edit.text().strip(),
+            "author": self._author_edit.text().strip(),
+            "game": self._game_edit.text().strip(),
+            "description": self._desc_edit.text().strip(),
+            "source_url": self._source_url_edit.text().strip(),
+        }
+
+    def _save_state(self, context: str) -> None:
+        bucket = self._dialog_state_bucket()
+        bucket.update(self._dialog_state())
+        _save_browse_config(self.config, context)
+
+    def _restore_state(self) -> None:
+        bucket = self._dialog_state_bucket()
+        self._url_edit.setText(str(bucket.get("url", "") or ""))
+        self._name_edit.setText(str(bucket.get("name", "") or ""))
+        self._author_edit.setText(str(bucket.get("author", "") or ""))
+        self._game_edit.setText(str(bucket.get("game", "") or ""))
+        self._desc_edit.setText(str(bucket.get("description", "") or ""))
+        self._source_url_edit.setText(str(bucket.get("source_url", "") or ""))
+        saved_type = bucket.get("type", "")
+        if saved_type and not self._set_combo_value(self._type_combo, saved_type):
+            logger.warning(
+                "Saved direct-download mod type %r is no longer available; using default",
+                saved_type,
+            )
+
+    @staticmethod
+    def _set_combo_value(combo, value: object) -> bool:
+        if combo is None:
+            return False
+        if hasattr(value, "value") and not isinstance(value, str):
+            value = getattr(value, "value")
+        if value in (None, ""):
+            return False
+        target = str(value)
+        count = getattr(combo, "count", lambda: 0)()
+        item_data = getattr(combo, "itemData", None)
+        if not callable(item_data):
+            return False
+        for index in range(count):
+            data = item_data(index)
+            if data == value:
+                combo.setCurrentIndex(index)
+                return True
+            if hasattr(data, "value") and getattr(data, "value") == value:
+                combo.setCurrentIndex(index)
+                return True
+            if str(data) == target:
+                combo.setCurrentIndex(index)
+                return True
+        return False
+
+    def reject(self):
+        self._save_state("closing direct download dialog")
+        super().reject()
+
     @staticmethod
     def _convert_url(url: str) -> Optional[str]:
         """Convert a share-page URL to a direct download URL where possible.
@@ -1479,6 +1553,7 @@ class DownloadInstallDialog(QDialog):
         return url
 
     def _download(self):
+        self._save_state("starting direct download")
         raw_url = self._url_edit.text().strip()
         if not raw_url:
             self._status.setText("⚠  Please enter a URL")
