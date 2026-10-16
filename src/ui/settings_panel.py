@@ -408,7 +408,26 @@ class SettingsPanel(BasePanel):
         if not path:
             QMessageBox.warning(self, "No Path", "Please set the PCSX2 config directory first.")
             return
-        paths = detect_pcsx2_paths(path)
+        if not Path(path).is_dir():
+            logger.warning("PCSX2 config directory not found: %s", path)
+            QMessageBox.warning(
+                self,
+                "PCSX2 Path Not Found",
+                "Could not auto-detect PCSX2 subfolders because the selected "
+                f"folder does not exist:\n{path}",
+            )
+            return
+        try:
+            paths = detect_pcsx2_paths(path)
+        except Exception as exc:
+            logger.warning("Could not auto-detect PCSX2 paths for %s: %s", path, exc)
+            QMessageBox.warning(
+                self,
+                "Auto-detect Failed",
+                "Could not auto-detect PCSX2 subfolders from:\n"
+                f"{path}\n\n{exc}",
+            )
+            return
         self._tex_chooser.set_path(paths.get("textures_path", ""))
         self._pnach_chooser.set_path(paths.get("pnach_path", ""))
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))

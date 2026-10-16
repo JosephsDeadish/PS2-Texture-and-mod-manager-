@@ -2018,6 +2018,80 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         fake._game_lib_count_lbl.setText.assert_called_once_with("  Folder not found")
         self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
 
+    def test_settings_panel_auto_detect_missing_path_preserves_existing_values(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            fake._pcsx2_chooser.get_path.return_value = "/definitely/not/a/real/folder"
+
+            with patch("src.core.config_manager.detect_pcsx2_paths") as detect_paths:
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                    with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                        SettingsPanel._auto_detect(fake)
+
+        detect_paths.assert_not_called()
+        warning.assert_called_once()
+        self.assertTrue(any("PCSX2 config directory not found" in msg for msg in logs.output))
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._partial_tex_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
+    def test_settings_panel_auto_detect_failure_preserves_existing_values(self):
+        import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake._pcsx2_chooser.get_path.return_value = tmpdir
+                with patch(
+                    "src.core.config_manager.detect_pcsx2_paths",
+                    side_effect=RuntimeError("boom"),
+                ) as detect_paths:
+                    with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._auto_detect(fake)
+
+        detect_paths.assert_called_once_with(tmpdir)
+        warning.assert_called_once()
+        self.assertTrue(any("Could not auto-detect PCSX2 paths" in msg for msg in logs.output))
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._partial_tex_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
     def test_settings_panel_catalogue_check_reports_issues(self):
         import sys
         from types import SimpleNamespace
