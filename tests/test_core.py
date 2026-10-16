@@ -3593,6 +3593,19 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         ids = self._load_catalogue()
         self.assertGreaterEqual(len(ids), 40, f"Expected ≥40 entries, got {len(ids)}")
 
+    def test_builtin_catalogue_index_matches_entries(self):
+        from src.core.catalogue_loader import load_catalogue
+
+        built_in = load_catalogue(
+            catalogue_dir=self.catalogue_dir,
+            strict=True,
+            user_catalogue_dir=False,
+        )
+        manifest = json.loads((self.catalogue_dir / "_index.json").read_text(encoding="utf-8"))
+        ids = [entry["id"] for entry in built_in]
+        self.assertEqual(manifest["count"], len(ids))
+        self.assertEqual(manifest["ids"], ids)
+
     def test_catalogue_column_helper_is_responsive(self):
         from src.core.browse_layout import calculate_catalogue_columns
         self.assertEqual(calculate_catalogue_columns(0), 3)
