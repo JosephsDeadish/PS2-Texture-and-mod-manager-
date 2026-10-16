@@ -6733,10 +6733,16 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._list_widget = FakeListWidget()
 
         with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
-            panel._restore_history_selection()
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._restore_history_selection()
 
         self.assertEqual(panel._list_widget.set_calls, 0)
         self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertNotIn(
+            "history_selected_entry_id",
+            panel.config.ui_state["downloads_panel"],
+        )
+        save_mock.assert_called_once()
         self.assertTrue(
             any("no longer available" in msg for msg in logs.output),
             logs.output,
@@ -6768,10 +6774,16 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._list_widget = FakeListWidget()
 
         with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
-            panel._restore_history_selection()
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._restore_history_selection()
 
         self.assertEqual(panel._list_widget.set_calls, 0)
         self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertNotIn(
+            "history_selected_entry_id",
+            panel.config.ui_state["downloads_panel"],
+        )
+        save_mock.assert_called_once()
         self.assertTrue(
             any("invalid" in msg for msg in logs.output),
             logs.output,

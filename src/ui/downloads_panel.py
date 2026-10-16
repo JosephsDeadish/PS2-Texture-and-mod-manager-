@@ -231,6 +231,9 @@ class DownloadsPanel(BasePanel):
                 "Saved download history entry %r is invalid; clearing selection",
                 entry_id,
             )
+            self._clear_history_selection_state(
+                "clearing invalid download history selection",
+            )
             return
         if not entry_id:
             return
@@ -251,6 +254,19 @@ class DownloadsPanel(BasePanel):
             "Saved download history entry %r is no longer available; clearing selection",
             entry_id,
         )
+        self._clear_history_selection_state(
+            "clearing missing download history selection",
+        )
+
+    def _clear_history_selection_state(self, context: str) -> None:
+        config = getattr(self, "config", None)
+        if config is None:
+            return
+        bucket = ui_state_bucket(config, "downloads_panel")
+        if "history_selected_entry_id" not in bucket:
+            return
+        bucket.pop("history_selected_entry_id", None)
+        self._save_panel_config(context)
 
     def _clear_history_filters(self) -> None:
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
