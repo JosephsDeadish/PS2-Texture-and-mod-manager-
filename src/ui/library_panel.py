@@ -1031,6 +1031,15 @@ class LibraryPanel(BasePanel):
                 self._detail.show_game(game)
                 return
 
+        logger.warning(
+            "Saved library selection path=%r serial=%r no longer matches a visible game; "
+            "clearing stale selection",
+            target_path,
+            target_serial,
+        )
+        if state.pop("selected_game", None) is not None:
+            _save_library_config(self.config, "clearing stale selected game state")
+
     # ------------------------------------------------------------------
     # Populate game list
     # ------------------------------------------------------------------
@@ -1138,7 +1147,7 @@ class LibraryPanel(BasePanel):
                 library_serials.add(serial_key)
 
         # Add DB-only games (have mods but no matching ISO in the library)
-        db_only_games = self._get_db_only_games(library_serials)
+        db_only_games = self._get_db_only_games(library_serials, mods_by_serial)
         if db_only_games:
             sep_lbl = QLabel("── Installed (no disc image) ──")
             sep_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1176,18 +1185,23 @@ class LibraryPanel(BasePanel):
     # DB-game helpers
     # ------------------------------------------------------------------
 
-    def _get_db_only_games(self, exclude_serials: set[str]) -> list[tuple[GameEntry, int]]:
+    def _get_db_only_games(
+        self,
+        exclude_serials: set[str],
+        serial_counts: Optional[dict[str, int]] = None,
+    ) -> list[tuple[GameEntry, int]]:
         """Build GameEntry objects for serials in the mod DB that aren't in exclude_serials."""
         from src.core.game_registry import lookup_game_title
-        all_mods = self.db.all()
-        serials_with_mods: dict[str, int] = {}
-        for m in all_mods:
-            if m.game_id:
-                key = m.game_id.upper()
-                serials_with_mods[key] = serials_with_mods.get(key, 0) + 1
+        if serial_counts is None:
+            all_mods = self.db.all()
+            serial_counts = {}
+            for m in all_mods:
+                if m.game_id:
+                    key = m.game_id.upper()
+                    serial_counts[key] = serial_counts.get(key, 0) + 1
 
         result: list[tuple[GameEntry, int]] = []
-        for serial, mod_count in sorted(serials_with_mods.items()):
+        for serial, mod_count in sorted(serial_counts.items()):
             if serial in exclude_serials:
                 continue
             title = lookup_game_title(serial) or serial

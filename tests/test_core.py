@@ -8274,6 +8274,63 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertIs(panel._selected_card, panel._cards[1])
         self.assertEqual(panel._detail.shown.title, "Kingdom Hearts")
 
+    def test_restore_selected_game_clears_stale_selection(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeGame:
+            def __init__(self, path, serial, title):
+                self.path = path
+                self.serial = serial
+                self.title = title
+
+        class FakeCard:
+            def __init__(self, game):
+                self.game = game
+                self.selected = False
+
+            def set_selected(self, value):
+                self.selected = bool(value)
+
+        class FakeDetail:
+            def __init__(self):
+                self.shown = None
+
+            def show_game(self, game):
+                self.shown = game
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "selected_game": {
+                        "path": "/games/missing.iso",
+                        "serial": "SLUS-99999",
+                        "title": "Missing Game",
+                    }
+                }
+            }
+        )
+        panel._cards = [FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War"))]
+        panel._selected_card = None
+        panel._detail = FakeDetail()
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                LibraryPanel._restore_selected_game(panel)
+
+        self.assertEqual(panel.config.ui_state["library_panel"], {})
+        self.assertFalse(panel._cards[0].selected)
+        self.assertIsNone(panel._selected_card)
+        self.assertIsNone(panel._detail.shown)
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(
+            any("clearing stale selection" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_scan_library_reuses_cache_until_invalidated(self):
         library_panel = self._import_library_panel()
         LibraryPanel = library_panel.LibraryPanel
@@ -8295,6 +8352,33 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertEqual(second, ["first"])
         self.assertEqual(third, ["second"])
         self.assertEqual(scan_mock.call_count, 2)
+
+    def test_get_db_only_games_uses_provided_serial_counts(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.db = types.SimpleNamespace(all=MagicMock(side_effect=AssertionError("unexpected db scan")))
+
+        with patch(
+            "src.core.game_registry.lookup_game_title",
+            side_effect=lambda serial: f"Title {serial}",
+        ) as lookup_mock:
+            db_only = LibraryPanel._get_db_only_games(
+                panel,
+                {"SLUS-20062"},
+                {"SLUS-20062": 2, "SLUS-21075": 1},
+            )
+
+        self.assertEqual(len(db_only), 1)
+        game, mod_count = db_only[0]
+        self.assertEqual(game.serial, "SLUS-21075")
+        self.assertEqual(game.title, "Title SLUS-21075")
+        self.assertEqual(mod_count, 1)
+        panel.db.all.assert_not_called()
+        lookup_mock.assert_called_once_with("SLUS-21075")
 
     def test_populate_missing_game_library_path_shows_fallback(self):
         library_panel = self._import_library_panel()
