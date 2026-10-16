@@ -330,6 +330,7 @@ def _extract_7z(src: Path, dest: Path) -> List[str]:
     except Exception as exc:
         if isinstance(exc, ArchiveError):
             raise
+        logger.warning("7z extraction failed for %s: %s", src, exc)
         raise ArchiveError(f"7z extraction failed: {exc}") from exc
 
     return extracted
@@ -380,6 +381,7 @@ def _extract_rar(src: Path, dest: Path) -> List[str]:
     except Exception as exc:
         if isinstance(exc, ArchiveError):
             raise
+        logger.warning("RAR extraction failed for %s: %s", src, exc)
         raise ArchiveError(f"RAR extraction failed: {exc}") from exc
 
     return extracted

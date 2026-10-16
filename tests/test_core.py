@@ -1222,6 +1222,95 @@ class TestArchiveExtraction(unittest.TestCase):
             extract_archive(rar_path, self.tmpdir)
         self.assertIn("RAR", str(ctx.exception))
 
+    def test_extract_7z_logs_unexpected_failure(self):
+        import sys
+        import types
+
+        fake_py7zr = types.SimpleNamespace()
+
+        class FakeSevenZipFile:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def getnames(self):
+                return ["safe.txt"]
+
+            def extractall(self, path=None):
+                raise RuntimeError("boom")
+
+        fake_py7zr.SevenZipFile = FakeSevenZipFile
+
+        with patch.dict(sys.modules, {"py7zr": fake_py7zr}):
+            from src.core.archive import _extract_7z, ArchiveError
+
+            src = Path(self.tmpdir) / "mod.7z"
+            src.write_bytes(b"fake")
+            dest = Path(self.tmpdir) / "out7z"
+
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                with self.assertRaises(ArchiveError):
+                    _extract_7z(src, dest)
+
+        self.assertTrue(any("7z extraction failed" in msg for msg in logs.output))
+
+    def test_extract_rar_logs_unexpected_failure(self):
+        import sys
+        import types
+
+        fake_rarfile = types.SimpleNamespace()
+
+        class FakeMember:
+            def __init__(self, filename):
+                self.filename = filename
+
+            def is_dir(self):
+                return False
+
+        class FakeRarFile:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def infolist(self):
+                return [FakeMember("safe.txt")]
+
+            def extractall(self, path):
+                raise RuntimeError("boom")
+
+        fake_rarfile.RarFile = FakeRarFile
+        class FakeBadRarFile(Exception):
+            pass
+
+        class FakeRarCannotExec(Exception):
+            pass
+
+        fake_rarfile.BadRarFile = FakeBadRarFile
+        fake_rarfile.RarCannotExec = FakeRarCannotExec
+
+        with patch.dict(sys.modules, {"rarfile": fake_rarfile}):
+            from src.core.archive import _extract_rar, ArchiveError
+
+            src = Path(self.tmpdir) / "mod.rar"
+            src.write_bytes(b"fake")
+            dest = Path(self.tmpdir) / "outrar"
+
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                with self.assertRaises(ArchiveError):
+                    _extract_rar(src, dest)
+
+        self.assertTrue(any("RAR extraction failed" in msg for msg in logs.output))
+
     def test_extract_unsupported_format_raises(self):
         from src.core.archive import extract_archive, ArchiveError
         p = str(Path(self.tmpdir) / "mod.tar.gz")
