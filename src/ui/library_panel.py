@@ -763,6 +763,8 @@ class LibraryPanel(BasePanel):
         self.manager = ModManager(self.db)
         self._cards: list[_GameCard] = []
         self._selected_card: Optional[_GameCard] = None
+        self._library_scan_cache_path: Optional[str] = None
+        self._library_scan_cache: list[GameEntry] = []
         self._state_persistence_enabled = False
         self._build()
 
@@ -981,7 +983,7 @@ class LibraryPanel(BasePanel):
             self._populate_db_games()
             return
 
-        games = scan_library(library_path)
+        games = self._scan_library(library_path)
 
         if not games:
             placeholder = QLabel(
@@ -1039,6 +1041,18 @@ class LibraryPanel(BasePanel):
         self._count_lbl.setText(
             f"Library games: {total} total  •  {games_with_mods} with installed mods"
         )
+
+    def _invalidate_library_scan_cache(self) -> None:
+        self._library_scan_cache_path = None
+        self._library_scan_cache = []
+
+    def _scan_library(self, library_path: str) -> list[GameEntry]:
+        if self._library_scan_cache_path == library_path:
+            return list(self._library_scan_cache)
+        games = scan_library(library_path)
+        self._library_scan_cache_path = library_path
+        self._library_scan_cache = list(games)
+        return list(games)
 
     # ------------------------------------------------------------------
     # DB-game helpers
@@ -1121,6 +1135,7 @@ class LibraryPanel(BasePanel):
                     break
 
     def refresh(self):
+        self._invalidate_library_scan_cache()
         self._sync_installed_content()
         if self._mode_stack.currentIndex() == 1:
             self._switch_to_all_mods()

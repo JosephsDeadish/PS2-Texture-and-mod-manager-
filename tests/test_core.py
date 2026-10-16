@@ -7372,6 +7372,28 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         )
         save_mock.assert_called_once_with(panel.config)
 
+    def test_scan_library_reuses_cache_until_invalidated(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel._library_scan_cache_path = None
+        panel._library_scan_cache = []
+
+        with patch.object(library_panel, "scan_library", side_effect=[
+            ["first"],
+            ["second"],
+        ]) as scan_mock:
+            first = LibraryPanel._scan_library(panel, "/games")
+            second = LibraryPanel._scan_library(panel, "/games")
+            LibraryPanel._invalidate_library_scan_cache(panel)
+            third = LibraryPanel._scan_library(panel, "/games")
+
+        self.assertEqual(first, ["first"])
+        self.assertEqual(second, ["first"])
+        self.assertEqual(third, ["second"])
+        self.assertEqual(scan_mock.call_count, 2)
+
     def test_save_library_config_logs_warning_on_failure(self):
         library_panel = self._import_library_panel()
         with patch.object(library_panel, "save_config", side_effect=RuntimeError("boom")):
