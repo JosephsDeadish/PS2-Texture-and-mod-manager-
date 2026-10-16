@@ -982,7 +982,54 @@ class LibraryPanel(BasePanel):
         state = _library_ui_state(self.config)
         state["mode"] = "all_mods" if self._mode_stack.currentIndex() == 1 else "by_game"
         state["all_mods"] = self._all_mods_pane.current_filter_state()
+        selected_game = self._selected_game_state()
+        if selected_game:
+            state["selected_game"] = selected_game
         _save_library_config(self.config, context)
+
+    def _selected_game_state(self) -> dict:
+        card = getattr(self, "_selected_card", None)
+        game = getattr(card, "game", None)
+        if game is None:
+            return {}
+        path = str(getattr(game, "path", "") or "")
+        serial = str(getattr(game, "serial", "") or "")
+        title = str(getattr(game, "title", "") or "")
+        if not any((path, serial, title)):
+            return {}
+        return {
+            "path": path,
+            "serial": serial.upper(),
+            "title": title,
+        }
+
+    def _restore_selected_game(self) -> None:
+        state = _library_ui_state(self.config)
+        selected = state.get("selected_game", {})
+        if not isinstance(selected, dict):
+            return
+
+        target_path = str(selected.get("path", "") or "")
+        target_serial = str(selected.get("serial", "") or "").upper()
+        if not target_path and not target_serial:
+            return
+
+        for card in self._cards:
+            game = getattr(card, "game", None)
+            if game is None:
+                continue
+            game_path = str(getattr(game, "path", "") or "")
+            game_serial = str(getattr(game, "serial", "") or "").upper()
+            if target_path and game_path == target_path:
+                card.set_selected(True)
+                self._selected_card = card
+                self._detail.show_game(game)
+                return
+            if target_serial and game_serial == target_serial:
+                card.set_selected(True)
+                self._selected_card = card
+                self._detail.show_game(game)
+                return
 
     # ------------------------------------------------------------------
     # Populate game list
@@ -1029,6 +1076,7 @@ class LibraryPanel(BasePanel):
 
             # Still show DB-tracked games even without a library path
             self._populate_db_games()
+            self._restore_selected_game()
             return
 
         library_root = Path(library_path)
@@ -1048,6 +1096,7 @@ class LibraryPanel(BasePanel):
 
             # Still show DB-tracked games even if the configured folder is invalid.
             self._populate_db_games()
+            self._restore_selected_game()
             return
 
         games = self._scan_library(library_path)
@@ -1065,6 +1114,7 @@ class LibraryPanel(BasePanel):
 
             # Still show DB-tracked games even if no ISO files were found
             self._populate_db_games()
+            self._restore_selected_game()
             return
 
         # Count mods per serial
@@ -1108,6 +1158,7 @@ class LibraryPanel(BasePanel):
         self._count_lbl.setText(
             f"Library games: {total} total  •  {games_with_mods} with installed mods"
         )
+        self._restore_selected_game()
 
     def _invalidate_library_scan_cache(self) -> None:
         self._library_scan_cache_path = None
@@ -1184,22 +1235,15 @@ class LibraryPanel(BasePanel):
                 break
 
         self._detail.show_game(game)
+        self._save_view_state("selecting game in library")
 
     def _on_mod_toggled(self):
         """Refresh the game list counts after a mod toggle."""
         if self._mode_stack.currentIndex() == 1:
             self._all_mods_pane.refresh()
             return
+        self._save_view_state("refreshing library after mod toggle")
         self._populate()
-        # Re-select the game if one was selected
-        if self._selected_card:
-            game = self._selected_card.game
-            for card in self._cards:
-                if card.game.path == game.path:
-                    card.set_selected(True)
-                    self._selected_card = card
-                    self._detail.show_game(game)
-                    break
 
     def refresh(self):
         self._invalidate_library_scan_cache()

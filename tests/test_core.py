@@ -7929,6 +7929,102 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         )
         save_mock.assert_called_once_with(panel.config)
 
+    def test_save_view_state_persists_selected_game(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeStack:
+            def __init__(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+        class FakePane:
+            def current_filter_state(self):
+                return {"search": "gta", "type": "pnach", "status": "enabled"}
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._mode_stack = FakeStack(0)
+        panel._all_mods_pane = FakePane()
+        panel._selected_card = types.SimpleNamespace(
+            game=types.SimpleNamespace(
+                path="/games/kh.iso",
+                serial="slus-20370",
+                title="Kingdom Hearts",
+            )
+        )
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            LibraryPanel._save_view_state(panel, "selecting game in library")
+
+        self.assertEqual(
+            panel.config.ui_state["library_panel"]["selected_game"],
+            {
+                "path": "/games/kh.iso",
+                "serial": "SLUS-20370",
+                "title": "Kingdom Hearts",
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_restore_selected_game_reselects_matching_card(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeGame:
+            def __init__(self, path, serial, title):
+                self.path = path
+                self.serial = serial
+                self.title = title
+
+        class FakeCard:
+            def __init__(self, game):
+                self.game = game
+                self.selected = False
+
+            def set_selected(self, value):
+                self.selected = bool(value)
+
+        class FakeDetail:
+            def __init__(self):
+                self.shown = None
+
+            def show_game(self, game):
+                self.shown = game
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "selected_game": {
+                        "path": "/games/kh.iso",
+                        "serial": "SLUS-20370",
+                        "title": "Kingdom Hearts",
+                    }
+                }
+            }
+        )
+        panel._cards = [
+            FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War")),
+            FakeCard(FakeGame("/games/kh.iso", "SLUS-20370", "Kingdom Hearts")),
+        ]
+        panel._selected_card = None
+        panel._detail = FakeDetail()
+
+        LibraryPanel._restore_selected_game(panel)
+
+        self.assertFalse(panel._cards[0].selected)
+        self.assertTrue(panel._cards[1].selected)
+        self.assertIs(panel._selected_card, panel._cards[1])
+        self.assertEqual(panel._detail.shown.title, "Kingdom Hearts")
+
     def test_scan_library_reuses_cache_until_invalidated(self):
         library_panel = self._import_library_panel()
         LibraryPanel = library_panel.LibraryPanel
