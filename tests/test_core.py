@@ -8533,6 +8533,21 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertEqual(third, ["second"])
         self.assertEqual(scan_mock.call_count, 2)
 
+    def test_scan_library_logs_failure_and_returns_empty_list(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel._library_scan_cache_path = None
+        panel._library_scan_cache = []
+
+        with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                result = LibraryPanel._scan_library(panel, "/games")
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+
     def test_get_db_only_games_uses_provided_serial_counts(self):
         import types
 

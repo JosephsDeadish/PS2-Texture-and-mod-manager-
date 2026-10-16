@@ -1176,7 +1176,11 @@ class LibraryPanel(BasePanel):
     def _scan_library(self, library_path: str) -> list[GameEntry]:
         if self._library_scan_cache_path == library_path:
             return list(self._library_scan_cache)
-        games = scan_library(library_path)
+        try:
+            games = scan_library(library_path)
+        except Exception as exc:
+            logger.warning("Could not scan game library folder %s: %s", library_path, exc)
+            return []
         self._library_scan_cache_path = library_path
         self._library_scan_cache = list(games)
         return list(games)
