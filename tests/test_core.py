@@ -5370,7 +5370,10 @@ class TestScraperDialogClassifier(unittest.TestCase):
         pyqt_pkg = types.ModuleType("PyQt6")
         pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
         qtcore = types.ModuleType("PyQt6.QtCore")
-        qtcore.Qt = types.SimpleNamespace()
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
         qtcore.QTimer = type("QTimer", (), {})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
@@ -5416,7 +5419,10 @@ class TestScraperDialogClassifier(unittest.TestCase):
         pyqt_pkg = types.ModuleType("PyQt6")
         pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
         qtcore = types.ModuleType("PyQt6.QtCore")
-        qtcore.Qt = types.SimpleNamespace()
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
         qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
@@ -5521,6 +5527,79 @@ class TestScraperDialogClassifier(unittest.TestCase):
         self.assertTrue(any("not a valid image" in msg for msg in logs.output))
         card._cover_lbl.setPixmap.assert_not_called()
         card._cover_lbl.setText.assert_not_called()
+
+    def test_cover_art_preview_caches_successful_fetches(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda _ms, fn: fn())})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+
+        class _FakePixmap:
+            def __init__(self, path):
+                self.path = path
+
+            def scaled(self, *args, **kwargs):
+                return self
+
+            def isNull(self):
+                return False
+
+        qtgui.QPixmap = _FakePixmap
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: False))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            import importlib
+            from src.ui import browse_panel
+            browse_panel = importlib.reload(browse_panel)
+            browse_panel._fetch_browse_cover_art_data.cache_clear()
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            response = io.BytesIO(b"X" * 600)
+            with patch("urllib.request.urlopen", return_value=response) as mock_urlopen:
+                first = CatalogueCard._fetch_and_display(card, "https://example.com/cached-thumb.jpg")
+                second = CatalogueCard._fetch_and_display(card, "https://example.com/cached-thumb.jpg")
+
+        self.assertTrue(first)
+        self.assertTrue(second)
+        self.assertEqual(mock_urlopen.call_count, 1)
+        self.assertEqual(card._cover_lbl.setPixmap.call_count, 2)
 
     def test_browse_search_helper_matches_source_serial_and_alias(self):
         import sys

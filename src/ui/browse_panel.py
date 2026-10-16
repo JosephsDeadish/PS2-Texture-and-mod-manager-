@@ -11,6 +11,7 @@ Features:
 
 import logging
 import os
+from functools import lru_cache
 import threading
 import tempfile
 import uuid
@@ -58,6 +59,20 @@ from src.ui.url_helpers import open_external_url
 
 logger = logging.getLogger(__name__)
 
+
+
+# ---------------------------------------------------------------------------
+# Browse cover-art cache
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=256)
+def _fetch_browse_cover_art_data(url: str) -> bytes:
+    """Return cached image bytes for a browse-panel thumbnail URL."""
+    import urllib.request
+
+    with urllib.request.urlopen(url, timeout=8) as resp:
+        return resp.read()
 
 
 # ---------------------------------------------------------------------------
@@ -808,77 +823,58 @@ class CatalogueCard(QFrame):
         if not url:
             return False
         try:
-            import urllib.request
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
-                tmp = f.name
-            with urllib.request.urlopen(url, timeout=8) as resp:
-                data = resp.read()
-            if len(data) < 512:
-                # Too small — likely a 404 placeholder or empty response
-                logger.warning(
-                    "Browse cover art response from %s was too small (%d bytes); "
-                    "keeping placeholder icon",
-                    url,
-                    len(data),
+            data = _fetch_browse_cover_art_data(url)
+        except Exception as exc:
+            logger.warning("Could not fetch browse cover art from %s: %s", url, exc)
+            return False
+        if len(data) < 512:
+            # Too small — likely a 404 placeholder or empty response
+            logger.warning(
+                "Browse cover art response from %s was too small (%d bytes); "
+                "keeping placeholder icon",
+                url,
+                len(data),
+            )
+            return False
+        image = QImage.fromData(data)
+        if image.isNull():
+            logger.warning(
+                "Browse cover art from %s was not a valid image; "
+                "keeping placeholder icon",
+                url,
+            )
+            return False
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            tmp = f.name
+            f.write(data)
+
+        def _update():
+            if not self._cover_lbl:
+                return
+            pix = QPixmap(tmp).scaled(
+                60, 88,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            if not pix.isNull():
+                self._cover_lbl.setPixmap(pix)
+                self._cover_lbl.setText("")
+                self._cover_lbl.setStyleSheet(
+                    "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
                 )
-                try:
-                    os.unlink(tmp)
-                except OSError as exc:
-                    logger.warning(
-                        "Could not remove temporary browse cover art file %s: %s",
-                        tmp,
-                        exc,
-                    )
-                return False
-            image = QImage.fromData(data)
-            if image.isNull():
+            else:
                 logger.warning(
                     "Browse cover art from %s was not a valid image; "
                     "keeping placeholder icon",
                     url,
                 )
-                try:
-                    os.unlink(tmp)
-                except OSError as exc:
-                    logger.warning(
-                        "Could not remove temporary browse cover art file %s: %s",
-                        tmp,
-                        exc,
-                    )
-                return False
-            with open(tmp, "wb") as f:
-                f.write(data)
+            try:
+                os.unlink(tmp)
+            except OSError as exc:
+                logger.warning("Could not remove temporary browse cover art file %s: %s", tmp, exc)
 
-            def _update():
-                if not self._cover_lbl:
-                    return
-                pix = QPixmap(tmp).scaled(
-                    60, 88,
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation,
-                )
-                if not pix.isNull():
-                    self._cover_lbl.setPixmap(pix)
-                    self._cover_lbl.setText("")
-                    self._cover_lbl.setStyleSheet(
-                        "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
-                    )
-                else:
-                    logger.warning(
-                        "Browse cover art from %s was not a valid image; "
-                        "keeping placeholder icon",
-                        url,
-                    )
-                try:
-                    os.unlink(tmp)
-                except OSError as exc:
-                    logger.warning("Could not remove temporary browse cover art file %s: %s", tmp, exc)
-
-            QTimer.singleShot(0, _update)
-            return True
-        except Exception as exc:
-            logger.warning("Could not fetch browse cover art from %s: %s", url, exc)
-            return False
+        QTimer.singleShot(0, _update)
+        return True
 
 
 # ---------------------------------------------------------------------------
