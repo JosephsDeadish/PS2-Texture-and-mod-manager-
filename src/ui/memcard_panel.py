@@ -55,6 +55,13 @@ class MemoryCardPanel(BasePanel):
     def _panel_state_bucket(self) -> dict:
         return ui_state_bucket(self.config, "memcard_panel")
 
+    def _selected_save_bucket(self) -> dict:
+        bucket = self._panel_state_bucket().setdefault("selected_save_dir_by_card", {})
+        if not isinstance(bucket, dict):
+            bucket = {}
+            self._panel_state_bucket()["selected_save_dir_by_card"] = bucket
+        return bucket
+
     def _remember_last_path(self, key: str, path: str) -> None:
         self._last_paths_bucket()[key] = path
         try:
@@ -68,6 +75,32 @@ class MemoryCardPanel(BasePanel):
             save_config(self.config)
         except Exception as exc:
             logger.warning("Could not save memory card selection: %s", exc)
+
+    def _remember_selected_save(self, save_name: str) -> None:
+        if not self._current_card or not save_name:
+            return
+        bucket = self._selected_save_bucket()
+        if bucket.get(self._current_card) == save_name:
+            return
+        bucket[self._current_card] = save_name
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card save selection: %s", exc)
+
+    def _clear_selected_save_state(self, context: str) -> None:
+        if not self._current_card:
+            return
+        bucket = self._panel_state_bucket().get("selected_save_dir_by_card", {})
+        if not isinstance(bucket, dict) or self._current_card not in bucket:
+            return
+        bucket.pop(self._current_card, None)
+        if not bucket:
+            self._panel_state_bucket().pop("selected_save_dir_by_card", None)
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card save selection after %s: %s", context, exc)
 
     def _validated_splitter_sizes(self, sizes, *, action: str):
         if not isinstance(sizes, (list, tuple)):
@@ -142,6 +175,44 @@ class MemoryCardPanel(BasePanel):
         )
         self._current_card = ""
         self._card_combo.setCurrentIndex(0)
+
+    def _restore_selected_save(self) -> None:
+        if not self._current_card:
+            return
+        bucket = self._panel_state_bucket().get("selected_save_dir_by_card", {})
+        if not isinstance(bucket, dict):
+            logger.warning(
+                "Saved memory card save selection state is invalid; clearing selection"
+            )
+            self._panel_state_bucket().pop("selected_save_dir_by_card", None)
+            try:
+                save_config(self.config)
+            except Exception as exc:
+                logger.warning("Could not save memory card save selection reset: %s", exc)
+            return
+        save_name = bucket.get(self._current_card, "")
+        if not isinstance(save_name, str) or not save_name:
+            return
+
+        for idx in range(self._saves_list.count()):
+            item = self._saves_list.item(idx)
+            if item is None:
+                continue
+            if item.data(Qt.ItemDataRole.UserRole) != save_name:
+                continue
+            self._save_selection_syncing = True
+            try:
+                self._saves_list.setCurrentRow(idx)
+            finally:
+                self._save_selection_syncing = False
+            return
+
+        logger.warning(
+            "Saved memory card save %r for %r is no longer available; clearing selection",
+            save_name,
+            self._current_card,
+        )
+        self._clear_selected_save_state("clearing missing memory card save selection")
 
     def _build(self):
         content = self._content_layout
@@ -223,6 +294,9 @@ class MemoryCardPanel(BasePanel):
             "QListWidget::item { padding: 8px; color: #e0e0e0; }"
             "QListWidget::item:selected { background: #e94560; }"
         )
+        save_selection_changed = getattr(self._saves_list, "currentRowChanged", None)
+        if callable(getattr(save_selection_changed, "connect", None)):
+            save_selection_changed.connect(self._on_save_selected)
         right_layout.addWidget(self._saves_list, 1)
 
         save_actions = QHBoxLayout()
@@ -255,6 +329,19 @@ class MemoryCardPanel(BasePanel):
         content.addWidget(splitter, 1)
 
         self.refresh()
+
+    def _on_save_selected(self, idx: int) -> None:
+        if getattr(self, "_saves_loading", False) or getattr(self, "_save_selection_syncing", False):
+            return
+        item = self._saves_list.currentItem()
+        if item is None:
+            self._clear_selected_save_state("clearing memory card save selection")
+            return
+        save_name = item.data(Qt.ItemDataRole.UserRole)
+        if not isinstance(save_name, str) or not save_name:
+            self._clear_selected_save_state("clearing memory card save selection")
+            return
+        self._remember_selected_save(save_name)
 
     def refresh(self):
         """Reload the list of memory card files."""
@@ -296,44 +383,50 @@ class MemoryCardPanel(BasePanel):
             self._card_combo.setCurrentIndex(self._card_combo.count() - 1)
 
     def _load_saves(self):
-        self._saves_list.clear()
-
-        if not self._current_card:
-            self._info_lbl.setText("No card selected")
-            return
-
-        card_path = Path(self._current_card)
-        if not card_path.is_file():
-            self._info_lbl.setText("File not found")
-            return
-
-        size_mb = card_path.stat().st_size / (1024 * 1024)
-        valid = is_valid_memcard(self._current_card)
-
-        self._info_lbl.setText(
-            f"File: {card_path.name}\n"
-            f"Size: {size_mb:.2f} MB\n"
-            f"Valid PS2 card: {'Yes ✅' if valid else 'Unknown ⚠'}"
-        )
-
-        if not valid:
-            self._saves_list.addItem("(Not a recognized PS2 memory card)")
-            return
-
+        self._saves_loading = True
         try:
-            saves = list_saves(self._current_card)
-            if not saves:
-                item = QListWidgetItem("💾  (No saves found)")
-                item.setForeground(Qt.GlobalColor.gray)
-                self._saves_list.addItem(item)
-            else:
-                for save in saves:
-                    item = QListWidgetItem(f"💾  {save.name}")
-                    item.setData(Qt.ItemDataRole.UserRole, save.dir_name)
-                    item.setToolTip(f"Size: {save.size_bytes} bytes")
+            self._saves_list.clear()
+
+            if not self._current_card:
+                self._info_lbl.setText("No card selected")
+                return
+
+            card_path = Path(self._current_card)
+            if not card_path.is_file():
+                self._info_lbl.setText("File not found")
+                return
+
+            size_mb = card_path.stat().st_size / (1024 * 1024)
+            valid = is_valid_memcard(self._current_card)
+
+            self._info_lbl.setText(
+                f"File: {card_path.name}\n"
+                f"Size: {size_mb:.2f} MB\n"
+                f"Valid PS2 card: {'Yes ✅' if valid else 'Unknown ⚠'}"
+            )
+
+            if not valid:
+                self._saves_list.addItem("(Not a recognized PS2 memory card)")
+                return
+
+            try:
+                saves = list_saves(self._current_card)
+                if not saves:
+                    item = QListWidgetItem("💾  (No saves found)")
+                    item.setForeground(Qt.GlobalColor.gray)
                     self._saves_list.addItem(item)
-        except MemoryCardError as exc:
-            self._saves_list.addItem(f"Error reading card: {exc}")
+                else:
+                    for save in saves:
+                        item = QListWidgetItem(f"💾  {save.name}")
+                        item.setData(Qt.ItemDataRole.UserRole, save.dir_name)
+                        item.setToolTip(f"Size: {save.size_bytes} bytes")
+                        self._saves_list.addItem(item)
+                    self._restore_selected_save()
+            except MemoryCardError as exc:
+                logger.warning("Failed to load memory card saves for %s: %s", self._current_card, exc)
+                self._saves_list.addItem(f"Error reading card: {exc}")
+        finally:
+            self._saves_loading = False
 
     def _create_card(self):
         """Create a new blank PCSX2-format memory card image."""

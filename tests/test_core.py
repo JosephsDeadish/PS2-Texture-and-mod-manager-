@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from typing import List
 from unittest.mock import patch, MagicMock
@@ -7496,14 +7497,37 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         pyqt_pkg = types.ModuleType("PyQt6")
         pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
         qtcore = types.ModuleType("PyQt6.QtCore")
-        qtcore.Qt = types.SimpleNamespace()
+        qtcore.Qt = types.SimpleNamespace(
+            ItemDataRole=types.SimpleNamespace(UserRole=object()),
+            GlobalColor=types.SimpleNamespace(gray=object()),
+        )
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        class FakeQListWidgetItem:
+            def __init__(self, text=""):
+                self.text = text
+                self._data = {}
+                self.tooltip = ""
+                self.foreground = None
+
+            def setData(self, role, value):
+                self._data[role] = value
+
+            def data(self, role):
+                return self._data.get(role)
+
+            def setToolTip(self, text):
+                self.tooltip = text
+
+            def setForeground(self, color):
+                self.foreground = color
+
         for name in (
             "QComboBox", "QFileDialog", "QFrame", "QHBoxLayout", "QInputDialog",
             "QLabel", "QListWidget", "QListWidgetItem", "QMessageBox", "QPushButton",
             "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
+        qtwidgets.QListWidgetItem = FakeQListWidgetItem
         base_panel_stub = types.ModuleType("src.ui.base_panel")
         base_panel_stub.BasePanel = type("BasePanel", (), {})
         widgets_stub = types.ModuleType("src.ui.widgets")
@@ -7562,6 +7586,40 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel._load_saves.assert_called_once()
         save_mock.assert_called_once_with(panel.config)
 
+    def test_save_selection_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeItem:
+            def __init__(self, save_name):
+                self._save_name = save_name
+
+            def data(self, role):
+                return self._save_name
+
+        class FakeListWidget:
+            def __init__(self):
+                self._current = FakeItem("BASLUS-12345")
+
+            def currentItem(self):
+                return self._current
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig()
+        panel._current_card = "/cards/a.ps2"
+        panel._saves_loading = False
+        panel._save_selection_syncing = False
+        panel._saves_list = FakeListWidget()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._on_save_selected(panel, 0)
+
+        self.assertEqual(
+            panel.config.ui_state["memcard_panel"]["selected_save_dir_by_card"]["/cards/a.ps2"],
+            "BASLUS-12345",
+        )
+        save_mock.assert_called_once_with(panel.config)
+
     def test_refresh_restores_last_selected_card(self):
         memcard_panel = self._import_memcard_panel()
         MemoryCardPanel = memcard_panel.MemoryCardPanel
@@ -7609,6 +7667,78 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._card_combo.current_index, 2)
         panel._load_saves.assert_called_once()
 
+    def test_refresh_restores_selected_save(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+
+            def clear(self):
+                self.items = []
+                self.current_row = -1
+
+            def addItem(self, item):
+                self.items.append(item)
+                if self.current_row < 0:
+                    self.current_row = 0
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+
+            def currentItem(self):
+                if 0 <= self.current_row < len(self.items):
+                    return self.items[self.current_row]
+                return None
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(
+            memcards_path="/cards",
+            ui_state={
+                "memcard_panel": {
+                    "selected_card": "/cards/beta.ps2",
+                    "selected_save_dir_by_card": {"/cards/beta.ps2": "BASLUS-12345"},
+                }
+            },
+        )
+        panel._current_card = "/cards/beta.ps2"
+        panel._card_combo = SimpleNamespace()
+        panel._saves_list = FakeListWidget()
+        panel._info_lbl = FakeLabel()
+
+        fake_saves = [
+            SimpleNamespace(name="Save A", dir_name="BASLUS-11111", size_bytes=128),
+            SimpleNamespace(name="Save B", dir_name="BASLUS-12345", size_bytes=256),
+        ]
+
+        with patch.object(memcard_panel.Path, "is_file", return_value=True):
+            with patch.object(
+                memcard_panel.Path,
+                "stat",
+                return_value=SimpleNamespace(st_size=4 * 1024 * 1024),
+            ):
+                with patch.object(memcard_panel, "is_valid_memcard", return_value=True):
+                    with patch.object(memcard_panel, "list_saves", return_value=fake_saves):
+                        MemoryCardPanel._load_saves(panel)
+
+        self.assertEqual(panel._saves_list.current_row, 1)
+        self.assertEqual(panel._info_lbl.text.splitlines()[0], "File: beta.ps2")
+
     def test_restore_selected_card_warns_when_missing(self):
         memcard_panel = self._import_memcard_panel()
         MemoryCardPanel = memcard_panel.MemoryCardPanel
@@ -7641,6 +7771,53 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertEqual(panel._current_card, "")
         self.assertEqual(panel._card_combo.current_index, 0)
         self.assertTrue(any("memory card selection" in msg for msg in logs.output))
+
+    def test_restore_selected_save_warns_when_missing(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeItem:
+            def __init__(self, save_name):
+                self._save_name = save_name
+
+            def data(self, role):
+                return self._save_name
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = [FakeItem("BASLUS-11111")]
+                self.current_row = -1
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "memcard_panel": {
+                    "selected_save_dir_by_card": {"/cards/beta.ps2": "BASLUS-12345"},
+                }
+            },
+        )
+        panel._current_card = "/cards/beta.ps2"
+        panel._saves_list = FakeListWidget()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+                MemoryCardPanel._restore_selected_save(panel)
+
+        self.assertNotIn(
+            "selected_save_dir_by_card",
+            panel.config.ui_state["memcard_panel"],
+        )
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(any("no longer available" in msg for msg in logs.output))
 
     def test_splitter_state_restores_and_saves(self):
         memcard_panel = self._import_memcard_panel()
