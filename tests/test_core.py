@@ -7598,6 +7598,32 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             )
         )
 
+    def test_mod_matches_query_includes_extended_metadata(self):
+        library_panel = self._import_library_panel()
+
+        mod = ModInfo(
+        id="meta-1",
+        name="Texture Overhaul",
+        mod_type=ModType.TEXTURE_PACK,
+        path="/mods/texture-overhaul",
+        author="Alice",
+        description="HD overhaul for God of War",
+        game_id="SLUS-20062",
+        version="1.2",
+        thumbnail_path="/covers/texture-overhaul.png",
+        source_url="https://example.com/posts/texture-overhaul",
+        files=["textures/hero.dds", "readme.txt"],
+        tags=["hd", "4k"],
+        )
+
+        self.assertTrue(library_panel._mod_matches_query(mod, "grand theft auto iii"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "slus20062"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "hero.dds"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "example.com"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "4k"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "1.2"))
+        self.assertFalse(library_panel._mod_matches_query(mod, "yakuza"))
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.

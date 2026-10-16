@@ -32,6 +32,7 @@ from PyQt6.QtWidgets import (
 
 from src.core.config_manager import save_config
 from src.core.game_library import GameEntry, scan_library
+from src.core.game_registry import lookup_game_title
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
@@ -93,6 +94,58 @@ def _save_library_config(config: AppConfig, context: str) -> None:
         save_config(config)
     except Exception as exc:
         logger.warning("Could not save library panel config after %s: %s", context, exc)
+
+
+def _mod_matches_query(mod: ModInfo, query: object) -> bool:
+    """Return True when *mod* matches the All Mods search query."""
+    if not isinstance(query, str):
+        return False
+
+    needle = query.strip().casefold()
+    if not needle:
+        return True
+
+    compact = "".join(ch for ch in needle if ch.isalnum())
+
+    def _matches_text(value: object) -> bool:
+        if not isinstance(value, str):
+            return False
+        lowered = value.casefold()
+        if needle in lowered:
+            return True
+        if compact:
+            value_compact = "".join(ch for ch in lowered if ch.isalnum())
+            if compact in value_compact:
+                return True
+        return False
+
+    game_title = lookup_game_title(mod.game_id) if mod.game_id else ""
+    for value in (
+        mod.id,
+        mod.name,
+        mod.game_id,
+        game_title,
+        mod.author,
+        mod.description,
+        mod.version,
+        mod.source_url,
+        mod.thumbnail_url,
+        mod.thumbnail_path,
+        mod.path,
+        getattr(mod.mod_type, "value", ""),
+    ):
+        if _matches_text(value):
+            return True
+
+    tags = getattr(mod, "tags", [])
+    if isinstance(tags, list) and any(_matches_text(tag) for tag in tags if isinstance(tag, str)):
+        return True
+
+    files = getattr(mod, "files", [])
+    if isinstance(files, list) and any(_matches_text(rel_path) for rel_path in files if isinstance(rel_path, str)):
+        return True
+
+    return False
 
 
 # ---------------------------------------------------------------------------
@@ -588,7 +641,9 @@ class _AllModsPane(QWidget):
         filter_bar.addWidget(search_lbl)
 
         self._search_edit = QLineEdit()
-        self._search_edit.setPlaceholderText("Search by name, game, or author…")
+        self._search_edit.setPlaceholderText(
+            "Search by name, game title, serial, author, tag, file, or source URL…"
+        )
         self._search_edit.setClearButtonEnabled(True)
         self._search_edit.textChanged.connect(self._apply_filter)
         filter_bar.addWidget(self._search_edit, 1)
@@ -699,7 +754,7 @@ class _AllModsPane(QWidget):
 
     # ------------------------------------------------------------------
     def _apply_filter(self):
-        needle = self._search_edit.text().strip().lower()
+        needle = self._search_edit.text().strip()
         type_filter = self._type_combo.currentData() or ""
         status_filter = self._status_combo.currentData() or "all"
 
@@ -707,17 +762,10 @@ class _AllModsPane(QWidget):
         for row in self._rows:
             mod = row.mod
 
-            # Name / game / author search
-            if needle:
-                haystack = " ".join([
-                    mod.name or "",
-                    mod.game_id or "",
-                    mod.author or "",
-                    (mod.mod_type.value if mod.mod_type else ""),
-                ]).lower()
-                if needle not in haystack:
-                    row.setVisible(False)
-                    continue
+            # Rich metadata search across local mod and game fields
+            if needle and not _mod_matches_query(mod, needle):
+                row.setVisible(False)
+                continue
 
             # Type filter
             if type_filter and mod.mod_type and mod.mod_type.value != type_filter:
