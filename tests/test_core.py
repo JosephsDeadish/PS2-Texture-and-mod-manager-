@@ -2288,6 +2288,70 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
             )
         )
 
+    def test_setup_wizard_auto_fill_failure_shows_status(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                _pcsx2_status=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _cheats_chooser=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.detect_pcsx2_paths", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._auto_fill_from_path(fake, "/tmp/pcsx2")
+
+        self.assertTrue(any("Could not auto-fill PCSX2 subfolders" in msg for msg in logs.output))
+        fake._pcsx2_status.setText.assert_called_once()
+        self.assertTrue(
+            any(
+                "Please browse for the folder manually" in call.args[0]
+                for call in fake._pcsx2_status.setText.call_args_list
+            )
+        )
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._cheats_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
+    def test_setup_wizard_game_library_scan_failure_is_recovered(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(game_library_path="/games"),
+                _done_summary=MagicMock(),
+            )
+
+            with patch("src.core.game_library.scan_library", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._run_automatic_setup(fake)
+
+        self.assertTrue(any("Could not scan game library during setup" in msg for msg in logs.output))
+        fake._done_summary.setText.assert_called_once()
+        self.assertTrue(
+            any(
+                "Could not scan game library" in call.args[0]
+                for call in fake._done_summary.setText.call_args_list
+            )
+        )
+
 
 class TestWidgetsLogging(unittest.TestCase):
     """Widgets with recoverable failures should log before surfacing errors."""

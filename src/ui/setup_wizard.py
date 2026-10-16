@@ -467,11 +467,16 @@ class SetupWizard(QDialog):
         if self.config.cover_art_path:
             summary_lines.append(f"🎨 Covers: {self.config.cover_art_path}")
         if self.config.game_library_path:
-            from src.core.game_library import scan_library
-            games = scan_library(self.config.game_library_path)
-            summary_lines.append(
-                f"🎮 Game Library: {len(games)} disc image(s) found"
-            )
+            try:
+                from src.core.game_library import scan_library
+                games = scan_library(self.config.game_library_path)
+            except Exception as exc:
+                logger.warning("Could not scan game library during setup: %s", exc)
+                summary_lines.append(f"⚠️  Could not scan game library: {exc}")
+            else:
+                summary_lines.append(
+                    f"🎮 Game Library: {len(games)} disc image(s) found"
+                )
         summary_lines.append("⚡ Mods deploy automatically when toggled on/off")
 
         if summary_lines:
@@ -543,7 +548,15 @@ class SetupWizard(QDialog):
         )
 
     def _auto_fill_from_path(self, path: str):
-        paths = detect_pcsx2_paths(path)
+        try:
+            paths = detect_pcsx2_paths(path)
+        except Exception as exc:
+            logger.warning("Could not auto-fill PCSX2 subfolders from %s: %s", path, exc)
+            self._pcsx2_status.setText(
+                "⚠ Could not inspect the selected PCSX2 folder.\n"
+                "Please browse for the folder manually."
+            )
+            return
         self._tex_chooser.set_path(paths.get("textures_path", ""))
         self._pnach_chooser.set_path(paths.get("pnach_path", ""))
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
