@@ -263,6 +263,7 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
         "description",
         "author",
         "url",
+        "source_url",
         "source",
         "game",
         "game_serial",
@@ -280,7 +281,15 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
                 f"{field!r} must be a string"
             )
 
-    for field in ("url", "author_url", "thumbnail_url"):
+    if not entry.get("url") and isinstance(entry.get("source_url"), str) and entry["source_url"]:
+        log.warning(
+            "[%s] entry %r: url missing; using source_url as a fallback",
+            source_file.name,
+            entry.get("id", "?"),
+        )
+        entry["url"] = entry["source_url"]
+
+    for field in ("url", "author_url", "thumbnail_url", "source_url"):
         if isinstance(entry.get(field), str):
             entry[field] = _normalise_url(entry[field])
     if isinstance(entry.get("thumbnail_url"), str) and _is_placeholder_thumbnail_url(entry["thumbnail_url"]):
@@ -301,7 +310,7 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
             entry["direct_download_url"],
             preserve_fragment=True,
         )
-    for field in ("url", "author_url", "thumbnail_url", "direct_download_url"):
+    for field in ("url", "author_url", "thumbnail_url", "direct_download_url", "source_url"):
         value = entry.get(field, "")
         if value and isinstance(value, str):
             lowered = value.lower()

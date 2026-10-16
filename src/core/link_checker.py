@@ -42,7 +42,7 @@ _REPO_ROOT = Path(__file__).parent.parent.parent
 _CAT_DIR   = _REPO_ROOT / "data" / "catalogue"
 
 # URL fields that may appear in a catalogue entry
-_URL_FIELDS = ("url", "author_url", "direct_download_url", "thumbnail_url")
+_URL_FIELDS = ("url", "source_url", "author_url", "direct_download_url", "thumbnail_url")
 
 # File/type kinds where missing author credits are data-quality problems.
 _CATALOGUE_KINDS = frozenset({

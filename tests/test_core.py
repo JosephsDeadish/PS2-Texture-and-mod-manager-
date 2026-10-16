@@ -11312,6 +11312,25 @@ class TestUserCatalogueLoader(unittest.TestCase):
             logs.output,
         )
 
+    def test_load_user_catalogue_uses_source_url_as_url_fallback(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["url"] = ""
+        entry["source_url"] = " https://example.com/source-page "
+        (Path(self.tmpdir) / "source_url_only.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        loaded = result[0]
+        self.assertEqual(loaded["url"], "https://example.com/source-page")
+        self.assertEqual(loaded["source_url"], "https://example.com/source-page")
+        self.assertTrue(any("using source_url as a fallback" in msg for msg in logs.output))
+
     def test_load_user_catalogue_strips_placeholder_thumbnail_url(self):
         from src.core.catalogue_loader import load_user_catalogue
 
@@ -14428,7 +14447,7 @@ class TestLinkChecker(unittest.TestCase):
         from src.core import link_checker
         self.assertEqual(
             link_checker._URL_FIELDS,
-            ("url", "author_url", "direct_download_url", "thumbnail_url"),
+            ("url", "source_url", "author_url", "direct_download_url", "thumbnail_url"),
         )
 
     # -- Unit tests for URL validators --
@@ -14438,6 +14457,15 @@ class TestLinkChecker(unittest.TestCase):
         lc = LinkChecker()
         issues = lc.check_entries(
             [{"url": "https://github.com/PCSX2/pcsx2"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_source_url_only_entry_passes(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"source_url": "https://github.com/PCSX2/pcsx2"}],
             source_file="test",
         )
         self.assertEqual(issues, [])
