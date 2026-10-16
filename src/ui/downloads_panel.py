@@ -203,6 +203,39 @@ class DownloadsPanel(BasePanel):
         if hasattr(splitter, "setSizes"):
             splitter.setSizes(sizes)
 
+    def _save_history_selection(self, row: int) -> None:
+        if getattr(self, "_history_state_syncing", False):
+            return
+        if row < 0 or row >= len(self._history_entries):
+            return
+        entry = self._history_entries[row]
+        entry_id = getattr(entry, "id", "")
+        if not entry_id:
+            return
+        bucket = self._history_panel_bucket()
+        if bucket.get("history_selected_entry_id") == entry_id:
+            return
+        bucket["history_selected_entry_id"] = str(entry_id)
+        self._save_panel_config("updating download history selection")
+
+    def _restore_history_selection(self) -> None:
+        entry_id = self._history_panel_bucket().get("history_selected_entry_id", "")
+        if not isinstance(entry_id, str) or not entry_id:
+            return
+        for row, entry in enumerate(self._history_entries):
+            if getattr(entry, "id", "") != entry_id:
+                continue
+            self._history_state_syncing = True
+            try:
+                setter = getattr(self._list_widget, "setCurrentRow", None)
+                if callable(setter):
+                    setter(row)
+                else:
+                    self._on_selection_changed(row)
+            finally:
+                self._history_state_syncing = False
+            return
+
     def _clear_history_filters(self) -> None:
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
             setter = getattr(widget, "blockSignals", None)
@@ -482,6 +515,7 @@ class DownloadsPanel(BasePanel):
         self._history_entries = []
         self._selected_source_url = ""
         self._update_history_source_actions()
+        self._delete_btn.setEnabled(False)
 
         try:
             from src.core.download_history import list_history
@@ -515,8 +549,9 @@ class DownloadsPanel(BasePanel):
             self._detail_label.setText(f"<i>{empty_msg}</i>")
             self._selected_source_url = ""
             self._update_history_source_actions()
-
-        self._delete_btn.setEnabled(False)
+            self._delete_btn.setEnabled(False)
+        else:
+            self._restore_history_selection()
 
     def _on_selection_changed(self, row: int):
         if row < 0 or row >= len(self._history_entries):
@@ -565,6 +600,7 @@ class DownloadsPanel(BasePanel):
 
         self._detail_label.setText(details_html)
         self._delete_btn.setEnabled(True)
+        self._save_history_selection(row)
 
     def _open_selected_source(self) -> None:
         url = self._selected_source_url.strip()

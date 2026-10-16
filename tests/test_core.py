@@ -6216,6 +6216,178 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             logs.output,
         )
 
+    def test_history_selection_state_restores_and_persists(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def text(self):
+                return ""
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+                self.on_set_current_row = None
+
+            def clear(self):
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                if callable(self.on_set_current_row):
+                    self.on_set_current_row(row)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        entries = [
+            types.SimpleNamespace(
+                id="entry-1",
+                mod_name="First Mod",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 09:00",
+                serial="SLUS-10001",
+                source_url="https://example.com/1",
+                size_bytes=10,
+                size_label="10 B",
+                note="",
+            ),
+            types.SimpleNamespace(
+                id="entry-2",
+                mod_name="Second Mod",
+                type_label="PNACH Patch",
+                status="failed",
+                status_label="Failed",
+                timestamp="2026-10-15 10:00",
+                serial="SLUS-10002",
+                source_url="https://example.com/2",
+                size_bytes=20,
+                size_label="20 B",
+                note="",
+            ),
+        ]
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": "entry-2"}}
+        )
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._list_widget.on_set_current_row = panel._on_selection_changed
+
+        with patch("src.core.download_history.list_history", return_value=entries):
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._refresh_history()
+
+        self.assertEqual(panel._list_widget.current_row, 1)
+        self.assertEqual(panel._selected_source_url, "https://example.com/2")
+        self.assertTrue(panel._delete_btn.enabled)
+        self.assertIn("Second Mod", panel._detail_label.value)
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"],
+            "entry-2",
+        )
+        save_mock.assert_not_called()
+
+    def test_history_selection_change_saves_entry_id(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel.config = AppConfig()
+        panel._history_entries = [
+            types.SimpleNamespace(
+                id="entry-1",
+                mod_name="First Mod",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 09:00",
+                serial="SLUS-10001",
+                source_url="https://example.com/1",
+                size_bytes=10,
+                size_label="10 B",
+                note="",
+            ),
+            types.SimpleNamespace(
+                id="entry-2",
+                mod_name="Second Mod",
+                type_label="PNACH Patch",
+                status="failed",
+                status_label="Failed",
+                timestamp="2026-10-15 10:00",
+                serial="SLUS-10002",
+                source_url="https://example.com/2",
+                size_bytes=20,
+                size_label="20 B",
+                note="",
+            ),
+        ]
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._selected_source_url = ""
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._on_selection_changed(1)
+
+        self.assertEqual(panel._selected_source_url, "https://example.com/2")
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"],
+            "entry-2",
+        )
+        self.assertTrue(panel._delete_btn.enabled)
+        save_mock.assert_called_once_with(panel.config)
+
     def test_history_details_escape_html(self):
         import types
 
