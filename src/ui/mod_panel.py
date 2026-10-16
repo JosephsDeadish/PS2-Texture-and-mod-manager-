@@ -196,6 +196,8 @@ class ModPanel(BasePanel):
         self.config = config
         self.manager = ModManager(db)
         self._state_persistence_enabled = False
+        self._library_serials_cache_path = ""
+        self._library_serials_cache = frozenset()
         self._build()
 
     def _all_mods(self) -> list:
@@ -363,8 +365,13 @@ class ModPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def refresh(self):
+        self._invalidate_library_serial_cache()
         self._refresh_author_filter()
         self._apply_filter()
+
+    def _invalidate_library_serial_cache(self) -> None:
+        self._library_serials_cache_path = ""
+        self._library_serials_cache = frozenset()
 
     def _make_guidance_banner(self) -> QWidget:
         """Build a dismissable PCSX2 guidance banner for texture/pnach/cheat panels."""
@@ -763,13 +770,22 @@ class ModPanel(BasePanel):
         """
         path = getattr(self.config, "game_library_path", "")
         if not path:
+            self._invalidate_library_serial_cache()
             return frozenset()
+        if (
+            getattr(self, "_library_serials_cache_path", "") == path
+            and isinstance(getattr(self, "_library_serials_cache", None), frozenset)
+        ):
+            return self._library_serials_cache
         try:
             from src.core.game_library import get_library_serials
-            return get_library_serials(path)
+            serials = get_library_serials(path)
         except Exception as exc:
             logger.warning("Could not load library serials for mod panel: %s", exc)
-            return frozenset()
+            serials = frozenset()
+        self._library_serials_cache_path = path
+        self._library_serials_cache = serials
+        return serials
 
     def _filter_by_author(self, author: str):
         """Set the author filter dropdown to *author* and refresh the list."""

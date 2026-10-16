@@ -7076,6 +7076,27 @@ class TestModPanelEmptyState(unittest.TestCase):
         )
         save_mock.assert_called_once_with(panel.config)
 
+    def test_get_library_serials_caches_until_path_changes(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.config = AppConfig(game_library_path="/games/a")
+        panel._library_serials_cache_path = ""
+        panel._library_serials_cache = frozenset()
+
+        with patch("src.core.game_library.get_library_serials", return_value=frozenset({"SLUS-20062"})) as get_serials:
+            first = ModPanel._get_library_serials(panel)
+            second = ModPanel._get_library_serials(panel)
+            panel.config.game_library_path = "/games/b"
+            get_serials.return_value = frozenset({"SLUS-21075"})
+            third = ModPanel._get_library_serials(panel)
+
+        self.assertEqual(first, frozenset({"SLUS-20062"}))
+        self.assertEqual(second, frozenset({"SLUS-20062"}))
+        self.assertEqual(third, frozenset({"SLUS-21075"}))
+        self.assertEqual(get_serials.call_count, 2)
+
 
 class TestLibraryPanelStatePersistence(unittest.TestCase):
     """Tests for library-panel mode/filter state persistence helpers."""
