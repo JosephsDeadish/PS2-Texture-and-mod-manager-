@@ -7161,6 +7161,19 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         )
         save_mock.assert_called_once_with(panel.config)
 
+    def test_save_library_config_logs_warning_on_failure(self):
+        library_panel = self._import_library_panel()
+        with patch.object(library_panel, "save_config", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                library_panel._save_library_config(AppConfig(), "saving library view state")
+
+        self.assertTrue(
+            any(
+                "Could not save library panel config after saving library view state: boom" in msg
+                for msg in logs.output
+            )
+        )
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.

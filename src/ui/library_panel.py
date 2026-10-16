@@ -7,6 +7,7 @@ the user enable / disable individual mods that target that game.
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import List, Optional
 
@@ -34,6 +35,8 @@ from src.core.game_library import GameEntry, scan_library
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
