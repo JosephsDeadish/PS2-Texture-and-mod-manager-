@@ -5864,6 +5864,9 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             def setText(self, value):
                 self.value = value
 
+            def text(self):
+                return self.value
+
         class FakeComboBox:
             def __init__(self, items):
                 self.items = list(items)
@@ -5892,6 +5895,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
             def setChecked(self, value):
                 self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
 
         class FakeTabs:
             def __init__(self, count):
@@ -5961,6 +5979,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             def setText(self, value):
                 self.value = value
 
+            def text(self):
+                return self.value
+
+            def text(self):
+                return self.value
+
+            def text(self):
+                return self.value
+
+            def text(self):
+                return self.value
+
+            def text(self):
+                return self.value
+
         class FakeComboBox:
             def __init__(self, items):
                 self.items = list(items)
@@ -5992,6 +6025,9 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
             def setChecked(self, value):
                 self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
 
         class FakeTabs:
             def __init__(self, count):
@@ -6035,18 +6071,24 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         panel._in_app_check = FakeCheckBox()
         panel._tabs = FakeTabs(count=2)
 
-        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
-            panel._restore_browse_state()
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                panel._restore_browse_state()
 
         self.assertEqual(panel._search.value, "gta")
         self.assertEqual(panel._source_filter.currentData(), "")
         self.assertEqual(panel._author_filter.currentData(), "")
         self.assertEqual(panel._sort_filter.currentData(), "featured")
         self.assertEqual(panel._tabs.currentIndex(), 1)
+        self.assertEqual(panel.config.browse_source_filter, "")
+        self.assertEqual(panel.config.browse_author_filter, "")
+        self.assertEqual(panel.config.browse_sort_mode, "featured")
+        self.assertEqual(panel.config.browse_selected_tab, 1)
         self.assertTrue(any("source filter" in msg for msg in logs.output))
         self.assertTrue(any("author filter" in msg for msg in logs.output))
         self.assertTrue(any("sort mode" in msg for msg in logs.output))
         self.assertTrue(any("tab index" in msg for msg in logs.output))
+        save_mock.assert_called_once_with(panel.config, "sanitizing browse state")
 
     def test_download_install_dialog_state_restores_and_saves(self):
         browse_panel = self._import_browse_panel()
@@ -6142,6 +6184,9 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             def setText(self, value):
                 self.value = value
 
+            def text(self):
+                return self.value
+
         class FakeComboBox:
             def __init__(self, items):
                 self.items = list(items)
@@ -6183,14 +6228,20 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         dialog._desc_edit = FakeLineEdit()
         dialog._source_url_edit = FakeLineEdit()
 
-        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
-            dialog._restore_state()
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                dialog._restore_state()
 
         self.assertEqual(dialog._type_combo.currentData(), ModType.TEXTURE_PACK)
+        self.assertEqual(
+            dialog.config.ui_state[browse_panel._DOWNLOAD_INSTALL_STATE_KEY]["type"],
+            "texture_pack",
+        )
         self.assertTrue(
             any("Saved direct-download mod type" in msg for msg in logs.output),
             logs.output,
         )
+        save_mock.assert_called_once_with(dialog.config, "sanitizing direct download dialog state")
 
     def test_cover_dialog_auto_fills_single_serial_match(self):
         browse_panel = self._import_browse_panel()
@@ -6987,12 +7038,16 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         ], index=4)
         panel._serial_edit = FakeLineEdit("SLUS-20228")
 
-        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
-            panel._restore_history_filters()
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._restore_history_filters()
 
         self.assertEqual(panel._status_combo.currentText(), "All")
         self.assertEqual(panel._type_combo.currentText(), "All")
         self.assertEqual(panel._serial_edit.value, "12345")
+        self.assertEqual(panel.config.download_history_status_filter, "All")
+        self.assertEqual(panel.config.download_history_type_filter, "All")
+        self.assertEqual(panel.config.download_history_serial_filter, "12345")
         self.assertTrue(
             any("status filter" in msg for msg in logs.output),
             logs.output,
@@ -7001,6 +7056,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             any("type filter" in msg for msg in logs.output),
             logs.output,
         )
+        save_mock.assert_called_once_with(panel.config)
 
     def test_clear_history_filters_resets_widgets_and_refreshes(self):
         downloads_panel = self._import_downloads_panel()

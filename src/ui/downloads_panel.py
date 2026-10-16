@@ -474,15 +474,31 @@ class DownloadsPanel(BasePanel):
                 setter(enabled)
 
     def _restore_history_filters(self) -> None:
+        state_changed = False
         status = getattr(self.config, "download_history_status_filter", "All") or "All"
         mod_type = getattr(self.config, "download_history_type_filter", "All") or "All"
         serial = getattr(self.config, "download_history_serial_filter", "") or ""
         if not isinstance(status, str):
+            logger.warning(
+                "Saved download history status filter %r is invalid; using All",
+                status,
+            )
             status = str(status)
+            state_changed = True
         if not isinstance(mod_type, str):
+            logger.warning(
+                "Saved download history type filter %r is invalid; using All",
+                mod_type,
+            )
             mod_type = str(mod_type)
+            state_changed = True
         if not isinstance(serial, str):
+            logger.warning(
+                "Saved download history serial filter %r is invalid; using text form",
+                serial,
+            )
             serial = str(serial)
+            state_changed = True
 
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
             widget.blockSignals(True)
@@ -498,6 +514,7 @@ class DownloadsPanel(BasePanel):
             )
             if all_status_idx >= 0:
                 self._status_combo.setCurrentIndex(all_status_idx)
+            state_changed = True
         all_type_idx = self._type_combo.findText("All")
         idx = self._type_combo.findText(mod_type)
         if idx >= 0:
@@ -509,10 +526,14 @@ class DownloadsPanel(BasePanel):
             )
             if all_type_idx >= 0:
                 self._type_combo.setCurrentIndex(all_type_idx)
+            state_changed = True
         self._serial_edit.setText(serial)
 
         for widget in (self._status_combo, self._type_combo, self._serial_edit):
             widget.blockSignals(False)
+
+        if state_changed:
+            self._save_history_filters()
 
     def _on_history_filter_changed(self, *_args):
         self._save_history_filters()

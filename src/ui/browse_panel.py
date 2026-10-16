@@ -1121,6 +1121,8 @@ class CoverDownloadDialog(QDialog):
         tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
         if tab_count > 0:
             self._tabs.setCurrentIndex(max(0, min(selected_tab, tab_count - 1)))
+        if state_changed:
+            self._save_state("sanitizing cover download dialog state")
 
     def _wire_state_persistence(self) -> None:
         self._tabs.currentChanged.connect(self._save_state)
@@ -1504,11 +1506,15 @@ class DownloadInstallDialog(QDialog):
         self._desc_edit.setText(str(bucket.get("description", "") or ""))
         self._source_url_edit.setText(str(bucket.get("source_url", "") or ""))
         saved_type = bucket.get("type", "")
+        state_changed = False
         if saved_type and not self._set_combo_value(self._type_combo, saved_type):
             logger.warning(
                 "Saved direct-download mod type %r is no longer available; using default",
                 saved_type,
             )
+            state_changed = True
+        if state_changed:
+            self._save_state("sanitizing direct download dialog state")
 
     @staticmethod
     def _set_combo_value(combo, value: object) -> bool:
@@ -2706,32 +2712,55 @@ class BrowsePanel(BasePanel):
         )
 
     def _restore_browse_state(self) -> None:
+        state_changed = False
         query = getattr(self.config, "browse_query", "")
         if query is None:
             query = ""
         elif not isinstance(query, str):
+            logger.warning(
+                "Saved browse search query %r is invalid; using text form",
+                query,
+            )
             query = str(query)
+            state_changed = True
 
         source = getattr(self.config, "browse_source_filter", "")
         if source is None:
             source = ""
         elif not isinstance(source, str):
+            logger.warning(
+                "Saved browse source filter %r is invalid; using text form",
+                source,
+            )
             source = str(source)
+            state_changed = True
 
         author = getattr(self.config, "browse_author_filter", "")
         if author is None:
             author = ""
         elif not isinstance(author, str):
+            logger.warning(
+                "Saved browse author filter %r is invalid; using text form",
+                author,
+            )
             author = str(author)
+            state_changed = True
 
         raw_sort_mode = getattr(self.config, "browse_sort_mode", "featured")
         sort_mode = _normalise_sort_mode(raw_sort_mode)
-        if isinstance(raw_sort_mode, str) and raw_sort_mode and raw_sort_mode.strip() != sort_mode:
+        if not isinstance(raw_sort_mode, str):
+            logger.warning(
+                "Saved browse sort mode %r is invalid; using featured order",
+                raw_sort_mode,
+            )
+            state_changed = True
+        elif raw_sort_mode and raw_sort_mode.strip() != sort_mode:
             logger.warning(
                 "Saved browse sort mode %r is no longer available; using %r",
                 raw_sort_mode,
                 sort_mode,
             )
+            state_changed = True
         favs_only = bool(getattr(self.config, "browse_favorites_only", False))
         try:
             selected_tab = int(getattr(self.config, "browse_selected_tab", 0) or 0)
@@ -2741,6 +2770,7 @@ class BrowsePanel(BasePanel):
                 getattr(self.config, "browse_selected_tab", 0),
             )
             selected_tab = 0
+            state_changed = True
 
         self._search.setText(query)
 
@@ -2752,6 +2782,8 @@ class BrowsePanel(BasePanel):
                 "Saved browse source filter %r is no longer available; using All Sources",
                 source,
             )
+            source = ""
+            state_changed = True
 
         author_index = self._author_filter.findData(author) if author else -1
         if author_index >= 0:
@@ -2761,6 +2793,8 @@ class BrowsePanel(BasePanel):
                 "Saved browse author filter %r is no longer available; using All Authors",
                 author,
             )
+            author = ""
+            state_changed = True
 
         sort_index = self._sort_filter.findData(sort_mode) if sort_mode else -1
         if sort_index >= 0:
@@ -2770,6 +2804,8 @@ class BrowsePanel(BasePanel):
                 "Saved browse sort mode %r is no longer available; using featured order",
                 sort_mode,
             )
+            sort_mode = "featured"
+            state_changed = True
 
         self._favs_check.setChecked(favs_only)
         browse_state = ui_state_bucket(self.config, "browse_panel")
@@ -2786,7 +2822,12 @@ class BrowsePanel(BasePanel):
                         tab_count,
                         clamped,
                     )
+                    selected_tab = clamped
+                    state_changed = True
                 self._tabs.setCurrentIndex(clamped)
+
+        if state_changed:
+            self._save_browse_state("sanitizing browse state")
 
     def _save_browse_state(self, context: str) -> None:
         query, source, author, favs_only, sort_mode, tab_index = self._browse_state()
