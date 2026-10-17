@@ -9396,6 +9396,107 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         )
         self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
 
+    def test_populate_scan_failure_shows_error_placeholder_and_status(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeLabel:
+            def __init__(self, text=""):
+                self.text = text
+                self.alignment = None
+                self.stylesheet = ""
+                self.word_wrap = False
+
+            def setAlignment(self, value):
+                self.alignment = value
+
+            def setStyleSheet(self, value):
+                self.stylesheet = value
+
+            def setWordWrap(self, value):
+                self.word_wrap = value
+
+            def setText(self, value):
+                self.text = value
+
+        class FakeLayout:
+            def __init__(self):
+                self.widgets = []
+                self.stretch_calls = 0
+
+            def count(self):
+                return 0
+
+            def takeAt(self, _index):
+                return None
+
+            def addWidget(self, widget, *_args):
+                self.widgets.append(widget)
+
+            def addStretch(self):
+                self.stretch_calls += 1
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            panel = LibraryPanel.__new__(LibraryPanel)
+            panel.config = AppConfig(game_library_path=tmpdir)
+            panel.db = types.SimpleNamespace(all=lambda: [])
+            panel._library_scan_cache_path = None
+            panel._library_scan_cache = []
+            panel._list_layout = FakeLayout()
+            panel._cards = []
+            panel._count_lbl = FakeLabel()
+            panel._populate_db_games = MagicMock()
+            panel._restore_selected_game = MagicMock()
+            panel.emit_status = MagicMock()
+
+            with patch.object(library_panel, "QLabel", FakeLabel):
+                with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")):
+                    with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                        LibraryPanel._populate(panel)
+
+            self.assertEqual(panel._count_lbl.text, "Scan failed — showing installed mods only")
+            self.assertTrue(
+                any(
+                    getattr(widget, "text", "").startswith("Could not scan your game library folder.")
+                    for widget in panel._list_layout.widgets
+                )
+            )
+            self.assertTrue(
+                any("boom" in getattr(widget, "text", "") for widget in panel._list_layout.widgets)
+            )
+            panel._populate_db_games.assert_called_once()
+            panel._restore_selected_game.assert_called_once()
+            panel.emit_status.assert_called_once_with(
+                f"Could not scan game library folder: {tmpdir}"
+            )
+            self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+
+    def test_refresh_keeps_scan_failure_status_message(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel._mode_stack = types.SimpleNamespace(currentIndex=lambda: 0)
+        panel._invalidate_library_scan_cache = MagicMock()
+        panel._sync_installed_content = MagicMock()
+        def _populate():
+            panel._last_library_status = "Could not scan game library folder: boom"
+            panel.emit_status(panel._last_library_status)
+
+        panel._populate = _populate
+        panel.emit_status = MagicMock()
+        panel._last_library_status = ""
+
+        LibraryPanel.refresh(panel)
+
+        panel.emit_status.assert_called_once_with("Could not scan game library folder: boom")
+        panel._invalidate_library_scan_cache.assert_called_once()
+        panel._sync_installed_content.assert_called_once()
+
     def test_save_library_config_logs_warning_on_failure(self):
         library_panel = self._import_library_panel()
         with patch.object(library_panel, "save_config", side_effect=RuntimeError("boom")):

@@ -840,6 +840,8 @@ class LibraryPanel(BasePanel):
         self._selected_card: Optional[_GameCard] = None
         self._library_scan_cache_path: Optional[str] = None
         self._library_scan_cache: list[GameEntry] = []
+        self._last_library_status: str = ""
+        self._library_scan_error: str = ""
         self._state_persistence_enabled = False
         self._build()
 
@@ -1072,6 +1074,9 @@ class LibraryPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def _populate(self):
+        self._last_library_status = ""
+        self._library_scan_error = ""
+
         # Clear current list
         while self._list_layout.count():
             item = self._list_layout.takeAt(0)
@@ -1082,6 +1087,7 @@ class LibraryPanel(BasePanel):
 
         library_path = getattr(self.config, "game_library_path", "")
         if not library_path:
+            self._last_library_status = "Game library path not configured."
             # Try to auto-detect from pcsx2_path
             pcsx2_path = getattr(self.config, "pcsx2_path", "") or ""
             auto_hint = ""
@@ -1109,6 +1115,7 @@ class LibraryPanel(BasePanel):
             msg.setWordWrap(True)
             self._list_layout.addWidget(msg)
             self._count_lbl.setText("Not configured")
+            self.emit_status(self._last_library_status)
 
             # Still show DB-tracked games even without a library path
             self._populate_db_games()
@@ -1117,6 +1124,7 @@ class LibraryPanel(BasePanel):
 
         library_root = Path(library_path)
         if not library_root.is_dir():
+            self._last_library_status = f"Game library folder not found: {library_path}"
             logger.warning("Game library folder not found: %s", library_path)
             msg = QLabel(
                 "Game library folder not found.\n\n"
@@ -1136,6 +1144,23 @@ class LibraryPanel(BasePanel):
             return
 
         games = self._scan_library(library_path)
+        if self._library_scan_error:
+            self._last_library_status = f"Could not scan game library folder: {library_path}"
+            msg = QLabel(
+                "Could not scan your game library folder.\n\n"
+                f"{self._library_scan_error}\n\n"
+                "The mods installed in the database are still shown below.\n"
+                "Check the folder permissions or press Refresh to try again."
+            )
+            msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            msg.setStyleSheet("color: #b07070; font-size: 13px;")
+            msg.setWordWrap(True)
+            self._list_layout.addWidget(msg)
+            self._count_lbl.setText("Scan failed — showing installed mods only")
+            self.emit_status(self._last_library_status)
+            self._populate_db_games()
+            self._restore_selected_game()
+            return
 
         if not games:
             placeholder = QLabel(
@@ -1207,7 +1232,9 @@ class LibraryPanel(BasePanel):
             games = scan_library(library_path)
         except Exception as exc:
             logger.warning("Could not scan game library folder %s: %s", library_path, exc)
+            self._library_scan_error = str(exc)
             return []
+        self._library_scan_error = ""
         self._library_scan_cache_path = library_path
         self._library_scan_cache = list(games)
         return list(games)
@@ -1294,10 +1321,13 @@ class LibraryPanel(BasePanel):
         self._invalidate_library_scan_cache()
         self._sync_installed_content()
         if self._mode_stack.currentIndex() == 1:
+            self._last_library_status = ""
             self._switch_to_all_mods()
+            self.emit_status("Library refreshed")
         else:
             self._populate()
-        self.emit_status("Library refreshed")
+            if not self._last_library_status:
+                self.emit_status("Library refreshed")
 
     def _sync_installed_content(self):
         """Auto-import unmanaged installed content so it appears in the library."""
