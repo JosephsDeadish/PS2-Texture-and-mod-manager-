@@ -73,6 +73,9 @@
 - Status badges on every card: **💰 Paid**, **🔐 Account**, **🔧 WIP/Partial** shown where applicable
 - **Result count label** — "Showing X of Y entries" updates live as filters change
 - **✖ Clear Filters** button — resets all filter controls in one click
+- **Compact cards** — a remembered, denser view that keeps source/install actions and status badges visible; hover over a title for descriptions, context, and tags
+- Empty results offer **Clear Filters** and **Reload catalogue** actions directly in the grid
+- Search is debounced, tabs render on demand, and resizing reuses existing cards without restarting thumbnail downloads
 - Async thumbnail loading per card — thumbnails loaded in background without blocking the UI
 - ❤ **Favorite authors** toggle — mark authors you follow; favorites shown first
 - Download cover art by game ID directly from GameTDB

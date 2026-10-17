@@ -362,6 +362,7 @@ def _catalogue_empty_state_message(
     show_account_required: bool,
     show_incomplete: bool,
     in_app_only: bool,
+    has_entries: bool = True,
 ) -> str:
     filters = []
     if query.strip():
@@ -383,7 +384,7 @@ def _catalogue_empty_state_message(
     if in_app_only:
         filters.append("in-app downloads only")
 
-    if not filters:
+    if not has_entries or not filters:
         return (
             "No catalogue entries are available in this tab. "
             "Use Reload to re-read the catalogue files."
@@ -488,11 +489,14 @@ class CatalogueCard(QFrame):
         self.setMinimumWidth(260)  # issue #21: give cards enough room for button text
         self.setMaximumWidth(420)
         self._fav_btn = None   # set to a QLabel widget inside _build() for non-hub entries; hub entries skip the favourite button entirely, so callers must guard with `if self._fav_btn`
+        self._detail_widgets = []
         self._build()
+        self.set_compact(bool(ui_state_bucket(config, "browse_panel").get("compact_cards", False)))
 
     def _build(self):
         # Outer layout: cover art on the left, all existing content on the right
         outer = QHBoxLayout(self)
+        self._outer_layout = outer
         outer.setContentsMargins(10, 10, 10, 10)
         outer.setSpacing(10)
 
@@ -546,6 +550,7 @@ class CatalogueCard(QFrame):
 
         # ── Right: all existing card content ────────────────────────────────
         layout = QVBoxLayout()
+        self._body_layout = layout
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
         outer.addLayout(layout, 1)
@@ -609,6 +614,15 @@ class CatalogueCard(QFrame):
         title = QLabel(self.entry["name"])
         title.setStyleSheet("font-weight: bold; font-size: 13px; color: #ffffff;")
         title.setWordWrap(True)
+        details = "\n\n".join(
+            text for text in (
+                self.entry["description"],
+                self.entry.get("context", ""),
+                ", ".join(self.entry.get("tags", [])),
+            ) if text
+        )
+        title.setToolTip(details)
+        self.setAccessibleDescription(details)
         layout.addWidget(title)
 
         # Game badge — shows game name AND serial (e.g. "🎮 God of War  ·  SCUS-97399")
@@ -726,6 +740,7 @@ class CatalogueCard(QFrame):
         desc.setWordWrap(True)
         desc.setMaximumHeight(60)
         layout.addWidget(desc)
+        self._detail_widgets.append(desc)
 
         # Context info (collapsible-style tooltip hint)
         if self.entry.get("context"):
@@ -737,6 +752,7 @@ class CatalogueCard(QFrame):
             ctx_lbl.setWordWrap(True)
             ctx_lbl.setToolTip(self.entry["context"])
             layout.addWidget(ctx_lbl)
+            self._detail_widgets.append(ctx_lbl)
 
         # Upscale tech + size label row
         meta_row = QHBoxLayout()
@@ -758,7 +774,9 @@ class CatalogueCard(QFrame):
 
         # Tags
         if self.entry.get("tags"):
-            tags_row = QHBoxLayout()
+            tags_widget = QWidget()
+            tags_row = QHBoxLayout(tags_widget)
+            tags_row.setContentsMargins(0, 0, 0, 0)
             tags_row.setSpacing(4)
             for tag in self.entry["tags"][:4]:
                 tag_lbl = QLabel(tag)
@@ -768,7 +786,8 @@ class CatalogueCard(QFrame):
                 )
                 tags_row.addWidget(tag_lbl)
             tags_row.addStretch()
-            layout.addLayout(tags_row)
+            layout.addWidget(tags_widget)
+            self._detail_widgets.append(tags_widget)
 
         layout.addStretch()
 
@@ -860,6 +879,15 @@ class CatalogueCard(QFrame):
             action_row.addWidget(dl_btn, 1)
 
         layout.addLayout(action_row)
+
+    def set_compact(self, compact: bool) -> None:
+        """Change card density without restarting thumbnail downloads."""
+        margin = 6 if compact else 10
+        self._outer_layout.setContentsMargins(margin, margin, margin, margin)
+        self._outer_layout.setSpacing(6 if compact else 10)
+        self._body_layout.setSpacing(4 if compact else 8)
+        for widget in self._detail_widgets:
+            widget.setVisible(not compact)
 
     def _toggle_favorite(self):
         author = self.entry["author"]
@@ -2551,6 +2579,8 @@ class _CatalogueTabContent(QWidget):
     copy_url = pyqtSignal(str)
     install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
     result_count_changed = pyqtSignal(int, int)  # (visible, total)
+    clear_filters_requested = pyqtSignal()
+    reload_requested = pyqtSignal()
 
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -2565,6 +2595,11 @@ class _CatalogueTabContent(QWidget):
         self._show_paid = False
         self._show_account_required = False
         self._show_incomplete = True
+        self._in_app_only = False
+        self._last_filter_key = None
+        self._compact = bool(ui_state_bucket(config, "browse_panel").get("compact_cards", False))
+        self._cards = []
+        self._empty_widget = None
 
         # Pagination state – updated by _populate / _append_cards
         self._all_filtered: list = []   # current filter-result set
@@ -2581,16 +2616,10 @@ class _CatalogueTabContent(QWidget):
         self._cards_container = QWidget()
         self._cards_layout = QGridLayout(self._cards_container)
         self._cards_layout.setContentsMargins(4, 8, 4, 8)
-        self._cards_layout.setSpacing(14)
+        self._cards_layout.setSpacing(8 if self._compact else 14)
         self._scroll.setWidget(self._cards_container)
         layout.addWidget(self._scroll, 1)
-        # Populate with NSFW, paid, and account-required content hidden by default
-        initial = [
-            e for e in entries
-            if not e.get("nsfw", False) and _entry_is_free(e)
-            and not _entry_requires_account(e)
-        ]
-        self._populate(initial)
+        # Cards are created only when this tab becomes active.
 
     def apply_filters(self, query: str = "", source: str = "",
                       author: str = "", favs_only: bool = False,
@@ -2600,6 +2629,14 @@ class _CatalogueTabContent(QWidget):
                       show_incomplete: bool = True,
                       in_app_only: bool = False,
                       sort_mode: str = "featured"):
+        filter_key = (
+            query, source, author, favs_only, show_nsfw, show_paid,
+            show_account_required, show_incomplete, in_app_only, sort_mode,
+            tuple(getattr(self.config, "favorite_authors", [])),
+        )
+        if filter_key == self._last_filter_key:
+            self.result_count_changed.emit(len(self._all_filtered), len(self._all_entries))
+            return
         self._current_query = query
         self._current_source = source
         self._current_author = author
@@ -2660,10 +2697,18 @@ class _CatalogueTabContent(QWidget):
 
         filtered = _sort_catalogue_entries(filtered, sort_mode)
         self._populate(filtered)
+        self._last_filter_key = filter_key
 
     def set_entries(self, entries: list) -> None:
         """Replace the backing catalogue entries for this tab."""
         self._all_entries = entries
+        self._last_filter_key = None
+
+    def set_compact(self, compact: bool) -> None:
+        self._compact = compact
+        self._cards_layout.setSpacing(8 if compact else 14)
+        for card in self._cards:
+            card.set_compact(compact)
 
     def _populate(self, entries: list, shown_count: Optional[int] = None):
         # Clear every widget currently in the grid (cards, spacers, load-more btn)
@@ -2675,10 +2720,13 @@ class _CatalogueTabContent(QWidget):
         self._all_filtered = entries
         self._shown_count = 0
         self._load_more_btn = None
+        self._cards = []
+        self._empty_widget = None
 
         initial_count = _PAGE_SIZE if shown_count is None else shown_count
         if not entries:
-            cols = calculate_catalogue_columns(self._scroll.viewport().width())
+            self._empty_widget = QWidget()
+            empty_layout = QVBoxLayout(self._empty_widget)
             empty_lbl = QLabel(
                 _catalogue_empty_state_message(
                     self._current_query,
@@ -2690,6 +2738,7 @@ class _CatalogueTabContent(QWidget):
                     self._show_account_required,
                     self._show_incomplete,
                     self._in_app_only,
+                    has_entries=bool(self._all_entries),
                 )
             )
             empty_lbl.setWordWrap(True)
@@ -2697,7 +2746,20 @@ class _CatalogueTabContent(QWidget):
             empty_lbl.setStyleSheet(
                 "color: #7080a0; font-size: 13px; padding: 30px 20px;"
             )
-            self._cards_layout.addWidget(empty_lbl, 0, 0, 1, cols)
+            empty_layout.addWidget(empty_lbl)
+            actions = QHBoxLayout()
+            actions.addStretch()
+            if self._all_entries:
+                clear_btn = QPushButton("✖ Clear Filters")
+                clear_btn.setObjectName("primary_btn")
+                clear_btn.clicked.connect(lambda: self.clear_filters_requested.emit())
+                actions.addWidget(clear_btn)
+            reload_btn = QPushButton("🔄 Reload catalogue")
+            reload_btn.clicked.connect(lambda: self.reload_requested.emit())
+            actions.addWidget(reload_btn)
+            actions.addStretch()
+            empty_layout.addLayout(actions)
+            self._reflow_cards()
             self.result_count_changed.emit(0, len(self._all_entries))
             return
         self._append_cards(initial_count)
@@ -2711,9 +2773,6 @@ class _CatalogueTabContent(QWidget):
         entries = self._all_filtered
         start = self._shown_count
         end = min(start + count, len(entries))
-        cols = calculate_catalogue_columns(self._scroll.viewport().width())
-        self._current_columns = cols
-
         for i in range(start, end):
             entry = entries[i]
             card = CatalogueCard(entry, self.config)
@@ -2722,18 +2781,27 @@ class _CatalogueTabContent(QWidget):
             card.download_cover.connect(self._download_cover)
             card.favorite_toggled.connect(self.favorite_toggled)
             card.install_direct.connect(self.install_direct.emit)
-            self._cards_layout.addWidget(card, i // cols, i % cols)
+            self._cards.append(card)
 
         self._shown_count = end
+        self._reflow_cards()
 
-        # Remove the previous "Load More" button (if any) before deciding
-        # whether a new one is needed.
-        if self._load_more_btn is not None:
-            self._cards_layout.removeWidget(self._load_more_btn)
-            self._load_more_btn.deleteLater()
-            self._load_more_btn = None
+    def _reflow_cards(self):
+        """Move existing cards to their new grid positions without rebuilding them."""
+        while self._cards_layout.count():
+            widget = self._cards_layout.takeAt(0).widget()
+            if widget is not None and widget not in self._cards and widget is not self._empty_widget:
+                widget.deleteLater()
+        self._load_more_btn = None
+        cols = calculate_catalogue_columns(self._scroll.viewport().width())
+        self._current_columns = cols
+        if self._empty_widget is not None:
+            self._cards_layout.addWidget(self._empty_widget, 0, 0, 1, cols)
+            return
+        for i, card in enumerate(self._cards):
+            self._cards_layout.addWidget(card, i // cols, i % cols)
 
-        n_remaining = len(entries) - self._shown_count
+        n_remaining = len(self._all_filtered) - self._shown_count
         if n_remaining > 0:
             # Place "Load More" button spanning all columns in the next row
             load_row = (self._shown_count + cols - 1) // cols
@@ -2746,7 +2814,7 @@ class _CatalogueTabContent(QWidget):
             # Last page — fill any incomplete row with invisible spacers so
             # cards in the last row don't stretch to fill the full width.
             remainder = self._shown_count % cols
-            if remainder and entries:
+            if remainder and self._cards:
                 for j in range(cols - remainder):
                     spacer = QWidget()
                     spacer.setSizePolicy(
@@ -2758,11 +2826,9 @@ class _CatalogueTabContent(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if not self._all_filtered:
-            return
         cols = calculate_catalogue_columns(self._scroll.viewport().width())
         if cols != self._current_columns:
-            self._populate(self._all_filtered, shown_count=self._shown_count)
+            self._reflow_cards()
 
     def _load_more(self):
         """Append the next page of catalogue cards."""
@@ -3022,6 +3088,16 @@ class BrowsePanel(BasePanel):
         tools_row.addWidget(backup_btn)
 
         tools_row.addStretch()
+        self._compact_check = QCheckBox("Compact cards")
+        self._compact_check.setChecked(
+            bool(ui_state_bucket(self.config, "browse_panel").get("compact_cards", False))
+        )
+        self._compact_check.setToolTip(
+            "Show more entries with tighter spacing and fewer detail rows.\n"
+            "Hover over a title for its description, context, and tags."
+        )
+        self._compact_check.toggled.connect(self._on_compact_toggled)
+        tools_row.addWidget(self._compact_check)
         content.addLayout(tools_row)
 
         # ── Filter row ───────────────────────────────────────────────────
@@ -3180,6 +3256,8 @@ class BrowsePanel(BasePanel):
             tab.copy_url.connect(self._copy_url)
             tab.install_direct.connect(self._install_catalogue_entry)
             tab.result_count_changed.connect(self._on_result_count_changed)
+            tab.clear_filters_requested.connect(self._clear_filters)
+            tab.reload_requested.connect(self._reload_catalogue)
             self._tab_contents.append(tab)
             self._tab_mod_types.append(mod_type)
             self._tabs.addTab(tab, label)
@@ -3188,7 +3266,12 @@ class BrowsePanel(BasePanel):
 
         self._restore_browse_state()
 
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(200)
+        self._search_timer.timeout.connect(self._on_search_timeout)
         self._search.textChanged.connect(self._on_search_changed)
+        self._search.editingFinished.connect(self._on_search_timeout)
         self._source_filter.currentIndexChanged.connect(self._on_source_filter_changed)
         self._author_filter.currentIndexChanged.connect(self._on_author_filter_changed)
         self._sort_filter.currentIndexChanged.connect(self._on_sort_changed)
@@ -3236,17 +3319,21 @@ class BrowsePanel(BasePanel):
             self._tab_contents[index].apply_filters(*args)
 
     def _apply_filters(self):
-        args = self._filter_args()
-        active_index = self._active_tab_index()
-        for index, tab in enumerate(self._tab_contents):
-            if index == active_index:
-                continue
-            tab.apply_filters(*args)
+        self._search_timer.stop()
         self._refresh_active_tab()
 
     def _on_search_changed(self, _text: str):
+        self._search_timer.start()
+
+    def _on_search_timeout(self):
         self._save_browse_state("updating search filter")
         self._apply_filters()
+
+    def _on_compact_toggled(self, compact: bool):
+        ui_state_bucket(self.config, "browse_panel")["compact_cards"] = compact
+        _save_browse_config(self.config, "updating browse card density")
+        for tab in self._tab_contents:
+            tab.set_compact(compact)
 
     def _on_source_filter_changed(self, _index: int):
         self._save_browse_state("updating source filter")
@@ -3305,7 +3392,7 @@ class BrowsePanel(BasePanel):
         """Sync the result count label when the user switches tabs."""
         if 0 <= index < len(self._tab_contents):
             self._save_browse_state("switching browse tabs")
-            self._refresh_active_tab()
+            self._apply_filters()
 
     def _clear_filters(self):
         """Reset all search and filter controls to their default state."""
@@ -3360,6 +3447,7 @@ class BrowsePanel(BasePanel):
         """Rebuild author dropdown when favorites change."""
         current = self._author_filter.currentData() or ""
         self._refresh_author_filter(CATALOGUE, current)
+        self._refresh_active_tab()
 
     def _refresh_source_filter(self, sources: List[str], selected: str = "") -> None:
         """Rebuild the source filter dropdown from the supplied source list."""

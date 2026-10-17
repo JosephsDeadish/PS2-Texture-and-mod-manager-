@@ -6897,6 +6897,193 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
 
+    def test_compact_cards_preserve_detail_widgets_and_persist_preference(self):
+        browse_panel = self._import_browse_panel()
+        card = SimpleNamespace(
+            _outer_layout=MagicMock(),
+            _body_layout=MagicMock(),
+            _detail_widgets=[MagicMock(), MagicMock()],
+        )
+        for compact in (True, False):
+            browse_panel.CatalogueCard.set_compact(card, compact)
+            for widget in card._detail_widgets:
+                widget.setVisible.assert_called_with(not compact)
+            card._body_layout.setSpacing.assert_called_with(4 if compact else 8)
+
+        panel = SimpleNamespace(config=AppConfig(), _tab_contents=[MagicMock(), MagicMock()])
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            browse_panel.BrowsePanel._on_compact_toggled(panel, True)
+        for tab in panel._tab_contents:
+            tab.set_compact.assert_called_once_with(True)
+        restored = AppConfig.from_dict(panel.config.to_dict())
+        self.assertTrue(restored.ui_state["browse_panel"]["compact_cards"])
+        save_mock.assert_called_once_with(panel.config, "updating browse card density")
+
+    def test_browse_search_debounces_rendering_and_config_writes(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._refresh_active_tab = MagicMock()
+
+        panel._on_search_changed("g")
+        panel._on_search_changed("gta")
+        self.assertEqual(panel._search_timer.start.call_count, 2)
+        panel._save_browse_state.assert_not_called()
+        panel._refresh_active_tab.assert_not_called()
+
+        panel._on_search_timeout()
+        panel._search_timer.stop.assert_called_once()
+        panel._save_browse_state.assert_called_once_with("updating search filter")
+        panel._refresh_active_tab.assert_called_once()
+
+    def test_filters_render_only_active_tab_and_switch_uses_latest_filters(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._tab_contents = [MagicMock(), MagicMock(), MagicMock()]
+        panel._tabs = MagicMock()
+        panel._tabs.currentIndex.return_value = 1
+        args = ("gta", "GitHub", "", False, False, False, False, True, True, "name")
+        panel._filter_args = MagicMock(return_value=args)
+
+        panel._apply_filters()
+        panel._tab_contents[0].apply_filters.assert_not_called()
+        panel._tab_contents[1].apply_filters.assert_called_once_with(*args)
+        panel._tab_contents[2].apply_filters.assert_not_called()
+
+        panel._tabs.currentIndex.return_value = 2
+        panel._on_tab_changed(2)
+        panel._tab_contents[2].apply_filters.assert_called_once_with(*args)
+        self.assertEqual(panel._search_timer.stop.call_count, 2)
+
+    def test_catalogue_filter_cache_preserves_pagination_and_invalidates(self):
+        browse_panel = self._import_browse_panel()
+        tab = browse_panel._CatalogueTabContent.__new__(browse_panel._CatalogueTabContent)
+        tab.config = AppConfig()
+        tab._all_entries = [{"name": "Alpha", "author": "Alice", "source": "GitHub"}]
+        tab._last_filter_key = None
+        tab._serial_db = False
+        tab.result_count_changed = MagicMock()
+
+        def populate(entries):
+            tab._all_filtered = entries
+            tab._shown_count = len(entries)
+
+        tab._populate = MagicMock(side_effect=populate)
+        tab.apply_filters(sort_mode="name")
+        tab._shown_count = 42
+        tab.apply_filters(sort_mode="name")
+        tab._populate.assert_called_once()
+        self.assertEqual(tab._shown_count, 42)
+        tab.result_count_changed.emit.assert_called_once_with(1, 1)
+
+        tab.config.favorite_authors.append("Alice")
+        tab.apply_filters(sort_mode="name")
+        self.assertEqual(tab._populate.call_count, 2)
+        tab.set_entries([])
+        tab.apply_filters(sort_mode="name")
+        self.assertEqual(tab._populate.call_count, 3)
+        self.assertEqual(tab._all_filtered, [])
+
+    def test_catalogue_reflow_keeps_cards_pagination_and_load_more(self):
+        browse_panel = self._import_browse_panel()
+
+        class FakeGrid:
+            def __init__(self, widgets):
+                self.items = [(widget, ()) for widget in widgets]
+
+            def count(self):
+                return len(self.items)
+
+            def takeAt(self, index):
+                widget, _ = self.items.pop(index)
+                return SimpleNamespace(widget=lambda: widget)
+
+            def addWidget(self, widget, *position):
+                self.items.append((widget, position))
+
+        cards = [MagicMock() for _ in range(4)]
+        old_button = MagicMock()
+        width = [600]
+        tab = SimpleNamespace(
+            _cards=cards,
+            _empty_widget=None,
+            _cards_layout=FakeGrid(cards + [old_button]),
+            _all_filtered=[{}] * 6,
+            _shown_count=4,
+            _scroll=SimpleNamespace(viewport=lambda: SimpleNamespace(width=lambda: width[0])),
+            _load_more=MagicMock(),
+        )
+        with patch.object(browse_panel, "CatalogueCard") as card_class, \
+                patch.object(browse_panel, "QPushButton") as button_class:
+            browse_panel._CatalogueTabContent._reflow_cards(tab)
+            self.assertEqual([pos for _, pos in tab._cards_layout.items[:4]],
+                             [(0, 0), (0, 1), (1, 0), (1, 1)])
+            old_button.deleteLater.assert_called_once()
+            button_class.assert_called_with("⬇  Load more  (2 remaining)")
+            width[0] = 300
+            browse_panel._CatalogueTabContent._reflow_cards(tab)
+            self.assertEqual([pos for _, pos in tab._cards_layout.items[:4]],
+                             [(0, 0), (1, 0), (2, 0), (3, 0)])
+            card_class.assert_not_called()
+        self.assertEqual(tab._shown_count, 4)
+        for card in cards:
+            card.deleteLater.assert_not_called()
+
+    def test_catalogue_empty_states_offer_recovery_actions(self):
+        browse_panel = self._import_browse_panel()
+        for has_entries in (True, False):
+            with self.subTest(has_entries=has_entries):
+                tab = SimpleNamespace(
+                    _cards_layout=MagicMock(),
+                    _all_entries=[{}] if has_entries else [],
+                    _current_query="missing",
+                    _current_source="",
+                    _current_author="",
+                    _show_favs_only=False,
+                    _show_nsfw=False,
+                    _show_paid=False,
+                    _show_account_required=False,
+                    _show_incomplete=True,
+                    _in_app_only=False,
+                    _reflow_cards=MagicMock(),
+                    result_count_changed=MagicMock(),
+                    clear_filters_requested=MagicMock(),
+                    reload_requested=MagicMock(),
+                )
+                tab._cards_layout.count.return_value = 0
+                buttons = []
+
+                def make_button(text):
+                    button = MagicMock()
+                    buttons.append((text, button))
+                    return button
+
+                with patch.multiple(
+                    browse_panel,
+                    QWidget=MagicMock(), QVBoxLayout=MagicMock(),
+                    QHBoxLayout=MagicMock(), QLabel=MagicMock(),
+                    QPushButton=MagicMock(side_effect=make_button),
+                    Qt=SimpleNamespace(AlignmentFlag=SimpleNamespace(AlignCenter=0)),
+                ):
+                    browse_panel._CatalogueTabContent._populate(tab, [])
+                self.assertEqual(
+                    [text for text, _ in buttons],
+                    (["✖ Clear Filters"] if has_entries else []) + ["🔄 Reload catalogue"],
+                )
+                for _, button in buttons:
+                    button.clicked.connect.call_args.args[0]()
+                self.assertEqual(tab.clear_filters_requested.emit.call_count, int(has_entries))
+                tab.reload_requested.emit.assert_called_once()
+                tab.result_count_changed.emit.assert_called_once_with(0, int(has_entries))
+                message = browse_panel._catalogue_empty_state_message(
+                    "", "", "", False, False, False, False, True, False,
+                    has_entries=has_entries,
+                )
+                self.assertIn("match the current filters" if has_entries else "available in this tab", message)
+
     def test_source_badge_text_uses_site_icons(self):
         browse_panel = self._import_browse_panel()
         self.assertEqual(browse_panel._source_badge_text("GBAtemp"), "🧵 GBAtemp")
