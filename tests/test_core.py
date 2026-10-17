@@ -6904,11 +6904,71 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         self.assertEqual(browse_panel._source_badge_text("PCSX2 CheatDB"), "🧪 PCSX2 CheatDB")
         self.assertEqual(browse_panel._source_badge_text(" Patreon "), "🌐 Patreon")
 
+    def test_entry_copy_url_prefers_direct_download_url(self):
+        browse_panel = self._import_browse_panel()
+        self.assertEqual(
+            browse_panel._entry_copy_url({
+                "direct_download_url": "https://example.com/direct.zip",
+                "url": "https://example.com/source",
+                "author_url": "https://example.com/author",
+            }),
+            "https://example.com/direct.zip",
+        )
+        self.assertEqual(
+            browse_panel._entry_copy_url({
+                "url": "https://example.com/source",
+                "author_url": "https://example.com/author",
+            }),
+            "https://example.com/source",
+        )
+
     def test_entry_has_named_author_helper_skips_placeholders(self):
         browse_panel = self._import_browse_panel()
         self.assertTrue(browse_panel._entry_has_named_author({"author": "TexMaster"}))
         self.assertFalse(browse_panel._entry_has_named_author({"author": "Unknown"}))
         self.assertFalse(browse_panel._entry_has_named_author({"author": " Anonymous "}))
+
+    def test_copy_url_uses_clipboard_and_status_message(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeClipboard:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        messages = []
+        panel.emit_status = messages.append
+
+        clipboard = FakeClipboard()
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+        class FakeQApplication:
+            @staticmethod
+            def clipboard():
+                return clipboard
+
+        qtwidgets.QApplication = FakeQApplication
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            result = BrowsePanel._copy_url(panel, "https://example.com/direct.zip")
+
+        self.assertTrue(result)
+        self.assertEqual(clipboard.value, "https://example.com/direct.zip")
+        self.assertEqual(messages[-1], "Copied the selected link to the clipboard.")
 
     def test_reload_catalogue_refreshes_tabs_and_filters(self):
         browse_panel = self._import_browse_panel()

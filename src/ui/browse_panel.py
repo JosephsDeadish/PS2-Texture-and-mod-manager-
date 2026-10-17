@@ -161,6 +161,17 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
     return False
 
 
+def _entry_copy_url(entry: dict) -> str:
+    """Return the most useful URL to copy for *entry*."""
+    for field_name in ("direct_download_url", "url", "author_url"):
+        value = entry.get(field_name, "")
+        if isinstance(value, str):
+            value = value.strip()
+            if value:
+                return value
+    return ""
+
+
 def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = None) -> bool:
     """Return True when *entry* matches the browse search query."""
     needle = query.strip().casefold()
@@ -464,6 +475,7 @@ class CatalogueCard(QFrame):
     """A card in the mod browser showing one catalogue entry."""
 
     open_url = pyqtSignal(str)
+    copy_url = pyqtSignal(str)
     download_cover = pyqtSignal(dict)
     favorite_toggled = pyqtSignal(str, bool)   # author, is_favorite
     install_direct = pyqtSignal(dict)           # entry dict — in-app install requested
@@ -768,6 +780,19 @@ class CatalogueCard(QFrame):
         visit_btn.setObjectName("primary_btn")
         visit_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
         action_row.addWidget(visit_btn, 1)
+
+        copy_btn = QPushButton("📋 Copy")
+        copy_btn.setToolTip(
+            "Copy the direct download link if available, otherwise the source page URL."
+        )
+        copy_btn.setAccessibleName("Copy catalogue link")
+        copy_btn.setAccessibleDescription(
+            "Copy the most useful link for this catalogue entry to the clipboard."
+        )
+        copy_target = _entry_copy_url(self.entry)
+        copy_btn.setEnabled(bool(copy_target))
+        copy_btn.clicked.connect(lambda: self.copy_url.emit(copy_target))
+        action_row.addWidget(copy_btn, 1)
 
         download_action = self.entry.get("download_action", "")
         has_direct = bool(self.entry.get("direct_download_url"))
@@ -2523,6 +2548,7 @@ _COVER_DOWNLOAD_STATE_KEY = "cover_download_dialog"
 
 class _CatalogueTabContent(QWidget):
     favorite_toggled = pyqtSignal(str, bool)
+    copy_url = pyqtSignal(str)
     install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
     result_count_changed = pyqtSignal(int, int)  # (visible, total)
 
@@ -2692,6 +2718,7 @@ class _CatalogueTabContent(QWidget):
             entry = entries[i]
             card = CatalogueCard(entry, self.config)
             card.open_url.connect(self._open_url)
+            card.copy_url.connect(self.copy_url.emit)
             card.download_cover.connect(self._download_cover)
             card.favorite_toggled.connect(self.favorite_toggled)
             card.install_direct.connect(self.install_direct.emit)
@@ -3150,6 +3177,7 @@ class BrowsePanel(BasePanel):
             )
             tab = _CatalogueTabContent(entries, self.config)
             tab.favorite_toggled.connect(self._on_favorite_toggled)
+            tab.copy_url.connect(self._copy_url)
             tab.install_direct.connect(self._install_catalogue_entry)
             tab.result_count_changed.connect(self._on_result_count_changed)
             self._tab_contents.append(tab)
@@ -3526,6 +3554,25 @@ class BrowsePanel(BasePanel):
             title="Browse Link Unavailable",
             failure_message="Could not open the selected link. Please copy the URL into your browser.",
         )
+
+    def _copy_url(self, url: str):
+        url = (url or "").strip()
+        if not url:
+            self.emit_status("No link is available to copy for this entry.")
+            return False
+        try:
+            from PyQt6.QtWidgets import QApplication
+
+            clipboard = QApplication.clipboard()
+            if clipboard is None:
+                raise RuntimeError("clipboard unavailable")
+            clipboard.setText(url)
+        except Exception as exc:
+            logger.warning("Could not copy browse link %s: %s", url, exc)
+            self.emit_status("Could not copy the selected link.")
+            return False
+        self.emit_status("Copied the selected link to the clipboard.")
+        return True
 
     def _reload_catalogue(self):
         """Reload catalogue from disk, refresh filters and cards.
