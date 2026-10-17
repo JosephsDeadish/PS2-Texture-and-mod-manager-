@@ -1580,7 +1580,7 @@ def _run_direct_download(result, request_id, state, mod_type, config, db, url=No
                 source_url=source_url, status=STATUS_SUCCESS, size_bytes=installed_size,
             )
         except Exception as exc:
-            logger.warning("Could not record browse download history: %s", exc)
+            logger.warning("Could not record browse download history for %s: %s", mod.name, exc)
             message += "\nInstallation succeeded, but history could not be saved."
         result.installed.emit()
         result.finished.emit(request_id, True, message)
@@ -1595,7 +1595,7 @@ def _run_direct_download(result, request_id, state, mod_type, config, db, url=No
                 status=STATUS_FAILED, note=f"{phase}: {error}",
             )
         except Exception as history_exc:
-            logger.warning("Could not record failed browse download history: %s", history_exc)
+            logger.warning("Could not record failed browse download history for %s: %s", state["name"], history_exc)
         result.finished.emit(
             request_id, False,
             f"❌  {phase.capitalize()} failed: {error}\n"
