@@ -12212,6 +12212,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             TextFormat=types.SimpleNamespace(PlainText=0),
         )
         qtcore.QObject = type("QObject", (), {})
+        qtcore.QTimer = type("QTimer", (), {})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtcore.pyqtSlot = lambda *args, **kwargs: lambda fn: fn
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
@@ -12256,6 +12257,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._rendered_library_path = None
         panel._last_library_status = ""
         panel._cards = []
+        panel._shown_cards = []
         panel._selected_card = None
         panel._detail = MagicMock()
         panel._count_lbl = MagicMock()
@@ -12265,7 +12267,401 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._list_layout = MagicMock()
         panel._list_layout.count.return_value = 0
         panel.emit_status = MagicMock()
+        self._add_game_filter_controls(panel)
         return panel
+
+    def _add_game_filter_controls(self, panel):
+        panel._game_search = MagicMock()
+        panel._game_search.text.return_value = ""
+        panel._game_search.setText.side_effect = lambda text: setattr(
+            panel._game_search.text, "return_value", text,
+        )
+        panel._game_search.clear.side_effect = lambda: panel._game_search.setText("")
+
+        def combo(values):
+            widget = MagicMock()
+            widget.currentData.return_value = values[0]
+            widget.findData.side_effect = lambda value: values.index(value) if value in values else -1
+            widget.setCurrentIndex.side_effect = lambda index: setattr(
+                widget.currentData, "return_value", values[index],
+            )
+            return widget
+
+        panel._game_filter = combo(["all", "with_mods", "without_mods", "disc", "tracked"])
+        panel._game_sort = combo(["title", "title_desc", "mods", "size", "serial"])
+        panel._game_search_timer = MagicMock()
+        panel._clear_game_filters_btn = MagicMock()
+        panel._game_empty = MagicMock()
+
+    def _add_sample_game_cards(self, panel, module):
+        entries = [
+            module.GameEntry(
+                path="/games/God of War.iso", filename="God of War.iso",
+                serial="SCUS-97399", title="God of War", size_bytes=400, crcs=["77E61C8A"],
+            ),
+            module.GameEntry(
+                path="/games/Kingdom Hearts.iso", filename="Kingdom Hearts.iso",
+                serial="SLUS-20370", title="Kingdom Hearts", size_bytes=100,
+            ),
+            module.GameEntry(path="", filename="", serial="SLES-55432", title="Persona 4"),
+            module.GameEntry(
+                path="/games/mystery.chd", filename="mystery.chd",
+                serial="", title="", size_bytes=800,
+            ),
+        ]
+        panel._cards = [
+            MagicMock(game=game, mod_count=count)
+            for game, count in zip(entries, (0, 3, 1, 0))
+        ]
+        return list(panel._cards)
+
+    def test_game_search_all_words_can_match_different_fields(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("gOd war scus97399 ntscu ISO 77E6")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [cards[0]])
+        for card, expected in zip(cards, (True, False, False, False)):
+            card.setVisible.assert_called_once_with(expected)
+
+    def test_game_search_matches_filenames_paths_regions_and_crc(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for query, matches in (
+            ("MYSTERYCHD", [3]), ("/games/Kingdom", [1]),
+            ("pal", [2]), ("77e61c8a", [0]), ("CHD", [3]),
+            ("god kingdom", []), ("does not exist", []),
+        ):
+            with self.subTest(query=query):
+                panel._game_search.setText(query)
+                panel._apply_game_filters()
+                self.assertEqual(panel._shown_cards, [cards[i] for i in matches])
+
+    def test_game_search_unicode_casefold_and_whitespace(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        game = module.GameEntry(
+            path="/games/Ōkami.iso", filename="Ōkami.iso", serial="SLUS-21115", title="Ōkami",
+        )
+        card = MagicMock(game=game, mod_count=0)
+        panel._cards = [card]
+        panel._game_search.setText("  ŌKAMI \t slus21115 \n")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [card])
+        self.assertEqual(panel._current_game_filter_state()["search"], "  ŌKAMI \t slus21115 \n")
+
+    def test_game_filters_distinguish_mod_counts_and_disc_presence(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for mode, indices in (
+            ("all", [0, 1, 3, 2]), ("with_mods", [1, 2]),
+            ("without_mods", [0, 3]), ("disc", [0, 1, 3]), ("tracked", [2]),
+        ):
+            with self.subTest(mode=mode):
+                panel._game_filter.currentData.return_value = mode
+                panel._apply_game_filters()
+                self.assertEqual(panel._shown_cards, [cards[i] for i in indices])
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0],
+                         "Library games: 1/4 shown • 1 with installed mods\n0 disc images • 1 tracked only")
+
+    def test_search_composes_with_game_filter_and_sort(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("iso")
+        panel._game_filter.currentData.return_value = "with_mods"
+        panel._game_sort.currentData.return_value = "size"
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [cards[1]])
+        self.assertIn("1/4 shown", panel._count_lbl.setText.call_args.args[0])
+
+    def test_game_sort_orders_and_deterministic_ties(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for sort, indices in (
+            ("title", [0, 1, 3, 2]), ("title_desc", [2, 3, 1, 0]),
+            ("mods", [1, 2, 0, 3]), ("size", [3, 0, 1, 2]),
+            ("serial", [0, 2, 1, 3]),
+        ):
+            with self.subTest(sort=sort):
+                panel._game_sort.currentData.return_value = sort
+                panel._list_layout.insertWidget.reset_mock()
+                panel._apply_game_filters()
+                expected = [cards[i] for i in indices]
+                self.assertEqual(panel._shown_cards, expected)
+                self.assertEqual(
+                    [call.args[1] for call in panel._list_layout.insertWidget.call_args_list], expected,
+                )
+        self.assertEqual(panel._cards, cards)  # Full snapshot is not narrowed or reordered.
+
+    def test_empty_filters_do_not_construct_cards_scan_or_touch_database(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        with patch.object(module, "scan_library") as scan, patch.object(module, "_GameCard") as constructor:
+            for text in ("", "g", "god", "no match", ""):
+                panel._game_search.setText(text)
+                panel._apply_game_filters()
+        scan.assert_not_called()
+        constructor.assert_not_called()
+        panel.db.all.assert_not_called()
+        self.assertEqual(panel._cards, cards)
+
+    def test_hiding_selection_clears_detail_not_saved_identity(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._apply_game_filters()
+        panel._on_game_clicked(cards[0].game)
+        # Persist explicitly: fixture disables automatic persistence by default.
+        panel.config.ui_state["library_panel"]["selected_game"] = panel._selected_game_state()
+        selected = dict(panel.config.ui_state["library_panel"]["selected_game"])
+        panel._game_search.setText("kingdom")
+        panel._detail.clear_game.reset_mock()
+        with patch.object(module, "save_config") as save:
+            panel._apply_game_filters()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        panel._detail.clear_game.assert_called_once()
+        cards[0].set_selected.assert_called_with(False)
+        save.assert_not_called()
+        panel._game_search.setText("")
+        panel._apply_game_filters()
+        self.assertIs(panel._selected_card, cards[0])
+
+    def test_hidden_exact_disc_does_not_fall_back_to_visible_sibling(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        other = MagicMock(
+            game=module.GameEntry(path="/games/variant.chd", filename="variant.chd",
+                                  serial=cards[0].game.serial, title="Variant"),
+            mod_count=0,
+        )
+        panel._cards.append(other)
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": cards[0].game.path, "serial": cards[0].game.serial,
+        }}}
+        panel._game_search.setText("variant")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [other])
+        self.assertIsNone(panel._selected_card)
+        panel._detail.show_game.assert_not_called()
+
+    def test_serial_fallback_skips_hidden_matches_when_exact_disc_is_absent(self):
+        module = self._import_library_panel()
+        for saved_path in ("", "/removed/disc.iso"):
+            with self.subTest(saved_path=saved_path):
+                panel = self._new_scan_panel(module=module)
+                cards = self._add_sample_game_cards(panel, module)
+                other = MagicMock(
+                    game=module.GameEntry(path="/games/variant.chd", filename="variant.chd",
+                                          serial=cards[0].game.serial, title="Variant"),
+                    mod_count=0,
+                )
+                panel._cards.append(other)
+                panel.config.ui_state = {"library_panel": {"selected_game": {
+                    "path": saved_path, "serial": cards[0].game.serial,
+                }}}
+                panel._game_search.setText("variant")
+                panel._apply_game_filters()
+                self.assertIs(panel._selected_card, other)
+                panel._detail.show_game.assert_called_once_with(other.game)
+
+    def test_hidden_serial_fallback_preserves_saved_selection_when_none_visible(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        selected = {"path": "/removed/disc.iso", "serial": cards[0].game.serial}
+        panel.config.ui_state = {"library_panel": {"selected_game": dict(selected)}}
+        panel._game_search.setText("no match")
+        with patch.object(module, "save_config") as save:
+            panel._apply_game_filters()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        save.assert_not_called()
+
+    def test_selecting_another_game_replaces_hidden_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._state_persistence_enabled = True
+        panel._all_mods_pane = MagicMock()
+        panel._all_mods_pane.current_filter_state.return_value = {}
+        with patch.object(module, "save_config"):
+            panel._apply_game_filters()
+            panel._on_game_clicked(cards[0].game)
+            panel._game_search.setText("kingdom")
+            panel._on_game_filters_changed()
+            panel._on_game_clicked(cards[1].game)
+            panel._clear_game_filters()
+        self.assertIs(panel._selected_card, cards[1])
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"]["path"], cards[1].game.path)
+        cards[0].set_selected.assert_called_with(False)
+
+    def test_hidden_game_click_is_ignored(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("kingdom")
+        panel._apply_game_filters()
+        panel._on_game_clicked(cards[1].game)
+        panel._detail.show_game.reset_mock()
+        panel._on_game_clicked(cards[0].game)
+        self.assertIs(panel._selected_card, cards[1])
+        panel._detail.show_game.assert_not_called()
+
+    def test_no_match_recovery_resets_search_filter_sort_once(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("no match")
+        panel._game_filter.currentData.return_value = "disc"
+        panel._game_sort.currentData.return_value = "mods"
+        panel._apply_game_filters()
+        panel._game_empty.setVisible.assert_called_with(True)
+        self.assertIn("Clear Filters", panel._game_empty.setText.call_args.args[0])
+        self.assertIn("0/4 shown", panel._count_lbl.setText.call_args.args[0])
+        with patch.object(panel, "_save_view_state") as save, patch.object(panel, "_apply_game_filters", wraps=panel._apply_game_filters) as apply:
+            panel._clear_game_filters()
+        self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+        self.assertEqual(len(panel._shown_cards), 4)
+        panel._game_empty.setVisible.assert_called_with(False)
+        panel._clear_game_filters_btn.setEnabled.assert_called_with(False)
+        apply.assert_called_once()
+        save.assert_called_once()
+        for widget in (panel._game_search, panel._game_filter, panel._game_sort):
+            self.assertEqual([call.args[0] for call in widget.blockSignals.call_args_list[-2:]], [True, False])
+
+    def test_game_filter_state_round_trip_preserves_raw_search(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        state = {"search": "  Kingdom  SLUS20370 ", "filter": "disc", "sort": "mods"}
+        with patch.object(module, "save_config") as save:
+            panel._restore_game_filter_state(state)
+        self.assertEqual(panel._current_game_filter_state(), state)
+        save.assert_not_called()
+        for widget in (panel._game_search, panel._game_filter, panel._game_sort):
+            self.assertEqual([call.args[0] for call in widget.blockSignals.call_args_list], [True, False])
+        panel._game_search_timer.start.assert_not_called()
+
+    def test_game_filter_state_repairs_stale_and_malformed_values(self):
+        module = self._import_library_panel()
+        for state in (
+            None, [], {"search": 12, "filter": ["disc"], "sort": False},
+            {"filter": "archived", "sort": "recent"},
+        ):
+            with self.subTest(state=state):
+                panel = self._new_scan_panel(module=module)
+                with patch.object(module, "save_config") as save:
+                    with self.assertLogs("src.ui.library_panel", level="WARNING"):
+                        panel._restore_game_filter_state(state)
+                self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+                self.assertEqual(panel.config.ui_state["library_panel"]["by_game"], panel._current_game_filter_state())
+                save.assert_called_once_with(panel.config)
+
+    def test_game_filter_state_defaults_without_writing_config(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        with patch.object(module, "save_config") as save:
+            panel._restore_game_filter_state({})
+        self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+        save.assert_not_called()
+
+    def test_game_and_all_mods_filter_states_remain_independent(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._all_mods_pane = MagicMock()
+        all_mods = {"search": "author:Alice", "status": "enabled", "type": "pnach"}
+        panel._all_mods_pane.current_filter_state.return_value = all_mods
+        panel._state_persistence_enabled = True
+        state = {"search": "god", "filter": "disc", "sort": "size"}
+        panel._restore_game_filter_state(state)
+        with patch.object(module, "save_config"):
+            panel._save_view_state("testing independent filters")
+        saved = panel.config.ui_state["library_panel"]
+        self.assertEqual(saved["all_mods"], all_mods)
+        self.assertEqual(saved["by_game"], state)
+
+    def test_late_game_search_timer_does_not_overwrite_all_mods_count(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._game_search.setText("god")
+        with patch.object(panel, "_apply_game_filters") as apply, patch.object(panel, "_save_view_state") as save:
+            panel._on_game_filters_changed()
+        panel._game_search_timer.stop.assert_called_once()
+        apply.assert_not_called()
+        save.assert_called_once()
+        panel._count_lbl.setText.assert_not_called()
+
+    def test_no_matches_during_scan_are_not_reported_as_finished_empty(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._scan_active = (1, "/games")
+        panel._game_search.setText("no match")
+        panel._apply_game_filters()
+        self.assertIn("still loading", panel._game_empty.setText.call_args.args[0])
+        self.assertIn("Scanning disc images: 0/4", panel._count_lbl.setText.call_args.args[0])
+
+    def test_filtered_error_state_reports_failure_and_allows_reset(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._library_scan_error = "disk offline"
+        panel._game_filter.currentData.return_value = "tracked"
+        panel._apply_game_filters()
+        self.assertIn("Scan failed: 1/4", panel._count_lbl.setText.call_args.args[0])
+        panel._clear_game_filters()
+        self.assertEqual(len(panel._shown_cards), 4)
+
+    def test_filters_apply_to_async_completion_without_dropping_full_snapshot(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        entries = [card.game for card in originals[:2]]
+        panel._cards = []
+        panel._game_search.setText("kingdom")
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+                panel._on_library_scan_finished(*panel._scan_active, entries, "")
+        self.assertEqual([card.game for card in panel._shown_cards], [entries[1]])
+        self.assertEqual([card.game for card in panel._cards], entries)
+        self.assertEqual(panel._library_scan_cache, entries)
+
+    def test_same_folder_refresh_retains_hidden_disc_results(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        panel._rendered_library_path = "/games"
+        panel._game_search.setText("kingdom")
+        panel._apply_game_filters()
+        panel._sync_installed_content = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+                panel.refresh()
+        self.assertEqual([card.game for card in panel._cards], [originals[i].game for i in (0, 1, 3)])
+        self.assertEqual([card.game for card in panel._shown_cards], [originals[1].game])
+
+    def test_game_mod_filter_updates_after_database_refresh(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        panel._scan_requested_path = "/games"
+        panel._library_scan_cache_path = "/games"
+        panel._library_scan_cache = [card.game for card in originals[:2]]
+        panel._game_filter.currentData.return_value = "with_mods"
+        panel.db.all.return_value = [MagicMock(game_id=originals[0].game.serial)]
+        with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+            panel._populate()
+        self.assertEqual([card.game for card in panel._shown_cards], [originals[0].game])
+        self.assertEqual([card.mod_count for card in panel._cards], [1, 0])
 
     def test_all_mods_filter_state_round_trip(self):
         library_panel = self._import_library_panel()
@@ -12456,6 +12852,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._by_game_btn = FakeButton()
         panel._all_mods_btn = FakeButton()
         panel._count_lbl = FakeLabel()
+        self._add_game_filter_controls(panel)
         panel._populate = lambda: setattr(panel, "populate_called", True)
         panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
         panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
@@ -12529,6 +12926,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._by_game_btn = FakeButton()
         panel._all_mods_btn = FakeButton()
         panel._count_lbl = FakeLabel()
+        self._add_game_filter_controls(panel)
         panel._populate = lambda: setattr(panel, "populate_called", True)
         panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
         panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
@@ -12564,6 +12962,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._state_persistence_enabled = True
         panel._mode_stack = FakeStack(1)
         panel._all_mods_pane = FakePane()
+        self._add_game_filter_controls(panel)
 
         with patch.object(library_panel, "save_config") as save_mock:
             LibraryPanel._save_view_state(panel, "switching library view to all-mods")
@@ -12573,6 +12972,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             {
                 "mode": "all_mods",
                 "all_mods": {"search": "gta", "type": "pnach", "status": "enabled"},
+                "by_game": {"search": "", "filter": "all", "sort": "title"},
             },
         )
         save_mock.assert_called_once_with(panel.config)
@@ -12606,6 +13006,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
                 title="Kingdom Hearts",
             )
         )
+        self._add_game_filter_controls(panel)
 
         with patch.object(library_panel, "save_config") as save_mock:
             LibraryPanel._save_view_state(panel, "selecting game in library")
@@ -12663,6 +13064,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War")),
             FakeCard(FakeGame("/games/kh.iso", "SLUS-20370", "Kingdom Hearts")),
         ]
+        panel._shown_cards = list(panel._cards)
         panel._selected_card = None
         panel._detail = FakeDetail()
         panel._scan_active = None
@@ -13055,6 +13457,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._cards = [MagicMock(), MagicMock()]
         for card, path in zip(panel._cards, ("/games/first.iso", "/games/second.iso")):
             card.game = module.GameEntry(path=path, filename=Path(path).name, serial="SLUS-20062", title="")
+        panel._shown_cards = list(panel._cards)
         panel._restore_selected_game()
         self.assertIs(panel._selected_card, panel._cards[1])
         panel._cards[0].set_selected.assert_not_called()
@@ -13086,6 +13489,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
             with patch.object(module, "_GameCard") as card:
                 card.return_value.game = disc
+                card.return_value.mod_count = 1
                 panel._populate()
         card.assert_called_once_with(disc, 1, config=panel.config)
         self.assertIs(panel._selected_card, card.return_value)
@@ -13119,6 +13523,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._cards = [MagicMock(game=disc)]
         with patch.object(module, "_GameCard") as card:
             card.return_value.game = disc
+            card.return_value.mod_count = 0
             panel._populate()
         card.assert_called_once_with(disc, 0, config=panel.config)
         self.assertIn("disk disconnected", panel._scan_status.setText.call_args.args[0])

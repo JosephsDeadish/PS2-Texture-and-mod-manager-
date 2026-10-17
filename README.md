@@ -55,6 +55,9 @@
 - Same-folder scans retain previous disc results and selection while refreshing tracked-mod counts; changing folders clears old cards and details
 - Loading and error feedback stays visible in either Library view; **Scan Library** retries failures, and **All Mods** remains usable independently
 - Rapid scans/settings changes keep only one running scan and the latest queued request; stale results never replace the current folder
+- **By Game** searches titles, serials, filenames, paths, regions, formats, and known CRCs; all words must match (across fields), ignoring case and punctuation
+- Filter games with/without installed mods, disc images, or tracked-only games; sort by title, mod count, disc size, or serial, with shown/total counts
+- Search/filter/sort preferences are remembered separately from **All Mods**. Filtering reuses existing cards without rescanning; hidden selections return when shown again, and **Clear Filters** recovers no-match results
 
 ### ✏️ Mod Metadata
 - Edit names, authors, versions, Game IDs, descriptions, source links, and tags from a mod row or **Details → Edit Metadata**

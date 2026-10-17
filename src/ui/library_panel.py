@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import List, Optional
 
-from PyQt6.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
+from PyQt6.QtCore import QObject, QTimer, Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -98,6 +98,24 @@ def _save_library_config(config: AppConfig, context: str) -> None:
         save_config(config)
     except Exception as exc:
         logger.warning("Could not save library panel config after %s: %s", context, exc)
+
+
+def _game_matches_search(game: GameEntry, terms: list[tuple[str, str]]) -> bool:
+    if not terms:
+        return True
+    values = (
+        game.title, game.serial, game.filename, game.path,
+        game.region, game.disc_type if game.path else "", *game.crcs,
+    )
+    normalized = [
+        (value.casefold(), "".join(ch for ch in value.casefold() if ch.isalnum()))
+        for value in values
+    ]
+    return all(
+        any(text in value or (compact and compact in compact_value)
+            for value, compact_value in normalized)
+        for text, compact in terms
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -461,6 +479,7 @@ class _GameCard(QFrame):
     def __init__(self, game: GameEntry, mod_count: int, parent=None, config=None):
         super().__init__(parent)
         self.game = game
+        self.mod_count = mod_count
         self.setObjectName("card")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         focus_policy = getattr(getattr(Qt, "FocusPolicy", None), "StrongFocus", None)
@@ -532,6 +551,8 @@ class _GameCard(QFrame):
         info_col.setSpacing(2)
 
         name_lbl = QLabel(game.title or game.filename)
+        name_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        name_lbl.setToolTip(game.path or "Tracked game with installed mods; no disc image found")
         name_lbl.setStyleSheet("font-weight: bold; color: #d0d0f0; font-size: 13px;")
         name_lbl.setWordWrap(True)  # issue #32: wrap long game names instead of horizontal scroll
         name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -541,7 +562,7 @@ class _GameCard(QFrame):
             sub_parts.append(game.serial)
         if game.region:
             sub_parts.append(game.region)
-        sub_parts.append(game.disc_type)
+        sub_parts.append(game.disc_type if game.path else "No disc image")
         if game.size_bytes:
             sub_parts.append(_fmt_size(game.size_bytes))
         if sub_parts:
@@ -851,6 +872,7 @@ class LibraryPanel(BasePanel):
         self.config = config
         self.manager = ModManager(self.db)
         self._cards: list[_GameCard] = []
+        self._shown_cards: list[_GameCard] = []
         self._selected_card: Optional[_GameCard] = None
         self._library_scan_cache_path: Optional[str] = None
         self._library_scan_cache: list[GameEntry] = []
@@ -928,6 +950,7 @@ class LibraryPanel(BasePanel):
         # Count label on its own row so it never forces a horizontal scroll bar (issue #20)
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
+        self._count_lbl.setWordWrap(True)
         content.addWidget(self._count_lbl)
         self._scan_status = QLabel()
         self._scan_status.setWordWrap(True)
@@ -942,6 +965,52 @@ class LibraryPanel(BasePanel):
         by_game_widget = QWidget()
         by_game_layout = QVBoxLayout(by_game_widget)
         by_game_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._game_search = QLineEdit()
+        self._game_search.setPlaceholderText("Search titles, serials, files, paths, regions, or CRCs…")
+        self._game_search.setAccessibleName("Search library games")
+        self._game_search.setClearButtonEnabled(True)
+        self._game_search.setToolTip(
+            "All words must match, even across different game fields. "
+            "Matching ignores case and punctuation. Search does not scan your folders."
+        )
+        self._game_search_timer = QTimer(self)
+        self._game_search_timer.setSingleShot(True)
+        self._game_search_timer.setInterval(180)
+        self._game_search_timer.timeout.connect(self._on_game_filters_changed)
+        self._game_search.textChanged.connect(lambda: self._game_search_timer.start())
+        by_game_layout.addWidget(self._game_search)
+
+        filters = QHBoxLayout()
+        self._game_filter = QComboBox()
+        self._game_filter.setAccessibleName("Filter library games")
+        for label, value in (
+            ("All games", "all"), ("With installed mods", "with_mods"),
+            ("Without installed mods", "without_mods"), ("Disc images only", "disc"),
+            ("Tracked only (no disc)", "tracked"),
+        ):
+            self._game_filter.addItem(label, value)
+        self._game_filter.currentIndexChanged.connect(self._on_game_filters_changed)
+        filters.addWidget(self._game_filter, 1)
+        self._game_sort = QComboBox()
+        self._game_sort.setAccessibleName("Sort library games")
+        for label, value in (
+            ("Title A–Z", "title"), ("Title Z–A", "title_desc"),
+            ("Most installed mods", "mods"), ("Largest disc images", "size"),
+            ("Serial", "serial"),
+        ):
+            self._game_sort.addItem(label, value)
+        self._game_sort.currentIndexChanged.connect(self._on_game_filters_changed)
+        filters.addWidget(self._game_sort, 1)
+        self._clear_game_filters_btn = QPushButton("Clear Filters")
+        self._clear_game_filters_btn.clicked.connect(self._clear_game_filters)
+        filters.addWidget(self._clear_game_filters_btn)
+        by_game_layout.addLayout(filters)
+        self._game_empty = QLabel()
+        self._game_empty.setWordWrap(True)
+        self._game_empty.setTextFormat(Qt.TextFormat.PlainText)
+        self._game_empty.hide()
+        by_game_layout.addWidget(self._game_empty)
 
         self._splitter = QSplitter(Qt.Orientation.Horizontal)
         self._splitter.setChildrenCollapsible(False)
@@ -1020,6 +1089,7 @@ class LibraryPanel(BasePanel):
 
     def _restore_view_state(self):
         state = _library_ui_state(self.config)
+        self._restore_game_filter_state(state.get("by_game", {}))
         all_mods_state = state.get("all_mods", {})
         if isinstance(all_mods_state, dict):
             self._all_mods_pane.restore_filter_state(all_mods_state)
@@ -1036,10 +1106,127 @@ class LibraryPanel(BasePanel):
         state = _library_ui_state(self.config)
         state["mode"] = "all_mods" if self._mode_stack.currentIndex() == 1 else "by_game"
         state["all_mods"] = self._all_mods_pane.current_filter_state()
+        state["by_game"] = self._current_game_filter_state()
         selected_game = self._selected_game_state()
         if selected_game:
             state["selected_game"] = selected_game
         _save_library_config(self.config, context)
+
+    def _current_game_filter_state(self) -> dict:
+        return {
+            "search": self._game_search.text(),
+            "filter": self._game_filter.currentData(),
+            "sort": self._game_sort.currentData(),
+        }
+
+    def _restore_game_filter_state(self, state):
+        corrected = not isinstance(state, dict)
+        state = state if isinstance(state, dict) else {}
+        search = state.get("search", "")
+        if not isinstance(search, str):
+            search = ""
+            corrected = True
+        _block_signals(self._game_search, True)
+        self._game_search.setText(search)
+        _block_signals(self._game_search, False)
+        for widget, key, default in (
+            (self._game_filter, "filter", "all"), (self._game_sort, "sort", "title"),
+        ):
+            value = state.get(key, default)
+            index = widget.findData(value) if isinstance(value, str) else -1
+            if index < 0:
+                index = 0
+                corrected = True
+            _block_signals(widget, True)
+            widget.setCurrentIndex(index)
+            _block_signals(widget, False)
+        if corrected:
+            logger.warning("Invalid saved Library game filters; restoring valid defaults")
+            _library_ui_state(self.config)["by_game"] = self._current_game_filter_state()
+            _save_library_config(self.config, "repairing Library game filters")
+
+    def _on_game_filters_changed(self, *_args):
+        self._game_search_timer.stop()
+        if self._mode_stack.currentIndex() == 0:
+            self._apply_game_filters()
+        self._save_view_state("filtering Library games")
+
+    def _clear_game_filters(self):
+        self._game_search_timer.stop()
+        for widget in (self._game_search, self._game_filter, self._game_sort):
+            _block_signals(widget, True)
+        self._game_search.clear()
+        self._game_filter.setCurrentIndex(0)
+        self._game_sort.setCurrentIndex(0)
+        for widget in (self._game_search, self._game_filter, self._game_sort):
+            _block_signals(widget, False)
+        self._on_game_filters_changed()
+
+    def _apply_game_filters(self):
+        query = self._game_search.text().casefold()
+        terms = [(word, "".join(ch for ch in word if ch.isalnum())) for word in query.split()]
+        mode = self._game_filter.currentData()
+        order = self._game_sort.currentData()
+
+        def title_key(card):
+            game = card.game
+            return (
+                (game.title or game.filename or game.serial).casefold(),
+                game.serial.casefold(), game.path.casefold(),
+            )
+
+        ordered = sorted(self._cards, key=title_key, reverse=order == "title_desc")
+        if order == "mods":
+            ordered.sort(key=lambda card: -card.mod_count)
+        elif order == "size":
+            ordered.sort(key=lambda card: -card.game.size_bytes)
+        elif order == "serial":
+            ordered.sort(key=lambda card: (not bool(card.game.serial), card.game.serial.casefold()))
+        self._shown_cards = []
+        for card in self._cards:
+            self._list_layout.removeWidget(card)
+        for index, card in enumerate(ordered):
+            visible = (
+                (mode != "with_mods" or card.mod_count > 0)
+                and (mode != "without_mods" or card.mod_count == 0)
+                and (mode != "disc" or bool(card.game.path))
+                and (mode != "tracked" or not card.game.path)
+                and _game_matches_search(card.game, terms)
+            )
+            card.setVisible(visible)
+            self._list_layout.insertWidget(index, card)
+            if visible:
+                self._shown_cards.append(card)
+        if self._selected_card is not None and self._selected_card not in self._shown_cards:
+            self._selected_card.set_selected(False)
+            self._selected_card = None
+            self._detail.clear_game()
+        if self._selected_card is None:
+            self._restore_selected_game()
+        active = bool(terms) or mode != "all"
+        self._clear_game_filters_btn.setEnabled(active or order != "title")
+        if self._scan_active or self._scan_pending:
+            message = (
+                "No available games match yet; disc images are still loading. "
+                "Use Clear Filters to show all available games."
+            )
+        else:
+            message = "No games match these filters. Use Clear Filters to show all available games."
+        self._game_empty.setText(message)
+        self._game_empty.setVisible(active and not self._shown_cards)
+        if self._cards or active:
+            prefix = "Library games"
+            if self._scan_active or self._scan_pending:
+                prefix = "Scanning disc images"
+            elif self._library_scan_error:
+                prefix = "Scan failed"
+            disc_count = sum(bool(card.game.path) for card in self._shown_cards)
+            with_mods = sum(card.mod_count > 0 for card in self._shown_cards)
+            self._count_lbl.setText(
+                f"{prefix}: {len(self._shown_cards)}/{len(self._cards)} shown"
+                f" • {with_mods} with installed mods\n"
+                f"{disc_count} disc images • {len(self._shown_cards) - disc_count} tracked only"
+            )
 
     def _selected_game_state(self) -> dict:
         card = getattr(self, "_selected_card", None)
@@ -1079,6 +1266,7 @@ class LibraryPanel(BasePanel):
             self._cards,
             key=lambda card: str(getattr(card.game, "path", "") or "") != target_path,
         )
+        hidden_match = False
         for card in candidates:
             game = getattr(card, "game", None)
             if game is None:
@@ -1086,6 +1274,8 @@ class LibraryPanel(BasePanel):
             game_path = str(getattr(game, "path", "") or "")
             game_serial = str(getattr(game, "serial", "") or "").upper()
             if target_path and game_path == target_path:
+                if card not in self._shown_cards:
+                    return
                 card.set_selected(True)
                 self._selected_card = card
                 self._detail.show_game(game)
@@ -1096,12 +1286,15 @@ class LibraryPanel(BasePanel):
                     self._scan_active or self._scan_pending or self._library_scan_error
                 ))
             ):
+                if card not in self._shown_cards:
+                    hidden_match = True
+                    continue
                 card.set_selected(True)
                 self._selected_card = card
                 self._detail.show_game(game)
                 return
 
-        if self._scan_active or self._scan_pending or self._library_scan_error:
+        if hidden_match or self._scan_active or self._scan_pending or self._library_scan_error:
             return
         logger.warning(
             "Saved library selection path=%r serial=%r no longer matches a visible game; "
@@ -1181,12 +1374,13 @@ class LibraryPanel(BasePanel):
 
             # Still show DB-tracked games even without a library path
             self._populate_db_games()
-            self._restore_selected_game()
+            self._apply_game_filters()
             return
 
         if pending and not using_previous:
             self._populate_db_games()
             self._count_lbl.setText(f"Scanning disc images • {len(self._cards)} tracked game(s) available")
+            self._apply_game_filters()
             return
 
         if self._library_scan_error and not using_previous:
@@ -1203,7 +1397,7 @@ class LibraryPanel(BasePanel):
             self._list_layout.addWidget(msg)
             self._count_lbl.setText("Scan failed — showing installed mods only")
             self._populate_db_games()
-            self._restore_selected_game()
+            self._apply_game_filters()
             return
 
         if not games:
@@ -1219,7 +1413,7 @@ class LibraryPanel(BasePanel):
 
             # Still show DB-tracked games even if no ISO files were found
             self._populate_db_games()
-            self._restore_selected_game()
+            self._apply_game_filters()
             return
 
         # Count mods per serial
@@ -1245,10 +1439,6 @@ class LibraryPanel(BasePanel):
         # Add DB-only games (have mods but no matching ISO in the library)
         db_only_games = self._get_db_only_games(library_serials, mods_by_serial)
         if db_only_games:
-            sep_lbl = QLabel("── Installed (no disc image) ──")
-            sep_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            sep_lbl.setStyleSheet("color: #404070; font-size: 10px; margin-top: 4px;")
-            self._list_layout.addWidget(sep_lbl)
             for game, mod_count in db_only_games:
                 card = _GameCard(game, mod_count, config=self.config)
                 card.clicked.connect(self._on_game_clicked)
@@ -1263,7 +1453,7 @@ class LibraryPanel(BasePanel):
         self._count_lbl.setText(
             f"Library games: {total} total  •  {games_with_mods} with installed mods"
         )
-        self._restore_selected_game()
+        self._apply_game_filters()
 
     def _invalidate_library_scan_cache(self) -> None:
         self._scan_generation += 1
@@ -1401,10 +1591,6 @@ class LibraryPanel(BasePanel):
         db_only = self._get_db_only_games(set())
         if not db_only:
             return
-        sep_lbl = QLabel("── Games with installed mods ──")
-        sep_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        sep_lbl.setStyleSheet("color: #404070; font-size: 10px; margin-top: 4px;")
-        self._list_layout.addWidget(sep_lbl)
         for game, mod_count in db_only:
             card = _GameCard(game, mod_count, config=self.config)
             card.clicked.connect(self._on_game_clicked)
@@ -1418,16 +1604,16 @@ class LibraryPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def _on_game_clicked(self, game: GameEntry):
+        card = next((card for card in self._shown_cards if card.game is game), None)
+        if card is None:
+            return
         # Deselect previous
         if self._selected_card:
             self._selected_card.set_selected(False)
 
         # Select new
-        for card in self._cards:
-            if card.game is game:
-                card.set_selected(True)
-                self._selected_card = card
-                break
+        card.set_selected(True)
+        self._selected_card = card
 
         self._detail.show_game(game)
         self._save_view_state("selecting game in library")
