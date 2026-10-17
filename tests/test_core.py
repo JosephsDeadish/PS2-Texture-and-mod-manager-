@@ -8218,6 +8218,78 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._refresh_history.assert_not_called()
 
 
+class TestDashboardWorkflows(unittest.TestCase):
+    def _import_dashboard(self):
+        import importlib
+        import types
+
+        pyqt = types.ModuleType("PyQt6")
+        pyqt.__path__ = []
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = SimpleNamespace(
+            AlignmentFlag=SimpleNamespace(AlignCenter=0),
+            CursorShape=SimpleNamespace(PointingHandCursor=1),
+        )
+        qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QFrame", "QGridLayout", "QHBoxLayout", "QLabel", "QPushButton",
+            "QScrollArea", "QVBoxLayout", "QWidget", "QLineEdit",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        with patch.dict(sys.modules, {
+            "PyQt6": pyqt, "PyQt6.QtCore": qtcore, "PyQt6.QtWidgets": qtwidgets,
+        }):
+            return importlib.import_module("src.ui.dashboard")
+
+    def test_dashboard_actions_emit_distinct_routes_and_stats_include_cheats(self):
+        dashboard = self._import_dashboard()
+        panel = MagicMock(config=AppConfig())
+        mods = [
+            ModInfo(id=str(i), name=str(i), mod_type=kind, path=f"/mods/{i}")
+            for i, kind in enumerate((ModType.PNACH, ModType.CHEAT))
+        ]
+        panel.db.all.return_value = mods
+        panel.db.by_type.return_value = []
+        buttons = {}
+
+        def make_button(text):
+            buttons[text] = MagicMock()
+            return buttons[text]
+
+        grid = MagicMock()
+        stat = MagicMock()
+        with patch.multiple(
+            dashboard, QScrollArea=MagicMock(), QWidget=MagicMock(), QFrame=MagicMock(),
+            QVBoxLayout=MagicMock(), QHBoxLayout=MagicMock(), QGridLayout=grid,
+            QLabel=MagicMock(), QPushButton=MagicMock(side_effect=make_button),
+            StatCard=stat, ModManager=MagicMock(),
+        ):
+            dashboard.ModManager.return_value.detect_conflicts.return_value = []
+            dashboard.DashboardPanel._build(panel)
+        routes = {
+            "🌐 Discover Mods": "discover", "➕ Import Textures": "import_textures",
+            "⬇ Download from URL": "download_url", "📥 Downloads / History": "downloads",
+            "⚙ Open Settings": "settings",
+        }
+        for text, action in routes.items():
+            buttons[text].clicked.connect.call_args.args[0]()
+            panel.action_requested.emit.assert_called_with(action)
+        self.assertTrue(any(call.args[1:3] == ("PNACH / Cheats", "2") for call in stat.call_args_list))
+        panel._content_layout.addWidget.assert_called_once()
+        grid.return_value.addWidget.assert_any_call(stat.return_value, 1, 2)
+
+    def test_dashboard_refresh_disposes_old_scroll_container_before_rebuild(self):
+        dashboard = self._import_dashboard()
+        old_scroll = MagicMock()
+        panel = MagicMock()
+        panel._content_layout.count.side_effect = [1, 0]
+        panel._content_layout.takeAt.return_value.widget.return_value = old_scroll
+        dashboard.DashboardPanel.refresh(panel)
+        old_scroll.deleteLater.assert_called_once()
+        panel._build.assert_called_once()
+
+
 class TestMainWindowNavigationState(unittest.TestCase):
     """Tests for main-window panel selection persistence."""
 
@@ -8316,6 +8388,37 @@ class TestMainWindowNavigationState(unittest.TestCase):
         self.assertEqual(panel._stack.panel.refresh_count, 1)
         self.assertEqual(panel.config.ui_state["main_window"]["selected_nav_index"], 1)
         save_mock.assert_called_once_with(panel.config)
+
+    def test_dashboard_actions_navigate_then_open_the_matching_workflow(self):
+        main_window = self._import_main_window()
+        window = main_window.MainWindow.__new__(main_window.MainWindow)
+        window._activate_nav = MagicMock()
+        window._texture_panel = MagicMock()
+        window._browse_panel = MagicMock()
+        for action, index in (
+            ("discover", 1), ("import_textures", 4), ("download_url", 1),
+            ("downloads", 3), ("settings", 8),
+        ):
+            with self.subTest(action=action):
+                window._on_dashboard_action(action)
+                window._activate_nav.assert_called_with(index)
+        window._texture_panel._import_mod.assert_called_once()
+        window._browse_panel._open_download_dialog.assert_called_once()
+        calls = window._activate_nav.call_count
+        window._on_dashboard_action("unknown")
+        self.assertEqual(window._activate_nav.call_count, calls)
+
+    def test_discover_install_refreshes_panels_to_invalidate_issue_caches(self):
+        main_window = self._import_main_window()
+        window = main_window.MainWindow.__new__(main_window.MainWindow)
+        panels = [MagicMock(), MagicMock(), MagicMock()]
+        window._texture_panel, window._pnach_panel, window._cover_panel = panels
+        window._library_panel = MagicMock()
+        window._dashboard = MagicMock()
+        window._on_mod_installed()
+        for panel in panels:
+            panel.refresh.assert_called_once()
+            panel._apply_filter.assert_not_called()
 
     def test_selected_nav_index_from_state_logs_and_clamps_invalid_values(self):
         main_window = self._import_main_window()
@@ -9480,6 +9583,21 @@ class TestModPanelEmptyState(unittest.TestCase):
             edit.return_value.exec.return_value = edit.return_value.DialogCode.Accepted
             panel._on_edit("a")
         panel.manager.update_metadata.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_code_builder_close_invalidates_cached_pnach_overlaps(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.config = AppConfig()
+        panel._library_filter_check = MagicMock()
+        panel._library_filter_check.isChecked.return_value = False
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        with patch("src.ui.widgets.PnachCodeBuilderDialog") as builder, \
+                patch.object(AppConfig, "load", return_value=panel.config, create=True):
+            panel._open_code_builder()
+        builder.return_value.exec.assert_called_once()
         panel._invalidate_issue_state_cache.assert_called_once()
         panel._apply_filter.assert_called_once()
 

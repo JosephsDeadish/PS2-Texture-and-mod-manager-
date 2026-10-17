@@ -116,6 +116,11 @@
 - Auto-detection of PCSX2 config sub-folders
 - All paths configurable individually
 
+### 🏠 Dashboard Workflows
+- One-click discovery, texture import, URL download, downloads/history, and settings actions
+- Scrollable overview with a two-row statistics grid, including both PNACH patches and cheats
+- First-use guidance when no mods are installed
+
 ### 🚀 Animated Splash Screen
 - PS2 controller icon with pulsing glow ring and rotating accent arc
 - Loading progress bar

@@ -347,20 +347,24 @@ class ModPanel(BasePanel):
         author_row.addWidget(self._status_filter)
 
         author_row.addStretch()
+        content.addLayout(author_row)
 
         # ---- Enable-all / Disable-all ----
+        batch_row = QHBoxLayout()
+        batch_row.addWidget(QLabel("All mods in this panel:"))
         enable_all = QPushButton("✅ Enable All")
         enable_all.setObjectName("success_btn")
         enable_all.clicked.connect(self._enable_all)
-        author_row.addWidget(enable_all)
+        batch_row.addWidget(enable_all)
         disable_all = QPushButton("🚫 Disable All")
         disable_all.clicked.connect(self._disable_all)
-        author_row.addWidget(disable_all)
+        batch_row.addWidget(disable_all)
+        batch_row.addStretch()
 
         clear_filters = QPushButton("✖ Clear Filters")
         clear_filters.setToolTip("Reset search, sort, author, library, and status filters")
         clear_filters.clicked.connect(self._clear_filters)
-        author_row.addWidget(clear_filters)
+        batch_row.addWidget(clear_filters)
 
         # Status / conflict label — acts as a clickable link when conflicts exist
         # Issue #20: placed on its own row below the toolbar to avoid triggering a scrollbar
@@ -369,7 +373,7 @@ class ModPanel(BasePanel):
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px; text-align: left; border: none;")
         self._count_lbl.setCursor(Qt.CursorShape.ArrowCursor)
         self._count_lbl.clicked.connect(self._on_count_lbl_clicked)
-        content.addLayout(author_row)
+        content.addLayout(batch_row)
         content.addWidget(self._count_lbl)
 
         # ---- PCSX2 guidance banner (texture / pnach / cheat panels only) ----
@@ -1137,6 +1141,8 @@ class ModPanel(BasePanel):
             parent=self,
         )
         dlg.exec()
+        self._invalidate_issue_state_cache()
+        self._apply_filter()
 
     def _check_updates(self):
         """

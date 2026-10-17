@@ -217,6 +217,7 @@ class MainWindow(QMainWindow):
 
         # Pages (must match nav_items order + settings at end)
         self._dashboard = DashboardPanel(self.db, self.config)
+        self._dashboard.action_requested.connect(self._on_dashboard_action)
         self._stack.addWidget(self._dashboard)          # index 0
 
         self._browse_panel = BrowsePanel(self.config)
@@ -327,6 +328,23 @@ class MainWindow(QMainWindow):
     # Handlers
     # ------------------------------------------------------------------
 
+    def _on_dashboard_action(self, action: str):
+        routes = {
+            "discover": 1,
+            "import_textures": 4,
+            "download_url": 1,
+            "downloads": 3,
+            "settings": 8,
+        }
+        index = routes.get(action)
+        if index is None:
+            return
+        self._activate_nav(index)
+        if action == "import_textures":
+            self._texture_panel._import_mod()
+        elif action == "download_url":
+            self._browse_panel._open_download_dialog()
+
     def _on_mod_installed(self):
         """Refresh all mod panels after a mod is installed from the Discover panel."""
         for panel in (
@@ -335,7 +353,7 @@ class MainWindow(QMainWindow):
             self._cover_panel,
         ):
             try:
-                panel._apply_filter()
+                panel.refresh()
             except Exception as exc:
                 logger.warning(
                     "Failed to refresh %s after mod install: %s",
