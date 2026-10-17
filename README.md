@@ -112,9 +112,9 @@
 - Export the selected save, only the search results (**Export Shown**), or every save including hidden results (**Export All Saves**). Existing dumps are never overwritten; export results include copyable details of successes and failures
 - Exports are best-effort raw page dumps of up to 64 KiB, not complete save archives. Use **Backup Card** for a full card image or mymc for compatible save archives
 - List and export individual saves
-- **Import** a save dump back into a memory card
-- **Copy** a save between memory card images
-- **Backup** any card with a timestamped copy
+- **Import** a raw dump or **Copy** a save between cards using an exact-source/destination confirmation (defaults to No). These are best-effort raw page writes, not full save-archive operations; close PCSX2 first and use mymc when archive compatibility is needed
+- Every confirmed import/copy first creates a full destination-card image in its adjacent `backups` folder; a failed backup cancels the write. Success and write-failure messages include the backup path for manual recovery
+- **Backup** any card with a timestamped copy. Repeated backups use unique names and never replace existing files, including when created within the same second
 - Search save names and directory IDs, with saved sorting and selection preserved across filters
 - Clear empty-state actions and selection-aware controls; browsed cards survive refresh and new cards open automatically
 

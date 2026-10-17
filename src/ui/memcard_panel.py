@@ -65,6 +65,7 @@ class MemoryCardPanel(BasePanel):
         self._all_saves = []
         self._shown_saves = []
         self._export_busy = False
+        self._write_busy = False
         self._card_exists = False
         self._card_valid = False
         self._filter_timer = QTimer(self)
@@ -269,14 +270,15 @@ class MemoryCardPanel(BasePanel):
     def _update_save_actions(self):
         item = self._saves_list.currentItem()
         selected = bool(item and item.data(Qt.ItemDataRole.UserRole))
-        self._export_btn.setEnabled(self._card_valid and selected and not self._export_busy)
-        self._copy_btn.setEnabled(self._card_valid and selected)
+        busy = self._export_busy or self._write_busy
+        self._export_btn.setEnabled(self._card_valid and selected and not busy)
+        self._copy_btn.setEnabled(self._card_valid and selected and not busy)
         self._copy_id_btn.setEnabled(self._card_valid and selected)
-        self._import_btn.setEnabled(self._card_valid)
-        self._export_all_btn.setEnabled(self._card_valid and bool(self._all_saves) and not self._export_busy)
-        self._export_shown_btn.setEnabled(self._card_valid and bool(self._shown_saves) and not self._export_busy)
+        self._import_btn.setEnabled(self._card_valid and not busy)
+        self._export_all_btn.setEnabled(self._card_valid and bool(self._all_saves) and not busy)
+        self._export_shown_btn.setEnabled(self._card_valid and bool(self._shown_saves) and not busy)
         self._export_shown_btn.setText(f"Export Shown ({len(self._shown_saves)})")
-        self._backup_btn.setEnabled(self._card_exists)
+        self._backup_btn.setEnabled(self._card_exists and not busy)
         save = self._selected_save()
         self._selected_save_info.setText(
             f"{save.name}\nDirectory ID: {save.dir_name}\nListed size: {save.size_bytes:,} bytes"
@@ -414,7 +416,9 @@ class MemoryCardPanel(BasePanel):
         new_btn.setObjectName("primary_btn")
         new_btn.clicked.connect(self._create_card)
         card_actions.addWidget(new_btn)
-        safety_hint = QLabel("Close PCSX2 before changing saves. Back up your card first.")
+        safety_hint = QLabel(
+            "Close PCSX2 before changing saves. Import/copy backs up the destination card first."
+        )
         safety_hint.setWordWrap(True)
         card_actions.addWidget(safety_hint, 1)
 
@@ -525,7 +529,7 @@ class MemoryCardPanel(BasePanel):
 
         copy_btn = QPushButton("📋 Copy to Other Card")
         self._copy_btn = copy_btn
-        copy_btn.setToolTip("Copy selected save to another memory card")
+        copy_btn.setToolTip("Confirm a best-effort raw copy; a full destination-card backup is required first")
         copy_btn.clicked.connect(self._copy_save_to_other_card)
         save_actions.addWidget(copy_btn)
 
@@ -545,7 +549,7 @@ class MemoryCardPanel(BasePanel):
 
         import_btn = QPushButton("📥 Import Save")
         self._import_btn = import_btn
-        import_btn.setToolTip("Import a .bin save dump into this memory card")
+        import_btn.setToolTip("Confirm a best-effort raw import; a full destination-card backup is required first")
         import_btn.setObjectName("primary_btn")
         import_btn.clicked.connect(self._import_save)
         right_layout.addWidget(import_btn)
@@ -741,7 +745,7 @@ class MemoryCardPanel(BasePanel):
         self._export_saves("All Saves (including hidden)", self._all_saves)
 
     def _export_saves(self, scope, saves):
-        if self._export_busy or not self._current_card or not self._card_valid:
+        if self._export_busy or self._write_busy or not self._current_card or not self._card_valid:
             return
         card = self._current_card
         # Freeze identity before the native folder chooser runs its event loop.
@@ -791,28 +795,102 @@ class MemoryCardPanel(BasePanel):
 
     def _backup_card(self):
         """Back up the current memory card to a timestamped file."""
+        if self._write_busy or self._export_busy:
+            return
         if not self._current_card:
             QMessageBox.information(self, "No Card", "Please select a memory card first.")
             return
 
-        last_paths = self._last_paths_bucket()
-        dest_dir = QFileDialog.getExistingDirectory(
-            self, "Choose backup destination folder",
-            last_paths.get("memcard_backup_dir", self.config.memcards_path or ""),
-        )
-        if not dest_dir:
-            return
-        self._remember_last_path("memcard_backup_dir", dest_dir)
-
+        card = self._current_card
+        self._write_busy = True
+        self._update_save_actions()
         try:
-            backup_path = backup_memcard(self._current_card, dest_dir)
-            QMessageBox.information(
-                self, "Backup Complete",
-                f"Memory card backed up to:\n{backup_path}"
+            dest_dir = QFileDialog.getExistingDirectory(
+                self, "Choose backup destination folder",
+                self._last_paths_bucket().get("memcard_backup_dir", self.config.memcards_path or ""),
             )
+            if not dest_dir:
+                return
+            self._remember_last_path("memcard_backup_dir", dest_dir)
+            backup_path = backup_memcard(card, dest_dir)
+            self._show_card_result("Backup Complete", f"Source card: {card}\n\nBackup: {backup_path}")
             self.emit_status(f"Backup saved: {Path(backup_path).name}")
         except MemoryCardError as exc:
-            QMessageBox.critical(self, "Backup Error", str(exc))
+            self._show_card_result("Backup Error", str(exc), failed=True)
+        finally:
+            self._write_busy = False
+            self._update_save_actions()
+
+    def _show_card_result(self, title, text, *, failed=False):
+        result = QMessageBox(self)
+        result.setWindowTitle(title)
+        result.setTextFormat(Qt.TextFormat.PlainText)
+        result.setIcon(QMessageBox.Icon.Warning if failed else QMessageBox.Icon.Information)
+        result.setText(text)
+        result.exec()
+
+    def _write_save_with_backup(self, source, destination, directory, *, copying):
+        backup_path = ""
+        action = "Copy" if copying else "Import"
+        try:
+            source = str(Path(source).resolve(strict=True))
+            destination = str(Path(destination).resolve(strict=True))
+            if Path(source).samefile(destination):
+                raise MemoryCardError("Source and destination are the same file (or aliases of it).")
+            if not is_valid_memcard(destination):
+                raise MemoryCardError("Destination is not a valid PS2 memory card image.")
+            backup_dir = str(Path(destination).parent / "backups")
+            question = QMessageBox(self)
+            question.setWindowTitle(f"{action} Save — Back Up and Write")
+            question.setTextFormat(Qt.TextFormat.PlainText)
+            question.setIcon(QMessageBox.Icon.Warning)
+            question.setText(
+                f"Directory ID: {directory}\nSource: {source}\n"
+                f"Destination card: {destination}\n\n"
+                f"A full destination-card backup will be created in:\n{backup_dir}\n"
+                "The write is cancelled if backup creation fails.\n\n"
+                "Close PCSX2 before continuing. This is a best-effort raw page operation, "
+                "not a full save-archive import. It may replace existing pages or append data "
+                "and may damage the card; compatibility is not guaranteed. "
+                "Use mymc for compatible save archives.\n\nBack up and write?"
+            )
+            question.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            question.setDefaultButton(QMessageBox.StandardButton.No)
+            if question.exec() != QMessageBox.StandardButton.Yes:
+                return
+            # Recheck after the confirmation's nested event loop, before backup/write.
+            if Path(source).samefile(destination) or not is_valid_memcard(destination):
+                raise MemoryCardError("Source or destination changed; no write was attempted.")
+            backup_path = backup_memcard(destination, backup_dir)
+            if copying:
+                import tempfile
+                with tempfile.TemporaryDirectory() as tmp:
+                    found = copy_save_between_cards(source, directory, destination, tmp)
+            else:
+                found = import_raw_save(source, destination, directory)
+            if not is_valid_memcard(destination):
+                raise MemoryCardError("The destination no longer has a valid memory-card header after writing.")
+            self._show_card_result(
+                f"{action} Finished",
+                f"Raw data {'replaced matching pages' if found else 'was appended'} "
+                f"for '{directory}'.\nDestination card: {destination}\n\n"
+                f"Full card backup: {backup_path}\n\n"
+                "Verify the save in PCSX2 before discarding the backup. "
+                "This operation does not validate save compatibility.",
+            )
+            self.emit_status(f"{action} finished; full card backup: {backup_path}")
+        except (MemoryCardError, OSError, RuntimeError) as exc:
+            logger.warning("Memory card %s failed for %s: %s", action.lower(), destination, exc)
+            recovery = (
+                f"\n\nFull pre-write backup: {backup_path}\n"
+                "The destination may be partially changed. Close PCSX2 and restore this "
+                "full image manually if needed before retrying."
+                if backup_path else "\n\nNo save write was attempted."
+            )
+            self._show_card_result(f"{action} Failed", f"{exc}{recovery}", failed=True)
+        finally:
+            if backup_path:
+                self._load_saves()
 
     # ------------------------------------------------------------------
     # Import save into card
@@ -820,54 +898,46 @@ class MemoryCardPanel(BasePanel):
 
     def _import_save(self):
         """Import a .bin save dump into the current memory card."""
+        if self._write_busy or self._export_busy or not self._card_valid:
+            return
         if not self._current_card:
             QMessageBox.information(self, "No Card", "Please select a memory card first.")
             return
 
-        last_paths = self._last_paths_bucket()
-        src_path, _ = QFileDialog.getOpenFileName(
-            self,
-            "Select Save File to Import",
-            last_paths.get("memcard_import_file_dir", self.config.memcards_path or ""),
-            "Save Dumps (*.bin);;All Files (*)",
-        )
-        if not src_path:
-            return
-        self._remember_last_path("memcard_import_file_dir", str(Path(src_path).parent))
-
-        save_name, ok = QInputDialog.getText(
-            self,
-            "Save Name",
-            "Enter the save directory name (e.g. BISLUS-12345):",
-            text=Path(src_path).stem,
-        )
-        if not ok or not save_name.strip():
-            return
-
-        # Warn user before writing
-        reply = QMessageBox.warning(
-            self,
-            "Write to Memory Card",
-            "This will modify your memory card image.\n"
-            "Make sure you have a backup before continuing.\n\n"
-            "Continue?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
-        if reply != QMessageBox.StandardButton.Yes:
-            return
-
+        card = self._current_card
+        self._write_busy = True
+        self._update_save_actions()
         try:
-            found = import_raw_save(src_path, self._current_card, save_name.strip())
-            verb = "updated" if found else "appended"
-            QMessageBox.information(
-                self, "Import Complete",
-                f"Save '{save_name.strip()}' has been {verb} in the memory card."
+            src_path, _ = QFileDialog.getOpenFileName(
+                self, "Select Raw Save Dump to Import",
+                self._last_paths_bucket().get("memcard_import_file_dir", self.config.memcards_path or ""),
+                "Raw Save Dumps (*.bin);;All Files (*)",
             )
-            self.emit_status(f"Save imported: {save_name.strip()}")
-            self._load_saves()
-        except MemoryCardError as exc:
-            QMessageBox.critical(self, "Import Error", str(exc))
+            if not src_path:
+                return
+            self._remember_last_path("memcard_import_file_dir", str(Path(src_path).parent))
+            save_name, ok = QInputDialog.getText(
+                self, "Save Directory ID",
+                "Enter the save directory ID (1–32 printable ASCII characters, no slashes):",
+                text=Path(src_path).stem,
+            )
+            if not ok or not save_name.strip():
+                return
+            directory = save_name.strip()
+            if (
+                len(directory) > 32 or directory in (".", "..")
+                or any(not 32 <= ord(char) <= 126 or char in "/\\" for char in directory)
+            ):
+                self._show_card_result(
+                    "Invalid Directory ID",
+                    "Use 1–32 printable ASCII characters without slashes. No save write was attempted.",
+                    failed=True,
+                )
+                return
+            self._write_save_with_backup(src_path, card, directory, copying=False)
+        finally:
+            self._write_busy = False
+            self._update_save_actions()
 
     # ------------------------------------------------------------------
     # Copy save to another card
@@ -875,41 +945,26 @@ class MemoryCardPanel(BasePanel):
 
     def _copy_save_to_other_card(self):
         """Copy the selected save to a different memory card."""
-        item = self._saves_list.currentItem()
-        if not item:
+        if self._write_busy or self._export_busy or not self._card_valid:
+            return
+        save = self._selected_save()
+        if save is None:
             QMessageBox.information(self, "No Selection", "Please select a save to copy.")
             return
 
-        save_name = item.data(Qt.ItemDataRole.UserRole)
-        if not save_name:
-            return
-
-        last_paths = self._last_paths_bucket()
-        dest_card, _ = QFileDialog.getOpenFileName(
-            self,
-            "Select Destination Memory Card",
-            last_paths.get("memcard_copy_card_dir", self.config.memcards_path or ""),
-            "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
-        )
-        if not dest_card:
-            return
-        self._remember_last_path("memcard_copy_card_dir", str(Path(dest_card).parent))
-
-        if dest_card == self._current_card:
-            QMessageBox.warning(self, "Same Card", "Source and destination are the same card.")
-            return
-
-        import tempfile
+        card, directory = self._current_card, save.dir_name
+        self._write_busy = True
+        self._update_save_actions()
         try:
-            with tempfile.TemporaryDirectory() as tmp:
-                result = copy_save_between_cards(
-                    self._current_card, save_name, dest_card, tmp
-                )
-            verb = "updated" if result else "added"
-            QMessageBox.information(
-                self, "Copy Complete",
-                f"Save '{save_name}' has been {verb} in:\n{dest_card}"
+            dest_card, _ = QFileDialog.getOpenFileName(
+                self, "Select Destination Memory Card",
+                self._last_paths_bucket().get("memcard_copy_card_dir", self.config.memcards_path or ""),
+                "Memory Cards (*.ps2 *.mcd *.mc2 *.bin);;All Files (*)",
             )
-            self.emit_status(f"Copied '{save_name}' → {Path(dest_card).name}")
-        except MemoryCardError as exc:
-            QMessageBox.critical(self, "Copy Error", str(exc))
+            if not dest_card:
+                return
+            self._remember_last_path("memcard_copy_card_dir", str(Path(dest_card).parent))
+            self._write_save_with_backup(card, dest_card, directory, copying=True)
+        finally:
+            self._write_busy = False
+            self._update_save_actions()

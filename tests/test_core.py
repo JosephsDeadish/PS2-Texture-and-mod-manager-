@@ -2124,6 +2124,75 @@ class TestMemoryCardWrite(unittest.TestCase):
         with self.assertRaises(MemoryCardError):
             backup_memcard("/nonexistent/card.ps2", self.tmpdir)
 
+    def test_backup_same_timestamp_preserves_previous_versions_and_metadata(self):
+        from src.core.memory_card import backup_memcard
+        from datetime import datetime
+        card = Path(self._make_card("Card.ps2"))
+        first_data = card.read_bytes()
+        with patch("datetime.datetime") as clock:
+            clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+            first = Path(backup_memcard(str(card), self.tmpdir))
+            card.write_bytes(first_data + b"new version")
+            card.chmod(0o640)
+            second = Path(backup_memcard(str(card), self.tmpdir))
+        self.assertNotEqual(first, second)
+        self.assertEqual(first.read_bytes(), first_data)
+        self.assertEqual(second.read_bytes(), card.read_bytes())
+        self.assertEqual(second.stat().st_mode, card.stat().st_mode)
+        self.assertEqual(second.stat().st_mtime_ns, card.stat().st_mtime_ns)
+
+    def test_backup_never_follows_existing_symlinks_or_hardlinks(self):
+        from src.core.memory_card import backup_memcard
+        from datetime import datetime
+        card = Path(self._make_card("Card.ps2"))
+        original = card.read_bytes()
+        occupied = Path(self.tmpdir) / "Card_backup_20261017_230000.ps2"
+        for kind in ("symlink", "dangling", "hardlink"):
+            with self.subTest(kind=kind), patch("datetime.datetime") as clock:
+                clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+                if kind == "hardlink":
+                    occupied.hardlink_to(card)
+                else:
+                    occupied.symlink_to(card if kind == "symlink" else Path(self.tmpdir) / "missing.ps2")
+                result = Path(backup_memcard(str(card), self.tmpdir))
+                self.assertNotEqual(result, occupied)
+                self.assertEqual(result.read_bytes(), original)
+                self.assertEqual(card.read_bytes(), original)
+                self.assertTrue(occupied.is_symlink() if kind != "hardlink" else occupied.samefile(card))
+                result.unlink()
+                occupied.unlink()
+
+    def test_backup_failed_copy_removes_only_new_partial_file(self):
+        from src.core.memory_card import backup_memcard, MemoryCardError
+        from datetime import datetime
+        card = self._make_card("Card.ps2")
+        occupied = Path(self.tmpdir) / "Card_backup_20261017_230000.ps2"
+        occupied.write_bytes(b"keep previous backup")
+
+        def fail_copy(source, output):
+            output.write(b"partial")
+            raise OSError("disk full")
+
+        with patch("datetime.datetime") as clock, \
+             patch("shutil.copyfileobj", side_effect=fail_copy):
+            clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+            with self.assertLogs("src.core.memory_card", level="WARNING"), \
+                 self.assertRaises(MemoryCardError):
+                backup_memcard(card, self.tmpdir)
+        self.assertEqual(occupied.read_bytes(), b"keep previous backup")
+        self.assertEqual(sorted(p.name for p in Path(self.tmpdir).iterdir()), [Path(card).name, occupied.name])
+
+    def test_backup_source_open_failure_does_not_remove_existing_backup(self):
+        from src.core.memory_card import backup_memcard, MemoryCardError
+        card = self._make_card("Card.ps2")
+        occupied = Path(self.tmpdir) / "Card_backup_existing.ps2"
+        occupied.write_bytes(b"keep")
+        with patch.object(Path, "open", side_effect=PermissionError("locked")), \
+             self.assertLogs("src.core.memory_card", level="WARNING"), \
+             self.assertRaises(MemoryCardError):
+            backup_memcard(card, self.tmpdir)
+        self.assertEqual(occupied.read_bytes(), b"keep")
+
     def test_import_raw_save_into_valid_card(self):
         """Import a .bin save into a valid memory card."""
         from src.core.memory_card import import_raw_save, create_memcard
@@ -12088,6 +12157,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel._all_saves = []
         panel._shown_saves = []
         panel._export_busy = False
+        panel._write_busy = False
         panel._card_exists = False
         panel._card_valid = False
         panel._filter_timer = MagicMock()
@@ -12571,6 +12641,267 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel._copy_id_btn.setEnabled.assert_called_with(False)
         self.assertNotIn("ALPHA", panel._selected_save_info.setText.call_args.args[0])
         self.assertEqual(panel._selected_save_bucket()[panel._current_card], "ALPHA")
+
+    def test_busy_card_operations_disable_writes_and_exports_but_keep_details(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_exists = panel._card_valid = True
+        panel._all_saves = panel._shown_saves = [SaveEntry("Alpha", "A", 512)]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        for exporting, writing in ((True, False), (False, True)):
+            with self.subTest(exporting=exporting, writing=writing):
+                panel._export_busy, panel._write_busy = exporting, writing
+                panel._update_save_actions()
+                for name in ("_backup_btn", "_import_btn", "_copy_btn", "_export_btn",
+                             "_export_all_btn", "_export_shown_btn"):
+                    getattr(panel, name).setEnabled.assert_called_with(False)
+                panel._copy_id_btn.setEnabled.assert_called_with(True)
+
+    def test_write_dialogs_freeze_original_card_and_selected_save(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying):
+                panel = self._make_panel(module)
+                panel._current_card = "/cards/original.ps2"
+                panel._card_valid = True
+                panel._all_saves = [SaveEntry("Alpha", "ALPHA", 512)]
+                panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "ALPHA")
+                panel._write_save_with_backup = MagicMock()
+
+                def choose(*args):
+                    self.assertTrue(panel._write_busy)
+                    panel._current_card = "/cards/changed.ps2"
+                    panel._all_saves = []
+                    # Reentrant actions must not launch another chooser.
+                    panel._import_save()
+                    panel._copy_save_to_other_card()
+                    panel._backup_card()
+                    return "/chosen.bin", ""
+
+                with patch.object(module, "QFileDialog") as picker, \
+                     patch.object(module, "QInputDialog") as names, \
+                     patch.object(module, "save_config"):
+                    picker.getOpenFileName.side_effect = choose
+                    names.getText.return_value = ("ALPHA", True)
+                    if copying:
+                        panel._copy_save_to_other_card()
+                        expected = ("/cards/original.ps2", "/chosen.bin", "ALPHA")
+                    else:
+                        panel._import_save()
+                        expected = ("/chosen.bin", "/cards/original.ps2", "ALPHA")
+                panel._write_save_with_backup.assert_called_once_with(*expected, copying=copying)
+                picker.getOpenFileName.assert_called_once()
+                self.assertFalse(panel._write_busy)
+
+    def test_manual_backup_freezes_card_before_chooser_and_releases_busy(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/original.ps2"
+        panel._show_card_result = MagicMock()
+        panel.emit_status = MagicMock()
+
+        def choose(*args):
+            self.assertTrue(panel._write_busy)
+            panel._current_card = "/cards/changed.ps2"
+            panel._backup_card()
+            return "/backups"
+
+        with patch.object(module, "QFileDialog") as picker, \
+             patch.object(module, "backup_memcard", return_value="/backups/original.ps2") as backup, \
+             patch.object(module, "save_config"):
+            picker.getExistingDirectory.side_effect = choose
+            panel._backup_card()
+        backup.assert_called_once_with("/cards/original.ps2", "/backups")
+        self.assertIn("/cards/original.ps2", panel._show_card_result.call_args.args[1])
+        self.assertFalse(panel._write_busy)
+
+    def test_import_cancel_and_invalid_ids_never_start_backup_or_write(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/card.ps2"
+        panel._card_valid = True
+        panel._show_card_result = MagicMock()
+        panel._write_save_with_backup = MagicMock()
+        with patch.object(module, "QFileDialog") as picker, \
+             patch.object(module, "QInputDialog") as names, \
+             patch.object(module, "save_config"):
+            picker.getOpenFileName.return_value = ("", "")
+            panel._import_save()
+            names.getText.assert_not_called()
+            picker.getOpenFileName.return_value = ("/saves/raw.bin", "")
+            for name, ok in (("A", False), (" ", True), ("A" * 33, True),
+                             ("../bad", True), ("A\\B", True), ("é", True),
+                             ("A\x00B", True), ("..", True)):
+                with self.subTest(name=name, ok=ok):
+                    names.getText.return_value = (name, ok)
+                    panel._import_save()
+                    self.assertFalse(panel._write_busy)
+        panel._write_save_with_backup.assert_not_called()
+
+    def _card_write_fixture(self, module, tmp):
+        from src.core.memory_card import create_memcard
+        source, destination = str(Path(tmp) / "source.bin"), str(Path(tmp) / "card.ps2")
+        Path(source).write_bytes(b"ALPHA" + b"\x00" * 507)
+        create_memcard(destination, size_mb=1)
+        panel = self._make_panel(module)
+        panel._show_card_result = MagicMock()
+        panel._load_saves = MagicMock()
+        panel.emit_status = MagicMock()
+        message = MagicMock()
+        message.StandardButton = SimpleNamespace(Yes=1, No=2)
+        message.return_value.exec.return_value = 1
+        return panel, source, destination, message
+
+    def test_confirmed_import_and_copy_back_up_destination_before_write(self):
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                events = []
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard", side_effect=lambda *a: events.append("backup") or "/backup.ps2") as backup, \
+                     patch.object(module, "import_raw_save", side_effect=lambda *a: events.append("import") or False) as write, \
+                     patch.object(module, "copy_save_between_cards", side_effect=lambda *a: events.append("copy") or True) as copy:
+                    panel._write_save_with_backup(source, destination, "<ALPHA>", copying=copying)
+                self.assertEqual(events, ["backup", "copy" if copying else "import"])
+                backup.assert_called_once_with(destination, str(Path(tmp) / "backups"))
+                if copying:
+                    self.assertEqual(copy.call_args.args[:3], (source, "<ALPHA>", destination))
+                    write.assert_not_called()
+                else:
+                    write.assert_called_once_with(source, destination, "<ALPHA>")
+                    copy.assert_not_called()
+                question = message.return_value
+                question.setDefaultButton.assert_called_once_with(2)
+                question.setTextFormat.assert_called_once_with(module.Qt.TextFormat.PlainText)
+                text = question.setText.call_args.args[0]
+                for value in (source, destination, "<ALPHA>", "best-effort", "Close PCSX2", "backups"):
+                    self.assertIn(value, text)
+                self.assertIn("/backup.ps2", panel._show_card_result.call_args.args[1])
+                panel._load_saves.assert_called_once()
+
+    def test_declined_card_write_never_creates_backup_or_writes(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            message.return_value.exec.return_value = 2
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard") as backup, \
+                 patch.object(module, "import_raw_save") as write, \
+                 patch.object(module, "copy_save_between_cards") as copy:
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backup.assert_not_called()
+            write.assert_not_called()
+            copy.assert_not_called()
+            panel._show_card_result.assert_not_called()
+            panel.emit_status.assert_not_called()
+
+    def test_backup_failure_aborts_write_and_does_not_claim_success(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard", side_effect=module.MemoryCardError("disk full")), \
+                 patch.object(module, "import_raw_save") as write, \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            write.assert_not_called()
+            self.assertIn("No save write was attempted", panel._show_card_result.call_args.args[1])
+            panel.emit_status.assert_not_called()
+
+    def test_failed_write_retains_backup_location_and_recovery_guidance(self):
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                target = "copy_save_between_cards" if copying else "import_raw_save"
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard", return_value="/backups/prewrite.ps2"), \
+                     patch.object(module, target, side_effect=module.MemoryCardError("write failed")), \
+                     self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                    panel._write_save_with_backup(source, destination, "ALPHA", copying=copying)
+                result = panel._show_card_result.call_args
+                self.assertTrue(result.kwargs["failed"])
+                self.assertIn("/backups/prewrite.ps2", result.args[1])
+                self.assertIn("restore", result.args[1])
+                panel.emit_status.assert_not_called()
+
+    def test_invalid_destination_and_same_file_aliases_are_rejected_before_backup(self):
+        module = self._import_memcard_panel()
+        for kind in ("same", "symlink", "hardlink", "invalid", "missing"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                if kind == "same":
+                    source = destination
+                elif kind in ("symlink", "hardlink"):
+                    alias = Path(tmp) / "alias.ps2"
+                    if kind == "symlink":
+                        alias.symlink_to(destination)
+                    else:
+                        alias.hardlink_to(destination)
+                    source = str(alias)
+                elif kind == "invalid":
+                    Path(destination).write_bytes(b"invalid card")
+                else:
+                    Path(destination).unlink()
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard") as backup, \
+                     patch.object(module, "copy_save_between_cards") as copy, \
+                     self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                    panel._write_save_with_backup(source, destination, "ALPHA", copying=True)
+                backup.assert_not_called()
+                copy.assert_not_called()
+                message.assert_not_called()
+                self.assertTrue(panel._show_card_result.call_args.kwargs["failed"])
+
+    def test_card_removed_during_confirmation_never_starts_backup(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+
+            def confirm():
+                Path(destination).unlink()
+                return 1
+
+            message.return_value.exec.side_effect = confirm
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard") as backup, \
+                 patch.object(module, "import_raw_save") as write, \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backup.assert_not_called()
+            write.assert_not_called()
+
+    def test_import_rejects_corrupted_post_write_header_and_keeps_real_backup(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            before = Path(destination).read_bytes()
+
+            def corrupt(*args):
+                Path(destination).write_bytes(b"bad header")
+                return True
+
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "import_raw_save", side_effect=corrupt), \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backups = list((Path(tmp) / "backups").glob("*.ps2"))
+            self.assertEqual(len(backups), 1)
+            self.assertEqual(backups[0].read_bytes(), before)
+            self.assertIn(str(backups[0]), panel._show_card_result.call_args.args[1])
+            self.assertIn("header", panel._show_card_result.call_args.args[1])
+            panel.emit_status.assert_not_called()
+
+    def test_card_results_render_untrusted_names_and_paths_as_plain_text(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        with patch.object(module, "QMessageBox") as message:
+            panel._show_card_result("Finished", "<b>raw path</b>")
+        message.return_value.setTextFormat.assert_called_once_with(module.Qt.TextFormat.PlainText)
+        message.return_value.setText.assert_called_once_with("<b>raw path</b>")
 
     def test_export_scopes_use_selected_shown_or_entire_cached_card(self):
         from src.core.memory_card import SaveEntry

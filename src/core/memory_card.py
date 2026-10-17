@@ -205,7 +205,8 @@ def backup_memcard(src_path: str, backup_dir: str) -> str:
     Back up a memory card image by copying it to *backup_dir*.
 
     The backup filename is derived from the original filename with a
-    timestamp suffix, e.g. ``MemoryCard1_20240101_120000.ps2``.
+    timestamp suffix and a collision suffix when necessary. Existing files
+    (including symlinks) are never replaced.
 
     Returns the full path to the backup file.
     """
@@ -213,32 +214,36 @@ def backup_memcard(src_path: str, backup_dir: str) -> str:
     from datetime import datetime
 
     src = Path(src_path)
-    if not src.is_file():
-        logger.warning("Source memory card not found: %s", src_path)
-        raise MemoryCardError(f"Source card not found: {src_path}")
-
     dest = Path(backup_dir)
-    try:
-        dest.mkdir(parents=True, exist_ok=True)
-    except OSError as exc:
-        logger.warning("Could not create backup directory %s: %s", backup_dir, exc)
-        raise MemoryCardError(f"Backup failed: {exc}") from exc
-
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_name = f"{src.stem}_backup_{stamp}{src.suffix}"
-    backup_path = dest / backup_name
-
+    backup_path = None
+    created = False
     try:
-        shutil.copy2(str(src), str(backup_path))
+        if not src.is_file():
+            raise MemoryCardError(f"Source card not found: {src_path}")
+        dest.mkdir(parents=True, exist_ok=True)
+        with src.open("rb") as source:
+            for attempt in range(10000):
+                suffix = f"_{attempt}" if attempt else ""
+                backup_path = dest / f"{src.stem}_backup_{stamp}{suffix}{src.suffix}"
+                try:
+                    output = backup_path.open("xb")
+                except FileExistsError:
+                    continue
+                created = True
+                with output:
+                    shutil.copyfileobj(source, output)
+                shutil.copystat(src, backup_path)
+                return str(backup_path)
+        raise MemoryCardError("Too many backup filename collisions; choose another folder")
     except OSError as exc:
         logger.warning("Failed to back up memory card %s to %s: %s", src_path, backup_dir, exc)
-        try:
-            backup_path.unlink(missing_ok=True)
-        except OSError as cleanup_exc:
-            logger.warning("Could not remove partial backup %s: %s", backup_path, cleanup_exc)
+        if created:
+            try:
+                backup_path.unlink(missing_ok=True)
+            except OSError as cleanup_exc:
+                logger.warning("Could not remove partial backup %s: %s", backup_path, cleanup_exc)
         raise MemoryCardError(f"Backup failed: {exc}") from exc
-
-    return str(backup_path)
 
 
 def import_raw_save(src_path: str, memcard_path: str, save_name: str) -> bool:
