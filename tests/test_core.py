@@ -2841,16 +2841,22 @@ class TestEditModDialogWorkflows(unittest.TestCase):
     def test_fetch_uses_compact_serial_but_emits_normalized_identity(self):
         import src.core.config_manager as config
         self.dialog._gameid_edit.text.return_value = "sles_50386"
-        with patch("threading.Thread") as thread, patch(
-            "src.core.downloader.download_file",
-        ) as download:
-            self.dialog._fetch_thumbnail()
-            thread.call_args.kwargs["target"]()
-        destination = str(config.THUMBNAILS_DIR / "SLES50386.jpg")
-        download.assert_called_once_with(
-            "https://art.gametdb.com/ps2/cover/EN/SLES50386.jpg", destination, timeout=10,
-        )
-        self.relay.finished.emit.assert_called_once_with("SLES-50386", destination, "")
+        with tempfile.TemporaryDirectory() as directory, patch.object(config, "THUMBNAILS_DIR", Path(directory)):
+            with patch("threading.Thread") as thread, patch(
+                "src.core.downloader.download_file",
+                side_effect=lambda url, dest, timeout: Path(dest).write_bytes(b"cover"),
+            ) as download:
+                self.dialog._fetch_thumbnail()
+                thread.call_args.kwargs["target"]()
+            staged = download.call_args.args[1]
+            download.assert_called_once_with(
+                "https://art.gametdb.com/ps2/cover/EN/SLES50386.jpg", staged, timeout=10,
+            )
+            destination = str(Path(directory) / "SLES-50386.jpg")
+            self.assertNotEqual(staged, destination)
+            self.assertEqual(Path(destination).read_bytes(), b"cover")
+            self.assertFalse(Path(staged).exists())
+            self.relay.finished.emit.assert_called_once_with("SLES-50386", destination, "")
 
     def test_invalid_serial_or_active_fetch_cannot_start_duplicate_request(self):
         with patch("threading.Thread") as thread:
@@ -33284,7 +33290,7 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
             "Could not record browse download history for",
             "Could not record failed browse download history for",
             "Could not load serial database for alias-aware browse filters",
-            "Could not scan game library for browse bulk download",
+            "Cover %s failed: %s",
             "Could not fetch browse cover art from",
             "Could not download browse cover art from",
             "Could not remove temporary browse cover art file",
