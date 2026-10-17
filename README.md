@@ -46,7 +46,8 @@
 ### 📋 Mod Profiles
 - Save, search, duplicate, rename, and delete named enabled-mod setups from **Library → Profiles**
 - Preview installed/missing mods and the enable/disable changes across the whole library before applying
-- Applying uses normal deployment/undeployment for configured PCSX2 folders and reports deployment warnings; priorities are unchanged
+- Applying batches deployment/undeployment once per affected mod type and reports warnings; reapplying retries file updates even when enabled flags already match, and priorities are unchanged
+- Profiles never copy or remove live memory-card files; PNACH and cheats sharing a folder are merged together
 - Existing profiles require overwrite confirmation, and failed saves leave saved profiles intact
 
 ### 🖼️ Cover Art Manager

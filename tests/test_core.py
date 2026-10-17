@@ -20581,14 +20581,20 @@ class TestModProfilesDialogWorkflows(unittest.TestCase):
         self.assertIsNotNone(self.dialog._pm.get_profile("HD"))
         self.critical.assert_called_once()
 
-    def test_apply_uses_normal_disable_then_enable_with_config(self):
+    def test_confirmation_does_not_render_profile_name_as_html(self):
+        self.dialog._selected_profile.return_value = "<img src='https://example.invalid/test'>"
+        self.question.return_value = 2
+        self.dialog_type._on_delete(self.dialog)
+        text = self.question.call_args.args[2]
+        self.assertNotIn("<img", text)
+        self.assertIn("&lt;img", text)
+
+    def test_apply_reconciles_all_installed_states_in_one_batch(self):
         with patch("src.core.mod_manager.ModManager") as manager:
-            manager.return_value.set_enabled.return_value = (1, [])
+            manager.return_value.set_enabled_many.return_value = (1, [])
             self.dialog_type._on_apply(self.dialog)
-        self.assertEqual(
-            manager.return_value.set_enabled.call_args_list,
-            [unittest.mock.call("off", False, self.dialog._config),
-             unittest.mock.call("on", True, self.dialog._config)],
+        manager.return_value.set_enabled_many.assert_called_once_with(
+            {"on": True, "off": False}, self.dialog._config,
         )
         self.assertEqual(self.dialog._pm.get_active_name(), "HD")
         self.dialog.profile_applied.emit.assert_called_once_with("HD")
@@ -20637,22 +20643,22 @@ class TestModProfilesDialogWorkflows(unittest.TestCase):
         self.dialog_type._on_selection_changed(self.dialog, 0)
         self.assertIn("database flags only", self.dialog._detail_text.setPlainText.call_args.args[0])
         with patch("src.core.mod_manager.ModManager") as manager:
-            manager.return_value.set_enabled.return_value = (0, [])
+            manager.return_value.set_enabled_many.return_value = (0, [])
             self.dialog_type._on_apply(self.dialog)
-        self.assertEqual(manager.return_value.set_enabled.call_args.args, ("on", True, None))
+        manager.return_value.set_enabled_many.assert_called_once_with({"on": True, "off": False}, None)
         self.assertIn("Database flags only", self.question.call_args.args[2])
 
     def test_apply_reports_deployment_warnings(self):
         with patch("src.core.mod_manager.ModManager") as manager:
-            manager.return_value.set_enabled.return_value = (0, ["No target configured"])
+            manager.return_value.set_enabled_many.return_value = (0, ["No target configured"])
             self.dialog_type._on_apply(self.dialog)
         self.warning.assert_called_once()
-        self.assertEqual(self.warning.call_args.args[-1], "No target configured")
+        self.assertEqual(self.warning.call_args.args[-1], "<p>No target configured</p>")
         self.assertIn("deployment warnings", self.dialog._status_lbl.setText.call_args.args[0])
 
     def test_partial_apply_refreshes_without_marking_active(self):
         with patch("src.core.mod_manager.ModManager") as manager:
-            manager.return_value.set_enabled.side_effect = [(1, []), OSError("denied")]
+            manager.return_value.set_enabled_many.side_effect = OSError("denied")
             with self.assertLogs("src.ui.widgets", level="WARNING"):
                 self.dialog_type._on_apply(self.dialog)
         self.assertIsNone(self.dialog._pm.get_active_name())
@@ -20662,7 +20668,7 @@ class TestModProfilesDialogWorkflows(unittest.TestCase):
 
     def test_apply_metadata_failure_still_refreshes_mod_state(self):
         with patch("src.core.mod_manager.ModManager") as manager:
-            manager.return_value.set_enabled.return_value = (1, [])
+            manager.return_value.set_enabled_many.return_value = (1, [])
             with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
                 with self.assertLogs("src.ui.widgets", level="WARNING"):
                     self.dialog_type._on_apply(self.dialog)
@@ -20689,6 +20695,157 @@ class TestModProfilesDialogWorkflows(unittest.TestCase):
         self.dialog._search_edit.text.return_value = ""
         self.dialog_type._refresh(self.dialog)
         self.dialog._profile_list.setCurrentRow.assert_called_with(1)
+
+
+class TestModProfileBatchDeployment(unittest.TestCase):
+    """Batch profile application reconciles files once per type, including retries."""
+
+    def setUp(self):
+        from src.core.mod_manager import ModManager
+        from src.models.mod import AppConfig, ModInfo, ModType
+
+        self.tmp = self.enterContext(tempfile.TemporaryDirectory())
+        self.root = Path(self.tmp)
+        self.target = self.root / "target"
+        self.target.mkdir()
+        self.mods = []
+        for index in range(3):
+            source = self.root / f"source{index}"
+            source.mkdir()
+            (source / f"{index}.png").write_bytes(b"texture")
+            (self.target / f"{index}.png").write_bytes(b"texture")
+            self.mods.append(ModInfo(str(index), str(index), ModType.TEXTURE_PACK, str(source)))
+        self.db = MagicMock()
+        self.db.all.return_value = self.mods
+        self.db.get.side_effect = lambda mid: next((m for m in self.mods if m.id == mid), None)
+        self.db.by_type.side_effect = lambda kind: [m for m in self.mods if m.mod_type == kind]
+        self.manager = ModManager(self.db)
+        self.config = AppConfig(textures_path=str(self.target))
+
+    def test_disable_all_never_recopies_packs_and_deploys_once(self):
+        from src.models.mod import ModType
+        with patch.object(self.manager, "deploy", wraps=self.manager.deploy) as deploy, patch(
+            "src.core.mod_manager.shutil.copytree",
+        ) as copy:
+            count, warnings = self.manager.set_enabled_many({m.id: False for m in self.mods}, self.config)
+        self.assertEqual((count, warnings), (0, []))
+        deploy.assert_called_once_with(ModType.TEXTURE_PACK, str(self.target))
+        copy.assert_not_called()
+        self.assertEqual(list(self.target.iterdir()), [])
+        self.db.save.assert_called_once()
+
+    def test_unchanged_enabled_flag_retries_missing_source(self):
+        import shutil
+        source = Path(self.mods[0].path)
+        shutil.rmtree(source)
+        self.mods[0].enabled = False
+        count, warnings = self.manager.set_enabled_many({"0": True, "1": False, "2": False}, self.config)
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(count, 0)
+        self.assertTrue(warnings)
+        source.mkdir()
+        (source / "0.png").write_bytes(b"restored")
+        count, warnings = self.manager.set_enabled_many({"0": True, "1": False, "2": False}, self.config)
+        self.assertEqual((count, warnings), (1, []))
+        self.assertEqual((self.target / "0.png").read_bytes(), b"restored")
+
+    def test_retry_after_cleanup_exception_reconciles_disabled_flags(self):
+        states = {m.id: False for m in self.mods}
+        with patch.object(self.manager, "undeploy_mod", side_effect=OSError("denied")):
+            with self.assertRaises(OSError):
+                self.manager.set_enabled_many(states, self.config)
+        self.assertTrue(all(not m.enabled for m in self.mods))
+        self.manager.set_enabled_many(states, self.config)
+        self.assertEqual(list(self.target.iterdir()), [])
+
+    def test_database_save_failure_restores_in_memory_flags_and_skips_deploy(self):
+        self.db.save.side_effect = OSError("denied")
+        with patch.object(self.manager, "deploy") as deploy:
+            with self.assertRaises(OSError):
+                self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(self.mods[0].enabled)
+        deploy.assert_not_called()
+        self.assertTrue((self.target / "0.png").exists())
+
+    def test_no_config_persists_flags_without_touching_files(self):
+        with patch.object(self.manager, "deploy") as deploy:
+            result = self.manager.set_enabled_many({"0": False, "unknown": True})
+        self.assertEqual(result, (0, []))
+        self.assertFalse(self.mods[0].enabled)
+        self.assertTrue((self.target / "0.png").exists())
+        deploy.assert_not_called()
+
+    def test_missing_target_warns_once_per_type(self):
+        self.config.textures_path = ""
+        count, warnings = self.manager.set_enabled_many({m.id: False for m in self.mods}, self.config)
+        self.assertEqual(count, 0)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("No target path", warnings[0])
+        self.assertEqual(len(list(self.target.iterdir())), 3)
+
+    def test_multiple_types_deploy_once_each_and_unrequested_flags_stay_unchanged(self):
+        from src.models.mod import ModType
+        self.mods[1].mod_type = ModType.PNACH
+        self.config.pnach_path = str(self.root / "patches")
+        with patch.object(self.manager, "deploy", return_value=(1, [])) as deploy, patch.object(
+            self.manager, "_deploy_pnach", return_value=(1, []),
+        ) as pnach_deploy:
+            count, warnings = self.manager.set_enabled_many({"0": False, "1": True}, self.config)
+        self.assertEqual((count, warnings), (2, []))
+        deploy.assert_called_once()
+        pnach_deploy.assert_called_once()
+        self.assertTrue(self.mods[2].enabled)
+
+    def test_disable_removes_renamed_cover_output(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.COVER_ART
+        self.mods[0].game_id = "SLUS-20062"
+        self.config.cover_art_path = str(self.target)
+        self.manager.deploy(ModType.COVER_ART, str(self.target))
+        canonical = self.target / "SLUS-20062.png"
+        self.assertTrue(canonical.exists())
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse(canonical.exists())
+
+    def test_disable_removes_flattened_and_crc_normalized_patches(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.PNACH
+        source = Path(self.mods[0].path) / "nested"
+        source.mkdir()
+        (source / "1234abcd.pnach").write_text("patch=1,EE,00100000,word,00000001")
+        (source / "custom.pnach").write_text("patch=1,EE,00100004,word,00000002")
+        self.config.pnach_path = str(self.target)
+        self.manager.deploy(ModType.PNACH, str(self.target))
+        self.assertTrue((self.target / "1234ABCD.pnach").exists())
+        self.assertTrue((self.target / "custom.pnach").exists())
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse((self.target / "1234ABCD.pnach").exists())
+        self.assertFalse((self.target / "custom.pnach").exists())
+
+    def test_unchanged_or_changed_save_flags_never_overwrite_or_delete_live_cards(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        self.config.memcards_path = str(self.target)
+        live = self.target / "0.png"
+        live.write_bytes(b"newer game progress")
+        for enabled in (True, False, True):
+            self.manager.set_enabled_many({"0": enabled}, self.config)
+            self.assertEqual(live.read_bytes(), b"newer game progress")
+        self.assertTrue(self.mods[0].enabled)
+
+    def test_shared_pnach_cheat_target_cleans_before_combined_deploy(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[1].mod_type = ModType.CHEAT
+        for mod, address in ((self.mods[0], "00100000"), (self.mods[1], "00100004")):
+            (Path(mod.path) / "1234ABCD.pnach").write_text(f"patch=1,EE,{address},word,00000001")
+        self.config.pnach_path = self.config.cheats_path = str(self.target)
+        self.manager.set_enabled_many({"0": True, "1": False}, self.config)
+        output = self.target / "1234ABCD.pnach"
+        self.assertIn("00100000", output.read_text())
+        self.manager.set_enabled_many({"0": True, "1": True}, self.config)
+        self.assertIn("00100000", output.read_text())
+        self.assertIn("00100004", output.read_text())
 
 
 class TestWave53TextureOverwriteConflicts(unittest.TestCase):

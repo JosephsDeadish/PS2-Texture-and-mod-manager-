@@ -2,6 +2,7 @@
 
 import logging
 from copy import deepcopy
+from html import escape
 import os
 import textwrap
 from pathlib import Path
@@ -4507,7 +4508,8 @@ class ModProfilesDialog(QDialog):
         header = QLabel(
             "Save your current mod configuration as a named profile, or switch "
             "between saved profiles. Applying changes enabled mods across the whole "
-            "library, not just the current game. Priorities are left unchanged."
+            "library, not just the current game. Priorities are unchanged; "
+            "live memory-card files are never copied or removed."
         )
         header.setWordWrap(True)
         header.setStyleSheet("color: #9090c0; font-size: 11px;")
@@ -4671,7 +4673,7 @@ class ModProfilesDialog(QDialog):
         except Exception as exc:
             logger.warning("Could not update mod profiles: %s", exc)
             self._status_lbl.setText("Could not save profiles. No profile changes were committed.")
-            QMessageBox.critical(self, "Profile Save Failed", str(exc))
+            QMessageBox.critical(self, "Profile Save Failed", f"<p>{escape(str(exc))}</p>")
             return False
         self._pm = candidate
         self._refresh(selected)
@@ -4707,6 +4709,7 @@ class ModProfilesDialog(QDialog):
                     f"\nSaved: {len(available)} installed, {len(missing)} missing.",
                     f"Changes: enable {len(to_enable)}, disable {len(to_disable)}.",
                     "Scope: all installed mods. Priorities are unchanged.",
+                    "Save-file flags only: live memory cards are never copied or removed.",
                 ))
                 if not to_enable and not to_disable:
                     lines.append("Enabled states already match this profile.")
@@ -4738,7 +4741,7 @@ class ModProfilesDialog(QDialog):
         if existing:
             reply = QMessageBox.question(
                 self, "Overwrite Profile",
-                f"Replace the saved enabled-mod list for '{name}' with the current state?",
+                f"<p>Replace the saved enabled-mod list for '{escape(name)}' with the current state?</p>",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No,
             )
@@ -4774,14 +4777,15 @@ class ModProfilesDialog(QDialog):
         if not profile:
             return
 
-        _mods, available, missing, to_enable, to_disable = self._profile_preview(profile)
+        mods, available, missing, to_enable, to_disable = self._profile_preview(profile)
         reply = QMessageBox.question(
             self,
             "Apply Profile",
-            f"Apply profile '{name}' across the whole library?\n\n"
-            f"Enable {len(to_enable)} and disable {len(to_disable)} mod(s).\n"
-            f"{len(missing)} saved mod(s) are missing and will be skipped.\n"
-            + ("Configured PCSX2 folders will be updated. Priorities are unchanged."
+            f"<p>Apply profile '{escape(name)}' across the whole library?</p>"
+            f"<p>Enable {len(to_enable)} and disable {len(to_disable)} mod(s).<br>"
+            f"{len(missing)} saved mod(s) are missing and will be skipped.</p>"
+            + ("Configured PCSX2 folders will be updated. Priorities are unchanged. "
+               "Live memory cards are never copied or removed."
                if self._config is not None else "Database flags only; no deployment configuration supplied."),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
@@ -4793,13 +4797,13 @@ class ModProfilesDialog(QDialog):
         manager = ModManager(self._db)
         warnings = []
         try:
-            for mod in to_disable + to_enable:
-                _count, notices = manager.set_enabled(mod.id, mod.id in available, self._config)
-                warnings.extend(notices)
+            _count, warnings = manager.set_enabled_many(
+                {mid: mid in available for mid in mods}, self._config,
+            )
         except Exception as exc:
             logger.warning("Could not apply profile %s: %s", name, exc)
             self._status_lbl.setText("Profile application stopped. Some mods may have changed; review their state.")
-            QMessageBox.critical(self, "Profile Partially Applied", str(exc))
+            QMessageBox.critical(self, "Profile Partially Applied", f"<p>{escape(str(exc))}</p>")
             self._refresh(name)
             self.profile_applied.emit(name)
             return
@@ -4813,7 +4817,8 @@ class ModProfilesDialog(QDialog):
             self._status_lbl.setText("Mod states changed, but the last-used profile could not be saved.")
         if warnings:
             self._status_lbl.setText("Mod states changed with deployment warnings. Check PCSX2 paths and files.")
-            QMessageBox.warning(self, "Profile Deployment Warnings", "\n".join(dict.fromkeys(warnings)))
+            detail = "<br>".join(escape(notice) for notice in dict.fromkeys(warnings))
+            QMessageBox.warning(self, "Profile Deployment Warnings", f"<p>{detail}</p>")
 
     def _on_rename(self):
         old = self._selected_profile()
@@ -4851,7 +4856,8 @@ class ModProfilesDialog(QDialog):
             return
         reply = QMessageBox.question(
             self, "Delete Profile",
-            f"Delete profile '{name}'?\nThis cannot be undone. Installed mods are not removed.",
+            f"<p>Delete profile '{escape(name)}'?</p>"
+            "This cannot be undone. Installed mods are not removed.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )

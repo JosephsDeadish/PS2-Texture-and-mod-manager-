@@ -379,12 +379,80 @@ class ModManager:
             # Remove this mod's files then re-deploy remaining enabled mods
             return self.undeploy_mod(mod_id, config)
 
-    def undeploy_mod(self, mod_id: str, config) -> Tuple[int, List[str]]:
+    def set_enabled_many(
+        self, states: Dict[str, bool], config=None,
+    ) -> Tuple[int, List[str]]:
+        """Reconcile requested states, deploying each affected type only once.
+
+        Unchanged flags are also reconciled so retrying after a deployment
+        failure does not mistake persisted flags for successfully copied files.
+        Save-file flags are updated without touching live memory cards.
+        """
+        mods = [mod for mod in self.db.all() if mod.id in states]
+        previous = {mod.id: mod.enabled for mod in mods}
+        for mod in mods:
+            mod.enabled = states[mod.id]
+        try:
+            self.db.save()
+        except Exception:
+            for mod in mods:
+                mod.enabled = previous[mod.id]
+            raise
+        if config is None:
+            return 0, []
+
+        from src.core.pcsx2_layout import get_deploy_path
+        deployed = 0
+        warnings: List[str] = []
+        targets = {}
+        for mod_type in dict.fromkeys(mod.mod_type for mod in mods):
+            if mod_type == ModType.SAVE_FILE:
+                continue
+            target_path = get_deploy_path(config, mod_type)
+            if not target_path:
+                warnings.append(
+                    f"No target path configured for {mod_type.value}. "
+                    "Check Settings → PCSX2 Paths."
+                )
+                continue
+            targets[mod_type] = target_path
+        # Finish cleanup before deploying: different types can share a target.
+        for mod in mods:
+            if mod.mod_type in targets and not mod.enabled:
+                _count, notices = self.undeploy_mod(mod.id, config, redeploy=False)
+                warnings.extend(notices)
+        code_targets = set()
+        for mod_type, target_path in targets.items():
+            if mod_type in (ModType.PNACH, ModType.CHEAT):
+                target = Path(target_path).resolve()
+                if target in code_targets:
+                    continue
+                code_targets.add(target)
+                shared_types = {
+                    kind for kind in (ModType.PNACH, ModType.CHEAT)
+                    if get_deploy_path(config, kind)
+                    and Path(get_deploy_path(config, kind)).resolve() == target
+                }
+                code_mods = sorted(
+                    [mod for mod in self.db.all() if mod.enabled and mod.mod_type in shared_types],
+                    key=lambda mod: mod.priority, reverse=True,
+                )
+                target.mkdir(parents=True, exist_ok=True)
+                notices = []
+                count, notices = self._deploy_pnach(code_mods, target, notices)
+            else:
+                count, notices = self.deploy(mod_type, target_path)
+            deployed += count
+            warnings.extend(notices)
+        return deployed, warnings
+
+    def undeploy_mod(self, mod_id: str, config, *, redeploy: bool = True) -> Tuple[int, List[str]]:
         """
         Remove a single mod's deployed files from the PCSX2 target folder then
         re-deploy all remaining *enabled* mods so nothing is accidentally lost.
 
         Returns ``(deployed_count, warnings)`` from the re-deploy step.
+        Batch updates can defer that step with ``redeploy=False``.
         """
         mod = self.db.get(mod_id)
         if not mod:
@@ -400,20 +468,29 @@ class ModManager:
         if target.exists():
             # Remove files that belong to this mod from the target folder
             mod_src = Path(mod.path)
-            if mod_src.is_dir():
-                for f in mod_src.rglob("*"):
-                    if f.is_file():
-                        rel = f.relative_to(mod_src)
-                        deployed_file = target / rel
-                        if deployed_file.exists():
-                            try:
-                                deployed_file.unlink()
-                            except OSError as exc:
-                                msg = f"Could not remove deployed file {deployed_file}: {exc}"
-                                logger.warning(msg)
-                                cleanup_warnings.append(msg)
+            deployed_files = []
+            if mod.mod_type == ModType.COVER_ART:
+                from src.core.game_registry import (
+                    detect_game_serial, detect_serial_from_path, normalise_serial,
+                )
+                serial = normalise_serial(mod.game_id) if mod.game_id else ""
+                serial = serial or detect_game_serial(str(mod_src)) or detect_serial_from_path(str(mod_src))
+                deployed_files = [target / (f"{serial}.png" if serial else mod_src.name)]
+            elif mod.mod_type in (ModType.PNACH, ModType.CHEAT):
+                from src.core.pnach import extract_game_crc
+                sources = list(mod_src.rglob("*.pnach")) if mod_src.is_dir() else [mod_src]
+                for source in sources:
+                    if source.suffix.lower() == ".pnach":
+                        crc = extract_game_crc(str(source))
+                        deployed_files.append(target / (f"{crc}.pnach" if crc else source.name))
+            elif mod_src.is_dir():
+                deployed_files = [
+                    target / f.relative_to(mod_src)
+                    for f in mod_src.rglob("*") if f.is_file()
+                ]
             elif mod_src.is_file():
-                deployed_file = target / mod_src.name
+                deployed_files = [target / mod_src.name]
+            for deployed_file in deployed_files:
                 if deployed_file.exists():
                     try:
                         deployed_file.unlink()
@@ -423,6 +500,8 @@ class ModManager:
                         cleanup_warnings.append(msg)
 
         # Re-deploy remaining enabled mods so priority ordering is honoured
+        if not redeploy:
+            return 0, cleanup_warnings
         deployed, warnings = self.deploy(mod.mod_type, target_path)
         return deployed, cleanup_warnings + warnings
 
