@@ -229,7 +229,8 @@ class MainWindow(QMainWindow):
         self._library_panel.browse_game.connect(self._on_library_browse_game)
         self._stack.addWidget(self._library_panel)      # index 2
 
-        self._downloads_panel = DownloadsPanel(self.config)
+        self._downloads_panel = DownloadsPanel(self.config, db=self.db)
+        self._downloads_panel.mod_installed.connect(self._on_mod_installed)
         self._stack.addWidget(self._downloads_panel)    # index 3
 
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)

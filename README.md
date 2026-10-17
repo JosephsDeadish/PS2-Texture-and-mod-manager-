@@ -193,6 +193,8 @@
 - Saved search and sorting: newest, oldest, name, or size; Game Save includes legacy and current records
 - Debounced local filtering avoids re-reading the log while typing; visible history reloads when the log changes
 - Two-line entries, scrollable details, visible-result counts, and one-click recovery from empty filters
+- **Review Download…** opens a new, editable download from a selected history entry's name, type, serial, and HTTP(S) source; nothing starts automatically and the original record is kept
+- History sources may be web pages: replace the file URL when needed; downloading again is not a resume or repair and can create a duplicate mod
 
 ### 🚀 Animated Splash Screen
 - PS2 controller icon with pulsing glow ring and rotating accent arc

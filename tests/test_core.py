@@ -9608,6 +9608,177 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._active_summary = MagicMock()
         return panel
 
+    def _make_review_panel(self, module):
+        from src.core.download_history import HistoryEntry
+        panel = self._make_panel(module)
+        panel._db = MagicMock()
+        panel._history_download_open = False
+        panel._review_download_btn = MagicMock()
+        panel._selected_source_url = "https://example.com/source"
+        panel._list_widget = MagicMock()
+        panel._list_widget.currentRow.return_value = 0
+        panel._history_entries = [HistoryEntry(
+            id="original", timestamp="2026-10-17T10:00:00",
+            mod_name="<b>Texture & Pack</b>", mod_type="texture_pack",
+            serial="SLUS-12345", source_url=" https://example.com/source ",
+            status="failed", note="installing: old error, not a description",
+        )]
+        panel._notify_status = MagicMock()
+        return panel
+
+    def test_history_download_details_support_all_types_and_legacy_saves(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        for raw_type, expected in [
+            ("texture_pack", ModType.TEXTURE_PACK), ("pnach", ModType.PNACH),
+            ("cover_art", ModType.COVER_ART), ("save_file", ModType.SAVE_FILE),
+            ("save", ModType.SAVE_FILE), ("cheat", ModType.CHEAT),
+        ]:
+            for status in ("success", "failed", "skipped"):
+                with self.subTest(mod_type=raw_type, status=status):
+                    entry = HistoryEntry(
+                        id="old", timestamp="", mod_name="Name", mod_type=raw_type,
+                        serial="SLUS-12345", source_url=" https://example.com/source ",
+                        status=status, note="Not metadata",
+                    )
+                    before = entry.to_dict()
+                    self.assertEqual(module._history_download_details(entry), {
+                        "type": expected, "url": "https://example.com/source",
+                        "source_url": "https://example.com/source",
+                        "name": "Name", "game": "SLUS-12345",
+                    })
+                    self.assertEqual(entry.to_dict(), before)
+
+    def test_history_download_details_reject_invalid_sources_and_unknown_types(self):
+        module = self._import_downloads_panel()
+        entry = self._make_review_panel(module)._history_entries[0]
+        for source in ("", " ", "relative.zip", "https://", "file:///tmp/mod.zip",
+                       "javascript:alert(1)", "https://[broken", None, 123):
+            with self.subTest(source=source):
+                entry.source_url = source
+                self.assertIsNone(module._history_download_details(entry))
+        entry.source_url = "https://example.com/file.zip"
+        for raw_type in ("other", "", None, [], 123):
+            with self.subTest(mod_type=raw_type):
+                entry.mod_type = raw_type
+                self.assertIsNone(module._history_download_details(entry))
+        self.assertIsNone(module._history_download_details(None))
+
+    def test_history_review_action_tracks_selection_database_and_open_dialog(self):
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        entry = panel._history_entries[0]
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(True)
+        panel._update_history_source_actions()
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+        panel._history_download_open = True
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+        panel._history_download_open = False
+        panel._db = None
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+
+    def test_history_review_prefills_only_available_metadata_without_starting(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        before = panel._history_entries[0].to_dict()
+        dialog = MagicMock()
+        dialog._type_combo.findData.return_value = 2
+        dialog.exec.side_effect = lambda: panel._review_history_download()
+        factory = MagicMock(return_value=dialog)
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+        }):
+            panel._review_history_download()
+        factory.assert_called_once_with(panel.config, panel._db, panel)
+        dialog._url_edit.setText.assert_called_once_with("https://example.com/source")
+        dialog._source_url_edit.setText.assert_called_once_with("https://example.com/source")
+        dialog._name_edit.setText.assert_called_once_with("<b>Texture & Pack</b>")
+        dialog._game_edit.setText.assert_called_once_with("SLUS-12345")
+        dialog._author_edit.clear.assert_called_once()
+        dialog._desc_edit.clear.assert_called_once()
+        dialog._type_combo.findData.assert_called_once_with(ModType.TEXTURE_PACK)
+        dialog._type_combo.setCurrentIndex.assert_called_once_with(2)
+        message = dialog._status.setText.call_args.args[0]
+        self.assertIn("web page", message)
+        self.assertIn("not a resume", message)
+        self.assertIn("duplicate", message)
+        dialog.exec.assert_called_once()
+        dialog._download.assert_not_called()
+        dialog._run_download.assert_not_called()
+        dialog.deleteLater.assert_called_once()
+        self.assertEqual(panel._history_entries[0].to_dict(), before)
+        self.assertFalse(panel._history_download_open)
+        panel._review_download_btn.setEnabled.assert_called_with(True)
+
+    def test_history_review_rechecks_current_selection_and_invalid_entries(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        factory = MagicMock()
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+        }):
+            for row in (-1, 1, 100):
+                panel._list_widget.currentRow.return_value = row
+                panel._review_history_download()
+            panel._list_widget.currentRow.return_value = 0
+            entry = panel._history_entries[0]
+            entry.source_url = "file:///tmp/mod.zip"
+            panel._review_history_download()
+            entry.source_url = "https://example.com/source"
+            entry.mod_type = "other"
+            panel._review_history_download()
+            entry.mod_type = "texture_pack"
+            panel._db = None
+            panel._review_history_download()
+        factory.assert_not_called()
+        self.assertEqual(panel._notify_status.call_count, 6)
+
+    def test_history_review_uses_snapshot_and_rechecks_selection_after_close(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        dialog = MagicMock()
+
+        def make_dialog(*args):
+            panel._history_entries[0].mod_name = "Changed after opening"
+            return dialog
+
+        def close_dialog():
+            panel._history_entries = []
+            panel._list_widget.currentRow.return_value = -1
+            panel._selected_source_url = ""
+
+        dialog.exec.side_effect = close_dialog
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=make_dialog),
+        }):
+            panel._review_history_download()
+        dialog._name_edit.setText.assert_called_once_with("<b>Texture & Pack</b>")
+        self.assertFalse(panel._history_download_open)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+
+    def test_history_review_failures_allow_retry_and_dispose_created_dialog(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        dialog = MagicMock()
+        dialog.exec.side_effect = RuntimeError("dialog failed")
+        for factory in (MagicMock(side_effect=RuntimeError("constructor failed")),
+                        MagicMock(return_value=dialog)):
+            with self.subTest(factory=factory), patch.dict(sys.modules, {
+                "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+            }), self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                panel._review_history_download()
+            self.assertFalse(panel._history_download_open)
+            panel._review_download_btn.setEnabled.assert_called_with(True)
+        dialog.deleteLater.assert_called_once()
+        self.assertEqual(panel._notify_status.call_count, 2)
+
     def _make_active_row(self, module):
         row = module._ActiveDownloadRow.__new__(module._ActiveDownloadRow)
         for name in (

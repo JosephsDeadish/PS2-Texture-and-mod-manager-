@@ -32,7 +32,7 @@ from PyQt6.QtWidgets import (
 )
 
 from src.core.config_manager import save_config, ui_state_bucket
-from src.models.mod import AppConfig
+from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
 from src.ui.url_helpers import open_external_url
 
@@ -111,6 +111,22 @@ def _download_source_url(value: str) -> str:
     except (AttributeError, ValueError):
         pass
     return ""
+
+
+def _history_download_details(entry):
+    if entry is None:
+        return None
+    url = _download_source_url(entry.source_url)
+    try:
+        mod_type = ModType("save_file" if entry.mod_type == "save" else entry.mod_type)
+    except (TypeError, ValueError):
+        return None
+    if not url:
+        return None
+    return {
+        "url": url, "type": mod_type, "name": str(entry.mod_name or ""),
+        "game": str(entry.serial or ""), "source_url": url,
+    }
 
 
 class _ActiveDownloadRow(QWidget):
@@ -273,9 +289,13 @@ class ActiveDownloads:
 class DownloadsPanel(BasePanel):
     """Full-page panel for active downloads and download history."""
 
-    def __init__(self, config: AppConfig, parent=None):
+    mod_installed = pyqtSignal()
+
+    def __init__(self, config: AppConfig, parent=None, *, db=None):
         super().__init__("📥  Downloads", "Active downloads and installation history", parent)
         self.config = config
+        self._db = db
+        self._history_download_open = False
         self._history_entries: list = []
         self._all_history_entries: list = []
         self._history_stamp = None
@@ -600,6 +620,15 @@ class DownloadsPanel(BasePanel):
         right_sep.setFrameShape(QFrame.Shape.HLine)
         rl.addWidget(right_sep)
 
+        self._review_download_btn = QPushButton("Review Download…")
+        self._review_download_btn.setAccessibleName("Review a new download from selected history entry")
+        self._review_download_btn.setEnabled(False)
+        self._review_download_btn.setToolTip(
+            "Select an entry with a supported mod type and HTTP(S) source to review a new download."
+        )
+        self._review_download_btn.clicked.connect(self._review_history_download)
+        rl.addWidget(self._review_download_btn)
+
         btn_row = QHBoxLayout()
         self._delete_btn = QPushButton("🗑  Delete Entry")
         self._delete_btn.setToolTip("Remove this entry from the history log")
@@ -700,13 +729,68 @@ class DownloadsPanel(BasePanel):
             for widget in (self._search_edit, self._sort_combo):
                 widget.blockSignals(False)
 
-    def _update_history_source_actions(self) -> None:
+    def _update_history_source_actions(self, entry=None) -> None:
         enabled = bool(self._selected_source_url.strip())
         for attr in ("_open_source_btn", "_copy_source_btn"):
             button = getattr(self, attr, None)
             setter = getattr(button, "setEnabled", None)
             if callable(setter):
                 setter(enabled)
+        button = getattr(self, "_review_download_btn", None)
+        if button is not None:
+            details = _history_download_details(entry)
+            available = details is not None and self._db is not None
+            button.setEnabled(available and not self._history_download_open)
+            button.setToolTip(
+                "Review a new full download; nothing starts until Download & Install is pressed."
+                if available else
+                "Requires a supported mod type, an HTTP(S) source URL, and a loaded mod database."
+            )
+
+    def _review_history_download(self):
+        if self._history_download_open:
+            return
+        row = self._list_widget.currentRow()
+        entry = self._history_entries[row] if 0 <= row < len(self._history_entries) else None
+        details = _history_download_details(entry)
+        if details is None or self._db is None:
+            self._notify_status("Select a history entry with a supported type and HTTP(S) source.")
+            return
+        self._history_download_open = True
+        self._review_download_btn.setEnabled(False)
+        dialog = None
+        try:
+            # Import lazily: Browse also imports the active-download registry.
+            from src.ui.browse_panel import DownloadInstallDialog
+            dialog = DownloadInstallDialog(self.config, self._db, self)
+            dialog.setWindowTitle("Review New Download from History")
+            dialog._url_edit.setText(details["url"])
+            dialog._source_url_edit.setText(details["source_url"])
+            dialog._name_edit.setText(details["name"])
+            dialog._game_edit.setText(details["game"])
+            # History does not store authors or descriptions; don't reuse a
+            # different download's saved metadata (or treat error notes as it).
+            dialog._author_edit.clear()
+            dialog._desc_edit.clear()
+            dialog._type_combo.setCurrentIndex(dialog._type_combo.findData(details["type"]))
+            dialog._status.setText(
+                "Review the URL, mod type, and metadata before downloading.\n"
+                "History stores a source URL, which may be a web page rather than a file. "
+                "If needed, open/copy the source and replace the URL with a direct file link.\n"
+                "This starts a new full download, not a resume or repair. Existing mods are not "
+                "replaced; installing again may create a duplicate. The original history entry is kept."
+            )
+            dialog.exec()
+        except Exception as exc:
+            logger.warning("Could not open history download review: %s", exc)
+            self._notify_status("Could not open download review. Please try again.")
+        finally:
+            if dialog is not None:
+                dialog.deleteLater()
+            self._history_download_open = False
+            row = self._list_widget.currentRow()
+            entry = self._history_entries[row] if 0 <= row < len(self._history_entries) else None
+            self._update_history_source_actions(entry)
 
     def _restore_history_filters(self) -> None:
         state_changed = False
@@ -922,7 +1006,7 @@ class DownloadsPanel(BasePanel):
 
         e = self._history_entries[row]
         self._selected_source_url = str(getattr(e, "source_url", "") or "").strip()
-        self._update_history_source_actions()
+        self._update_history_source_actions(e)
 
         try:
             from src.core.download_history import STATUS_COLOR
