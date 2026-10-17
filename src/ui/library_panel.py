@@ -509,6 +509,13 @@ class _GameCard(QFrame):
         self.game = game
         self.setObjectName("card")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        focus_policy = getattr(getattr(Qt, "FocusPolicy", None), "StrongFocus", None)
+        if focus_policy is not None:
+            self.setFocusPolicy(focus_policy)
+        self.setAccessibleName(f"Game card: {game.display_name}")
+        self.setAccessibleDescription(
+            "Press Enter or Space to select this game and manage its mods."
+        )
         self._selected = False
 
         layout = QHBoxLayout(self)
@@ -611,6 +618,23 @@ class _GameCard(QFrame):
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
         self.clicked.emit(self.game)
+
+    def keyPressEvent(self, event):
+        key = getattr(event, "key", lambda: None)()
+        activate_keys = {
+            getattr(getattr(Qt, "Key", None), "Key_Return", None),
+            getattr(getattr(Qt, "Key", None), "Key_Enter", None),
+            getattr(getattr(Qt, "Key", None), "Key_Space", None),
+        }
+        if key in activate_keys:
+            accept = getattr(event, "accept", None)
+            if callable(accept):
+                accept()
+            self.clicked.emit(self.game)
+            return
+        key_press = getattr(super(), "keyPressEvent", None)
+        if callable(key_press):
+            key_press(event)
 
 
 # ---------------------------------------------------------------------------

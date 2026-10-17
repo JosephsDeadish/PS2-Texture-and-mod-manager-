@@ -9653,6 +9653,45 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         self.assertTrue(library_panel._mod_matches_query(mod, "gta iii"))
         self.assertFalse(library_panel._mod_matches_query(mod, "yakuza"))
 
+    def test_game_card_key_press_activates_selected_card(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        GameCard = library_panel._GameCard
+        library_panel.Qt.Key = types.SimpleNamespace(
+            Key_Return=1,
+            Key_Enter=2,
+            Key_Space=3,
+        )
+
+        class FakeSignal:
+            def __init__(self):
+                self.emitted = []
+
+            def emit(self, *args):
+                self.emitted.append(args)
+
+        class FakeEvent:
+            def __init__(self, key):
+                self._key = key
+                self.accepted = False
+
+            def key(self):
+                return self._key
+
+            def accept(self):
+                self.accepted = True
+
+        card = GameCard.__new__(GameCard)
+        card.clicked = FakeSignal()
+        card.game = types.SimpleNamespace(display_name="Kingdom Hearts")
+
+        event = FakeEvent(library_panel.Qt.Key.Key_Return)
+        GameCard.keyPressEvent(card, event)
+
+        self.assertTrue(event.accepted)
+        self.assertEqual(card.clicked.emitted, [(card.game,)])
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
