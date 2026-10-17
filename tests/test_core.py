@@ -1899,6 +1899,8 @@ class TestImportDialogLogging(unittest.TestCase):
             qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
             qtcore.QTimer = type("QTimer", (), {})
             qtcore.pyqtSignal = lambda *args: MagicMock()
+            qtcore.pyqtSlot = lambda *args: lambda method: method
+            qtcore.QObject = type("QObject", (), {})
             qtwidgets = types.ModuleType("PyQt6.QtWidgets")
             for name in (
                 "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -1933,6 +1935,8 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
         qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -1982,6 +1986,8 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
         qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -2028,6 +2034,8 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
         qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -2239,7 +2247,7 @@ class TestEditModDialogWorkflows(unittest.TestCase):
         self.dialog = SimpleNamespace(
             mod=self.mod, _save_callback=MagicMock(), _dialog_closed=False,
             _fetching_game_id="", _discard_thumbnail_result=False,
-            _fetched_thumbnail="", _fetched_game_id="", _thumbnail_finished=MagicMock(),
+            _fetched_thumbnail="", _fetched_game_id="",
             _save_btn=MagicMock(), _revert_btn=MagicMock(), _fetch_thumb_btn=MagicMock(),
             _readiness_lbl=MagicMock(), _thumb_status_lbl=MagicMock(), updated_meta={},
             accept=MagicMock(),
@@ -2261,6 +2269,8 @@ class TestEditModDialogWorkflows(unittest.TestCase):
                      "_on_thumbnail_finished", "_fetch_thumbnail", "_save"):
             setattr(self.dialog, name, MethodType(getattr(self.dialog_type, name), self.dialog))
         self.dialog._original_meta = self.dialog._draft()
+        self.relay = MagicMock()
+        self.enterContext(patch.object(self.module, "_ThumbnailResult", return_value=self.relay))
         self.warning = self.enterContext(patch.object(self.message_box, "warning", create=True))
 
     def test_validation_and_readiness_cover_required_fields_and_malformed_urls(self):
@@ -2392,7 +2402,8 @@ class TestEditModDialogWorkflows(unittest.TestCase):
             self.dialog._fetch_thumbnail()
             self.dialog._thumb_status_lbl.setText.reset_mock()
             thread.call_args.kwargs["target"]()
-        self.dialog._thumbnail_finished.emit.assert_called_once_with("SLUS-20062", "/cache/new.png", "")
+        self.relay.finished.emit.assert_called_once_with("SLUS-20062", "/cache/new.png", "")
+        self.relay.deleteLater.assert_called_once()
         self.dialog._thumb_status_lbl.setText.assert_not_called()
         self.assertEqual(self.dialog._fetched_thumbnail, "")
 
@@ -2403,7 +2414,21 @@ class TestEditModDialogWorkflows(unittest.TestCase):
             self.dialog._fetch_thumbnail()
             with self.assertLogs("src.ui.import_dialog", level="WARNING"):
                 thread.call_args.kwargs["target"]()
-        self.dialog._thumbnail_finished.emit.assert_called_once_with("SLUS-20062", "", "offline")
+        self.relay.finished.emit.assert_called_once_with("SLUS-20062", "", "offline")
+
+    def test_fetch_uses_compact_serial_but_emits_normalized_identity(self):
+        import src.core.config_manager as config
+        self.dialog._gameid_edit.text.return_value = "sles_50386"
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.download_file",
+        ) as download:
+            self.dialog._fetch_thumbnail()
+            thread.call_args.kwargs["target"]()
+        destination = str(config.THUMBNAILS_DIR / "SLES50386.jpg")
+        download.assert_called_once_with(
+            "https://art.gametdb.com/ps2/cover/EN/SLES50386.jpg", destination, timeout=10,
+        )
+        self.relay.finished.emit.assert_called_once_with("SLES-50386", destination, "")
 
     def test_invalid_serial_or_active_fetch_cannot_start_duplicate_request(self):
         with patch("threading.Thread") as thread:
@@ -2414,13 +2439,16 @@ class TestEditModDialogWorkflows(unittest.TestCase):
             self.dialog._fetch_thumbnail()
         thread.assert_not_called()
 
-    def test_deleted_dialog_signal_does_not_crash_worker(self):
-        self.dialog._thumbnail_finished.emit.side_effect = RuntimeError("wrapped object deleted")
+    def test_worker_retains_independent_signal_relay_until_completion(self):
         with patch("threading.Thread") as thread, patch(
             "src.core.downloader.fetch_gametdb_art", return_value="/cache/new.png",
         ):
             self.dialog._fetch_thumbnail()
+            self.relay.finished.connect.assert_called_once_with(self.dialog._on_thumbnail_finished)
+            self.relay.finished.emit.assert_not_called()
             thread.call_args.kwargs["target"]()
+        self.relay.finished.emit.assert_called_once()
+        self.relay.deleteLater.assert_called_once()
         self.dialog.accept.assert_not_called()
 
     def test_save_while_fetching_does_not_wait_or_attach_pending_image(self):
@@ -9963,6 +9991,8 @@ class TestModPanelEmptyState(unittest.TestCase):
         )
         qtcore.QSize = type("QSize", (), {})
         qtcore.QThread = type("QThread", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda method: method
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (

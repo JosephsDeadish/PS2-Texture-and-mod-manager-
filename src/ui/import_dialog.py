@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -590,10 +590,12 @@ class ImportModDialog(QDialog):
 # Edit Mod Metadata Dialog
 # ---------------------------------------------------------------------------
 
+class _ThumbnailResult(QObject):
+    finished = pyqtSignal(str, str, str)
+
+
 class EditModDialog(QDialog):
     """Dialog for editing an existing mod's metadata fields."""
-
-    _thumbnail_finished = pyqtSignal(str, str, str)
 
     def __init__(self, mod: ModInfo, parent=None, *, save_callback=None):
         super().__init__(parent)
@@ -607,7 +609,6 @@ class EditModDialog(QDialog):
         self.setWindowTitle(f"Edit — {mod.name}")
         self.resize(560, 560)
         self.updated_meta: dict = {}
-        self._thumbnail_finished.connect(self._on_thumbnail_finished)
         self._build()
         self._original_meta = self._draft()
         self._update_readiness()
@@ -800,28 +801,30 @@ class EditModDialog(QDialog):
         self._fetching_game_id = game_id
         self._discard_thumbnail_result = False
         self._fetch_thumb_btn.setEnabled(False)
-        self._thumb_status_lbl.setText("Fetching…")
+        self._thumb_status_lbl.setText(
+            "Fetching… You can save metadata now; a pending image will not be kept."
+        )
 
         import threading
         from src.core.downloader import fetch_gametdb_art
         import src.core.config_manager as _cfg
 
-        finished = self._thumbnail_finished
+        # No dialog parent: the worker must keep this relay alive after close.
+        result = _ThumbnailResult()
+        result.finished.connect(self._on_thumbnail_finished)
 
         def _run():
             error = ""
             try:
-                path = fetch_gametdb_art(game_id, str(_cfg.THUMBNAILS_DIR)) or ""
+                path = fetch_gametdb_art(game_id.replace("-", ""), str(_cfg.THUMBNAILS_DIR)) or ""
             except Exception as exc:
                 logger.warning("Could not fetch edit-dialog thumbnail for %s: %s", game_id, exc)
                 path, error = "", str(exc)
-            try:
-                finished.emit(game_id, path, error)
-            except RuntimeError:
-                # The dialog may have been deleted while the request was running.
-                return
+            result.finished.emit(game_id, path, error)
+            result.deleteLater()
         threading.Thread(target=_run, daemon=True).start()
 
+    @pyqtSlot(str, str, str)
     def _on_thumbnail_finished(self, game_id, path, error):
         if self._dialog_closed:
             return
