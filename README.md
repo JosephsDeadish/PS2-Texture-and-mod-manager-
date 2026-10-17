@@ -26,6 +26,7 @@
 - Import HD texture replacement packs (ZIP, 7z, folder)
 - **Multi-part archive support** — packs split across `_Part1.zip`, `_Part2.zip` … (or 7-zip volumes) are extracted automatically; the import dialog detects all sibling parts and warns about any that are missing
 - **Auto folder normalization** — packs that ship with a `replacement/` folder (common in Patreon releases) are automatically placed into the correct `textures/<SERIAL>/replacements/` layout when a Game ID is provided
+- **Import readiness** — inline source, Game ID, and source-URL guidance enables Import only when ready; scrollable fields keep the action buttons visible on smaller screens
 - Enable/disable individual packs without deleting them
 - Set priority order — higher-priority packs win conflicts
 - Greyed-out **"Completely Shadowed"** badge when a pack is 100% overridden by a higher-priority one
@@ -115,6 +116,7 @@
 - Guided setup wizard on first launch
 - Auto-detection of PCSX2 config sub-folders
 - All paths configurable individually
+- Setup completion lists unconfigured destinations and explains which features need Settings before use
 
 ### 🏠 Dashboard Workflows
 - One-click discovery, texture import, URL download, downloads/history, and settings actions

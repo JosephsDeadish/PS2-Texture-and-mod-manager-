@@ -466,6 +466,10 @@ class SetupWizard(QDialog):
             summary_lines.append(f"📝 PNACH: {self.config.pnach_path}")
         if self.config.cover_art_path:
             summary_lines.append(f"🎨 Covers: {self.config.cover_art_path}")
+        if self.config.memcards_path:
+            summary_lines.append(f"💾 Memory Cards: {self.config.memcards_path}")
+        if self.config.mods_storage_path:
+            summary_lines.append(f"📦 Mod Storage: {self.config.mods_storage_path}")
         if self.config.game_library_path:
             try:
                 from src.core.game_library import scan_library
@@ -477,7 +481,21 @@ class SetupWizard(QDialog):
                 summary_lines.append(
                     f"🎮 Game Library: {len(games)} disc image(s) found"
                 )
-        summary_lines.append("⚡ Mods deploy automatically when toggled on/off")
+        missing = [
+            label for label, path in (
+                ("Textures", self.config.textures_path),
+                ("PNACH / Cheats", self.config.pnach_path),
+                ("Cover Art", self.config.cover_art_path),
+                ("Memory Cards", self.config.memcards_path),
+            ) if not path
+        ]
+        if missing:
+            summary_lines.append("⚠️ Not configured: " + ", ".join(missing) + ".")
+            summary_lines.append(
+                "You can browse and import mods now. Configure missing folders in Settings before using those features."
+            )
+        else:
+            summary_lines.append("⚡ Mods deploy automatically when toggled on/off")
 
         if summary_lines:
             self._done_summary.setText("\n".join(summary_lines))

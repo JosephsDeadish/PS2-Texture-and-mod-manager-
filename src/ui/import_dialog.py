@@ -29,6 +29,50 @@ from src.models.mod import ModInfo, ModType
 logger = logging.getLogger(__name__)
 
 
+_REPLACEMENT_HINT_TEXT = (
+    "⚠  This pack uses a folder named 'replacement'.\n"
+    "Enter the Game ID (e.g. SLUS-21228) so PS2 Mod Manager can\n"
+    "automatically place files in the correct PCSX2 location:\n"
+    "  textures/<SERIAL>/replacements/"
+)
+
+
+def _import_validation_problem(
+    mod_type: ModType, source: str, game_id: str, source_url: str,
+) -> tuple[str, str] | None:
+    if not source:
+        return "No Source", "Please select a source folder or file."
+    try:
+        exists = Path(source).exists()
+    except OSError as exc:
+        logger.warning("Could not inspect import source %s: %s", source, exc)
+        return "Source Unavailable", "The selected source cannot be inspected. Please choose it again."
+    if not exists:
+        return (
+            "Missing Source",
+            "The selected source folder or file no longer exists.\nPlease choose it again.",
+        )
+    if mod_type == ModType.TEXTURE_PACK:
+        from src.core.game_registry import is_valid_serial
+        if not is_valid_serial(game_id):
+            return (
+                "Game ID Required",
+                "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
+            )
+    if source_url:
+        try:
+            parsed = urlparse(source_url)
+            valid_url = parsed.scheme in ("http", "https") and bool(parsed.netloc)
+        except ValueError:
+            valid_url = False
+        if not valid_url:
+            return (
+                "Invalid Source URL",
+                "Please enter a valid http(s) source page URL, or leave the field blank.",
+            )
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Import Mod Dialog
 # ---------------------------------------------------------------------------
@@ -52,9 +96,18 @@ class ImportModDialog(QDialog):
         self._build()
 
     def _build(self):
-        layout = QVBoxLayout(self)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(20, 20, 20, 20)
+        root.setSpacing(10)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        body = QWidget()
+        layout = QVBoxLayout(body)
         layout.setSpacing(14)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(0, 0, 0, 0)
+        scroll.setWidget(body)
+        root.addWidget(scroll, 1)
 
         # ---- Header ----
         header = QLabel(f"{_type_icon(self.mod_type)}  Import {_type_label(self.mod_type)}")
@@ -81,7 +134,8 @@ class ImportModDialog(QDialog):
             folder_btn.clicked.connect(self._choose_folder)
             src_row.addWidget(folder_btn)
 
-        archive_btn = QPushButton("📦 Archive (.zip/.7z)")
+        archive_btn = QPushButton("📦 Archive")
+        archive_btn.setToolTip("Choose a ZIP, 7z, RAR, or supported split archive part")
         archive_btn.clicked.connect(self._choose_archive)
         src_row.addWidget(archive_btn)
 
@@ -125,12 +179,7 @@ class ImportModDialog(QDialog):
         form.addRow(game_id_label, self._gameid_edit)
 
         # Hint shown when a "replacement" folder pattern is detected
-        self._replacement_hint = QLabel(
-            "⚠  This pack uses a folder named 'replacement'.\n"
-            "Enter the Game ID (e.g. SLUS-21228) so PS2 Mod Manager can\n"
-            "automatically place files in the correct PCSX2 location:\n"
-            "  textures/<SERIAL>/replacements/"
-        )
+        self._replacement_hint = QLabel(_REPLACEMENT_HINT_TEXT)
         self._replacement_hint.setStyleSheet(
             "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
             "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
@@ -180,15 +229,37 @@ class ImportModDialog(QDialog):
 
         layout.addStretch()
 
+        self._readiness_lbl = QLabel()
+        self._readiness_lbl.setWordWrap(True)
+        self._readiness_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        root.addWidget(self._readiness_lbl)
+
         # ---- Buttons ----
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
-        btns.button(QDialogButtonBox.StandardButton.Ok).setText("Import →")
-        btns.button(QDialogButtonBox.StandardButton.Ok).setObjectName("primary_btn")
+        self._import_btn = btns.button(QDialogButtonBox.StandardButton.Ok)
+        self._import_btn.setText("Import →")
+        self._import_btn.setObjectName("primary_btn")
         btns.accepted.connect(self._accept)
         btns.rejected.connect(self.reject)
-        layout.addWidget(btns)
+        root.addWidget(btns)
+        for field in (self._src_edit, self._gameid_edit, self._url_edit):
+            field.textChanged.connect(self._update_import_state)
+        self._update_import_state()
+
+    def _update_import_state(self, *_args):
+        problem = _import_validation_problem(
+            self.mod_type, self._src_edit.text().strip(),
+            self._gameid_edit.text().strip(), self._url_edit.text().strip(),
+        )
+        self._import_btn.setEnabled(problem is None)
+        self._readiness_lbl.setText(
+            problem[1] if problem else "✅ Ready to import. Your original source files will be kept."
+        )
+        self._readiness_lbl.setStyleSheet(
+            f"color: {'#e0a040' if problem else '#60c090'}; font-size: 12px;"
+        )
 
     # ------------------------------------------------------------------
     # Source pickers
@@ -222,6 +293,7 @@ class ImportModDialog(QDialog):
             last_paths.get("import_folder", ""),
         )
         if d:
+            self._multipart_hint.hide()
             self._src_edit.setText(d)
             self._remember_last_path("import_folder", d)
             # Auto-fill name from folder
@@ -239,7 +311,7 @@ class ImportModDialog(QDialog):
             self,
             f"Select {_type_label(self.mod_type)} Archive",
             last_paths.get("import_archive", ""),
-            "Archives (*.zip *.7z *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
+            "Archives (*.zip *.7z *.rar *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;RAR Files (*.rar);;All Files (*)",
         )
         if path:
             self._src_edit.setText(path)
@@ -268,6 +340,7 @@ class ImportModDialog(QDialog):
             self, f"Select {_type_label(self.mod_type)}", last_paths.get("import_file", ""), ext_filter
         )
         if path:
+            self._multipart_hint.hide()
             self._src_edit.setText(path)
             self._remember_last_path("import_file", str(Path(path).parent))
             if not self._name_edit.text():
@@ -348,6 +421,7 @@ class ImportModDialog(QDialog):
         if not hasattr(self, '_replacement_hint'):
             return  # hint widget not built (shouldn't happen for TEXTURE_PACK)
 
+        self._replacement_hint.setText(_REPLACEMENT_HINT_TEXT)
         needs_hint = False
         p = Path(path)
 
@@ -492,44 +566,13 @@ class ImportModDialog(QDialog):
     def _accept(self):
         """Collect metadata and accept the dialog."""
         source = self._src_edit.text().strip()
-        if not source:
-            from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "No Source", "Please select a source folder or file.")
-            return
-
-        if not Path(source).exists():
-            from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(
-                self,
-                "Missing Source",
-                "The selected source folder or file no longer exists.\nPlease choose it again.",
-            )
-            return
-
         game_id = self._gameid_edit.text().strip()
-        if self.mod_type == ModType.TEXTURE_PACK:
-            from PyQt6.QtWidgets import QMessageBox
-            from src.core.game_registry import is_valid_serial
-
-            if not is_valid_serial(game_id):
-                QMessageBox.warning(
-                    self,
-                    "Game ID Required",
-                    "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
-                )
-                return
-
         source_url = self._url_edit.text().strip()
-        if source_url:
-            parsed = urlparse(source_url)
-            if parsed.scheme not in ("http", "https") or not parsed.netloc:
-                from PyQt6.QtWidgets import QMessageBox
-                QMessageBox.warning(
-                    self,
-                    "Invalid Source URL",
-                    "Please enter a valid http(s) source page URL, or leave the field blank.",
-                )
-                return
+        problem = _import_validation_problem(self.mod_type, source, game_id, source_url)
+        if problem:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.warning(self, *problem)
+            return
 
         self.source_path = source
         self.meta = {

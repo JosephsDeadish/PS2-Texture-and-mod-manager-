@@ -2071,6 +2071,99 @@ class TestImportDialogLogging(unittest.TestCase):
         warning.assert_called_once()
         fake.accept.assert_not_called()
 
+    def test_import_readiness_covers_source_serial_and_optional_url(self):
+        with self._import_dialog_module() as (module, _):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                cases = [
+                    (ModType.TEXTURE_PACK, "", "SLUS-20062", "", "No Source"),
+                    (ModType.TEXTURE_PACK, str(Path(tmpdir) / "missing"), "SLUS-20062", "", "Missing Source"),
+                    (ModType.TEXTURE_PACK, tmpdir, "BAD", "", "Game ID Required"),
+                    (ModType.TEXTURE_PACK, tmpdir, "SLUS-20062", "", None),
+                    (ModType.PNACH, tmpdir, "", "", None),
+                    (ModType.PNACH, tmpdir, "", "https://example.com/pack", None),
+                    (ModType.PNACH, tmpdir, "", "not-a-url", "Invalid Source URL"),
+                    (ModType.PNACH, tmpdir, "", "https://[", "Invalid Source URL"),
+                    (ModType.PNACH, tmpdir, "", "file:///tmp/pack", "Invalid Source URL"),
+                ]
+                for mod_type, source, serial, url, expected in cases:
+                    with self.subTest(source=source, serial=serial, url=url):
+                        problem = module._import_validation_problem(mod_type, source, serial, url)
+                        self.assertEqual(problem[0] if problem else None, expected)
+
+    def test_import_readiness_button_and_inline_hint_follow_validation(self):
+        with self._import_dialog_module() as (module, _):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake = SimpleNamespace(
+                    mod_type=ModType.TEXTURE_PACK, _src_edit=MagicMock(),
+                    _gameid_edit=MagicMock(), _url_edit=MagicMock(),
+                    _import_btn=MagicMock(), _readiness_lbl=MagicMock(),
+                )
+                fake._src_edit.text.return_value = tmpdir
+                fake._url_edit.text.return_value = ""
+                for serial, enabled in (("", False), ("BAD", False), ("SLUS-20062", True)):
+                    fake._gameid_edit.text.return_value = serial
+                    module.ImportModDialog._update_import_state(fake)
+                    fake._import_btn.setEnabled.assert_called_with(enabled)
+                self.assertIn("original source files will be kept", fake._readiness_lbl.setText.call_args.args[0])
+                fake._url_edit.text.return_value = "bad-url"
+                module.ImportModDialog._update_import_state(fake)
+                fake._import_btn.setEnabled.assert_called_with(False)
+                self.assertIn("http(s)", fake._readiness_lbl.setText.call_args.args[0])
+
+    def test_import_accept_rechecks_disappearing_source_and_preserves_metadata(self):
+        with self._import_dialog_module() as (module, box):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                source = Path(tmpdir) / "pack.zip"
+                source.touch()
+                fake = SimpleNamespace(
+                    mod_type=ModType.TEXTURE_PACK,
+                    _src_edit=SimpleNamespace(text=lambda: f" {source} "),
+                    _gameid_edit=SimpleNamespace(text=lambda: " SLUS-20062 "),
+                    _url_edit=SimpleNamespace(text=lambda: " https://example.com/pack "),
+                    _name_edit=SimpleNamespace(text=lambda: " A pack "),
+                    _author_edit=SimpleNamespace(text=lambda: " Creator "),
+                    _version_edit=SimpleNamespace(text=lambda: " 1.0 "),
+                    _desc_edit=SimpleNamespace(toPlainText=lambda: " Description "),
+                    accept=MagicMock(),
+                )
+                module.ImportModDialog._accept(fake)
+                fake.accept.assert_called_once()
+                self.assertEqual(fake.source_path, str(source))
+                self.assertEqual(fake.meta, {
+                    "name": "A pack", "author": "Creator", "version": "1.0",
+                    "game_id": "SLUS-20062", "source_url": "https://example.com/pack",
+                    "description": "Description",
+                })
+                fake.accept.reset_mock()
+                source.unlink()
+                with patch.object(box, "warning", create=True) as warning:
+                    module.ImportModDialog._accept(fake)
+                warning.assert_called_once()
+                self.assertEqual(warning.call_args.args[1], "Missing Source")
+                fake.accept.assert_not_called()
+
+    def test_archive_picker_exposes_rar_files(self):
+        with self._import_dialog_module() as (module, _):
+            fake = SimpleNamespace(mod_type=ModType.TEXTURE_PACK, _last_paths_bucket=lambda: {})
+            with patch.object(module.QFileDialog, "getOpenFileName", return_value=("", ""), create=True) as choose:
+                module.ImportModDialog._choose_archive(fake)
+            self.assertIn("*.rar", choose.call_args.args[3])
+
+    def test_switching_from_archive_to_folder_clears_multipart_hint(self):
+        with self._import_dialog_module() as (module, _):
+            fake = SimpleNamespace(
+                mod_type=ModType.TEXTURE_PACK, _last_paths_bucket=lambda: {},
+                _remember_last_path=MagicMock(), _src_edit=MagicMock(),
+                _name_edit=MagicMock(), _multipart_hint=MagicMock(),
+                _auto_detect_game_id=MagicMock(), _check_replacement_pattern=MagicMock(),
+            )
+            fake._name_edit.text.return_value = "Keep user name"
+            with patch.object(module.QFileDialog, "getExistingDirectory", return_value="/selected/pack", create=True):
+                module.ImportModDialog._choose_folder(fake)
+            fake._multipart_hint.hide.assert_called_once()
+            fake._name_edit.setText.assert_not_called()
+            fake._src_edit.setText.assert_called_once_with("/selected/pack")
+
 
 class TestSettingsDialogSaveFailures(unittest.TestCase):
     """Settings/setup dialogs should log and surface save failures."""
@@ -2579,6 +2672,34 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
                 for call in fake._done_summary.setText.call_args_list
             )
         )
+
+    def test_setup_summary_distinguishes_missing_destinations_from_ready_setup(self):
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            for complete in (False, True):
+                with self.subTest(complete=complete):
+                    config = AppConfig(
+                        textures_path="/textures" if complete else "",
+                        pnach_path="/cheats" if complete else "",
+                        cover_art_path="/covers" if complete else "",
+                        memcards_path="/memcards" if complete else "",
+                        mods_storage_path="/mods",
+                    )
+                    fake = SimpleNamespace(config=config, _done_summary=MagicMock())
+                    SetupWizard._run_automatic_setup(fake)
+                    summary = fake._done_summary.setText.call_args.args[0]
+                    self.assertIn("Mod Storage: /mods", summary)
+                    if complete:
+                        self.assertIn("Memory Cards: /memcards", summary)
+                        self.assertIn("deploy automatically", summary)
+                        self.assertNotIn("Not configured", summary)
+                    else:
+                        self.assertIn("Not configured", summary)
+                        self.assertIn("Settings", summary)
+                        self.assertIn("browse and import", summary)
+                        self.assertNotIn("deploy automatically", summary)
 
 
 class TestWidgetsLogging(unittest.TestCase):
