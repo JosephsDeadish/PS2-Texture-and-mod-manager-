@@ -89,6 +89,8 @@
 - Cover art is automatically renamed to `{SERIAL}.png` (e.g. `SLUS-20062.png`) on deploy — the exact format PCSX2 expects
 - **One cover art per game** — enabling a second cover for the same serial offers to auto-disable the other
 - Download cover art from **GameTDB** (free, by game serial ID)
+- Single and bulk cover downloads keep the dialog responsive, report per-game results, and offer **Stop After Current** / **Retry Remaining** without repeating successful bulk items
+- Closing the cover dialog stops bulk scheduling after the current file; failed downloads leave existing covers intact. Library scans report missing/unreadable folders and can be retried
 
 ### ⚠️ Installed-Content Conflict Review
 - **Resolve Conflicts** in Library or Browse scans configured PCSX2 folders in the background without freezing the dialog

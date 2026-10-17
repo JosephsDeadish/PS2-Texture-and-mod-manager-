@@ -837,6 +837,55 @@ class TestMemoryCard(unittest.TestCase):
 class TestDownloader(unittest.TestCase):
     """Test downloader (mocked network)."""
 
+    def test_cover_serial_normalization_rejects_unsafe_or_malformed_names(self):
+        from src.core.downloader import normalize_cover_serial
+        for value in ("slus20062", " SLUS_20062 ", "SLUS-20062"):
+            self.assertEqual(normalize_cover_serial(value), "SLUS-20062")
+        for value in ("../SLUS-20062", "SLUS-20062/../other", "SLUS-2006", "SLUS-２００６２", ""):
+            self.assertEqual(normalize_cover_serial(value), "")
+
+    def test_cover_fetch_normalizes_endpoint_and_atomically_replaces_file(self):
+        from src.core.downloader import fetch_gametdb_art
+        for region, expected in (("EN", "EN"), ("EU", "EN"), ("JP", "JA"), ("US", "US")):
+            with self.subTest(region=region), tempfile.TemporaryDirectory() as directory:
+                target = Path(directory) / "SLUS-20062.jpg"
+                target.write_bytes(b"old cover")
+
+                def transfer(url, dest, timeout):
+                    self.assertEqual(url, f"https://art.gametdb.com/ps2/cover/{expected}/SLUS20062.jpg")
+                    self.assertEqual(target.read_bytes(), b"old cover")
+                    self.assertNotEqual(Path(dest), target)
+                    Path(dest).write_bytes(b"new cover")
+
+                with patch("src.core.downloader.download_file", side_effect=transfer):
+                    self.assertEqual(fetch_gametdb_art("slus_20062", directory, region), str(target))
+                self.assertEqual(target.read_bytes(), b"new cover")
+                self.assertEqual(list(Path(directory).iterdir()), [target])
+
+    def test_cover_fetch_failure_preserves_existing_file_and_cleans_staging(self):
+        from src.core.downloader import fetch_gametdb_art
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "SLUS-20062.jpg"
+            target.write_bytes(b"old cover")
+
+            def transfer(url, dest, timeout):
+                Path(dest).write_bytes(b"partial")
+                raise OSError("connection lost")
+
+            with patch("src.core.downloader.download_file", side_effect=transfer):
+                with self.assertLogs("src.core.downloader", level="WARNING"):
+                    self.assertIsNone(fetch_gametdb_art("SLUS-20062", directory))
+            self.assertEqual(target.read_bytes(), b"old cover")
+            self.assertEqual(list(Path(directory).iterdir()), [target])
+
+    def test_cover_fetch_rejects_unsafe_serial_and_region_before_network(self):
+        from src.core.downloader import fetch_gametdb_art
+        for serial, region in (("../other", "EN"), ("SLUS-20062", "../US")):
+            with patch("src.core.downloader.download_file") as transfer:
+                with self.assertLogs("src.core.downloader", level="WARNING"):
+                    self.assertIsNone(fetch_gametdb_art(serial, "/unused", region))
+            transfer.assert_not_called()
+
     def test_download_rejects_non_http_scheme(self):
         from src.core.downloader import download_file, DownloadError
         with self.assertRaises(DownloadError):
@@ -8476,6 +8525,188 @@ class TestScraperDialogClassifier(unittest.TestCase):
 
 class TestBrowsePanelStatePersistence(unittest.TestCase):
     """Tests for browse-panel filter state persistence helpers."""
+
+    def _cover_dialog_fixture(self, module):
+        dialog = module.CoverDownloadDialog.__new__(module.CoverDownloadDialog)
+        dialog.config = AppConfig(game_library_path="/library", cover_art_path="/covers")
+        dialog._closed = False
+        dialog._operation = ""
+        dialog._request_id = ""
+        dialog._stop_event = None
+        dialog._retry_serials = []
+        dialog._bulk_library = "/library"
+        dialog._bulk_serials = [("SLUS-20062", "First"), ("SLUS-20063", "Second")]
+        dialog._job_values = {}
+        for name in ("_dl_btn", "_id_edit", "_search_edit", "_suggestions", "_region_combo",
+                     "_bulk_region_combo", "_skip_existing_check", "_bulk_scan_btn",
+                     "_bulk_dl_btn", "_bulk_retry_btn", "_bulk_stop_btn", "_status",
+                     "_bulk_status", "_progress", "_bulk_progress", "_bulk_list", "_lib_lbl",
+                     "destroyed"):
+            setattr(dialog, name, MagicMock())
+        dialog._id_edit.text.return_value = "slus20062"
+        dialog._region_combo.currentText.return_value = "US"
+        dialog._bulk_region_combo.currentText.return_value = "EN"
+        dialog._skip_existing_check.isChecked.return_value = True
+        return dialog
+
+    def test_cover_jobs_capture_values_and_block_duplicate_cross_tab_requests(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult"):
+            dialog._download()
+            dialog._download()
+            dialog._bulk_scan()
+            dialog._bulk_download()
+        thread.assert_called_once()
+        self.assertIs(thread.call_args.kwargs["target"], module._run_cover_job)
+        args = thread.call_args.kwargs["args"]
+        self.assertNotIn(dialog, args)
+        self.assertEqual(args[2], "single")
+        dialog.config.cover_art_path = "/changed"
+        self.assertEqual(args[3], {"serial": "SLUS-20062", "destination": "/covers", "region": "US"})
+        dialog._bulk_scan_btn.setEnabled.assert_called_with(False)
+
+    def test_cover_invalid_serial_or_closed_dialog_does_not_start_worker(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread:
+            dialog._id_edit.text.return_value = "../SLUS-20062"
+            dialog._download()
+            dialog._closed = True
+            dialog._bulk_scan()
+            dialog._bulk_download()
+            dialog._retry_bulk_download()
+        thread.assert_not_called()
+
+    def test_cover_thread_start_failure_restores_controls_and_retry(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult") as relay:
+            thread.return_value.start.side_effect = RuntimeError("no thread")
+            dialog._bulk_download()
+        self.assertEqual(dialog._operation, "")
+        self.assertEqual(dialog._retry_serials, dialog._bulk_serials)
+        dialog._bulk_retry_btn.setEnabled.assert_called_with(True)
+        relay.return_value.deleteLater.assert_called_once()
+
+    def test_cover_scan_worker_deduplicates_normalizes_sorts_and_uses_strict_scan(self):
+        import types
+        import threading
+        module = self._import_browse_panel()
+        games = [types.SimpleNamespace(serial=serial, title=title) for serial, title in
+                 (("slus20062", "Zebra"), ("SLUS-20062", "Duplicate"), ("SLUS-20063", "Alpha"),
+                  ("../escape", "Invalid"), ("", "Unknown"))]
+        relay = MagicMock()
+        with patch("src.core.game_library.scan_library", return_value=games) as scan:
+            module._run_cover_job(relay, "r", "scan", {"library": "/games"}, threading.Event())
+        scan.assert_called_once_with("/games", strict=True)
+        relay.finished.emit.assert_called_once_with(
+            "r", [("SLUS-20063", "Alpha"), ("SLUS-20062", "Zebra")], "")
+        relay.deleteLater.assert_called_once()
+
+    def test_cover_scan_error_reaches_ui_and_allows_retry(self):
+        import threading
+        module = self._import_browse_panel()
+        relay = MagicMock()
+        with patch("src.core.game_library.scan_library", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                module._run_cover_job(relay, "r", "scan", {"library": "/games"}, threading.Event())
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "scan", "r"
+        dialog._job_values = {"library": "/library"}
+        dialog._bulk_serials = []
+        dialog._on_cover_finished(*relay.finished.emit.call_args.args)
+        self.assertIn("denied", dialog._bulk_status.setText.call_args.args[0])
+        dialog._bulk_scan_btn.setEnabled.assert_called_with(True)
+        dialog._bulk_dl_btn.setEnabled.assert_called_with(False)
+
+    def test_cover_scan_rejects_changed_folder_result(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "scan", "r"
+        dialog._job_values = {"library": "/old"}
+        dialog._bulk_serials = []
+        dialog._on_cover_finished("r", [("SLUS-20062", "Game")], "")
+        self.assertEqual(dialog._bulk_serials, [])
+        dialog._bulk_list.addItem.assert_not_called()
+        dialog._start_cover_job = MagicMock()
+        dialog._bulk_download()
+        dialog._bulk_serials = [("SLUS-20062", "Game")]
+        dialog._bulk_library = "/old"
+        dialog._bulk_download()
+        dialog._start_cover_job.assert_not_called()
+
+    def test_cover_bulk_worker_tracks_skips_failures_and_keeps_processing_after_error(self):
+        import threading
+        module = self._import_browse_panel()
+        serials = tuple((f"SLUS-{number}", str(number)) for number in range(20062, 20066))
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "SLUS-20062.jpg").write_bytes(b"existing")
+            relay = MagicMock()
+            with patch("src.core.downloader.fetch_gametdb_art",
+                       side_effect=[OSError("offline"), None, "/saved"]) as fetch:
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    module._run_cover_job(relay, "r", "bulk", {
+                        "serials": serials, "destination": directory,
+                        "region": "EN", "skip_existing": True,
+                    }, threading.Event())
+            self.assertEqual(fetch.call_count, 3)
+        payload = relay.finished.emit.call_args.args[1]
+        self.assertEqual((payload["ok"], payload["skipped"], payload["failed"]), (1, 1, 2))
+        self.assertEqual(payload["remaining"], list(serials[1:3]))
+        self.assertEqual(relay.progress.emit.call_count, 8)
+        relay.deleteLater.assert_called_once()
+
+    def test_cover_stop_finishes_current_and_retries_only_failed_or_unprocessed_serials(self):
+        import threading
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        stop = threading.Event()
+        relay = MagicMock()
+
+        def fetch(*args):
+            stop.set()
+            return "/saved"
+
+        values = {"serials": tuple(dialog._bulk_serials), "destination": "/covers",
+                  "region": "EN", "skip_existing": False}
+        with patch("src.core.downloader.fetch_gametdb_art", side_effect=fetch) as transfer:
+            module._run_cover_job(relay, "r", "bulk", values, stop)
+        transfer.assert_called_once()
+        dialog._operation, dialog._request_id = "bulk", "r"
+        dialog._job_values = values
+        dialog._on_cover_finished(*relay.finished.emit.call_args.args)
+        self.assertEqual(dialog._retry_serials, dialog._bulk_serials[1:])
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult"):
+            dialog._retry_bulk_download()
+        retry_values = thread.call_args.kwargs["args"][3]
+        self.assertEqual(retry_values["serials"], tuple(dialog._bulk_serials[1:]))
+        dialog._retry_serials.clear()
+        self.assertEqual(len(retry_values["serials"]), 1)
+
+    def test_cover_progress_counts_completed_files_and_filters_stale_or_closed_results(self):
+        import threading
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "bulk", "r"
+        dialog._job_values = {"serials": tuple(dialog._bulk_serials)}
+        dialog._stop_event = threading.Event()
+        dialog._on_cover_progress("r", 0, "downloading")
+        dialog._bulk_progress.setValue.assert_called_with(0)
+        dialog._on_cover_progress("r", 0, "downloaded")
+        dialog._bulk_progress.setValue.assert_called_with(1)
+        dialog._stop_bulk_download()
+        dialog._bulk_status.reset_mock()
+        dialog._on_cover_progress("r", 1, "downloading")
+        dialog._bulk_status.setText.assert_not_called()
+        dialog._bulk_progress.reset_mock()
+        dialog._on_cover_progress("old", 0, "downloaded")
+        dialog._on_cover_finished("old", {}, "")
+        self.assertEqual(dialog._operation, "bulk")
+        dialog._closed = True
+        dialog._on_cover_progress("r", 0, "downloaded")
+        dialog._on_cover_finished("r", {}, "")
+        dialog._bulk_progress.setValue.assert_not_called()
 
     def _import_browse_panel(self):
         import importlib

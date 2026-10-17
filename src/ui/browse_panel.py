@@ -990,6 +990,67 @@ class CatalogueCard(QFrame):
 # Cover art download dialog
 # ---------------------------------------------------------------------------
 
+class _CoverDownloadResult(QObject):
+    finished = pyqtSignal(str, object, str)
+    progress = pyqtSignal(str, int, str)
+
+
+def _run_cover_job(result, request_id, operation, values, stop):
+    """Perform cover I/O without retaining any dialog or widget."""
+    from src.core.downloader import fetch_gametdb_art, normalize_cover_serial
+
+    payload = None
+    error = ""
+    try:
+        if operation == "scan":
+            from src.core.game_library import scan_library
+            from src.core.game_registry import lookup_game_title
+            seen = set()
+            payload = []
+            for game in scan_library(values["library"], strict=True):
+                serial = normalize_cover_serial(game.serial or "")
+                if serial and serial not in seen:
+                    seen.add(serial)
+                    payload.append((serial, game.title or lookup_game_title(serial) or serial))
+            payload.sort(key=lambda item: (item[1].casefold(), item[0]))
+        elif operation == "single":
+            payload = fetch_gametdb_art(values["serial"], values["destination"], values["region"])
+        else:
+            ok = skipped = failed = 0
+            remaining = []
+            serials = values["serials"]
+            for index, (serial, title) in enumerate(serials):
+                if stop.is_set():
+                    remaining.extend(serials[index:])
+                    break
+                result.progress.emit(request_id, index, "downloading")
+                try:
+                    if values["skip_existing"] and (Path(values["destination"]) / f"{serial}.jpg").is_file():
+                        skipped += 1
+                        outcome = "skipped, exists"
+                    elif fetch_gametdb_art(serial, values["destination"], values["region"]):
+                        ok += 1
+                        outcome = "downloaded"
+                    else:
+                        failed += 1
+                        remaining.append((serial, title))
+                        outcome = "not found or failed"
+                except Exception as exc:
+                    logger.warning("Could not download cover for %s: %s", serial, exc)
+                    failed += 1
+                    remaining.append((serial, title))
+                    outcome = "not found or failed"
+                result.progress.emit(request_id, index, outcome)
+            payload = {"ok": ok, "skipped": skipped, "failed": failed, "remaining": remaining,
+                       "stopped": stop.is_set()}
+    except Exception as exc:
+        logger.warning("Cover %s failed: %s", operation, exc)
+        error = str(exc) or type(exc).__name__
+    finally:
+        result.finished.emit(request_id, payload, error)
+        result.deleteLater()
+
+
 class CoverDownloadDialog(QDialog):
     """Download PS2 cover art from GameTDB by game serial or game title.
 
@@ -1003,6 +1064,13 @@ class CoverDownloadDialog(QDialog):
     def __init__(self, config: AppConfig, parent=None, initial_serial: str = ""):
         super().__init__(parent)
         self.config = config
+        self._closed = False
+        self._operation = ""
+        self._request_id = ""
+        self._stop_event = None
+        self._retry_serials = []
+        self._bulk_library = ""
+        self._job_values = {}
         self.setWindowTitle("Download Cover Art")
         self.setMinimumWidth(560)
         self.setMinimumHeight(480)
@@ -1094,6 +1162,7 @@ class CoverDownloadDialog(QDialog):
 
         # Status + progress
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
         single_layout.addWidget(self._status)
 
@@ -1112,6 +1181,7 @@ class CoverDownloadDialog(QDialog):
         btns.addWidget(self._dl_btn)
         close_btn1 = QPushButton("Close")
         close_btn1.clicked.connect(self.reject)
+        close_btn1.setAutoDefault(False)
         btns.addWidget(close_btn1)
         single_layout.addLayout(btns)
 
@@ -1135,8 +1205,9 @@ class CoverDownloadDialog(QDialog):
         lib_row = QHBoxLayout()
         lib_row.addWidget(QLabel("Library folder:"))
         self._lib_lbl = QLabel(
-            self.config.game_library_path or "<i>not configured — set in Settings</i>"
+            self.config.game_library_path or "Not configured — set in Settings"
         )
+        self._lib_lbl.setTextFormat(Qt.TextFormat.PlainText)
         self._lib_lbl.setWordWrap(True)
         self._lib_lbl.setStyleSheet("color: #8090b0; font-size: 11px;")
         lib_row.addWidget(self._lib_lbl, 1)
@@ -1161,6 +1232,7 @@ class CoverDownloadDialog(QDialog):
         bulk_layout.addWidget(self._bulk_list, 1)
 
         self._bulk_status = QLabel("")
+        self._bulk_status.setTextFormat(Qt.TextFormat.PlainText)
         self._bulk_status.setWordWrap(True)
         bulk_layout.addWidget(self._bulk_status)
 
@@ -1178,8 +1250,17 @@ class CoverDownloadDialog(QDialog):
         self._bulk_dl_btn.setEnabled(False)
         self._bulk_dl_btn.clicked.connect(self._bulk_download)
         bulk_btns.addWidget(self._bulk_dl_btn)
+        self._bulk_retry_btn = QPushButton("Retry Remaining")
+        self._bulk_retry_btn.setEnabled(False)
+        self._bulk_retry_btn.clicked.connect(self._retry_bulk_download)
+        bulk_btns.addWidget(self._bulk_retry_btn)
+        self._bulk_stop_btn = QPushButton("Stop After Current")
+        self._bulk_stop_btn.setEnabled(False)
+        self._bulk_stop_btn.clicked.connect(self._stop_bulk_download)
+        bulk_layout.addWidget(self._bulk_stop_btn)
         close_btn2 = QPushButton("Close")
         close_btn2.clicked.connect(self.reject)
+        close_btn2.setAutoDefault(False)
         bulk_btns.addWidget(close_btn2)
         bulk_layout.addLayout(bulk_btns)
 
@@ -1189,6 +1270,9 @@ class CoverDownloadDialog(QDialog):
         self._title_to_serials = title_to_serials
         # Cache for bulk scan results: list of (serial, display_name)
         self._bulk_serials: list = []
+        for button in (self._dl_btn, self._bulk_scan_btn, self._bulk_dl_btn,
+                       self._bulk_retry_btn, self._bulk_stop_btn):
+            button.setAutoDefault(False)
 
     def _cover_state_bucket(self) -> dict:
         return ui_state_bucket(self.config, _COVER_DOWNLOAD_STATE_KEY)
@@ -1298,11 +1382,8 @@ class CoverDownloadDialog(QDialog):
         self._suggestions.hide()
         if hasattr(self, "_status"):
             self._status.setText(
-                f"Serial set to <b>{serial}</b> — click Download to fetch cover art."
+                f"Serial set to {serial} — click Download to fetch cover art."
             )
-            rich_text = getattr(getattr(Qt, "TextFormat", None), "RichText", None)
-            if rich_text is not None and hasattr(self._status, "setTextFormat"):
-                self._status.setTextFormat(rich_text)
 
     def _on_search_changed(self, text: str):
         """Populate the suggestions list from the game registry."""
@@ -1336,29 +1417,20 @@ class CoverDownloadDialog(QDialog):
     # ------------------------------------------------------------------
 
     def _download(self):
-        from src.core.downloader import fetch_gametdb_art
-        game_id = self._id_edit.text().strip()
-        if not game_id:
-            self._status.setText("⚠  Please enter a Game ID or search by name above")
+        from src.core.downloader import normalize_cover_serial
+        if self._closed or self._operation:
             return
-        dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
-        region = self._region_combo.currentText()
-        self._dl_btn.setEnabled(False)
+        game_id = normalize_cover_serial(self._id_edit.text())
+        if not game_id:
+            self._status.setText("⚠  Enter a serial such as SLUS-20062, or search by name above.")
+            return
+        self._id_edit.setText(game_id)
         self._progress.show()
         self._status.setText(f"Downloading cover for {game_id}…")
-
-        def _run():
-            path = fetch_gametdb_art(game_id, dest_dir, region)
-            msg = f"✅  Saved to: {path}" if path else "❌  Cover not found or download failed."
-
-            def _done():
-                self._status.setText(msg)
-                self._dl_btn.setEnabled(True)
-                self._progress.hide()
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._start_cover_job("single", {
+            "serial": game_id, "destination": self.config.cover_art_path or str(THUMBNAILS_DIR),
+            "region": self._region_combo.currentText(),
+        })
 
     # ------------------------------------------------------------------
     # Bulk download helpers
@@ -1366,9 +1438,8 @@ class CoverDownloadDialog(QDialog):
 
     def _bulk_scan(self):
         """Scan the game library and populate the list with found serials."""
-        from src.core.game_library import scan_library
-        from src.core.game_registry import lookup_game_title
-
+        if self._closed or self._operation:
+            return
         lib_path = self.config.game_library_path or ""
         if not lib_path:
             self._bulk_status.setText(
@@ -1376,135 +1447,132 @@ class CoverDownloadDialog(QDialog):
             )
             return
 
-        self._bulk_scan_btn.setEnabled(False)
         self._bulk_status.setText("Scanning library…")
         self._bulk_list.clear()
         self._bulk_serials = []
-
-        def _run():
-            try:
-                games = scan_library(lib_path)
-            except Exception as exc:
-                logger.warning("Could not scan game library for browse bulk download: %s", exc)
-                err = str(exc)
-
-                def _err():
-                    self._bulk_status.setText(f"❌  Scan failed: {err}")
-                    self._bulk_scan_btn.setEnabled(True)
-
-                QTimer.singleShot(0, _err)
-                return
-
-            seen: set = set()
-            results = []
-            for g in games:
-                serial = g.serial or ""
-                if not serial or serial in seen:
-                    continue
-                seen.add(serial)
-                title = g.title or lookup_game_title(serial) or serial
-                results.append((serial, title))
-
-            self._bulk_serials = results
-
-            def _update():
-                self._bulk_list.clear()
-                if not results:
-                    item = QListWidgetItem("No games with recognisable serials found.")
-                    item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
-                    self._bulk_list.addItem(item)
-                    self._bulk_dl_btn.setEnabled(False)
-                else:
-                    for serial, title in results:
-                        self._bulk_list.addItem(f"{serial}  —  {title}")
-                    self._bulk_dl_btn.setEnabled(True)
-
-                self._bulk_status.setText(
-                    f"Found {len(results)} game(s) with recognised serials."
-                )
-                self._bulk_scan_btn.setEnabled(True)
-
-            QTimer.singleShot(0, _update)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._retry_serials = []
+        self._bulk_library = lib_path
+        self._lib_lbl.setText(lib_path)
+        self._start_cover_job("scan", {"library": lib_path})
 
     def _bulk_download(self):
         """Download covers for all serials found by the last scan."""
-        from src.core.downloader import fetch_gametdb_art
-        from pathlib import Path as _Path
+        self._begin_bulk_download(self._bulk_serials)
 
-        if not self._bulk_serials:
+    def _retry_bulk_download(self):
+        self._begin_bulk_download(self._retry_serials)
+
+    def _begin_bulk_download(self, serials):
+        if self._closed or self._operation or not serials:
             return
-
-        dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
-        region = self._bulk_region_combo.currentText()
-        skip_existing = self._skip_existing_check.isChecked()
-        total = len(self._bulk_serials)
-
-        self._bulk_dl_btn.setEnabled(False)
-        self._bulk_scan_btn.setEnabled(False)
+        if self._bulk_library != (self.config.game_library_path or ""):
+            self._bulk_status.setText("Library folder changed. Scan Library again before downloading.")
+            return
+        serials = tuple(serials)
+        self._bulk_list.clear()
+        for serial, title in serials:
+            self._bulk_list.addItem(f"{serial}  —  {title}")
         self._bulk_progress.setValue(0)
-        self._bulk_progress.setRange(0, total)
+        self._bulk_progress.setRange(0, len(serials))
         self._bulk_progress.show()
+        self._bulk_status.setText(f"Starting {len(serials)} cover download(s)…")
+        self._start_cover_job("bulk", {
+            "serials": serials, "destination": self.config.cover_art_path or str(THUMBNAILS_DIR),
+            "region": self._bulk_region_combo.currentText(),
+            "skip_existing": self._skip_existing_check.isChecked(),
+        })
 
-        def _run():
-            ok = 0
-            skipped = 0
-            failed = 0
-            for i, (serial, title) in enumerate(self._bulk_serials, 1):
-                def _set_progress(idx=i, ser=serial, ttl=title):
-                    self._bulk_status.setText(
-                        f"Downloading {idx}/{total}: {ser} — {ttl}…"
-                    )
-                    self._bulk_progress.setValue(idx)
+    def _start_cover_job(self, operation, values):
+        self._operation = operation
+        self._job_values = values
+        self._stop_event = threading.Event()
+        self.destroyed.connect(lambda _obj=None, stop=self._stop_event: stop.set())
+        self._request_id = request_id = uuid.uuid4().hex
+        result = _CoverDownloadResult()
+        result.finished.connect(self._on_cover_finished)
+        result.progress.connect(self._on_cover_progress)
+        self._update_cover_controls()
+        try:
+            threading.Thread(target=_run_cover_job,
+                             args=(result, request_id, operation, values, self._stop_event),
+                             daemon=True).start()
+        except RuntimeError as exc:
+            result.deleteLater()
+            self._on_cover_finished(request_id, None, str(exc))
 
-                QTimer.singleShot(0, _set_progress)
+    def _update_cover_controls(self):
+        busy = bool(self._operation)
+        for widget in (self._dl_btn, self._id_edit, self._search_edit, self._suggestions,
+                       self._region_combo, self._bulk_region_combo, self._skip_existing_check,
+                       self._bulk_scan_btn):
+            widget.setEnabled(not busy)
+        self._bulk_dl_btn.setEnabled(not busy and bool(self._bulk_serials))
+        self._bulk_retry_btn.setEnabled(not busy and bool(self._retry_serials))
+        self._bulk_stop_btn.setEnabled(self._operation == "bulk")
 
-                dest_file = _Path(dest_dir) / f"{serial}.jpg"
-                if skip_existing and dest_file.exists():
-                    skipped += 1
+    def _stop_bulk_download(self):
+        if self._operation == "bulk":
+            self._stop_event.set()
+            self._bulk_stop_btn.setEnabled(False)
+            self._bulk_status.setText("Stopping after the current file; remaining games can be retried.")
 
-                    def _skip(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"⏭  {ser}  —  {ttl}  (skipped, exists)")
+    @pyqtSlot(str, int, str)
+    def _on_cover_progress(self, request_id, index, outcome):
+        if self._closed or self._operation != "bulk" or request_id != self._request_id:
+            return
+        serials = self._job_values["serials"]
+        serial, title = serials[index]
+        item = self._bulk_list.item(index)
+        if item:
+            item.setText(f"{serial}  —  {title}  ({outcome})")
+        self._bulk_progress.setValue(index if outcome == "downloading" else index + 1)
+        if not self._stop_event.is_set():
+            self._bulk_status.setText(f"{index + 1}/{len(serials)}: {serial} — {outcome}")
 
-                    QTimer.singleShot(0, _skip)
-                    continue
-
-                path = fetch_gametdb_art(serial, dest_dir, region)
-                if path:
-                    ok += 1
-
-                    def _ok(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"✅  {ser}  —  {ttl}")
-
-                    QTimer.singleShot(0, _ok)
-                else:
-                    failed += 1
-
-                    def _fail(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"❌  {ser}  —  {ttl}  (not found)")
-
-                    QTimer.singleShot(0, _fail)
-
-            ok_final, skipped_final, failed_final = ok, skipped, failed
-
-            def _done():
+    @pyqtSlot(str, object, str)
+    def _on_cover_finished(self, request_id, payload, error):
+        if self._closed or not self._operation or request_id != self._request_id:
+            return
+        operation, values = self._operation, self._job_values
+        self._operation = ""
+        self._progress.hide()
+        self._bulk_progress.hide()
+        if operation == "single":
+            self._status.setText(
+                f"✅  Saved to: {payload}" if payload and not error else
+                f"❌  {error or 'Cover not found or download failed.'} Try another region or retry."
+            )
+        elif operation == "scan":
+            if values["library"] != (self.config.game_library_path or ""):
+                self._bulk_status.setText("Library folder changed. Scan Library again.")
+            elif error:
+                self._bulk_status.setText(f"❌  Scan failed: {error}\nCheck the folder and retry Scan Library.")
+            else:
+                self._bulk_serials = list(payload)
+                for serial, title in payload:
+                    self._bulk_list.addItem(f"{serial}  —  {title}")
                 self._bulk_status.setText(
-                    f"Done — {ok_final} downloaded, {skipped_final} skipped, {failed_final} not found."
+                    f"Found {len(payload)} game(s) with recognised serials." if payload else
+                    "No games with recognisable serials found. Check filenames or use Single Download."
                 )
-                self._bulk_progress.hide()
-                self._bulk_dl_btn.setEnabled(True)
-                self._bulk_scan_btn.setEnabled(True)
+        elif error:
+            self._retry_serials = list(values["serials"])
+            self._bulk_status.setText(f"❌  Could not start/finish downloads: {error}\nRetry Remaining to try again.")
+        else:
+            self._retry_serials = list(payload["remaining"])
+            self._bulk_status.setText(
+                f"{'Stopped' if payload['stopped'] else 'Done'} — {payload['ok']} downloaded, "
+                f"{payload['skipped']} skipped, {payload['failed']} failed/not found. "
+                f"{len(self._retry_serials)} remaining."
+            )
+        self._update_cover_controls()
 
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    def done(self, result):
+        self._closed = True
+        if self._stop_event is not None:
+            self._stop_event.set()
+        self._save_state(context="closing cover download dialog")
+        super().done(result)
 
 
 # ---------------------------------------------------------------------------

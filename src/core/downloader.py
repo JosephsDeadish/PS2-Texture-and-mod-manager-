@@ -9,6 +9,7 @@ import logging
 import json
 import os
 import re
+import tempfile
 import threading
 import urllib.parse
 from pathlib import Path
@@ -238,6 +239,12 @@ class AsyncDownloader:
         return self._thread is not None and self._thread.is_alive()
 
 
+def normalize_cover_serial(game_id: str) -> str:
+    """Return a filename-safe, dashed disc serial, or an empty string."""
+    match = re.fullmatch(r"([A-Z]{4})[-_]?([0-9]{5})", game_id.strip().upper())
+    return f"{match[1]}-{match[2]}" if match else ""
+
+
 def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Optional[str]:
     """
     Download cover art from GameTDB (https://www.gametdb.com) for *game_id*.
@@ -245,10 +252,20 @@ def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Option
     beyond what is publicly hosted by the service.
     Returns local path or None on failure.
     """
-    url = f"https://art.gametdb.com/ps2/cover/{region}/{game_id}.jpg"
-    dest = str(Path(dest_dir) / f"{game_id}.jpg")
     try:
-        download_file(url, dest, timeout=10)
+        serial = normalize_cover_serial(game_id)
+        region = {"JP": "JA", "EU": "EN"}.get(region.upper(), region.upper())
+        if not serial or region not in ("EN", "US", "JA", "KO", "ZHCN"):
+            raise ValueError("Invalid cover serial or region")
+        url = f"https://art.gametdb.com/ps2/cover/{region}/{serial.replace('-', '')}.jpg"
+        directory = Path(dest_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        dest = str(directory / f"{serial}.jpg")
+        # Stage beside the destination so failure cannot truncate an existing cover.
+        with tempfile.TemporaryDirectory(prefix=".ps2mm_cover_", dir=directory) as staging:
+            staged = str(Path(staging) / f"{serial}.jpg")
+            download_file(url, staged, timeout=10)
+            os.replace(staged, dest)
         return dest
     except DownloadError as exc:
         logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
