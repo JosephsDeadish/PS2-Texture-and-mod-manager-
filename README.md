@@ -106,6 +106,9 @@
 
 ### 💾 Memory Card & Save File Manager
 - Browse all `.ps2` / `.mcd` memory card images
+- Inspect the selected save's directory ID and listed size; copy the ID without opening a dialog
+- Export the selected save, only the search results (**Export Shown**), or every save including hidden results (**Export All Saves**). Existing dumps are never overwritten; export results include copyable details of successes and failures
+- Exports are best-effort raw page dumps of up to 64 KiB, not complete save archives. Use **Backup Card** for a full card image or mymc for compatible save archives
 - List and export individual saves
 - **Import** a save dump back into a memory card
 - **Copy** a save between memory card images

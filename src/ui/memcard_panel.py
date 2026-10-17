@@ -63,6 +63,8 @@ class MemoryCardPanel(BasePanel):
         self.config = config
         self._current_card: str = ""
         self._all_saves = []
+        self._shown_saves = []
+        self._export_busy = False
         self._card_exists = False
         self._card_valid = False
         self._filter_timer = QTimer(self)
@@ -267,11 +269,40 @@ class MemoryCardPanel(BasePanel):
     def _update_save_actions(self):
         item = self._saves_list.currentItem()
         selected = bool(item and item.data(Qt.ItemDataRole.UserRole))
-        self._export_btn.setEnabled(self._card_valid and selected)
+        self._export_btn.setEnabled(self._card_valid and selected and not self._export_busy)
         self._copy_btn.setEnabled(self._card_valid and selected)
+        self._copy_id_btn.setEnabled(self._card_valid and selected)
         self._import_btn.setEnabled(self._card_valid)
-        self._export_all_btn.setEnabled(self._card_valid and bool(self._all_saves))
+        self._export_all_btn.setEnabled(self._card_valid and bool(self._all_saves) and not self._export_busy)
+        self._export_shown_btn.setEnabled(self._card_valid and bool(self._shown_saves) and not self._export_busy)
+        self._export_shown_btn.setText(f"Export Shown ({len(self._shown_saves)})")
         self._backup_btn.setEnabled(self._card_exists)
+        save = self._selected_save()
+        self._selected_save_info.setText(
+            f"{save.name}\nDirectory ID: {save.dir_name}\nListed size: {save.size_bytes:,} bytes"
+            if save else "Select a save to see its directory ID and listed size."
+        )
+
+    def _selected_save(self):
+        item = self._saves_list.currentItem()
+        directory = item.data(Qt.ItemDataRole.UserRole) if item else None
+        return next((save for save in self._all_saves if save.dir_name == directory), None)
+
+    def _copy_save_id(self):
+        save = self._selected_save() if self._card_valid else None
+        if save is None:
+            return
+        try:
+            from PyQt6.QtWidgets import QApplication
+            clipboard = QApplication.clipboard()
+            if clipboard is None:
+                raise RuntimeError("clipboard unavailable")
+            clipboard.setText(save.dir_name)
+        except Exception as exc:
+            logger.warning("Could not copy memory card save directory ID: %s", exc)
+            self.emit_status("Could not copy the save directory ID.")
+            return
+        self.emit_status("Copied save directory ID.")
 
     def _show_saves_empty(self, message, action, label):
         self._saves_empty_message.setText(message)
@@ -325,6 +356,7 @@ class MemoryCardPanel(BasePanel):
             saves = _filter_saves(
                 self._all_saves, self._search_edit.text(), self._sort_combo.currentText(),
             )
+            self._shown_saves = saves
             total = len(self._all_saves)
             self._saves_summary.setText(
                 f"Showing {len(saves)} of {total} saves · "
@@ -464,6 +496,7 @@ class MemoryCardPanel(BasePanel):
 
         self._saves_list = QListWidget()
         self._saves_list.setWordWrap(True)
+        self._saves_list.setAccessibleName("Memory card saves")
         self._saves_list.setStyleSheet(
             "QListWidget { background: #0f1830; border-radius: 6px; }"
             "QListWidget::item { padding: 8px; color: #e0e0e0; }"
@@ -474,6 +507,15 @@ class MemoryCardPanel(BasePanel):
             save_selection_changed.connect(self._on_save_selected)
         right_layout.addWidget(self._saves_list, 1)
         self._set_saves_placeholder_visible(True)
+
+        self._selected_save_info = QLabel("Select a save to see its directory ID and listed size.")
+        self._selected_save_info.setWordWrap(True)
+        self._selected_save_info.setTextFormat(Qt.TextFormat.PlainText)
+        self._selected_save_info.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        right_layout.addWidget(self._selected_save_info)
+        self._copy_id_btn = QPushButton("Copy Directory ID")
+        self._copy_id_btn.clicked.connect(self._copy_save_id)
+        right_layout.addWidget(self._copy_id_btn)
 
         save_actions = QHBoxLayout()
         export_btn = QPushButton("📤 Export Selected")
@@ -489,6 +531,17 @@ class MemoryCardPanel(BasePanel):
 
         save_actions.addStretch()
         right_layout.addLayout(save_actions)
+
+        self._export_shown_btn = QPushButton("Export Shown (0)")
+        self._export_shown_btn.setToolTip("Export only saves matching the current search; existing dumps are never overwritten")
+        self._export_shown_btn.clicked.connect(self._export_shown)
+        right_layout.addWidget(self._export_shown_btn)
+        export_hint = QLabel(
+            "Exports are best-effort raw page dumps (up to 64 KiB), not full save archives. "
+            "Use Backup Card for a complete image or mymc for compatible save archives."
+        )
+        export_hint.setWordWrap(True)
+        right_layout.addWidget(export_hint)
 
         import_btn = QPushButton("📥 Import Save")
         self._import_btn = import_btn
@@ -569,6 +622,7 @@ class MemoryCardPanel(BasePanel):
     def _load_saves(self):
         self._saves_loading = True
         self._all_saves = []
+        self._shown_saves = []
         self._card_exists = False
         self._card_valid = False
         self._saves_summary.setText("")
@@ -672,67 +726,64 @@ class MemoryCardPanel(BasePanel):
             QMessageBox.critical(self, "Error", str(exc))
 
     def _export_selected(self):
-        item = self._saves_list.currentItem()
-        if not item:
+        save = self._selected_save()
+        if save is None:
             QMessageBox.information(self, "No Selection", "Please select a save to export.")
             return
+        self._export_saves("Selected Save", [save])
 
-        save_name = item.data(Qt.ItemDataRole.UserRole)
-        if not save_name:
-            return
-
-        last_paths = self._last_paths_bucket()
-        dest = QFileDialog.getExistingDirectory(
-            self,
-            "Export Save To…",
-            last_paths.get("memcard_export_dir", ""),
-        )
-        if not dest:
-            return
-        self._remember_last_path("memcard_export_dir", dest)
-
-        try:
-            path = export_save(self._current_card, save_name, dest)
-            QMessageBox.information(
-                self, "Export Complete", f"Save exported to:\n{path}"
-            )
-        except MemoryCardError as exc:
-            QMessageBox.critical(self, "Export Error", str(exc))
+    def _export_shown(self):
+        if self._filter_timer.isActive():
+            self._on_save_filter_changed()
+        self._export_saves("Shown Saves", self._shown_saves)
 
     def _export_all(self):
-        if not self._current_card:
-            QMessageBox.information(self, "No Card", "Please select a memory card first.")
-            return
+        self._export_saves("All Saves (including hidden)", self._all_saves)
 
-        last_paths = self._last_paths_bucket()
-        dest = QFileDialog.getExistingDirectory(
-            self,
-            "Export All Saves To…",
-            last_paths.get("memcard_export_dir", ""),
-        )
-        if not dest:
+    def _export_saves(self, scope, saves):
+        if self._export_busy or not self._current_card or not self._card_valid:
             return
-        self._remember_last_path("memcard_export_dir", dest)
-
+        card = self._current_card
+        # Freeze identity before the native folder chooser runs its event loop.
+        snapshot = tuple({save.dir_name: save.name for save in saves}.items())
+        if not snapshot:
+            return
+        self._export_busy = True
+        self._update_save_actions()
         try:
-            saves = list_saves(self._current_card)
-        except MemoryCardError as exc:
-            QMessageBox.critical(self, "Error", str(exc))
-            return
-
-        errors = []
-        for save in saves:
-            try:
-                export_save(self._current_card, save.dir_name, dest)
-            except MemoryCardError as exc:
-                errors.append(f"{save.name}: {exc}")
-
-        msg = f"Exported {len(saves) - len(errors)} save(s) to {dest}"
-        if errors:
-            msg += "\n\nErrors:\n" + "\n".join(errors)
-            QMessageBox.warning(self, "Export Complete with Errors", msg)
-        else:
-            QMessageBox.information(self, "Export Complete", msg)
+            dest = QFileDialog.getExistingDirectory(
+                self, f"Export {scope} — {len(snapshot)} save(s)",
+                self._last_paths_bucket().get("memcard_export_dir", ""),
+            )
+            if not dest:
+                return
+            self._remember_last_path("memcard_export_dir", dest)
+            errors = []
+            paths = []
+            for directory, name in snapshot:
+                try:
+                    paths.append(export_save(card, directory, dest, overwrite=False))
+                except MemoryCardError as exc:
+                    errors.append(f"{name} [{directory}]: {exc}")
+            summary = (
+                f"{scope}: exported {len(paths)} of {len(snapshot)} save(s).\n"
+                f"Source card: {card}\nDestination: {dest}\n\n"
+                "Existing files were not overwritten. The source card was not modified.\n"
+                "These are best-effort raw page dumps, not full save archives."
+            )
+            result = QMessageBox(self)
+            result.setWindowTitle("Export Results")
+            result.setTextFormat(Qt.TextFormat.PlainText)
+            result.setText(summary)
+            result.setIcon(QMessageBox.Icon.Warning if errors else QMessageBox.Icon.Information)
+            result.setDetailedText(
+                "\n".join(["Exported:", *paths, "", "Not exported:", *errors])
+            )
+            result.exec()
+            self.emit_status(f"{scope}: exported {len(paths)}/{len(snapshot)} saves.")
+        finally:
+            self._export_busy = False
+            self._update_save_actions()
 
     # ------------------------------------------------------------------
     # Backup card

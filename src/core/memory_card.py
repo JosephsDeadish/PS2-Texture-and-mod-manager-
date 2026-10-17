@@ -129,14 +129,27 @@ def list_saves(memcard_path: str) -> List[SaveEntry]:
     return saves
 
 
-def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
+def export_save(
+    memcard_path: str, save_name: str, dest_dir: str, *, overwrite: bool = True,
+) -> str:
     """
     Export a save directory from a memory card to *dest_dir*.
     Returns the path of the exported file.
 
     This creates a raw binary dump of the relevant pages.
     For full compatibility, use mymc (GPL-2.0) as an external tool.
+    Set *overwrite* to False to create a new dump without replacing existing files.
     """
+    if (
+        not isinstance(save_name, str) or not save_name
+        or save_name.endswith((".", " "))
+        or any(ord(char) < 32 or char in '<>:"/\\|?*' for char in save_name)
+        or save_name.split(".")[0].upper() in (
+            "CON", "PRN", "AUX", "NUL",
+            *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10)),
+        )
+    ):
+        raise MemoryCardError("Save directory ID is not a safe export filename")
     dest = Path(dest_dir)
     try:
         dest.mkdir(parents=True, exist_ok=True)
@@ -144,8 +157,16 @@ def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
         logger.warning("Could not create export directory %s: %s", dest_dir, exc)
         raise MemoryCardError(f"Export failed: {exc}") from exc
     out_path = dest / f"{save_name}.bin"
+    created = False
 
     try:
+        if out_path.resolve().parent != dest.resolve():
+            raise MemoryCardError("Export path escapes the destination folder")
+        if (
+            out_path.resolve() == Path(memcard_path).resolve()
+            or (out_path.exists() and out_path.samefile(memcard_path))
+        ):
+            raise MemoryCardError("Cannot export over the source memory card")
         with open(memcard_path, "rb") as f:
             data = f.read()
 
@@ -158,7 +179,8 @@ def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
         page_start = (start // MC_PAGE_SIZE) * MC_PAGE_SIZE
         chunk = data[page_start : page_start + 64 * 1024]
 
-        with open(out_path, "wb") as f:
+        with open(out_path, "wb" if overwrite else "xb") as f:
+            created = True
             f.write(chunk)
 
         return str(out_path)
@@ -170,10 +192,11 @@ def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
             dest_dir,
             exc,
         )
-        try:
-            out_path.unlink(missing_ok=True)
-        except OSError as cleanup_exc:
-            logger.warning("Could not remove partial export %s: %s", out_path, cleanup_exc)
+        if created:
+            try:
+                out_path.unlink(missing_ok=True)
+            except OSError as cleanup_exc:
+                logger.warning("Could not remove partial export %s: %s", out_path, cleanup_exc)
         raise MemoryCardError(f"Export failed: {exc}") from exc
 
 

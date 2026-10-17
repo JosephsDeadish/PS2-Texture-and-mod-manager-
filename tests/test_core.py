@@ -638,6 +638,115 @@ class TestMemoryCard(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
+    def test_export_save_preserves_default_replacement_and_raw_dump_format(self):
+        from src.core.memory_card import export_save
+        card = Path(self.tmpdir) / "card.ps2"
+        payload = b"\x00" * 512 + b"SAVE" + b"x" * 70000
+        card.write_bytes(payload)
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"old export")
+        self.assertEqual(export_save(str(card), "SAVE", self.tmpdir), str(output))
+        self.assertEqual(output.read_bytes(), payload[512:512 + 65536])
+        self.assertEqual(card.read_bytes(), payload)
+
+    def test_export_save_exclusive_mode_preserves_existing_dump(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE" + b"x" * 1024)
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"keep this export")
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertEqual(output.read_bytes(), b"keep this export")
+
+    def test_export_save_exclusive_mode_creates_dump(self):
+        from src.core.memory_card import export_save
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE" + b"x" * 1024)
+        output = Path(export_save(str(card), "SAVE", self.tmpdir, overwrite=False))
+        self.assertEqual(output.read_bytes(), card.read_bytes())
+
+    def test_export_save_rejects_unsafe_cross_platform_filenames(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        destination = Path(self.tmpdir) / "exports"
+        for name in ("", ".", "..", "../outside", "/outside", r"..\outside",
+                     r"C:\outside", "a:b", "a\x00b", "a\nb", "trailing.",
+                     "trailing ", "NUL", "con.txt", "COM1", "LPT9"):
+            with self.subTest(name=name), self.assertRaises(MemoryCardError):
+                export_save("/missing.ps2", name, str(destination), overwrite=False)
+        self.assertFalse(destination.exists())
+
+    def test_export_save_rejects_symlink_outside_destination(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        destination = Path(self.tmpdir) / "exports"
+        destination.mkdir()
+        outside = Path(self.tmpdir) / "outside.bin"
+        outside.write_bytes(b"keep")
+        (destination / "SAVE.bin").symlink_to(outside)
+        with self.assertRaises(MemoryCardError):
+            export_save("/missing.ps2", "SAVE", str(destination))
+        self.assertEqual(outside.read_bytes(), b"keep")
+        self.assertTrue((destination / "SAVE.bin").is_symlink())
+
+    def test_export_save_exclusive_mode_preserves_dangling_symlink(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        target = Path(self.tmpdir) / "missing.bin"
+        output.symlink_to(target)
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertTrue(output.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_export_save_never_overwrites_source_or_hardlink(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "SAVE.bin"
+        card.write_bytes(b"SAVE")
+        with self.assertRaises(MemoryCardError):
+            export_save(str(card), "SAVE", self.tmpdir)
+        alias = Path(self.tmpdir) / "ALIAS.bin"
+        alias.hardlink_to(card)
+        with self.assertRaises(MemoryCardError):
+            export_save(str(card), "ALIAS", self.tmpdir)
+        self.assertEqual(card.read_bytes(), b"SAVE")
+        self.assertEqual(alias.read_bytes(), b"SAVE")
+
+    def test_export_save_read_failure_does_not_remove_existing_output(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"keep")
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(Path(self.tmpdir) / "missing.ps2"), "SAVE", self.tmpdir)
+        self.assertEqual(output.read_bytes(), b"keep")
+
+    def test_export_save_removes_only_new_partial_output_on_write_failure(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        real_open = open
+
+        def failing_write(path, mode):
+            handle = real_open(path, mode)
+            if mode == "xb":
+                handle.close()
+                broken = MagicMock()
+                broken.__enter__.return_value.write.side_effect = OSError("disk full")
+                return broken
+            return handle
+
+        with patch("builtins.open", side_effect=failing_write):
+            with self.assertLogs("src.core.memory_card", level="WARNING"):
+                with self.assertRaises(MemoryCardError):
+                    export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertFalse(output.exists())
+        self.assertEqual(card.read_bytes(), b"SAVE")
+
     def test_is_valid_memcard_returns_false_for_nonexistent(self):
         from src.core.memory_card import is_valid_memcard
         self.assertFalse(is_valid_memcard("/nonexistent/file.ps2"))
@@ -11353,6 +11462,8 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel.config = AppConfig()
         panel._current_card = ""
         panel._all_saves = []
+        panel._shown_saves = []
+        panel._export_busy = False
         panel._card_exists = False
         panel._card_valid = False
         panel._filter_timer = MagicMock()
@@ -11363,7 +11474,8 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel._sort_combo.currentText.return_value = "Card order"
         for name in ("_export_btn", "_copy_btn", "_import_btn", "_export_all_btn",
                      "_backup_btn", "_saves_summary", "_saves_empty_message",
-                     "_saves_empty_action", "_saves_empty_state", "_info_lbl"):
+                     "_saves_empty_action", "_saves_empty_state", "_info_lbl",
+                     "_export_shown_btn", "_selected_save_info", "_copy_id_btn"):
             setattr(panel, name, MagicMock())
         panel._saves_list = MagicMock()
         panel._saves_list.currentItem.return_value = None
@@ -11413,6 +11525,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         qtcore.Qt = types.SimpleNamespace(
             ItemDataRole=types.SimpleNamespace(UserRole=object()),
             GlobalColor=types.SimpleNamespace(gray=object()),
+            TextFormat=types.SimpleNamespace(PlainText=object()),
         )
         qtcore.QTimer = type("QTimer", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
@@ -11789,6 +11902,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         panel._apply_save_filters.assert_called_once()
 
     def test_save_actions_follow_card_readiness_and_selection(self):
+        from src.core.memory_card import SaveEntry
         module = self._import_memcard_panel()
         panel = self._make_panel(module)
         for exists, valid, selected, has_saves in (
@@ -11798,7 +11912,8 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         ):
             with self.subTest(exists=exists, valid=valid, selected=selected, has_saves=has_saves):
                 panel._card_exists, panel._card_valid = exists, valid
-                panel._all_saves = [object()] if has_saves else []
+                panel._all_saves = [SaveEntry("Save", "SAVE", 512)] if has_saves else []
+                panel._shown_saves = panel._all_saves[:]
                 panel._saves_list.currentItem.return_value = (
                     SimpleNamespace(data=lambda role: "SAVE") if selected else None
                 )
@@ -11808,6 +11923,171 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
                 panel._export_all_btn.setEnabled.assert_called_with(valid and has_saves)
                 panel._export_btn.setEnabled.assert_called_with(valid and selected)
                 panel._copy_btn.setEnabled.assert_called_with(valid and selected)
+                panel._copy_id_btn.setEnabled.assert_called_with(valid and selected)
+                panel._export_shown_btn.setEnabled.assert_called_with(valid and has_saves)
+
+    def test_selected_save_details_clear_when_selection_is_filtered_out(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._current_card = "/cards/card.ps2"
+        panel._all_saves = [SaveEntry("<b>Alpha</b>", "ALPHA", 512)]
+        panel._saves_list = self._make_save_list(panel)
+        with patch.object(module, "save_config"):
+            panel._apply_save_filters()
+            panel._saves_list.setCurrentRow(0)
+            panel._selected_save_info.setText.assert_called_with(
+                "<b>Alpha</b>\nDirectory ID: ALPHA\nListed size: 512 bytes"
+            )
+            panel._search_edit.text.return_value = "missing"
+            panel._apply_save_filters()
+        self.assertEqual(panel._shown_saves, [])
+        panel._export_shown_btn.setEnabled.assert_called_with(False)
+        panel._copy_id_btn.setEnabled.assert_called_with(False)
+        self.assertNotIn("ALPHA", panel._selected_save_info.setText.call_args.args[0])
+        self.assertEqual(panel._selected_save_bucket()[panel._current_card], "ALPHA")
+
+    def test_export_scopes_use_selected_shown_or_entire_cached_card(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 1024)]
+        panel._all_saves = saves
+        panel._shown_saves = [saves[0]]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        panel._export_saves = MagicMock()
+        panel._export_selected()
+        panel._export_saves.assert_called_with("Selected Save", [saves[0]])
+        panel._export_shown()
+        panel._export_saves.assert_called_with("Shown Saves", [saves[0]])
+        panel._export_all()
+        panel._export_saves.assert_called_with("All Saves (including hidden)", saves)
+
+    def test_export_shown_flushes_pending_search_before_taking_snapshot(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._filter_timer.isActive.return_value = True
+        shown = [SaveEntry("Alpha", "A", 512)]
+        panel._on_save_filter_changed = MagicMock(
+            side_effect=lambda: setattr(panel, "_shown_saves", shown)
+        )
+        panel._export_saves = MagicMock()
+        panel._export_shown()
+        panel._on_save_filter_changed.assert_called_once()
+        panel._export_saves.assert_called_once_with("Shown Saves", shown)
+
+    def test_export_batch_freezes_source_scope_and_deduplicates_ids(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/original.ps2"
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Other label", "A", 512)]
+        panel.emit_status = MagicMock()
+
+        def choose(*args):
+            panel._current_card = "/cards/changed.ps2"
+            panel._all_saves.append(SaveEntry("New save", "B", 1024))
+            return "/exports"
+
+        dialog = MagicMock()
+        message = MagicMock()
+        dialog.getExistingDirectory.side_effect = choose
+        with patch.object(module, "QFileDialog", dialog), \
+             patch.object(module, "QMessageBox", message), \
+             patch.object(module, "export_save", return_value="/exports/A.bin") as export, \
+             patch.object(module, "save_config"):
+            panel._export_all()
+        export.assert_called_once_with("/cards/original.ps2", "A", "/exports", overwrite=False)
+        self.assertIn("1 save(s)", dialog.getExistingDirectory.call_args.args[1])
+        self.assertIn("exported 1 of 1", message.return_value.setText.call_args.args[0])
+        self.assertIn("/cards/original.ps2", message.return_value.setText.call_args.args[0])
+        self.assertFalse(panel._export_busy)
+
+    def test_export_batch_reports_partial_failure_and_keeps_processing(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._card_valid = True
+        panel.emit_status = MagicMock()
+        panel._all_saves = [
+            SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 512),
+            SaveEntry("Gamma", "C", 512),
+        ]
+        message = MagicMock()
+        with patch.object(module, "QFileDialog") as dialog, \
+             patch.object(module, "QMessageBox", message), \
+             patch.object(module, "save_config"), \
+             patch.object(module, "export_save", side_effect=[
+                 "/exports/A.bin", module.MemoryCardError("File exists"), "/exports/C.bin",
+             ]) as export:
+            dialog.getExistingDirectory.return_value = "/exports"
+            panel._export_all()
+        self.assertEqual(export.call_count, 3)
+        result = message.return_value
+        self.assertIn("exported 2 of 3", result.setText.call_args.args[0])
+        self.assertIn("Beta [B]: File exists", result.setDetailedText.call_args.args[0])
+        result.setIcon.assert_called_once_with(message.Icon.Warning)
+        self.assertFalse(panel._export_busy)
+
+    def test_export_cancel_empty_invalid_and_busy_do_not_write(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        with patch.object(module, "QFileDialog") as dialog, \
+             patch.object(module, "export_save") as export, \
+             patch.object(module, "save_config") as save:
+            panel._export_all()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._card_valid = True
+            panel._export_shown()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._export_busy = True
+            panel._export_all()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._export_busy = False
+            dialog.getExistingDirectory.return_value = ""
+            panel._export_all()
+            dialog.getExistingDirectory.assert_called_once()
+            save.assert_not_called()
+            export.assert_not_called()
+        self.assertFalse(panel._export_busy)
+
+    def test_copy_directory_id_uses_current_visible_selection(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        panel.emit_status = MagicMock()
+        application = MagicMock()
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": SimpleNamespace(QApplication=application)}):
+            panel._copy_save_id()
+            application.clipboard.assert_not_called()
+            panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+            panel._copy_save_id()
+        application.clipboard.return_value.setText.assert_called_once_with("A")
+        panel.emit_status.assert_called_once_with("Copied save directory ID.")
+
+    def test_copy_directory_id_failure_is_logged_without_success_feedback(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        panel.emit_status = MagicMock()
+        application = MagicMock()
+        application.clipboard.return_value = None
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": SimpleNamespace(QApplication=application)}):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._copy_save_id()
+        panel.emit_status.assert_called_once_with("Could not copy the save directory ID.")
 
     def test_card_load_states_offer_matching_recovery_actions(self):
         module = self._import_memcard_panel()
