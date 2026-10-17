@@ -32,6 +32,9 @@
 - One-click **Deploy** to push enabled packs to PCSX2
 - **👤 See more by [author]** quick-filter button on every mod item
 - **Cross-panel navigation** — "Find PNACH by this author" opens the PNACH panel pre-filtered
+- **Remembered status filters** — show enabled/disabled mods, conflicts, completely shadowed texture packs, or code issues in enabled PNACH/cheat mods
+- **Clearer mod rows** — status badges sit below the title, enabled state is written out, and conflict badges open review in one click
+- Filtered lists show visible versus total counts and offer **Clear Filters** or **Import** directly in empty states
 
 ### 🔧 PNACH Patch Manager
 - Manage `.pnach` game patches (widescreen, 60fps, gameplay tweaks)
@@ -89,6 +92,7 @@
 - "A wins all / B wins all / Allow both" quick-resolve buttons
 - Address-level PNACH conflict detection for overlapping patch addresses
 - Visual conflict indicator per mod item
+- PNACH address overlaps share cached detection results with inline indicators and the conflict review dialog; summary counts distinguish file-conflict pairs from address overlaps
 
 ### 👤 Author Quick Navigation
 - **"See more by [author]"** button on every mod item — filters current panel to that author instantly

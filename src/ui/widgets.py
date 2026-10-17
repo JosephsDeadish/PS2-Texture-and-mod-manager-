@@ -452,6 +452,7 @@ class ModItemWidget(QFrame):
     details_requested = pyqtSignal(str)    # mod_id
     edit_requested = pyqtSignal(str)       # mod_id
     filter_by_author = pyqtSignal(str)     # author name — quick "see more by" filter
+    conflicts_requested = pyqtSignal()
 
     def __init__(
         self,
@@ -523,6 +524,10 @@ class ModItemWidget(QFrame):
         name_lbl.setMinimumWidth(0)
         name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         name_row.addWidget(name_lbl)
+        info.addLayout(name_row)
+
+        badges = QHBoxLayout()
+        badges.setSpacing(6)
 
         if self.is_shadowed:
             shadow_badge = QLabel("🚫 Completely Shadowed")
@@ -535,17 +540,19 @@ class ModItemWidget(QFrame):
                 "It will have no effect when deployed. Raise its priority or disable\n"
                 "the conflicting higher-priority mod to restore it."
             )
-            name_row.addWidget(shadow_badge)
+            badges.addWidget(shadow_badge)
 
-        if self.has_conflict and not self.is_shadowed:
-            warn = QLabel("⚠ Conflict")
+        if self.has_conflict:
+            warn = QPushButton("⚠ Review conflicts")
             warn.setObjectName("badge")
             warn.setStyleSheet(
                 "background:#7a2020; color:#ff8080; border-radius:9px;"
-                "padding: 2px 8px; font-size:11px; cursor: pointer;"
+                "padding: 2px 8px; font-size:11px;"
             )
-            warn.setToolTip("This mod conflicts with another enabled mod. Click '⚠ Conflicts' to resolve.")
-            name_row.addWidget(warn)
+            warn.setToolTip("Review file or PNACH address overlaps between enabled mods in this panel.")
+            warn.setAccessibleName(f"Review conflicts for {self.mod.name}")
+            warn.clicked.connect(lambda: self.conflicts_requested.emit())
+            badges.addWidget(warn)
 
         if self.validation_errors and not self.is_shadowed:
             n = self.validation_errors
@@ -556,9 +563,9 @@ class ModItemWidget(QFrame):
             )
             err_badge.setToolTip(
                 f"{n} code error{'s' if n != 1 else ''} detected (invalid size, bad processor, "
-                "value overflow, or non-CRC filename). Click ⚠ Conflicts to review."
+                "value overflow, or non-CRC filename). Correct the source codes and re-import this mod."
             )
-            name_row.addWidget(err_badge)
+            badges.addWidget(err_badge)
 
         if self.validation_warnings and not self.is_shadowed and not self.validation_errors:
             n = self.validation_warnings
@@ -569,9 +576,9 @@ class ModItemWidget(QFrame):
             )
             warn_badge.setToolTip(
                 f"{n} code warning{'s' if n != 1 else ''} detected (address out of range, "
-                "redundant duplicate). Click ⚠ Conflicts to review."
+                "redundant duplicate). Review this mod's source codes before deploying."
             )
-            name_row.addWidget(warn_badge)
+            badges.addWidget(warn_badge)
 
         if self.mod.has_update:
             upd = QLabel("↑ Update")
@@ -579,10 +586,11 @@ class ModItemWidget(QFrame):
                 "background:#1a4a6a; color:#80c8ff; border-radius:9px;"
                 "padding: 2px 8px; font-size:11px;"
             )
-            name_row.addWidget(upd)
+            badges.addWidget(upd)
 
-        name_row.addStretch()
-        info.addLayout(name_row)
+        if badges.count():
+            badges.addStretch()
+            info.addLayout(badges)
 
         meta_parts = []
         if self.mod.author:
@@ -666,8 +674,12 @@ class ModItemWidget(QFrame):
         outer.addLayout(btn_col)
 
         # Toggle
-        self.toggle = QCheckBox()
+        self.toggle = QCheckBox("Enabled" if self.mod.enabled else "Disabled")
+        self.toggle.setAccessibleName(f"Enable or disable {self.mod.name}")
         self.toggle.setChecked(self.mod.enabled)
+        self.toggle.toggled.connect(
+            lambda enabled: self.toggle.setText("Enabled" if enabled else "Disabled")
+        )
         self.toggle.toggled.connect(lambda v: self.toggled.emit(self.mod.id, v))
         outer.addWidget(self.toggle)
 

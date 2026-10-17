@@ -8884,6 +8884,7 @@ class TestModPanelEmptyState(unittest.TestCase):
                         "sort_index": 3,
                         "author": "TexMaster",
                         "library_only": True,
+                        "status": "conflicts",
                     }
                 }
             }
@@ -8902,6 +8903,10 @@ class TestModPanelEmptyState(unittest.TestCase):
             ("Panda_Venom", "Panda_Venom"),
         ])
         panel._library_filter_check = FakeCheckBox()
+        panel._status_filter = FakeComboBox([
+            ("All statuses", "all"),
+            ("Conflicts", "conflicts"),
+        ])
 
         ModPanel._restore_filter_state(panel)
 
@@ -8909,6 +8914,8 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertEqual(panel._sort_combo.currentIndex(), 3)
         self.assertEqual(panel._author_filter.currentData(), "TexMaster")
         self.assertTrue(panel._library_filter_check.isChecked())
+        self.assertEqual(panel._status_filter.currentData(), "conflicts")
+        self.assertFalse(panel._status_filter.blocked)
 
     def test_restore_filter_state_warns_on_stale_values(self):
         mod_panel = self._import_mod_panel()
@@ -8981,6 +8988,7 @@ class TestModPanelEmptyState(unittest.TestCase):
                         "sort_index": 99,
                         "author": "Missing Author",
                         "library_only": False,
+                        "status": "obsolete",
                     }
                 }
             }
@@ -8998,6 +9006,7 @@ class TestModPanelEmptyState(unittest.TestCase):
             ("TexMaster", "TexMaster"),
         ])
         panel._library_filter_check = FakeCheckBox()
+        panel._status_filter = FakeComboBox([("All statuses", "all")])
 
         with patch.object(mod_panel, "_save_mod_panel_config") as save_mock:
             with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
@@ -9017,6 +9026,9 @@ class TestModPanelEmptyState(unittest.TestCase):
         )
         self.assertTrue(any("sort index" in msg for msg in logs.output), logs.output)
         self.assertTrue(any("author filter" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("status filter" in msg for msg in logs.output), logs.output)
+        self.assertEqual(panel._status_filter.currentData(), "all")
+        self.assertEqual(panel.config.ui_state["mod_panels"]["texture_pack"]["status"], "all")
         save_mock.assert_called_once_with(panel.config, "sanitizing mod panel filter state")
 
     def test_search_helper_matches_tags_source_url_files_and_type(self):
@@ -9081,6 +9093,7 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel._sort_combo = FakeComboBox(2, None)
         panel._author_filter = FakeComboBox(0, "Curse_Arms")
         panel._library_filter_check = FakeCheckBox(False)
+        panel._status_filter = FakeComboBox(1, "disabled")
 
         with patch.object(mod_panel, "save_config") as save_mock:
             ModPanel._save_filter_state(panel, "updating mod panel filters")
@@ -9092,6 +9105,7 @@ class TestModPanelEmptyState(unittest.TestCase):
                 "sort_index": 2,
                 "author": "Curse_Arms",
                 "library_only": False,
+                "status": "disabled",
             },
         )
         save_mock.assert_called_once_with(panel.config)
@@ -9193,6 +9207,10 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel.manager.detect_conflicts.return_value = [
             ConflictInfo(mod_a_id="mod-a", mod_b_id="mod-b", conflicting_files=["code.pnach"])
         ]
+        panel.manager.detect_pnach_conflicts.side_effect = lambda mt: (
+            [{"mod_a_id": "mod-c", "mod_b_id": "mod-d", "address": "00200000"}]
+            if mt == ModType.CHEAT else []
+        )
         panel.manager.validate_all_pnach.return_value = {
             "mod-a": [
                 types.SimpleNamespace(severity="error"),
@@ -9210,7 +9228,9 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertIsNot(first, third)
         self.assertEqual(panel.manager.detect_conflicts.call_count, 4)
         self.assertEqual(panel.manager.validate_all_pnach.call_count, 2)
-        self.assertEqual(first["conflicting_ids"], {"mod-a", "mod-b"})
+        self.assertEqual(first["conflicting_ids"], {"mod-a", "mod-b", "mod-c", "mod-d"})
+        self.assertEqual(len(first["pnach_conflicts"]), 1)
+        self.assertEqual(panel.manager.detect_pnach_conflicts.call_count, 4)
         self.assertEqual(first["pnach_validation"]["mod-a"], {"errors": 1, "warnings": 1})
 
     def test_refresh_invalidates_issue_state_cache(self):
@@ -9250,6 +9270,267 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertEqual(second, frozenset({"SLUS-20062"}))
         self.assertEqual(third, frozenset({"SLUS-21075"}))
         self.assertEqual(get_serials.call_count, 2)
+
+    def _make_filter_panel(self, mod_panel, mods, issues=None):
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.config = AppConfig()
+        panel._all_mods = MagicMock(return_value=mods)
+        panel._search = MagicMock()
+        panel._search.text.return_value = ""
+        panel._author_filter = MagicMock()
+        panel._author_filter.currentData.return_value = ""
+        panel._library_filter_check = MagicMock()
+        panel._library_filter_check.isChecked.return_value = False
+        panel._status_filter = MagicMock()
+        panel._status_filter.currentData.return_value = "all"
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentIndex.return_value = 0
+        panel._issue_state = MagicMock(return_value=issues or {
+            "conflicts": [], "pnach_conflicts": [],
+            "conflicting_ids": set(), "shadowed_ids": set(), "pnach_validation": {},
+        })
+        panel._list_layout = MagicMock()
+        panel._list_layout.count.return_value = 1
+        panel._count_lbl = MagicMock()
+        panel._save_filter_state = MagicMock()
+        panel._get_library_serials = MagicMock(return_value={"SLUS-20062"})
+        for handler in (
+            "_on_toggle", "_on_remove", "_on_priority_up", "_on_priority_down",
+            "_on_details", "_on_edit", "_filter_by_author", "_show_conflicts",
+            "_clear_filters", "_import_mod",
+        ):
+            setattr(panel, handler, MagicMock())
+        return panel
+
+    def test_status_filters_cover_enabled_disabled_and_each_issue_kind(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(id="enabled", name="Enabled", mod_type=ModType.PNACH, path="/mods/a", enabled=True),
+            ModInfo(id="disabled", name="Disabled", mod_type=ModType.PNACH, path="/mods/b", enabled=False),
+            ModInfo(id="warning", name="Warning", mod_type=ModType.PNACH, path="/mods/c", enabled=True),
+            ModInfo(id="clean", name="Clean", mod_type=ModType.PNACH, path="/mods/d", enabled=True),
+        ]
+        issues = {
+            "conflicting_ids": {"enabled"},
+            "shadowed_ids": {"enabled"},
+            "pnach_validation": {"enabled": {"errors": 1}, "warning": {"warnings": 2}},
+        }
+        expected = {
+            "all": {"enabled", "disabled", "warning", "clean"},
+            "enabled": {"enabled", "warning", "clean"},
+            "disabled": {"disabled"},
+            "conflicts": {"enabled"},
+            "shadowed": {"enabled"},
+            "code_issues": {"enabled", "warning"},
+        }
+        for status, ids in expected.items():
+            with self.subTest(status=status):
+                self.assertEqual(
+                    {m.id for m in mods if mod_panel._mod_matches_status(m, status, issues)}, ids,
+                )
+        message = mod_panel._mod_panel_empty_message("PNACH", "", "", False, "code_issues")
+        self.assertIn("Code issues (enabled)", message)
+
+    def test_status_filter_combines_search_author_library_and_sort(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(
+                id=str(i), name=name, mod_type=ModType.PNACH, path=f"/mods/{i}",
+                author=author, game_id=serial, enabled=enabled,
+            )
+            for i, (name, author, serial, enabled) in enumerate([
+                ("Pack Alpha", "Alice", "SLUS-20062", True),
+                ("Pack Zulu", "Alice", "SLUS-20062", True),
+                ("Pack Disabled", "Alice", "SLUS-20062", False),
+                ("Pack Other Game", "Alice", "SLUS-21075", True),
+                ("Pack Other Author", "Bob", "SLUS-20062", True),
+                ("Unrelated", "Alice", "SLUS-20062", True),
+            ])
+        ]
+        panel = self._make_filter_panel(mod_panel, mods)
+        panel._search.text.return_value = "pack"
+        panel._author_filter.currentData.return_value = "Alice"
+        panel._library_filter_check.isChecked.return_value = True
+        panel._sort_combo.currentIndex.return_value = 1
+        panel._status_filter.currentData.return_value = "enabled"
+        with patch.object(mod_panel, "ModItemWidget") as widget:
+            panel._apply_filter()
+        self.assertEqual([call.args[0].name for call in widget.call_args_list], ["Pack Zulu", "Pack Alpha"])
+        self.assertIn("Showing 2 of 6", panel._count_lbl.setText.call_args.args[0])
+        widget.return_value.conflicts_requested.connect.assert_called_with(panel._show_conflicts)
+        panel._all_mods.assert_called_once()
+
+    def test_pnach_only_conflicts_are_visible_and_counts_exclude_other_panels(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(id="overlap", name="Overlap", mod_type=ModType.PNACH, path="/mods/a", enabled=True),
+            ModInfo(id="warning", name="Warning", mod_type=ModType.PNACH, path="/mods/b", enabled=True),
+        ]
+        issues = {
+            "conflicts": [],
+            "pnach_conflicts": [{"mod_a_id": "overlap", "mod_b_id": "other", "address": "00200000"}],
+            "conflicting_ids": {"overlap", "other"},
+            "shadowed_ids": set(),
+            "pnach_validation": {
+                "warning": {"errors": 0, "warnings": 1},
+                "unrelated-mod": {"errors": 1, "warnings": 0},
+            },
+        }
+        panel = self._make_filter_panel(mod_panel, mods, issues)
+        panel._status_filter.currentData.return_value = "conflicts"
+        with patch.object(mod_panel, "ModItemWidget") as widget:
+            panel._apply_filter()
+        self.assertEqual(widget.call_count, 1)
+        self.assertTrue(widget.call_args.kwargs["has_conflict"])
+        text = panel._count_lbl.setText.call_args.args[0]
+        self.assertIn("Showing 1 of 2", text)
+        self.assertIn("1 PNACH address overlap(s)", text)
+        self.assertIn("1 with code warnings", text)
+        self.assertNotIn("invalid", text)
+        self.assertNotIn("file conflict", text)
+        panel._count_lbl.setCursor.assert_called_with(mod_panel.Qt.CursorShape.PointingHandCursor)
+
+    def test_empty_state_offers_clear_filters_or_import(self):
+        mod_panel = self._import_mod_panel()
+        for installed in (False, True):
+            with self.subTest(installed=installed):
+                mods = [ModInfo(id="disabled", name="Disabled", mod_type=ModType.PNACH, path="/mods/a", enabled=False)] if installed else []
+                panel = self._make_filter_panel(mod_panel, mods)
+                panel._status_filter.currentData.return_value = "enabled"
+                with patch.object(mod_panel, "EmptyStateWidget") as empty, \
+                        patch.object(mod_panel, "QPushButton") as button:
+                    panel._apply_filter()
+                button.assert_called_once_with("✖ Clear Filters" if installed else "➕ Import")
+                button.return_value.clicked.connect.assert_called_once_with(
+                    panel._clear_filters if installed else panel._import_mod,
+                )
+                empty.return_value.layout.return_value.addWidget.assert_called_once_with(button.return_value)
+                message = empty.call_args.args[1]
+                self.assertIn("match the current filters" if installed else "yet", message)
+
+    def test_clear_filters_resets_status_and_saves_once_before_refresh(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        for name in ("_search", "_sort_combo", "_author_filter", "_library_filter_check", "_status_filter"):
+            setattr(panel, name, MagicMock())
+        panel._save_filter_state = MagicMock()
+        panel._apply_filter = MagicMock()
+        panel._clear_filters()
+        panel._search.clear.assert_called_once()
+        panel._status_filter.setCurrentIndex.assert_called_once_with(0)
+        panel._status_filter.blockSignals.assert_any_call(True)
+        panel._status_filter.blockSignals.assert_called_with(False)
+        panel._library_filter_check.setChecked.assert_called_once_with(False)
+        panel._save_filter_state.assert_called_once_with("clearing mod panel filters")
+        panel._apply_filter.assert_called_once()
+
+    def test_conflict_dialog_uses_cached_pnach_results_and_invalidates_after_close(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        overlaps = [{"mod_a_id": "a", "mod_b_id": "b", "address": "00200000"}]
+        panel._issue_state = MagicMock(return_value={"conflicts": [], "pnach_conflicts": overlaps})
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        panel.manager = MagicMock()
+        with patch.object(mod_panel, "ConflictDialog") as dialog:
+            panel._show_conflicts()
+            dialog.assert_called_once_with([], panel.db, panel, pnach_conflicts=overlaps)
+            dialog.return_value.exec.assert_called_once()
+        panel.manager.detect_pnach_conflicts.assert_not_called()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_issue_summary_only_opens_review_for_actual_conflicts(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel._show_conflicts = MagicMock()
+        panel._issue_state = MagicMock(return_value={"conflicts": [], "pnach_conflicts": []})
+        panel._on_count_lbl_clicked()
+        panel._show_conflicts.assert_not_called()
+        panel._issue_state.return_value["pnach_conflicts"] = [{"address": "00200000"}]
+        panel._on_count_lbl_clicked()
+        panel._show_conflicts.assert_called_once()
+
+    def test_old_filter_state_defaults_to_all_statuses(self):
+        mod_panel = self._import_mod_panel()
+        panel = self._make_filter_panel(mod_panel, [])
+        panel.config.ui_state = {"mod_panels": {"pnach": {"query": "gta"}}}
+        panel._sort_combo.count.return_value = 5
+        panel._status_filter.findData.return_value = 0
+        with patch.object(mod_panel, "_save_mod_panel_config") as save:
+            panel._restore_filter_state()
+        panel._status_filter.findData.assert_called_once_with("all")
+        panel._status_filter.setCurrentIndex.assert_called_once_with(0)
+        self.assertEqual(panel.config.ui_state["mod_panels"]["pnach"]["status"], "all")
+        save.assert_not_called()
+
+    def test_metadata_edit_invalidates_cached_issue_state(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.db.get.return_value = ModInfo(id="a", name="A", mod_type=ModType.PNACH, path="/mods/a")
+        panel.manager = MagicMock()
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.updated_meta = {"name": "Edited"}
+            edit.return_value.exec.return_value = edit.return_value.DialogCode.Accepted
+            panel._on_edit("a")
+        panel.manager.update_metadata.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_pnach_detection_failure_logs_and_preserves_file_conflicts(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.extra_types = []
+        panel._issue_state_cache = None
+        panel.manager = MagicMock()
+        panel.manager.detect_conflicts.return_value = [
+            ConflictInfo(mod_a_id="a", mod_b_id="b", conflicting_files=["ABCD1234.pnach"]),
+        ]
+        panel.manager.detect_pnach_conflicts.side_effect = OSError("unreadable")
+        panel.manager.validate_all_pnach.return_value = {}
+        with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
+            state = panel._issue_state()
+        self.assertEqual(state["pnach_conflicts"], [])
+        self.assertEqual(state["conflicting_ids"], {"a", "b"})
+        self.assertTrue(any("Could not detect PNACH conflicts" in msg for msg in logs.output))
+
+    def test_mod_row_conflict_button_is_actionable_even_when_shadowed(self):
+        self._import_mod_panel()
+        from src.ui import widgets
+        for shadowed in (False, True):
+            with self.subTest(shadowed=shadowed):
+                mod = ModInfo(id="a", name="A pack", mod_type=ModType.TEXTURE_PACK, path="/mods/a", enabled=False)
+                row = MagicMock(
+                    mod=mod, has_conflict=True, is_shadowed=shadowed,
+                    validation_errors=0, validation_warnings=0, tooltip_mode="normal",
+                )
+                qt = SimpleNamespace(AlignmentFlag=SimpleNamespace(AlignCenter=0))
+                buttons = MagicMock()
+                checkbox = MagicMock()
+                with patch.multiple(
+                    widgets, QLabel=MagicMock(), QHBoxLayout=MagicMock(),
+                    QVBoxLayout=MagicMock(), QPushButton=buttons,
+                    QCheckBox=checkbox, QFrame=MagicMock(), QSizePolicy=MagicMock(), Qt=qt,
+                ):
+                    widgets.ModItemWidget._build_ui(row)
+                calls = buttons.call_args_list
+                self.assertIn(unittest.mock.call("⚠ Review conflicts"), calls)
+                button = buttons.return_value
+                review_callback = button.clicked.connect.call_args_list[0].args[0]
+                review_callback()
+                row.conflicts_requested.emit.assert_called_once_with()
+                checkbox.assert_called_once_with("Disabled")
+                row.toggle.setAccessibleName.assert_called_once_with("Enable or disable A pack")
+                toggle_callback = row.toggle.toggled.connect.call_args_list[0].args[0]
+                toggle_callback(True)
+                row.toggle.setText.assert_called_with("Enabled")
 
 
 class TestLibraryPanelStatePersistence(unittest.TestCase):

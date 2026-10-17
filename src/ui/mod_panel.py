@@ -80,7 +80,35 @@ _TYPE_META = {
 }
 
 
-def _mod_panel_empty_message(label: str, query: str, author: str, library_only: bool) -> str:
+_STATUS_FILTERS = [
+    ("All statuses", "all"),
+    ("Enabled", "enabled"),
+    ("Disabled", "disabled"),
+    ("Conflicts", "conflicts"),
+    ("Completely shadowed", "shadowed"),
+    ("Code issues (enabled)", "code_issues"),
+]
+
+
+def _mod_matches_status(mod: ModInfo, status: str, issue_state: dict) -> bool:
+    if status == "enabled":
+        return mod.enabled
+    if status == "disabled":
+        return not mod.enabled
+    if status == "conflicts":
+        return mod.id in issue_state["conflicting_ids"]
+    if status == "shadowed":
+        return mod.id in issue_state["shadowed_ids"]
+    if status == "code_issues":
+        validation = issue_state["pnach_validation"].get(mod.id, {})
+        return bool(validation.get("errors", 0) or validation.get("warnings", 0))
+    return True
+
+
+def _mod_panel_empty_message(
+    label: str, query: str, author: str, library_only: bool, status: str = "all",
+    has_mods: bool = True,
+) -> str:
     active = []
     if query.strip():
         active.append(f"search {query!r}")
@@ -88,7 +116,10 @@ def _mod_panel_empty_message(label: str, query: str, author: str, library_only: 
         active.append(f"author {author!r}")
     if library_only:
         active.append("library-only filter")
-    if not active:
+    if status != "all":
+        status_label = next((text for text, value in _STATUS_FILTERS if value == status), status)
+        active.append(f"status {status_label!r}")
+    if not has_mods or not active:
         return f"No {label} yet.\nClick ➕ Import to add some."
     return (
         f"No {label.lower()} match the current filters.\n"
@@ -297,6 +328,24 @@ class ModPanel(BasePanel):
         self._library_filter_check.stateChanged.connect(self._apply_filter)
         author_row.addWidget(self._library_filter_check)
 
+        self._status_filter = QComboBox()
+        for label, value in _STATUS_FILTERS:
+            if value == "shadowed" and self.mod_type != ModType.TEXTURE_PACK:
+                continue
+            if value == "code_issues" and not any(
+                mt in (ModType.PNACH, ModType.CHEAT) for mt in [self.mod_type] + self.extra_types
+            ):
+                continue
+            self._status_filter.addItem(label, value)
+        self._status_filter.setAccessibleName("Filter mods by status")
+        self._status_filter.setToolTip(
+            "Narrow this list by enabled state or detected issues.\n"
+            "Code checks cover enabled PNACH/cheat mods only.\n"
+            "Enable All and Disable All still affect every mod in this panel."
+        )
+        self._status_filter.currentIndexChanged.connect(self._apply_filter)
+        author_row.addWidget(self._status_filter)
+
         author_row.addStretch()
 
         # ---- Enable-all / Disable-all ----
@@ -309,7 +358,7 @@ class ModPanel(BasePanel):
         author_row.addWidget(disable_all)
 
         clear_filters = QPushButton("✖ Clear Filters")
-        clear_filters.setToolTip("Reset search, sort, author, and library filters")
+        clear_filters.setToolTip("Reset search, sort, author, library, and status filters")
         clear_filters.clicked.connect(self._clear_filters)
         author_row.addWidget(clear_filters)
 
@@ -394,10 +443,20 @@ class ModPanel(BasePanel):
             except Exception as exc:
                 logger.warning("Could not detect conflicts for %s: %s", mt.value, exc)
 
+        pnach_conflicts = []
+        for mt in [self.mod_type] + self.extra_types:
+            if mt in (ModType.PNACH, ModType.CHEAT):
+                try:
+                    pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
+                except Exception as exc:
+                    logger.warning("Could not detect PNACH conflicts for %s: %s", mt.value, exc)
+
         conflicting_ids = set()
         for conflict in conflicts:
             conflicting_ids.add(conflict.mod_a_id)
             conflicting_ids.add(conflict.mod_b_id)
+        for conflict in pnach_conflicts:
+            conflicting_ids.update((conflict["mod_a_id"], conflict["mod_b_id"]))
 
         shadowed_ids: set = set()
         if self.mod_type == ModType.TEXTURE_PACK:
@@ -412,7 +471,7 @@ class ModPanel(BasePanel):
                 )
 
         pnach_validation: dict = {}
-        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
+        if any(mt in (ModType.PNACH, ModType.CHEAT) for mt in [self.mod_type] + self.extra_types):
             try:
                 raw = self.manager.validate_all_pnach()
                 for mid, issues in raw.items():
@@ -424,6 +483,7 @@ class ModPanel(BasePanel):
 
         cache = {
             "conflicts": conflicts,
+            "pnach_conflicts": pnach_conflicts,
             "conflicting_ids": conflicting_ids,
             "shadowed_ids": shadowed_ids,
             "pnach_validation": pnach_validation,
@@ -528,6 +588,7 @@ class ModPanel(BasePanel):
         _block_signals(self._sort_combo, True)
         _block_signals(self._author_filter, True)
         _block_signals(self._library_filter_check, True)
+        _block_signals(self._status_filter, True)
         try:
             query = str(state.get("query", ""))
             self._search.setText(query)
@@ -571,11 +632,24 @@ class ModPanel(BasePanel):
             library_only = bool(state.get("library_only", False))
             self._library_filter_check.setChecked(library_only)
             state["library_only"] = library_only
+
+            status = state.get("status", "all")
+            status_idx = self._status_filter.findData(status)
+            if status_idx < 0:
+                logger.warning(
+                    "Saved mod-panel status filter %r is no longer available; using All statuses",
+                    status,
+                )
+                status_idx = 0
+                should_save = True
+            self._status_filter.setCurrentIndex(status_idx)
+            state["status"] = self._status_filter.currentData() or "all"
         finally:
             _block_signals(self._search, False)
             _block_signals(self._sort_combo, False)
             _block_signals(self._author_filter, False)
             _block_signals(self._library_filter_check, False)
+            _block_signals(self._status_filter, False)
 
         if should_save:
             _save_mod_panel_config(self.config, "sanitizing mod panel filter state")
@@ -589,6 +663,7 @@ class ModPanel(BasePanel):
             "sort_index": self._sort_combo.currentIndex(),
             "author": self._author_filter.currentData() or "",
             "library_only": self._library_filter_check.isChecked(),
+            "status": self._status_filter.currentData() or "all",
         })
         _save_mod_panel_config(self.config, context)
 
@@ -596,7 +671,9 @@ class ModPanel(BasePanel):
         query = self._search.text().lower()
         author_filter = self._author_filter.currentData() or ""
         library_only = self._library_filter_check.isChecked()
-        mods = self._all_mods()
+        all_mods = self._all_mods()
+        mods = all_mods
+        status_filter = self._status_filter.currentData() or "all"
         sort_idx = self._sort_combo.currentIndex()
 
         if query:
@@ -631,6 +708,7 @@ class ModPanel(BasePanel):
         conflicting_ids = issue_state["conflicting_ids"]
         shadowed_ids = issue_state["shadowed_ids"]
         pnach_validation = issue_state["pnach_validation"]
+        mods = [m for m in mods if _mod_matches_status(m, status_filter, issue_state)]
 
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
@@ -646,8 +724,14 @@ class ModPanel(BasePanel):
                     query,
                     author_filter,
                     library_only,
+                    status_filter,
+                    has_mods=bool(all_mods),
                 ),
             )
+            action = QPushButton("✖ Clear Filters" if all_mods else "➕ Import")
+            action.setObjectName("primary_btn")
+            action.clicked.connect(self._clear_filters if all_mods else self._import_mod)
+            empty.layout().addWidget(action)
             self._list_layout.insertWidget(0, empty)
         else:
             for i, mod in enumerate(mods):
@@ -668,27 +752,45 @@ class ModPanel(BasePanel):
                 widget.details_requested.connect(self._on_details)
                 widget.edit_requested.connect(self._on_edit)
                 widget.filter_by_author.connect(self._filter_by_author)
+                widget.conflicts_requested.connect(self._show_conflicts)
                 self._list_layout.insertWidget(i, widget)
 
-        all_mods = self._all_mods()
         enabled_count = sum(1 for m in all_mods if m.enabled)
         total_count = len(all_mods)
-        shadow_note = f"  •  {len(shadowed_ids)} shadowed" if shadowed_ids else ""
-        invalid_mods = sum(1 for v in pnach_validation.values() if v.get("errors", 0))
-        invalid_note = f"  •  ❌ {invalid_mods} invalid" if invalid_mods else ""
-        has_any_issue = bool(conflicts or shadowed_ids or invalid_mods)
+        panel_validation = [pnach_validation[m.id] for m in all_mods if m.id in pnach_validation]
+        invalid_mods = sum(1 for v in panel_validation if v.get("errors", 0))
+        warning_mods = sum(1 for v in panel_validation if v.get("warnings", 0) and not v.get("errors", 0))
+        pnach_conflicts = issue_state["pnach_conflicts"]
+        has_conflicts = bool(conflicts or pnach_conflicts)
+        has_any_issue = bool(has_conflicts or shadowed_ids or invalid_mods or warning_mods)
         # Issue #4: clarify what the count refers to using the panel's mod type label
         type_label = _TYPE_META[self.mod_type].get("label", "mod(s)")
-        status = (
-            f"{enabled_count}/{total_count} {type_label} enabled"
-            + (f"  •  ⚠ {len(conflicts)} conflict(s) — click to resolve" if conflicts else "")
-            + shadow_note
-            + invalid_note
-        )
+        status = f"Showing {len(mods)} of {total_count} {type_label}  •  {enabled_count} enabled"
+        issue_notes = []
+        if conflicts:
+            issue_notes.append(f"{len(conflicts)} file conflict pair(s)")
+        if pnach_conflicts:
+            issue_notes.append(f"{len(pnach_conflicts)} PNACH address overlap(s)")
+        if shadowed_ids:
+            issue_notes.append(f"{len(shadowed_ids)} shadowed")
+        if invalid_mods:
+            issue_notes.append(f"{invalid_mods} invalid")
+        if warning_mods:
+            issue_notes.append(f"{warning_mods} with code warnings")
+        if has_conflicts:
+            issue_notes.append("Click to review conflicts")
+        if issue_notes:
+            status += "\n" + "  •  ".join(issue_notes)
         self._count_lbl.setText(status)
-        # Make label clickable (pointer cursor) when there is something to resolve
+        self._count_lbl.setToolTip(
+            "Counts cover every mod in this panel, including hidden results.\n"
+            "Click to review file and PNACH address conflicts."
+            if has_conflicts else
+            "Counts cover every mod in this panel, including hidden results.\n"
+            "Use the status filter to find shadowed mods or code issues."
+        )
         self._count_lbl.setCursor(
-            Qt.CursorShape.PointingHandCursor if has_any_issue else Qt.CursorShape.ArrowCursor
+            Qt.CursorShape.PointingHandCursor if has_conflicts else Qt.CursorShape.ArrowCursor
         )
         self._count_lbl.setStyleSheet(
             "color: #ff8080; font-size: 12px; text-align: left; border: none;"
@@ -698,16 +800,19 @@ class ModPanel(BasePanel):
         self._save_filter_state("updating mod panel filters")
 
     def _clear_filters(self):
-        """Reset the mod search, sort, author, and library-only filters."""
-        for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
+        """Reset the mod search, sort, author, library-only, and status filters."""
+        for widget in (self._search, self._sort_combo, self._author_filter,
+                       self._library_filter_check, self._status_filter):
             _block_signals(widget, True)
 
         self._search.clear()
         self._sort_combo.setCurrentIndex(0)
         self._author_filter.setCurrentIndex(0)
         self._library_filter_check.setChecked(False)
+        self._status_filter.setCurrentIndex(0)
 
-        for widget in (self._search, self._sort_combo, self._author_filter, self._library_filter_check):
+        for widget in (self._search, self._sort_combo, self._author_filter,
+                       self._library_filter_check, self._status_filter):
             _block_signals(widget, False)
 
         self._save_filter_state("clearing mod panel filters")
@@ -892,6 +997,7 @@ class ModPanel(BasePanel):
                     updated.thumbnail_path = meta["thumbnail_path"]
                     self.db.update(updated)
             self.emit_status(f"Updated '{meta.get('name', mod.name)}'")
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _enable_all(self):
@@ -976,19 +1082,14 @@ class ModPanel(BasePanel):
 
     def _on_count_lbl_clicked(self):
         """Click handler for the status/count label — opens conflict resolver if issues exist."""
-        self._show_conflicts()
+        issues = self._issue_state()
+        if issues["conflicts"] or issues["pnach_conflicts"]:
+            self._show_conflicts()
 
     def _show_conflicts(self):
-        all_types = [self.mod_type] + self.extra_types
         issue_state = self._issue_state()
         conflicts = list(issue_state["conflicts"])
-        pnach_conflicts = []
-        for mt in all_types:
-            if mt in (ModType.PNACH, ModType.CHEAT):
-                try:
-                    pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
-                except Exception as exc:
-                    logger.warning("Could not detect PNACH conflicts for %s: %s", mt.value, exc)
+        pnach_conflicts = list(issue_state["pnach_conflicts"])
 
         if not conflicts and not pnach_conflicts:
             QMessageBox.information(
