@@ -123,6 +123,12 @@
 - Scrollable overview with a two-row statistics grid, including both PNACH patches and cheats
 - First-use guidance when no mods are installed
 
+### 📥 Downloads & History
+- Search names, source URLs, and notes alongside status, type, and partial serial filters
+- Saved search and sorting: newest, oldest, name, or size; Game Save includes legacy and current records
+- Debounced local filtering avoids re-reading the log while typing; visible history reloads when the log changes
+- Two-line entries, scrollable details, visible-result counts, and one-click recovery from empty filters
+
 ### 🚀 Animated Splash Screen
 - PS2 controller icon with pulsing glow ring and rotating accent arc
 - Loading progress bar

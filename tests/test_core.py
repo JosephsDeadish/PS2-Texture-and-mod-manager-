@@ -7390,6 +7390,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 class TestDownloadsPanelHistoryHandling(unittest.TestCase):
     """Tests for DownloadsPanel history error handling."""
 
+    def _make_panel(self, module):
+        panel = module.DownloadsPanel.__new__(module.DownloadsPanel)
+        panel.config = AppConfig()
+        panel._all_history_entries = []
+        panel._history_entries = []
+        panel._history_stamp = None
+        panel._search_edit = MagicMock()
+        panel._search_edit.text.return_value = ""
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentText.return_value = "Newest first"
+        panel._filter_timer = MagicMock()
+        panel._filter_timer.isActive.return_value = False
+        panel._empty_filters_btn = MagicMock()
+        return panel
+
     def _import_downloads_panel(self):
         import importlib
         import sys
@@ -7463,7 +7478,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setEnabled(self, value):
                 self.enabled = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._status_combo = FakeComboBox()
         panel._type_combo = FakeComboBox()
@@ -7530,7 +7545,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setEnabled(self, value):
                 self.enabled = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._status_combo = FakeComboBox()
         panel._type_combo = FakeComboBox()
@@ -7570,6 +7585,192 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             downloads_panel._history_summary_message(2, True),
             "Showing 2 matching download history entries.",
         )
+        self.assertEqual(
+            downloads_panel._history_summary_message(2, True, 10),
+            "Showing 2 of 10 download history entries.",
+        )
+
+    def test_history_search_composes_filters_and_matches_metadata(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("1", "", "Silent Hill HD", "texture_pack", serial="SLUS-20228",
+                         source_url="https://example.com/packs", note="CRC mismatch", status="failed"),
+            HistoryEntry("2", "", "Silent Hill HD", "texture_pack", serial="SLES-50382",
+                         source_url="https://example.com/packs", status="success"),
+            HistoryEntry("3", "", "Silent Hill Save", "save_file", serial="SLUS-20228",
+                         status="failed"),
+        ]
+        result = module._filter_history(
+            entries, "failed", "texture_pack", "slus202", "HILL example mismatch", "Newest first",
+        )
+        self.assertEqual([entry.id for entry in result], ["1"])
+        for query in ("silent", "slus-20228", "EXAMPLE.COM", "mismatch", "failed"):
+            with self.subTest(query=query):
+                self.assertIn(entries[0], module._filter_history(
+                    entries, None, None, "", query, "Newest first",
+                ))
+        self.assertEqual(
+            module._filter_history(entries, None, None, "", "hill missing", "Newest first"), [],
+        )
+
+    def test_history_save_filter_includes_both_recorded_type_spellings(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("1", "", "Legacy save", "save"),
+            HistoryEntry("2", "", "New save", "save_file"),
+            HistoryEntry("3", "", "Pack", "texture_pack"),
+        ]
+        self.assertEqual(
+            module._filter_history(entries, None, "save", "", "", "Newest first"), entries[:2],
+        )
+
+    def test_history_sorting_is_stable_and_does_not_mutate_cached_entries(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("new", "2026-10-17", "Zulu", "pnach", size_bytes=10),
+            HistoryEntry("mid", "2026-10-16", "alpha", "pnach", size_bytes=30),
+            HistoryEntry("old", "2026-10-15", "Alpha", "pnach", size_bytes=30),
+        ]
+        for sort, ids in (
+            ("Newest first", ["new", "mid", "old"]),
+            ("Oldest first", ["old", "mid", "new"]),
+            ("Name (A–Z)", ["mid", "old", "new"]),
+            ("Largest first", ["mid", "old", "new"]),
+        ):
+            with self.subTest(sort=sort):
+                result = module._filter_history(entries, None, None, "", "", sort)
+                self.assertEqual([entry.id for entry in result], ids)
+        self.assertEqual([entry.id for entry in entries], ["new", "mid", "old"])
+
+    def test_history_filters_use_cached_entries_and_clear_stale_details(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._all_history_entries = [
+            HistoryEntry("1", "2026-10-17T12:30:00", "Pack", "texture_pack", serial="SLUS-20228"),
+        ]
+        panel._status_combo = MagicMock()
+        panel._status_combo.currentText.return_value = "All"
+        panel._type_combo = MagicMock()
+        panel._type_combo.currentText.return_value = "All"
+        panel._serial_edit = MagicMock()
+        panel._serial_edit.text.return_value = ""
+        panel._list_widget = MagicMock()
+        panel._detail_label = MagicMock()
+        panel._delete_btn = MagicMock()
+        panel._history_summary_lbl = MagicMock()
+        panel._restore_history_selection = MagicMock()
+        with patch("src.core.download_history.list_history") as load:
+            panel._apply_history_filters()
+            self.assertEqual(len(panel._history_entries), 1)
+            label = panel._list_widget.addItem.call_args.args[0]
+            self.assertIn("\n2026-10-17 12:30", label)
+            self.assertIn("SLUS-20228", label)
+            panel._search_edit.text.return_value = "not found"
+            panel._apply_history_filters()
+        load.assert_not_called()
+        self.assertEqual(panel._history_entries, [])
+        panel._empty_filters_btn.setVisible.assert_called_with(True)
+        panel._delete_btn.setEnabled.assert_called_with(False)
+        self.assertIn("No history entries match", panel._detail_label.setText.call_args.args[0])
+
+    def test_history_text_changes_debounce_saving_and_local_filtering(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._save_history_filters = MagicMock()
+        panel._apply_history_filters = MagicMock()
+        panel._on_history_text_changed("s")
+        panel._on_history_text_changed("sh")
+        self.assertEqual(panel._filter_timer.start.call_count, 2)
+        panel._save_history_filters.assert_not_called()
+        panel._apply_history_filters.assert_not_called()
+        panel._on_history_filter_changed()
+        panel._filter_timer.stop.assert_called_once()
+        panel._save_history_filters.assert_called_once()
+        panel._apply_history_filters.assert_called_once()
+
+    def test_history_query_and_sort_restore_and_save(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"query": "Silent Hill", "sort": "Largest first"}}
+        panel._restore_history_view()
+        panel._search_edit.setText.assert_called_once_with("Silent Hill")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(3)
+        panel._search_edit.blockSignals.assert_called_with(False)
+        panel._sort_combo.blockSignals.assert_called_with(False)
+        panel._history_filter_state = lambda: ("All", "All", "")
+        panel._search_edit.text.return_value = "  new query  "
+        panel._sort_combo.currentText.return_value = "Oldest first"
+        with patch.object(module, "save_config") as save:
+            panel._save_history_filters()
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["query"], "new query")
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["sort"], "Oldest first")
+        save.assert_called_once_with(panel.config)
+
+    def test_history_view_ignores_malformed_saved_preferences(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"query": ["bad"], "sort": {"bad": True}}}
+        panel._restore_history_view()
+        panel._search_edit.setText.assert_called_once_with("")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(0)
+
+    def test_history_selection_is_retained_when_temporarily_filtered_out(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"history_selected_entry_id": "hidden"}}
+        panel._all_history_entries = [SimpleNamespace(id="hidden")]
+        panel._clear_history_selection_state = MagicMock()
+        panel._restore_history_selection()
+        panel._clear_history_selection_state.assert_not_called()
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"], "hidden",
+        )
+
+    def test_history_poll_reloads_only_when_disk_log_changes(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._history_stamp = (123, 400)
+        panel._history_file_stamp = MagicMock(return_value=(123, 400))
+        panel._refresh_history = MagicMock()
+        panel._refresh_active = MagicMock()
+        panel._poll_downloads()
+        panel._refresh_history.assert_not_called()
+        panel._history_file_stamp.return_value = (124, 500)
+        panel._poll_downloads()
+        panel._refresh_history.assert_called_once()
+        self.assertEqual(panel._refresh_active.call_count, 2)
+
+    def test_history_file_stamp_handles_creation_changes_and_removal(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "history.json"
+            with patch("src.core.download_history.get_history_file", return_value=path):
+                self.assertIsNone(panel._history_file_stamp())
+                path.write_text("[]")
+                first = panel._history_file_stamp()
+                self.assertEqual(first[1], 2)
+                path.write_text("[{}]")
+                self.assertNotEqual(panel._history_file_stamp(), first)
+                path.unlink()
+                self.assertIsNone(panel._history_file_stamp())
+
+    def test_history_refresh_flushes_pending_search_before_reloading(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._filter_timer.isActive.return_value = True
+        panel._save_history_filters = MagicMock()
+        panel._apply_history_filters = MagicMock()
+        with patch("src.core.download_history.list_history", return_value=[]) as load:
+            panel._refresh_history()
+        panel._filter_timer.stop.assert_called_once()
+        panel._save_history_filters.assert_called_once()
+        load.assert_called_once_with(panel.config)
+        panel._apply_history_filters.assert_called_once()
 
     def test_history_filters_restore_and_save(self):
         import types
@@ -7612,7 +7813,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def blockSignals(self, value):
                 self.blocked = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             download_history_status_filter="❌ Failed",
             download_history_type_filter="🖼 Cover Art",
@@ -7649,7 +7850,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._notify_status = MagicMock()
 
@@ -7699,7 +7900,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def blockSignals(self, value):
                 self.blocked = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             download_history_status_filter="Archived",
             download_history_type_filter=object(),
@@ -7771,7 +7972,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def blockSignals(self, value):
                 self.blocked = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             download_history_status_filter="❌ Failed",
             download_history_type_filter="🖼 Cover Art",
@@ -7783,7 +7984,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
         ], index=3)
         panel._serial_edit = FakeLineEdit()
-        panel._refresh_history = MagicMock()
+        panel._apply_history_filters = MagicMock()
 
         with patch.object(downloads_panel, "save_config") as save_mock:
             panel._clear_history_filters()
@@ -7794,7 +7995,9 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertEqual(panel.config.download_history_status_filter, "All")
         self.assertEqual(panel.config.download_history_type_filter, "All")
         self.assertEqual(panel.config.download_history_serial_filter, "")
-        panel._refresh_history.assert_called_once()
+        panel._apply_history_filters.assert_called_once()
+        panel._search_edit.setText.assert_called_once_with("")
+        panel._filter_timer.stop.assert_called_once()
         save_mock.assert_called_once_with(panel.config)
 
     def test_history_splitter_state_restores_and_saves(self):
@@ -7811,7 +8014,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setSizes(self, sizes):
                 self._sizes = list(sizes)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": [280, 520]}})
         panel._history_splitter = FakeSplitter([120, 680])
 
@@ -7840,7 +8043,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
                 self._sizes = list(sizes)
                 self.set_calls += 1
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": "broken"}})
         panel._history_splitter = FakeSplitter([120, 680])
 
@@ -7910,6 +8113,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             types.SimpleNamespace(
                 id="entry-1",
                 mod_name="First Mod",
+                mod_type="texture_pack",
                 type_label="Texture Pack",
                 status="success",
                 status_label="Success",
@@ -7923,6 +8127,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             types.SimpleNamespace(
                 id="entry-2",
                 mod_name="Second Mod",
+                mod_type="pnach",
                 type_label="PNACH Patch",
                 status="failed",
                 status_label="Failed",
@@ -7935,7 +8140,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             ),
         ]
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             ui_state={"downloads_panel": {"history_selected_entry_id": "entry-2"}}
         )
@@ -7978,7 +8183,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
                 self.current_row = row
                 self.set_calls += 1
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             ui_state={"downloads_panel": {"history_selected_entry_id": "missing-entry"}}
         )
@@ -8019,7 +8224,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
                 self.current_row = row
                 self.set_calls += 1
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig(
             ui_state={"downloads_panel": {"history_selected_entry_id": 12345}}
         )
@@ -8065,7 +8270,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setEnabled(self, value):
                 self.enabled = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._history_entries = [
             types.SimpleNamespace(
@@ -8118,7 +8323,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
         panel._delete_btn = types.SimpleNamespace(enabled=False, setEnabled=lambda value: setattr(panel._delete_btn, "enabled", bool(value)))
         panel._history_entries = [
@@ -8137,7 +8342,8 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             )
         ]
 
-        panel._on_selection_changed(0)
+        with patch.object(downloads_panel, "save_config"):
+            panel._on_selection_changed(0)
 
         self.assertIn("&lt;b&gt;Danger &amp; Mod&lt;/b&gt;", panel._detail_label.value)
         self.assertIn("&lt;Ready&gt;", panel._detail_label.value)
@@ -8156,7 +8362,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setEnabled(self, value):
                 self.enabled = bool(value)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
         panel._delete_btn = FakeButton()
         panel._open_source_btn = FakeButton()
@@ -8177,7 +8383,8 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             )
         ]
 
-        panel._on_selection_changed(0)
+        with patch.object(downloads_panel, "save_config"):
+            panel._on_selection_changed(0)
 
         self.assertEqual(panel._selected_source_url, "https://example.com/source")
         self.assertTrue(panel._open_source_btn.enabled)
@@ -8197,7 +8404,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setText(self, text):
                 self.text = text
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel._selected_source_url = "https://example.com/source"
         panel._notify_status = MagicMock()
 
@@ -8233,7 +8440,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         downloads_panel = self._import_downloads_panel()
         DownloadsPanel = downloads_panel.DownloadsPanel
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel._selected_source_url = ""
         panel._notify_status = MagicMock()
 
@@ -8261,7 +8468,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             def setText(self, _text):
                 raise RuntimeError("clipboard boom")
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel._selected_source_url = "https://example.com/source"
         panel._notify_status = MagicMock()
 
@@ -8303,7 +8510,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         DownloadsPanel = downloads_panel.DownloadsPanel
         downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
         panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]
@@ -8324,7 +8531,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         DownloadsPanel = downloads_panel.DownloadsPanel
         downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
 
-        panel = DownloadsPanel.__new__(DownloadsPanel)
+        panel = self._make_panel(downloads_panel)
         panel.config = AppConfig()
         panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
         panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]

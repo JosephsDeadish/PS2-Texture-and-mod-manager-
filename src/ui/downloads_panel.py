@@ -37,7 +37,9 @@ from src.ui.base_panel import BasePanel
 logger = logging.getLogger(__name__)
 
 
-def _history_summary_message(entry_count: int, filters_active: bool) -> str:
+def _history_summary_message(
+    entry_count: int, filters_active: bool, total: int | None = None,
+) -> str:
     """Return a compact history summary for the current filter state."""
     if entry_count <= 0:
         if filters_active:
@@ -45,9 +47,43 @@ def _history_summary_message(entry_count: int, filters_active: bool) -> str:
         return "No download history entries recorded yet. Finished downloads will appear here."
 
     noun = "entry" if entry_count == 1 else "entries"
+    if total is not None and filters_active:
+        return f"Showing {entry_count} of {total} download history entries."
     if filters_active:
         return f"Showing {entry_count} matching download history {noun}."
     return f"Showing {entry_count} download history {noun}."
+
+
+_HISTORY_SORTS = ("Newest first", "Oldest first", "Name (A–Z)", "Largest first")
+
+
+def _filter_history(entries, status, mod_type, serial, query, sort):
+    serial = "".join(c for c in serial.casefold() if c.isalnum())
+    terms = query.casefold().split()
+    matches = []
+    for entry in entries:
+        if status and entry.status != status:
+            continue
+        entry_type = "save" if entry.mod_type == "save_file" else entry.mod_type
+        if mod_type and entry_type != mod_type:
+            continue
+        normalized_serial = "".join(c for c in str(entry.serial or "").casefold() if c.isalnum())
+        if serial and serial not in normalized_serial:
+            continue
+        searchable = " ".join(str(value or "") for value in (
+            entry.mod_name, entry.serial, entry.source_url, entry.note,
+            entry.type_label, entry.status_label,
+        )).casefold()
+        if all(term in searchable for term in terms):
+            matches.append(entry)
+    # The history log is already newest-first; retain that order for ties.
+    if sort == "Oldest first":
+        matches.reverse()
+    elif sort == "Name (A–Z)":
+        matches.sort(key=lambda entry: entry.mod_name.casefold())
+    elif sort == "Largest first":
+        matches.sort(key=lambda entry: entry.size_bytes, reverse=True)
+    return matches
 
 
 # ---------------------------------------------------------------------------
@@ -138,12 +174,18 @@ class DownloadsPanel(BasePanel):
         super().__init__("📥  Downloads", "Active downloads and installation history", parent)
         self.config = config
         self._history_entries: list = []
+        self._all_history_entries: list = []
+        self._history_stamp = None
         self._selected_source_url: str = ""
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(200)
+        self._filter_timer.timeout.connect(self._on_history_filter_changed)
         self._build()
         # Poll active downloads when the panel is visible
         self._poll_timer = QTimer(self)
         self._poll_timer.setInterval(1000)
-        self._poll_timer.timeout.connect(self._refresh_active)
+        self._poll_timer.timeout.connect(self._poll_downloads)
 
     def _last_paths_bucket(self) -> dict:
         return ui_state_bucket(self.config, "last_paths")
@@ -270,6 +312,8 @@ class DownloadsPanel(BasePanel):
             finally:
                 self._history_state_syncing = False
             return
+        if any(entry.id == entry_id for entry in self._all_history_entries):
+            return  # A filter temporarily hides the saved selection.
         logger.warning(
             "Saved download history entry %r is no longer available; clearing selection",
             entry_id,
@@ -289,7 +333,9 @@ class DownloadsPanel(BasePanel):
         self._save_panel_config(context)
 
     def _clear_history_filters(self) -> None:
-        for widget in (self._status_combo, self._type_combo, self._serial_edit):
+        widgets = (self._status_combo, self._type_combo, self._serial_edit, self._search_edit)
+        self._filter_timer.stop()
+        for widget in widgets:
             setter = getattr(widget, "blockSignals", None)
             if callable(setter):
                 setter(True)
@@ -301,19 +347,22 @@ class DownloadsPanel(BasePanel):
             if type_idx >= 0:
                 self._type_combo.setCurrentIndex(type_idx)
             self._serial_edit.setText("")
+            self._search_edit.setText("")
         finally:
-            for widget in (self._status_combo, self._type_combo, self._serial_edit):
+            for widget in widgets:
                 setter = getattr(widget, "blockSignals", None)
                 if callable(setter):
                     setter(False)
         self._save_history_filters()
-        self._refresh_history()
+        self._apply_history_filters()
 
     def showEvent(self, event):
         super().showEvent(event)
         self._poll_timer.start()
 
     def hideEvent(self, event):
+        if self._filter_timer.isActive():
+            self._on_history_filter_changed()
         super().hideEvent(event)
         self._poll_timer.stop()
 
@@ -354,6 +403,20 @@ class DownloadsPanel(BasePanel):
         hist_hdr.setStyleSheet("font-weight: bold; font-size: 13px; color: #a0a0d0;")
         content.addWidget(hist_hdr)
 
+        search_row = QHBoxLayout()
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Search names, sources, notes…")
+        self._search_edit.setClearButtonEnabled(True)
+        self._search_edit.setAccessibleName("Search download history")
+        self._search_edit.textChanged.connect(self._on_history_text_changed)
+        search_row.addWidget(self._search_edit, 1)
+        search_row.addWidget(QLabel("Sort:"))
+        self._sort_combo = QComboBox()
+        self._sort_combo.addItems(_HISTORY_SORTS)
+        self._sort_combo.currentIndexChanged.connect(self._on_history_filter_changed)
+        search_row.addWidget(self._sort_combo)
+        content.addLayout(search_row)
+
         # Filter row
         filter_row = QHBoxLayout()
         filter_row.setSpacing(8)
@@ -375,20 +438,11 @@ class DownloadsPanel(BasePanel):
 
         filter_row.addWidget(QLabel("Serial:"))
         self._serial_edit = QLineEdit()
-        self._serial_edit.setPlaceholderText("e.g. SLUS-20228")
+        self._serial_edit.setPlaceholderText("Serial or fragment")
         self._serial_edit.setMaximumWidth(130)
-        self._serial_edit.textChanged.connect(self._on_history_filter_changed)
+        self._serial_edit.setToolTip("Match part of a serial, ignoring case and punctuation")
+        self._serial_edit.textChanged.connect(self._on_history_text_changed)
         filter_row.addWidget(self._serial_edit)
-
-        refresh_hist_btn = QPushButton("🔄 Refresh")
-        refresh_hist_btn.setToolTip("Reload the history log from disk")
-        refresh_hist_btn.clicked.connect(self._refresh_history)
-        filter_row.addWidget(refresh_hist_btn)
-
-        clear_hist_btn = QPushButton("✖ Clear Filters")
-        clear_hist_btn.setToolTip("Reset the history status, type, and serial filters")
-        clear_hist_btn.clicked.connect(self._clear_history_filters)
-        filter_row.addWidget(clear_hist_btn)
 
         filter_row.addStretch()
         content.addLayout(filter_row)
@@ -399,6 +453,11 @@ class DownloadsPanel(BasePanel):
         self._history_summary_lbl.setWordWrap(True)
         content.addWidget(self._history_summary_lbl)
 
+        self._empty_filters_btn = QPushButton("Clear Filters")
+        self._empty_filters_btn.clicked.connect(self._clear_history_filters)
+        self._empty_filters_btn.hide()
+        content.addWidget(self._empty_filters_btn)
+
         # Splitter: list (left) | detail (right)
         splitter = QSplitter(Qt.Orientation.Horizontal)
 
@@ -406,6 +465,8 @@ class DownloadsPanel(BasePanel):
         ll = QVBoxLayout(left)
         ll.setContentsMargins(0, 0, 0, 0)
         self._list_widget = QListWidget()
+        self._list_widget.setWordWrap(True)
+        self._list_widget.setSpacing(3)
         self._list_widget.setAlternatingRowColors(True)
         self._list_widget.currentRowChanged.connect(self._on_selection_changed)
         ll.addWidget(self._list_widget)
@@ -418,7 +479,11 @@ class DownloadsPanel(BasePanel):
         self._detail_label.setWordWrap(True)
         self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._detail_label.setTextFormat(Qt.TextFormat.RichText)
-        rl.addWidget(self._detail_label, 1)
+        detail_scroll = QScrollArea()
+        detail_scroll.setWidgetResizable(True)
+        detail_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        detail_scroll.setWidget(self._detail_label)
+        rl.addWidget(detail_scroll, 1)
 
         right_sep = QFrame()
         right_sep.setFrameShape(QFrame.Shape.HLine)
@@ -429,7 +494,7 @@ class DownloadsPanel(BasePanel):
         self._delete_btn.setToolTip("Remove this entry from the history log")
         self._delete_btn.setEnabled(False)
         self._delete_btn.clicked.connect(self._on_delete_entry)
-        btn_row.addWidget(self._delete_btn)
+        rl.addWidget(self._delete_btn)
 
         self._open_source_btn = QPushButton("🌐 Open Source")
         self._open_source_btn.setToolTip("Open the selected entry's source page in your browser")
@@ -457,6 +522,16 @@ class DownloadsPanel(BasePanel):
 
         # Bottom actions
         bottom_row = QHBoxLayout()
+        refresh_hist_btn = QPushButton("🔄 Refresh")
+        refresh_hist_btn.setToolTip("Reload the history log from disk")
+        refresh_hist_btn.clicked.connect(self._refresh_history)
+        bottom_row.addWidget(refresh_hist_btn)
+
+        clear_hist_btn = QPushButton("✖ Clear Filters")
+        clear_hist_btn.setToolTip("Reset history search, status, type, and serial filters")
+        clear_hist_btn.clicked.connect(self._clear_history_filters)
+        bottom_row.addWidget(clear_hist_btn)
+
         clear_btn = QPushButton("🗑  Clear All History")
         clear_btn.setToolTip("Permanently delete every entry in the history log")
         clear_btn.clicked.connect(self._on_clear)
@@ -470,6 +545,7 @@ class DownloadsPanel(BasePanel):
         bottom_row.addStretch()
         content.addLayout(bottom_row)
 
+        self._restore_history_view()
         self._restore_history_filters()
         self._restore_history_splitter()
 
@@ -492,7 +568,26 @@ class DownloadsPanel(BasePanel):
         self.config.download_history_status_filter = status or "All"
         self.config.download_history_type_filter = mod_type or "All"
         self.config.download_history_serial_filter = serial
+        self._history_panel_bucket().update({
+            "query": self._search_edit.text().strip(),
+            "sort": self._sort_combo.currentText(),
+        })
         self._save_panel_config("updating download history filters")
+
+    def _restore_history_view(self) -> None:
+        bucket = self._history_panel_bucket()
+        query = bucket.get("query", "")
+        sort = bucket.get("sort", _HISTORY_SORTS[0])
+        for widget in (self._search_edit, self._sort_combo):
+            widget.blockSignals(True)
+        try:
+            self._search_edit.setText(query if isinstance(query, str) else "")
+            self._sort_combo.setCurrentIndex(
+                _HISTORY_SORTS.index(sort) if sort in _HISTORY_SORTS else 0
+            )
+        finally:
+            for widget in (self._search_edit, self._sort_combo):
+                widget.blockSignals(False)
 
     def _update_history_source_actions(self) -> None:
         enabled = bool(self._selected_source_url.strip())
@@ -565,8 +660,12 @@ class DownloadsPanel(BasePanel):
             self._save_history_filters()
 
     def _on_history_filter_changed(self, *_args):
+        self._filter_timer.stop()
         self._save_history_filters()
-        self._refresh_history()
+        self._apply_history_filters()
+
+    def _on_history_text_changed(self, *_args):
+        self._filter_timer.start()
 
     # ------------------------------------------------------------------
     # Active downloads
@@ -611,44 +710,72 @@ class DownloadsPanel(BasePanel):
         "📦 Other": "other",
     }
 
+    def _history_file_stamp(self):
+        from src.core.download_history import get_history_file
+        try:
+            stat = get_history_file(self.config).stat()
+            return stat.st_mtime_ns, stat.st_size
+        except FileNotFoundError:
+            return None
+        except OSError as exc:
+            logger.warning("Could not inspect download history: %s", exc)
+            return None
+
+    def _poll_downloads(self):
+        self._refresh_active()
+        if self._history_file_stamp() != self._history_stamp:
+            self._refresh_history()
+
     def _refresh_history(self):
+        if self._filter_timer.isActive():
+            self._filter_timer.stop()
+            self._save_history_filters()
+        self._history_stamp = self._history_file_stamp()
+        try:
+            from src.core.download_history import list_history
+            self._all_history_entries = list_history(self.config)
+        except Exception as exc:
+            logger.warning("Failed to load download history: %s", exc)
+            self._all_history_entries = []
+            self._apply_history_filters()
+            empty_msg = f"Could not read history: {exc}"
+            self._list_widget.clear()
+            self._list_widget.addItem(empty_msg)
+            self._detail_label.setText(f"<i>{html.escape(empty_msg)}</i>")
+            self._set_history_summary("Could not read download history.")
+            return
+        self._apply_history_filters()
+
+    def _apply_history_filters(self):
         status_filter = self._STATUS_MAP.get(self._status_combo.currentText())
         type_filter = self._TYPE_MAP.get(self._type_combo.currentText())
         serial_text = self._serial_edit.text().strip()
         serial_filter = serial_text if serial_text else None
-        filters_active = any(value is not None for value in (status_filter, type_filter, serial_filter))
+        query = self._search_edit.text().strip()
+        filters_active = bool(status_filter or type_filter or serial_filter or query)
         self._list_widget.clear()
         self._history_entries = []
+        self._detail_label.setText("← Select an entry to see details")
         self._selected_source_url = ""
         self._update_history_source_actions()
         self._delete_btn.setEnabled(False)
 
-        try:
-            from src.core.download_history import list_history
-            self._history_entries = list_history(
-                self.config,
-                status=status_filter,
-                mod_type=type_filter,
-                serial=serial_filter,
-            )
-        except Exception as exc:
-            logger.warning("Failed to load download history: %s", exc)
-            empty_msg = f"Could not read history: {exc}"
-            self._list_widget.addItem(empty_msg)
-            self._detail_label.setText(f"<i>{empty_msg}</i>")
-            self._set_history_summary("Could not read download history.")
-            self._delete_btn.setEnabled(False)
-            return
+        self._history_entries = _filter_history(
+            self._all_history_entries, status_filter, type_filter,
+            serial_text, query, self._sort_combo.currentText(),
+        )
+        self._empty_filters_btn.setVisible(not self._history_entries and filters_active)
 
         for entry in self._history_entries:
             label = (
-                f"{entry.timestamp[:10]}  {entry.status_label}  "
-                f"{entry.type_label}  {entry.mod_name}"
+                f"{entry.status_label}  {entry.mod_name}\n"
+                f"{entry.timestamp[:16].replace('T', ' ')}  ·  {entry.type_label}"
+                + (f"  ·  {entry.serial}" if entry.serial else "")
             )
             self._list_widget.addItem(label)
 
         if not self._history_entries:
-            if status_filter is None and type_filter is None and serial_filter is None:
+            if not filters_active:
                 empty_msg = "No download history entries recorded yet."
             else:
                 empty_msg = "No history entries match the current filters."
@@ -659,7 +786,9 @@ class DownloadsPanel(BasePanel):
             self._set_history_summary(_history_summary_message(0, filters_active))
         else:
             self._set_history_summary(
-                _history_summary_message(len(self._history_entries), filters_active)
+                _history_summary_message(
+                    len(self._history_entries), filters_active, len(self._all_history_entries),
+                )
             )
             self._restore_history_selection()
 
