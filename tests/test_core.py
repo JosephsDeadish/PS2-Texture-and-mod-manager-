@@ -4065,6 +4065,343 @@ class TestInstalledConflictReview(unittest.TestCase):
         d._rescan_btn.setEnabled.assert_called_with(True)
 
 
+class TestManagedConflictReview(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        import src.ui.widgets as module
+        self.module = module
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    author="Alice", game_id="SLUS-20062", priority=1),
+            ModInfo("b", "Beta", ModType.TEXTURE_PACK, "/mods/b", priority=3),
+            ModInfo("c", "Gamma", ModType.PNACH, "/mods/c", priority=9),
+        ]
+        self.db = MagicMock()
+        self.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        self.db.all.side_effect = lambda: list(self.mods)
+        self.conflicts = [ConflictInfo("b", "a", [f"texture{i}.png" for i in range(35)])]
+        self.addresses = [
+            dict(mod_a_id="c", mod_b_id="a", value_a="CCCC", value_b="AAAA",
+                 address="20300000", processor="EE", game_crc="DEADBEEF"),
+        ]
+        d = self.dialog = SimpleNamespace(
+            db=self.db, manager=MagicMock(), config=AppConfig(textures_path="/target"),
+            _busy=False, _selected_pair=None, _visible_pairs=[], _row=-1,
+            _pairs=module.ConflictDialog._group_conflicts(self.conflicts, self.addresses),
+            _texture_conflicts=self.conflicts, pnach_conflicts=self.addresses,
+        )
+        for name in ("_search", "_kind", "_pair_list", "_summary", "_details", "_feedback", "_search_timer"):
+            setattr(d, name, MagicMock())
+        d._search.text.return_value = ""
+        d._kind.currentData.return_value = ""
+        d._action_buttons = [MagicMock() for _ in range(4)]
+        d._pair_list.currentRow.side_effect = lambda: d._row
+        d._pair_list.clear.side_effect = lambda: setattr(d, "_row", -1)
+        d._pair_list.setCurrentRow.side_effect = lambda row: setattr(d, "_row", row)
+        for name in ("_current_pair", "_apply_filters", "_on_pair_selected", "_clear_filters",
+                     "_apply_action", "_open_texture_picker", "_open_code_picker"):
+            setattr(d, name, MethodType(getattr(module.ConflictDialog, name), d))
+        module.QMessageBox.StandardButton = SimpleNamespace(Yes=1, No=2)
+        d.manager.set_priority.return_value = (2, [])
+        d.manager.set_enabled_many.return_value = (1, [])
+
+    def test_grouping_combines_files_and_addresses_without_mutating_inputs(self):
+        conflict = ConflictInfo("c", "a", ["same.pnach", "same.pnach"])
+        pairs = self.module.ConflictDialog._group_conflicts([conflict], self.addresses)
+        self.assertEqual(list(pairs), [("a", "c")])
+        self.assertEqual(pairs[("a", "c")]["files"], {"same.pnach"})
+        entry = pairs[("a", "c")]["addresses"][0]
+        self.assertEqual((entry["mod_a_id"], entry["value_a"]), ("a", "AAAA"))
+        self.assertEqual((entry["mod_b_id"], entry["value_b"]), ("c", "CCCC"))
+        self.assertEqual(self.addresses[0]["value_a"], "CCCC")
+
+    def test_first_selection_has_complete_file_details_and_plain_text(self):
+        d = self.dialog
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "b"))
+        text = d._details.setPlainText.call_args.args[0]
+        self.assertIn("A: Alpha <literal>", text)
+        self.assertIn("texture34.png", text)
+        self.assertIn("Shared relative files (35)", text)
+        d._details.setHtml.assert_not_called()
+        self.assertIn("Showing 2 of 2 mod pairs", d._summary.setText.call_args.args[0])
+
+    def test_address_values_follow_canonical_a_b_labels(self):
+        d = self.dialog
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        text = d._details.setPlainText.call_args.args[0]
+        self.assertIn("A: Alpha", text)
+        self.assertIn("B: Gamma", text)
+        self.assertIn("A: AAAA • B: CCCC", text)
+        self.assertIn("DEADBEEF", text)
+
+    def test_query_combines_name_author_serial_and_file_terms(self):
+        d = self.dialog
+        d._search.text.return_value = "alice slus20062 texture34"
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [("a", "b")])
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [])
+        self.assertIn("Clear Filters", d._details.setPlainText.call_args.args[0])
+        for button in d._action_buttons:
+            button.setEnabled.assert_called_with(False)
+
+    def test_query_matches_code_values_crcs_and_addresses(self):
+        self.dialog._search.text.return_value = "DEAD-BEEF 20300000 CCCC"
+        self.dialog._apply_filters()
+        self.assertEqual(self.dialog._visible_pairs, [("a", "c")])
+
+    def test_selection_survives_filter_hiding_and_clear(self):
+        d = self.dialog
+        d._apply_filters()
+        d._row = 1
+        d._on_pair_selected()
+        d._kind.currentData.return_value = "files"
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "b"))
+        self.assertEqual(d._selected_pair, ("a", "c"))
+        d._kind.currentData.return_value = ""
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "c"))
+        d._clear_filters()
+        d._search.clear.assert_called_once()
+        d._kind.setCurrentIndex.assert_called_once_with(0)
+
+    def test_deleted_pair_members_are_omitted_and_cannot_be_changed(self):
+        self.mods.pop(0)
+        d = self.dialog
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [])
+        d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_not_called()
+
+    def test_cancel_action_defaults_to_no_and_keeps_state(self):
+        d = self.dialog
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=2) as question:
+            d._apply_action(0, "Prioritize")
+        self.assertEqual(question.call_args.args[-1], 2)
+        self.assertIn("Alpha &lt;literal&gt;", question.call_args.args[2])
+        self.assertIn("whole library", question.call_args.args[2])
+        d.manager.set_priority.assert_not_called()
+        self.assertFalse(d._busy)
+        self.assertEqual(self.mods[0].priority, 1)
+
+    def test_filtered_priority_targets_selected_mod_and_exceeds_third_mod(self):
+        d = self.dialog
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_called_once_with("a", 10, d.config)
+        self.assertIn("Deployment reconciled", d._feedback.setPlainText.call_args.args[0])
+        self.assertFalse(d._busy)
+
+    def test_retry_priority_does_not_keep_increasing_already_highest_priority(self):
+        d = self.dialog
+        self.mods[0].priority = 20
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Prioritize")
+            d._apply_action(0, "Prioritize")
+        self.assertEqual([call.args[1] for call in d.manager.set_priority.call_args_list], [20, 20])
+
+    def test_disabled_mods_keep_disable_retry_but_not_priority_actions(self):
+        d = self.dialog
+        self.mods[0].enabled = False
+        d._apply_filters()
+        d._action_buttons[0].setEnabled.assert_called_with(False)
+        d._action_buttons[2].setEnabled.assert_called_with(True)
+        d._action_buttons[2].setText.assert_called_with("Retry Disable A")
+        d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_not_called()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_called_once_with({"a": False}, d.config)
+
+    def test_partial_failure_keeps_retry_available_and_feedback_literal(self):
+        d = self.dialog
+        d._apply_filters()
+        d.manager.set_priority.side_effect = OSError("<denied>")
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                d._apply_action(0, "Prioritize")
+        self.assertFalse(d._busy)
+        self.assertIn("<denied>", d._feedback.setPlainText.call_args.args[0])
+        self.assertIn("Retry the same action", d._feedback.setPlainText.call_args.args[0])
+        d._action_buttons[0].setEnabled.assert_called_with(True)
+
+    def test_warning_or_absent_config_never_claims_installed_files_reconciled(self):
+        d = self.dialog
+        d._apply_filters()
+        for config, warnings in ((None, []), (d.config, ["Missing path <source>"])):
+            d.config = config
+            d.manager.set_enabled_many.return_value = (0, warnings)
+            with patch.object(self.module.QMessageBox, "question", return_value=1):
+                d._apply_action(0, "Disable")
+            text = d._feedback.setPlainText.call_args.args[0]
+            self.assertNotIn("Deployment reconciled", text)
+            self.assertIn("not changed" if config is None else "retry", text)
+
+    def test_busy_actions_do_not_reenter_manager(self):
+        d = self.dialog
+        d._apply_filters()
+        d._busy = True
+        d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_not_called()
+
+    def test_save_file_priority_blocked_and_disable_explains_card_safety(self):
+        d = self.dialog
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        d._apply_filters()
+        d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_not_called()
+        self.assertIn("Live memory-card", d._details.setPlainText.call_args.args[0])
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Disable")
+        self.assertIn("Live memory-card files were not changed", d._feedback.setPlainText.call_args.args[0])
+
+    def test_pickers_drop_disabled_pairs_without_exporting_stale_snapshot(self):
+        d = self.dialog
+        self.mods[0].enabled = False
+        with patch.object(self.module, "TextureFilePickerDialog") as textures:
+            with patch.object(self.module, "PnachCodePickerDialog") as codes:
+                d._open_texture_picker()
+                d._open_code_picker()
+        textures.assert_not_called()
+        codes.assert_not_called()
+
+
+class TestManagedConflictDeployment(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.target = self.root / "target"
+        self.mods = []
+        for index in range(3):
+            source = self.root / f"source{index}"
+            source.mkdir()
+            (source / "shared.png").write_text(f"pack{index}", encoding="utf-8")
+            (source / f"unique{index}.png").write_text("unique", encoding="utf-8")
+            self.mods.append(ModInfo(str(index), f"Pack {index}", ModType.TEXTURE_PACK, str(source), priority=index))
+        self.db = MagicMock()
+        self.db.all.side_effect = lambda: list(self.mods)
+        self.db.by_type.side_effect = lambda kind: [mod for mod in self.mods if mod.mod_type == kind]
+        self.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        self.manager = ModManager(self.db)
+        self.config = AppConfig(textures_path=str(self.target))
+
+    def test_priority_redeploys_highest_last_regardless_of_database_order(self):
+        for mods in (self.mods[:], list(reversed(self.mods))):
+            self.mods[:] = mods
+            count, warnings = self.manager.set_priority("0", 10, self.config)
+            self.assertEqual((count, warnings), (3, []))
+            self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+            self.assertTrue((self.target / "unique2.png").exists())
+        self.assertEqual(self.db.update.call_count, 2)
+        self.db.save.assert_not_called()
+
+    def test_single_file_texture_sources_follow_highest_priority(self):
+        for mod in self.mods:
+            mod.path = str(Path(mod.path) / "shared.png")
+        self.manager.set_priority("1", 50, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack1")
+
+    def test_failed_save_restores_priority_and_does_not_touch_installed_files(self):
+        self.db.update.side_effect = OSError("database locked")
+        with self.assertRaises(OSError):
+            self.manager.set_priority("0", 100, self.config)
+        self.assertEqual(self.mods[0].priority, 0)
+        self.assertFalse(self.target.exists())
+
+    def test_reapplying_priority_retries_deployment_after_exception(self):
+        with patch.object(self.manager, "deploy", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(self.mods[0].priority, 30)
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+
+    def test_no_target_reports_warning_and_can_retry_after_configured(self):
+        self.config.textures_path = ""
+        count, warnings = self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(count, 0)
+        self.assertIn("No target path configured", warnings[0])
+        self.config.textures_path = str(self.target)
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+
+    def test_no_config_only_persists_priority(self):
+        self.assertEqual(self.manager.set_priority("0", 30), (0, []))
+        self.assertEqual(self.mods[0].priority, 30)
+        self.assertFalse(self.target.exists())
+
+    def test_missing_mod_does_not_persist_or_deploy(self):
+        count, warnings = self.manager.set_priority("missing", 30, self.config)
+        self.assertEqual(count, 0)
+        self.assertIn("not found", warnings[0])
+        self.db.update.assert_not_called()
+        self.assertFalse(self.target.exists())
+
+    def test_disable_removes_unique_files_and_restores_surviving_priority(self):
+        self.manager.set_priority("0", 30, self.config)
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+        self.assertFalse(self.mods[0].enabled)
+
+    def test_disable_with_missing_source_warns_instead_of_claiming_complete_cleanup(self):
+        self.manager.set_priority("0", 30, self.config)
+        shutil.rmtree(self.mods[0].path)
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(any("Could not verify complete deployed-file cleanup" in notice for notice in warnings))
+        self.assertTrue((self.target / "unique0.png").exists())
+
+    def _code_mods(self, filename="DEADBEEF.pnach"):
+        for index, mod in enumerate(self.mods):
+            mod.mod_type = ModType.PNACH if index != 1 else ModType.CHEAT
+            mod.path = str(Path(mod.path) / filename)
+            Path(mod.path).write_text(
+                f"patch=1,EE,20300000,word,0000000{index}\n"
+                f"patch=1,EE,2030000{index + 1},word,000000FF\n", encoding="utf-8",
+            )
+        self.config.pnach_path = str(self.target)
+        self.config.cheats_path = str(self.target / ".")
+
+    def test_priority_redeploy_merges_shared_pnach_cheat_destination(self):
+        self._code_mods()
+        count, warnings = self.manager.set_priority("1", 30, self.config)
+        self.assertEqual((count, warnings), (1, []))
+        text = (self.target / "DEADBEEF.pnach").read_text()
+        self.assertIn("20300000,word,00000001", text)
+        self.assertNotIn("20300000,word,00000002", text)
+        for index in range(3):
+            self.assertIn(f"2030000{index + 1}", text)
+
+    def test_no_crc_filename_collision_uses_highest_priority(self):
+        self._code_mods("custom.pnach")
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "custom.pnach").read_text(), Path(self.mods[0].path).read_text())
+
+    def test_priority_reconciliation_never_touches_live_memory_cards(self):
+        self.target.mkdir()
+        live = self.target / "shared.png"
+        live.write_bytes(b"active card")
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        self.config.memcards_path = str(self.target)
+        result = self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(result, (0, []))
+        self.assertEqual(live.read_bytes(), b"active card")
+
+
 class TestAssetPaths(unittest.TestCase):
     """Tests for src.core.assets path helpers."""
 
@@ -11237,9 +11574,13 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel._invalidate_issue_state_cache = MagicMock()
         panel._apply_filter = MagicMock()
         panel.manager = MagicMock()
+        panel.config = AppConfig()
         with patch.object(mod_panel, "ConflictDialog") as dialog:
             panel._show_conflicts()
-            dialog.assert_called_once_with([], panel.db, panel, pnach_conflicts=overlaps)
+            dialog.assert_called_once_with(
+                [], panel.db, panel, pnach_conflicts=overlaps,
+                manager=panel.manager, config=panel.config,
+            )
             dialog.return_value.exec.assert_called_once()
         panel.manager.detect_pnach_conflicts.assert_not_called()
         panel._invalidate_issue_state_cache.assert_called_once()

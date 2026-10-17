@@ -75,6 +75,14 @@
 - Selection survives filtering and re-scans; scrollable details, selected-file **Open Folder**, and **Copy Paths** speed up manual review
 - Auto-Fix requires confirmation, affects only the selected result, and re-scans after success or failure; unavailable/error results cannot be fixed
 
+### 🔀 Managed-Mod Conflict Review
+- Content-panel conflict indicators open a searchable mod-pair comparison with shared-file/address filters and complete, copyable details
+- A/B labels stay aligned with PNACH values; pair counts distinguish shared file references from address overlaps
+- **Prioritize A/B** changes the whole mod's priority and re-deploys affected content; **Disable A/B** removes its deployed files and restores remaining enabled mods
+- Higher priority wins copied-file collisions as well as merged PNACH addresses; priority choices affect other overlaps too, not just the selected pair
+- Confirmations, deployment warnings, and retryable actions distinguish saved library state from installed files; live memory cards are never modified
+- Use **Texture Picker** or **Code Picker** for individual-file/code choices and merged exports; overlap reviews are snapshots, not a persisted “allow both” policy
+
 ### 💾 Memory Card & Save File Manager
 - Browse all `.ps2` / `.mcd` memory card images
 - List and export individual saves

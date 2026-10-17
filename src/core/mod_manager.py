@@ -399,6 +399,9 @@ class ModManager:
             for mod in mods:
                 mod.enabled = previous[mod.id]
             raise
+        return self._reconcile_deployment(mods, config)
+
+    def _reconcile_deployment(self, mods: List[ModInfo], config=None) -> Tuple[int, List[str]]:
         if config is None:
             return 0, []
 
@@ -469,6 +472,11 @@ class ModManager:
         if target.exists():
             # Remove files that belong to this mod from the target folder
             mod_src = Path(mod.path)
+            if not mod_src.exists():
+                cleanup_warnings.append(
+                    f"Missing source for '{mod.name}': {mod_src}. "
+                    "Could not verify complete deployed-file cleanup. Restore the source and retry."
+                )
             deployed_files = []
             if mod.mod_type == ModType.COVER_ART:
                 from src.core.game_registry import (
@@ -506,11 +514,22 @@ class ModManager:
         deployed, warnings = self.deploy(mod.mod_type, target_path)
         return deployed, cleanup_warnings + warnings
 
-    def set_priority(self, mod_id: str, priority: int):
+    def set_priority(self, mod_id: str, priority: int, config=None) -> Tuple[int, List[str]]:
+        """Persist priority with rollback, then reconcile files when configured.
+
+        Reapplying the same priority retries deployment after a partial failure.
+        """
         mod = self.db.get(mod_id)
-        if mod:
+        if not mod:
+            return 0, [f"Mod not found: {mod_id}"]
+        previous = mod.priority
+        try:
             mod.priority = priority
             self.db.update(mod)
+        except Exception:
+            mod.priority = previous
+            raise
+        return self._reconcile_deployment([mod], config)
 
     # ------------------------------------------------------------------
     # Metadata update
@@ -779,8 +798,8 @@ class ModManager:
         if mod_type == ModType.COVER_ART:
             return self._deploy_cover_art(mods, target, warnings)
 
-        # ── All other types: copy in priority order ───────────────────────
-        for mod in mods:
+        # Copy low priority first so the highest-priority files are written last.
+        for mod in reversed(mods):
             src = Path(mod.path)
             if not src.exists():
                 warnings.append(f"Missing path for mod '{mod.name}': {mod.path}")
@@ -977,7 +996,7 @@ class ModManager:
                     deployed += 1
 
         # Copy no-CRC files directly
-        for _prio, path in no_crc_files:
+        for _prio, path in sorted(no_crc_files, key=lambda entry: entry[0]):
             shutil.copy2(path, str(target / Path(path).name))
             deployed += 1
 

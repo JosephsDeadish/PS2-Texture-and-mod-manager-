@@ -1053,7 +1053,10 @@ class ModPanel(BasePanel):
                 self, "No Conflicts", "No conflicts detected between enabled mods! ✅"
             )
             return
-        dlg = ConflictDialog(conflicts, self.db, self, pnach_conflicts=pnach_conflicts)
+        dlg = ConflictDialog(
+            conflicts, self.db, self, pnach_conflicts=pnach_conflicts,
+            manager=self.manager, config=self.config,
+        )
         dlg.exec()
         self._invalidate_issue_state_cache()
         self._apply_filter()

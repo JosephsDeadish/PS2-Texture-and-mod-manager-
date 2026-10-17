@@ -1151,406 +1151,303 @@ class TextureFilePickerDialog(QDialog):
 # ---------------------------------------------------------------------------
 
 class ConflictDialog(QDialog):
-    """Shows conflicts and lets the user choose resolution."""
+    """Review managed-mod overlaps and apply whole-mod changes."""
 
-    def __init__(self, conflicts: list, db, parent=None, pnach_conflicts: list = None):
+    def __init__(self, conflicts: list, db, parent=None, pnach_conflicts: list = None,
+                 *, manager=None, config=None):
         super().__init__(parent)
-        self.conflicts = conflicts
-        self.pnach_conflicts = pnach_conflicts or []
         self.db = db
-        total = len(conflicts) + len(self.pnach_conflicts)
-        self.setWindowTitle(f"Mod Conflicts Detected ({total})")
-        self.setMinimumSize(740, 560)
+        from src.core.mod_manager import ModManager
+        self.manager = manager if manager is not None else ModManager(db)
+        self.config = config
+        self._busy = False
+        self._pairs = self._group_conflicts(conflicts, pnach_conflicts or [])
+        self._visible_pairs = []
+        self._selected_pair = None
+        self._texture_conflicts = [
+            conflict for conflict in conflicts
+            if all(self.db.get(mid) and self.db.get(mid).mod_type == ModType.TEXTURE_PACK
+                   for mid in (conflict.mod_a_id, conflict.mod_b_id))
+        ]
+        self.pnach_conflicts = pnach_conflicts or []
+        self.setWindowTitle("Managed Mod Conflicts")
+        self.resize(820, 600)
         self._build_ui()
+        self._apply_filters()
+
+    @staticmethod
+    def _group_conflicts(conflicts, pnach_conflicts):
+        pairs = {}
+        for conflict in conflicts:
+            key = tuple(sorted((conflict.mod_a_id, conflict.mod_b_id)))
+            pair = pairs.setdefault(key, {"files": set(), "addresses": []})
+            pair["files"].update(conflict.conflicting_files)
+        for entry in pnach_conflicts:
+            key = tuple(sorted((entry["mod_a_id"], entry["mod_b_id"])))
+            normalized = dict(entry)
+            if entry["mod_a_id"] != key[0]:
+                normalized["value_a"], normalized["value_b"] = entry.get("value_b", "?"), entry.get("value_a", "?")
+            normalized["mod_a_id"], normalized["mod_b_id"] = key
+            pairs.setdefault(key, {"files": set(), "addresses": []})["addresses"].append(normalized)
+        return pairs
 
     def _build_ui(self):
         layout = QVBoxLayout(self)
-        layout.setSpacing(12)
-        layout.setContentsMargins(20, 20, 20, 20)
-
-        n_file = len(self.conflicts)
-        n_pnach = len(self.pnach_conflicts)
-        parts = []
-        if n_file:
-            parts.append(f"{n_file} file conflict(s)")
-        if n_pnach:
-            parts.append(f"{n_pnach} PNACH address conflict(s)")
-        summary_str = "  •  ".join(parts) if parts else "conflicts"
-
-        header = QLabel(f"⚠  {summary_str} detected between enabled mods")
-        header.setStyleSheet("font-size: 16px; font-weight: bold; color: #ff8080;")
-        layout.addWidget(header)
-
-        sub = QLabel(
-            "Choose which mod wins each conflict. You can resolve all files at once,\n"
-            "or expand a conflict to pick winners file-by-file."
+        header = QLabel(
+            "Priority affects the whole mod, not just the selected files or addresses. "
+            "Overlaps remain visible after prioritizing. This is a review snapshot; "
+            "close and reopen to scan again."
         )
-        sub.setStyleSheet("color: #9090b0;")
-        sub.setWordWrap(True)
-        layout.addWidget(sub)
-
-        sep = QFrame()
-        sep.setFrameShape(QFrame.Shape.HLine)
-        layout.addWidget(sep)
-
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        container = QWidget()
-        c_layout = QVBoxLayout(container)
-        c_layout.setSpacing(10)
-
-        for conflict in self.conflicts:
-            mod_a = self.db.get(conflict.mod_a_id)
-            mod_b = self.db.get(conflict.mod_b_id)
-            if not mod_a or not mod_b:
-                continue
-
-            frame = QFrame()
-            frame.setObjectName("card")
-            f_layout = QVBoxLayout(frame)
-
-            # ── Header row ──────────────────────────────────────────────
-            title = QLabel(f"🔴  {mod_a.name}  ↔  {mod_b.name}")
-            title.setStyleSheet("font-weight: bold; color: #ff8080;")
-            f_layout.addWidget(title)
-
-            count_lbl = QLabel(
-                f"{len(conflict.conflicting_files)} conflicting file(s)"
-            )
-            count_lbl.setStyleSheet("color: #9090b0; font-size: 11px;")
-            f_layout.addWidget(count_lbl)
-
-            # ── Quick-resolve: entire conflict ───────────────────────────
-            quick_row = QHBoxLayout()
-            a_wins = QPushButton(f"✅ {mod_a.name} wins all")
-            a_wins.setObjectName("success_btn")
-            b_wins = QPushButton(f"✅ {mod_b.name} wins all")
-            b_wins.setObjectName("success_btn")
-            ignore_btn = QPushButton("⚡ Allow both (⚠ unexpected effects)")
-            ignore_btn.setObjectName("primary_btn")
-
-            def _make_whole_resolver(ma, mb, which, btn_a, btn_b, ign_btn):
-                def _resolve():
-                    if which == "a":
-                        ma.priority = max(ma.priority, mb.priority) + 1
-                        self.db.update(ma)
-                        btn_a.setEnabled(False)
-                        btn_b.setEnabled(False)
-                        ign_btn.setEnabled(False)
-                        btn_a.setText(f"✅ {ma.name} wins all  (applied)")
-                    elif which == "b":
-                        mb.priority = max(ma.priority, mb.priority) + 1
-                        self.db.update(mb)
-                        btn_a.setEnabled(False)
-                        btn_b.setEnabled(False)
-                        ign_btn.setEnabled(False)
-                        btn_b.setText(f"✅ {mb.name} wins all  (applied)")
-                return _resolve
-
-            def _make_ignore_resolver(btn_a, btn_b, ign_btn):
-                def _ignore():
-                    btn_a.setEnabled(False)
-                    btn_b.setEnabled(False)
-                    ign_btn.setEnabled(False)
-                    ign_btn.setText("⚡ Allowing both  (applied)")
-                return _ignore
-
-            a_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "a", a_wins, b_wins, ignore_btn))
-            b_wins.clicked.connect(_make_whole_resolver(mod_a, mod_b, "b", a_wins, b_wins, ignore_btn))
-            ignore_btn.clicked.connect(_make_ignore_resolver(a_wins, b_wins, ignore_btn))
-
-            quick_row.addWidget(a_wins)
-            quick_row.addWidget(b_wins)
-            quick_row.addWidget(ignore_btn)
-            f_layout.addLayout(quick_row)
-
-            # ── "Disable loser" resolution row ──────────────────────────
-            disable_row = QHBoxLayout()
-            disable_a_btn = QPushButton(f"🚫 Disable '{mod_a.name}'")
-            disable_a_btn.setStyleSheet(
-                "background:#2a0a0a; color:#d06060; border-radius:4px; font-size:10px;"
-            )
-            disable_b_btn = QPushButton(f"🚫 Disable '{mod_b.name}'")
-            disable_b_btn.setStyleSheet(
-                "background:#2a0a0a; color:#d06060; border-radius:4px; font-size:10px;"
-            )
-
-            def _make_disable_resolver(target_mod):
-                def _resolve():
-                    target_mod.enabled = False
-                    self.db.update(target_mod)
-                    from PyQt6.QtWidgets import QMessageBox
-                    QMessageBox.information(
-                        self,
-                        "Conflict Resolved",
-                        f"'{target_mod.name}' has been disabled.\n"
-                        "Re-enable it any time from the mod panel.",
-                    )
-                return _resolve
-
-            disable_a_btn.clicked.connect(_make_disable_resolver(mod_a))
-            disable_b_btn.clicked.connect(_make_disable_resolver(mod_b))
-            disable_row.addWidget(QLabel("Or disable one mod:"))
-            disable_row.addWidget(disable_a_btn)
-            disable_row.addWidget(disable_b_btn)
-            disable_row.addStretch()
-            f_layout.addLayout(disable_row)
-
-            # ── Per-file resolution (expandable) ────────────────────────
-            if conflict.conflicting_files:
-                toggle_btn = QPushButton(
-                    f"▶  Per-file resolution ({len(conflict.conflicting_files)} files)"
-                )
-                toggle_btn.setCheckable(True)
-                toggle_btn.setStyleSheet(
-                    "background: transparent; color: #6090d0; border: none; text-align: left;"
-                )
-
-                per_file_container = QWidget()
-                per_file_container.setVisible(False)
-                pf_layout = QVBoxLayout(per_file_container)
-                pf_layout.setContentsMargins(12, 4, 4, 4)
-                pf_layout.setSpacing(4)
-
-                for rel_file in conflict.conflicting_files[:20]:  # cap at 20 for UI
-                    row = QHBoxLayout()
-                    fname_lbl = QLabel(rel_file)
-                    fname_lbl.setStyleSheet(
-                        "color: #808090; font-size: 11px; font-family: monospace;"
-                    )
-                    fname_lbl.setToolTip(rel_file)
-                    row.addWidget(fname_lbl, 1)
-
-                    def _make_file_resolver(ma, mb, f):
-                        def _resolve_a():
-                            # Ensure ma has higher priority than mb
-                            if ma.priority <= mb.priority:
-                                ma.priority = mb.priority + 1
-                                self.db.update(ma)
-                        def _resolve_b():
-                            if mb.priority <= ma.priority:
-                                mb.priority = ma.priority + 1
-                                self.db.update(mb)
-                        return _resolve_a, _resolve_b
-
-                    ra, rb = _make_file_resolver(mod_a, mod_b, rel_file)
-                    fa_btn = QPushButton(f"A")
-                    fa_btn.setFixedWidth(30)
-                    fa_btn.setToolTip(f"{mod_a.name} wins this file")
-                    fa_btn.setStyleSheet(
-                        "background:#1a4a1a; color:#60c060; border-radius:4px; padding:2px 4px;"
-                    )
-                    fa_btn.clicked.connect(ra)
-                    fb_btn = QPushButton(f"B")
-                    fb_btn.setFixedWidth(30)
-                    fb_btn.setToolTip(f"{mod_b.name} wins this file")
-                    fb_btn.setStyleSheet(
-                        "background:#1a1a4a; color:#6060c0; border-radius:4px; padding:2px 4px;"
-                    )
-                    fb_btn.clicked.connect(rb)
-
-                    row.addWidget(fa_btn)
-                    row.addWidget(fb_btn)
-                    pf_layout.addLayout(row)
-
-                if len(conflict.conflicting_files) > 20:
-                    pf_layout.addWidget(
-                        QLabel(
-                            f"  … and {len(conflict.conflicting_files) - 20} more files "
-                            "(use 'wins all' buttons above for bulk resolution)"
-                        )
-                    )
-
-                def _toggle_expanded(checked, container=per_file_container, btn=toggle_btn):
-                    container.setVisible(checked)
-                    btn.setText(
-                        (f"▼  Per-file resolution ({len(conflict.conflicting_files)} files)"
-                         if checked else
-                         f"▶  Per-file resolution ({len(conflict.conflicting_files)} files)")
-                    )
-
-                toggle_btn.toggled.connect(_toggle_expanded)
-                f_layout.addWidget(toggle_btn)
-                f_layout.addWidget(per_file_container)
-
-            c_layout.addWidget(frame)
-
-        # ── PNACH address-level conflicts ────────────────────────────────
-        if self.pnach_conflicts:
-            pnach_sep = QFrame()
-            pnach_sep.setFrameShape(QFrame.Shape.HLine)
-            pnach_sep.setStyleSheet("color: #3a3060; margin-top: 8px;")
-            c_layout.addWidget(pnach_sep)
-
-            pnach_header = QLabel("🔧  PNACH Address Conflicts")
-            pnach_header.setStyleSheet(
-                "font-size: 14px; font-weight: bold; color: #e0a030; margin-top: 4px;"
-            )
-            c_layout.addWidget(pnach_header)
-
-            pnach_sub = QLabel(
-                "The following PNACH mods write different values to the same memory address.\n"
-                "Only one value can take effect. Raise a mod's priority to let it win."
-            )
-            pnach_sub.setStyleSheet("color: #9090b0; font-size: 11px;")
-            pnach_sub.setWordWrap(True)
-            c_layout.addWidget(pnach_sub)
-
-            # Group by (mod_a, mod_b) pair for cleaner display
-            from collections import defaultdict
-            pnach_by_pair: dict = defaultdict(list)
-            for pc in self.pnach_conflicts:
-                pair = tuple(sorted([pc["mod_a_id"], pc["mod_b_id"]]))
-                pnach_by_pair[pair].append(pc)
-
-            for (id_a, id_b), entries in pnach_by_pair.items():
-                mod_a = self.db.get(id_a)
-                mod_b = self.db.get(id_b)
-                if not mod_a or not mod_b:
-                    continue
-
-                pf = QFrame()
-                pf.setObjectName("card")
-                pf.setStyleSheet(
-                    "QFrame#card { border: 1px solid #5a3010; background: #1e1208; }"
-                )
-                pf_layout = QVBoxLayout(pf)
-
-                pf_title = QLabel(
-                    f"🟠  {mod_a.name}  ↔  {mod_b.name}"
-                    f"  —  {len(entries)} address conflict(s)"
-                )
-                pf_title.setStyleSheet("font-weight: bold; color: #e0a030; font-size: 12px;")
-                pf_layout.addWidget(pf_title)
-
-                # Quick-resolve buttons
-                pq_row = QHBoxLayout()
-                pa_wins = QPushButton(f"✅ {mod_a.name} wins")
-                pa_wins.setObjectName("success_btn")
-                pb_wins = QPushButton(f"✅ {mod_b.name} wins")
-                pb_wins.setObjectName("success_btn")
-
-                def _make_pnach_resolver(ma, mb, which, btn_a, btn_b):
-                    def _resolve():
-                        if which == "a":
-                            ma.priority = max(ma.priority, mb.priority) + 1
-                            self.db.update(ma)
-                            btn_a.setEnabled(False)
-                            btn_b.setEnabled(False)
-                            btn_a.setText(f"✅ {ma.name} wins  (applied)")
-                        else:
-                            mb.priority = max(ma.priority, mb.priority) + 1
-                            self.db.update(mb)
-                            btn_a.setEnabled(False)
-                            btn_b.setEnabled(False)
-                            btn_b.setText(f"✅ {mb.name} wins  (applied)")
-                    return _resolve
-
-                pa_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "a", pa_wins, pb_wins))
-                pb_wins.clicked.connect(_make_pnach_resolver(mod_a, mod_b, "b", pa_wins, pb_wins))
-                pq_row.addWidget(pa_wins)
-                pq_row.addWidget(pb_wins)
-                pq_row.addStretch()
-                pf_layout.addLayout(pq_row)
-
-                # Expandable address list
-                addr_toggle = QPushButton(
-                    f"▶  Show conflicting addresses ({len(entries)})"
-                )
-                addr_toggle.setCheckable(True)
-                addr_toggle.setStyleSheet(
-                    "background: transparent; color: #c08030; border: none; text-align: left;"
-                )
-
-                addr_container = QWidget()
-                addr_container.setVisible(False)
-                al = QVBoxLayout(addr_container)
-                al.setContentsMargins(12, 2, 4, 2)
-                al.setSpacing(2)
-
-                for entry in entries[:20]:
-                    ar = QHBoxLayout()
-                    crc_lbl = QLabel(f"CRC {entry.get('game_crc', '?')}")
-                    crc_lbl.setStyleSheet("color: #606060; font-size: 10px; font-family: monospace;")
-                    crc_lbl.setFixedWidth(90)
-                    ar.addWidget(crc_lbl)
-
-                    proc_lbl = QLabel(entry.get("processor", "EE"))
-                    proc_lbl.setStyleSheet("color: #606090; font-size: 10px; font-family: monospace;")
-                    proc_lbl.setFixedWidth(30)
-                    ar.addWidget(proc_lbl)
-
-                    addr_lbl = QLabel(f"0x{entry.get('address', '?')}")
-                    addr_lbl.setStyleSheet("color: #a09040; font-family: monospace; font-size: 11px;")
-                    addr_lbl.setFixedWidth(110)
-                    ar.addWidget(addr_lbl)
-
-                    val_a_lbl = QLabel(f"A: {entry.get('value_a', '?')}")
-                    val_a_lbl.setStyleSheet("color: #60a060; font-size: 10px; font-family: monospace;")
-                    val_a_lbl.setFixedWidth(100)
-                    ar.addWidget(val_a_lbl)
-
-                    val_b_lbl = QLabel(f"B: {entry.get('value_b', '?')}")
-                    val_b_lbl.setStyleSheet("color: #6060a0; font-size: 10px; font-family: monospace;")
-                    val_b_lbl.setFixedWidth(100)
-                    ar.addWidget(val_b_lbl)
-
-                    ar.addStretch()
-                    al.addLayout(ar)
-
-                if len(entries) > 20:
-                    al.addWidget(QLabel(f"  … and {len(entries) - 20} more addresses"))
-
-                def _toggle_addrs(checked, c=addr_container, b=addr_toggle, n=len(entries)):
-                    c.setVisible(checked)
-                    b.setText(
-                        f"▼  Show conflicting addresses ({n})" if checked
-                        else f"▶  Show conflicting addresses ({n})"
-                    )
-
-                addr_toggle.toggled.connect(_toggle_addrs)
-                pf_layout.addWidget(addr_toggle)
-                pf_layout.addWidget(addr_container)
-
-                c_layout.addWidget(pf)
-
-        c_layout.addStretch()
-        scroll.setWidget(container)
-        layout.addWidget(scroll, 1)
-
-        # Button row: Texture Picker + Code Picker + Close
+        header.setWordWrap(True)
+        layout.addWidget(header)
+        filters = QHBoxLayout()
+        self._search = QLineEdit()
+        self._search.setPlaceholderText("Search mods, files, CRCs, or addresses…")
+        self._search.setAccessibleName("Search managed conflicts")
+        self._search.setClearButtonEnabled(True)
+        from PyQt6.QtCore import QTimer
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(200)
+        self._search_timer.timeout.connect(self._apply_filters)
+        self._search.textChanged.connect(lambda *_: self._search_timer.start())
+        filters.addWidget(self._search, 1)
+        self._kind = QComboBox()
+        for label, value in (("All overlaps", ""), ("Shared files", "files"), ("PNACH addresses", "addresses")):
+            self._kind.addItem(label, value)
+        self._kind.setAccessibleName("Filter conflict kind")
+        self._kind.currentIndexChanged.connect(self._apply_filters)
+        filters.addWidget(self._kind)
+        layout.addLayout(filters)
+        clear = QPushButton("Clear Filters")
+        clear.clicked.connect(self._clear_filters)
+        layout.addWidget(clear)
+        self._summary = QLabel()
+        self._summary.setWordWrap(True)
+        layout.addWidget(self._summary)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._pair_list = QListWidget()
+        self._pair_list.setWordWrap(True)
+        self._pair_list.currentRowChanged.connect(self._on_pair_selected)
+        splitter.addWidget(self._pair_list)
+        right = QWidget()
+        details = QVBoxLayout(right)
+        details.setContentsMargins(0, 0, 0, 0)
+        self._details = QTextEdit()
+        self._details.setReadOnly(True)
+        self._details.setMinimumSize(0, 60)
+        self._details.setAccessibleName("Managed conflict comparison")
+        details.addWidget(self._details, 1)
+        self._action_buttons = []
+        for action in ("Prioritize", "Disable"):
+            row = QHBoxLayout()
+            for index, label in enumerate(("A", "B")):
+                button = QPushButton(f"{action} {label}")
+                button.clicked.connect(lambda _, i=index, a=action: self._apply_action(i, a))
+                self._action_buttons.append(button)
+                row.addWidget(button)
+            details.addLayout(row)
+        splitter.addWidget(right)
+        splitter.setSizes([280, 540])
+        layout.addWidget(splitter, 1)
+        self._feedback = QTextEdit()
+        self._feedback.setReadOnly(True)
+        self._feedback.setAccessibleName("Conflict action result")
+        self._feedback.setMaximumHeight(100)
+        self._feedback.hide()
+        layout.addWidget(self._feedback)
         btn_row = QHBoxLayout()
-        btn_row.addStretch()
-
-        if self.conflicts:
-            tex_picker_btn = QPushButton("🎨 Open Texture File Picker — build custom merged texture pack")
-            tex_picker_btn.setObjectName("primary_btn")
+        if self._texture_conflicts:
+            tex_picker_btn = QPushButton("Texture Picker")
             tex_picker_btn.setToolTip(
-                "Opens the Texture File Picker where you can choose exactly which mod's "
-                "file wins for each conflicting texture, then export a merged texture pack folder."
+                "Choose individual textures from all enabled texture conflict pairs and export a merged pack."
             )
             tex_picker_btn.clicked.connect(self._open_texture_picker)
             btn_row.addWidget(tex_picker_btn)
-
         if self.pnach_conflicts:
-            picker_btn = QPushButton("🔧 Open Code Picker — build custom merged PNACH")
-            picker_btn.setObjectName("primary_btn")
+            picker_btn = QPushButton("Code Picker")
             picker_btn.setToolTip(
-                "Opens the PNACH Code Picker where you can choose exactly which "
-                "code wins for each conflicting address and merge them into a single patch."
+                "Choose individual codes from all enabled PNACH conflict pairs and export merged patches."
             )
             picker_btn.clicked.connect(self._open_code_picker)
             btn_row.addWidget(picker_btn)
-
+        btn_row.addStretch()
         close_btn = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         close_btn.rejected.connect(self.accept)
         btn_row.addWidget(close_btn)
-
         layout.addLayout(btn_row)
+
+    def _apply_filters(self, *_):
+        self._search_timer.stop()
+        terms = self._search.text().casefold().split()
+        kind = self._kind.currentData() or ""
+        available = []
+        self._visible_pairs = []
+        for key, pair in self._pairs.items():
+            mods = [self.db.get(mid) for mid in key]
+            if not all(mods):
+                continue
+            available.append(key)
+            if kind and not pair[kind]:
+                continue
+            values = [
+                value for mod in mods
+                for value in (mod.name, mod.id, mod.author, mod.game_id, mod.mod_type.value)
+            ] + list(pair["files"])
+            values += [str(entry.get(field, "")) for entry in pair["addresses"]
+                       for field in ("game_crc", "processor", "address", "value_a", "value_b")]
+            text = "\n".join(values).casefold()
+            compact = ["".join(ch for ch in value.casefold() if ch.isalnum()) for value in values]
+            if all(term in text or (
+                bool(token := "".join(ch for ch in term if ch.isalnum()))
+                and any(token in value for value in compact)
+            ) for term in terms):
+                self._visible_pairs.append(key)
+        self._pair_list.blockSignals(True)
+        self._pair_list.clear()
+        for key in self._visible_pairs:
+            a, b = (self.db.get(mid) for mid in key)
+            pair = self._pairs[key]
+            self._pair_list.addItem(
+                f"{a.name} ↔ {b.name}\n{len(pair['files'])} shared file(s) • "
+                f"{len(pair['addresses'])} address overlap(s)"
+                + ("" if a.enabled and b.enabled else " • Disabled mod")
+            )
+        if self._visible_pairs:
+            index = self._visible_pairs.index(self._selected_pair) if self._selected_pair in self._visible_pairs else 0
+            self._pair_list.setCurrentRow(index)
+        self._pair_list.blockSignals(False)
+        files = sum(len(self._pairs[key]["files"]) for key in available)
+        addresses = sum(len(self._pairs[key]["addresses"]) for key in available)
+        self._summary.setText(
+            f"Showing {len(self._visible_pairs)} of {len(available)} mod pairs • "
+            f"{files} shared file references • {addresses} address overlaps"
+        )
+        self._on_pair_selected(remember=False)
+
+    def _clear_filters(self):
+        for widget in (self._search, self._kind):
+            widget.blockSignals(True)
+        self._search.clear()
+        self._kind.setCurrentIndex(0)
+        for widget in (self._search, self._kind):
+            widget.blockSignals(False)
+        self._apply_filters()
+
+    def _current_pair(self):
+        row = self._pair_list.currentRow()
+        return self._visible_pairs[row] if 0 <= row < len(self._visible_pairs) else None
+
+    def _on_pair_selected(self, *_, remember=True):
+        key = self._current_pair()
+        mods = [self.db.get(mid) for mid in key] if key else []
+        valid = len(mods) == 2 and all(mods)
+        for index, button in enumerate(self._action_buttons):
+            can_prioritize = valid and all(mod.enabled and mod.mod_type != ModType.SAVE_FILE for mod in mods)
+            button.setEnabled(not self._busy and valid and (index >= 2 or can_prioritize))
+            if index >= 2 and valid:
+                button.setText(f"{'Disable' if mods[index - 2].enabled else 'Retry Disable'} {'AB'[index - 2]}")
+        if not valid:
+            self._details.setPlainText(
+                "No mod pairs match these filters. Use Clear Filters to recover the review."
+                if self._pairs else "No overlaps to review."
+            )
+            return
+        if remember or self._selected_pair is None:
+            self._selected_pair = key
+        pair = self._pairs[key]
+        lines = []
+        for label, mod in zip(("A", "B"), mods):
+            lines.extend((
+                f"{label}: {mod.name}", f"{mod.mod_type.value} • {mod.game_id or 'No Game ID'} • "
+                f"Priority {mod.priority} • {'Enabled' if mod.enabled else 'Disabled'}",
+                f"Storage: {mod.path}", "",
+            ))
+        if any(mod.mod_type == ModType.SAVE_FILE for mod in mods):
+            lines.append("Live memory-card files are never changed here; disabling only changes library state.")
+        elif not all(mod.enabled for mod in mods):
+            lines.append("A mod in this pair is disabled. Retry Disable to reconcile files after an earlier failure.")
+        else:
+            lines.append("Higher priority takes precedence in a shared deployment target; equal priorities should be reviewed.")
+        lines.extend(("", f"Shared relative files ({len(pair['files'])}):", *sorted(pair["files"]), "",
+                      f"PNACH address overlaps ({len(pair['addresses'])}):"))
+        for entry in pair["addresses"]:
+            lines.append(
+                f"CRC {entry.get('game_crc', '?')} • {entry.get('processor', 'EE')} "
+                f"0x{entry.get('address', '?')} • A: {entry.get('value_a', '?')} • B: {entry.get('value_b', '?')}"
+            )
+        self._details.setPlainText("\n".join(lines))
+
+    def _apply_action(self, index, action):
+        key = self._current_pair()
+        if self._busy or key is None:
+            return
+        mods = [self.db.get(mid) for mid in key]
+        if not all(mods) or index not in (0, 1):
+            return
+        mod = mods[index]
+        if action == "Prioritize" and any(not item.enabled or item.mod_type == ModType.SAVE_FILE for item in mods):
+            return
+        self._busy = True
+        self._on_pair_selected(remember=False)
+        message = (
+            "This raises priority across the whole library and re-deploys the affected type, "
+            "not only the displayed overlap. Other enabled mods remain enabled."
+            if action == "Prioritize" else
+            "This disables the whole mod and removes its deployed files, then re-deploys remaining mods. "
+            "Live memory-card files are not modified."
+        )
+        reply = QMessageBox.question(
+            self, f"{action} Mod",
+            f"<p>{action} {escape(mod.name)}?</p><p>{message}</p>"
+            "<p>Back up installed content first. Proceed?</p>",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            self._busy = False
+            self._on_pair_selected(remember=False)
+            return
+        try:
+            if action == "Prioritize":
+                other_priorities = [item.priority for item in self.db.all() if item.id != mod.id and item.enabled]
+                priority = max(mod.priority, max(other_priorities, default=mod.priority - 1) + 1)
+                count, warnings = self.manager.set_priority(mod.id, priority, self.config)
+            else:
+                count, warnings = self.manager.set_enabled_many({mod.id: False}, self.config)
+        except Exception as exc:
+            logger.warning("Could not apply %s to mod %s: %s", action, mod.id, exc)
+            self._feedback.setPlainText(
+                f"Could not finish {action.lower()}: {exc}\n"
+                "Library changes may be saved but installed files may be incomplete. Retry the same action."
+            )
+        else:
+            message = f"{action}: {mod.name} — library state saved."
+            if self.config is None:
+                message += " No deployment configuration supplied; installed files were not changed."
+            elif mod.mod_type == ModType.SAVE_FILE:
+                message += " Live memory-card files were not changed."
+            elif not warnings:
+                message += f" Deployment reconciled ({count} item(s))."
+            if warnings:
+                message += "\n" + "\n".join(warnings) + "\nCorrect the issue and retry the same action."
+            self._feedback.setPlainText(message)
+        finally:
+            self._busy = False
+            self._feedback.show()
+            self._apply_filters()
 
     def _open_texture_picker(self):
         from src.ui.widgets import TextureFilePickerDialog
-        dlg = TextureFilePickerDialog(self.conflicts, self.db, self)
+        conflicts = [
+            conflict for conflict in self._texture_conflicts
+            if all(self.db.get(mid) and self.db.get(mid).enabled
+                   for mid in (conflict.mod_a_id, conflict.mod_b_id))
+        ]
+        if not conflicts:
+            QMessageBox.information(self, "No Enabled Texture Pairs", "No enabled texture pairs remain in this review.")
+            return
+        dlg = TextureFilePickerDialog(conflicts, self.db, self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             result = dlg.write_merged()
             dest = result.get("dest", "")
@@ -1571,7 +1468,15 @@ class ConflictDialog(QDialog):
 
     def _open_code_picker(self):
         from src.ui.widgets import PnachCodePickerDialog
-        dlg = PnachCodePickerDialog(self.pnach_conflicts, self.db, self)
+        conflicts = [
+            entry for entry in self.pnach_conflicts
+            if all(self.db.get(mid) and self.db.get(mid).enabled
+                   for mid in (entry["mod_a_id"], entry["mod_b_id"]))
+        ]
+        if not conflicts:
+            QMessageBox.information(self, "No Enabled Code Pairs", "No enabled PNACH pairs remain in this review.")
+            return
+        dlg = PnachCodePickerDialog(conflicts, self.db, self)
         if dlg.exec() == QDialog.DialogCode.Accepted:
             written = dlg.write_merged()
             if written:
