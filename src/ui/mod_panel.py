@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
     QComboBox,
@@ -188,6 +189,9 @@ class ModPanel(BasePanel):
         self._library_serials_cache_path = ""
         self._library_serials_cache = frozenset()
         self._issue_state_cache = None
+        self._shown_mod_ids = ()
+        self._batch_busy = False
+        self._batch_retry_states = {}
         self._build()
 
     def _all_mods(self) -> list:
@@ -316,9 +320,11 @@ class ModPanel(BasePanel):
         enable_all = QPushButton("✅ Enable All")
         enable_all.setObjectName("success_btn")
         enable_all.clicked.connect(self._enable_all)
+        self._enable_all_btn = enable_all
         batch_row.addWidget(enable_all)
         disable_all = QPushButton("🚫 Disable All")
         disable_all.clicked.connect(self._disable_all)
+        self._disable_all_btn = disable_all
         batch_row.addWidget(disable_all)
         batch_row.addStretch()
 
@@ -335,6 +341,42 @@ class ModPanel(BasePanel):
         self._count_lbl.setCursor(Qt.CursorShape.ArrowCursor)
         self._count_lbl.clicked.connect(self._on_count_lbl_clicked)
         content.addLayout(batch_row)
+        shown_row = QHBoxLayout()
+        shown_row.addWidget(QLabel("Shown results only:"))
+        self._enable_shown_btn = QPushButton("Enable Shown")
+        self._enable_shown_btn.setToolTip("Enable only disabled mods matching the current search and filters.")
+        self._enable_shown_btn.clicked.connect(lambda: self._set_batch_enabled(True, shown=True))
+        shown_row.addWidget(self._enable_shown_btn)
+        self._disable_shown_btn = QPushButton("Disable Shown")
+        self._disable_shown_btn.setToolTip("Disable only enabled mods matching the current search and filters.")
+        self._disable_shown_btn.clicked.connect(lambda: self._set_batch_enabled(False, shown=True))
+        shown_row.addWidget(self._disable_shown_btn)
+        shown_row.addStretch()
+        content.addLayout(shown_row)
+        self._batch_feedback = QTextEdit()
+        self._batch_feedback.setReadOnly(True)
+        self._batch_feedback.setAccessibleName("Batch action result")
+        self._batch_feedback.setMaximumHeight(100)
+        self._batch_feedback.hide()
+        content.addWidget(self._batch_feedback)
+        recovery_row = QHBoxLayout()
+        self._batch_retry_btn = QPushButton("Retry Batch")
+        self._batch_retry_btn.setToolTip(
+            "Review and retry the original batch, not the current filtered results. "
+            "Already-saved enabled flags are reconciled again."
+        )
+        self._batch_retry_btn.clicked.connect(self._retry_batch)
+        self._batch_retry_btn.hide()
+        recovery_row.addWidget(self._batch_retry_btn)
+        self._batch_dismiss_btn = QPushButton("Dismiss Result")
+        self._batch_dismiss_btn.setToolTip(
+            "Hide this result and forget its retry snapshot. This does not undo saved flags or file changes."
+        )
+        self._batch_dismiss_btn.clicked.connect(self._dismiss_batch_result)
+        self._batch_dismiss_btn.hide()
+        recovery_row.addWidget(self._batch_dismiss_btn)
+        recovery_row.addStretch()
+        content.addLayout(recovery_row)
         content.addWidget(self._count_lbl)
 
         # ---- PCSX2 guidance banner (texture / pnach / cheat panels only) ----
@@ -675,6 +717,8 @@ class ModPanel(BasePanel):
         shadowed_ids = issue_state["shadowed_ids"]
         pnach_validation = issue_state["pnach_validation"]
         mods = [m for m in mods if _mod_matches_status(m, status_filter, issue_state)]
+        self._shown_mod_ids = tuple(mod.id for mod in mods)
+        self._update_batch_actions(all_mods)
 
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
@@ -958,84 +1002,151 @@ class ModPanel(BasePanel):
             self._apply_filter()
 
     def _enable_all(self):
-        meta = _TYPE_META[self.mod_type]
-        target_path = getattr(self.config, meta["deploy_key"], "")
-        all_types = [self.mod_type] + self.extra_types
-        pending = [mod for mod in self._all_mods() if not mod.enabled]
-        if not pending:
-            self.emit_status(f"All {meta['label'].lower()} are already enabled")
-            return
-
-        reply = QMessageBox.question(
-            self,
-            f"Enable All {meta['label']}",
-            (
-                f"Enable all {len(pending)} disabled {meta['label'].lower()}?\n\n"
-                "They will be deployed to PCSX2 immediately."
-            ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
-        if reply != QMessageBox.StandardButton.Yes:
-            self.emit_status(f"Enable all {meta['label'].lower()} cancelled")
-            return
-
-        self.emit_status(f"Enabling {len(pending)} {meta['label'].lower()}…")
-        for mod in pending:
-            mod.enabled = True
-            self.db.update(mod)
-        # Single bulk deploy after all flags are set
-        if target_path:
-            total = sum(self.manager.deploy(mt, target_path)[0] for mt in all_types)
-            self.emit_status(
-                f"Enabled {len(pending)} {meta['label'].lower()} — deployed {total} to PCSX2"
-            )
-        else:
-            self.emit_status(
-                f"Enabled {len(pending)} {meta['label'].lower()} "
-                "(configure path in Settings to deploy)"
-            )
-        self._invalidate_issue_state_cache()
-        self._apply_filter()
+        self._set_batch_enabled(True)
 
     def _disable_all(self):
-        meta = _TYPE_META[self.mod_type]
-        target_path = getattr(self.config, meta["deploy_key"], "")
-        all_types = [self.mod_type] + self.extra_types
-        pending = [mod for mod in self._all_mods() if mod.enabled]
-        if not pending:
-            self.emit_status(f"No {meta['label'].lower()} are currently enabled")
-            return
+        self._set_batch_enabled(False)
 
-        reply = QMessageBox.question(
-            self,
-            f"Disable All {meta['label']}",
-            (
-                f"Disable all {len(pending)} enabled {meta['label'].lower()}?\n\n"
-                "They will be removed from PCSX2 immediately."
-            ),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+    def _update_batch_actions(self, mods):
+        shown = set(self._shown_mod_ids)
+        for enabled, visible, button, label in (
+            (True, False, self._enable_all_btn, "Enable All"),
+            (False, False, self._disable_all_btn, "Disable All"),
+            (True, True, self._enable_shown_btn, "Enable Shown"),
+            (False, True, self._disable_shown_btn, "Disable Shown"),
+        ):
+            count = sum(mod.enabled != enabled and (not visible or mod.id in shown) for mod in mods)
+            button.setText(f"{label} ({count})")
+            button.setEnabled(bool(count) and not self._batch_busy)
+        self._batch_retry_btn.setVisible(bool(self._batch_retry_states))
+        self._batch_retry_btn.setEnabled(not self._batch_busy)
+        self._batch_dismiss_btn.setEnabled(not self._batch_busy)
+
+    def _set_batch_enabled(self, enabled, *, shown=False):
+        if self._batch_busy:
+            return
+        shown_ids = set(self._shown_mod_ids)
+        states = {
+            mod.id: enabled for mod in self._all_mods()
+            if mod.enabled != enabled and (not shown or mod.id in shown_ids)
+        }
+        if not states:
+            self.emit_status("No mods need this change in the chosen scope. Use Retry Batch for an earlier incomplete operation.")
+            return
+        self._run_batch(
+            states,
+            "Shown results captured before this action" if shown else "All mods in this panel, including hidden results",
         )
-        if reply != QMessageBox.StandardButton.Yes:
-            self.emit_status(f"Disable all {meta['label'].lower()} cancelled")
-            return
 
-        self.emit_status(f"Disabling {len(pending)} {meta['label'].lower()}…")
-        for mod in pending:
-            mod.enabled = False
-            self.db.update(mod)
-        # Re-deploy (nothing enabled → clears deployed files via empty deploy)
-        if target_path:
-            for mt in all_types:
-                self.manager.deploy(mt, target_path)
-            self.emit_status(
-                f"Disabled {len(pending)} {meta['label'].lower()} — removed from PCSX2"
+    def _confirm_batch(self, states, scope, skipped=0):
+        from src.core.pcsx2_layout import get_deploy_path
+        mods = [self.db.get(mid) for mid in states]
+        action = "Enable" if next(iter(states.values())) else "Disable"
+        changed = sum(mod.enabled != states[mod.id] for mod in mods)
+        box = QMessageBox(self)
+        box.setWindowTitle(f"{action} Mods")
+        box.setTextFormat(Qt.TextFormat.PlainText)
+        box.setText(
+            f"{action} {len(mods)} mod(s)?\nScope: {scope}\n"
+            f"{changed} enabled flag(s) will change; {len(mods) - changed} already match and will be reconciled again."
+        )
+        details = []
+        for kind in dict.fromkeys(mod.mod_type for mod in mods):
+            if kind == ModType.SAVE_FILE:
+                details.append("Save files: library flags only; live memory cards are never copied or removed.")
+            else:
+                target = get_deploy_path(self.config, kind) if self.config is not None else ""
+                details.append(f"{kind.value}: {target or 'No destination configured — set it in Settings, then retry.'}")
+        box.setInformativeText(
+            "Only the listed enabled flags change. Deployment rebuilds affected content using all enabled mods, "
+            "including hidden ones, to preserve shared files and priorities. Back up installed content first.\n\n"
+            + "\n".join(details)
+            + (f"\n{skipped} original mod(s) were removed or moved out of this panel and will be skipped." if skipped else "")
+            + ("\nApplying this batch replaces the earlier retry snapshot; it does not finish that earlier batch."
+               if self._batch_retry_states and self._batch_retry_states != states else "")
+            + "\n\nShow Details lists every mod in this batch."
+        )
+        box.setDetailedText("\n".join(
+            f"{mod.name} [{mod.id}] • {mod.mod_type.value} • "
+            f"{'Enabled' if mod.enabled else 'Disabled'} → {'Enabled' if states[mod.id] else 'Disabled'}"
+            for mod in mods
+        ))
+        box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        box.setDefaultButton(QMessageBox.StandardButton.No)
+        return box.exec() == QMessageBox.StandardButton.Yes
+
+    def _run_batch(self, states, scope, *, skipped=0):
+        if self._batch_busy:
+            return
+        self._batch_busy = True
+        self._update_batch_actions(self._all_mods())
+        attempted = False
+        try:
+            if not self._confirm_batch(states, scope, skipped):
+                self.emit_status("Batch action cancelled; no changes made.")
+                return
+            # Freeze the confirmed IDs before status filters can hide changed mods.
+            self._batch_retry_states = dict(states)
+            attempted = True
+            action = "Enable" if next(iter(states.values())) else "Disable"
+            self.emit_status(f"{action}: applying batch of {len(states)} mod(s)…")
+            try:
+                count, warnings = self.manager.set_enabled_many(states, self.config)
+            except Exception as exc:
+                logger.warning("Could not complete mod batch (%s): %s", scope, exc)
+                message = (
+                    f"{action} batch could not finish: {exc or type(exc).__name__}\nScope: {scope}\n"
+                    "Library changes may already be saved, but installed files may be incomplete. "
+                    "Correct the problem and use Retry Batch to review the original mods, even if filters now hide them."
+                )
+            else:
+                message = f"{action} batch: saved enabled flags for {len(states)} mod(s).\nScope: {scope}"
+                if self.config is None:
+                    message += "\nNo deployment configuration supplied; installed files were not changed."
+                elif all(self.db.get(mid).mod_type == ModType.SAVE_FILE for mid in states):
+                    message += "\nLive memory-card files were not changed."
+                elif not warnings:
+                    message += f"\nDeployment reconciled ({count} item(s)); live memory cards were not changed."
+                if warnings:
+                    message += "\n" + "\n".join(warnings) + "\nCorrect the problem and use Retry Batch."
+                else:
+                    self._batch_retry_states = {}
+            if skipped:
+                message += f"\nSkipped {skipped} original mod(s) no longer in this panel."
+            self._batch_feedback.setPlainText(message)
+            self._batch_feedback.show()
+            self._batch_dismiss_btn.show()
+            self.emit_status(message.splitlines()[0])
+        finally:
+            self._batch_busy = False
+            if attempted:
+                self._invalidate_issue_state_cache()
+                self._apply_filter()
+            else:
+                self._update_batch_actions(self._all_mods())
+
+    def _retry_batch(self):
+        if self._batch_busy or not self._batch_retry_states:
+            return
+        panel_ids = {mod.id for mod in self._all_mods()}
+        states = {mid: enabled for mid, enabled in self._batch_retry_states.items() if mid in panel_ids}
+        skipped = len(self._batch_retry_states) - len(states)
+        if not states:
+            self._batch_retry_states = {}
+            self._batch_feedback.setPlainText(
+                "None of the original batch mods remain in this panel. No changes made."
             )
-        else:
-            self.emit_status(f"Disabled {len(pending)} {meta['label'].lower()}")
-        self._invalidate_issue_state_cache()
-        self._apply_filter()
+            self._update_batch_actions(self._all_mods())
+            return
+        self._run_batch(states, "Retry original batch — not current filters", skipped=skipped)
+
+    def _dismiss_batch_result(self):
+        if self._batch_busy:
+            return
+        self._batch_retry_states = {}
+        self._batch_feedback.hide()
+        self._batch_dismiss_btn.hide()
+        self._update_batch_actions(self._all_mods())
 
     def _on_count_lbl_clicked(self):
         """Click handler for the status/count label — opens conflict resolver if issues exist."""

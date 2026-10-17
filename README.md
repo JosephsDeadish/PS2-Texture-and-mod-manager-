@@ -63,6 +63,14 @@
 - Searches ignore case and punctuation, compose with existing dropdown filters, and remain saved with the panel; **Clear Filters** recovers empty results
 - Search changes only what is shown; **Enable All** and **Disable All** still affect every mod in their panel
 
+### ✅ Scoped Batch Actions
+- **Enable Shown / Disable Shown** change only matching results; **Enable All / Disable All** remain panel-wide, including hidden mods
+- Button counts show how many enabled flags will change; confirmation previews the scope, destinations, and full mod list under **Show Details**
+- Batches save flags once, clean disabled outputs, and reconcile each affected destination; PNACH/cheat types use their own configured folders or merge when they share one
+- Warnings and failures retain **Retry Batch** for the original mod IDs, even when a status filter hides them after flags were saved; retries never include later imports
+- Retry requires confirmation, skips removed/moved mods, and rechecks already-matching flags; a new confirmed batch replaces the previous retry snapshot
+- Results are copyable; **Dismiss Result** forgets the session's retry snapshot without undoing changes. Save-file batches never copy or remove live memory cards
+
 ### 🖼️ Cover Art Manager
 - Store and deploy cover art for PCSX2's game browser
 - Cover art is automatically renamed to `{SERIAL}.png` (e.g. `SLUS-20062.png`) on deploy — the exact format PCSX2 expects

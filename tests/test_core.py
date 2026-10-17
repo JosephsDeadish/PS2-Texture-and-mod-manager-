@@ -4065,6 +4065,440 @@ class TestInstalledConflictReview(unittest.TestCase):
         d._rescan_btn.setEnabled.assert_called_with(True)
 
 
+class TestModPanelBatchActions(unittest.TestCase):
+    def setUp(self):
+        from types import MethodType
+        helper = TestModPanelEmptyState()
+        self.module = helper._import_mod_panel()
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    author="Alice", game_id="SLUS-20062", enabled=False),
+            ModInfo("b", "Beta", ModType.TEXTURE_PACK, "/mods/b",
+                    author="Bob", game_id="SLUS-21075", enabled=True),
+            ModInfo("c", "Gamma", ModType.TEXTURE_PACK, "/mods/c",
+                    author="Alice", game_id="SLUS-20062", enabled=False),
+        ]
+        p = self.panel = helper._make_filter_panel(self.module, self.mods)
+        p.mod_type = ModType.TEXTURE_PACK
+        p.extra_types = []
+        p.config = AppConfig(textures_path="/pcsx2/textures")
+        p.db = MagicMock()
+        p.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        p.db.all.side_effect = lambda: list(self.mods)
+        p.db.by_type.side_effect = lambda kind: [mod for mod in self.mods if mod.mod_type == kind]
+        p._all_mods = MethodType(self.module.ModPanel._all_mods, p)
+        p.emit_status = MagicMock()
+        p._invalidate_issue_state_cache = MagicMock()
+        p._confirm_batch = MagicMock(return_value=True)
+        p.manager = MagicMock()
+        p.manager.set_enabled_many.side_effect = self._persist
+        for name in ("ModItemWidget", "EmptyStateWidget", "QPushButton"):
+            patcher = patch.object(self.module, name, MagicMock())
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        p._apply_filter()
+
+    def _persist(self, states, config):
+        for mid, enabled in states.items():
+            self.panel.db.get(mid).enabled = enabled
+        return len(states), []
+
+    def test_enable_shown_composes_search_author_status_and_library_filters(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._author_filter.currentData.return_value = "Alice"
+        p._status_filter.currentData.return_value = "disabled"
+        p._library_filter_check.isChecked.return_value = True
+        p._apply_filter()
+        self.assertEqual(p._shown_mod_ids, ("a",))
+        p._set_batch_enabled(True, shown=True)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertEqual([mod.enabled for mod in self.mods], [True, True, False])
+        self.assertEqual(p._shown_mod_ids, ())
+        self.assertIn("Shown results captured", p._confirm_batch.call_args.args[1])
+
+    def test_enable_all_still_includes_hidden_disabled_mods(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._apply_filter()
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "c": True}, p.config)
+        self.assertIn("including hidden", p._confirm_batch.call_args.args[1])
+
+    def test_disable_all_reconciles_hidden_mods_without_manual_flag_updates(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._apply_filter()
+        p._disable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"b": False}, p.config)
+        p.db.update.assert_not_called()
+        p.manager.deploy.assert_not_called()
+        self.assertFalse(self.mods[1].enabled)
+
+    def test_empty_shown_scope_never_falls_back_to_all_mods(self):
+        p = self.panel
+        p._search.text.return_value = "no such mod"
+        p._apply_filter()
+        p._set_batch_enabled(True, shown=True)
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        p._enable_shown_btn.setEnabled.assert_called_with(False)
+        p._enable_all_btn.setEnabled.assert_called_with(True)
+
+    def test_readiness_counts_match_scope_and_change_not_total_count(self):
+        p = self.panel
+        p._search.text.return_value = "name:Beta"
+        p._apply_filter()
+        for button, text, enabled in (
+            (p._enable_all_btn, "Enable All (2)", True),
+            (p._disable_all_btn, "Disable All (1)", True),
+            (p._enable_shown_btn, "Enable Shown (0)", False),
+            (p._disable_shown_btn, "Disable Shown (1)", True),
+        ):
+            button.setText.assert_called_with(text)
+            button.setEnabled.assert_called_with(enabled)
+
+    def test_no_pending_states_needs_explicit_retry_not_new_batch(self):
+        p = self.panel
+        for mod in self.mods:
+            mod.enabled = True
+        p._enable_all()
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertIn("Retry Batch", p.emit_status.call_args.args[0])
+
+    def test_cancel_preserves_previous_retry_and_makes_no_changes(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._confirm_batch.return_value = False
+        p._enable_all()
+        self.assertEqual(p._batch_retry_states, {"b": False})
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+        p._invalidate_issue_state_cache.assert_not_called()
+        self.assertFalse(p._batch_busy)
+
+    def test_failure_after_flag_save_retries_original_ids_even_when_filtered_out(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._status_filter.currentData.return_value = "disabled"
+        p._apply_filter()
+        def partial(states, config):
+            self._persist(states, config)
+            raise OSError("disk <full>")
+        p.manager.set_enabled_many.side_effect = partial
+        with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+            p._set_batch_enabled(True, shown=True)
+        self.assertEqual(p._shown_mod_ids, ())
+        self.assertEqual(p._batch_retry_states, {"a": True})
+        self.assertIn("disk <full>", p._batch_feedback.setPlainText.call_args.args[0])
+        p._batch_retry_btn.setVisible.assert_called_with(True)
+        # A later import and a different filter must not widen the retry.
+        self.mods.append(ModInfo("new", "New", ModType.TEXTURE_PACK, "/new", enabled=False))
+        p._search.text.return_value = "name:New"
+        p._apply_filter()
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"a": True})
+        self.assertFalse(self.mods[-1].enabled)
+        self.assertEqual(p._batch_retry_states, {})
+        self.assertIn("not current filters", p._confirm_batch.call_args.args[1])
+
+    def test_save_failure_keeps_original_snapshot_and_retry_remains_available(self):
+        p = self.panel
+        p.manager.set_enabled_many.side_effect = OSError("database <locked>")
+        with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+            p._enable_all()
+        self.assertEqual(p._batch_retry_states, {"a": True, "c": True})
+        self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+        self.assertFalse(p._batch_busy)
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertTrue(all(mod.enabled for mod in self.mods))
+        self.assertEqual(p._batch_retry_states, {})
+
+    def test_warning_keeps_snapshot_and_never_claims_reconciled_files(self):
+        p = self.panel
+        def warning(states, config):
+            self._persist(states, config)
+            return 0, ["No target configured <path>"]
+        p.manager.set_enabled_many.side_effect = warning
+        p._enable_all()
+        text = p._batch_feedback.setPlainText.call_args.args[0]
+        self.assertIn("No target configured <path>", text)
+        self.assertIn("Retry Batch", text)
+        self.assertNotIn("Deployment reconciled", text)
+        self.assertEqual(p._batch_retry_states, {"a": True, "c": True})
+
+    def test_disable_warning_retries_cleanup_even_though_flags_already_false(self):
+        p = self.panel
+        def warning(states, config):
+            self._persist(states, config)
+            return 0, ["Could not remove deployed file"]
+        p.manager.set_enabled_many.side_effect = warning
+        p._disable_all()
+        self.assertFalse(self.mods[1].enabled)
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"b": False})
+        self.assertEqual(p._batch_retry_states, {})
+
+    def test_retry_skips_removed_or_moved_mods_and_never_includes_new_mods(self):
+        p = self.panel
+        p._batch_retry_states = {"a": True, "b": False, "removed": True}
+        self.mods[0].mod_type = ModType.COVER_ART
+        p._retry_batch()
+        p.manager.set_enabled_many.assert_called_once_with({"b": False}, p.config)
+        self.assertEqual(p._confirm_batch.call_args.args[2], 2)
+        self.assertIn("Skipped 2", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_retry_with_no_remaining_mods_does_not_enable_any_new_mod(self):
+        p = self.panel
+        p._batch_retry_states = {"removed": True}
+        p._retry_batch()
+        p.manager.set_enabled_many.assert_not_called()
+        p._confirm_batch.assert_not_called()
+        self.assertEqual(p._batch_retry_states, {})
+        self.assertIn("No changes made", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_busy_batch_blocks_duplicate_actions_retries_and_dismissal(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._batch_busy = True
+        p._enable_all()
+        p._retry_batch()
+        p._dismiss_batch_result()
+        p._run_batch({"a": True}, "scope")
+        p._update_batch_actions(self.mods)
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._batch_retry_states, {"b": False})
+        for button in (p._enable_all_btn, p._disable_all_btn, p._enable_shown_btn, p._disable_shown_btn):
+            button.setEnabled.assert_called_with(False)
+
+    def test_dismiss_clears_retry_without_changing_mods(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._dismiss_batch_result()
+        p._batch_feedback.hide.assert_called_once()
+        p._batch_dismiss_btn.hide.assert_called_once()
+        p._batch_retry_btn.setVisible.assert_called_with(False)
+        self.assertEqual(p._batch_retry_states, {})
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_combined_panel_passes_both_code_types_to_one_batch_call(self):
+        p = self.panel
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[2].mod_type = ModType.CHEAT
+        p.mod_type = ModType.PNACH
+        p.extra_types = [ModType.CHEAT, ModType.PNACH]
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "c": True}, p.config)
+        p.manager.deploy.assert_not_called()
+        self.assertTrue(self.mods[1].enabled)
+
+    def test_success_without_config_explicitly_says_files_unchanged(self):
+        p = self.panel
+        p.config = None
+        p._enable_all()
+        self.assertIn("installed files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_save_file_result_does_not_claim_live_files_deployed(self):
+        p = self.panel
+        p.mod_type = ModType.SAVE_FILE
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertIn("Live memory-card files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_confirmation_defaults_no_and_lists_full_literal_batch_with_destinations(self):
+        p = self.panel
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[2].mod_type = ModType.CHEAT
+        p.config.pnach_path = "/pcsx2/cheats"
+        p.config.cheats_path = "/other/cheats_ws"
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt") as qt:
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            box.return_value.exec.return_value = 1
+            confirmed = self.module.ModPanel._confirm_batch(p, {"a": True, "c": True}, "Original scope", 1)
+        self.assertTrue(confirmed)
+        box.return_value.setTextFormat.assert_called_once_with(qt.TextFormat.PlainText)
+        box.return_value.setDefaultButton.assert_called_once_with(2)
+        self.assertIn("Original scope", box.return_value.setText.call_args.args[0])
+        self.assertIn("2 enabled flag(s) will change", box.return_value.setText.call_args.args[0])
+        info = box.return_value.setInformativeText.call_args.args[0]
+        self.assertIn("/pcsx2/cheats", info)
+        self.assertIn("/other/cheats_ws", info)
+        self.assertIn("1 original mod(s)", info)
+        self.assertIn("including hidden ones", info)
+        detail = box.return_value.setDetailedText.call_args.args[0]
+        self.assertIn("Alpha <literal> [a]", detail)
+        self.assertIn("Gamma [c]", detail)
+        self.assertNotIn("Beta", detail)
+
+    def test_retry_confirmation_counts_already_saved_flags_and_missing_destinations(self):
+        p = self.panel
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt"):
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            box.return_value.exec.return_value = 2
+            p.config.textures_path = ""
+            confirmed = self.module.ModPanel._confirm_batch(p, {"b": True}, "Retry original batch")
+        self.assertFalse(confirmed)
+        self.assertIn("0 enabled flag(s)", box.return_value.setText.call_args.args[0])
+        self.assertIn("1 already match", box.return_value.setText.call_args.args[0])
+        self.assertIn("No destination configured", box.return_value.setInformativeText.call_args.args[0])
+
+    def test_confirmation_warns_before_replacing_an_unfinished_batch(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt"):
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            self.module.ModPanel._confirm_batch(p, {"a": True}, "Shown")
+        self.assertIn("replaces the earlier retry snapshot", box.return_value.setInformativeText.call_args.args[0])
+
+    def test_real_disable_all_removes_deployed_files_and_saves_once(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            p.manager = ModManager(p.db)
+            for mod in self.mods:
+                mod.enabled = True
+            p.manager.deploy(ModType.TEXTURE_PACK, p.config.textures_path)
+            p._search.text.return_value = "name:Alpha"
+            p._apply_filter()
+            p._disable_all()
+            self.assertFalse(any(mod.enabled for mod in self.mods))
+            self.assertEqual(list((root / "target").rglob("*.png")), [])
+            p.db.save.assert_called_once()
+            p.db.update.assert_not_called()
+            self.assertIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def _prepare_real_sources(self, root):
+        p = self.panel
+        p.config.textures_path = str(root / "target")
+        for index, mod in enumerate(self.mods):
+            source = root / f"source{index}"
+            source.mkdir()
+            (source / "shared.png").write_bytes(f"pack{index}".encode())
+            (source / f"unique{index}.png").write_bytes(b"unique")
+            mod.path = str(source)
+            mod.files = ["shared.png", f"unique{index}.png"]
+
+    def test_real_missing_source_warning_retries_original_hidden_mod_after_restore(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            source = Path(self.mods[0].path)
+            shutil.rmtree(source)
+            p.manager = ModManager(p.db)
+            p._search.text.return_value = "name:Alpha"
+            p._status_filter.currentData.return_value = "disabled"
+            p._apply_filter()
+            p._set_batch_enabled(True, shown=True)
+            self.assertEqual(p._batch_retry_states, {"a": True})
+            self.assertEqual(p._shown_mod_ids, ())
+            self.assertFalse(self.mods[2].enabled)
+            source.mkdir()
+            (source / "restored.png").write_bytes(b"restored")
+            p._retry_batch()
+            self.assertTrue((root / "target" / "restored.png").exists())
+            self.assertFalse(self.mods[2].enabled)
+            self.assertEqual(p._batch_retry_states, {})
+            self.assertEqual(p.db.save.call_count, 2)
+
+    def test_real_save_failure_restores_flags_and_retry_does_not_include_new_mods(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            p.manager = ModManager(p.db)
+            p.db.save.side_effect = OSError("locked")
+            with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+                p._enable_all()
+            self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+            self.assertFalse((root / "target").exists())
+            self.mods.append(ModInfo("later", "Later", ModType.TEXTURE_PACK, "/later", enabled=False))
+            p.db.save.side_effect = None
+            p._retry_batch()
+            self.assertEqual([mod.enabled for mod in self.mods], [True, True, True, False])
+            self.assertTrue((root / "target" / "unique0.png").exists())
+            self.assertEqual(p._batch_retry_states, {})
+
+    def test_real_combined_code_panel_uses_each_types_actual_destination(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for mod, kind, value in ((self.mods[0], ModType.PNACH, "01"), (self.mods[2], ModType.CHEAT, "02")):
+                source = root / mod.id
+                source.mkdir()
+                (source / "DEADBEEF.pnach").write_text(
+                    f"patch=1,EE,20300000,word,000000{value}\n", encoding="utf-8",
+                )
+                mod.path = str(source)
+                mod.mod_type = kind
+                mod.files = ["DEADBEEF.pnach"]
+            p.mod_type = ModType.PNACH
+            p.extra_types = [ModType.CHEAT]
+            p.config.pnach_path = str(root / "cheats")
+            p.config.cheats_path = str(root / "cheats_ws")
+            p.manager = ModManager(p.db)
+            p._enable_all()
+            self.assertIn("00000001", (root / "cheats" / "DEADBEEF.pnach").read_text())
+            self.assertIn("00000002", (root / "cheats_ws" / "DEADBEEF.pnach").read_text())
+            p.db.save.assert_called_once()
+            self.assertTrue(self.mods[1].enabled)
+
+    def test_real_shared_code_destination_combines_both_types_once(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for index, mod in enumerate((self.mods[0], self.mods[2])):
+                source = root / mod.id
+                source.mkdir()
+                (source / "DEADBEEF.pnach").write_text(
+                    f"patch=1,EE,2030000{index},word,00000001\n", encoding="utf-8",
+                )
+                mod.path = str(source)
+                mod.mod_type = ModType.PNACH if index == 0 else ModType.CHEAT
+            p.mod_type = ModType.PNACH
+            p.extra_types = [ModType.CHEAT]
+            p.config.pnach_path = p.config.cheats_path = str(root / "cheats")
+            p.manager = ModManager(p.db)
+            with patch.object(p.manager, "_deploy_pnach", wraps=p.manager._deploy_pnach) as deploy:
+                p._enable_all()
+            deploy.assert_called_once()
+            text = (root / "cheats" / "DEADBEEF.pnach").read_text()
+            self.assertIn("20300000", text)
+            self.assertIn("20300001", text)
+            p.db.save.assert_called_once()
+
+    def test_real_save_file_batches_preserve_live_card_on_enable_and_disable(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "card.ps2"
+            source.write_bytes(b"stored")
+            target = root / "memcards"
+            target.mkdir()
+            live = target / source.name
+            live.write_bytes(b"live progress")
+            p.mod_type = ModType.SAVE_FILE
+            self.mods[0].mod_type = ModType.SAVE_FILE
+            self.mods[0].path = str(source)
+            self.mods[0].files = [source.name]
+            p.config.memcards_path = str(target)
+            p.manager = ModManager(p.db)
+            p._enable_all()
+            p._disable_all()
+            self.assertEqual(live.read_bytes(), b"live progress")
+            self.assertFalse(self.mods[0].enabled)
+            self.assertIn("Live memory-card files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+
+
 class TestManagedConflictReview(unittest.TestCase):
     def setUp(self):
         from contextlib import ExitStack
@@ -11275,8 +11709,8 @@ class TestModPanelEmptyState(unittest.TestCase):
         ModPanel = mod_panel.ModPanel
 
         mods = [
-            types.SimpleNamespace(id="one", enabled=False),
-            types.SimpleNamespace(id="two", enabled=True),
+            ModInfo("one", "One", ModType.TEXTURE_PACK, "/one", enabled=False),
+            ModInfo("two", "Two", ModType.TEXTURE_PACK, "/two", enabled=True),
         ]
         panel = ModPanel.__new__(ModPanel)
         panel.mod_type = ModType.TEXTURE_PACK
@@ -11284,30 +11718,30 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel.config = AppConfig(textures_path="/pcsx2/textures")
         panel.db = MagicMock()
         panel.manager = MagicMock()
-        panel.manager.deploy.return_value = (2, [])
+        panel.manager.set_enabled_many.return_value = (2, [])
+        panel.db.get.side_effect = lambda mid: next(mod for mod in mods if mod.id == mid)
         panel._all_mods = MagicMock(return_value=mods)
         panel.emit_status = MagicMock()
         panel._invalidate_issue_state_cache = MagicMock()
         panel._apply_filter = MagicMock()
+        self._prepare_batch_panel(panel)
 
-        fake_box = types.SimpleNamespace(
-            StandardButton=types.SimpleNamespace(Yes=1, No=0),
-            question=MagicMock(return_value=1),
-        )
+        def confirm(states, scope, skipped):
+            panel.manager.set_enabled_many.assert_not_called()
+            self.assertEqual(states, {"one": True})
+            self.assertIn("including hidden", scope)
+            return True
 
-        with patch.object(mod_panel, "QMessageBox", fake_box):
+        with patch.object(panel, "_confirm_batch", side_effect=confirm) as confirmation:
             ModPanel._enable_all(panel)
 
-        self.assertTrue(mods[0].enabled)
+        confirmation.assert_called_once()
         self.assertTrue(mods[1].enabled)
-        panel.db.update.assert_called_once_with(mods[0])
-        panel.manager.deploy.assert_called_once_with(ModType.TEXTURE_PACK, "/pcsx2/textures")
+        panel.db.update.assert_not_called()
+        panel.manager.set_enabled_many.assert_called_once_with({"one": True}, panel.config)
+        panel.manager.deploy.assert_not_called()
         self.assertTrue(
-            any("Enabling 1 texture packs" in call.args[0] for call in panel.emit_status.call_args_list),
-            panel.emit_status.call_args_list,
-        )
-        self.assertTrue(
-            any("Enabled 1 texture packs" in call.args[0] for call in panel.emit_status.call_args_list),
+            any("saved enabled flags for 1" in call.args[0] for call in panel.emit_status.call_args_list),
             panel.emit_status.call_args_list,
         )
         panel._invalidate_issue_state_cache.assert_called_once()
@@ -11370,20 +11804,17 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel.emit_status = MagicMock()
         panel._invalidate_issue_state_cache = MagicMock()
         panel._apply_filter = MagicMock()
+        self._prepare_batch_panel(panel)
 
-        fake_box = types.SimpleNamespace(
-            StandardButton=types.SimpleNamespace(Yes=1, No=0),
-            question=MagicMock(return_value=0),
-        )
-
-        with patch.object(mod_panel, "QMessageBox", fake_box):
+        with patch.object(panel, "_confirm_batch", return_value=False):
             ModPanel._disable_all(panel)
 
         self.assertTrue(all(mod.enabled for mod in mods))
         panel.db.update.assert_not_called()
         panel.manager.deploy.assert_not_called()
+        panel.manager.set_enabled_many.assert_not_called()
         self.assertTrue(
-            any("Disable all texture packs cancelled" in call.args[0] for call in panel.emit_status.call_args_list),
+            any("cancelled" in call.args[0] for call in panel.emit_status.call_args_list),
             panel.emit_status.call_args_list,
         )
         panel._invalidate_issue_state_cache.assert_not_called()
@@ -11466,6 +11897,16 @@ class TestModPanelEmptyState(unittest.TestCase):
         self.assertEqual(third, frozenset({"SLUS-21075"}))
         self.assertEqual(get_serials.call_count, 2)
 
+    def _prepare_batch_panel(self, panel):
+        panel._shown_mod_ids = ()
+        panel._batch_busy = False
+        panel._batch_retry_states = {}
+        for name in (
+            "_enable_all_btn", "_disable_all_btn", "_enable_shown_btn", "_disable_shown_btn",
+            "_batch_feedback", "_batch_retry_btn", "_batch_dismiss_btn",
+        ):
+            setattr(panel, name, MagicMock())
+
     def _make_filter_panel(self, mod_panel, mods, issues=None):
         panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
         panel.mod_type = ModType.PNACH
@@ -11490,6 +11931,7 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel._count_lbl = MagicMock()
         panel._save_filter_state = MagicMock()
         panel._get_library_serials = MagicMock(return_value={"SLUS-20062"})
+        self._prepare_batch_panel(panel)
         for handler in (
             "_on_toggle", "_on_remove", "_on_priority_up", "_on_priority_down",
             "_on_details", "_on_edit", "_filter_by_author", "_show_conflicts",
