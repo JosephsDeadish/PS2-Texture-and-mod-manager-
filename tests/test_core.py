@@ -2298,6 +2298,45 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         ):
             chooser.set_path.assert_not_called()
 
+    def test_settings_panel_auto_detect_warns_when_no_pcx2_folders_exist(self):
+        import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake._pcsx2_chooser.get_path.return_value = tmpdir
+                detected = {
+                    "textures_path": f"{tmpdir}/textures",
+                    "pnach_path": f"{tmpdir}/cheats",
+                    "cover_art_path": f"{tmpdir}/covers",
+                    "memcards_path": f"{tmpdir}/memcards",
+                    "partial_textures_path": f"{tmpdir}/textures",
+                }
+                with patch("src.core.config_manager.detect_pcsx2_paths", return_value=detected):
+                    with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._auto_detect(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not recognize any PCSX2 subfolders" in msg for msg in logs.output))
+        fake._tex_chooser.set_path.assert_called_once_with(detected["textures_path"])
+        fake._pnach_chooser.set_path.assert_called_once_with(detected["pnach_path"])
+        fake._covers_chooser.set_path.assert_called_once_with(detected["cover_art_path"])
+        fake._memcards_chooser.set_path.assert_called_once_with(detected["memcards_path"])
+        fake._partial_tex_chooser.set_path.assert_called_once_with(detected["partial_textures_path"])
+
     def test_settings_panel_auto_detect_failure_preserves_existing_values(self):
         import sys
         import tempfile

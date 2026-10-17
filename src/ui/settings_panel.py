@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+from pathlib import Path
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -463,6 +464,24 @@ class SettingsPanel(BasePanel):
                 f"{path}\n\n{exc}",
             )
             return
+        if not any(
+            isinstance(paths.get(key), str)
+            and paths[key]
+            and Path(paths[key]).exists()
+            for key in ("textures_path", "pnach_path", "cover_art_path", "memcards_path")
+        ):
+            logger.warning(
+                "Could not recognize any PCSX2 subfolders under %s; using canonical defaults",
+                path,
+            )
+            QMessageBox.warning(
+                self,
+                "PCSX2 Folders Not Found",
+                "I couldn't find any PCSX2 subfolders in the selected directory.\n\n"
+                "The fields were filled with the expected locations, but you may "
+                "need to choose the actual PCSX2 config folder or create the "
+                "folders first.",
+            )
         self._tex_chooser.set_path(paths.get("textures_path", ""))
         self._pnach_chooser.set_path(paths.get("pnach_path", ""))
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
