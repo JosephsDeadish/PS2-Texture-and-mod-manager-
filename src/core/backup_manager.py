@@ -29,11 +29,16 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import datetime
+import os
+import tempfile
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
+
+logger = logging.getLogger(__name__)
 
 # Sub-directory name (relative to the exe directory) used for all archives.
 BACKUP_SUBDIR = "backups"
@@ -154,14 +159,59 @@ def create_backup(config, note: str = "") -> BackupEntry:
     paths_to_include = _collect_paths(config)
     total_size = 0
 
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
-        for folder in paths_to_include:
-            folder_name = folder.name
-            for item in sorted(folder.rglob("*")):
-                if item.is_file():
-                    arcname = folder_name + "/" + str(item.relative_to(folder))
-                    zf.write(item, arcname)
-                    total_size += item.stat().st_size
+    fd, tmp_name = tempfile.mkstemp(dir=backup_dir, suffix=".tmp")
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        failures = 0
+        written_files = 0
+        first_error: Exception | None = None
+        with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+            for folder in paths_to_include:
+                folder_name = folder.name
+                try:
+                    items = sorted(folder.rglob("*"))
+                except OSError as exc:
+                    failures += 1
+                    if first_error is None:
+                        first_error = exc
+                    logger.warning("Failed to enumerate backup folder %s: %s", folder, exc)
+                    continue
+                for item in items:
+                    if item.is_file():
+                        arcname = folder_name + "/" + str(item.relative_to(folder))
+                        try:
+                            zf.write(item, arcname)
+                            written_files += 1
+                        except OSError as exc:
+                            failures += 1
+                            if first_error is None:
+                                first_error = exc
+                            logger.warning("Failed to add backup file %s: %s", item, exc)
+                            continue
+                        try:
+                            total_size += item.stat().st_size
+                        except OSError as exc:
+                            failures += 1
+                            if first_error is None:
+                                first_error = exc
+                            logger.warning("Failed to inspect backup file %s after archiving: %s", item, exc)
+        if failures and written_files:
+            logger.warning(
+                "Created backup archive %s with %s recoverable failure(s)",
+                zip_path,
+                failures,
+            )
+        if first_error is not None and written_files == 0:
+            raise first_error
+        os.replace(tmp_path, zip_path)
+    except Exception as exc:
+        logger.warning("Failed to create backup archive %s: %s", zip_path, exc)
+        try:
+            tmp_path.unlink()
+        except OSError as cleanup_exc:
+            logger.warning("Could not remove temporary backup archive %s: %s", tmp_path, cleanup_exc)
+        raise
 
     created_at = datetime.datetime.now().isoformat(timespec="seconds")
     return BackupEntry(
@@ -185,11 +235,16 @@ def list_backups(config) -> List[BackupEntry]:
     entries: List[BackupEntry] = []
 
     for zp in sorted(backup_dir.glob("backup_*.zip"), reverse=True):
-        stat = zp.stat()
+        try:
+            stat = zp.stat()
+        except OSError as exc:
+            logger.warning("Failed to inspect backup archive metadata %s: %s", zp, exc)
+            continue
         try:
             with zipfile.ZipFile(zp) as zf:
                 size_bytes = sum(i.file_size for i in zf.infolist())
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to inspect backup archive %s: %s", zp, exc)
             size_bytes = stat.st_size
 
         entries.append(
@@ -243,27 +298,55 @@ def restore_backup(entry: BackupEntry, config) -> int:
             folder_map[dest.name] = dest
 
     restored = 0
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        for info in zf.infolist():
-            if info.is_dir():
-                continue
-            parts = info.filename.split("/", 1)
-            if len(parts) < 2:
-                continue
-            top_folder, rel_path = parts
-            dest_root = folder_map.get(top_folder)
-            if dest_root is None:
-                continue
-            dest_file = dest_root / rel_path
-            # Guard against zip-slip: reject any path that escapes dest_root.
-            try:
-                dest_file.resolve().relative_to(dest_root.resolve())
-            except ValueError:
-                continue
-            dest_file.parent.mkdir(parents=True, exist_ok=True)
-            with zf.open(info) as src, open(dest_file, "wb") as dst:
-                dst.write(src.read())
-            restored += 1
+    failures = 0
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            for info in zf.infolist():
+                if info.is_dir():
+                    continue
+                parts = info.filename.split("/", 1)
+                if len(parts) < 2:
+                    continue
+                top_folder, rel_path = parts
+                dest_root = folder_map.get(top_folder)
+                if dest_root is None:
+                    continue
+                dest_file = dest_root / rel_path
+                # Guard against zip-slip: reject any path that escapes dest_root.
+                try:
+                    dest_file.resolve().relative_to(dest_root.resolve())
+                except ValueError:
+                    logger.warning(
+                        "Skipping backup archive entry outside destination %s: %s",
+                        dest_root,
+                        info.filename,
+                    )
+                    continue
+                try:
+                    dest_file.parent.mkdir(parents=True, exist_ok=True)
+                    with zf.open(info) as src, open(dest_file, "wb") as dst:
+                        dst.write(src.read())
+                except Exception as exc:
+                    failures += 1
+                    logger.warning(
+                        "Failed to restore backup entry %s to %s: %s",
+                        info.filename,
+                        dest_file,
+                        exc,
+                    )
+                    continue
+                restored += 1
+    except Exception as exc:
+        logger.warning("Failed to restore backup archive %s: %s", zip_path, exc)
+        raise
+
+    if failures:
+        logger.warning(
+            "Restored %s file(s) from %s with %s failure(s)",
+            restored,
+            zip_path,
+            failures,
+        )
 
     return restored
 
@@ -284,5 +367,6 @@ def delete_backup(entry: BackupEntry) -> bool:
     try:
         Path(entry.path).unlink()
         return True
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to delete backup %s: %s", entry.path, exc)
         return False

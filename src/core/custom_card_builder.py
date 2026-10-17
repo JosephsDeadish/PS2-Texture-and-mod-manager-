@@ -27,12 +27,15 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 import time
 import uuid
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # ID generation
@@ -261,8 +264,8 @@ def save_entry(
             raw = json.loads(out_path.read_text(encoding="utf-8"))
             if isinstance(raw, list):
                 existing = raw
-        except (json.JSONDecodeError, OSError):
-            pass
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning("Failed to load custom card catalogue %s: %s", out_path, exc)
 
     # Check for duplicate IDs
     existing_ids = {e.get("id") for e in existing if isinstance(e, dict)}

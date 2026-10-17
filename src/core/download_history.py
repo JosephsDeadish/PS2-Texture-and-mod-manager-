@@ -45,6 +45,7 @@ from __future__ import annotations
 import csv
 import datetime
 import json
+import logging
 import os
 import tempfile
 import uuid
@@ -91,6 +92,8 @@ HISTORY_FILENAME = "download_history.json"
 
 # Maximum entries retained in the log before the oldest are pruned on save.
 MAX_HISTORY_ENTRIES = 500
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -227,8 +230,34 @@ def _load(config=None) -> List[HistoryEntry]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
-        return [HistoryEntry.from_dict(d) for d in raw if isinstance(d, dict)]
-    except Exception:
+        if not isinstance(raw, list):
+            logger.warning(
+                "Failed to load download history from %s: expected a JSON array at the top level",
+                path,
+            )
+            return []
+        entries: List[HistoryEntry] = []
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "Skipping malformed download history entry %s[%s]: expected a JSON object, got %r",
+                    path,
+                    idx,
+                    item,
+                )
+                continue
+            try:
+                entries.append(HistoryEntry.from_dict(item))
+            except Exception as exc:
+                logger.warning(
+                    "Skipping malformed download history entry %s[%s]: %s",
+                    path,
+                    idx,
+                    exc,
+                )
+        return entries
+    except Exception as exc:
+        logger.warning("Failed to load download history from %s: %s", path, exc)
         return []
 
 
@@ -245,8 +274,8 @@ def _save(entries: List[HistoryEntry], config=None) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary download history file %s: %s", tmp_path, exc)
         raise
 
 

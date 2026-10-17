@@ -29,10 +29,13 @@ This module provides:
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -208,8 +211,8 @@ def merge_pnach_files(
     for path in pnach_paths:
         try:
             parsed.append(parse_pnach(path))
-        except ValueError:
-            pass  # Skip unreadable files
+        except ValueError as exc:
+            logger.warning("Skipping unreadable PNACH file during merge: %s (%s)", path, exc)
 
     if not parsed:
         raise ValueError("No valid PNACH files could be parsed")
@@ -289,7 +292,8 @@ def find_pnach_conflicts(pnach_paths: List[str]) -> List[PnachConflict]:
     for path in pnach_paths:
         try:
             pf = parse_pnach(path)
-        except ValueError:
+        except ValueError as exc:
+            logger.warning("Skipping unreadable PNACH file during conflict scan: %s (%s)", path, exc)
             continue
         for patch in pf.patches:
             if not patch.enabled:

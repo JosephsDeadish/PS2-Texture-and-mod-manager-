@@ -17,11 +17,14 @@ that completely unknown addresses can receive a rough category guess.
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 import struct
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -40,9 +43,16 @@ def _load_db() -> Dict[str, dict]:
     """Load the known-address database from disk.  Returns empty dict on error."""
     try:
         if _DB_FILE.is_file():
-            return json.loads(_DB_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        pass
+            raw = json.loads(_DB_FILE.read_text(encoding="utf-8"))
+            if isinstance(raw, dict):
+                return raw
+            logger.warning(
+                "Failed to load PNACH analyzer DB %s: expected JSON object, got %s",
+                _DB_FILE,
+                type(raw).__name__,
+            )
+    except Exception as exc:
+        logger.warning("Failed to load PNACH analyzer DB %s: %s", _DB_FILE, exc)
     return {}
 
 
@@ -269,8 +279,12 @@ def _guess_from_value(value: str, size: str, default: str = "gameplay") -> str:
             if 0.01 < abs(fval) < 100.0:
                 # Likely a float multiplier/constant — physics or gameplay
                 return "physics"
-        except (struct.error, OverflowError):
-            pass
+        except (struct.error, OverflowError) as exc:
+            logger.warning(
+                "Could not interpret PNACH value %s as a float for category inference: %s",
+                value,
+                exc,
+            )
 
     # Suspiciously large integers → probably cheat codes (infinite ammo etc.)
     if raw in (0x7FFFFFFF, 0xFFFFFFFF, 0x63, 0x9999, 0x270F):
@@ -307,8 +321,12 @@ def _interpret_value(value: str, size: str, value_map: Optional[dict] = None) ->
             fval = struct.unpack(">f", struct.pack(">I", raw))[0]
             if not _math.isnan(fval) and abs(fval) < 1e10:
                 notes.append(f"float: {fval:.4g}")
-        except (struct.error, OverflowError):
-            pass
+        except (struct.error, OverflowError) as exc:
+            logger.warning(
+                "Could not interpret PNACH value %s as a float note: %s",
+                value,
+                exc,
+            )
 
     return "  |  ".join(notes)
 
@@ -744,7 +762,8 @@ def get_version_label(game_crc: str) -> Optional[str]:
             from src.core.serial_validator import SerialDatabase as _SDB
             _SERIAL_DB = _SDB()
         return _SERIAL_DB.label_for_crc(game_crc)  # type: ignore[union-attr]
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up version label for %s: %s", game_crc, exc)
         return None
 
 

@@ -185,8 +185,8 @@ def _read_pnach_addresses(path: Path) -> Set[str]:
             m = _PNACH_PATCH_LINE_RE.match(line)
             if m:
                 addresses.add(m.group(1).upper())
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Could not read PNACH addresses from %s: %s", path, exc)
     return addresses
 
 
@@ -198,7 +198,8 @@ def _read_pnach_patch_set(path: Path) -> Set[PatchSignature]:
     """
     try:
         from src.core.pnach import parse_pnach
-    except Exception:
+    except Exception as exc:
+        logger.warning("Could not import PNACH parser for %s: %s", path, exc)
         return set()
     try:
         parsed = parse_pnach(str(path))
@@ -227,7 +228,8 @@ def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
         return 0, 0
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not read PNACH file %s: %s", path, exc)
         return 0, 0
 
     removed = 0
@@ -249,7 +251,8 @@ def _remove_pnach_addresses(path: Path, addresses: Set[str]) -> Tuple[int, int]:
 
     try:
         path.write_text("\n".join(kept_lines) + ("\n" if kept_lines else ""), encoding="utf-8")
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not write PNACH file %s: %s", path, exc)
         return 0, 0
     return removed, remaining_patches
 
@@ -289,8 +292,8 @@ def _files_identical(p_file: Path, c_file: Path) -> bool:
     try:
         if p_file.stat().st_size != c_file.stat().st_size:
             return False
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Could not compare PNACH file sizes for %s and %s: %s", p_file, c_file, exc)
     p_hash = _hash_file(p_file)
     c_hash = _hash_file(c_file)
     return bool(p_hash) and p_hash == c_hash
@@ -383,8 +386,8 @@ def resolve_pnach_conflicts(
                 crc = _crc_from_pnach_name(f)
                 if crc:
                     result[crc] = f
-        except PermissionError:
-            pass
+        except PermissionError as exc:
+            logger.warning("Could not scan PNACH directory %s: %s", directory, exc)
         return result
 
     pnach_files  = _crc_map(pnach_dir)
@@ -479,7 +482,8 @@ def resolve_cover_art_conflicts(cover_art_path: str) -> List[Conflict]:
     serial_to_files: Dict[str, List[Path]] = {}
     try:
         files = sorted(covers_dir.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan cover art directory %s: %s", covers_dir, exc)
         return conflicts
 
     for f in files:
@@ -538,7 +542,8 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
 
     try:
         serial_dirs = [d for d in sorted(tex_dir.iterdir()) if d.is_dir()]
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan textures directory %s: %s", tex_dir, exc)
         return conflicts
 
     for serial_dir in serial_dirs:
@@ -560,7 +565,8 @@ def resolve_texture_conflicts(textures_path: str) -> List[Conflict]:
                     digest = _hash_file(path)
                     if digest:
                         hash_map.setdefault(digest, []).append(path)
-        except PermissionError:
+        except PermissionError as exc:
+            logger.warning("Could not walk replacements directory %s: %s", replacements, exc)
             continue
 
         for digest, files in sorted(hash_map.items()):
@@ -710,11 +716,20 @@ class TextureOverwriteConflict:
 
 
 def _files_have_same_content(path_a: Path, path_b: Path, check_bytes: int = 8192) -> bool:
-    """Return True if the first *check_bytes* of both files are identical."""
+    """Return True if both files have identical contents."""
     try:
-        with open(path_a, "rb") as fa, open(path_b, "rb") as fb:
-            return fa.read(check_bytes) == fb.read(check_bytes)
-    except OSError:
+        hash_a = _hash_file(path_a)
+        hash_b = _hash_file(path_b)
+        if not hash_a or not hash_b:
+            return False
+        return hash_a == hash_b
+    except OSError as exc:
+        logger.warning(
+            "Could not compare texture file contents %s and %s: %s",
+            path_a,
+            path_b,
+            exc,
+        )
         return False
 
 
@@ -741,7 +756,8 @@ def _detect_alpha_type(path: Path) -> str:
     """
     try:
         data = path.read_bytes()
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not read texture file %s for alpha detection: %s", path, exc)
         return "unknown"
 
     if path.suffix.lower() == ".png":
@@ -766,7 +782,8 @@ def _file_size_bytes(path: Path) -> int:
     """Return the size of *path* in bytes, or 0 on error."""
     try:
         return path.stat().st_size
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not stat texture file %s: %s", path, exc)
         return 0
 
 
@@ -778,7 +795,7 @@ def _hash_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
             for chunk in iter(lambda: handle.read(chunk_size), b""):
                 hasher.update(chunk)
     except OSError as exc:
-        logger.debug("Failed to hash file %s: %s", path, exc)
+        logger.warning("Could not hash file %s: %s", path, exc)
         return ""
     return hasher.hexdigest()
 
@@ -789,19 +806,27 @@ _TEXTURE_EXTS: frozenset[str] = frozenset({
 })
 
 
+def _texture_key(name: str) -> str:
+    """Return a case-insensitive key for a texture filename."""
+    return name.casefold()
+
+
 def _scan_replacements_dir(
     replacements: Path,
 ) -> Dict[str, Path]:
     """Return a dict of {filename → Path} for all texture files under *replacements*."""
     result: Dict[str, Path] = {}
     try:
-        for dirpath, _dirs, files in os.walk(replacements):
-            for fname in files:
+        for dirpath, dirnames, files in os.walk(replacements):
+            dirnames.sort()
+            for fname in sorted(files):
                 if Path(fname).suffix.lower() in _TEXTURE_EXTS:
-                    # Key on the basename — this is what PCSX2 matches against.
-                    result.setdefault(fname, Path(dirpath) / fname)
-    except PermissionError:
-        pass
+                    # Key on a case-insensitive basename — PCSX2 filename
+                    # matching is effectively case-insensitive on the common
+                    # Windows install path, so case-only variants still clash.
+                    result.setdefault(_texture_key(fname), Path(dirpath) / fname)
+    except PermissionError as exc:
+        logger.warning("Could not scan replacements directory %s: %s", replacements, exc)
     return result
 
 
@@ -840,7 +865,8 @@ def resolve_texture_overwrite_conflicts(
             d for d in tex_dir.iterdir()
             if d.is_dir() and _is_ps2_serial(d.name)
         )
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan textures directory %s: %s", tex_dir, exc)
         return conflicts
 
     for serial_dir in serial_dirs:
@@ -854,7 +880,8 @@ def resolve_texture_overwrite_conflicts(
             pack_dirs = sorted(
                 d for d in replacements.iterdir() if d.is_dir()
             )
-        except PermissionError:
+        except PermissionError as exc:
+            logger.warning("Could not scan replacements directory %s: %s", replacements, exc)
             continue
 
         if len(pack_dirs) < 2:
@@ -882,7 +909,7 @@ def resolve_texture_overwrite_conflicts(
                     path_b = map_b[tid]
                     same = _files_have_same_content(path_a, path_b)
                     conflicts.append(TextureOverwriteConflict(
-                        texture_id=tid,
+                        texture_id=path_a.name,
                         serial=serial,
                         pack_a_id=pack_a_id,
                         pack_a_path=path_a,

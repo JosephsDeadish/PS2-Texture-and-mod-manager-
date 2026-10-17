@@ -1,10 +1,13 @@
 """Configuration manager for PS2 Mod Manager."""
 
 import json
+import logging
 import os
 import sys
 from pathlib import Path
 from src.models.mod import AppConfig
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # README content placed in the user_catalogue directory
@@ -115,6 +118,28 @@ def get_user_catalogue_dir() -> Path:
     return user_cat_dir
 
 
+def ui_state_bucket(config: AppConfig, *keys: str) -> dict:
+    """Return a nested mutable bucket under ``config.ui_state``.
+
+    The bucket is created on demand and nested dictionaries are initialized as
+    needed, so callers can safely store panel-specific UI state without having
+    to duplicate the same boilerplate everywhere.
+    """
+    ui_state = getattr(config, "ui_state", None)
+    if not isinstance(ui_state, dict):
+        ui_state = {}
+        config.ui_state = ui_state
+
+    bucket = ui_state
+    for key in keys:
+        child = bucket.get(key)
+        if not isinstance(child, dict):
+            child = {}
+            bucket[key] = child
+        bucket = child
+    return bucket
+
+
 CONFIG_FILE = get_config_dir() / "config.json"
 MODS_DB_FILE = get_data_dir() / "mods.json"
 THUMBNAILS_DIR = get_data_dir() / "thumbnails"
@@ -137,8 +162,8 @@ def load_config() -> AppConfig:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
             return AppConfig.from_dict(data)
-        except (json.JSONDecodeError, KeyError, TypeError):
-            pass
+        except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+            logger.warning("Failed to load config file %s: %s", CONFIG_FILE, exc)
     return AppConfig()
 
 
@@ -171,4 +196,3 @@ def auto_detect_pcsx2() -> str:
     """
     from src.core.pcsx2_layout import auto_detect_pcsx2 as _detect
     return _detect()
-

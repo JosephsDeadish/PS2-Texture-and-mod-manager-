@@ -39,6 +39,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import hashlib
 import json
 import os
@@ -46,6 +47,8 @@ import tempfile
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -170,8 +173,8 @@ class TextureHashDB:
             for rec in raw.get("entries", []):
                 entry = TextureEntry.from_dict(rec)
                 self._index(entry)
-        except (json.JSONDecodeError, KeyError, TypeError):
-            pass  # corrupt DB — start fresh
+        except (json.JSONDecodeError, KeyError, TypeError) as exc:
+            logger.warning("Failed to load texture hash DB %s: %s", self._db_path, exc)
 
     def save(self) -> None:
         """Persist all entries to disk atomically."""
@@ -194,11 +197,12 @@ class TextureHashDB:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.write(data)
             os.replace(tmp, str(self._db_path))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to save texture hash DB %s: %s", self._db_path, exc)
             try:
                 os.unlink(tmp)
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.warning("Could not remove temporary texture hash file %s: %s", tmp, exc)
             raise
 
     # ------------------------------------------------------------------
@@ -252,7 +256,8 @@ class TextureHashDB:
         p = Path(file_path)
         try:
             size = p.stat().st_size
-        except OSError:
+        except OSError as exc:
+            logger.warning("Could not stat texture file %s: %s", p, exc)
             size = 0
 
         broken = size < MIN_TEXTURE_BYTES
@@ -262,7 +267,8 @@ class TextureHashDB:
         else:
             try:
                 content_hash = self._hash_file(p)
-            except OSError:
+            except OSError as exc:
+                logger.warning("Could not hash texture file %s: %s", p, exc)
                 content_hash = hashlib.sha256(b"").hexdigest()
                 broken = True
 
@@ -319,7 +325,7 @@ class TextureHashDB:
                     )
                     registered.append(entry)
         except PermissionError:
-            pass
+            logger.warning("Could not scan texture pack directory %s: permission denied", root)
         return registered
 
     def remove_pack(self, pack_id: str) -> int:

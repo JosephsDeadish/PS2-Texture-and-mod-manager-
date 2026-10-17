@@ -43,6 +43,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import csv
 import datetime
 import json
@@ -52,6 +53,8 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -185,8 +188,29 @@ def _load(config=None) -> List[NoteEntry]:
     try:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
-        return [NoteEntry.from_dict(d) for d in raw if isinstance(d, dict)]
-    except Exception:
+        if not isinstance(raw, list):
+            logger.warning(
+                "Could not load mod notes from %s: expected a JSON array at the top level",
+                path,
+            )
+            return []
+        notes: List[NoteEntry] = []
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "Skipping malformed mod note %s[%s]: expected a JSON object, got %r",
+                    path,
+                    idx,
+                    item,
+                )
+                continue
+            try:
+                notes.append(NoteEntry.from_dict(item))
+            except Exception as exc:
+                logger.warning("Skipping malformed mod note %s[%s]: %s", path, idx, exc)
+        return notes
+    except Exception as exc:
+        logger.warning("Could not load mod notes from %s: %s", path, exc)
         return []
 
 
@@ -202,8 +226,8 @@ def _save(notes: List[NoteEntry], config=None) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary notes file %s: %s", tmp_path, exc)
         raise
 
 

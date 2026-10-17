@@ -47,12 +47,15 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import json
 import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -180,14 +183,21 @@ class ModProfileManager:
             return
         try:
             raw = json.loads(self._path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                logger.warning(
+                    "Failed to load mod profiles file %s: expected JSON object, got %s",
+                    self._path,
+                    type(raw).__name__,
+                )
+                return
             for pname, pdata in raw.get("profiles", {}).items():
                 if isinstance(pdata, dict):
                     self._profiles[pname] = ModProfile.from_dict(pname, pdata)
             active = raw.get("active_profile")
             if active and active in self._profiles:
                 self._active = active
-        except (json.JSONDecodeError, TypeError):
-            pass
+        except (json.JSONDecodeError, TypeError) as exc:
+            logger.warning("Failed to load mod profiles file %s: %s", self._path, exc)
 
     def save(self) -> None:
         """Persist all profiles to disk atomically."""
@@ -208,11 +218,16 @@ class ModProfileManager:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.write(payload)
             os.replace(tmp, str(self._path))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to save mod profiles file %s: %s", self._path, exc)
             try:
                 os.unlink(tmp)
-            except OSError:
-                pass
+            except OSError as cleanup_exc:
+                logger.warning(
+                    "Could not remove temporary profiles file %s after save failure: %s",
+                    tmp,
+                    cleanup_exc,
+                )
             raise
 
     # ------------------------------------------------------------------

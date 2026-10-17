@@ -1,0 +1,35 @@
+{
+  "pcsx2_path": "",
+  "textures_path": "",
+  "pnach_path": "",
+  "cover_art_path": "",
+  "memcards_path": "",
+  "cheats_path": "",
+  "partial_textures_path": "",
+  "mods_storage_path": "",
+  "game_library_path": "",
+  "theme": "dark",
+  "check_updates_on_start": true,
+  "show_conflict_warnings": true,
+  "first_run": true,
+  "favorite_authors": [],
+  "show_nsfw": false,
+  "show_paid": false,
+  "show_account_required": false,
+  "show_incomplete": true,
+  "browse_query": "gta",
+  "browse_source_filter": "GBAtemp",
+  "browse_author_filter": "Curse_Arms",
+  "browse_favorites_only": true,
+  "browse_sort_mode": "game",
+  "browse_selected_tab": 2,
+  "download_history_status_filter": "All",
+  "download_history_type_filter": "All",
+  "download_history_serial_filter": "",
+  "ui_state": {
+    "browse_panel": {
+      "in_app_only": true
+    }
+  },
+  "tooltip_mode": "normal"
+}

@@ -1,7 +1,8 @@
 """Dashboard panel — overview and quick stats."""
 
+import logging
 import time
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -13,11 +14,13 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.base_panel import BasePanel
+from src.ui.url_helpers import open_external_url
 
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+logger = logging.getLogger(__name__)
 
 
 class StatCard(QFrame):
@@ -56,6 +59,8 @@ class StatCard(QFrame):
 class DashboardPanel(BasePanel):
     """Main dashboard with stats and recent activity."""
 
+    action_requested = pyqtSignal(str)
+
     def __init__(self, db: ModDatabase, config: AppConfig, parent=None):
         super().__init__("🏠  Dashboard", parent=parent)
         self.db = db
@@ -63,10 +68,16 @@ class DashboardPanel(BasePanel):
         self._build()
 
     def _build(self):
-        content = self._content_layout
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        container = QWidget()
+        content = QVBoxLayout(container)
+        content.setContentsMargins(0, 0, 0, 0)
+        content.setSpacing(12)
 
         # ---- Welcome message ----
-        welcome = QLabel("Welcome to PS2 Mod Manager")
+        welcome = QLabel(f"Welcome to {APP_NAME}")
         welcome.setObjectName("section_title")
         content.addWidget(welcome)
 
@@ -74,15 +85,21 @@ class DashboardPanel(BasePanel):
         sub.setObjectName("section_subtitle")
         content.addWidget(sub)
 
-        # ---- Stats row ----
-        stats_scroll = QScrollArea()
-        stats_scroll.setWidgetResizable(True)
-        stats_scroll.setMaximumHeight(160)
-        stats_scroll.setFrameShape(QFrame.Shape.NoFrame)
-        stats_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        actions = QGridLayout()
+        for i, (label, action, tip) in enumerate((
+            ("🌐 Discover Mods", "discover", "Browse the community catalogue"),
+            ("➕ Import Textures", "import_textures", "Choose a texture pack to import"),
+            ("⬇ Download from URL", "download_url", "Paste a download link to install a mod"),
+            ("📥 Downloads / History", "downloads", "View running downloads and previous installs"),
+        )):
+            button = QPushButton(label)
+            button.setToolTip(tip)
+            button.clicked.connect(lambda _checked=False, action=action: self.action_requested.emit(action))
+            actions.addWidget(button, i // 2, i % 2)
+        content.addLayout(actions)
 
-        stats_container = QWidget()
-        stats_row = QHBoxLayout(stats_container)
+        # ---- Stats row ----
+        stats_row = QGridLayout()
         stats_row.setContentsMargins(0, 0, 0, 0)
         stats_row.setSpacing(12)
 
@@ -90,15 +107,16 @@ class DashboardPanel(BasePanel):
         enabled_mods = [m for m in all_mods if m.enabled]
         conflicts = ModManager(self.db).detect_conflicts()
 
-        self._card_total = StatCard("📦", "Total Mods", str(len(all_mods)), "#6080d0")
+        self._card_total = StatCard("📦", "Installed Mods", str(len(all_mods)), "#6080d0")
+        self._card_total.setToolTip("All installed mods across every mod type")
         self._card_enabled = StatCard("✅", "Enabled", str(len(enabled_mods)), "#22c870")
         self._card_texture = StatCard(
             "🎨", "Texture Packs",
             str(len(self.db.by_type(ModType.TEXTURE_PACK))), "#e94560"
         )
         self._card_pnach = StatCard(
-            "🔧", "PNACH Files",
-            str(len(self.db.by_type(ModType.PNACH))), "#e09030"
+            "🔧", "PNACH / Cheats",
+            str(sum(1 for mod in all_mods if mod.mod_type in (ModType.PNACH, ModType.CHEAT))), "#e09030"
         )
         self._card_saves = StatCard(
             "💾", "Save Files",
@@ -110,17 +128,15 @@ class DashboardPanel(BasePanel):
             "#e94560" if conflicts else "#22c870"
         )
 
-        for card in (
+        for i, card in enumerate((
             self._card_total, self._card_enabled,
             self._card_texture, self._card_pnach,
             self._card_saves, self._card_conflicts,
-        ):
+        )):
             card.setMinimumWidth(130)
-            stats_row.addWidget(card)
+            stats_row.addWidget(card, i // 3, i % 3)
 
-        stats_row.addStretch()
-        stats_scroll.setWidget(stats_container)
-        content.addWidget(stats_scroll)
+        content.addLayout(stats_row)
 
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
@@ -156,9 +172,14 @@ class DashboardPanel(BasePanel):
         cfg_layout.setContentsMargins(16, 12, 16, 12)
         cfg_layout.setSpacing(6)
 
+        cfg_header = QHBoxLayout()
         cfg_title = QLabel("⚙  PCSX2 Configuration")
         cfg_title.setStyleSheet("font-weight: bold; color: #b0b0d0; font-size: 14px;")
-        cfg_layout.addWidget(cfg_title)
+        cfg_header.addWidget(cfg_title, 1)
+        settings_btn = QPushButton("⚙ Open Settings")
+        settings_btn.clicked.connect(lambda: self.action_requested.emit("settings"))
+        cfg_header.addWidget(settings_btn)
+        cfg_layout.addLayout(cfg_header)
 
         paths = {
             "PCSX2 Root": self.config.pcsx2_path,
@@ -214,6 +235,7 @@ class DashboardPanel(BasePanel):
 
                 name_lbl = QLabel(mod.name)
                 name_lbl.setStyleSheet("color: #d0d0e8; font-size: 12px;")
+                name_lbl.setWordWrap(True)
                 row.addWidget(name_lbl, 1)
 
                 if mod.author and mod.author != "Unknown":
@@ -227,7 +249,8 @@ class DashboardPanel(BasePanel):
                     try:
                         dt = datetime.fromtimestamp(ts)
                         time_str = dt.strftime("%b %d, %H:%M")
-                    except Exception:
+                    except Exception as exc:
+                        logger.warning("Failed to format recent activity timestamp for %s: %s", mod.id, exc)
                         time_str = ""
                     if time_str:
                         time_lbl = QLabel(time_str)
@@ -244,6 +267,11 @@ class DashboardPanel(BasePanel):
                 recent_layout.addLayout(row)
 
             content.addWidget(recent_frame)
+        else:
+            empty = QLabel("No mods installed yet. Discover a pack or use Import Textures to get started.")
+            empty.setWordWrap(True)
+            empty.setStyleSheet("color: #9090b0; font-size: 12px; padding: 8px;")
+            content.addWidget(empty)
 
         # ---- Patreon / About banner ----
         about_frame = QFrame()
@@ -261,7 +289,7 @@ class DashboardPanel(BasePanel):
 
         msg_col = QVBoxLayout()
         msg_col.setSpacing(4)
-        msg_title = QLabel("<b>PS2 Mod Manager is free!</b>")
+        msg_title = QLabel(f"<b>{APP_NAME} is free!</b>")
         msg_title.setStyleSheet("font-size: 14px; color: #f96854;")
         msg_col.addWidget(msg_title)
         msg_sub = QLabel(
@@ -282,6 +310,8 @@ class DashboardPanel(BasePanel):
 
         content.addWidget(about_frame)
         content.addStretch()
+        scroll.setWidget(container)
+        self._content_layout.addWidget(scroll)
 
     def refresh(self):
         """Rebuild the dashboard with fresh data."""
@@ -292,6 +322,12 @@ class DashboardPanel(BasePanel):
         self._build()
 
     def _open_patreon(self):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(PATREON_URL))
+        open_external_url(
+            PATREON_URL,
+            parent=self,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )

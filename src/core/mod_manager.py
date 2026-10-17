@@ -2,17 +2,21 @@
 
 import hashlib
 import json
+import logging
 import os
 import re
 import shutil
 import tempfile
 import uuid
-from pathlib import Path
+from copy import deepcopy
+from pathlib import Path, PureWindowsPath
 from typing import Dict, List, Optional, Tuple
 
 import src.core.config_manager as _cfg
 from src.core.archive import ArchiveError, extract_archive, is_archive
 from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -33,7 +37,8 @@ def _folder_has_serial_structure(folder: Path) -> bool:
             child.is_dir() and _PS2_SERIAL_RE.match(child.name) is not None
             for child in folder.iterdir()
         )
-    except PermissionError:
+    except OSError as exc:
+        logger.warning("Could not inspect folder structure for %s: %s", folder, exc)
         return False
 
 
@@ -53,8 +58,8 @@ def _atomic_json_write(path: Path, data) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary mod database file %s: %s", tmp_path, exc)
         raise
 
 
@@ -76,16 +81,24 @@ class ModDatabase:
             try:
                 with open(db_file, "r", encoding="utf-8") as f:
                     raw = json.load(f)
+                if not isinstance(raw, dict):
+                    logger.warning(
+                        "Failed to load mod database %s: expected a JSON object at the top level",
+                        db_file,
+                    )
+                    self._mods = {}
+                    return
                 # Load entries individually so a single corrupt record does not
                 # wipe the entire mod database.
                 mods: Dict[str, ModInfo] = {}
                 for k, v in raw.items():
                     try:
                         mods[k] = ModInfo.from_dict(v)
-                    except (KeyError, TypeError, ValueError):
-                        pass  # skip corrupt individual entries
+                    except (KeyError, TypeError, ValueError) as exc:
+                        logger.warning("Skipping corrupt mod entry %s: %s", k, exc)
                 self._mods = mods
-            except (json.JSONDecodeError, TypeError):
+            except (OSError, json.JSONDecodeError, TypeError) as exc:
+                logger.warning("Failed to load mod database %s: %s", db_file, exc)
                 self._mods = {}
 
     def save(self):
@@ -139,7 +152,8 @@ class ModManager:
             from src.core.config_manager import get_data_dir
             from src.core.installed_scanner import scan_all
             from src.core.game_registry import normalise_serial
-        except Exception:
+        except Exception as exc:
+            logger.warning("Auto-import setup failed: %s", exc)
             return 0
 
         storage = (getattr(config, "mods_storage_path", "") or "").strip()
@@ -180,8 +194,8 @@ class ModManager:
                             m = crc_re.match(pf.name)
                             if m:
                                 _add_sig(mod.mod_type.value, m.group(1))
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        logger.warning("Could not scan PNACH directory for %s: %s", p, exc)
 
         imported = 0
         for item in unmanaged:
@@ -215,8 +229,8 @@ class ModManager:
                 )
                 known_signatures.add(sig)
                 imported += 1
-            except Exception:
-                # Best-effort import — ignore individual failures.
+            except Exception as exc:
+                logger.warning("Auto-import failed for %s: %s", item.path, exc)
                 continue
 
         return imported
@@ -366,12 +380,83 @@ class ModManager:
             # Remove this mod's files then re-deploy remaining enabled mods
             return self.undeploy_mod(mod_id, config)
 
-    def undeploy_mod(self, mod_id: str, config) -> Tuple[int, List[str]]:
+    def set_enabled_many(
+        self, states: Dict[str, bool], config=None,
+    ) -> Tuple[int, List[str]]:
+        """Reconcile requested states, deploying each affected type only once.
+
+        Unchanged flags are also reconciled so retrying after a deployment
+        failure does not mistake persisted flags for successfully copied files.
+        Save-file flags are updated without touching live memory cards.
+        """
+        mods = [mod for mod in self.db.all() if mod.id in states]
+        previous = {mod.id: mod.enabled for mod in mods}
+        for mod in mods:
+            mod.enabled = states[mod.id]
+        try:
+            self.db.save()
+        except Exception:
+            for mod in mods:
+                mod.enabled = previous[mod.id]
+            raise
+        return self._reconcile_deployment(mods, config)
+
+    def _reconcile_deployment(self, mods: List[ModInfo], config=None) -> Tuple[int, List[str]]:
+        if config is None:
+            return 0, []
+
+        from src.core.pcsx2_layout import get_deploy_path
+        deployed = 0
+        warnings: List[str] = []
+        targets = {}
+        for mod_type in dict.fromkeys(mod.mod_type for mod in mods):
+            if mod_type == ModType.SAVE_FILE:
+                continue
+            target_path = get_deploy_path(config, mod_type)
+            if not target_path:
+                warnings.append(
+                    f"No target path configured for {mod_type.value}. "
+                    "Check Settings → PCSX2 Paths."
+                )
+                continue
+            targets[mod_type] = target_path
+        # Finish cleanup before deploying: different types can share a target.
+        for mod in mods:
+            if mod.mod_type in targets and not mod.enabled:
+                _count, notices = self.undeploy_mod(mod.id, config, redeploy=False)
+                warnings.extend(notices)
+        code_targets = set()
+        for mod_type, target_path in targets.items():
+            if mod_type in (ModType.PNACH, ModType.CHEAT):
+                target = Path(target_path).resolve()
+                if target in code_targets:
+                    continue
+                code_targets.add(target)
+                shared_types = {
+                    kind for kind in (ModType.PNACH, ModType.CHEAT)
+                    if get_deploy_path(config, kind)
+                    and Path(get_deploy_path(config, kind)).resolve() == target
+                }
+                code_mods = sorted(
+                    [mod for mod in self.db.all() if mod.enabled and mod.mod_type in shared_types],
+                    key=lambda mod: mod.priority, reverse=True,
+                )
+                target.mkdir(parents=True, exist_ok=True)
+                notices = []
+                count, notices = self._deploy_pnach(code_mods, target, notices)
+            else:
+                count, notices = self.deploy(mod_type, target_path)
+            deployed += count
+            warnings.extend(notices)
+        return deployed, warnings
+
+    def undeploy_mod(self, mod_id: str, config, *, redeploy: bool = True) -> Tuple[int, List[str]]:
         """
         Remove a single mod's deployed files from the PCSX2 target folder then
         re-deploy all remaining *enabled* mods so nothing is accidentally lost.
 
         Returns ``(deployed_count, warnings)`` from the re-deploy step.
+        Batch updates can defer that step with ``redeploy=False``.
         """
         mod = self.db.get(mod_id)
         if not mod:
@@ -383,35 +468,89 @@ class ModManager:
             return 0, []
 
         target = Path(target_path)
+        cleanup_warnings: List[str] = []
         if target.exists():
             # Remove files that belong to this mod from the target folder
             mod_src = Path(mod.path)
-            if mod_src.is_dir():
-                for f in mod_src.rglob("*"):
-                    if f.is_file():
-                        rel = f.relative_to(mod_src)
-                        deployed_file = target / rel
-                        if deployed_file.exists():
-                            try:
-                                deployed_file.unlink()
-                            except OSError:
-                                pass
+            if not mod_src.exists():
+                cleanup_warnings.append(
+                    f"Missing source for '{mod.name}': {mod_src}. "
+                    "Could not verify complete deployed-file cleanup. Restore the source and retry."
+                )
+            inventory = []
+            for name in mod.files:
+                relative = Path(name.replace("\\", "/"))
+                if (relative.is_absolute() or PureWindowsPath(name).drive
+                        or ".." in relative.parts or relative == Path(".")):
+                    cleanup_warnings.append(f"Skipped unsafe deployed-file inventory path: {name}")
+                    continue
+                inventory.append(relative)
+            deployed_files = []
+            if mod.mod_type == ModType.COVER_ART:
+                from src.core.game_registry import (
+                    detect_game_serial, detect_serial_from_path, normalise_serial,
+                )
+                serial = normalise_serial(mod.game_id) if mod.game_id else ""
+                serial = serial or detect_game_serial(str(mod_src)) or detect_serial_from_path(str(mod_src))
+                deployed_files = [target / (f"{serial}.png" if serial else mod_src.name)]
+            elif mod.mod_type in (ModType.PNACH, ModType.CHEAT):
+                from src.core.pnach import extract_game_crc
+                sources = list(mod_src.rglob("*.pnach")) if mod_src.is_dir() else [mod_src]
+                sources.extend(inventory)
+                for source in sources:
+                    if source.suffix.lower() == ".pnach":
+                        crc = extract_game_crc(str(source))
+                        deployed_files.append(target / (f"{crc}.pnach" if crc else source.name))
+            elif mod_src.is_dir():
+                deployed_files = [
+                    target / f.relative_to(mod_src)
+                    for f in mod_src.rglob("*") if f.is_file()
+                ]
+                deployed_files.extend(target / relative for relative in inventory)
             elif mod_src.is_file():
-                deployed_file = target / mod_src.name
+                deployed_files = [target / mod_src.name]
+            else:
+                deployed_files = [target / relative for relative in inventory]
+            target_root = target.resolve()
+            for deployed_file in dict.fromkeys(deployed_files):
+                try:
+                    resolved = deployed_file.resolve()
+                    safe = resolved != target_root and resolved.is_relative_to(target_root)
+                except (OSError, RuntimeError):
+                    safe = False
+                if not safe:
+                    cleanup_warnings.append(f"Skipped deployed-file cleanup outside target: {deployed_file}")
+                    continue
                 if deployed_file.exists():
                     try:
                         deployed_file.unlink()
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        msg = f"Could not remove deployed file {deployed_file}: {exc}"
+                        logger.warning(msg)
+                        cleanup_warnings.append(msg)
 
         # Re-deploy remaining enabled mods so priority ordering is honoured
-        return self.deploy(mod.mod_type, target_path)
+        if not redeploy:
+            return 0, cleanup_warnings
+        deployed, warnings = self.deploy(mod.mod_type, target_path)
+        return deployed, cleanup_warnings + warnings
 
-    def set_priority(self, mod_id: str, priority: int):
+    def set_priority(self, mod_id: str, priority: int, config=None) -> Tuple[int, List[str]]:
+        """Persist priority with rollback, then reconcile files when configured.
+
+        Reapplying the same priority retries deployment after a partial failure.
+        """
         mod = self.db.get(mod_id)
-        if mod:
+        if not mod:
+            return 0, [f"Mod not found: {mod_id}"]
+        previous = mod.priority
+        try:
             mod.priority = priority
             self.db.update(mod)
+        except Exception:
+            mod.priority = previous
+            raise
+        return self._reconcile_deployment([mod], config)
 
     # ------------------------------------------------------------------
     # Metadata update
@@ -420,40 +559,42 @@ class ModManager:
     def update_metadata(
         self,
         mod_id: str,
-        name: str = "",
-        author: str = "",
-        description: str = "",
-        game_id: str = "",
-        version: str = "",
-        source_url: str = "",
+        name: Optional[str] = None,
+        author: Optional[str] = None,
+        description: Optional[str] = None,
+        game_id: Optional[str] = None,
+        version: Optional[str] = None,
+        source_url: Optional[str] = None,
         tags: Optional[List[str]] = None,
+        *,
+        thumbnail_path: Optional[str] = None,
+        fetch_thumbnail: bool = True,
     ):
         """Update editable metadata fields on an existing mod."""
         mod = self.db.get(mod_id)
         if not mod:
             return
-        if name:
-            mod.name = name
-        if author is not None:
-            mod.author = author
-        if description is not None:
-            mod.description = description
-        if version:
-            mod.version = version
-        if source_url is not None:
-            mod.source_url = source_url
-        if tags is not None:
-            mod.tags = tags
+        original = deepcopy(vars(mod))
+        try:
+            if name:
+                mod.name = name
+            for field, value in (
+                ("author", author), ("description", description), ("version", version),
+                ("source_url", source_url), ("tags", tags), ("thumbnail_path", thumbnail_path),
+            ):
+                if value is not None:
+                    setattr(mod, field, value)
 
-        # If game_id changed and we don't have a thumbnail yet, fetch one
-        if game_id is not None and game_id != mod.game_id:
-            mod.game_id = game_id
-            if game_id and not mod.thumbnail_path:
-                mod.thumbnail_path = self._fetch_thumbnail(game_id) or ""
-        elif game_id is not None:
-            mod.game_id = game_id
-
-        self.db.update(mod)
+            # UI editors fetch explicitly in the background instead of on Save.
+            if game_id is not None:
+                changed = game_id != mod.game_id
+                mod.game_id = game_id
+                if changed and game_id and not mod.thumbnail_path and fetch_thumbnail:
+                    mod.thumbnail_path = self._fetch_thumbnail(game_id) or ""
+            self.db.update(mod)
+        except Exception:
+            vars(mod).update(original)
+            raise
 
     # ------------------------------------------------------------------
     # Thumbnail helpers
@@ -471,7 +612,8 @@ class ModManager:
             from src.core.downloader import fetch_gametdb_art
             thumb_dir = str(_cfg.THUMBNAILS_DIR)
             return fetch_gametdb_art(game_id, thumb_dir, region)
-        except Exception:
+        except Exception as exc:
+            logger.warning("Thumbnail fetch failed for %s: %s", game_id, exc)
             return None
 
     @staticmethod
@@ -529,7 +671,13 @@ class ModManager:
         if replacements_src is None:
             try:
                 subdirs = [d for d in dest_dir.iterdir() if d.is_dir()]
-            except PermissionError:
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture pack contents in %s for serial %s: %s",
+                    dest_dir,
+                    serial,
+                    exc,
+                )
                 return
             if len(subdirs) == 1:
                 for sub_name in ("replacements", "replacement"):
@@ -538,14 +686,73 @@ class ModManager:
                         replacements_src = p
                         break
 
-        # ── Move files into <serial>/replacements/ ─────────────────────────
-        target = dest_dir / serial / "replacements"
-        target.mkdir(parents=True, exist_ok=True)
-
+        items = None
         if replacements_src is not None:
             # Move each item from the replacement folder into the target
-            for item in list(replacements_src.iterdir()):
-                shutil.move(str(item), str(target / item.name))
+            try:
+                items = list(replacements_src.iterdir())
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture replacement folder %s for serial %s: %s",
+                    replacements_src,
+                    serial,
+                    exc,
+                )
+                return
+        else:
+            # Flat structure: move all top-level items into target
+            try:
+                items = list(dest_dir.iterdir())
+            except OSError as exc:
+                logger.warning(
+                    "Could not inspect texture pack contents in %s for serial %s: %s",
+                    dest_dir,
+                    serial,
+                    exc,
+                )
+                return
+
+        target = dest_dir / serial / "replacements"
+        try:
+            target.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            logger.warning(
+                "Could not create normalized texture folder %s for serial %s: %s",
+                target,
+                serial,
+                exc,
+            )
+            return
+
+        if replacements_src is not None:
+            for item in items:
+                try:
+                    shutil.move(str(item), str(target / item.name))
+                except (OSError, shutil.Error) as exc:
+                    logger.warning(
+                        "Could not move texture pack item %s into %s for serial %s: %s",
+                        item,
+                        target,
+                        serial,
+                        exc,
+                    )
+                    continue
+        else:
+            for item in items:
+                if item.name != serial:  # don't move the serial folder we just created
+                    try:
+                        shutil.move(str(item), str(target / item.name))
+                    except (OSError, shutil.Error) as exc:
+                        logger.warning(
+                            "Could not move texture pack item %s into %s for serial %s: %s",
+                            item,
+                            target,
+                            serial,
+                            exc,
+                        )
+                        continue
+
+        if replacements_src is not None:
             # Clean up the now-empty wrapper/replacement folder
             try:
                 outer = replacements_src.parent
@@ -553,13 +760,13 @@ class ModManager:
                     shutil.rmtree(str(outer), ignore_errors=True)
                 else:
                     replacements_src.rmdir()
-            except OSError:
-                pass
-        else:
-            # Flat structure: move all top-level items into target
-            for item in list(dest_dir.iterdir()):
-                if item.name != serial:  # don't move the serial folder we just created
-                    shutil.move(str(item), str(target / item.name))
+            except OSError as exc:
+                logger.warning(
+                    "Could not remove temporary texture folder %s for serial %s: %s",
+                    replacements_src.parent,
+                    serial,
+                    exc,
+                )
 
     def refresh_thumbnail(self, mod_id: str, region: str = "EN") -> bool:
         """Re-fetch the thumbnail for *mod_id* from GameTDB. Returns True on success."""
@@ -612,8 +819,8 @@ class ModManager:
         if mod_type == ModType.COVER_ART:
             return self._deploy_cover_art(mods, target, warnings)
 
-        # ── All other types: copy in priority order ───────────────────────
-        for mod in mods:
+        # Copy low priority first so the highest-priority files are written last.
+        for mod in reversed(mods):
             src = Path(mod.path)
             if not src.exists():
                 warnings.append(f"Missing path for mod '{mod.name}': {mod.path}")
@@ -797,6 +1004,11 @@ class ModManager:
                         shutil.copy2(merged, str(target / f"{crc}.pnach"))
                     deployed += 1
                 except Exception as exc:
+                    logger.warning(
+                        "Failed to merge PNACH for CRC %s: %s. Using highest-priority file instead.",
+                        crc,
+                        exc,
+                    )
                     warnings.append(
                         f"Failed to merge PNACH for CRC {crc}: {exc}. "
                         "Using highest-priority file instead."
@@ -805,7 +1017,7 @@ class ModManager:
                     deployed += 1
 
         # Copy no-CRC files directly
-        for _prio, path in no_crc_files:
+        for _prio, path in sorted(no_crc_files, key=lambda entry: entry[0]):
             shutil.copy2(path, str(target / Path(path).name))
             deployed += 1
 
@@ -983,8 +1195,8 @@ class ModManager:
                     try:
                         issues = validate_pnach_file(str(pf))
                         all_issues.extend(issues)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.warning("Could not validate PNACH file %s: %s", pf, exc)
                 if all_issues:
                     results[mod.id] = all_issues
         return results
@@ -1001,12 +1213,31 @@ class ModManager:
         Returns ``True`` if the resolution was applied, ``False`` if either
         mod is not found in the database.
         """
+        if winner_id not in (conflict.mod_a_id, conflict.mod_b_id):
+            logger.warning(
+                "Could not resolve conflict between %s and %s: winner %s is not part of the conflict",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                winner_id,
+            )
+            return False
         loser_id = (
             conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
         )
         winner = self.db.get(winner_id)
         loser = self.db.get(loser_id)
         if not winner or not loser:
+            missing = []
+            if not winner:
+                missing.append(winner_id)
+            if not loser:
+                missing.append(loser_id)
+            logger.warning(
+                "Could not resolve conflict between %s and %s: missing mod(s) %s",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                ", ".join(missing),
+            )
             return False
         winner.priority = max(winner.priority, loser.priority) + 1
         self.db.update(winner)
@@ -1023,11 +1254,25 @@ class ModManager:
         Returns ``True`` if the resolution was applied, ``False`` if either
         mod is not found.
         """
+        if winner_id not in (conflict.mod_a_id, conflict.mod_b_id):
+            logger.warning(
+                "Could not disable conflict loser between %s and %s: winner %s is not part of the conflict",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                winner_id,
+            )
+            return False
         loser_id = (
             conflict.mod_b_id if winner_id == conflict.mod_a_id else conflict.mod_a_id
         )
         loser = self.db.get(loser_id)
         if not loser:
+            logger.warning(
+                "Could not disable conflict loser between %s and %s: missing mod %s",
+                conflict.mod_a_id,
+                conflict.mod_b_id,
+                loser_id,
+            )
             return False
         loser.enabled = False
         self.db.update(loser)
@@ -1080,6 +1325,7 @@ class ModManager:
         try:
             with open(path, "rb") as f:
                 h.update(f.read(65536))
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not hash file %s: %s", path, exc)
+            return ""
         return h.hexdigest()
