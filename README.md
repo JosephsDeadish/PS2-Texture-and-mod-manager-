@@ -119,6 +119,9 @@
 - Auto-detection of PCSX2 config sub-folders
 - All paths configurable individually
 - Setup completion lists unconfigured destinations and explains which features need Settings before use
+- Settings show inline folder guidance, unsaved-change feedback, and Revert Changes; optional paths may stay blank
+- Saving confirms inline without an extra dialog, and failed saves leave the active configuration unchanged
+- Library scans run on request instead of on every path edit or settings reload
 
 ### 🏠 Dashboard Workflows
 - One-click discovery, texture import, URL download, downloads/history, and settings actions

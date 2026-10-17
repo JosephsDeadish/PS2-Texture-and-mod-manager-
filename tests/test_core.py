@@ -2168,6 +2168,44 @@ class TestImportDialogLogging(unittest.TestCase):
 class TestSettingsDialogSaveFailures(unittest.TestCase):
     """Settings/setup dialogs should log and surface save failures."""
 
+    def _import_settings_panel(self):
+        import importlib
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            return importlib.import_module("src.ui.settings_panel")
+
+    def _make_settings_panel(self, module):
+        panel = module.SettingsPanel.__new__(module.SettingsPanel)
+        panel.config = AppConfig()
+        panel._syncing = False
+        panel._validation_timer = MagicMock()
+        panel._path_status_labels = {}
+        for chooser, key, _label in module._PATH_FIELDS:
+            field = MagicMock()
+            field.get_path.return_value = ""
+            setattr(panel, chooser, field)
+            panel._path_status_labels[key] = MagicMock()
+        panel._conflicts_check = MagicMock()
+        panel._conflicts_check.isChecked.return_value = panel.config.show_conflict_warnings
+        panel._updates_check = MagicMock()
+        panel._updates_check.isChecked.return_value = panel.config.check_updates_on_start
+        panel._theme_combo = MagicMock()
+        panel._theme_combo.currentData.return_value = "dark"
+        panel._theme_combo.findData.return_value = 0
+        panel._tooltip_combo = MagicMock()
+        panel._tooltip_combo.currentData.return_value = "normal"
+        panel._tooltip_combo.findData.return_value = 0
+        panel._fav_authors_edit = MagicMock()
+        panel._fav_authors_edit.toPlainText.return_value = ""
+        panel._feedback_lbl = MagicMock()
+        panel._save_btn = MagicMock()
+        panel._revert_btn = MagicMock()
+        panel._game_lib_count_lbl = MagicMock()
+        panel.settings_saved = MagicMock()
+        panel.emit_status = MagicMock()
+        panel._saved_values = panel._draft_values()
+        return panel
+
     def _stub_ui_modules(self):
         import sys
         import types
@@ -2177,6 +2215,7 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QComboBox", "QDialog", "QDialogButtonBox", "QFileDialog",
@@ -2256,6 +2295,9 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
                     _fav_authors_edit=MagicMock(),
                     settings_saved=MagicMock(),
                     emit_status=MagicMock(),
+                    _validation_timer=MagicMock(),
+                    _feedback_lbl=MagicMock(),
+                    _update_form_state=MagicMock(),
                 )
                 for chooser, value in (
                     (fake._pcsx2_chooser, valid_paths["pcsx2"]),
@@ -2273,6 +2315,7 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
                 fake._theme_combo.currentData.return_value = "dark"
                 fake._tooltip_combo.currentData.return_value = "normal"
                 fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+                fake._draft_values = lambda: SettingsPanel._draft_values(fake)
 
                 with patch("src.ui.settings_panel.save_config", side_effect=OSError("denied")):
                     with patch("src.ui.settings_panel.QMessageBox.critical") as critical:
@@ -2283,8 +2326,9 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         critical.assert_called_once()
         fake.settings_saved.emit.assert_not_called()
         fake.emit_status.assert_not_called()
-        self.assertEqual(fake.config.pcsx2_path, valid_paths["pcsx2"])
-        self.assertEqual(fake.config.favorite_authors, ["Alpha", "Beta"])
+        self.assertEqual(fake.config.pcsx2_path, "")
+        self.assertEqual(fake.config.favorite_authors, [])
+        self.assertIn("retry", fake._feedback_lbl.setText.call_args.args[0])
 
     def test_settings_panel_rejects_invalid_paths_before_saving(self):
         import sys
@@ -2311,6 +2355,8 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
                 _fav_authors_edit=MagicMock(),
                 settings_saved=MagicMock(),
                 emit_status=MagicMock(),
+                _validation_timer=MagicMock(),
+                _update_form_state=MagicMock(),
             )
             for chooser, value in (
                 (fake._pcsx2_chooser, "/definitely/not/a/real/folder"),
@@ -2328,6 +2374,7 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
             fake._theme_combo.currentData.return_value = "dark"
             fake._tooltip_combo.currentData.return_value = "normal"
             fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+            fake._draft_values = lambda: SettingsPanel._draft_values(fake)
 
             with patch("src.ui.settings_panel.save_config") as save_mock:
                 with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
@@ -2340,6 +2387,164 @@ class TestSettingsDialogSaveFailures(unittest.TestCase):
         fake.emit_status.assert_not_called()
         self.assertEqual(fake.config.pcsx2_path, "")
         self.assertTrue(any("invalid" in msg.lower() for msg in logs.output))
+
+    def test_folder_readiness_distinguishes_optional_missing_and_file_paths(self):
+        module = self._import_settings_panel()
+        self.assertTrue(module._folder_status("")[0])
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(module._folder_status(tmp), (True, "Folder found."))
+            file = Path(tmp) / "file"
+            file.touch()
+            valid, message = module._folder_status(str(file))
+            self.assertFalse(valid)
+            self.assertIn("not a folder", message)
+            valid, message = module._folder_status(str(Path(tmp) / "missing"))
+            self.assertFalse(valid)
+            self.assertIn("not found", message)
+        with patch.object(module.Path, "is_dir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                valid, message = module._folder_status("/restricted")
+        self.assertFalse(valid)
+        self.assertIn("permissions", message)
+
+    def test_settings_form_tracks_dirty_validity_and_optional_paths(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(False)
+        panel._updates_check.isChecked.return_value = not panel.config.check_updates_on_start
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(True)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("ready to save", panel._feedback_lbl.setText.call_args.args[0])
+        panel._tex_chooser.get_path.return_value = "/definitely/not/a/real/folder"
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Textures Folder", panel._feedback_lbl.setText.call_args.args[0])
+        self.assertIn("not found", panel._path_status_labels["textures_path"].setText.call_args.args[0])
+
+    def test_settings_form_debounces_validation_without_saving_draft(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._updates_check.isChecked.return_value = not panel.config.check_updates_on_start
+        with patch.object(module, "save_config") as save:
+            panel._on_form_changed()
+            panel._on_form_changed()
+        self.assertEqual(panel._validation_timer.start.call_count, 2)
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Unsaved", panel._feedback_lbl.setText.call_args.args[0])
+        save.assert_not_called()
+        panel._syncing = True
+        panel._validation_timer.reset_mock()
+        panel._on_form_changed()
+        panel._validation_timer.start.assert_not_called()
+
+    def test_settings_save_commits_only_after_persistence_and_needs_no_success_modal(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        original = panel.config
+        panel.config.ui_state = {"browse_panel": {"query": "existing"}}
+        panel._fav_authors_edit.toPlainText.return_value = " Alpha \n\n Beta \n"
+        with tempfile.TemporaryDirectory() as tmp:
+            panel._pnach_chooser.get_path.return_value = f" {tmp} "
+            def persist(candidate):
+                self.assertIsNot(candidate, original)
+                self.assertEqual(original.pnach_path, "")
+                self.assertEqual(candidate.pnach_path, tmp)
+                self.assertEqual(candidate.cheats_path, tmp)
+                self.assertEqual(candidate.ui_state, original.ui_state)
+            with patch.object(module, "save_config", side_effect=persist) as save:
+                with patch.object(module.QMessageBox, "information") as modal:
+                    panel._save()
+            self.assertEqual(original.pnach_path, tmp)
+        self.assertIs(panel.config, original)
+        self.assertEqual(original.favorite_authors, ["Alpha", "Beta"])
+        panel.settings_saved.emit.assert_called_once_with(original)
+        save.assert_called_once()
+        modal.assert_not_called()
+        self.assertEqual(panel._saved_values, panel._draft_values())
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(False)
+        panel._feedback_lbl.setText.assert_called_with("Settings saved ✅")
+
+    def test_settings_failed_save_preserves_shared_config_and_retryable_draft(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        original = panel.config
+        panel._fav_authors_edit.toPlainText.return_value = "New author"
+        with patch.object(module, "save_config", side_effect=OSError("locked")):
+            with patch.object(module.QMessageBox, "critical") as error:
+                with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                    panel._save()
+        self.assertIs(panel.config, original)
+        self.assertEqual(original.favorite_authors, [])
+        self.assertEqual(panel._saved_values["favorite_authors"], [])
+        self.assertEqual(panel._draft_values()["favorite_authors"], ["New author"])
+        panel._save_btn.setEnabled.assert_called_with(True)
+        panel.settings_saved.emit.assert_not_called()
+        error.assert_called_once()
+        with patch.object(module, "save_config"):
+            panel._save()
+        self.assertEqual(original.favorite_authors, ["New author"])
+
+    def test_settings_save_rechecks_folders_that_disappear_after_readiness(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "textures"
+            folder.mkdir()
+            panel._tex_chooser.get_path.return_value = str(folder)
+            panel._update_form_state()
+            panel._save_btn.setEnabled.assert_called_with(True)
+            folder.rmdir()
+            with patch.object(module, "save_config") as save, patch.object(module.QMessageBox, "warning") as warning:
+                with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                    panel._save()
+        save.assert_not_called()
+        warning.assert_called_once()
+        self.assertEqual(panel.config.textures_path, "")
+        panel._save_btn.setEnabled.assert_called_with(False)
+
+    def test_settings_game_library_edits_clear_stale_counts_without_scanning(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        with patch("src.core.game_library.scan_library") as scan:
+            panel._on_game_lib_changed("/new")
+            self.assertIn("Scan Library", panel._game_lib_count_lbl.setText.call_args.args[0])
+            panel._on_game_lib_changed("")
+            panel._game_lib_count_lbl.setText.assert_called_with("  No folder selected")
+        scan.assert_not_called()
+
+    def test_settings_reload_resets_draft_without_library_scan_or_theme_preview(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._on_theme_changed = MagicMock()
+        config = AppConfig(game_library_path="/games", favorite_authors=["Author"])
+        with patch("src.core.game_library.scan_library") as scan, patch.object(module, "save_config") as save:
+            panel.reload_config(config)
+        scan.assert_not_called()
+        save.assert_not_called()
+        panel._on_theme_changed.assert_not_called()
+        panel._game_lib_chooser.set_path.assert_called_once_with("/games")
+        panel._fav_authors_edit.setPlainText.assert_called_once_with("Author")
+        self.assertFalse(panel._syncing)
+        self.assertIs(panel.config, config)
+        panel._save_btn.setEnabled.assert_called_with(False)
+
+    def test_settings_revert_reloads_saved_config_and_restores_previewed_theme(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel.reload_config = MagicMock()
+        panel._on_theme_changed = MagicMock()
+        with patch.object(module, "save_config") as save:
+            panel._revert_changes()
+        panel.reload_config.assert_called_once_with(panel.config)
+        panel._on_theme_changed.assert_called_once_with(0)
+        panel._feedback_lbl.setText.assert_called_with("Changes reverted.")
+        save.assert_not_called()
 
     def test_settings_panel_missing_game_library_logs_and_shows_fallback(self):
         import sys
