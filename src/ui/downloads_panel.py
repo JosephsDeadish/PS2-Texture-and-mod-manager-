@@ -37,6 +37,19 @@ from src.ui.base_panel import BasePanel
 logger = logging.getLogger(__name__)
 
 
+def _history_summary_message(entry_count: int, filters_active: bool) -> str:
+    """Return a compact history summary for the current filter state."""
+    if entry_count <= 0:
+        if filters_active:
+            return "No history entries match the current filters."
+        return "No download history entries recorded yet."
+
+    noun = "entry" if entry_count == 1 else "entries"
+    if filters_active:
+        return f"Showing {entry_count} matching download history {noun}."
+    return f"Showing {entry_count} download history {noun}."
+
+
 # ---------------------------------------------------------------------------
 # Single active-download row widget
 # ---------------------------------------------------------------------------
@@ -177,6 +190,12 @@ class DownloadsPanel(BasePanel):
             emitter(message)
         else:
             logger.info(message)
+
+    def _set_history_summary(self, message: str) -> None:
+        summary_lbl = getattr(self, "_history_summary_lbl", None)
+        setter = getattr(summary_lbl, "setText", None)
+        if callable(setter):
+            setter(message)
 
     def _save_history_splitter(self, *_args) -> None:
         splitter = getattr(self, "_history_splitter", None)
@@ -369,6 +388,12 @@ class DownloadsPanel(BasePanel):
 
         filter_row.addStretch()
         content.addLayout(filter_row)
+
+        self._history_summary_lbl = QLabel("")
+        self._history_summary_lbl.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self._history_summary_lbl.setStyleSheet("color: #5060a0; font-size: 11px;")
+        self._history_summary_lbl.setWordWrap(True)
+        content.addWidget(self._history_summary_lbl)
 
         # Splitter: list (left) | detail (right)
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -587,6 +612,7 @@ class DownloadsPanel(BasePanel):
         type_filter = self._TYPE_MAP.get(self._type_combo.currentText())
         serial_text = self._serial_edit.text().strip()
         serial_filter = serial_text if serial_text else None
+        filters_active = any(value is not None for value in (status_filter, type_filter, serial_filter))
         self._list_widget.clear()
         self._history_entries = []
         self._selected_source_url = ""
@@ -606,6 +632,7 @@ class DownloadsPanel(BasePanel):
             empty_msg = f"Could not read history: {exc}"
             self._list_widget.addItem(empty_msg)
             self._detail_label.setText(f"<i>{empty_msg}</i>")
+            self._set_history_summary("Could not read download history.")
             self._delete_btn.setEnabled(False)
             return
 
@@ -625,8 +652,11 @@ class DownloadsPanel(BasePanel):
             self._detail_label.setText(f"<i>{empty_msg}</i>")
             self._selected_source_url = ""
             self._update_history_source_actions()
-            self._delete_btn.setEnabled(False)
+            self._set_history_summary(_history_summary_message(0, filters_active))
         else:
+            self._set_history_summary(
+                _history_summary_message(len(self._history_entries), filters_active)
+            )
             self._restore_history_selection()
 
     def _on_selection_changed(self, row: int):

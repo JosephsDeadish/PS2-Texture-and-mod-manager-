@@ -6926,6 +6926,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._serial_edit = FakeLineEdit()
         panel._list_widget = FakeListWidget()
         panel._detail_label = FakeLabel()
+        panel._history_summary_lbl = FakeLabel()
         panel._delete_btn = FakeButton()
 
         with patch("src.core.download_history.list_history", side_effect=RuntimeError("boom")):
@@ -6937,6 +6938,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertIn("Could not read history: boom", panel._list_widget.items[0])
         self.assertEqual(panel._history_entries, [])
         self.assertIn("Could not read history: boom", panel._detail_label.value)
+        self.assertEqual(panel._history_summary_lbl.value, "Could not read download history.")
         self.assertFalse(panel._delete_btn.enabled)
         self.assertTrue(any("Failed to load download history" in msg for msg in logs.output))
 
@@ -6991,6 +6993,7 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         panel._serial_edit = FakeLineEdit()
         panel._list_widget = FakeListWidget()
         panel._detail_label = FakeLabel()
+        panel._history_summary_lbl = FakeLabel()
         panel._delete_btn = FakeButton()
 
         with patch("src.core.download_history.list_history", return_value=[]):
@@ -6999,6 +7002,27 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertTrue(panel._list_widget.items)
         self.assertIn("No download history entries recorded yet.", panel._list_widget.items[0])
         self.assertIn("No download history entries recorded yet.", panel._detail_label.value)
+        self.assertEqual(panel._history_summary_lbl.value, "No download history entries recorded yet.")
+
+    def test_history_summary_message_reflects_filter_state(self):
+        downloads_panel = self._import_downloads_panel()
+
+        self.assertEqual(
+            downloads_panel._history_summary_message(0, False),
+            "No download history entries recorded yet.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(0, True),
+            "No history entries match the current filters.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(1, False),
+            "Showing 1 download history entry.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(2, True),
+            "Showing 2 matching download history entries.",
+        )
 
     def test_history_filters_restore_and_save(self):
         import types
