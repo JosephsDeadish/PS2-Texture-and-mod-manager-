@@ -1060,6 +1060,11 @@ class LibraryPanel(BasePanel):
         state = _library_ui_state(self.config)
         selected = state.get("selected_game", {})
         if not isinstance(selected, dict):
+            logger.warning(
+                "Saved library selected game state is invalid; clearing stale selection"
+            )
+            if state.pop("selected_game", None) is not None:
+                _save_library_config(self.config, "clearing invalid selected game state")
             return
 
         target_path = str(selected.get("path", "") or "")

@@ -9417,6 +9417,25 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             logs.output,
         )
 
+    def test_restore_selected_game_clears_invalid_state(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={"library_panel": {"selected_game": ["not", "a", "dict"]}}
+        )
+        panel._cards = []
+        panel._selected_card = None
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                LibraryPanel._restore_selected_game(panel)
+
+        self.assertEqual(panel.config.ui_state["library_panel"], {})
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(any("invalid" in msg for msg in logs.output), logs.output)
+
     def test_scan_library_reuses_cache_until_invalidated(self):
         library_panel = self._import_library_panel()
         LibraryPanel = library_panel.LibraryPanel
