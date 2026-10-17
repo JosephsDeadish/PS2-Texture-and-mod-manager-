@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import List, Optional
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -228,6 +228,11 @@ class _GameDetailPane(QWidget):
         self._placeholder.setVisible(False)
         self._scroll.setVisible(True)
         self._rebuild()
+
+    def clear_game(self):
+        self._game = None
+        self._scroll.setVisible(False)
+        self._placeholder.setVisible(True)
 
     def _rebuild(self):
         if not self._game:
@@ -827,6 +832,10 @@ class _AllModsPane(QWidget):
 # My Library Panel
 # ---------------------------------------------------------------------------
 
+class _LibraryScanResult(QObject):
+    finished = pyqtSignal(int, str, object, str)
+
+
 class LibraryPanel(BasePanel):
     """
     Shows all PS2 disc images from the user's game library folder.
@@ -847,6 +856,12 @@ class LibraryPanel(BasePanel):
         self._library_scan_cache: list[GameEntry] = []
         self._last_library_status: str = ""
         self._library_scan_error: str = ""
+        self._library_scan_error_path: Optional[str] = None
+        self._scan_generation = 0
+        self._scan_requested_path: Optional[str] = None
+        self._scan_active = None
+        self._scan_pending = None
+        self._rendered_library_path: Optional[str] = None
         self._state_persistence_enabled = False
         self._build()
 
@@ -914,6 +929,11 @@ class LibraryPanel(BasePanel):
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
         content.addWidget(self._count_lbl)
+        self._scan_status = QLabel()
+        self._scan_status.setWordWrap(True)
+        self._scan_status.setTextFormat(Qt.TextFormat.PlainText)
+        self._scan_status.hide()
+        content.addWidget(self._scan_status)
 
         # ── Mode stack: By Game (index 0) | All Mods (index 1) ──────────
         self._mode_stack = QStackedWidget()
@@ -1053,7 +1073,13 @@ class LibraryPanel(BasePanel):
         if not target_path and not target_serial:
             return
 
-        for card in self._cards:
+        # Prefer an exact disc-image path before falling back to another disc
+        # for the same serial.
+        candidates = sorted(
+            self._cards,
+            key=lambda card: str(getattr(card.game, "path", "") or "") != target_path,
+        )
+        for card in candidates:
             game = getattr(card, "game", None)
             if game is None:
                 continue
@@ -1064,12 +1090,19 @@ class LibraryPanel(BasePanel):
                 self._selected_card = card
                 self._detail.show_game(game)
                 return
-            if target_serial and game_serial == target_serial:
+            if (
+                target_serial and game_serial == target_serial
+                and not (target_path and (
+                    self._scan_active or self._scan_pending or self._library_scan_error
+                ))
+            ):
                 card.set_selected(True)
                 self._selected_card = card
                 self._detail.show_game(game)
                 return
 
+        if self._scan_active or self._scan_pending or self._library_scan_error:
+            return
         logger.warning(
             "Saved library selection path=%r serial=%r no longer matches a visible game; "
             "clearing stale selection",
@@ -1085,7 +1118,23 @@ class LibraryPanel(BasePanel):
 
     def _populate(self):
         self._last_library_status = ""
-        self._library_scan_error = ""
+        library_path = getattr(self.config, "game_library_path", "") or ""
+        if library_path != self._scan_requested_path:
+            self._invalidate_library_scan_cache()
+        games = self._scan_library(library_path) if library_path else []
+        pending = games is None
+        self._update_scan_status()
+        using_previous = (
+            (pending or bool(self._library_scan_error))
+            and self._rendered_library_path == library_path
+        )
+        if using_previous:
+            games = [card.game for card in self._cards if card.game.path]
+        if pending:
+            self._last_library_status = "Scanning game library in the background…"
+        elif self._library_scan_error:
+            self._last_library_status = f"Could not scan game library folder: {library_path}"
+            self.emit_status(self._last_library_status)
 
         # Clear current list
         while self._list_layout.count():
@@ -1094,8 +1143,11 @@ class LibraryPanel(BasePanel):
                 item.widget().deleteLater()
         self._cards.clear()
         self._selected_card = None
+        self._detail.clear_game()
+        self._rendered_library_path = (
+            library_path if using_previous or (not pending and not self._library_scan_error) else None
+        )
 
-        library_path = getattr(self.config, "game_library_path", "")
         if not library_path:
             self._last_library_status = "Game library path not configured."
             # Try to auto-detect from pcsx2_path
@@ -1132,42 +1184,24 @@ class LibraryPanel(BasePanel):
             self._restore_selected_game()
             return
 
-        library_root = Path(library_path)
-        if not library_root.is_dir():
-            self._last_library_status = f"Game library folder not found: {library_path}"
-            logger.warning("Game library folder not found: %s", library_path)
-            msg = QLabel(
-                "Game library folder not found.\n\n"
-                "Go to ⚙ Settings and set your Game Library folder\n"
-                "(the folder where you keep your .iso / .chd files)."
-            )
-            msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            msg.setStyleSheet("color: #b07070; font-size: 13px;")
-            msg.setWordWrap(True)
-            self._list_layout.addWidget(msg)
-            self._count_lbl.setText("Folder not found")
-            self.emit_status(f"Game library folder not found: {library_path}")
-
-            # Still show DB-tracked games even if the configured folder is invalid.
+        if pending and not using_previous:
             self._populate_db_games()
-            self._restore_selected_game()
+            self._count_lbl.setText(f"Scanning disc images • {len(self._cards)} tracked game(s) available")
             return
 
-        games = self._scan_library(library_path)
-        if self._library_scan_error:
-            self._last_library_status = f"Could not scan game library folder: {library_path}"
+        if self._library_scan_error and not using_previous:
             msg = QLabel(
                 "Could not scan your game library folder.\n\n"
                 f"{self._library_scan_error}\n\n"
                 "The mods installed in the database are still shown below.\n"
-                "Check the folder permissions or press Refresh to try again."
+                "Check the folder in Settings or use Scan Library to try again."
             )
             msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
             msg.setStyleSheet("color: #b07070; font-size: 13px;")
             msg.setWordWrap(True)
+            msg.setTextFormat(Qt.TextFormat.PlainText)
             self._list_layout.addWidget(msg)
             self._count_lbl.setText("Scan failed — showing installed mods only")
-            self.emit_status(self._last_library_status)
             self._populate_db_games()
             self._restore_selected_game()
             return
@@ -1232,22 +1266,101 @@ class LibraryPanel(BasePanel):
         self._restore_selected_game()
 
     def _invalidate_library_scan_cache(self) -> None:
+        self._scan_generation += 1
+        self._scan_requested_path = None
+        self._scan_pending = None
         self._library_scan_cache_path = None
         self._library_scan_cache = []
+        self._library_scan_error_path = None
+        self._library_scan_error = ""
 
-    def _scan_library(self, library_path: str) -> list[GameEntry]:
+    def _scan_library(self, library_path: str) -> Optional[list[GameEntry]]:
         if self._library_scan_cache_path == library_path:
             return list(self._library_scan_cache)
-        try:
-            games = scan_library(library_path)
-        except Exception as exc:
-            logger.warning("Could not scan game library folder %s: %s", library_path, exc)
-            self._library_scan_error = str(exc)
+        if self._library_scan_error_path == library_path:
             return []
-        self._library_scan_error = ""
-        self._library_scan_cache_path = library_path
-        self._library_scan_cache = list(games)
-        return list(games)
+        if self._scan_requested_path != library_path:
+            self._scan_generation += 1
+            self._scan_requested_path = library_path
+            self._scan_pending = (self._scan_generation, library_path)
+            self._start_next_scan()
+            if self._library_scan_error_path == library_path:
+                return []
+        return None
+
+    def _start_next_scan(self):
+        if self._scan_active is not None or self._scan_pending is None:
+            return
+        import threading
+        generation, path = self._scan_pending
+        self._scan_pending = None
+        self._scan_active = (generation, path)
+        # A worker owns the relay independently of panel lifetime.
+        result = _LibraryScanResult()
+        result.finished.connect(self._on_library_scan_finished)
+
+        def run():
+            games, error = [], ""
+            try:
+                games = scan_library(path, strict=True)
+            except Exception as exc:
+                logger.warning("Could not scan game library folder %s: %s", path, exc)
+                error = str(exc) or type(exc).__name__
+            result.finished.emit(generation, path, games, error)
+            result.deleteLater()
+
+        try:
+            threading.Thread(target=run, daemon=True).start()
+        except RuntimeError as exc:
+            logger.warning("Could not start game library scan: %s", exc)
+            result.deleteLater()
+            # Avoid re-entering list construction if thread creation fails.
+            self._scan_active = None
+            self._library_scan_error_path = path
+            self._library_scan_error = str(exc) or type(exc).__name__
+
+    @pyqtSlot(int, str, object, str)
+    def _on_library_scan_finished(self, generation, path, games, error):
+        if self._scan_active != (generation, path):
+            return
+        self._scan_active = None
+        current_path = getattr(self.config, "game_library_path", "") or ""
+        if current_path != self._scan_requested_path:
+            self._invalidate_library_scan_cache()
+            if current_path:
+                self._scan_library(current_path)
+        elif generation == self._scan_generation:
+            if error:
+                self._library_scan_error_path = path
+                self._library_scan_error = error
+            else:
+                self._library_scan_cache_path = path
+                self._library_scan_cache = list(games)
+                self._library_scan_error_path = None
+                self._library_scan_error = ""
+        self._start_next_scan()
+        self._update_scan_status()
+        if self._mode_stack.currentIndex() == 0:
+            self._populate()
+        elif error and generation == self._scan_generation:
+            self.emit_status("Game library scan failed; use Scan Library to retry.")
+
+    def _update_scan_status(self):
+        if self._library_scan_error:
+            message = (
+                f"Disc-image scan failed: {self._library_scan_error}\n"
+                "Showing previous results for this folder when available, plus tracked mods. "
+                "Check Settings and use Scan Library to retry."
+            )
+        elif self._scan_active or self._scan_pending:
+            message = (
+                "Scanning disc images in the background; you can use the library or switch views. "
+                "Existing cards remain available while this folder refreshes."
+            )
+        else:
+            message = ""
+        self._scan_status.setText(message)
+        self._scan_status.setVisible(bool(message))
 
     # ------------------------------------------------------------------
     # DB-game helpers
@@ -1332,8 +1445,12 @@ class LibraryPanel(BasePanel):
         self._sync_installed_content()
         if self._mode_stack.currentIndex() == 1:
             self._last_library_status = ""
+            library_path = getattr(self.config, "game_library_path", "") or ""
+            if library_path:
+                self._scan_library(library_path)
+            self._update_scan_status()
             self._switch_to_all_mods()
-            self.emit_status("Library refreshed")
+            self.emit_status("Library refreshed; disc-image scan runs in the background")
         else:
             self._populate()
             if not self._last_library_status:

@@ -50,6 +50,12 @@
 - Profiles never copy or remove live memory-card files; PNACH and cheats sharing a folder are merged together
 - Existing profiles require overwrite confirmation, and failed saves leave saved profiles intact
 
+### 🎮 Game Library Loading
+- Disc-image folder checks, enumeration, and title/CRC lookups run in the background; installed-content auto-import still runs on the UI thread
+- Same-folder scans retain previous disc results and selection while refreshing tracked-mod counts; changing folders clears old cards and details
+- Loading and error feedback stays visible in either Library view; **Scan Library** retries failures, and **All Mods** remains usable independently
+- Rapid scans/settings changes keep only one running scan and the latest queued request; stale results never replace the current folder
+
 ### ✏️ Mod Metadata
 - Edit names, authors, versions, Game IDs, descriptions, source links, and tags from a mod row or **Details → Edit Metadata**
 - Scrollable fields, inline validation, unsaved-change feedback, and **Revert Changes** keep editing manageable on smaller screens

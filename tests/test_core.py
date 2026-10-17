@@ -12209,8 +12209,11 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         qtcore.Qt = types.SimpleNamespace(
             Orientation=types.SimpleNamespace(Horizontal=0),
             AlignmentFlag=types.SimpleNamespace(AlignCenter=0),
+            TextFormat=types.SimpleNamespace(PlainText=0),
         )
+        qtcore.QObject = type("QObject", (), {})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.pyqtSlot = lambda *args, **kwargs: lambda fn: fn
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit",
@@ -12235,6 +12238,34 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             },
         ):
             return importlib.import_module("src.ui.library_panel")
+
+    def _new_scan_panel(self, path="/games", *, module=None):
+        module = module or self._import_library_panel()
+        panel = module.LibraryPanel.__new__(module.LibraryPanel)
+        panel.config = AppConfig(game_library_path=path)
+        panel.db = MagicMock()
+        panel.db.all.return_value = []
+        panel._library_scan_cache_path = None
+        panel._library_scan_cache = []
+        panel._library_scan_error_path = None
+        panel._library_scan_error = ""
+        panel._scan_generation = 0
+        panel._scan_requested_path = None
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._rendered_library_path = None
+        panel._last_library_status = ""
+        panel._cards = []
+        panel._selected_card = None
+        panel._detail = MagicMock()
+        panel._count_lbl = MagicMock()
+        panel._scan_status = MagicMock()
+        panel._mode_stack = MagicMock()
+        panel._mode_stack.currentIndex.return_value = 0
+        panel._list_layout = MagicMock()
+        panel._list_layout.count.return_value = 0
+        panel.emit_status = MagicMock()
+        return panel
 
     def test_all_mods_filter_state_round_trip(self):
         library_panel = self._import_library_panel()
@@ -12634,6 +12665,9 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         ]
         panel._selected_card = None
         panel._detail = FakeDetail()
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._library_scan_error = ""
 
         LibraryPanel._restore_selected_game(panel)
 
@@ -12684,6 +12718,9 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel._cards = [FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War"))]
         panel._selected_card = None
         panel._detail = FakeDetail()
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._library_scan_error = ""
 
         with patch.object(library_panel, "save_config") as save_mock:
             with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
@@ -12722,37 +12759,44 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         library_panel = self._import_library_panel()
         LibraryPanel = library_panel.LibraryPanel
 
-        panel = LibraryPanel.__new__(LibraryPanel)
-        panel._library_scan_cache_path = None
-        panel._library_scan_cache = []
-
-        with patch.object(library_panel, "scan_library", side_effect=[
-            ["first"],
-            ["second"],
-        ]) as scan_mock:
+        panel = self._new_scan_panel(module=library_panel)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult"):
             first = LibraryPanel._scan_library(panel, "/games")
+            self.assertIsNone(first)
+            generation = panel._scan_generation
+            panel._on_library_scan_finished(generation, "/games", ["first"], "")
             second = LibraryPanel._scan_library(panel, "/games")
+            second.append("not cached")
+            self.assertEqual(panel._scan_library("/games"), ["first"])
             LibraryPanel._invalidate_library_scan_cache(panel)
             third = LibraryPanel._scan_library(panel, "/games")
 
-        self.assertEqual(first, ["first"])
-        self.assertEqual(second, ["first"])
-        self.assertEqual(third, ["second"])
-        self.assertEqual(scan_mock.call_count, 2)
+        self.assertEqual(second, ["first", "not cached"])
+        self.assertIsNone(third)
+        self.assertEqual(thread.call_count, 2)
 
-    def test_scan_library_logs_failure_and_returns_empty_list(self):
+    def test_scan_library_logs_failure_and_keeps_retryable_error(self):
         library_panel = self._import_library_panel()
-        LibraryPanel = library_panel.LibraryPanel
+        panel = self._new_scan_panel(module=library_panel)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult") as relay:
+            with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")) as scan:
+                panel._scan_library("/games")
+                worker = thread.call_args.kwargs["target"]
+                with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                    worker()
+            scan.assert_called_once_with("/games", strict=True)
+            args = relay.return_value.finished.emit.call_args.args
+            self.assertEqual(args[1:], ("/games", [], "boom"))
+            panel._on_library_scan_finished(*args)
+            self.assertEqual(panel._scan_library("/games"), [])
+            self.assertEqual(thread.call_count, 1)
+            panel._invalidate_library_scan_cache()
+            self.assertIsNone(panel._scan_library("/games"))
+            self.assertEqual(thread.call_count, 2)
 
-        panel = LibraryPanel.__new__(LibraryPanel)
-        panel._library_scan_cache_path = None
-        panel._library_scan_cache = []
-
-        with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")):
-            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
-                result = LibraryPanel._scan_library(panel, "/games")
-
-        self.assertEqual(result, [])
+        relay.return_value.deleteLater.assert_called_once()
         self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
 
     def test_get_db_only_games_uses_provided_serial_counts(self):
@@ -12782,148 +12826,314 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         panel.db.all.assert_not_called()
         lookup_mock.assert_called_once_with("SLUS-21075")
 
-    def test_populate_missing_game_library_path_shows_fallback(self):
+    def test_populate_missing_game_library_path_is_checked_in_worker(self):
         library_panel = self._import_library_panel()
-        LibraryPanel = library_panel.LibraryPanel
-
-        class FakeLabel:
-            def __init__(self, text=""):
-                self.text = text
-                self.alignment = None
-                self.stylesheet = ""
-                self.word_wrap = False
-
-            def setAlignment(self, value):
-                self.alignment = value
-
-            def setStyleSheet(self, value):
-                self.stylesheet = value
-
-            def setWordWrap(self, value):
-                self.word_wrap = value
-
-            def setText(self, value):
-                self.text = value
-
-        class FakeLayout:
-            def __init__(self):
-                self.widgets = []
-                self.stretch_calls = 0
-
-            def count(self):
-                return 0
-
-            def takeAt(self, _index):
-                return None
-
-            def addWidget(self, widget, *_args):
-                self.widgets.append(widget)
-
-            def addStretch(self):
-                self.stretch_calls += 1
-
-        panel = LibraryPanel.__new__(LibraryPanel)
-        panel.config = AppConfig(game_library_path="/definitely/not/a/real/folder")
-        panel._list_layout = FakeLayout()
-        panel._cards = []
-        panel._selected_card = None
-        panel._count_lbl = FakeLabel()
+        path = "/definitely/not/a/real/folder"
+        panel = self._new_scan_panel(path, module=library_panel)
         panel._populate_db_games = MagicMock()
-        panel.emit_status = MagicMock()
-
-        with patch.object(library_panel, "QLabel", FakeLabel):
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult") as relay:
+            with patch.object(library_panel.Path, "is_dir", side_effect=AssertionError("UI filesystem access")):
+                panel._populate()
+            self.assertIn("Scanning", panel._count_lbl.setText.call_args.args[0])
+            panel._populate_db_games.assert_called_once()
             with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
-                LibraryPanel._populate(panel)
-
-        self.assertEqual(panel._count_lbl.text, "Folder not found")
-        self.assertTrue(
-            any(
-                getattr(widget, "text", "").startswith("Game library folder not found.")
-                for widget in panel._list_layout.widgets
-            )
-        )
-        panel._populate_db_games.assert_called_once()
-        panel.emit_status.assert_called_once_with(
-            "Game library folder not found: /definitely/not/a/real/folder"
-        )
+                thread.call_args.kwargs["target"]()
+            with patch.object(library_panel, "QLabel", MagicMock()):
+                panel._on_library_scan_finished(*relay.return_value.finished.emit.call_args.args)
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        self.assertIn("folder not found", panel._library_scan_error)
         self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
 
     def test_populate_scan_failure_shows_error_placeholder_and_status(self):
-        import types
-
         library_panel = self._import_library_panel()
-        LibraryPanel = library_panel.LibraryPanel
+        panel = self._new_scan_panel(module=library_panel)
+        panel._scan_requested_path = "/games"
+        panel._library_scan_error_path = "/games"
+        panel._library_scan_error = "permission <denied>"
+        panel._populate_db_games = MagicMock()
+        panel._restore_selected_game = MagicMock()
+        with patch.object(library_panel, "QLabel") as label:
+            panel._populate()
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        text = label.call_args.args[0]
+        self.assertTrue(text.startswith("Could not scan your game library folder."))
+        self.assertIn("permission <denied>", text)
+        label.return_value.setTextFormat.assert_called_once_with(library_panel.Qt.TextFormat.PlainText)
+        panel._populate_db_games.assert_called_once()
+        panel._restore_selected_game.assert_called_once()
+        panel.emit_status.assert_called_once_with("Could not scan game library folder: /games")
 
-        class FakeLabel:
-            def __init__(self, text=""):
-                self.text = text
-                self.alignment = None
-                self.stylesheet = ""
-                self.word_wrap = False
+    def test_scan_requests_coalesce_to_latest_folder(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            for path in ("/second", "/third", "/latest"):
+                panel.config.game_library_path = path
+                panel._invalidate_library_scan_cache()
+                panel._scan_library(path)
+            self.assertEqual(thread.call_count, 1)
+            latest = panel._scan_pending
+            self.assertEqual(latest[1], "/latest")
+            panel._on_library_scan_finished(*first, ["stale"], "")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._scan_active, latest)
+            self.assertIsNone(panel._scan_pending)
+            self.assertIsNone(panel._library_scan_cache_path)
+            panel._on_library_scan_finished(*latest, ["current"], "")
+            self.assertEqual(panel._scan_library("/latest"), ["current"])
+            self.assertEqual(thread.call_count, 2)
 
-            def setAlignment(self, value):
-                self.alignment = value
+    def test_repeated_populate_uses_one_pending_scan(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            for _ in range(5):
+                panel._populate()
+        self.assertEqual(thread.call_count, 1)
+        self.assertIsNone(panel._scan_pending)
+        self.assertIn("background", panel._scan_status.setText.call_args.args[0])
 
-            def setStyleSheet(self, value):
-                self.stylesheet = value
+    def test_refresh_during_scan_only_queues_one_followup(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._sync_installed_content = MagicMock()
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._populate()
+            first = panel._scan_active
+            for _ in range(5):
+                panel.refresh()
+            latest = panel._scan_pending
+            self.assertEqual(thread.call_count, 1)
+            panel._on_library_scan_finished(*first, [], "")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._scan_active, latest)
+            self.assertIsNone(panel._scan_pending)
+        panel.emit_status.assert_not_called()
 
-            def setWordWrap(self, value):
-                self.word_wrap = value
+    def test_completion_detects_settings_change_without_populate(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel.config.game_library_path = "/new"
+            panel._on_library_scan_finished(*first, ["old"], "stale failure")
+            self.assertEqual(panel._scan_active[1], "/new")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._library_scan_cache, [])
+            self.assertEqual(panel._library_scan_error, "")
+        panel.emit_status.assert_not_called()
 
-            def setText(self, value):
-                self.text = value
+    def test_cleared_folder_discards_result_and_queued_request(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel._invalidate_library_scan_cache()
+            panel._scan_library("/queued")
+            panel.config.game_library_path = ""
+            panel._on_library_scan_finished(*first, ["old"], "")
+            self.assertIsNone(panel._scan_active)
+            self.assertIsNone(panel._scan_pending)
+            self.assertIsNone(panel._library_scan_cache_path)
+            self.assertEqual(thread.call_count, 1)
 
-        class FakeLayout:
-            def __init__(self):
-                self.widgets = []
-                self.stretch_calls = 0
+    def test_duplicate_completion_cannot_release_new_worker(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel._invalidate_library_scan_cache()
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*first, ["old"], "")
+            current = panel._scan_active
+            panel._on_library_scan_finished(*first, ["duplicate"], "duplicate error")
+        self.assertEqual(panel._scan_active, current)
+        self.assertEqual(panel._library_scan_error, "")
+        self.assertIsNone(panel._library_scan_cache_path)
 
-            def count(self):
-                return 0
+    def test_all_mods_completion_caches_without_rebuilding_game_view(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        panel._mode_stack.currentIndex.return_value = 1
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*panel._scan_active, ["ready"], "")
+        panel._populate.assert_not_called()
+        panel._count_lbl.setText.assert_not_called()
+        panel._detail.clear_game.assert_not_called()
+        self.assertEqual(panel._scan_library("/games"), ["ready"])
+        panel._scan_status.setVisible.assert_called_with(False)
 
-            def takeAt(self, _index):
-                return None
+    def test_all_mods_scan_failure_keeps_count_and_reports_retry(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._populate = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*panel._scan_active, [], "denied")
+        panel._populate.assert_not_called()
+        panel._count_lbl.setText.assert_not_called()
+        self.assertIn("denied", panel._scan_status.setText.call_args.args[0])
+        panel.emit_status.assert_called_once_with("Game library scan failed; use Scan Library to retry.")
 
-            def addWidget(self, widget, *_args):
-                self.widgets.append(widget)
+    def test_all_mods_refresh_still_requests_disc_scan(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._sync_installed_content = MagicMock()
+        panel._switch_to_all_mods = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel.refresh()
+        self.assertEqual(thread.call_count, 1)
+        panel._switch_to_all_mods.assert_called_once()
+        panel._sync_installed_content.assert_called_once()
 
-            def addStretch(self):
-                self.stretch_calls += 1
+    def test_worker_owns_only_relay_and_immutable_request(self):
+        import inspect
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult") as relay:
+            with patch.object(module, "scan_library", return_value=["disc"]) as scan:
+                panel._scan_library("/games")
+                worker = thread.call_args.kwargs["target"]
+                closure = inspect.getclosurevars(worker).nonlocals
+                self.assertEqual(set(closure), {"result", "generation", "path"})
+                self.assertNotIn(panel, closure.values())
+                worker()
+        scan.assert_called_once_with("/games", strict=True)
+        relay.return_value.finished.connect.assert_called_once_with(panel._on_library_scan_finished)
+        relay.return_value.finished.emit.assert_called_once_with(panel._scan_generation, "/games", ["disc"], "")
+        relay.return_value.deleteLater.assert_called_once()
+        self.assertEqual(panel._library_scan_cache, [])  # Only the UI receiver writes state.
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            panel = LibraryPanel.__new__(LibraryPanel)
-            panel.config = AppConfig(game_library_path=tmpdir)
-            panel.db = types.SimpleNamespace(all=lambda: [])
-            panel._library_scan_cache_path = None
-            panel._library_scan_cache = []
-            panel._list_layout = FakeLayout()
-            panel._cards = []
-            panel._count_lbl = FakeLabel()
-            panel._populate_db_games = MagicMock()
-            panel._restore_selected_game = MagicMock()
-            panel.emit_status = MagicMock()
+    def test_thread_start_failure_is_rendered_without_recursive_populate(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult") as relay:
+            thread.return_value.start.side_effect = RuntimeError("no threads")
+            with patch.object(module, "QLabel"), self.assertLogs("src.ui.library_panel", level="WARNING"):
+                panel._populate()
+        self.assertIsNone(panel._scan_active)
+        self.assertIn("no threads", panel._library_scan_error)
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        relay.return_value.deleteLater.assert_called_once()
 
-            with patch.object(library_panel, "QLabel", FakeLabel):
-                with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")):
-                    with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
-                        LibraryPanel._populate(panel)
+    def test_pending_and_failed_scans_do_not_clear_saved_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        selected = {"path": "/games/disc.iso", "serial": "SLUS-20062"}
+        panel.config.ui_state = {"library_panel": {"selected_game": selected}}
+        with patch.object(module, "save_config") as save:
+            panel._scan_active = (1, "/games")
+            panel._restore_selected_game()
+            panel._scan_active = None
+            panel._library_scan_error = "denied"
+            panel._restore_selected_game()
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        save.assert_not_called()
 
-            self.assertEqual(panel._count_lbl.text, "Scan failed — showing installed mods only")
-            self.assertTrue(
-                any(
-                    getattr(widget, "text", "").startswith("Could not scan your game library folder.")
-                    for widget in panel._list_layout.widgets
-                )
-            )
-            self.assertTrue(
-                any("boom" in getattr(widget, "text", "") for widget in panel._list_layout.widgets)
-            )
-            panel._populate_db_games.assert_called_once()
-            panel._restore_selected_game.assert_called_once()
-            panel.emit_status.assert_called_once_with(
-                f"Could not scan game library folder: {tmpdir}"
-            )
-            self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+    def test_restore_prefers_exact_disc_over_another_with_same_serial(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": "/games/second.iso", "serial": "SLUS-20062",
+        }}}
+        panel._cards = [MagicMock(), MagicMock()]
+        for card, path in zip(panel._cards, ("/games/first.iso", "/games/second.iso")):
+            card.game = module.GameEntry(path=path, filename=Path(path).name, serial="SLUS-20062", title="")
+        panel._restore_selected_game()
+        self.assertIs(panel._selected_card, panel._cards[1])
+        panel._cards[0].set_selected.assert_not_called()
+
+    def test_error_fallback_does_not_replace_saved_disc_with_db_only_game(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        selected = {"path": "/games/disc.iso", "serial": "SLUS-20062"}
+        panel.config.ui_state = {"library_panel": {"selected_game": selected}}
+        panel._library_scan_error = "denied"
+        card = MagicMock()
+        card.game = module.GameEntry(path="", filename="", serial="SLUS-20062", title="")
+        panel._cards = [card]
+        panel._restore_selected_game()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        panel._detail.show_game.assert_not_called()
+
+    def test_refresh_reuses_same_folder_games_but_rebuilds_mod_counts(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._rendered_library_path = "/games"
+        disc = module.GameEntry(path="/games/disc.iso", filename="disc.iso", serial="SLUS-20062", title="")
+        panel._cards = [MagicMock(game=disc)]
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": disc.path, "serial": disc.serial,
+        }}}
+        panel.db.all.return_value = [MagicMock(game_id=disc.serial)]
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            with patch.object(module, "_GameCard") as card:
+                card.return_value.game = disc
+                panel._populate()
+        card.assert_called_once_with(disc, 1, config=panel.config)
+        self.assertIs(panel._selected_card, card.return_value)
+        panel._detail.show_game.assert_called_once_with(disc)
+        self.assertEqual(panel._rendered_library_path, "/games")
+        self.assertIn("Scanning", panel._last_library_status)
+
+    def test_new_folder_scan_clears_old_cards_and_details_not_saved_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(path="/new", module=module)
+        panel._rendered_library_path = "/old"
+        panel._cards = [MagicMock()]
+        panel._selected_card = panel._cards[0]
+        panel._populate_db_games = MagicMock()
+        panel.config.ui_state = {"library_panel": {"selected_game": {"path": "/old/disc.iso"}}}
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._populate()
+        self.assertEqual(panel._cards, [])
+        self.assertIsNone(panel._selected_card)
+        panel._detail.clear_game.assert_called_once()
+        self.assertIn("selected_game", panel.config.ui_state["library_panel"])
+
+    def test_scan_failure_keeps_previous_disc_results_usable(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._scan_requested_path = "/games"
+        panel._rendered_library_path = "/games"
+        panel._library_scan_error_path = "/games"
+        panel._library_scan_error = "disk disconnected"
+        disc = module.GameEntry(path="/games/disc.iso", filename="disc.iso", serial="", title="")
+        panel._cards = [MagicMock(game=disc)]
+        with patch.object(module, "_GameCard") as card:
+            card.return_value.game = disc
+            panel._populate()
+        card.assert_called_once_with(disc, 0, config=panel.config)
+        self.assertIn("disk disconnected", panel._scan_status.setText.call_args.args[0])
+        panel.emit_status.assert_called_once()
+
+    def test_clear_game_hides_stale_detail_and_restores_placeholder(self):
+        module = self._import_library_panel()
+        detail = module._GameDetailPane.__new__(module._GameDetailPane)
+        detail._game = MagicMock()
+        detail._scroll = MagicMock()
+        detail._placeholder = MagicMock()
+        detail.clear_game()
+        self.assertIsNone(detail._game)
+        detail._scroll.setVisible.assert_called_once_with(False)
+        detail._placeholder.setVisible.assert_called_once_with(True)
 
     def test_refresh_keeps_scan_failure_status_message(self):
         import types
@@ -14374,6 +14584,24 @@ class TestGameLibrary(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             result = self.scan_library(d)
             self.assertEqual(result, [])
+
+    def test_strict_missing_dir_raises(self):
+        with self.assertLogs("src.core.game_library", level="WARNING"):
+            with self.assertRaises(FileNotFoundError):
+                self.scan_library("/nonexistent/path/xyz_ps2_lib", strict=True)
+
+    def test_strict_empty_dir_is_successful(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(self.scan_library(directory, strict=True), [])
+
+    def test_strict_permission_error_raises_for_flat_and_recursive_scans(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for recursive in (False, True):
+                with self.subTest(recursive=recursive):
+                    with patch("src.core.game_library.os.scandir", side_effect=PermissionError("denied")):
+                        with self.assertLogs("src.core.game_library", level="WARNING"):
+                            with self.assertRaises(PermissionError):
+                                self.scan_library(directory, strict=True, recursive=recursive)
 
     # ── Extension filtering ──────────────────────────────────────────────────
 

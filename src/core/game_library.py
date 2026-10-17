@@ -157,6 +157,7 @@ def scan_library(
     directory: str,
     *,
     recursive: bool = False,
+    strict: bool = False,
 ) -> List[GameEntry]:
     """Scan *directory* for PS2 disc image files and return a list of
     :class:`GameEntry` objects sorted by display name.
@@ -168,6 +169,9 @@ def scan_library(
     recursive:
         When *True*, descend into sub-directories.  Defaults to *False*
         because most users keep all ISOs in a single flat folder.
+    strict:
+        Raise folder traversal errors instead of treating unreadable or missing
+        folders as empty. Metadata lookup failures remain recoverable.
 
     Returns
     -------
@@ -178,6 +182,8 @@ def scan_library(
     root = Path(directory)
     if not root.is_dir():
         log.warning("game_library: directory not found: %s", directory)
+        if strict:
+            raise FileNotFoundError(f"Game library folder not found: {directory}")
         return []
 
     entries: List[GameEntry] = []
@@ -186,10 +192,12 @@ def scan_library(
     def _walk_with_errors(root_dir: str):
         def _onerror(exc: OSError) -> None:
             log.warning("Could not scan game library folder %s: %s", exc.filename or root_dir, exc)
+            if strict:
+                raise exc
 
         yield from os.walk(root_dir, onerror=_onerror)
 
-    walk_fn = _walk_with_errors if recursive else _flat_walk
+    walk_fn = _walk_with_errors if recursive else lambda path: _flat_walk(path, strict=strict)
     for dirpath, _dirs, filenames in walk_fn(str(root)):
         for fname in filenames:
             ext = Path(fname).suffix.lower()
@@ -264,7 +272,7 @@ def get_library_serials(directory: str) -> frozenset:
 # Internal helpers
 # ---------------------------------------------------------------------------
 
-def _flat_walk(root: str):
+def _flat_walk(root: str, *, strict: bool = False):
     """Yield a single ``(dirpath, dirs, files)`` tuple for the top-level
     directory only — equivalent to ``os.walk`` with depth=1."""
     p = Path(root)
@@ -272,6 +280,8 @@ def _flat_walk(root: str):
         names = list(os.scandir(root))
     except PermissionError as exc:
         log.warning("Could not scan game library folder %s: %s", root, exc)
+        if strict:
+            raise
         return
     files = [e.name for e in names if e.is_file(follow_symlinks=True)]
     dirs = [e.name for e in names if e.is_dir(follow_symlinks=True)]
