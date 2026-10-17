@@ -4365,6 +4365,61 @@ class TestManagedConflictDeployment(unittest.TestCase):
         self.assertTrue(any("Could not verify complete deployed-file cleanup" in notice for notice in warnings))
         self.assertTrue((self.target / "unique0.png").exists())
 
+    def test_disable_removes_recorded_texture_file_even_if_source_file_is_missing(self):
+        self.mods[0].files = ["shared.png", "unique0.png"]
+        self.manager.set_priority("0", 30, self.config)
+        (Path(self.mods[0].path) / "unique0.png").unlink()
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(warnings, [])
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+
+    def test_missing_source_directory_uses_recorded_inventory_and_warns(self):
+        self.mods[0].files = ["shared.png", "unique0.png"]
+        self.manager.set_priority("0", 30, self.config)
+        shutil.rmtree(self.mods[0].path)
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(warnings)
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+
+    def test_inventory_cleanup_rejects_escaping_absolute_and_windows_paths(self):
+        self.manager.set_priority("0", 30, self.config)
+        outside = self.root / "outside.png"
+        outside.write_bytes(b"outside")
+        self.mods[0].files = [
+            "../outside.png", str(outside), r"C:\outside.png",
+            r"..\outside.png", ".", "shared.png",
+        ]
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(outside.read_bytes(), b"outside")
+        self.assertEqual(sum("unsafe" in notice for notice in warnings), 5)
+
+    def test_cleanup_does_not_follow_destination_symlinks_outside_target(self):
+        self.manager.set_priority("0", 30, self.config)
+        outside = self.root / "outside"
+        outside.mkdir()
+        (outside / "keep.png").write_bytes(b"keep")
+        try:
+            (self.target / "linked").symlink_to(outside, target_is_directory=True)
+        except OSError:
+            self.skipTest("Directory symlinks unavailable")
+        self.mods[0].files = ["linked/keep.png"]
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual((outside / "keep.png").read_bytes(), b"keep")
+        self.assertTrue(any("outside target" in notice for notice in warnings))
+
+    def test_pnach_inventory_cleanup_removes_flattened_output_for_missing_nested_file(self):
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[0].files = ["nested/deadbeef.pnach"]
+        self.config.pnach_path = str(self.target)
+        self.target.mkdir()
+        output = self.target / "DEADBEEF.pnach"
+        output.write_text("deployed code", encoding="utf-8")
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(warnings, [])
+        self.assertFalse(output.exists())
+
     def _code_mods(self, filename="DEADBEEF.pnach"):
         for index, mod in enumerate(self.mods):
             mod.mod_type = ModType.PNACH if index != 1 else ModType.CHEAT

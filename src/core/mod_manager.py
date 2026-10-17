@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import uuid
 from copy import deepcopy
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Dict, List, Optional, Tuple
 
 import src.core.config_manager as _cfg
@@ -477,6 +477,14 @@ class ModManager:
                     f"Missing source for '{mod.name}': {mod_src}. "
                     "Could not verify complete deployed-file cleanup. Restore the source and retry."
                 )
+            inventory = []
+            for name in mod.files:
+                relative = Path(name.replace("\\", "/"))
+                if (relative.is_absolute() or PureWindowsPath(name).drive
+                        or ".." in relative.parts or relative == Path(".")):
+                    cleanup_warnings.append(f"Skipped unsafe deployed-file inventory path: {name}")
+                    continue
+                inventory.append(relative)
             deployed_files = []
             if mod.mod_type == ModType.COVER_ART:
                 from src.core.game_registry import (
@@ -488,6 +496,7 @@ class ModManager:
             elif mod.mod_type in (ModType.PNACH, ModType.CHEAT):
                 from src.core.pnach import extract_game_crc
                 sources = list(mod_src.rglob("*.pnach")) if mod_src.is_dir() else [mod_src]
+                sources.extend(inventory)
                 for source in sources:
                     if source.suffix.lower() == ".pnach":
                         crc = extract_game_crc(str(source))
@@ -497,9 +506,21 @@ class ModManager:
                     target / f.relative_to(mod_src)
                     for f in mod_src.rglob("*") if f.is_file()
                 ]
+                deployed_files.extend(target / relative for relative in inventory)
             elif mod_src.is_file():
                 deployed_files = [target / mod_src.name]
-            for deployed_file in deployed_files:
+            else:
+                deployed_files = [target / relative for relative in inventory]
+            target_root = target.resolve()
+            for deployed_file in dict.fromkeys(deployed_files):
+                try:
+                    resolved = deployed_file.resolve()
+                    safe = resolved != target_root and resolved.is_relative_to(target_root)
+                except (OSError, RuntimeError):
+                    safe = False
+                if not safe:
+                    cleanup_warnings.append(f"Skipped deployed-file cleanup outside target: {deployed_file}")
+                    continue
                 if deployed_file.exists():
                     try:
                         deployed_file.unlink()
