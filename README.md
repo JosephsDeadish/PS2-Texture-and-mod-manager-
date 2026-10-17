@@ -58,6 +58,10 @@
 - **By Game** searches titles, serials, filenames, paths, regions, formats, and known CRCs; all words must match (across fields), ignoring case and punctuation
 - Filter games with/without installed mods, disc images, or tracked-only games; sort by title, mod count, disc size, or serial, with shown/total counts
 - Search/filter/sort preferences are remembered separately from **All Mods**. Filtering reuses existing cards without rescanning; hidden selections return when shown again, and **Clear Filters** recovers no-match results
+- Toggles in **By Game** and **All Mods** now reconcile deployed files as well as saved flags. **Enable Game Mods / Disable Game Mods** preview only that game's changed flags, across content types, with default-No confirmation
+- Library action results remain copyable across filters and view changes. Warnings/failures offer **Retry Original Action** for the original IDs and requested states, including already-saved flags; removed mods are skipped and later imports never join
+- Retries use current Settings and require confirmation; a different action asks before replacing an earlier retry snapshot. **Dismiss Result** forgets the session's retry without undoing changes
+- Affected destinations rebuild using all enabled mods, including other games and hidden results, to preserve priorities/shared files. Save-file toggles change library flags only and never copy or remove live memory cards
 
 ### ✏️ Mod Metadata
 - Edit names, authors, versions, Game IDs, descriptions, source links, and tags from a mod row or **Details → Edit Metadata**

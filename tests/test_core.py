@@ -12219,7 +12219,7 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
         for name in (
             "QCheckBox", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit",
             "QMessageBox", "QPushButton", "QScrollArea", "QSizePolicy", "QSplitter",
-            "QStackedWidget", "QToolButton", "QVBoxLayout", "QWidget",
+            "QStackedWidget", "QTextEdit", "QToolButton", "QVBoxLayout", "QWidget",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
         qtgui = types.ModuleType("PyQt6.QtGui")
@@ -13642,6 +13642,429 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
 
         self.assertTrue(event.accepted)
         self.assertEqual(card.clicked.emitted, [(card.game,)])
+
+
+class TestLibraryModActions(unittest.TestCase):
+    def setUp(self):
+        helper = TestLibraryPanelStatePersistence()
+        self.module = helper._import_library_panel()
+        self.panel = helper._new_scan_panel(module=self.module)
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    game_id="SLUS-20370", enabled=False),
+            ModInfo("b", "Beta", ModType.PNACH, "/mods/b",
+                    game_id="slus-20370", enabled=True),
+            ModInfo("c", "Other game", ModType.CHEAT, "/mods/c",
+                    game_id="SLUS-20062", enabled=False),
+        ]
+        p = self.panel
+        p.db.all.side_effect = lambda: list(self.mods)
+        p.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        p.config = AppConfig(textures_path="/pcsx2/textures", pnach_path="/pcsx2/cheats")
+        p._mod_action_busy = False
+        p._mod_retry_states = {}
+        p._mod_retry_scope = ""
+        for name in ("_mod_feedback", "_mod_retry_btn", "_mod_dismiss_btn"):
+            setattr(p, name, MagicMock())
+        p._confirm_mod_action = MagicMock(return_value=True)
+        p._on_mod_toggled = MagicMock()
+        p.manager = MagicMock()
+        p.manager.set_enabled_many.side_effect = self._persist
+
+    def _persist(self, states, config):
+        for mid, enabled in states.items():
+            self.panel.db.get(mid).enabled = enabled
+        return len(states), []
+
+    def _new_detail(self):
+        pane = self.module._GameDetailPane.__new__(self.module._GameDetailPane)
+        pane.db = self.panel.db
+        pane.enabled_requested = MagicMock()
+        pane._game = self.module.GameEntry("", "", "SLUS-20370", "Kingdom Hearts")
+        return pane
+
+    def test_row_requests_opposite_state_without_mutating_or_saving(self):
+        row = self.module._ModRow.__new__(self.module._ModRow)
+        row.mod = self.mods[0]
+        row.db = self.panel.db
+        row.toggle_requested = MagicMock()
+        row._on_toggle()
+        row.toggle_requested.emit.assert_called_once_with("a", True)
+        self.assertFalse(self.mods[0].enabled)
+        row.db.update.assert_not_called()
+        row.db.save.assert_not_called()
+
+    def test_row_toggle_labels_explain_deployment_and_card_safety(self):
+        row = self.module._ModRow.__new__(self.module._ModRow)
+        row.mod = self.mods[0]
+        row._toggle_btn = MagicMock()
+        row._refresh_toggle()
+        row._toggle_btn.setAccessibleName.assert_called_with("Enable Alpha <literal>")
+        self.assertIn("reconcile", row._toggle_btn.setToolTip.call_args.args[0])
+        row.mod = ModInfo("card", "Card", ModType.SAVE_FILE, "/cards", enabled=True)
+        row._refresh_toggle()
+        row._toggle_btn.setAccessibleName.assert_called_with("Disable Card")
+        self.assertIn("never copied or removed", row._toggle_btn.setToolTip.call_args.args[0])
+
+    def test_game_batch_requests_only_changed_flags_for_current_serial(self):
+        pane = self._new_detail()
+        self.mods.append(ModInfo("unidentified", "Unidentified", ModType.PNACH, "/unknown",
+                                 game_id=None, enabled=False))
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_called_once_with(
+            {"a": True}, "Game SLUS-20370 — all installed content types", True,
+        )
+        self.assertFalse(self.mods[0].enabled)
+        self.panel.db.update.assert_not_called()
+        pane.enabled_requested.reset_mock()
+        pane._request_game_enabled(False)
+        pane.enabled_requested.emit.assert_called_once_with(
+            {"b": False}, "Game SLUS-20370 — all installed content types", True,
+        )
+
+    def test_game_batch_uses_current_database_not_stale_rendered_rows(self):
+        pane = self._new_detail()
+        self.mods.append(ModInfo("later", "Later", ModType.SAVE_FILE, "/cards",
+                                 game_id="SLUS-20370", enabled=False))
+        pane._request_game_enabled(True)
+        self.assertEqual(pane.enabled_requested.emit.call_args.args[0], {"a": True, "later": True})
+        pane._game = None
+        pane.enabled_requested.reset_mock()
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_unidentified_game_never_requests_all_mods(self):
+        pane = self._new_detail()
+        pane._game.serial = ""
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_already_matching_game_flags_produce_no_new_batch(self):
+        pane = self._new_detail()
+        self.mods[0].enabled = True
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_both_views_forward_single_requests_to_parent(self):
+        detail = self._new_detail()
+        detail._request_mod_enabled("a", True)
+        detail.enabled_requested.emit.assert_called_once_with(
+            {"a": True}, "Single mod in By Game", False,
+        )
+        all_mods = self.module._AllModsPane.__new__(self.module._AllModsPane)
+        all_mods.enabled_requested = MagicMock()
+        all_mods._request_mod_enabled("b", False)
+        all_mods.enabled_requested.emit.assert_called_once_with(
+            {"b": False}, "Single mod in All Mods", False,
+        )
+
+    def test_single_action_uses_shared_reconciliation_not_direct_updates(self):
+        p = self.panel
+        p._run_mod_action({"a": True}, "Single mod", False)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        p._confirm_mod_action.assert_not_called()
+        p.db.update.assert_not_called()
+        p._on_mod_toggled.assert_called_once()
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertIn("Alpha <literal> [a] → Enabled", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_feedback.setHtml.assert_not_called()
+        p._mod_retry_btn.setVisible.assert_called_with(False)
+
+    def test_game_batch_confirms_before_one_shared_call(self):
+        p = self.panel
+        p._run_mod_action({"a": True, "b": False}, "Game SLUS-20370", True)
+        p._confirm_mod_action.assert_called_once_with({"a": True, "b": False}, "Game SLUS-20370", 0)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "b": False}, p.config)
+        self.assertEqual([mod.enabled for mod in self.mods], [True, False, False])
+
+    def test_cancel_preserves_flags_result_and_earlier_retry(self):
+        p = self.panel
+        p._mod_retry_states = {"c": True}
+        p._mod_retry_scope = "Earlier"
+        p._confirm_mod_action.return_value = False
+        p._run_mod_action({"a": True}, "Game", True)
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._mod_retry_states, {"c": True})
+        self.assertEqual(p._mod_retry_scope, "Earlier")
+        self.assertFalse(self.mods[0].enabled)
+        p._mod_feedback.setPlainText.assert_not_called()
+        p._on_mod_toggled.assert_not_called()
+        self.assertFalse(p._mod_action_busy)
+        p._mod_retry_btn.setEnabled.assert_called_with(True)
+
+    def test_warnings_keep_frozen_states_after_flags_save_and_row_refresh(self):
+        p = self.panel
+        states = {"a": True}
+        def warn(requested, config):
+            self._persist(requested, config)
+            return 0, ["Destination <locked>"]
+        p.manager.set_enabled_many.side_effect = warn
+        p._run_mod_action(states, "Single mod", False)
+        states["c"] = True
+        self.assertEqual(p._mod_retry_states, {"a": True})
+        self.assertTrue(self.mods[0].enabled)
+        self.assertIn("Destination <locked>", p._mod_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_retry_btn.setVisible.assert_called_with(True)
+
+    def test_exception_after_save_retains_requested_state_not_inverse(self):
+        p = self.panel
+        def fail(states, config):
+            self._persist(states, config)
+            raise OSError("disk <full>")
+        p.manager.set_enabled_many.side_effect = fail
+        with self.assertLogs("src.ui.library_panel", level="WARNING"):
+            p._run_mod_action({"a": True}, "Single mod", False)
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(p._mod_retry_states, {"a": True})
+        self.assertIn("Flags may already be saved", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_feedback.setHtml.assert_not_called()
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_mod_action()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"a": True})
+        self.assertTrue(self.mods[0].enabled)
+        p._confirm_mod_action.assert_called_once()
+
+    def test_retry_skips_removed_mods_excludes_later_imports_and_keeps_mixed_states(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True, "b": False, "removed": True}
+        p._mod_retry_scope = "Original game"
+        self.mods.append(ModInfo("later", "Later", ModType.TEXTURE_PACK, "/later",
+                                 game_id="SLUS-20370", enabled=False))
+        p._retry_mod_action()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "b": False}, p.config)
+        p._confirm_mod_action.assert_called_once_with(
+            {"a": True, "b": False}, "Retry original action — Original game", 1,
+        )
+        self.assertFalse(self.mods[-1].enabled)
+        self.assertIn("Skipped 1 original", p._mod_feedback.setPlainText.call_args.args[0])
+
+    def test_retry_uses_latest_settings_not_row_or_confirmation_snapshot(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Original"
+        p.config = AppConfig(textures_path="/new/pcsx2/textures")
+        p._retry_mod_action()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+
+    def test_repeated_retry_keeps_original_scope_without_growing_prefix(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Original game"
+        p.manager.set_enabled_many.return_value = (0, ["offline"])
+        p.manager.set_enabled_many.side_effect = None
+        for _ in range(3):
+            p._retry_mod_action()
+            self.assertEqual(p._mod_retry_scope, "Original game")
+            self.assertEqual(p._confirm_mod_action.call_args.args[1], "Retry original action — Original game")
+
+    def test_retry_when_all_original_mods_removed_never_widens_scope(self):
+        p = self.panel
+        p._mod_retry_states = {"removed": True}
+        p._retry_mod_action()
+        self.assertEqual(p._mod_retry_states, {})
+        p.manager.set_enabled_many.assert_not_called()
+        p._confirm_mod_action.assert_not_called()
+        self.assertIn("None of the original", p._mod_feedback.setPlainText.call_args.args[0])
+
+    def test_cancelled_retry_preserves_complete_original_snapshot(self):
+        p = self.panel
+        original = {"a": True, "removed": False}
+        p._mod_retry_states = dict(original)
+        p._confirm_mod_action.return_value = False
+        p._retry_mod_action()
+        self.assertEqual(p._mod_retry_states, original)
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_new_single_action_cannot_silently_replace_earlier_retry(self):
+        p = self.panel
+        p._mod_retry_states = {"b": False}
+        p._confirm_mod_action.return_value = False
+        p._run_mod_action({"a": True}, "Single mod", False)
+        p._confirm_mod_action.assert_called_once()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._mod_retry_states, {"b": False})
+
+    def test_busy_guard_covers_nested_confirmation_and_dismiss_retry(self):
+        p = self.panel
+        def confirm(*args):
+            self.assertTrue(p._mod_action_busy)
+            p._run_mod_action({"c": True}, "Nested", False)
+            p._retry_mod_action()
+            p._dismiss_mod_result()
+            return True
+        p._confirm_mod_action.side_effect = confirm
+        p._run_mod_action({"a": True}, "Game", True)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertFalse(self.mods[2].enabled)
+        self.assertFalse(p._mod_action_busy)
+
+    def test_dismiss_forgets_retry_without_undoing_flags(self):
+        p = self.panel
+        self.mods[0].enabled = True
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Earlier"
+        p._dismiss_mod_result()
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertEqual(p._mod_retry_scope, "")
+        self.assertTrue(self.mods[0].enabled)
+        p._mod_feedback.hide.assert_called_once()
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_removed_single_mod_is_a_safe_noop(self):
+        p = self.panel
+        p._run_mod_action({"removed": True}, "Single mod", False)
+        p.manager.set_enabled_many.assert_not_called()
+        p._on_mod_toggled.assert_not_called()
+
+    def test_confirmation_is_plain_text_default_no_and_describes_destinations(self):
+        p = self.panel
+        del p._confirm_mod_action
+        p._mod_retry_states = {"c": True}
+        self.mods.append(ModInfo("card", "Card", ModType.SAVE_FILE, "/cards"))
+        with patch.object(self.module, "QMessageBox") as box:
+            box.StandardButton.Yes = 1
+            box.StandardButton.No = 2
+            box.return_value.exec.return_value = 2
+            result = p._confirm_mod_action({"a": True, "b": True, "card": False}, "Game <literal>", 1)
+        self.assertFalse(result)
+        dialog = box.return_value
+        dialog.setTextFormat.assert_called_once_with(self.module.Qt.TextFormat.PlainText)
+        dialog.setDefaultButton.assert_called_once_with(2)
+        text = dialog.setText.call_args.args[0]
+        self.assertIn("1 already match", text)
+        self.assertIn("Game <literal>", text)
+        info = dialog.setInformativeText.call_args.args[0]
+        for phrase in ("/pcsx2/textures", "/pcsx2/cheats", "live memory cards",
+                       "other games and hidden results", "replaces the earlier retry snapshot",
+                       "1 original mod(s)"):
+            self.assertIn(phrase, info)
+        details = dialog.setDetailedText.call_args.args[0]
+        self.assertIn("Alpha <literal> [a]", details)
+        self.assertIn("Card [card]", details)
+
+    def test_view_refresh_after_action_never_starts_disc_scan(self):
+        p = self.panel
+        del p._on_mod_toggled
+        p._populate = MagicMock()
+        p._save_view_state = MagicMock()
+        p._switch_to_all_mods = MagicMock()
+        with patch.object(self.module, "scan_library") as scan:
+            p._on_mod_toggled()
+            p._populate.assert_called_once()
+            p._mode_stack.currentIndex.return_value = 1
+            p._on_mod_toggled()
+        p._switch_to_all_mods.assert_called_once()
+        scan.assert_not_called()
+
+    def test_all_mods_refresh_uses_current_settings_for_filter_persistence(self):
+        p = self.panel
+        p._by_game_btn = MagicMock()
+        p._all_mods_btn = MagicMock()
+        p._all_mods_pane = MagicMock()
+        p._all_mods_pane.config = AppConfig(textures_path="/old/textures")
+        p._save_view_state = MagicMock()
+        self.module.LibraryPanel._switch_to_all_mods(p)
+        self.assertIs(p._all_mods_pane.config, p.config)
+        p._all_mods_pane.refresh.assert_called_once()
+
+    def test_real_manager_rolls_back_flags_on_save_failure_then_retries(self):
+        p = self.panel
+        p.manager = self.module.ModManager(p.db)
+        p.db.save.side_effect = OSError("database locked")
+        with patch.object(p.manager, "_reconcile_deployment") as deploy:
+            with self.assertLogs("src.ui.library_panel", level="WARNING"):
+                p._run_mod_action({"a": True, "b": False}, "Game", True)
+            self.assertEqual([mod.enabled for mod in self.mods[:2]], [False, True])
+            self.assertEqual(p._mod_retry_states, {"a": True, "b": False})
+            deploy.assert_not_called()
+            p.db.save.side_effect = None
+            deploy.return_value = (2, [])
+            p._retry_mod_action()
+        self.assertEqual([mod.enabled for mod in self.mods[:2]], [True, False])
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertEqual(p.db.save.call_count, 2)
+        deploy.assert_called_once()
+
+    def test_real_texture_disable_restores_lower_priority_mod_and_persists(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                p.db = self.module.ModDatabase()
+                self.mods = []
+                for mid, priority, content in (("low", 1, b"base"), ("high", 10, b"override")):
+                    source = root / mid / "SLUS-20370" / "replacements"
+                    source.mkdir(parents=True)
+                    (source / "texture.png").write_bytes(content)
+                    mod = ModInfo(mid, mid, ModType.TEXTURE_PACK, str(root / mid),
+                                  enabled=True, game_id="SLUS-20370", priority=priority,
+                                  files=["SLUS-20370/replacements/texture.png"])
+                    p.db.add(mod)
+                p.config = AppConfig(textures_path=str(root / "textures"))
+                p.manager = self.module.ModManager(p.db)
+                p.manager.deploy(ModType.TEXTURE_PACK, p.config.textures_path)
+                deployed = root / "textures" / "SLUS-20370" / "replacements" / "texture.png"
+                self.assertEqual(deployed.read_bytes(), b"override")
+                p._run_mod_action({"high": False}, "Single mod", False)
+                self.assertEqual(deployed.read_bytes(), b"base")
+                self.assertFalse(self.module.ModDatabase().get("high").enabled)
+                p._run_mod_action({"high": True}, "Single mod", False)
+                self.assertEqual(deployed.read_bytes(), b"override")
+                self.assertTrue(self.module.ModDatabase().get("high").enabled)
+                self.assertEqual(p._mod_retry_states, {})
+
+    def test_real_shared_pnach_cheat_destination_reconciles_other_game_mods(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                p.db = self.module.ModDatabase()
+                for mid, kind, address in (("patch", ModType.PNACH, "20000000"),
+                                           ("cheat", ModType.CHEAT, "20000004")):
+                    source = root / mid
+                    source.mkdir()
+                    (source / "12345678.pnach").write_text(
+                        f"patch=1,EE,{address},extended,00000001\n", encoding="utf-8",
+                    )
+                    p.db.add(ModInfo(mid, mid, kind, str(source), enabled=True,
+                                     game_id="SLUS-20370" if mid == "patch" else "SLUS-20062",
+                                     files=["12345678.pnach"]))
+                destination = root / "cheats"
+                p.config = AppConfig(pnach_path=str(destination), cheats_path=str(destination))
+                p.manager = self.module.ModManager(p.db)
+                p._run_mod_action({"patch": True}, "Single mod", False)
+                text = (destination / "12345678.pnach").read_text()
+                self.assertIn("20000000", text)
+                self.assertIn("20000004", text)
+                p._run_mod_action({"patch": False}, "Single mod", False)
+                text = (destination / "12345678.pnach").read_text()
+                self.assertNotIn("20000000", text)
+                self.assertIn("20000004", text)
+                self.assertTrue(p.db.get("cheat").enabled)
+
+    def test_real_save_file_actions_never_copy_or_remove_live_cards(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                source = root / "source"
+                live = root / "memcards"
+                source.mkdir()
+                live.mkdir()
+                (source / "card.ps2").write_bytes(b"imported")
+                (live / "card.ps2").write_bytes(b"live-progress")
+                p.db = self.module.ModDatabase()
+                p.db.add(ModInfo("card", "Card", ModType.SAVE_FILE, str(source), enabled=False,
+                                 files=["card.ps2"], game_id="SLUS-20370"))
+                p.config = AppConfig(memcards_path=str(live))
+                p.manager = self.module.ModManager(p.db)
+                for state in (True, False):
+                    p._run_mod_action({"card": state}, "Single card", False)
+                    self.assertEqual((live / "card.ps2").read_bytes(), b"live-progress")
+                    self.assertEqual(p.db.get("card").enabled, state)
+                self.assertIn("Save-file flags only", p._mod_feedback.setPlainText.call_args.args[0])
 
 
 class TestCatalogueIntegrity(unittest.TestCase):

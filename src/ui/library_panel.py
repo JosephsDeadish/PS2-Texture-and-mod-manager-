@@ -25,6 +25,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QSplitter,
     QStackedWidget,
+    QTextEdit,
     QToolButton,
     QVBoxLayout,
     QWidget,
@@ -125,7 +126,7 @@ def _game_matches_search(game: GameEntry, terms: list[tuple[str, str]]) -> bool:
 class _ModRow(QFrame):
     """A compact row showing a mod with an enable/disable toggle."""
 
-    toggled = pyqtSignal()
+    toggle_requested = pyqtSignal(str, bool)
 
     def __init__(self, mod: ModInfo, db: ModDatabase, parent=None):
         super().__init__(parent)
@@ -145,10 +146,20 @@ class _ModRow(QFrame):
 
         # Name
         name_lbl = QLabel(mod.name)
+        name_lbl.setTextFormat(Qt.TextFormat.PlainText)
         name_lbl.setStyleSheet("color: #c8c8e8; font-size: 12px;")
-        name_lbl.setWordWrap(False)
+        name_lbl.setWordWrap(True)
         name_lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        layout.addWidget(name_lbl, 1)
+        info = QVBoxLayout()
+        info.setSpacing(2)
+        info.addWidget(name_lbl)
+        if mod.author and mod.author not in ("Unknown", ""):
+            auth_lbl = QLabel(f"by {mod.author}")
+            auth_lbl.setTextFormat(Qt.TextFormat.PlainText)
+            auth_lbl.setStyleSheet("color: #6070a0; font-size: 10px;")
+            auth_lbl.setWordWrap(True)
+            info.addWidget(auth_lbl)
+        layout.addLayout(info, 1)
 
         # Type label
         type_lbl = QLabel(_TYPE_LABELS.get(mod.mod_type, ""))
@@ -156,21 +167,22 @@ class _ModRow(QFrame):
         type_lbl.setFixedWidth(100)
         layout.addWidget(type_lbl)
 
-        # Author
-        if mod.author and mod.author not in ("Unknown", ""):
-            auth_lbl = QLabel(f"by {mod.author}")
-            auth_lbl.setStyleSheet("color: #6070a0; font-size: 10px;")
-            auth_lbl.setFixedWidth(130)
-            layout.addWidget(auth_lbl)
-
         # Enable/disable toggle button
         self._toggle_btn = QPushButton()
-        self._toggle_btn.setFixedSize(80, 24)
+        self._toggle_btn.setFixedSize(100, 28)
         self._toggle_btn.clicked.connect(self._on_toggle)
         layout.addWidget(self._toggle_btn)
         self._refresh_toggle()
 
     def _refresh_toggle(self):
+        action = "Disable" if self.mod.enabled else "Enable"
+        self._toggle_btn.setAccessibleName(f"{action} {self.mod.name}")
+        self._toggle_btn.setToolTip(
+            "Change this library flag only; live memory-card files are never copied or removed."
+            if self.mod.mod_type == ModType.SAVE_FILE else
+            f"{action} this mod and reconcile its configured PCSX2 destination. "
+            "Other enabled mods of the affected type are re-deployed to preserve priorities and shared files."
+        )
         if self.mod.enabled:
             self._toggle_btn.setText("✅ Enabled")
             self._toggle_btn.setStyleSheet(
@@ -185,10 +197,7 @@ class _ModRow(QFrame):
             )
 
     def _on_toggle(self):
-        self.mod.enabled = not self.mod.enabled
-        self.db.update(self.mod)
-        self._refresh_toggle()
-        self.toggled.emit()
+        self.toggle_requested.emit(self.mod.id, not self.mod.enabled)
 
 
 # ---------------------------------------------------------------------------
@@ -216,7 +225,7 @@ class _ConflictBadge(QLabel):
 class _GameDetailPane(QWidget):
     """Shows mods installed for one specific game."""
 
-    refreshed = pyqtSignal()
+    enabled_requested = pyqtSignal(object, str, bool)
     browse_requested = pyqtSignal(str)  # emits game serial
 
     def __init__(self, db: ModDatabase, parent=None):
@@ -278,6 +287,7 @@ class _GameDetailPane(QWidget):
             header_row.addWidget(serial_lbl)
 
         if self._game.serial:
+            game_actions = QHBoxLayout()
             browse_btn = QPushButton("🌐 Browse Catalogue")
             browse_btn.setToolTip(
                 f"Open the Browse panel filtered to mods for {self._game.serial}"
@@ -288,7 +298,7 @@ class _GameDetailPane(QWidget):
             )
             _serial = self._game.serial
             browse_btn.clicked.connect(lambda: self.browse_requested.emit(_serial))
-            header_row.addWidget(browse_btn)
+            game_actions.addWidget(browse_btn)
 
             load_order_btn = QPushButton("⬆⬇ Load Order")
             load_order_btn.setToolTip(
@@ -300,9 +310,12 @@ class _GameDetailPane(QWidget):
                 "font-size:11px; padding:4px 10px;"
             )
             load_order_btn.clicked.connect(lambda: self._open_load_order(_serial))
-            header_row.addWidget(load_order_btn)
+            game_actions.addWidget(load_order_btn)
+            game_actions.addStretch()
 
         layout.addLayout(header_row)
+        if self._game.serial:
+            layout.addLayout(game_actions)
 
         # ── Identity row: serial, region, disc type, CRCs, file path ────────
         id_parts: list[str] = []
@@ -390,39 +403,32 @@ class _GameDetailPane(QWidget):
                 f"<b>{enabled_count}</b> enabled"
             )
             summary_lbl.setStyleSheet("color: #9090c0; font-size: 12px;")
-            summary_row.addWidget(summary_lbl, 1)
+            summary_lbl.setWordWrap(True)
+            layout.addWidget(summary_lbl)
 
             # Quick enable-all / disable-all
-            enable_all_btn = QPushButton("✅ Enable All")
+            enable_count = sum(not mod.enabled for mod in game_mods)
+            disable_count = len(game_mods) - enable_count
+            enable_all_btn = QPushButton(f"Enable Game Mods ({enable_count})")
+            enable_all_btn.setEnabled(bool(enable_count))
+            enable_all_btn.setToolTip("Enable disabled mods for this game only, across all content types.")
             enable_all_btn.setFixedHeight(26)
             enable_all_btn.setStyleSheet(
                 "background:#1a3a1a; color:#60d060; border-radius:4px;"
                 "font-size:11px; padding:0 8px;"
             )
 
-            disable_all_btn = QPushButton("🚫 Disable All")
+            disable_all_btn = QPushButton(f"Disable Game Mods ({disable_count})")
+            disable_all_btn.setEnabled(bool(disable_count))
+            disable_all_btn.setToolTip("Disable enabled mods for this game only, across all content types.")
             disable_all_btn.setFixedHeight(26)
             disable_all_btn.setStyleSheet(
                 "background:#2a0a0a; color:#d06060; border-radius:4px;"
                 "font-size:11px; padding:0 8px;"
             )
 
-            def _enable_all():
-                for m in game_mods:
-                    m.enabled = True
-                    self.db.update(m)
-                self._rebuild()
-                self.refreshed.emit()
-
-            def _disable_all():
-                for m in game_mods:
-                    m.enabled = False
-                    self.db.update(m)
-                self._rebuild()
-                self.refreshed.emit()
-
-            enable_all_btn.clicked.connect(_enable_all)
-            disable_all_btn.clicked.connect(_disable_all)
+            enable_all_btn.clicked.connect(lambda: self._request_game_enabled(True))
+            disable_all_btn.clicked.connect(lambda: self._request_game_enabled(False))
             summary_row.addWidget(enable_all_btn)
             summary_row.addWidget(disable_all_btn)
             layout.addLayout(summary_row)
@@ -454,11 +460,25 @@ class _GameDetailPane(QWidget):
 
                 for mod in type_mods:
                     row = _ModRow(mod, self.db)
-                    row.toggled.connect(self.refreshed.emit)
+                    row.toggle_requested.connect(self._request_mod_enabled)
                     layout.addWidget(row)
 
         layout.addStretch()
         self._scroll.setWidget(container)
+
+    def _request_mod_enabled(self, mod_id, enabled):
+        self.enabled_requested.emit({mod_id: enabled}, "Single mod in By Game", False)
+
+    def _request_game_enabled(self, enabled):
+        if self._game is None or not self._game.serial:
+            return
+        serial = self._game.serial.upper()
+        states = {
+            mod.id: enabled for mod in self.db.all()
+            if mod.game_id and mod.game_id.upper() == serial and mod.enabled != enabled
+        }
+        if states:
+            self.enabled_requested.emit(states, f"Game {serial} — all installed content types", True)
 
     def _open_load_order(self, serial: str):
         """Open the Load Order dialog for *serial*."""
@@ -618,6 +638,8 @@ class _GameCard(QFrame):
 
 class _AllModsPane(QWidget):
     """Flat list of every mod in the database with search/filter controls."""
+
+    enabled_requested = pyqtSignal(object, str, bool)
 
     def __init__(self, db: ModDatabase, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -785,12 +807,15 @@ class _AllModsPane(QWidget):
         all_mods = self.db.all()
         for mod in sorted(all_mods, key=lambda m: (m.name or "").lower()):
             row = _ModRow(mod, self.db)
-            row.toggled.connect(self.refresh)
+            row.toggle_requested.connect(self._request_mod_enabled)
             self._rows.append(row)
             self._list_layout.addWidget(row)
         self._list_layout.addStretch()
 
         self._apply_filter()
+
+    def _request_mod_enabled(self, mod_id, enabled):
+        self.enabled_requested.emit({mod_id: enabled}, "Single mod in All Mods", False)
 
     # ------------------------------------------------------------------
     def _apply_filter(self):
@@ -885,6 +910,9 @@ class LibraryPanel(BasePanel):
         self._scan_pending = None
         self._rendered_library_path: Optional[str] = None
         self._state_persistence_enabled = False
+        self._mod_action_busy = False
+        self._mod_retry_states = {}
+        self._mod_retry_scope = ""
         self._build()
 
     # ------------------------------------------------------------------
@@ -957,6 +985,27 @@ class LibraryPanel(BasePanel):
         self._scan_status.setTextFormat(Qt.TextFormat.PlainText)
         self._scan_status.hide()
         content.addWidget(self._scan_status)
+        self._mod_feedback = QTextEdit()
+        self._mod_feedback.setReadOnly(True)
+        self._mod_feedback.setMaximumHeight(110)
+        self._mod_feedback.setAccessibleName("Library mod action result")
+        self._mod_feedback.hide()
+        content.addWidget(self._mod_feedback)
+        result_actions = QHBoxLayout()
+        self._mod_retry_btn = QPushButton("Retry Original Action")
+        self._mod_retry_btn.setToolTip(
+            "Review and retry only the original mod IDs and requested states, even if filters now hide them."
+        )
+        self._mod_retry_btn.clicked.connect(self._retry_mod_action)
+        self._mod_retry_btn.hide()
+        result_actions.addWidget(self._mod_retry_btn)
+        self._mod_dismiss_btn = QPushButton("Dismiss Result")
+        self._mod_dismiss_btn.setToolTip("Forget this result and retry snapshot; this does not undo saved changes.")
+        self._mod_dismiss_btn.clicked.connect(self._dismiss_mod_result)
+        self._mod_dismiss_btn.hide()
+        result_actions.addWidget(self._mod_dismiss_btn)
+        result_actions.addStretch()
+        content.addLayout(result_actions)
 
         # ── Mode stack: By Game (index 0) | All Mods (index 1) ──────────
         self._mode_stack = QStackedWidget()
@@ -1038,7 +1087,7 @@ class LibraryPanel(BasePanel):
 
         # Right: detail pane
         self._detail = _GameDetailPane(self.db)
-        self._detail.refreshed.connect(self._on_mod_toggled)
+        self._detail.enabled_requested.connect(self._run_mod_action)
         self._detail.browse_requested.connect(self.browse_game)
 
         self._splitter.addWidget(left_widget)
@@ -1051,6 +1100,7 @@ class LibraryPanel(BasePanel):
 
         # ── All-Mods widget ───────────────────────────────────────────────
         self._all_mods_pane = _AllModsPane(self.db, self.config)
+        self._all_mods_pane.enabled_requested.connect(self._run_mod_action)
         self._mode_stack.addWidget(self._all_mods_pane)
 
         content.addWidget(self._mode_stack, 1)
@@ -1079,6 +1129,7 @@ class LibraryPanel(BasePanel):
         self._by_game_btn.setChecked(False)
         self._all_mods_btn.setChecked(True)
         self._mode_stack.setCurrentIndex(1)
+        self._all_mods_pane.config = self.config
         self._all_mods_pane.refresh()
         total = len(self.db.all())
         enabled = sum(1 for m in self.db.all() if m.enabled)
@@ -1621,10 +1672,128 @@ class LibraryPanel(BasePanel):
     def _on_mod_toggled(self):
         """Refresh the game list counts after a mod toggle."""
         if self._mode_stack.currentIndex() == 1:
-            self._all_mods_pane.refresh()
+            self._switch_to_all_mods()
             return
         self._save_view_state("refreshing library after mod toggle")
         self._populate()
+
+    def _confirm_mod_action(self, states, scope, skipped=0):
+        from src.core.pcsx2_layout import get_deploy_path
+        mods = [self.db.get(mid) for mid in states]
+        box = QMessageBox(self)
+        box.setWindowTitle("Review Library Mod Action")
+        box.setTextFormat(Qt.TextFormat.PlainText)
+        changed = sum(mod.enabled != states[mod.id] for mod in mods)
+        box.setText(
+            f"Apply the requested state to {len(mods)} mod(s)?\nScope: {scope}\n"
+            f"{changed} flag(s) will change; {len(mods) - changed} already match and will be reconciled again."
+        )
+        details = []
+        for kind in dict.fromkeys(mod.mod_type for mod in mods):
+            if kind == ModType.SAVE_FILE:
+                details.append("Save files: library flags only; live memory cards are never copied or removed.")
+            else:
+                target = get_deploy_path(self.config, kind)
+                details.append(f"{kind.value}: {target or 'No destination configured — check Settings, then retry.'}")
+        box.setInformativeText(
+            "Only the listed flags change. Affected destinations are rebuilt using all enabled mods, "
+            "including other games and hidden results, to preserve priorities and shared files. "
+            "Back up installed content first.\n\n"
+            + "\n".join(details)
+            + (f"\n{skipped} original mod(s) were removed and will be skipped." if skipped else "")
+            + ("\nThis action replaces the earlier retry snapshot; it does not finish that earlier action."
+               if self._mod_retry_states and self._mod_retry_states != states else "")
+            + "\n\nShow Details lists every mod and requested state."
+        )
+        box.setDetailedText("\n".join(
+            f"{mod.name} [{mod.id}] • {mod.mod_type.value} • "
+            f"{'Enabled' if mod.enabled else 'Disabled'} → {'Enabled' if states[mod.id] else 'Disabled'}"
+            for mod in mods
+        ))
+        box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        box.setDefaultButton(QMessageBox.StandardButton.No)
+        return box.exec() == QMessageBox.StandardButton.Yes
+
+    def _run_mod_action(self, states, scope, confirm=True, *, retry=False, skipped=0):
+        if self._mod_action_busy:
+            return
+        states = {mid: enabled for mid, enabled in states.items() if self.db.get(mid) is not None}
+        if not states:
+            self.emit_status("No requested mods remain installed; no changes made.")
+            return
+        self._mod_action_busy = True
+        self._mod_retry_btn.setEnabled(False)
+        self._mod_dismiss_btn.setEnabled(False)
+        attempted = False
+        display_scope = f"Retry original action — {scope}" if retry else scope
+        try:
+            replacing = bool(self._mod_retry_states and self._mod_retry_states != states)
+            if (confirm or replacing) and not self._confirm_mod_action(states, display_scope, skipped):
+                self.emit_status("Library mod action cancelled; no changes made.")
+                return
+            # Keep requested states, not the inverse of possibly already-saved flags.
+            self._mod_retry_states = dict(states)
+            self._mod_retry_scope = scope
+            attempted = True
+            requested = "\n".join(
+                f"{self.db.get(mid).name} [{mid}] → {'Enabled' if enabled else 'Disabled'}"
+                for mid, enabled in states.items()
+            )
+            try:
+                count, warnings = self.manager.set_enabled_many(states, self.config)
+            except Exception as exc:
+                logger.warning("Could not complete Library mod action (%s): %s", scope, exc)
+                message = (
+                    f"Library mod action could not finish: {exc or type(exc).__name__}\nScope: {display_scope}\n"
+                    "Flags may already be saved, but installed files may be incomplete. "
+                    "Correct the problem and use Retry Original Action; do not toggle again to retry."
+                )
+            else:
+                message = f"Saved requested enabled flags for {len(states)} mod(s).\nScope: {display_scope}"
+                if warnings:
+                    message += "\n" + "\n".join(warnings) + "\nCorrect the problem and use Retry Original Action."
+                else:
+                    self._mod_retry_states = {}
+                    if all(self.db.get(mid).mod_type == ModType.SAVE_FILE for mid in states):
+                        message += "\nSave-file flags only; no live files were deployed or removed."
+                    else:
+                        message += f"\nDeployment reconciled ({count} item(s))."
+                message += "\nLive memory-card files were not changed."
+            message += "\n\nRequested states:\n" + requested
+            if skipped:
+                message += f"\nSkipped {skipped} original mod(s) that were removed."
+            self._mod_feedback.setPlainText(message)
+            self._mod_feedback.show()
+            self._mod_dismiss_btn.show()
+            self.emit_status(message.splitlines()[0])
+        finally:
+            self._mod_action_busy = False
+            self._mod_retry_btn.setVisible(bool(self._mod_retry_states))
+            self._mod_retry_btn.setEnabled(True)
+            self._mod_dismiss_btn.setEnabled(True)
+            if attempted:
+                self._on_mod_toggled()
+
+    def _retry_mod_action(self):
+        if self._mod_action_busy or not self._mod_retry_states:
+            return
+        states = {mid: enabled for mid, enabled in self._mod_retry_states.items() if self.db.get(mid) is not None}
+        if not states:
+            self._mod_retry_states = {}
+            self._mod_retry_btn.hide()
+            self._mod_feedback.setPlainText("None of the original mods remain installed. No changes made.")
+            return
+        skipped = len(self._mod_retry_states) - len(states)
+        self._run_mod_action(states, self._mod_retry_scope, True, retry=True, skipped=skipped)
+
+    def _dismiss_mod_result(self):
+        if self._mod_action_busy:
+            return
+        self._mod_retry_states = {}
+        self._mod_retry_scope = ""
+        self._mod_feedback.hide()
+        self._mod_retry_btn.hide()
+        self._mod_dismiss_btn.hide()
 
     def refresh(self):
         self._invalidate_library_scan_cache()
