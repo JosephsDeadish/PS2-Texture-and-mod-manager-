@@ -8832,6 +8832,83 @@ class TestLibraryPanelStatePersistence(unittest.TestCase):
             {"search": "gta", "type": "texture_pack", "status": "enabled"},
         )
 
+    def test_all_mods_filter_state_sanitizes_stale_values(self):
+        library_panel = self._import_library_panel()
+        AllModsPane = library_panel._AllModsPane
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, _blocked):
+                pass
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, _blocked):
+                pass
+
+        state = {
+            "search": "gta",
+            "type": "obsolete_type",
+            "status": "archived",
+        }
+
+        pane = AllModsPane.__new__(AllModsPane)
+        pane.config = AppConfig(ui_state={"library_panel": {"all_mods": state}})
+        pane._search_edit = FakeLineEdit()
+        pane._type_combo = FakeComboBox([
+            ("All types", ""),
+            ("pnach", "pnach"),
+            ("texture_pack", "texture_pack"),
+        ])
+        pane._status_combo = FakeComboBox([
+            ("All", "all"),
+            ("Enabled", "enabled"),
+            ("Disabled", "disabled"),
+        ])
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                AllModsPane.restore_filter_state(pane, state)
+
+        self.assertEqual(pane._search_edit.text(), "gta")
+        self.assertEqual(pane._type_combo.currentData(), "")
+        self.assertEqual(pane._status_combo.currentData(), "all")
+        self.assertEqual(state, {"search": "gta", "type": "", "status": "all"})
+        save_mock.assert_called_once_with(pane.config)
+        self.assertTrue(
+            any("library-panel type filter" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("library-panel status filter" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_restore_view_state_defaults_to_by_game(self):
         import types
 

@@ -704,6 +704,7 @@ class _AllModsPane(QWidget):
         if not isinstance(state, dict):
             return
 
+        should_save = False
         _block_signals(self._search_edit, True)
         _block_signals(self._type_combo, True)
         _block_signals(self._status_combo, True)
@@ -712,15 +713,38 @@ class _AllModsPane(QWidget):
 
             type_filter = str(state.get("type", "") or "")
             type_idx = self._type_combo.findData(type_filter)
-            self._type_combo.setCurrentIndex(type_idx if type_idx >= 0 else 0)
+            if type_idx >= 0:
+                self._type_combo.setCurrentIndex(type_idx)
+                state["type"] = type_filter
+            else:
+                logger.warning(
+                    "Saved library-panel type filter %r is no longer available; using All Types",
+                    type_filter,
+                )
+                self._type_combo.setCurrentIndex(0)
+                state["type"] = ""
+                should_save = True
 
             status_filter = str(state.get("status", "all") or "all")
             status_idx = self._status_combo.findData(status_filter)
-            self._status_combo.setCurrentIndex(status_idx if status_idx >= 0 else 0)
+            if status_idx >= 0:
+                self._status_combo.setCurrentIndex(status_idx)
+                state["status"] = status_filter
+            else:
+                logger.warning(
+                    "Saved library-panel status filter %r is no longer available; using All",
+                    status_filter,
+                )
+                self._status_combo.setCurrentIndex(0)
+                state["status"] = "all"
+                should_save = True
         finally:
             _block_signals(self._search_edit, False)
             _block_signals(self._type_combo, False)
             _block_signals(self._status_combo, False)
+
+        if should_save:
+            _save_library_config(self.config, "sanitizing library panel filter state")
 
     def current_filter_state(self) -> dict:
         return {
