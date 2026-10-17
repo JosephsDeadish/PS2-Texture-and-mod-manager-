@@ -13,8 +13,9 @@ import threading as _threading
 import webbrowser
 from pathlib import Path
 from typing import List
+from urllib.parse import urlparse
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -33,6 +34,7 @@ from PyQt6.QtWidgets import (
 from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
+from src.ui.url_helpers import open_external_url
 
 logger = logging.getLogger(__name__)
 
@@ -90,33 +92,118 @@ def _filter_history(entries, status, mod_type, serial, query, sort):
 # Single active-download row widget
 # ---------------------------------------------------------------------------
 
+def _download_size(value: int) -> str:
+    size = max(0, value)
+    for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
+        if size < 1024 or unit == "TiB":
+            return f"{size:.0f} B" if unit == "B" else f"{size:.1f} {unit}"
+        size /= 1024
+    return ""
+
+
+def _download_source_url(value: str) -> str:
+    """Only offer browser actions for a complete HTTP(S) source URL."""
+    try:
+        url = value.strip()
+        parsed = urlparse(url)
+        if parsed.scheme in ("http", "https") and parsed.hostname:
+            return url
+    except (AttributeError, ValueError):
+        pass
+    return ""
+
+
 class _ActiveDownloadRow(QWidget):
-    """A single row showing the name and progress of an in-flight download."""
+    """Stable row for one transfer, including its post-download installation."""
+
+    status_message = pyqtSignal(str)
 
     def __init__(self, name: str, parent=None):
         super().__init__(parent)
         from PyQt6.QtWidgets import QProgressBar
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(8, 4, 8, 4)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(8, 6, 8, 6)
+        header = QHBoxLayout()
         self._name_lbl = QLabel(name)
         self._name_lbl.setStyleSheet("color: #c0c0e0;")
-        layout.addWidget(self._name_lbl, 1)
+        self._name_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        self._name_lbl.setWordWrap(True)
+        header.addWidget(self._name_lbl, 1)
+        self._open_source_btn = QPushButton("Open Source")
+        self._open_source_btn.clicked.connect(self._open_source)
+        header.addWidget(self._open_source_btn)
+        self._copy_source_btn = QPushButton("Copy URL")
+        self._copy_source_btn.clicked.connect(self._copy_source)
+        header.addWidget(self._copy_source_btn)
+        layout.addLayout(header)
+        self._status_lbl = QLabel()
+        self._status_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        self._status_lbl.setWordWrap(True)
+        layout.addWidget(self._status_lbl)
         self._bar = QProgressBar()
         self._bar.setRange(0, 0)   # indeterminate by default
-        self._bar.setMaximumWidth(200)
         self._bar.setFixedHeight(14)
         layout.addWidget(self._bar)
+        self._source_url = ""
+        self.update_entry({"name": name, "received": 0, "total": 0})
+
+    def update_entry(self, entry):
+        name = entry["name"]
+        self._name_lbl.setText(name)
+        self._name_lbl.setToolTip(name)
+        self.setAccessibleName(f"Active download: {name}")
+        self._source_url = _download_source_url(entry.get("source_url", ""))
+        for button in (self._open_source_btn, self._copy_source_btn):
+            button.setEnabled(bool(self._source_url))
+            button.setToolTip(self._source_url or "No HTTP(S) source URL available")
+        received, total = entry["received"], entry["total"]
+        if entry.get("phase") == "installing":
+            self._bar.setRange(0, 0)
+            text = f"Installing • transfer finished • {_download_size(received)} received"
+        else:
+            self.set_progress(received, total)
+            if total > 0:
+                percent = min(100, max(0, received) * 100 // total)
+                text = f"Downloading • {percent}% • {_download_size(received)} / {_download_size(total)}"
+            elif received > 0:
+                text = f"Downloading • {_download_size(received)} received • total unknown"
+            else:
+                text = "Connecting • waiting for file data"
+        self._status_lbl.setText(text)
+        self._bar.setAccessibleName(text)
 
     def set_progress(self, received: int, total: int):
         if total > 0:
-            self._bar.setRange(0, total)
-            self._bar.setValue(received)
+            # Qt progress values are signed 32-bit integers, unlike byte counts.
+            self._bar.setRange(0, 1000)
+            self._bar.setValue(min(1000, max(0, received) * 1000 // total))
         else:
             self._bar.setRange(0, 0)
 
     def set_done(self):
         self._bar.setRange(0, 1)
         self._bar.setValue(1)
+
+    def _open_source(self):
+        if self._source_url and open_external_url(
+            self._source_url, parent=self, context="active download source",
+        ):
+            self.status_message.emit("Opened the active download source in your browser.")
+
+    def _copy_source(self):
+        if not self._source_url:
+            return
+        try:
+            from PyQt6.QtWidgets import QApplication
+            clipboard = QApplication.clipboard()
+            if clipboard is None:
+                raise RuntimeError("clipboard unavailable")
+            clipboard.setText(self._source_url)
+        except Exception as exc:
+            logger.warning("Could not copy active download source: %s", exc)
+            self.status_message.emit("Could not copy the active download source URL.")
+            return
+        self.status_message.emit("Copied the active download source URL.")
 
 
 # ---------------------------------------------------------------------------
@@ -136,9 +223,12 @@ class ActiveDownloads:
     _lock = _threading.Lock()
 
     @classmethod
-    def register(cls, download_id: str, name: str) -> None:
+    def register(cls, download_id: str, name: str, *, source_url: str = "") -> None:
         with cls._lock:
-            cls._entries[download_id] = {"name": name, "received": 0, "total": 0}
+            cls._entries[download_id] = {
+                "id": download_id, "name": name, "received": 0, "total": 0,
+                "source_url": source_url, "phase": "downloading",
+            }
 
     @classmethod
     def update(cls, download_id: str, received: int, total: int) -> None:
@@ -148,6 +238,12 @@ class ActiveDownloads:
                 cls._entries[download_id]["total"] = total
 
     @classmethod
+    def set_installing(cls, download_id: str) -> None:
+        with cls._lock:
+            if download_id in cls._entries:
+                cls._entries[download_id]["phase"] = "installing"
+
+    @classmethod
     def finish(cls, download_id: str) -> None:
         with cls._lock:
             cls._entries.pop(download_id, None)
@@ -155,7 +251,7 @@ class ActiveDownloads:
     @classmethod
     def all(cls) -> list[dict]:
         with cls._lock:
-            return list(cls._entries.values())
+            return [dict(entry) for entry in cls._entries.values()]
 
     @classmethod
     def count(cls) -> int:
@@ -177,6 +273,7 @@ class DownloadsPanel(BasePanel):
         self._all_history_entries: list = []
         self._history_stamp = None
         self._selected_source_url: str = ""
+        self._active_rows: dict[str, _ActiveDownloadRow] = {}
         self._filter_timer = QTimer(self)
         self._filter_timer.setSingleShot(True)
         self._filter_timer.setInterval(200)
@@ -358,6 +455,7 @@ class DownloadsPanel(BasePanel):
 
     def showEvent(self, event):
         super().showEvent(event)
+        self._refresh_active()
         self._poll_timer.start()
 
     def hideEvent(self, event):
@@ -374,9 +472,10 @@ class DownloadsPanel(BasePanel):
         content = self._content_layout
 
         # ── Active downloads section ──────────────────────────────────────
-        active_hdr = QLabel("⬇  Active Downloads")
-        active_hdr.setStyleSheet("font-weight: bold; font-size: 13px; color: #a0a0d0;")
-        content.addWidget(active_hdr)
+        self._active_summary = QLabel("⬇  Active Downloads")
+        self._active_summary.setStyleSheet("font-weight: bold; font-size: 13px; color: #a0a0d0;")
+        self._active_summary.setWordWrap(True)
+        content.addWidget(self._active_summary)
 
         self._active_container = QWidget()
         self._active_layout = QVBoxLayout(self._active_container)
@@ -385,13 +484,18 @@ class DownloadsPanel(BasePanel):
 
         self._active_placeholder = QLabel(
             "No downloads in progress.\n"
-            "Start a download from Browse or Import to see live progress here."
+            "Start a download from Browse to see transfer and installation progress here."
         )
         self._active_placeholder.setStyleSheet("color: #50507a; font-size: 12px;")
         self._active_placeholder.setWordWrap(True)
         self._active_layout.addWidget(self._active_placeholder)
 
-        content.addWidget(self._active_container)
+        self._active_scroll = QScrollArea()
+        self._active_scroll.setWidgetResizable(True)
+        self._active_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self._active_scroll.setMaximumHeight(240)
+        self._active_scroll.setWidget(self._active_container)
+        content.addWidget(self._active_scroll)
 
         sep = QFrame()
         sep.setFrameShape(QFrame.Shape.HLine)
@@ -673,21 +777,28 @@ class DownloadsPanel(BasePanel):
 
     def _refresh_active(self):
         active = ActiveDownloads.all()
-        # Clear the active layout
-        while self._active_layout.count():
-            item = self._active_layout.takeAt(0)
-            if item.widget():
-                item.widget().deleteLater()
-
-        if not active:
-            self._active_placeholder = QLabel("No downloads in progress.")
-            self._active_placeholder.setStyleSheet("color: #50507a; font-size: 12px;")
-            self._active_layout.addWidget(self._active_placeholder)
-        else:
-            for entry in active:
+        active_ids = {entry["id"] for entry in active}
+        for download_id in list(self._active_rows):
+            if download_id not in active_ids:
+                row = self._active_rows.pop(download_id)
+                self._active_layout.removeWidget(row)
+                row.hide()
+                row.deleteLater()
+        for entry in active:
+            row = self._active_rows.get(entry["id"])
+            if row is None:
                 row = _ActiveDownloadRow(entry["name"])
-                row.set_progress(entry["received"], entry["total"])
+                row.status_message.connect(self._notify_status)
+                self._active_rows[entry["id"]] = row
                 self._active_layout.addWidget(row)
+            row.update_entry(entry)
+        self._active_placeholder.setVisible(not active)
+        installing = sum(entry["phase"] == "installing" for entry in active)
+        self._active_summary.setText(
+            f"⬇  Active Downloads: {len(active)}"
+            f" • {len(active) - installing} downloading • {installing} installing"
+            if active else "⬇  Active Downloads: none"
+        )
 
     # ------------------------------------------------------------------
     # History

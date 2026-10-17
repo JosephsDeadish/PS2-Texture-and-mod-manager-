@@ -1885,7 +1885,9 @@ class DownloadInstallDialog(QDialog):
             tmpdir = None
             download_id = uuid.uuid4().hex
             download_name = _name_text or Path(unquote(urlparse(url).path)).name or "downloaded_mod"
-            ActiveDownloads.register(download_id, download_name)
+            ActiveDownloads.register(
+                download_id, download_name, source_url=_source_url_text or raw_url,
+            )
             try:
                 parsed = urlparse(url)
                 fname = Path(unquote(parsed.path)).name or "downloaded_mod"
@@ -1903,6 +1905,7 @@ class DownloadInstallDialog(QDialog):
                         QTimer.singleShot(0, lambda: self._progress.setRange(0, 0))
 
                 download_file(url, dest, _progress)
+                ActiveDownloads.set_installing(download_id)
                 from src.core.mod_manager import ModManager
                 mgr = ModManager(self.db)
                 name = _name_text or Path(fname).stem

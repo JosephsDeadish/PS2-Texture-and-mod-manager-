@@ -8389,6 +8389,69 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         )
         save_mock.assert_called_once_with(dialog.config, "sanitizing direct download dialog state")
 
+    def test_download_worker_tracks_transfer_then_install_and_always_finishes(self):
+        import types
+        module = self._import_browse_panel()
+        for outcome in ("success", "download_error", "install_error"):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as storage:
+                dialog = module.DownloadInstallDialog.__new__(module.DownloadInstallDialog)
+                dialog.config = AppConfig(mods_storage_path=storage)
+                dialog.db = MagicMock()
+                dialog._type_combo = MagicMock()
+                dialog._type_combo.currentData.return_value = ModType.TEXTURE_PACK
+                for name, value in (
+                    ("_name_edit", "Texture pack"), ("_author_edit", "Author"),
+                    ("_game_edit", "SLUS-20062"), ("_desc_edit", ""),
+                    ("_source_url_edit", "https://example.com/original"),
+                ):
+                    widget = MagicMock()
+                    widget.text.return_value = value
+                    setattr(dialog, name, widget)
+                registry = module.ActiveDownloads
+                destinations = []
+
+                def transfer(url, dest, progress):
+                    destinations.append(dest)
+                    entry = registry.all()[0]
+                    self.assertEqual(entry["name"], "Texture pack")
+                    self.assertEqual(entry["source_url"], "https://example.com/original")
+                    self.assertEqual(entry["phase"], "downloading")
+                    progress(3, 3)
+                    self.assertEqual(registry.all()[0]["received"], 3)
+                    if outcome == "download_error":
+                        raise module.DownloadError("offline")
+                    Path(dest).write_bytes(b"abc")
+                    return dest
+
+                def install(**kwargs):
+                    entry = registry.all()[0]
+                    self.assertEqual(entry["phase"], "installing")
+                    self.assertEqual(entry["received"], 3)
+                    if outcome == "install_error":
+                        raise OSError("storage full")
+                    return types.SimpleNamespace(name="Installed pack")
+
+                with patch.object(registry, "_entries", {}):
+                    with patch.object(module.threading, "Thread") as thread, patch.object(module, "QTimer"):
+                        with patch.object(module, "download_file", side_effect=transfer):
+                            with patch("src.core.mod_manager.ModManager") as manager:
+                                manager.return_value.install_from_folder.side_effect = install
+                                with patch("src.core.download_history.record_event") as record:
+                                    dialog._run_download("https://example.com/shared", "https://cdn.example.com/file.zip")
+                                    run = thread.call_args.kwargs["target"]
+                                    if outcome == "success":
+                                        run()
+                                    else:
+                                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                                            run()
+                                    self.assertEqual(registry.all(), [])
+                                    self.assertEqual(registry.count(), 0)
+                                    self.assertFalse(Path(destinations[0]).parent.exists())
+                                    self.assertEqual(record.call_args.kwargs["status"],
+                                                     "success" if outcome == "success" else "failed")
+                                    if outcome == "download_error":
+                                        manager.return_value.install_from_folder.assert_not_called()
+
     def test_cover_dialog_auto_fills_single_serial_match(self):
         browse_panel = self._import_browse_panel()
         CoverDownloadDialog = browse_panel.CoverDownloadDialog
@@ -9316,6 +9379,225 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
             },
         ):
             return importlib.import_module("src.ui.downloads_panel")
+
+    def _make_active_panel(self, module):
+        panel = module.DownloadsPanel.__new__(module.DownloadsPanel)
+        panel._active_rows = {}
+        panel._active_layout = MagicMock()
+        panel._active_placeholder = MagicMock()
+        panel._active_summary = MagicMock()
+        return panel
+
+    def _make_active_row(self, module):
+        row = module._ActiveDownloadRow.__new__(module._ActiveDownloadRow)
+        for name in (
+            "_name_lbl", "_status_lbl", "_bar", "_open_source_btn", "_copy_source_btn",
+            "setAccessibleName", "status_message",
+        ):
+            setattr(row, name, MagicMock())
+        row._source_url = ""
+        return row
+
+    def test_active_registry_returns_detached_id_based_snapshots(self):
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}):
+            registry.register("one", "Same name", source_url="https://example.com/source")
+            registry.register("two", "Same name")
+            registry.update("one", 1024, 4096)
+            before = registry.all()
+            self.assertEqual([entry["id"] for entry in before], ["one", "two"])
+            self.assertEqual(before[0]["source_url"], "https://example.com/source")
+            self.assertEqual(before[0]["phase"], "downloading")
+            registry.set_installing("one")
+            registry.update("one", 4096, 4096)
+            self.assertEqual(before[0]["received"], 1024)
+            self.assertEqual(before[0]["phase"], "downloading")
+            before[0]["name"] = "Modified snapshot"
+            before.clear()
+            current = registry.all()
+            self.assertEqual(current[0]["name"], "Same name")
+            self.assertEqual(current[0]["phase"], "installing")
+            self.assertEqual(registry.count(), 2)
+            registry.finish("one")
+            registry.update("one", 9999, 9999)
+            registry.set_installing("one")
+            self.assertEqual([entry["id"] for entry in registry.all()], ["two"])
+            registry.finish("two")
+            registry.finish("missing")
+            self.assertEqual(registry.all(), [])
+            self.assertEqual(registry.count(), 0)
+
+    def test_active_registry_snapshot_is_consistent_during_worker_updates(self):
+        import threading
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}):
+            registry.register("one", "Download")
+            def update():
+                for count in range(1, 1001):
+                    registry.update("one", count, count * 2)
+            thread = threading.Thread(target=update)
+            thread.start()
+            snapshots = [registry.all()[0] for _ in range(1000)]
+            thread.join(timeout=2)
+            self.assertFalse(thread.is_alive())
+            for snapshot in snapshots:
+                self.assertEqual(snapshot["total"], snapshot["received"] * 2)
+            registry.update("one", 2000, 4000)
+            self.assertTrue(all(snapshot["received"] <= 1000 for snapshot in snapshots))
+
+    def test_active_poll_reuses_rows_and_only_removes_finished_ids(self):
+        module = self._import_downloads_panel()
+        panel = self._make_active_panel(module)
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}), patch.object(module, "_ActiveDownloadRow") as constructor:
+            first, second, third = MagicMock(), MagicMock(), MagicMock()
+            constructor.side_effect = [first, second, third]
+            registry.register("one", "Same name")
+            registry.register("two", "Same name")
+            panel._refresh_active()
+            self.assertEqual(panel._active_rows, {"one": first, "two": second})
+            self.assertEqual(constructor.call_count, 2)
+            registry.update("one", 300, 400)
+            registry.set_installing("two")
+            panel._refresh_active()
+            self.assertEqual(constructor.call_count, 2)
+            self.assertEqual(first.update_entry.call_args.args[0]["received"], 300)
+            self.assertEqual(second.update_entry.call_args.args[0]["phase"], "installing")
+            self.assertIn("2 • 1 downloading • 1 installing", panel._active_summary.setText.call_args.args[0])
+            registry.finish("one")
+            registry.register("three", "New")
+            panel._refresh_active()
+            self.assertEqual(panel._active_rows, {"two": second, "three": third})
+            panel._active_layout.removeWidget.assert_called_once_with(first)
+            first.hide.assert_called_once()
+            first.deleteLater.assert_called_once()
+            second.deleteLater.assert_not_called()
+            self.assertEqual(panel._active_layout.addWidget.call_count, 3)
+            first.status_message.connect.assert_called_once_with(panel._notify_status)
+            panel._active_placeholder.setVisible.assert_called_with(False)
+            # The prior row's detached snapshot does not change after a worker update.
+            self.assertEqual(first.update_entry.call_args_list[0].args[0]["received"], 0)
+
+    def test_idle_active_polls_reuse_placeholder_without_allocating_rows(self):
+        module = self._import_downloads_panel()
+        panel = self._make_active_panel(module)
+        with patch.object(module.ActiveDownloads, "_entries", {}), patch.object(module, "_ActiveDownloadRow") as row:
+            for _ in range(3):
+                panel._refresh_active()
+        row.assert_not_called()
+        panel._active_placeholder.setVisible.assert_called_with(True)
+        panel._active_layout.addWidget.assert_not_called()
+        self.assertEqual(panel._active_summary.setText.call_args.args[0], "⬇  Active Downloads: none")
+
+    def test_active_progress_supports_bytes_larger_than_qt_integer_range(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({
+            "name": "<b>Large texture pack</b>", "received": 3 * 1024 ** 3,
+            "total": 6 * 1024 ** 3, "phase": "downloading",
+        })
+        row._bar.setRange.assert_called_with(0, 1000)
+        row._bar.setValue.assert_called_with(500)
+        row._name_lbl.setText.assert_called_with("<b>Large texture pack</b>")
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Downloading • 50% • 3.0 GiB / 6.0 GiB")
+        row._bar.setAccessibleName.assert_called_with(row._status_lbl.setText.call_args.args[0])
+
+    def test_active_progress_clamps_overrun_and_negative_received_counts(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        for received, expected in ((200, 1000), (-5, 0), (0, 0), (50, 500)):
+            with self.subTest(received=received):
+                row.update_entry({"name": "File", "received": received, "total": 100})
+                row._bar.setValue.assert_called_with(expected)
+                self.assertIn(f"{expected // 10}%", row._status_lbl.setText.call_args.args[0])
+
+    def test_active_unknown_total_and_connecting_states_stay_indeterminate(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({"name": "File", "received": 0, "total": 0})
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertIn("Connecting", row._status_lbl.setText.call_args.args[0])
+        row.update_entry({"name": "File", "received": 1048576, "total": -1})
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Downloading • 1.0 MiB received • total unknown")
+        row._bar.setValue.assert_not_called()
+
+    def test_active_installing_phase_does_not_claim_installation_is_complete(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({
+            "name": "File", "received": 1024, "total": 1024, "phase": "installing",
+        })
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Installing • transfer finished • 1.0 KiB received")
+        row._bar.setValue.assert_not_called()
+
+    def test_active_source_actions_accept_only_complete_http_urls(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        for url in ("", None, "javascript:alert(1)", "file:///etc/passwd", "https:///missing",
+                    "https://[invalid", "ftp://example.com/file"):
+            with self.subTest(url=url):
+                row.update_entry({"name": "File", "received": 0, "total": 0, "source_url": url})
+                self.assertEqual(row._source_url, "")
+                row._open_source_btn.setEnabled.assert_called_with(False)
+                row._copy_source_btn.setEnabled.assert_called_with(False)
+                with patch.object(module, "open_external_url") as open_url:
+                    row._open_source()
+                open_url.assert_not_called()
+        row.update_entry({"name": "File", "received": 0, "total": 0,
+                          "source_url": "  https://example.com/original  "})
+        self.assertEqual(row._source_url, "https://example.com/original")
+        row._open_source_btn.setEnabled.assert_called_with(True)
+        row._copy_source_btn.setEnabled.assert_called_with(True)
+
+    def test_active_source_opens_original_url_and_reports_success(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row._source_url = "https://example.com/source"
+        with patch.object(module, "open_external_url", return_value=True) as open_url:
+            row._open_source()
+        open_url.assert_called_once_with(row._source_url, parent=row, context="active download source")
+        row.status_message.emit.assert_called_once_with("Opened the active download source in your browser.")
+        row.status_message.emit.reset_mock()
+        with patch.object(module, "open_external_url", return_value=False):
+            row._open_source()
+        row.status_message.emit.assert_not_called()
+
+    def test_active_source_copy_reports_clipboard_errors(self):
+        import sys
+        import types
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row._source_url = "https://example.com/source"
+        widgets = types.ModuleType("PyQt6.QtWidgets")
+        widgets.QApplication = MagicMock()
+        clipboard = widgets.QApplication.clipboard.return_value
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": widgets}):
+            row._copy_source()
+            clipboard.setText.assert_called_once_with(row._source_url)
+            self.assertIn("Copied", row.status_message.emit.call_args.args[0])
+            clipboard.setText.side_effect = RuntimeError("locked")
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                row._copy_source()
+            self.assertIn("Could not copy", row.status_message.emit.call_args.args[0])
+            widgets.QApplication.clipboard.return_value = None
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                row._copy_source()
+            self.assertIn("Could not copy", row.status_message.emit.call_args.args[0])
+
+    def test_download_size_uses_binary_units_and_safe_zero(self):
+        module = self._import_downloads_panel()
+        for value, expected in ((0, "0 B"), (-1, "0 B"), (1023, "1023 B"),
+                                (1024, "1.0 KiB"), (1536, "1.5 KiB"),
+                                (1024 ** 4, "1.0 TiB")):
+            with self.subTest(value=value):
+                self.assertEqual(module._download_size(value), expected)
 
     def test_history_load_failure_keeps_error_message(self):
         downloads_panel = self._import_downloads_panel()
