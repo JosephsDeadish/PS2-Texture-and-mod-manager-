@@ -6807,6 +6807,13 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
 
+    def test_source_badge_text_uses_site_icons(self):
+        browse_panel = self._import_browse_panel()
+        self.assertEqual(browse_panel._source_badge_text("GBAtemp"), "🧵 GBAtemp")
+        self.assertEqual(browse_panel._source_badge_text("GitHub"), "🐙 GitHub")
+        self.assertEqual(browse_panel._source_badge_text("PCSX2 CheatDB"), "🧪 PCSX2 CheatDB")
+        self.assertEqual(browse_panel._source_badge_text(" Patreon "), "🌐 Patreon")
+
     def test_entry_has_named_author_helper_skips_placeholders(self):
         browse_panel = self._import_browse_panel()
         self.assertTrue(browse_panel._entry_has_named_author({"author": "TexMaster"}))

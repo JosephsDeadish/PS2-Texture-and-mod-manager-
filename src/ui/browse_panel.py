@@ -362,6 +362,23 @@ _TYPE_LABELS = {
     ModType.CHEAT: "Cheat",
 }
 
+_SOURCE_ICONS = {
+    "GBAtemp": "🧵",
+    "GitHub": "🐙",
+    "PCSX2 CheatDB": "🧪",
+}
+
+
+def _source_badge_text(source: object) -> str:
+    """Return a compact source label with a small site-specific icon."""
+    if not isinstance(source, str):
+        return ""
+    label = source.strip()
+    if not label:
+        return ""
+    icon = _SOURCE_ICONS.get(label, "🌐")
+    return f"{icon} {label}"
+
 
 def _download_cover_by_url_async(
     entry: dict,
@@ -501,11 +518,13 @@ class CatalogueCard(QFrame):
         header.addWidget(type_lbl)
 
         # Source badge
-        src_lbl = QLabel(self.entry.get("source", ""))
+        source_label = _source_badge_text(self.entry.get("source", ""))
+        src_lbl = QLabel(source_label)
         src_lbl.setStyleSheet(
             "background:#1a2050; color:#8080c0; border-radius:9px;"
             "padding: 2px 8px; font-size:10px;"
         )
+        src_lbl.setToolTip(f"Source site: {self.entry.get('source', '')}")
         header.addWidget(src_lbl)
 
         # Status badges: 💰 Paid / 🔐 Account Required / 🔧 WIP or Partial
