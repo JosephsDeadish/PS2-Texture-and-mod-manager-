@@ -186,6 +186,8 @@
 ### 📥 Downloads & History
 - Active transfers keep stable rows while polling, with byte totals and large-file-safe progress; unknown totals stay indeterminate
 - Downloading and installing are separate phases: a finished transfer is not yet a finished installation
+- Direct URL downloads resolve links in the background, freeze request details while running, and show retry guidance without losing your entries
+- The scrollable download dialog can **Continue in Background**: resolution, transfer, installation, history, and library refresh continue while the app stays open; closing is not cancellation
 - The scrollable active list leaves history usable; active counts and **Open Source / Copy URL** provide quick access to the original HTTP(S) source
 - Search names, source URLs, and notes alongside status, type, and partial serial filters
 - Saved search and sorting: newest, oldest, name, or size; Game Save includes legacy and current records

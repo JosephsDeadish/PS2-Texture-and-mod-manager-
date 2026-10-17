@@ -14,12 +14,14 @@ import os
 from functools import lru_cache
 import threading
 import tempfile
+import time
 import uuid
+from copy import deepcopy
 from pathlib import Path
 from typing import List, Optional
 from urllib.parse import unquote, urlparse
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QObject, Qt, QTimer, pyqtSignal, pyqtSlot
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (
     QComboBox,
@@ -54,7 +56,7 @@ from src.core.downloader import (
 )
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
-from src.ui.downloads_panel import ActiveDownloads
+from src.ui.downloads_panel import ActiveDownloads, _download_size
 from src.ui.url_helpers import open_external_url
 
 logger = logging.getLogger(__name__)
@@ -1507,6 +1509,106 @@ class CoverDownloadDialog(QDialog):
 # Download-from-URL install dialog
 # ---------------------------------------------------------------------------
 
+class _DownloadInstallResult(QObject):
+    phase = pyqtSignal(str, str)
+    progress = pyqtSignal(str, object, object)
+    finished = pyqtSignal(str, bool, str)
+    installed = pyqtSignal()
+
+
+def _is_download_url(url: str) -> bool:
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in ("http", "https") and bool(parsed.hostname)
+    except ValueError:
+        return False
+
+
+def _run_direct_download(result, request_id, state, mod_type, config, db, url=None):
+    """Run from immutable request values, never retaining a dialog or its widgets."""
+    tmpdir = None
+    phase = "resolving"
+    source_url = state["source_url"] or state["url"]
+    try:
+        if url is None:
+            url = DownloadInstallDialog._convert_url(state["url"])
+        if not url or not _is_download_url(url):
+            raise DownloadError(
+                "Could not resolve a direct file URL. Open the source in your browser "
+                "and copy a direct file link, or download manually and use Import."
+            )
+        phase = "downloading"
+        ActiveDownloads.set_phase(request_id, phase)
+        result.phase.emit(request_id, phase)
+        fname = Path(unquote(urlparse(url).path)).name
+        if fname in ("", ".", ".."):
+            fname = "downloaded_mod"
+        if not Path(fname).suffix:
+            fname += ".zip"
+        tmpdir = tempfile.mkdtemp(prefix="ps2mm_dl_")
+        dest = str(Path(tmpdir) / fname)
+        last_progress = 0.0
+
+        def progress(received, total):
+            nonlocal last_progress
+            ActiveDownloads.update(request_id, received, total)
+            now = time.monotonic()
+            if now - last_progress >= 0.1 or (total > 0 and received >= total):
+                result.progress.emit(request_id, received, total)
+                last_progress = now
+
+        download_file(url, dest, progress)
+        phase = "installing"
+        ActiveDownloads.set_installing(request_id)
+        result.phase.emit(request_id, phase)
+        from src.core.mod_manager import ModManager
+        mod = ModManager(db).install_from_folder(
+            source_path=dest, mod_type=mod_type, dest_base=config.mods_storage_path,
+            name=state["name"] or Path(fname).stem, author=state["author"],
+            game_id=state["game"], description=state["description"], source_url=source_url,
+        )
+        message = f"✅  Installed: {mod.name}"
+        try:
+            installed_size = Path(dest).stat().st_size
+        except OSError as exc:
+            logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
+            installed_size = 0
+        try:
+            from src.core.download_history import record_event, STATUS_SUCCESS
+            record_event(
+                config, mod_name=mod.name, mod_type=mod_type.value, serial=state["game"],
+                source_url=source_url, status=STATUS_SUCCESS, size_bytes=installed_size,
+            )
+        except Exception as exc:
+            logger.warning("Could not record browse download history: %s", exc)
+            message += "\nInstallation succeeded, but history could not be saved."
+        result.installed.emit()
+        result.finished.emit(request_id, True, message)
+    except Exception as exc:
+        error = str(exc) or type(exc).__name__
+        logger.warning("Direct download %s failed: %s", phase, error)
+        try:
+            from src.core.download_history import record_event, STATUS_FAILED
+            record_event(
+                config, mod_name=state["name"] or Path(urlparse(state["url"]).path).name,
+                mod_type=mod_type.value, serial=state["game"], source_url=source_url,
+                status=STATUS_FAILED, note=f"{phase}: {error}",
+            )
+        except Exception as history_exc:
+            logger.warning("Could not record failed browse download history: %s", history_exc)
+        result.finished.emit(
+            request_id, False,
+            f"❌  {phase.capitalize()} failed: {error}\n"
+            "Your entries are preserved. Retry starts a new download; it does not resume a partial file.",
+        )
+    finally:
+        ActiveDownloads.finish(request_id)
+        if tmpdir:
+            import shutil
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        result.deleteLater()
+
+
 class DownloadInstallDialog(QDialog):
     """
     Download any direct URL (ZIP, 7z, PNACH, PNG) and import it as a mod.
@@ -1517,13 +1619,19 @@ class DownloadInstallDialog(QDialog):
         super().__init__(parent)
         self.config = config
         self.db = db
+        self._busy = False
+        self._closed = False
+        self._request_id = ""
         self.setWindowTitle("Download & Install Mod from URL")
-        self.setMinimumSize(580, 440)
+        self.setMinimumSize(480, 380)
+        self.resize(640, 620)
         self._build()
         self._restore_state()
 
     def _build(self):
-        layout = QVBoxLayout(self)
+        outer = QVBoxLayout(self)
+        body = QWidget()
+        layout = QVBoxLayout(body)
         layout.setSpacing(12)
         layout.setContentsMargins(20, 20, 20, 20)
 
@@ -1546,6 +1654,7 @@ class DownloadInstallDialog(QDialog):
         url_row = QHBoxLayout()
         url_row.addWidget(QLabel("URL:"))
         self._url_edit = QLineEdit()
+        self._url_edit.setAccessibleName("Download file URL")
         self._url_edit.setPlaceholderText("https://example.com/texture_pack.zip")
         url_row.addWidget(self._url_edit, 1)
         layout.addLayout(url_row)
@@ -1590,12 +1699,20 @@ class DownloadInstallDialog(QDialog):
             row = QHBoxLayout()
             lbl = QLabel(label)
             lbl.setFixedWidth(60)
+            lbl.setBuddy(edit)
             row.addWidget(lbl)
             row.addWidget(edit, 1)
             meta_layout.addLayout(row)
         layout.addWidget(meta_frame)
 
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setWidget(body)
+        outer.addWidget(scroll, 1)
+        layout = outer
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
         self._status.setStyleSheet("color: #9090b0;")
         layout.addWidget(self._status)
@@ -1610,9 +1727,9 @@ class DownloadInstallDialog(QDialog):
         self._dl_btn.setObjectName("primary_btn")
         self._dl_btn.clicked.connect(self._download)
         btns.addWidget(self._dl_btn)
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.reject)
-        btns.addWidget(close_btn)
+        self._close_btn = QPushButton("Close")
+        self._close_btn.clicked.connect(self.reject)
+        btns.addWidget(self._close_btn)
         layout.addLayout(btns)
 
     def _dialog_state_bucket(self) -> dict:
@@ -1686,9 +1803,10 @@ class DownloadInstallDialog(QDialog):
                 return True
         return False
 
-    def reject(self):
+    def done(self, result):
+        self._closed = True
         self._save_state("closing direct download dialog")
-        super().reject()
+        super().done(result)
 
     @staticmethod
     def _convert_url(url: str) -> Optional[str]:
@@ -1750,12 +1868,15 @@ class DownloadInstallDialog(QDialog):
         return url
 
     def _download(self):
-        self._save_state("starting direct download")
-        raw_url = self._url_edit.text().strip()
-        if not raw_url:
-            self._status.setText("⚠  Please enter a URL")
+        if self._busy or self._closed:
             return
-        if "mega.nz" in raw_url or "mega.co.nz" in raw_url:
+        raw_url = self._url_edit.text().strip()
+        if not _is_download_url(raw_url):
+            self._status.setText("⚠  Enter a complete http(s) file URL.")
+            self._url_edit.setFocus()
+            return
+        host = urlparse(raw_url).hostname.lower()
+        if any(host == domain or host.endswith("." + domain) for domain in ("mega.nz", "mega.co.nz")):
             QMessageBox.information(
                 self, "MEGA Link",
                 "MEGA links require the MEGA desktop client.\n\n"
@@ -1763,258 +1884,105 @@ class DownloadInstallDialog(QDialog):
                 "the ➕ Import button in the relevant mod panel.",
             )
             return
-        try:
-            import urllib.parse as _up
-            _psd2 = _up.urlparse(raw_url)
-            _nl2 = _psd2.netloc.lower()
-            _is_mf_raw = (_nl2 in ("www.mediafire.com", "mediafire.com")
-                          and "/file/" in _psd2.path.lower())
-        except Exception as exc:
-            logger.warning("Could not inspect MediaFire browse URL %s: %s", raw_url, exc)
-            _is_mf_raw = False
-        if _is_mf_raw:
-            self._dl_btn.setEnabled(False)
-            self._progress.show()
-            self._status.setText("🔍 Resolving MediaFire link…")
+        self._run_download(raw_url)
 
-            def _resolve_then_download():
-                url = self._convert_url(raw_url)
-                if not url:
-                    def _mf_err():
-                        self._status.setText(
-                            "❌  Could not resolve MediaFire download link.\n"
-                            "Please open the MediaFire page in your browser, click Download,\n"
-                            "and paste the resulting direct URL here."
-                        )
-                        self._progress.hide()
-                        self._dl_btn.setEnabled(True)
-                    QTimer.singleShot(0, _mf_err)
-                    return
-                # Schedule _run_download back on the main thread so that Qt
-                # widget reads (mod type combo, etc.) happen on the correct thread.
-                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                QTimer.singleShot(0, lambda r=url: self._run_download(raw_url, r))
-
-            threading.Thread(target=_resolve_then_download, daemon=True).start()
-            return
-
-        # Resolve Yandex share links in a background thread (network API call).
-        try:
-            import urllib.parse as _up
-            _psd3 = _up.urlparse(raw_url)
-            _nl3 = _psd3.netloc.lower()
-            _is_yandex_raw = _nl3 in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk")
-        except Exception as exc:
-            logger.warning("Could not inspect Yandex browse URL %s: %s", raw_url, exc)
-            _is_yandex_raw = False
-        if _is_yandex_raw:
-            self._dl_btn.setEnabled(False)
-            self._progress.show()
-            self._status.setText("🔍 Resolving Yandex link…")
-
-            def _resolve_yandex_then_download():
-                resolved_url = self._convert_url(raw_url)
-                if not resolved_url:
-                    def _yd_err():
-                        self._status.setText(
-                            "❌  Could not resolve Yandex direct download link.\n"
-                            "Please open the source page in your browser and copy a direct file URL."
-                        )
-                        self._progress.hide()
-                        self._dl_btn.setEnabled(True)
-                    QTimer.singleShot(0, _yd_err)
-                    return
-                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                QTimer.singleShot(0, lambda r=resolved_url: self._run_download(raw_url, r))
-
-            threading.Thread(target=_resolve_yandex_then_download, daemon=True).start()
-            return
-
-        url = self._convert_url(raw_url)
-        if url is None:
-            self._status.setText(
-                "❌  This URL cannot be resolved as a direct download.\n"
-                "Use 🌐 Visit Source to open the page, then copy a direct file link."
-            )
-            self._progress.hide()
-            self._dl_btn.setEnabled(True)
+    def _run_download(self, raw_url: str, url: Optional[str] = None):
+        """Capture a request on the UI thread before any network work starts."""
+        if self._busy or self._closed:
             return
         mod_type = self._type_combo.currentData()
-        storage = self.config.mods_storage_path
-        if not storage:
-            QMessageBox.warning(self, "Storage Not Configured",
-                "Please configure a Mod Storage folder in Settings first.")
+        if not self.config.mods_storage_path:
+            self._status.setText("⚠  Configure a Mod Storage folder in Settings before downloading.")
             return
-        self._dl_btn.setEnabled(False)
-        self._progress.show()
-        self._status.setText("Downloading...")
-        self._run_download(raw_url, url)
-
-    def _run_download(self, raw_url: str, url: str):
-        """Perform the actual file download + install on a background thread."""
-        mod_type = self._type_combo.currentData()
-        storage = self.config.mods_storage_path
-        if not storage:
-            def _no_storage():
-                QMessageBox.warning(self, "Storage Not Configured",
-                    "Please configure a Mod Storage folder in Settings first.")
-                self._progress.hide()
-                self._dl_btn.setEnabled(True)
-            QTimer.singleShot(0, _no_storage)
-            return
-
         if self.db is None:
-            def _no_db():
-                QMessageBox.warning(self, "Database Not Ready",
-                    "The mod database is not loaded yet.\n"
-                    "Please wait for the application to finish starting up and try again.")
-                self._progress.hide()
-                self._dl_btn.setEnabled(True)
-            QTimer.singleShot(0, _no_db)
+            self._status.setText("⚠  The mod database is not ready. Please try again after startup.")
             return
+        if not isinstance(mod_type, ModType):
+            self._status.setText("⚠  Choose a mod type before downloading.")
+            return
+        state = self._dialog_state()
+        state["url"] = raw_url
+        config = deepcopy(self.config)
+        self._save_state("starting direct download")
+        self._request_id = request_id = uuid.uuid4().hex
+        result = _DownloadInstallResult()
+        result.phase.connect(self._on_download_phase)
+        result.progress.connect(self._on_download_progress)
+        result.finished.connect(self._on_download_finished)
+        parent = self.parent()
+        while parent is not None:
+            installed_signal = getattr(parent, "mod_installed", None)
+            if installed_signal is not None:
+                # Signal-to-signal delivery survives closing/deleting this dialog.
+                result.installed.connect(installed_signal)
+                break
+            parent = parent.parent()
+        self._set_download_busy(True)
+        self._on_download_phase(request_id, "resolving")
+        ActiveDownloads.register(
+            request_id, state["name"] or Path(urlparse(raw_url).path).name or "downloaded_mod",
+            source_url=state["source_url"] or raw_url, phase="resolving",
+        )
+        try:
+            threading.Thread(
+                target=_run_direct_download,
+                args=(result, request_id, state, mod_type, config, self.db, url),
+                daemon=True,
+            ).start()
+        except RuntimeError as exc:
+            logger.warning("Could not start direct download worker: %s", exc)
+            ActiveDownloads.finish(request_id)
+            result.deleteLater()
+            self._on_download_finished(request_id, False, f"Could not start download: {exc}\nPlease retry.")
 
-        # Capture widget text NOW on the main thread before the background thread
-        # starts — Qt widget reads must not be made from non-main threads.
-        _name_text = self._name_edit.text().strip()
-        _author_text = self._author_edit.text().strip()
-        _game_text = self._game_edit.text().strip()
-        _desc_text = self._desc_edit.text().strip()
-        _source_url_text = self._source_url_edit.text().strip()
+    def _set_download_busy(self, busy):
+        self._busy = busy
+        for widget in (
+            self._url_edit, self._type_combo, self._name_edit, self._author_edit,
+            self._game_edit, self._desc_edit, self._source_url_edit, self._dl_btn,
+        ):
+            widget.setEnabled(not busy)
+        self._close_btn.setText("Continue in Background" if busy else "Close")
 
-        def _run():
-            tmpdir = None
-            download_id = uuid.uuid4().hex
-            download_name = _name_text or Path(unquote(urlparse(url).path)).name or "downloaded_mod"
-            ActiveDownloads.register(
-                download_id, download_name, source_url=_source_url_text or raw_url,
-            )
-            try:
-                parsed = urlparse(url)
-                fname = Path(unquote(parsed.path)).name or "downloaded_mod"
-                if not Path(fname).suffix:
-                    fname += ".zip"
-                tmpdir = tempfile.mkdtemp(prefix="ps2mm_dl_")
-                dest = str(Path(tmpdir) / fname)
+    @pyqtSlot(str, str)
+    def _on_download_phase(self, request_id, phase):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        text = {
+            "resolving": "Resolving download link…",
+            "downloading": "Downloading…",
+            "installing": "Installing into managed storage…",
+        }.get(phase, phase)
+        self._status.setText(text + "\nYou can close this dialog; work continues in Downloads while the app is open.")
+        self._progress.setRange(0, 0)
+        self._progress.show()
 
-                def _progress(recv, total):
-                    ActiveDownloads.update(download_id, recv, total)
-                    if total > 0:
-                        pct = int(recv / total * 100)
-                        QTimer.singleShot(0, lambda: self._progress.setValue(pct))
-                    else:
-                        QTimer.singleShot(0, lambda: self._progress.setRange(0, 0))
+    @pyqtSlot(str, object, object)
+    def _on_download_progress(self, request_id, received, total):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        if total > 0:
+            percent = min(100, max(0, received) * 100 // total)
+            self._progress.setRange(0, 100)
+            self._progress.setValue(percent)
+            text = f"Downloading • {percent}% • {_download_size(received)} / {_download_size(total)}"
+        else:
+            self._progress.setRange(0, 0)
+            text = f"Downloading • {_download_size(received)} received • total unknown"
+        self._status.setText(text + "\nYou can close this dialog; work continues in Downloads while the app is open.")
 
-                download_file(url, dest, _progress)
-                ActiveDownloads.set_installing(download_id)
-                from src.core.mod_manager import ModManager
-                mgr = ModManager(self.db)
-                name = _name_text or Path(fname).stem
-                author = _author_text
-                game = _game_text
-                description = _desc_text
-                source_url = _source_url_text or raw_url
-                mod = mgr.install_from_folder(
-                    source_path=dest, mod_type=mod_type, dest_base=storage,
-                    name=name, author=author, game_id=game,
-                    description=description, source_url=source_url,
-                )
-                try:
-                    installed_size = Path(dest).stat().st_size if Path(dest).exists() else 0
-                except Exception as exc:
-                    logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
-                    installed_size = 0
-
-                try:
-                    from src.core.download_history import record_event, STATUS_SUCCESS
-                    record_event(
-                        self.config,
-                        mod_name=mod.name,
-                        mod_type=mod_type.value,
-                        serial=game,
-                        source_url=source_url,
-                        status=STATUS_SUCCESS,
-                        size_bytes=installed_size,
-                    )
-                except Exception as exc:
-                    logger.warning(
-                        "Could not record browse download history for %s: %s",
-                        mod.name,
-                        exc,
-                    )
-
-                def _done():
-                    self._progress.setRange(0, 100)
-                    self._progress.setValue(100)
-                    self._status.setText(f"✅  Installed: {mod.name}")
-                    self._dl_btn.setEnabled(True)
-                    parent = self.parent()
-                    while parent is not None:
-                        installed_signal = getattr(parent, "mod_installed", None)
-                        if installed_signal is not None:
-                            try:
-                                installed_signal.emit()
-                            except Exception as exc:
-                                logger.warning("Could not emit browse install signal: %s", exc)
-                            break
-                        parent = parent.parent() if hasattr(parent, "parent") else None
-                QTimer.singleShot(0, _done)
-            except DownloadError as exc:
-                _download_err_msg = str(exc)
-                logger.warning("Browse-panel download failed for %s: %s", raw_url, exc)
-                try:
-                    from src.core.download_history import record_event, STATUS_FAILED
-                    record_event(
-                        self.config,
-                        mod_name=_name_text or Path(urlparse(url).path).name,
-                        mod_type=mod_type.value,
-                        serial=_game_text,
-                        source_url=_source_url_text or raw_url,
-                        status=STATUS_FAILED,
-                        note=_download_err_msg,
-                    )
-                except Exception as exc:
-                    logger.warning(
-                        "Could not record failed browse download history for %s: %s",
-                        raw_url,
-                        exc,
-                    )
-                def _err():
-                    self._status.setText(f"❌  Download failed: {_download_err_msg}")
-                    self._progress.hide()
-                    self._dl_btn.setEnabled(True)
-                QTimer.singleShot(0, _err)
-            except Exception as exc:
-                _general_err_msg = str(exc)
-                logger.warning("Unexpected browse-panel download error for %s: %s", raw_url, exc)
-                try:
-                    from src.core.download_history import record_event, STATUS_FAILED
-                    record_event(
-                        self.config,
-                        mod_name=_name_text or Path(urlparse(url).path).name,
-                        mod_type=mod_type.value,
-                        serial=_game_text,
-                        source_url=_source_url_text or raw_url,
-                        status=STATUS_FAILED,
-                        note=_general_err_msg,
-                    )
-                except Exception as exc:
-                    logger.warning(
-                        "Could not record failed browse download history for %s: %s",
-                        raw_url,
-                        exc,
-                    )
-                def _err2():
-                    self._status.setText(f"❌  Error: {_general_err_msg}")
-                    self._progress.hide()
-                    self._dl_btn.setEnabled(True)
-                QTimer.singleShot(0, _err2)
-            finally:
-                ActiveDownloads.finish(download_id)
-                if tmpdir:
-                    import shutil
-                    shutil.rmtree(tmpdir, ignore_errors=True)
-
-        threading.Thread(target=_run, daemon=True).start()
+    @pyqtSlot(str, bool, str)
+    def _on_download_finished(self, request_id, success, message):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        self._set_download_busy(False)
+        self._dl_btn.setText("⬇ Download & Install" if success else "Retry Download")
+        if success:
+            self._progress.setRange(0, 100)
+            self._progress.setValue(100)
+        else:
+            self._progress.hide()
+        self._status.setText(message)
 
 
 # ---------------------------------------------------------------------------

@@ -7423,6 +7423,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
         )
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7472,6 +7474,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
         )
         qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7529,6 +7533,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace()
         qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7589,6 +7595,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
             TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
         )
         qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda _ms, fn: fn())})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7658,6 +7666,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace()
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7897,6 +7907,8 @@ class TestScraperDialogClassifier(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace()
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -7979,6 +7991,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace()
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -8389,24 +8403,39 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         )
         save_mock.assert_called_once_with(dialog.config, "sanitizing direct download dialog state")
 
+    def _download_dialog_fixture(self, module):
+        dialog = module.DownloadInstallDialog.__new__(module.DownloadInstallDialog)
+        dialog.config = AppConfig(mods_storage_path="/managed-mods")
+        dialog.db = MagicMock()
+        dialog._busy = False
+        dialog._closed = False
+        dialog._request_id = ""
+        dialog.parent = MagicMock(return_value=None)
+        dialog._type_combo = MagicMock()
+        dialog._type_combo.currentData.return_value = ModType.TEXTURE_PACK
+        for name, value in (
+            ("_url_edit", "https://example.com/shared"),
+            ("_name_edit", "Texture pack"), ("_author_edit", "Author"),
+            ("_game_edit", "SLUS-20062"), ("_desc_edit", "Description"),
+            ("_source_url_edit", "https://example.com/original"),
+        ):
+            widget = MagicMock()
+            widget.text.return_value = value
+            setattr(dialog, name, widget)
+        dialog._status = MagicMock()
+        dialog._progress = MagicMock()
+        dialog._dl_btn = MagicMock()
+        dialog._close_btn = MagicMock()
+        dialog._save_state = MagicMock()
+        return dialog
+
     def test_download_worker_tracks_transfer_then_install_and_always_finishes(self):
         import types
         module = self._import_browse_panel()
         for outcome in ("success", "download_error", "install_error"):
             with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as storage:
-                dialog = module.DownloadInstallDialog.__new__(module.DownloadInstallDialog)
+                dialog = self._download_dialog_fixture(module)
                 dialog.config = AppConfig(mods_storage_path=storage)
-                dialog.db = MagicMock()
-                dialog._type_combo = MagicMock()
-                dialog._type_combo.currentData.return_value = ModType.TEXTURE_PACK
-                for name, value in (
-                    ("_name_edit", "Texture pack"), ("_author_edit", "Author"),
-                    ("_game_edit", "SLUS-20062"), ("_desc_edit", ""),
-                    ("_source_url_edit", "https://example.com/original"),
-                ):
-                    widget = MagicMock()
-                    widget.text.return_value = value
-                    setattr(dialog, name, widget)
                 registry = module.ActiveDownloads
                 destinations = []
 
@@ -8432,18 +8461,24 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                     return types.SimpleNamespace(name="Installed pack")
 
                 with patch.object(registry, "_entries", {}):
-                    with patch.object(module.threading, "Thread") as thread, patch.object(module, "QTimer"):
+                    with patch.object(module.threading, "Thread") as thread, patch.object(module, "_DownloadInstallResult") as relay:
                         with patch.object(module, "download_file", side_effect=transfer):
                             with patch("src.core.mod_manager.ModManager") as manager:
                                 manager.return_value.install_from_folder.side_effect = install
                                 with patch("src.core.download_history.record_event") as record:
                                     dialog._run_download("https://example.com/shared", "https://cdn.example.com/file.zip")
+                                    self.assertEqual(registry.all()[0]["phase"], "resolving")
                                     run = thread.call_args.kwargs["target"]
+                                    args = thread.call_args.kwargs["args"]
+                                    self.assertIs(run, module._run_direct_download)
+                                    self.assertNotIn(dialog, args)
+                                    dialog.config.mods_storage_path = "/changed"
+                                    dialog._name_edit.text.return_value = "Changed name"
                                     if outcome == "success":
-                                        run()
+                                        run(*args)
                                     else:
                                         with self.assertLogs("src.ui.browse_panel", level="WARNING"):
-                                            run()
+                                            run(*args)
                                     self.assertEqual(registry.all(), [])
                                     self.assertEqual(registry.count(), 0)
                                     self.assertFalse(Path(destinations[0]).parent.exists())
@@ -8451,6 +8486,191 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                                                      "success" if outcome == "success" else "failed")
                                     if outcome == "download_error":
                                         manager.return_value.install_from_folder.assert_not_called()
+                                    else:
+                                        installed = manager.return_value.install_from_folder.call_args.kwargs
+                                        self.assertEqual(installed["dest_base"], storage)
+                                        self.assertEqual(installed["name"], "Texture pack")
+                                    result = relay.return_value
+                                    self.assertEqual(result.finished.emit.call_args.args[1], outcome == "success")
+                                    self.assertEqual(result.installed.emit.call_count, int(outcome == "success"))
+                                    result.deleteLater.assert_called_once()
+
+    def test_download_rejects_invalid_urls_without_starting_worker(self):
+        module = self._import_browse_panel()
+        for url in ("", "relative.zip", "file:///etc/passwd", "https://", "https://["):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                dialog._url_edit.text.return_value = url
+                with patch.object(module.threading, "Thread") as thread:
+                    dialog._download()
+                thread.assert_not_called()
+                dialog._url_edit.setFocus.assert_called_once()
+                self.assertFalse(dialog._busy)
+
+    def test_download_validates_storage_database_and_type_before_resolution(self):
+        module = self._import_browse_panel()
+        for missing in ("storage", "database", "type"):
+            with self.subTest(missing=missing):
+                dialog = self._download_dialog_fixture(module)
+                if missing == "storage":
+                    dialog.config.mods_storage_path = ""
+                elif missing == "database":
+                    dialog.db = None
+                else:
+                    dialog._type_combo.currentData.return_value = "stale"
+                with patch.object(module.threading, "Thread") as thread:
+                    dialog._download()
+                thread.assert_not_called()
+                self.assertFalse(dialog._busy)
+                dialog._status.setText.assert_called_once()
+
+    def test_download_mega_detection_uses_hostname_not_arbitrary_url_text(self):
+        module = self._import_browse_panel()
+        for url, manual in (
+            ("https://mega.nz/file/abc", True),
+            ("https://www.mega.co.nz/file/abc", True),
+            ("https://example.com/mega.nz/file.zip", False),
+            ("https://mega.nz.example.com/file.zip", False),
+        ):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                dialog._url_edit.text.return_value = url
+                dialog._run_download = MagicMock()
+                with patch.object(module, "QMessageBox") as box:
+                    dialog._download()
+                self.assertEqual(box.information.call_count, int(manual))
+                self.assertEqual(dialog._run_download.call_count, int(not manual))
+
+    def test_download_freezes_fields_and_blocks_duplicate_or_closed_starts(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        with patch.object(module, "_DownloadInstallResult"), patch.object(module.threading, "Thread") as thread:
+            with patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+                dialog._download()
+                thread.assert_called_once()
+                self.assertTrue(dialog._busy)
+                for widget in (dialog._url_edit, dialog._type_combo, dialog._name_edit, dialog._dl_btn):
+                    widget.setEnabled.assert_called_with(False)
+                dialog._close_btn.setText.assert_called_with("Continue in Background")
+                dialog._closed = True
+                dialog._download()
+                thread.assert_called_once()
+
+    def test_download_thread_start_failure_restores_retry_and_cleans_registry(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        with patch.object(module, "_DownloadInstallResult") as relay:
+            with patch.object(module.threading, "Thread") as thread:
+                thread.return_value.start.side_effect = RuntimeError("no threads")
+                with patch.object(module.ActiveDownloads, "_entries", {}):
+                    with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                        dialog._download()
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+        self.assertFalse(dialog._busy)
+        dialog._dl_btn.setText.assert_called_with("Retry Download")
+        relay.return_value.deleteLater.assert_called_once()
+
+    def test_download_completion_notification_connects_to_surviving_ancestor_signal(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        ancestor = MagicMock()
+        parent = type("Parent", (), {"parent": lambda self: ancestor})()
+        dialog.parent.return_value = parent
+        with patch.object(module, "_DownloadInstallResult") as relay:
+            with patch.object(module.threading, "Thread"), patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+        relay.return_value.installed.connect.assert_called_once_with(ancestor.mod_installed)
+
+    def test_download_progress_recovers_from_unknown_total_and_handles_large_files(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        dialog._busy = True
+        dialog._request_id = "active"
+        dialog._on_download_progress("active", 10, 0)
+        dialog._progress.setRange.assert_called_with(0, 0)
+        dialog._on_download_progress("active", 5 * 1024**3, 10 * 1024**3)
+        dialog._progress.setRange.assert_called_with(0, 100)
+        dialog._progress.setValue.assert_called_with(50)
+        self.assertIn("5.0 GiB", dialog._status.setText.call_args.args[0])
+        dialog._on_download_progress("active", 1000, 1)
+        dialog._progress.setValue.assert_called_with(100)
+        dialog._on_download_progress("active", -1, 100)
+        dialog._progress.setValue.assert_called_with(0)
+
+    def test_download_slots_ignore_closed_stale_and_finished_requests(self):
+        module = self._import_browse_panel()
+        for closed, busy, request_id in ((True, True, "active"), (False, True, "old"), (False, False, "active")):
+            with self.subTest(closed=closed, busy=busy, request=request_id):
+                dialog = self._download_dialog_fixture(module)
+                dialog._closed, dialog._busy, dialog._request_id = closed, busy, "active"
+                dialog._on_download_phase(request_id, "installing")
+                dialog._on_download_progress(request_id, 100, 100)
+                dialog._on_download_finished(request_id, True, "Done")
+                dialog._status.setText.assert_not_called()
+                dialog._progress.setValue.assert_not_called()
+                dialog._dl_btn.setEnabled.assert_not_called()
+
+    def test_download_error_preserves_form_and_allows_new_request(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        dialog._busy, dialog._request_id = True, "old"
+        dialog._on_download_finished("old", False, "<b>network error</b>")
+        self.assertFalse(dialog._busy)
+        dialog._name_edit.setEnabled.assert_called_with(True)
+        dialog._name_edit.setText.assert_not_called()
+        dialog._progress.hide.assert_called_once()
+        dialog._dl_btn.setText.assert_called_with("Retry Download")
+        with patch.object(module, "_DownloadInstallResult"), patch.object(module.threading, "Thread") as thread:
+            with patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+        self.assertTrue(dialog._busy)
+        self.assertNotEqual(dialog._request_id, "old")
+        thread.assert_called_once()
+
+    def test_download_resolution_failure_and_history_failure_are_recoverable(self):
+        module = self._import_browse_panel()
+        for failure in (None, OSError("resolver offline")):
+            with self.subTest(failure=failure):
+                result = MagicMock()
+                state = {"url": "https://disk.yandex.ru/d/id", "name": "Pack", "game": "",
+                         "source_url": "", "author": "", "description": ""}
+                with patch.object(module.DownloadInstallDialog, "_convert_url",
+                                  return_value=None, side_effect=failure):
+                    with patch.object(module, "download_file") as transfer:
+                        with patch.object(module.ActiveDownloads, "_entries", {}):
+                            module.ActiveDownloads.register("id", "Pack", phase="resolving")
+                            with patch("src.core.download_history.record_event", side_effect=OSError("read only")):
+                                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                                    module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig(), MagicMock())
+                            self.assertEqual(module.ActiveDownloads.all(), [])
+                transfer.assert_not_called()
+                self.assertFalse(result.finished.emit.call_args.args[1])
+                self.assertIn("Resolving failed", result.finished.emit.call_args.args[2])
+                result.installed.emit.assert_not_called()
+                result.deleteLater.assert_called_once()
+
+    def test_download_worker_throttles_progress_without_losing_registry_bytes(self):
+        from unittest.mock import call
+        module = self._import_browse_panel()
+        result = MagicMock()
+        state = {"url": "https://example.com/file.zip", "name": "Pack", "game": "",
+                 "source_url": "", "author": "", "description": ""}
+
+        def transfer(url, dest, progress):
+            for size in (1, 2, 3, 4):
+                progress(size, 4)
+                self.assertEqual(module.ActiveDownloads.all()[0]["received"], size)
+            Path(dest).write_bytes(b"test")
+
+        with patch.object(module.ActiveDownloads, "_entries", {}):
+            module.ActiveDownloads.register("id", "Pack")
+            with patch.object(module.time, "monotonic", side_effect=(1.0, 1.01, 1.02, 1.03)):
+                with patch.object(module, "download_file", side_effect=transfer):
+                    with patch("src.core.mod_manager.ModManager"), patch("src.core.download_history.record_event"):
+                        module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig(),
+                                                    MagicMock(), state["url"])
+        self.assertEqual(result.progress.emit.call_args_list, [call("id", 1, 4), call("id", 4, 4)])
 
     def test_cover_dialog_auto_fills_single_serial_match(self):
         browse_panel = self._import_browse_panel()
@@ -9446,6 +9666,27 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
                 self.assertEqual(snapshot["total"], snapshot["received"] * 2)
             registry.update("one", 2000, 4000)
             self.assertTrue(all(snapshot["received"] <= 1000 for snapshot in snapshots))
+
+    def test_resolving_downloads_are_visible_and_not_counted_as_transfers(self):
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        panel = self._make_active_panel(module)
+        row = self._make_active_row(module)
+        with patch.object(registry, "_entries", {}), patch.object(module, "_ActiveDownloadRow", return_value=row):
+            registry.register("id", "Pack", phase="resolving")
+            panel._refresh_active()
+            self.assertIn("0 downloading • 0 installing • 1 resolving",
+                          panel._active_summary.setText.call_args.args[0])
+            self.assertIn("Resolving", row._status_lbl.setText.call_args.args[0])
+            row._bar.setRange.assert_called_with(0, 0)
+            row._bar.setValue.assert_not_called()
+            registry.set_phase("id", "downloading")
+            panel._refresh_active()
+            self.assertIn("1 downloading", panel._active_summary.setText.call_args.args[0])
+            self.assertNotIn("resolving", panel._active_summary.setText.call_args.args[0])
+            registry.finish("id")
+            registry.set_phase("id", "resolving")
+            self.assertEqual(registry.all(), [])
 
     def test_active_poll_reuses_rows_and_only_removes_finished_ids(self):
         module = self._import_downloads_panel()

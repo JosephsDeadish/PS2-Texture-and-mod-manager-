@@ -157,7 +157,10 @@ class _ActiveDownloadRow(QWidget):
             button.setEnabled(bool(self._source_url))
             button.setToolTip(self._source_url or "No HTTP(S) source URL available")
         received, total = entry["received"], entry["total"]
-        if entry.get("phase") == "installing":
+        if entry.get("phase") == "resolving":
+            self._bar.setRange(0, 0)
+            text = "Resolving • finding the direct download link"
+        elif entry.get("phase") == "installing":
             self._bar.setRange(0, 0)
             text = f"Installing • transfer finished • {_download_size(received)} received"
         else:
@@ -223,11 +226,11 @@ class ActiveDownloads:
     _lock = _threading.Lock()
 
     @classmethod
-    def register(cls, download_id: str, name: str, *, source_url: str = "") -> None:
+    def register(cls, download_id: str, name: str, *, source_url: str = "", phase: str = "downloading") -> None:
         with cls._lock:
             cls._entries[download_id] = {
                 "id": download_id, "name": name, "received": 0, "total": 0,
-                "source_url": source_url, "phase": "downloading",
+                "source_url": source_url, "phase": phase,
             }
 
     @classmethod
@@ -239,9 +242,13 @@ class ActiveDownloads:
 
     @classmethod
     def set_installing(cls, download_id: str) -> None:
+        cls.set_phase(download_id, "installing")
+
+    @classmethod
+    def set_phase(cls, download_id: str, phase: str) -> None:
         with cls._lock:
             if download_id in cls._entries:
-                cls._entries[download_id]["phase"] = "installing"
+                cls._entries[download_id]["phase"] = phase
 
     @classmethod
     def finish(cls, download_id: str) -> None:
@@ -794,9 +801,11 @@ class DownloadsPanel(BasePanel):
             row.update_entry(entry)
         self._active_placeholder.setVisible(not active)
         installing = sum(entry["phase"] == "installing" for entry in active)
+        resolving = sum(entry["phase"] == "resolving" for entry in active)
         self._active_summary.setText(
             f"⬇  Active Downloads: {len(active)}"
-            f" • {len(active) - installing} downloading • {installing} installing"
+            f" • {len(active) - installing - resolving} downloading • {installing} installing"
+            + (f" • {resolving} resolving" if resolving else "")
             if active else "⬇  Active Downloads: none"
         )
 
