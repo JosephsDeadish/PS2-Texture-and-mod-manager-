@@ -183,6 +183,7 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
 
     for field_name in (
         "name", "description", "author", "context", "source",
+        "download_action",
         "upscale_tech", "size_label", "url", "author_url",
         "direct_download_url", "thumbnail_url",
     ):
