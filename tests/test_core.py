@@ -6511,7 +6511,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         dlg._skip_existing_check = FakeCheckBox()
 
         with patch.object(browse_panel, "_save_browse_config") as save_mock:
-            dlg._restore_state()
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                dlg._restore_state()
 
         self.assertEqual(dlg._tabs.currentIndex(), 1)
         self.assertEqual(dlg._search_edit.value, "God of War")
@@ -6535,6 +6536,18 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             "EN",
         )
         save_mock.assert_called_once_with(dlg.config, "sanitizing cover download dialog state")
+        self.assertTrue(
+            any("single-region" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("bulk-region" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("tab index" in msg for msg in logs.output),
+            logs.output,
+        )
 
     def test_cover_dialog_save_persists_state(self):
         import types

@@ -1136,23 +1136,47 @@ class CoverDownloadDialog(QDialog):
         search_query = stripped_query
         if hasattr(self, "_search_edit") and hasattr(self._search_edit, "setText"):
             self._search_edit.setText(search_query)
-        if not self._set_combo_text(self._region_combo, bucket.get("single_region", "EN")):
+        single_region = bucket.get("single_region", "EN")
+        if not self._set_combo_text(self._region_combo, single_region):
+            logger.warning(
+                "Saved cover download single-region %r is no longer available; using EN",
+                single_region,
+            )
             state_changed = True
-        if not self._set_combo_text(self._bulk_region_combo, bucket.get("bulk_region", "EN")):
+        bulk_region = bucket.get("bulk_region", "EN")
+        if not self._set_combo_text(self._bulk_region_combo, bulk_region):
+            logger.warning(
+                "Saved cover download bulk-region %r is no longer available; using EN",
+                bulk_region,
+            )
             state_changed = True
         self._skip_existing_check.setChecked(bool(bucket.get("skip_existing", True)))
+        raw_selected_tab = bucket.get("selected_tab", 0)
         try:
-            selected_tab = int(bucket.get("selected_tab", 0) or 0)
+            selected_tab = int(raw_selected_tab or 0)
         except (TypeError, ValueError):
+            logger.warning(
+                "Saved cover download tab index %r is invalid; using the first tab",
+                raw_selected_tab,
+            )
             selected_tab = 0
             state_changed = True
         tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
         if tab_count > 0:
             clamped_tab = max(0, min(selected_tab, tab_count - 1))
             if clamped_tab != selected_tab:
+                logger.warning(
+                    "Saved cover download tab index %r is no longer available; using %d",
+                    raw_selected_tab,
+                    clamped_tab,
+                )
                 state_changed = True
             self._tabs.setCurrentIndex(clamped_tab)
         elif selected_tab != 0:
+            logger.warning(
+                "Saved cover download tab index %r is invalid for an empty dialog; using the first tab",
+                raw_selected_tab,
+            )
             state_changed = True
         if state_changed:
             self._save_state(context="sanitizing cover download dialog state")
