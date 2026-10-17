@@ -7008,7 +7008,7 @@ class TestPnachBrowserFlows(unittest.TestCase):
 
     def test_thread_start_failure_clears_busy_and_registry(self):
         module, dialog = self._fixture()
-        with patch.object(module, "_PnachBrowserResult") as relay, patch.object(
+        with patch.object(module, "_PnachInstallResult") as relay, patch.object(
             module.threading, "Thread",
         ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
             thread.return_value.start.side_effect = RuntimeError("no threads")
@@ -7021,7 +7021,7 @@ class TestPnachBrowserFlows(unittest.TestCase):
     def test_install_captures_config_without_retaining_dialog_or_button(self):
         module, dialog = self._fixture()
         button = MagicMock()
-        with patch.object(module, "_PnachBrowserResult"), patch.object(
+        with patch.object(module, "_PnachInstallResult") as relay, patch.object(
             module.threading, "Thread",
         ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
             dialog._install_patch(self._patch("F0A235B4"), button)
@@ -7030,7 +7030,8 @@ class TestPnachBrowserFlows(unittest.TestCase):
             self.assertIsNot(args[3], dialog.config)
             dialog.config.pnach_path = "/changed"
             self.assertEqual(args[3].pnach_path, "/patches")
-            self.assertIs(args[4], dialog.db)
+            relay.assert_called_once_with(args[1], "F0A235B4", args[3], dialog.db)
+            self.assertEqual(len(args), 4)
             self.assertNotIn(dialog, args)
             self.assertNotIn(button, args)
             self.assertEqual(module.ActiveDownloads.count(), 1)
@@ -7040,7 +7041,16 @@ class TestPnachBrowserFlows(unittest.TestCase):
         for failure in ("", "transfer", "registration", "history"):
             with self.subTest(failure=failure), tempfile.TemporaryDirectory() as root:
                 config = AppConfig(pnach_path=str(Path(root) / "cheats"))
-                relay, db = MagicMock(), MagicMock()
+                db = MagicMock()
+                relay = module._PnachInstallResult.__new__(module._PnachInstallResult)
+                relay._request_id = "request"
+                relay._crc = "F0A235B4"
+                relay._config = config
+                relay._db = db
+                relay.transferred = MagicMock()
+                relay.finished = MagicMock()
+                relay.installed = MagicMock()
+                relay.deleteLater = MagicMock()
                 staged = []
 
                 def download(crc, folder, timeout):
@@ -7060,7 +7070,12 @@ class TestPnachBrowserFlows(unittest.TestCase):
                         db.add.side_effect = OSError("db read-only")
                     if failure == "history":
                         record.side_effect = OSError("history read-only")
-                    module._run_pnach_install(relay, "request", "F0A235B4", config, db)
+                    module._run_pnach_install(relay, "request", "F0A235B4", config)
+                    db.add.assert_not_called()
+                    record.assert_not_called()
+                    self.assertEqual(module.ActiveDownloads.count(), 1)
+                    relay.finished.emit.assert_not_called()
+                    relay._complete_install(*relay.transferred.emit.call_args.args)
                     self.assertEqual(module.ActiveDownloads.all(), [])
                     self.assertFalse(staged[0].exists())
                     destination = Path(config.pnach_path) / "F0A235B4.pnach"
@@ -7099,12 +7114,12 @@ class TestPnachBrowserFlows(unittest.TestCase):
                     "src.core.download_history.record_event",
                 ):
                     module._run_pnach_install(
-                        relay, "request", "F0A235B4", AppConfig(pnach_path=root), db,
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root),
                     )
                 transfer.assert_not_called()
                 db.add.assert_not_called()
                 self.assertEqual(destination.read_bytes(), b"existing")
-                self.assertIn("No file was replaced", relay.finished.emit.call_args.args[2])
+                self.assertIn("No file was replaced", relay.transferred.emit.call_args.args[1])
 
     def test_patch_created_during_transfer_is_not_replaced(self):
         module, _dialog = self._fixture()
@@ -7122,10 +7137,10 @@ class TestPnachBrowserFlows(unittest.TestCase):
                 "src.core.download_history.record_event",
             ):
                 module._run_pnach_install(
-                    relay, "request", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                    relay, "request", "F0A235B4", AppConfig(pnach_path=root),
                 )
             self.assertEqual(destination.read_bytes(), b"another install")
-            self.assertTrue(relay.finished.emit.call_args.args[2])
+            self.assertTrue(relay.transferred.emit.call_args.args[1])
 
     def test_failed_copy_removes_only_new_partial_patch_and_allows_retry(self):
         module, _dialog = self._fixture()
@@ -7143,12 +7158,12 @@ class TestPnachBrowserFlows(unittest.TestCase):
                 relay = MagicMock()
                 with patch.object(module.shutil, "copyfileobj", side_effect=OSError("disk full")):
                     module._run_pnach_install(
-                        relay, "request", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root),
                     )
                 self.assertFalse(destination.exists())
-                self.assertIn("disk full", relay.finished.emit.call_args.args[2])
+                self.assertIn("disk full", relay.transferred.emit.call_args.args[1])
                 module._run_pnach_install(
-                    MagicMock(), "retry", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                    MagicMock(), "retry", "F0A235B4", AppConfig(pnach_path=root),
                 )
                 self.assertEqual(destination.read_bytes(), b"new")
 
@@ -32704,11 +32719,11 @@ class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
                       "browse_panel must call record_event for download history")
 
     def test_pnach_install_references_record_event(self):
-        """The PNACH installation worker must record download history."""
+        """The PNACH installation completion receiver must record history."""
         bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
         src_text = bp_path.read_text(encoding="utf-8")
-        # Verify record_event appears after the installation worker definition
-        install_patch_pos = src_text.find("def _run_pnach_install")
+        # Verify record_event appears after the installation completion definition
+        install_patch_pos = src_text.find("def _complete_install")
         record_event_pos = src_text.find("record_event", install_patch_pos)
         self.assertGreater(record_event_pos, install_patch_pos,
                            "_install_patch must call record_event")

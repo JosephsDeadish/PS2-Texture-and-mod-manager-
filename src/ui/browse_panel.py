@@ -2002,6 +2002,63 @@ class _PnachBrowserResult(QObject):
     installed = pyqtSignal()
 
 
+class _PnachInstallResult(_PnachBrowserResult):
+    transferred = pyqtSignal(object, str)
+
+    def __init__(self, request_id, crc, config, db):
+        from PyQt6.QtCore import QCoreApplication
+
+        super().__init__(QCoreApplication.instance())
+        self._request_id = request_id
+        self._crc = crc
+        self._config = config
+        self._db = db
+        self.transferred.connect(self._complete_install)
+
+    @pyqtSlot(object, str)
+    def _complete_install(self, payload, error):
+        """Persist on the UI thread, even after the initiating dialog is deleted."""
+        crc = self._crc
+        source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
+        name = f"Widescreen Patch ({crc})"
+        try:
+            if payload:
+                warnings = payload["warnings"]
+                if self._db is not None:
+                    try:
+                        self._db.add(ModInfo(
+                            id=str(uuid.uuid4()), name=name, mod_type=ModType.PNACH,
+                            path=payload["path"], author="PCSX2 Team", source_url=source_url,
+                            files=[payload["path"]], size_bytes=payload["size"],
+                        ))
+                    except Exception as exc:
+                        logger.warning("PNACH DB registration warning for %s: %s", crc, exc)
+                        warnings.append("The file was installed, but library registration could not be saved.")
+                else:
+                    warnings.append("The file was installed without a library record (database unavailable).")
+            try:
+                from src.core.download_history import record_event, STATUS_FAILED, STATUS_SUCCESS
+                record_event(
+                    self._config, mod_name=name, mod_type="pnach", source_url=source_url,
+                    status=STATUS_SUCCESS if payload else STATUS_FAILED,
+                    size_bytes=payload["size"] if payload else 0,
+                    note="\n".join(payload["warnings"]) if payload else error,
+                )
+            except Exception as exc:
+                if payload:
+                    logger.warning("Could not record PNACH download history for %s: %s", crc, exc)
+                else:
+                    logger.warning("Could not record failed PNACH download history for %s: %s", crc, exc)
+                if payload:
+                    payload["warnings"].append("The file was installed, but download history could not be saved.")
+            if payload:
+                self.installed.emit()
+        finally:
+            ActiveDownloads.finish(self._request_id)
+            self.finished.emit(self._request_id, payload, error)
+            self.deleteLater()
+
+
 def _run_pnach_lookup(result, request_id, crc):
     try:
         if crc:
@@ -2016,10 +2073,8 @@ def _run_pnach_lookup(result, request_id, crc):
         result.deleteLater()
 
 
-def _run_pnach_install(result, request_id, crc, config, db):
+def _run_pnach_install(result, request_id, crc, config):
     """Stage transfers away from live patches and never replace existing files."""
-    source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
-    name = f"Widescreen Patch ({crc})"
     payload = None
     error = ""
     try:
@@ -2046,46 +2101,15 @@ def _run_pnach_install(result, request_id, crc, config, db):
                 if created:
                     destination.unlink()
                 raise
-        size = destination.stat().st_size
-        warnings = []
-        if db is not None:
-            try:
-                db.add(ModInfo(
-                    id=str(uuid.uuid4()), name=name, mod_type=ModType.PNACH,
-                    path=str(destination), author="PCSX2 Team", source_url=source_url,
-                    files=[str(destination)], size_bytes=size,
-                ))
-            except Exception as exc:
-                logger.warning("Could not save PNACH library registration for %s: %s", crc, exc)
-                warnings.append("The file was installed, but library registration could not be saved.")
-        else:
-            warnings.append("The file was installed without a library record (database unavailable).")
-        try:
-            from src.core.download_history import record_event, STATUS_SUCCESS
-            record_event(
-                config, mod_name=name, mod_type="pnach", source_url=source_url,
-                status=STATUS_SUCCESS, size_bytes=size, note="\n".join(warnings),
-            )
-        except Exception as exc:
-            logger.warning("Could not record PNACH download history for %s: %s", crc, exc)
-            warnings.append("The file was installed, but download history could not be saved.")
-        payload = {"crc": crc, "path": str(destination), "warnings": warnings}
-        result.installed.emit()
+        payload = {
+            "crc": crc, "path": str(destination),
+            "size": destination.stat().st_size, "warnings": [],
+        }
     except Exception as exc:
         error = str(exc) or type(exc).__name__
         logger.warning("PCSX2 patch installation failed for %s: %s", crc, error)
-        try:
-            from src.core.download_history import record_event, STATUS_FAILED
-            record_event(
-                config, mod_name=name, mod_type="pnach", source_url=source_url,
-                status=STATUS_FAILED, note=error,
-            )
-        except Exception as history_exc:
-            logger.warning("Could not record failed PNACH history for %s: %s", crc, history_exc)
     finally:
-        ActiveDownloads.finish(request_id)
-        result.finished.emit(request_id, payload, error)
-        result.deleteLater()
+        result.transferred.emit(payload, error)
 
 
 class PnachGitHubDialog(QDialog):
@@ -2143,13 +2167,14 @@ class PnachGitHubDialog(QDialog):
         self._crc_edit.setAccessibleName("Filter patches by CRC")
         self._crc_edit.setMaxLength(8)
         self._crc_edit.textChanged.connect(self._filter_list)
-        self._crc_edit.returnPressed.connect(self._check_single_crc)
         search_row.addWidget(self._crc_edit, 1)
         clear_btn = QPushButton("Clear Search")
+        clear_btn.setAutoDefault(False)
         clear_btn.clicked.connect(self._crc_edit.clear)
         search_row.addWidget(clear_btn)
 
         self._check_btn = QPushButton("🔍 Check CRC")
+        self._check_btn.setDefault(True)
         self._check_btn.clicked.connect(self._check_single_crc)
         search_row.addWidget(self._check_btn)
         layout.addLayout(search_row)
@@ -2157,6 +2182,7 @@ class PnachGitHubDialog(QDialog):
         # Index browser
         index_row = QHBoxLayout()
         self._load_btn = QPushButton("📋 Load Full Patch Index")
+        self._load_btn.setAutoDefault(False)
         self._load_btn.setObjectName("primary_btn")
         self._load_btn.setToolTip("Fetch the complete list of widescreen patches from PCSX2 GitHub (requires internet)")
         self._load_btn.clicked.connect(self._load_index)
@@ -2180,6 +2206,7 @@ class PnachGitHubDialog(QDialog):
         self._list_widget.setWidget(self._list_container)
         layout.addWidget(self._list_widget, 1)
         self._more_btn = QPushButton("Show More Patches")
+        self._more_btn.setAutoDefault(False)
         self._more_btn.clicked.connect(self._show_more)
         layout.addWidget(self._more_btn)
 
@@ -2198,6 +2225,7 @@ class PnachGitHubDialog(QDialog):
 
         btns = QHBoxLayout()
         close_btn = QPushButton("Close")
+        close_btn.setAutoDefault(False)
         close_btn.clicked.connect(self.reject)
         btns.addStretch()
         btns.addWidget(close_btn)
@@ -2220,9 +2248,9 @@ class PnachGitHubDialog(QDialog):
         self._operation = operation
         self._request_crc = crc
         self._request_id = request_id = uuid.uuid4().hex
-        result = _PnachBrowserResult()
-        result.finished.connect(self._on_request_finished)
         if operation == "install":
+            config = deepcopy(self.config)
+            result = _PnachInstallResult(request_id, crc, config, self.db)
             parent = self.parent()
             while parent is not None:
                 installed_signal = getattr(parent, "mod_installed", None)
@@ -2230,16 +2258,17 @@ class PnachGitHubDialog(QDialog):
                     result.installed.connect(installed_signal)
                     break
                 parent = parent.parent()
-            config = deepcopy(self.config)
             source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
             ActiveDownloads.register(request_id, f"Widescreen Patch ({crc})", source_url=source_url)
             target = _run_pnach_install
-            args = (result, request_id, crc, config, self.db)
+            args = (result, request_id, crc, config)
             text = f"Installing patch {crc}… You can close this dialog and follow progress in Downloads."
         else:
+            result = _PnachBrowserResult()
             target = _run_pnach_lookup
             args = (result, request_id, crc)
             text = f"Checking CRC {crc}…" if crc else "Fetching patch index from PCSX2 GitHub…"
+        result.finished.connect(self._on_request_finished)
         self._progress.show()
         self._status.setText(text)
         self._refresh_list()
@@ -2345,6 +2374,7 @@ class PnachGitHubDialog(QDialog):
         row.addWidget(file_lbl, 1)
 
         dl_btn = QPushButton("⬇ Install")
+        dl_btn.setAutoDefault(False)
         dl_btn.setFixedWidth(80)
         dl_btn.setObjectName("primary_btn")
         installed = self._installed_paths.get(patch["crc"])
