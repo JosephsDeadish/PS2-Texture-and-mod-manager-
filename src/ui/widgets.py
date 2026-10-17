@@ -1,6 +1,7 @@
 """Reusable UI widgets for PS2 Mod Manager."""
 
 import logging
+from copy import deepcopy
 import os
 import textwrap
 from pathlib import Path
@@ -4475,9 +4476,8 @@ class ModProfilesDialog(QDialog):
     Profiles let users save named configurations of enabled mods and
     instantly switch between them (e.g. "Vanilla+", "HD Graphics", etc.).
 
-    The currently active profile is highlighted.  Selecting a different
-    profile and clicking "Apply" enables/disables mods in the database to
-    match the saved profile state.
+    The last-used profile is highlighted. Applying uses the normal mod
+    enable/disable workflow, including configured deployment destinations.
     """
 
     # Emitted when a profile is applied so the caller can refresh its view
@@ -4489,6 +4489,7 @@ class ModProfilesDialog(QDialog):
         self.resize(580, 520)
         self._db = db
         self._config = config
+        self._selection = ""
 
         from src.core.config_manager import PROFILES_FILE
         from src.core.mod_profile import ModProfileManager
@@ -4505,8 +4506,8 @@ class ModProfilesDialog(QDialog):
         # Header
         header = QLabel(
             "Save your current mod configuration as a named profile, or switch "
-            "between saved profiles.  The <b>active profile</b> controls which "
-            "mods are enabled."
+            "between saved profiles. Applying changes enabled mods across the whole "
+            "library, not just the current game. Priorities are left unchanged."
         )
         header.setWordWrap(True)
         header.setStyleSheet("color: #9090c0; font-size: 11px;")
@@ -4525,8 +4526,17 @@ class ModProfilesDialog(QDialog):
         list_lbl.setStyleSheet("font-weight:bold; color:#8090c0; font-size:12px;")
         left_lay.addWidget(list_lbl)
 
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Search profiles…")
+        self._search_edit.setAccessibleName("Search profiles")
+        self._search_edit.setClearButtonEnabled(True)
+        self._search_edit.textChanged.connect(lambda *_: self._refresh())
+        left_lay.addWidget(self._search_edit)
+        self._count_lbl = QLabel()
+        left_lay.addWidget(self._count_lbl)
         self._profile_list = QListWidget()
         self._profile_list.setMinimumWidth(180)
+        self._profile_list.setWordWrap(True)
         self._profile_list.currentRowChanged.connect(self._on_selection_changed)
         self._profile_list.setStyleSheet(
             "QListWidget { background:#0d0d1a; color:#d0d0f0; font-size:12px; }"
@@ -4588,12 +4598,19 @@ class ModProfilesDialog(QDialog):
         self._del_btn.setStyleSheet("color:#d06060;")
         self._del_btn.clicked.connect(self._on_delete)
 
-        for b in (self._save_btn, self._apply_btn, self._rename_btn,
-                  self._dup_btn, self._del_btn):
+        for b in (self._save_btn, self._apply_btn):
             b.setFixedHeight(28)
             act_row.addWidget(b)
 
         root.addLayout(act_row)
+        manage_row = QHBoxLayout()
+        for b in (self._rename_btn, self._dup_btn, self._del_btn):
+            manage_row.addWidget(b)
+        root.addLayout(manage_row)
+        self._status_lbl = QLabel()
+        self._status_lbl.setWordWrap(True)
+        self._status_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        root.addWidget(self._status_lbl)
 
         # Close button
         from PyQt6.QtWidgets import QDialogButtonBox
@@ -4602,12 +4619,26 @@ class ModProfilesDialog(QDialog):
         root.addWidget(bbox)
 
     # ------------------------------------------------------------------
-    def _refresh(self):
+    def _refresh(self, selected=None):
+        if selected is not None:
+            self._selection = selected
+            self._search_edit.blockSignals(True)
+            self._search_edit.clear()
+            self._search_edit.blockSignals(False)
+        wanted = self._selection or self._pm.get_active_name()
+        terms = self._search_edit.text().casefold().split()
+        names = self._pm.list_profiles()
+        visible = [
+            name for name in names if all(
+                term in f"{name} {self._pm.get_profile(name).description}".casefold()
+                for term in terms
+            )
+        ]
+        self._profile_list.blockSignals(True)
         self._profile_list.clear()
         active = self._pm.get_active_name()
-        for name in self._pm.list_profiles():
-            from PyQt6.QtWidgets import QListWidgetItem
-            label = f"{'★ ' if name == active else '   '}{name}"
+        for name in visible:
+            label = f"{'★ ' if name == active else ''}{name}"
             item = QListWidgetItem(label)
             item.setData(256, name)
             if name == active:
@@ -4617,8 +4648,35 @@ class ModProfilesDialog(QDialog):
                 font.setBold(True)
                 item.setFont(font)
             self._profile_list.addItem(item)
+        if visible:
+            self._profile_list.setCurrentRow(visible.index(wanted) if wanted in visible else 0)
+        self._profile_list.blockSignals(False)
+        self._count_lbl.setText(f"Showing {len(visible)} of {len(names)} profiles")
+        self._on_selection_changed(self._profile_list.currentRow(), remember=False)
 
-        self._on_selection_changed(self._profile_list.currentRow())
+    def _profile_preview(self, profile):
+        mods = {mod.id: mod for mod in self._db.all()}
+        enabled = set(profile.enabled_mods)
+        available = enabled.intersection(mods)
+        missing = enabled.difference(mods)
+        to_enable = [mod for mod in mods.values() if mod.id in enabled and not mod.enabled]
+        to_disable = [mod for mod in mods.values() if mod.id not in enabled and mod.enabled]
+        return mods, available, missing, to_enable, to_disable
+
+    def _persist_profiles(self, operation, selected, message):
+        candidate = deepcopy(self._pm)
+        try:
+            operation(candidate)
+            candidate.save()
+        except Exception as exc:
+            logger.warning("Could not update mod profiles: %s", exc)
+            self._status_lbl.setText("Could not save profiles. No profile changes were committed.")
+            QMessageBox.critical(self, "Profile Save Failed", str(exc))
+            return False
+        self._pm = candidate
+        self._refresh(selected)
+        self._status_lbl.setText(message)
+        return True
 
     def _selected_profile(self) -> str:
         item = self._profile_list.currentItem()
@@ -4626,8 +4684,10 @@ class ModProfilesDialog(QDialog):
             return item.data(256) or ""
         return ""
 
-    def _on_selection_changed(self, _row: int):
+    def _on_selection_changed(self, _row: int, remember=True):
         name = self._selected_profile()
+        if name and remember:
+            self._selection = name
         has_sel = bool(name)
         self._apply_btn.setEnabled(has_sel)
         self._rename_btn.setEnabled(has_sel)
@@ -4637,31 +4697,33 @@ class ModProfilesDialog(QDialog):
         if name:
             profile = self._pm.get_profile(name)
             if profile:
-                active = self._pm.get_active_name()
+                mods, available, missing, to_enable, to_disable = self._profile_preview(profile)
                 lines = [
-                    f"<b>{name}</b>{'  ★ active' if name == active else ''}",
+                    name + ("  ★ last used" if name == self._pm.get_active_name() else ""),
                 ]
                 if profile.description:
-                    lines.append(f"<i>{profile.description}</i>")
-                lines.append(f"<br>Enabled mods: <b>{len(profile.enabled_mods)}</b>")
-                # Resolve mod names
-                all_mods = {m.id: m for m in self._db.all()}
-                mod_names = []
-                for mid in profile.enabled_mods[:12]:
-                    m = all_mods.get(mid)
-                    mod_names.append(
-                        f"  • {m.name or mid}" if m else f"  • <i>{mid}</i>"
-                    )
-                if len(profile.enabled_mods) > 12:
-                    mod_names.append(
-                        f"  <i>…and {len(profile.enabled_mods) - 12} more</i>"
-                    )
-                lines.extend(mod_names)
-                self._detail_text.setHtml("<br>".join(lines))
+                    lines.append(profile.description)
+                lines.extend((
+                    f"\nSaved: {len(available)} installed, {len(missing)} missing.",
+                    f"Changes: enable {len(to_enable)}, disable {len(to_disable)}.",
+                    "Scope: all installed mods. Priorities are unchanged.",
+                ))
+                if not to_enable and not to_disable:
+                    lines.append("Enabled states already match this profile.")
+                if self._config is None:
+                    lines.append("No configuration supplied: database flags only, no deployment.")
+                lines.append("\nEnabled mods in this profile:")
+                for mid in dict.fromkeys(profile.enabled_mods):
+                    lines.append(f"• {mods[mid].name or mid}" if mid in mods else f"• Missing: {mid}")
+                self._detail_text.setPlainText("\n".join(lines))
             else:
                 self._detail_text.setPlainText("")
         else:
-            self._detail_text.setPlainText("(select a profile to see details)")
+            self._detail_text.setPlainText(
+                "No profiles match. Clear the search to see more."
+                if self._pm.list_profiles()
+                else "No saved profiles yet. Use Save Current State to create one."
+            )
 
     def _on_save_as(self):
         from PyQt6.QtWidgets import QInputDialog
@@ -4672,9 +4734,20 @@ class ModProfilesDialog(QDialog):
         if not ok or not name.strip():
             return
         name = name.strip()
+        existing = self._pm.get_profile(name)
+        if existing:
+            reply = QMessageBox.question(
+                self, "Overwrite Profile",
+                f"Replace the saved enabled-mod list for '{name}' with the current state?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if reply != QMessageBox.StandardButton.Yes:
+                return
 
         desc, ok2 = QInputDialog.getText(
-            self, "Description", "Short description (optional):"
+            self, "Description", "Short description (optional):",
+            text=existing.description if existing else "",
         )
         if not ok2:
             return
@@ -4683,25 +4756,15 @@ class ModProfilesDialog(QDialog):
         all_mods = self._db.all()
         enabled_ids = [m.id for m in all_mods if m.enabled]
 
-        try:
-            if name in self._pm.list_profiles():
-                # Overwrite existing profile
-                profile = self._pm.get_profile(name)
+        def update(manager):
+            if manager.get_profile(name):
+                profile = manager.get_profile(name)
                 profile.enabled_mods = enabled_ids
-                if desc.strip():
-                    profile.description = desc.strip()
+                profile.description = desc.strip()
             else:
-                self._pm.create_profile(name, description=desc.strip())
-                profile = self._pm.get_profile(name)
-                profile.enabled_mods = enabled_ids
-            self._pm.set_active(name)
-            self._pm.save()
-        except Exception as exc:
-            logger.warning("Could not save profile %s: %s", name, exc)
-            QMessageBox.critical(self, "Error", str(exc))
-            return
-
-        self._refresh()
+                manager.create_profile(name, description=desc.strip(), enabled_mods=enabled_ids)
+            manager.set_active(name)
+        self._persist_profiles(update, name, f"Saved profile '{name}'.")
 
     def _on_apply(self):
         name = self._selected_profile()
@@ -4711,41 +4774,46 @@ class ModProfilesDialog(QDialog):
         if not profile:
             return
 
+        _mods, available, missing, to_enable, to_disable = self._profile_preview(profile)
         reply = QMessageBox.question(
             self,
             "Apply Profile",
-            f"Apply profile <b>{name}</b>?<br><br>"
-            f"This will enable <b>{len(profile.enabled_mods)}</b> mod(s) and "
-            f"disable all others.  Continue?",
+            f"Apply profile '{name}' across the whole library?\n\n"
+            f"Enable {len(to_enable)} and disable {len(to_disable)} mod(s).\n"
+            f"{len(missing)} saved mod(s) are missing and will be skipped.\n"
+            + ("Configured PCSX2 folders will be updated. Priorities are unchanged."
+               if self._config is not None else "Database flags only; no deployment configuration supplied."),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
 
-        # Enable/disable mods to match the profile
-        enabled_set = set(profile.enabled_mods)
-        for m in self._db.all():
-            new_state = m.id in enabled_set
-            if m.enabled != new_state:
-                m.enabled = new_state
-                self._db.update(m)
-
-        self._pm.set_active(name)
+        from src.core.mod_manager import ModManager
+        manager = ModManager(self._db)
+        warnings = []
         try:
-            self._pm.save()
+            for mod in to_disable + to_enable:
+                _count, notices = manager.set_enabled(mod.id, mod.id in available, self._config)
+                warnings.extend(notices)
         except Exception as exc:
             logger.warning("Could not apply profile %s: %s", name, exc)
-            QMessageBox.critical(self, "Error", str(exc))
-            self._refresh()
+            self._status_lbl.setText("Profile application stopped. Some mods may have changed; review their state.")
+            QMessageBox.critical(self, "Profile Partially Applied", str(exc))
+            self._refresh(name)
             self.profile_applied.emit(name)
             return
-        self._refresh()
-        self.profile_applied.emit(name)
-        QMessageBox.information(
-            self, "✅ Profile Applied",
-            f"Profile <b>{name}</b> applied — "
-            f"{len(profile.enabled_mods)} mod(s) enabled."
+        saved = self._persist_profiles(
+            lambda pm: pm.set_active(name), name,
+            f"Profile '{name}': {len(available)} installed mods enabled; {len(missing)} missing.",
         )
+        self.profile_applied.emit(name)
+        if not saved:
+            self._refresh(name)
+            self._status_lbl.setText("Mod states changed, but the last-used profile could not be saved.")
+        if warnings:
+            self._status_lbl.setText("Mod states changed with deployment warnings. Check PCSX2 paths and files.")
+            QMessageBox.warning(self, "Profile Deployment Warnings", "\n".join(dict.fromkeys(warnings)))
 
     def _on_rename(self):
         old = self._selected_profile()
@@ -4757,14 +4825,10 @@ class ModProfilesDialog(QDialog):
         )
         if not ok or not new_name.strip() or new_name.strip() == old:
             return
-        try:
-            self._pm.rename_profile(old, new_name.strip())
-            self._pm.save()
-        except (ValueError, KeyError) as exc:
-            logger.warning("Could not rename profile %s to %s: %s", old, new_name.strip(), exc)
-            QMessageBox.critical(self, "Error", str(exc))
-            return
-        self._refresh()
+        def rename(manager):
+            if not manager.rename_profile(old, new_name.strip()):
+                raise ValueError("That profile name is already in use.")
+        self._persist_profiles(rename, new_name.strip(), "Profile renamed.")
 
     def _on_duplicate(self):
         src = self._selected_profile()
@@ -4776,14 +4840,10 @@ class ModProfilesDialog(QDialog):
         )
         if not ok or not new_name.strip():
             return
-        try:
-            self._pm.duplicate_profile(src, new_name.strip())
-            self._pm.save()
-        except (ValueError, KeyError) as exc:
-            logger.warning("Could not duplicate profile %s to %s: %s", src, new_name.strip(), exc)
-            QMessageBox.critical(self, "Error", str(exc))
-            return
-        self._refresh()
+        def duplicate(manager):
+            if manager.duplicate_profile(src, new_name.strip()) is None:
+                raise ValueError("That profile name is already in use.")
+        self._persist_profiles(duplicate, new_name.strip(), "Profile duplicated.")
 
     def _on_delete(self):
         name = self._selected_profile()
@@ -4791,16 +4851,10 @@ class ModProfilesDialog(QDialog):
             return
         reply = QMessageBox.question(
             self, "Delete Profile",
-            f"Delete profile <b>{name}</b>?<br>This cannot be undone.",
+            f"Delete profile '{name}'?\nThis cannot be undone. Installed mods are not removed.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
-        try:
-            self._pm.delete_profile(name)
-            self._pm.save()
-        except (ValueError, KeyError) as exc:
-            logger.warning("Could not delete profile %s: %s", name, exc)
-            QMessageBox.critical(self, "Error", str(exc))
-            return
-        self._refresh()
+        self._persist_profiles(lambda pm: pm.delete_profile(name), "", "Profile deleted. Mod states are unchanged.")

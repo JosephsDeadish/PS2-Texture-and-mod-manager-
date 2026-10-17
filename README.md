@@ -43,6 +43,12 @@
 - **Automatic PNACH merging** — multiple enabled patches for the same game CRC are merged into one output file on deploy
 - Address-level conflict detection between overlapping patch addresses
 
+### 📋 Mod Profiles
+- Save, search, duplicate, rename, and delete named enabled-mod setups from **Library → Profiles**
+- Preview installed/missing mods and the enable/disable changes across the whole library before applying
+- Applying uses normal deployment/undeployment for configured PCSX2 folders and reports deployment warnings; priorities are unchanged
+- Existing profiles require overwrite confirmation, and failed saves leave saved profiles intact
+
 ### 🖼️ Cover Art Manager
 - Store and deploy cover art for PCSX2's game browser
 - Cover art is automatically renamed to `{SERIAL}.png` (e.g. `SLUS-20062.png`) on deploy — the exact format PCSX2 expects

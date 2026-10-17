@@ -20448,6 +20448,249 @@ class TestWave53ModProfiles(unittest.TestCase):
         self.assertEqual(p2.get_load_order("SLUS-20062"), ["m1", "m2"])
 
 
+class TestModProfilesDialogWorkflows(unittest.TestCase):
+    """Profile previews, persistence failures, and deployment use the same state."""
+
+    def setUp(self):
+        import sys
+        from types import MethodType, SimpleNamespace
+        from src.core.mod_profile import ModProfileManager
+
+        self.enterContext(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        from src.ui import widgets
+        self.widgets = widgets
+        self.dialog_type = widgets.ModProfilesDialog
+        self.tmp = self.enterContext(tempfile.TemporaryDirectory())
+        self.pm = ModProfileManager(str(Path(self.tmp) / "profiles.json"))
+        self.pm.create_profile("HD", "Graphics", ["on", "missing", "on"])
+        self.pm.create_profile("Vanilla")
+        self.mods = [
+            SimpleNamespace(id="on", name="<b>HD pack</b>", enabled=False),
+            SimpleNamespace(id="off", name="Other", enabled=True),
+        ]
+        self.dialog = SimpleNamespace(
+            _pm=self.pm, _db=MagicMock(), _config=object(), _selection="HD",
+            _selected_profile=MagicMock(return_value="HD"), _refresh=MagicMock(),
+            _status_lbl=MagicMock(), _detail_text=MagicMock(),
+            _apply_btn=MagicMock(), _rename_btn=MagicMock(), _dup_btn=MagicMock(),
+            _del_btn=MagicMock(), profile_applied=MagicMock(),
+        )
+        self.dialog._db.all.return_value = self.mods
+        for name in ("_profile_preview", "_persist_profiles"):
+            setattr(self.dialog, name, MethodType(getattr(self.dialog_type, name), self.dialog))
+        self.input = SimpleNamespace(getText=MagicMock())
+        self.enterContext(patch.object(sys.modules["PyQt6.QtWidgets"], "QInputDialog", self.input, create=True))
+        self.enterContext(patch.object(
+            widgets.QMessageBox, "StandardButton", SimpleNamespace(Yes=1, No=2), create=True,
+        ))
+        self.question = self.enterContext(patch.object(widgets.QMessageBox, "question", return_value=1))
+        self.critical = self.enterContext(patch.object(widgets.QMessageBox, "critical"))
+        self.warning = self.enterContext(patch.object(widgets.QMessageBox, "warning"))
+
+    def test_preview_deduplicates_missing_ids_and_reports_changes(self):
+        _mods, installed, missing, enable, disable = self.dialog._profile_preview(self.pm.get_profile("HD"))
+        self.assertEqual(installed, {"on"})
+        self.assertEqual(missing, {"missing"})
+        self.assertEqual([m.id for m in enable], ["on"])
+        self.assertEqual([m.id for m in disable], ["off"])
+
+    def test_details_are_plain_text_and_show_scope(self):
+        self.pm.get_profile("HD").description = "<img src='file:///private'>"
+        self.dialog_type._on_selection_changed(self.dialog, 0)
+        text = self.dialog._detail_text.setPlainText.call_args.args[0]
+        self.assertIn("<b>HD pack</b>", text)
+        self.assertIn("<img", text)
+        self.assertIn("1 installed, 1 missing", text)
+        self.assertIn("enable 1, disable 1", text)
+        self.assertIn("Priorities are unchanged", text)
+        self.dialog._detail_text.setHtml.assert_not_called()
+
+    def test_no_selection_disables_actions_and_explains_empty_search(self):
+        self.dialog._selected_profile.return_value = ""
+        self.dialog_type._on_selection_changed(self.dialog, -1)
+        self.dialog._apply_btn.setEnabled.assert_called_with(False)
+        self.assertIn("Clear the search", self.dialog._detail_text.setPlainText.call_args.args[0])
+
+    def test_empty_store_explains_save_action(self):
+        self.dialog._selected_profile.return_value = ""
+        self.pm.delete_profile("HD")
+        self.pm.delete_profile("Vanilla")
+        self.dialog_type._on_selection_changed(self.dialog, -1)
+        self.assertIn("Save Current State", self.dialog._detail_text.setPlainText.call_args.args[0])
+
+    def test_save_failure_keeps_manager_and_disk_unchanged(self):
+        self.pm.save()
+        original = self.pm._path.read_text()
+        with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                saved = self.dialog._persist_profiles(lambda pm: pm.delete_profile("HD"), "", "Deleted")
+        self.assertFalse(saved)
+        self.assertIs(self.dialog._pm, self.pm)
+        self.assertIsNotNone(self.pm.get_profile("HD"))
+        self.assertEqual(self.pm._path.read_text(), original)
+        self.dialog._refresh.assert_not_called()
+        self.critical.assert_called_once()
+
+    def test_successful_mutation_round_trips_and_selects_result(self):
+        self.assertTrue(self.dialog._persist_profiles(
+            lambda pm: pm.rename_profile("HD", "New"), "New", "Renamed",
+        ))
+        from src.core.mod_profile import ModProfileManager
+        loaded = ModProfileManager(str(self.pm._path))
+        self.assertIsNotNone(loaded.get_profile("New"))
+        self.assertIsNotNone(self.pm.get_profile("HD"))
+        self.dialog._refresh.assert_called_once_with("New")
+
+    def test_overwrite_decline_does_not_change_snapshot(self):
+        self.input.getText.return_value = ("HD", True)
+        self.question.return_value = 2
+        self.dialog_type._on_save_as(self.dialog)
+        self.assertEqual(self.pm.get_profile("HD").enabled_mods, ["on", "missing", "on"])
+        self.input.getText.assert_called_once()
+        self.assertFalse(self.pm._path.exists())
+
+    def test_confirmed_overwrite_replaces_states_but_preserves_load_order(self):
+        self.pm.get_profile("HD").set_load_order("SLUS-20062", ["on", "off"])
+        self.input.getText.side_effect = [("HD", True), ("", True)]
+        self.dialog_type._on_save_as(self.dialog)
+        saved = self.dialog._pm.get_profile("HD")
+        self.assertEqual(saved.enabled_mods, ["off"])
+        self.assertEqual(saved.description, "")
+        self.assertEqual(saved.get_load_order("SLUS-20062"), ["on", "off"])
+
+    def test_cancelled_description_does_not_create_profile(self):
+        self.input.getText.side_effect = [("New", True), ("", False)]
+        self.dialog_type._on_save_as(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_profile("New"))
+
+    def test_rename_and_duplicate_reject_collisions(self):
+        for action in ("_on_rename", "_on_duplicate"):
+            with self.subTest(action=action):
+                self.input.getText.return_value = ("Vanilla", True)
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    getattr(self.dialog_type, action)(self.dialog)
+                self.assertEqual(self.dialog._pm.list_profiles(), ["HD", "Vanilla"])
+                self.assertFalse(self.pm._path.exists())
+        self.assertEqual(self.critical.call_count, 2)
+
+    def test_delete_failure_is_recoverable(self):
+        with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                self.dialog_type._on_delete(self.dialog)
+        self.assertIsNotNone(self.dialog._pm.get_profile("HD"))
+        self.critical.assert_called_once()
+
+    def test_apply_uses_normal_disable_then_enable_with_config(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled.return_value = (1, [])
+            self.dialog_type._on_apply(self.dialog)
+        self.assertEqual(
+            manager.return_value.set_enabled.call_args_list,
+            [unittest.mock.call("off", False, self.dialog._config),
+             unittest.mock.call("on", True, self.dialog._config)],
+        )
+        self.assertEqual(self.dialog._pm.get_active_name(), "HD")
+        self.dialog.profile_applied.emit.assert_called_once_with("HD")
+        self.assertIn("1 installed mods enabled; 1 missing", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_apply_cancel_does_not_deploy_or_persist(self):
+        self.question.return_value = 2
+        with patch("src.core.mod_manager.ModManager") as manager:
+            self.dialog_type._on_apply(self.dialog)
+        manager.assert_not_called()
+        self.assertIsNone(self.pm.get_active_name())
+        self.assertFalse(self.pm._path.exists())
+
+    def test_apply_updates_real_texture_files_and_persisted_flags(self):
+        from src.core.mod_manager import ModDatabase
+        from src.models.mod import AppConfig, ModInfo, ModType
+
+        root = Path(self.tmp)
+        source = root / "new"
+        source.mkdir()
+        (source / "new.png").write_bytes(b"new")
+        old = root / "old"
+        old.mkdir()
+        (old / "old.png").write_bytes(b"old")
+        target = root / "textures"
+        target.mkdir()
+        (target / "old.png").write_bytes(b"old")
+        with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"), patch(
+            "src.core.config_manager.ensure_dirs",
+        ):
+            db = ModDatabase()
+            db.add(ModInfo("on", "New", ModType.TEXTURE_PACK, str(source), enabled=False))
+            db.add(ModInfo("off", "Old", ModType.TEXTURE_PACK, str(old), enabled=True))
+            self.dialog._db = db
+            self.dialog._config = AppConfig(textures_path=str(target))
+            self.dialog_type._on_apply(self.dialog)
+            self.assertEqual((target / "new.png").read_bytes(), b"new")
+            self.assertFalse((target / "old.png").exists())
+            reloaded = ModDatabase()
+            self.assertTrue(reloaded.get("on").enabled)
+            self.assertFalse(reloaded.get("off").enabled)
+        self.warning.assert_not_called()
+
+    def test_apply_without_config_explicitly_uses_database_only(self):
+        self.dialog._config = None
+        self.dialog_type._on_selection_changed(self.dialog, 0)
+        self.assertIn("database flags only", self.dialog._detail_text.setPlainText.call_args.args[0])
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled.return_value = (0, [])
+            self.dialog_type._on_apply(self.dialog)
+        self.assertEqual(manager.return_value.set_enabled.call_args.args, ("on", True, None))
+        self.assertIn("Database flags only", self.question.call_args.args[2])
+
+    def test_apply_reports_deployment_warnings(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled.return_value = (0, ["No target configured"])
+            self.dialog_type._on_apply(self.dialog)
+        self.warning.assert_called_once()
+        self.assertEqual(self.warning.call_args.args[-1], "No target configured")
+        self.assertIn("deployment warnings", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_partial_apply_refreshes_without_marking_active(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled.side_effect = [(1, []), OSError("denied")]
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                self.dialog_type._on_apply(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_active_name())
+        self.dialog._refresh.assert_called_once_with("HD")
+        self.dialog.profile_applied.emit.assert_called_once()
+        self.assertIn("Some mods may have changed", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_apply_metadata_failure_still_refreshes_mod_state(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled.return_value = (1, [])
+            with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    self.dialog_type._on_apply(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_active_name())
+        self.dialog.profile_applied.emit.assert_called_once()
+        self.dialog._refresh.assert_called_once_with("HD")
+        self.assertIn("last-used profile could not be saved", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_search_matches_description_and_restores_hidden_selection(self):
+        self.dialog._selection = "Vanilla"
+        self.dialog._search_edit = MagicMock()
+        self.dialog._count_lbl = MagicMock()
+        self.dialog._profile_list = MagicMock()
+        self.dialog._on_selection_changed = MagicMock()
+        self.dialog._search_edit.text.return_value = "graphics"
+        self.enterContext(patch.object(self.widgets, "QListWidgetItem", side_effect=lambda text: MagicMock()))
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._profile_list.setCurrentRow.assert_called_with(0)
+        self.dialog._count_lbl.setText.assert_called_with("Showing 1 of 2 profiles")
+        self.dialog._search_edit.text.return_value = "nothing"
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._count_lbl.setText.assert_called_with("Showing 0 of 2 profiles")
+        self.assertEqual(self.dialog._selection, "Vanilla")
+        self.dialog._search_edit.text.return_value = ""
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._profile_list.setCurrentRow.assert_called_with(1)
+
+
 class TestWave53TextureOverwriteConflicts(unittest.TestCase):
     """Wave 53: resolve_texture_overwrite_conflicts."""
 

@@ -1388,4 +1388,4 @@ class LibraryPanel(BasePanel):
     def _on_profile_applied(self, name: str):
         """Refresh the library after a profile is applied."""
         self.refresh()
-        self.emit_status(f"Profile '{name}' applied")
+        self.emit_status(f"Profile '{name}' processed — check the dialog for deployment details")
