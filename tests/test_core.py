@@ -7978,6 +7978,28 @@ class TestMainWindowNavigationState(unittest.TestCase):
         self.assertEqual(panel.config.ui_state["main_window"]["selected_nav_index"], 1)
         save_mock.assert_called_once_with(panel.config)
 
+    def test_selected_nav_index_from_state_logs_and_clamps_invalid_values(self):
+        main_window = self._import_main_window()
+
+        with self.assertLogs("src.ui.main_window", level="WARNING") as logs:
+            self.assertEqual(
+                main_window._selected_nav_index_from_state(
+                    {"selected_nav_index": "oops"},
+                    3,
+                ),
+                0,
+            )
+            self.assertEqual(
+                main_window._selected_nav_index_from_state(
+                    {"selected_nav_index": 99},
+                    3,
+                ),
+                2,
+            )
+
+        self.assertTrue(any("invalid" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("no longer available" in msg for msg in logs.output), logs.output)
+
 
 class TestMemoryCardPanelStatePersistence(unittest.TestCase):
     """Tests for memory-card panel last-path persistence."""

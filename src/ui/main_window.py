@@ -55,6 +55,29 @@ def _save_main_window_config(config: AppConfig, context: str) -> None:
         logger.warning("Could not save main window config after %s: %s", context, exc)
 
 
+def _selected_nav_index_from_state(state: dict, nav_count: int) -> int:
+    """Return a safe nav index from saved state."""
+    raw_index = state.get("selected_nav_index", 0)
+    try:
+        selected = int(raw_index or 0)
+    except (TypeError, ValueError):
+        logger.warning(
+            "Saved main window panel index %r is invalid; using the first panel",
+            raw_index,
+        )
+        return 0
+    if nav_count <= 0:
+        return 0
+    clamped = max(0, min(selected, nav_count - 1))
+    if clamped != selected:
+        logger.warning(
+            "Saved main window panel index %r is no longer available; using %d",
+            raw_index,
+            clamped,
+        )
+    return clamped
+
+
 # ---------------------------------------------------------------------------
 # Sidebar navigation button
 # ---------------------------------------------------------------------------
@@ -265,11 +288,8 @@ class MainWindow(QMainWindow):
 
         # Activate first nav button
         state = _main_window_state(self.config)
-        try:
-            initial_index = int(state.get("selected_nav_index", 0) or 0)
-        except (TypeError, ValueError):
-            initial_index = 0
-        self._activate_nav(max(0, min(initial_index, len(self._nav_buttons) - 1)), persist=False)
+        initial_index = _selected_nav_index_from_state(state, len(self._nav_buttons))
+        self._activate_nav(initial_index, persist=False)
 
     # ------------------------------------------------------------------
     # Navigation
