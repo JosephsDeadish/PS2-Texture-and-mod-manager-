@@ -32,8 +32,12 @@ from PyQt6.QtWidgets import (
 
 from src.core.config_manager import save_config
 from src.core.game_library import GameEntry, scan_library
-from src.core.game_registry import lookup_game_title, serial_matches_query
+from src.core.game_registry import lookup_game_title
 from src.core.mod_manager import ModDatabase, ModManager
+from src.core.mod_search import (
+    MOD_SEARCH_HELP, MOD_SEARCH_HINT, compile_mod_query,
+    mod_matches_query as _mod_matches_query,
+)
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
 
@@ -94,61 +98,6 @@ def _save_library_config(config: AppConfig, context: str) -> None:
         save_config(config)
     except Exception as exc:
         logger.warning("Could not save library panel config after %s: %s", context, exc)
-
-
-def _mod_matches_query(mod: ModInfo, query: object) -> bool:
-    """Return True when *mod* matches the All Mods search query."""
-    if not isinstance(query, str):
-        return False
-
-    needle = query.strip().casefold()
-    if not needle:
-        return True
-
-    compact = "".join(ch for ch in needle if ch.isalnum())
-
-    def _matches_text(value: object) -> bool:
-        if not isinstance(value, str):
-            return False
-        lowered = value.casefold()
-        if needle in lowered:
-            return True
-        if compact:
-            value_compact = "".join(ch for ch in lowered if ch.isalnum())
-            if compact in value_compact:
-                return True
-        return False
-
-    game_title = lookup_game_title(mod.game_id) if mod.game_id else ""
-    for value in (
-        mod.id,
-        mod.name,
-        mod.game_id,
-        game_title,
-        mod.author,
-        mod.description,
-        mod.version,
-        mod.source_url,
-        mod.thumbnail_url,
-        mod.thumbnail_path,
-        mod.path,
-        getattr(mod.mod_type, "value", ""),
-    ):
-        if _matches_text(value):
-            return True
-
-    tags = getattr(mod, "tags", [])
-    if isinstance(tags, list) and any(_matches_text(tag) for tag in tags if isinstance(tag, str)):
-        return True
-
-    files = getattr(mod, "files", [])
-    if isinstance(files, list) and any(_matches_text(rel_path) for rel_path in files if isinstance(rel_path, str)):
-        return True
-
-    if serial_matches_query(mod.game_id, query):
-        return True
-
-    return False
 
 
 # ---------------------------------------------------------------------------
@@ -672,6 +621,8 @@ class _AllModsPane(QWidget):
             "Search by name, game title, serial, author, tag, file, or source URL…"
         )
         self._search_edit.setClearButtonEnabled(True)
+        self._search_edit.setAccessibleName("Search all installed mods")
+        self._search_edit.setToolTip(MOD_SEARCH_HELP)
         self._search_edit.textChanged.connect(self._apply_filter)
         filter_bar.addWidget(self._search_edit, 1)
 
@@ -698,10 +649,22 @@ class _AllModsPane(QWidget):
         filter_bar.addWidget(self._status_combo)
 
         layout.addLayout(filter_bar)
+        help_row = QHBoxLayout()
+        hint = QLabel(MOD_SEARCH_HINT)
+        hint.setWordWrap(True)
+        hint.setToolTip(MOD_SEARCH_HELP)
+        help_row.addWidget(hint, 1)
+        self._clear_filters_btn = QPushButton("Clear Filters")
+        self._clear_filters_btn.clicked.connect(self._clear_filters)
+        help_row.addWidget(self._clear_filters_btn)
+        layout.addLayout(help_row)
 
         self._count_lbl = QLabel("")
         self._count_lbl.setStyleSheet("color: #606080; font-size: 11px;")
         layout.addWidget(self._count_lbl)
+        self._empty_lbl = QLabel()
+        self._empty_lbl.setWordWrap(True)
+        layout.addWidget(self._empty_lbl)
 
         # ── Scrollable mod list ──────────────────────────────────────
         scroll = QScrollArea()
@@ -806,6 +769,7 @@ class _AllModsPane(QWidget):
     # ------------------------------------------------------------------
     def _apply_filter(self):
         needle = self._search_edit.text().strip()
+        search = compile_mod_query(needle)
         type_filter = self._type_combo.currentData() or ""
         status_filter = self._status_combo.currentData() or "all"
 
@@ -814,7 +778,7 @@ class _AllModsPane(QWidget):
             mod = row.mod
 
             # Rich metadata search across local mod and game fields
-            if needle and not _mod_matches_query(mod, needle):
+            if not search.matches(mod):
                 row.setVisible(False)
                 continue
 
@@ -839,7 +803,24 @@ class _AllModsPane(QWidget):
             f"Showing {shown} of {total} tracked mod(s) in library"
             + (" — no mods installed yet" if total == 0 else "")
         )
+        self._empty_lbl.setText(
+            "No mods match these filters. Use Clear Filters to show all installed mods."
+            if total else "No installed mods yet. Import mods from a content panel or Browse."
+        )
+        self._empty_lbl.setVisible(shown == 0)
         self._save_filter_state("updating all-mods filters")
+
+    def _clear_filters(self):
+        for widget in (self._search_edit, self._type_combo, self._status_combo):
+            _block_signals(widget, True)
+        try:
+            self._search_edit.clear()
+            self._type_combo.setCurrentIndex(0)
+            self._status_combo.setCurrentIndex(0)
+        finally:
+            for widget in (self._search_edit, self._type_combo, self._status_combo):
+                _block_signals(widget, False)
+        self._apply_filter()
 
 
 # ---------------------------------------------------------------------------

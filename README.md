@@ -56,6 +56,13 @@
 - Metadata and explicitly fetched thumbnails save together; failures keep the draft open for retry, and Save never waits for a network request
 - GameTDB thumbnail fetching runs in the background and discards results after a Game ID change, Revert, or dialog close
 
+### 🔎 Installed-Mod Search
+- Mod panels and **Library → View All Mods** share search across names, game titles/aliases, authors, descriptions, tags, files, paths, versions, and source links
+- All words must match, even across different fields; use double quotes for a phrase, or `-demo` to exclude a term
+- Narrow a field with `name:`, `author:`, `game:`, `serial:`, `tag:`, `file:`, `source:`, `path:`, `description:`, `version:`, `type:`, or `id:` — for example, `game:"GTA III" tag:hd -author:Demo`
+- Searches ignore case and punctuation, compose with existing dropdown filters, and remain saved with the panel; **Clear Filters** recovers empty results
+- Search changes only what is shown; **Enable All** and **Disable All** still affect every mod in their panel
+
 ### 🖼️ Cover Art Manager
 - Store and deploy cover art for PCSX2's game browser
 - Cover art is automatically renamed to `{SERIAL}.png` (e.g. `SLUS-20062.png`) on deploy — the exact format PCSX2 expects

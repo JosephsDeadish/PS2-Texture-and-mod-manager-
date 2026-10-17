@@ -1672,6 +1672,258 @@ class TestUpdateMetadata(unittest.TestCase):
         self.assertEqual(type(db)().get("m").thumbnail_path, "/cache/art.png")
 
 
+class TestInstalledModSearch(unittest.TestCase):
+    """Structured search is shared, local, and independent of Qt."""
+
+    def setUp(self):
+        from src.core.mod_search import compile_mod_query, mod_matches_query
+        self.compile = compile_mod_query
+        self.matches = mod_matches_query
+        self.mod = ModInfo(
+            "pack-123", "High-Res UI", ModType.TEXTURE_PACK, r"C:\Mods\High Res",
+            author="Alice Example", description="Improves the menu and HUD",
+            game_id="SLUS-20062", version="1.2.3",
+            source_url="https://github.com/example/high-res",
+            thumbnail_url="https://images.example/preview.jpg",
+            thumbnail_path="/covers/local-preview.png",
+            tags=["HD", "4k"], files=["textures/hero.dds", "readme.txt"],
+        )
+
+    def test_blank_and_non_string_queries_keep_existing_semantics(self):
+        for query in ("", " \n ", '""'):
+            self.assertTrue(self.matches(self.mod, query))
+        for query in (None, 0, ["hd"], {}):
+            self.assertFalse(self.matches(self.mod, query))
+
+    def test_all_words_may_match_different_fields(self):
+        self.assertTrue(self.matches(self.mod, "alice hd hero.dds 1.2"))
+        self.assertFalse(self.matches(self.mod, "alice hd missing"))
+
+    def test_phrases_stay_within_one_metadata_value(self):
+        self.assertTrue(self.matches(self.mod, '"high res"'))
+        self.assertTrue(self.matches(self.mod, 'author:"alice example"'))
+        self.assertFalse(self.matches(self.mod, '"alice hd"'))
+        self.assertFalse(self.matches(self.mod, 'author:"example alice"'))
+
+    def test_unfinished_quote_is_a_phrase_without_error(self):
+        self.assertTrue(self.matches(self.mod, 'name:"high res'))
+        self.assertTrue(self.matches(self.mod, '"high res'))
+        self.assertFalse(self.matches(self.mod, '"high missing'))
+
+    def test_field_filters_do_not_leak_into_other_fields(self):
+        self.assertTrue(self.matches(self.mod, "author:alice tag:hd file:hero.dds"))
+        self.assertFalse(self.matches(self.mod, "name:alice"))
+        self.assertFalse(self.matches(self.mod, "tag:alice"))
+        self.assertFalse(self.matches(self.mod, "author:hd"))
+        self.assertFalse(self.matches(self.mod, "source:preview.jpg"))
+
+    def test_all_supported_fields_and_aliases(self):
+        for query in (
+            "id:pack123", "name:highres", "author:ALICE", "serial:slus_20062",
+            "tag:4k", "tags:hd", "file:hero.dds", "files:readme", "source:github",
+            "url:github", 'path:"high res"', "description:menu", "desc:hud",
+            "version:1.2", "type:texture_pack",
+        ):
+            with self.subTest(query=query):
+                self.assertTrue(self.matches(self.mod, query))
+
+    def test_exclusions_and_negative_only_queries(self):
+        self.assertTrue(self.matches(self.mod, "hd -demo -author:bob"))
+        self.assertFalse(self.matches(self.mod, "hd -author:alice"))
+        self.assertFalse(self.matches(self.mod, "-file:hero.dds"))
+        self.assertTrue(self.matches(self.mod, "-demo"))
+        self.assertFalse(self.matches(self.mod, '-"high res"'))
+
+    def test_quoted_operators_are_literals_not_filters(self):
+        self.mod.description = "A -demo label and author:Alice text"
+        self.assertTrue(self.matches(self.mod, '"-demo" "author:Alice"'))
+        self.assertFalse(self.matches(self.mod, '-"author:Alice"'))
+        self.assertTrue(self.matches(self.mod, "author:alice"))
+
+    def test_unknown_fields_and_empty_scopes_are_not_silently_ignored(self):
+        self.assertFalse(self.matches(self.mod, "unknown:hd"))
+        self.assertFalse(self.matches(self.mod, "author:"))
+        self.mod.description += " unknown:hd author:"
+        self.assertTrue(self.matches(self.mod, "unknown:hd author:"))
+
+    def test_urls_and_windows_paths_remain_literal(self):
+        self.assertTrue(self.matches(self.mod, "https://github.com/example/high-res"))
+        self.assertTrue(self.matches(self.mod, r'"C:\Mods\High Res"'))
+        self.assertTrue(self.matches(self.mod, r'path:"C:\Mods\High Res"'))
+        self.assertFalse(self.matches(self.mod, r'path:"C:\Other Mods"'))
+
+    def test_apostrophes_are_not_quote_delimiters(self):
+        self.mod.name = "Dante's Awakening"
+        self.assertTrue(self.matches(self.mod, "dante's"))
+        self.assertTrue(self.matches(self.mod, '"dantes awakening"'))
+
+    def test_casefold_and_punctuation_matching(self):
+        self.mod.name = "Straße: HD — Edition"
+        self.assertTrue(self.matches(self.mod, 'name:"STRASSE HD"'))
+        self.assertTrue(self.matches(self.mod, "serial:SLUS20062"))
+        self.assertTrue(self.matches(self.mod, "file:hero_dds"))
+
+    def test_game_titles_aliases_and_serial_fragments(self):
+        self.assertTrue(self.matches(self.mod, "gta iii hd"))
+        self.assertTrue(self.matches(self.mod, 'game:"Grand Theft Auto III"'))
+        self.assertTrue(self.matches(self.mod, 'game:"GTA III" tag:hd'))
+        self.assertTrue(self.matches(self.mod, "serial:20062"))
+        self.assertFalse(self.matches(self.mod, 'serial:"GTA III"'))
+        self.assertFalse(self.matches(self.mod, 'hd -game:"GTA III"'))
+
+    def test_no_serial_and_optional_malformed_lists_are_safe(self):
+        self.mod.game_id = ""
+        self.mod.tags = None
+        self.mod.files = [None, 12, "hero.dds"]
+        self.assertTrue(self.matches(self.mod, "high file:hero"))
+        self.assertFalse(self.matches(self.mod, "tag:hd"))
+        self.assertFalse(self.matches(self.mod, "game:gta"))
+        self.mod.files = "hero.dds"
+        self.assertFalse(self.matches(self.mod, "file:hero"))
+
+    def test_reused_compiled_query_reflects_metadata_changes_and_different_mods(self):
+        query = self.compile("author:alice file:new.dds")
+        self.assertFalse(query.matches(self.mod))
+        self.mod.files.append("new.dds")
+        self.assertTrue(query.matches(self.mod))
+        other = ModInfo("other", "Other", ModType.CHEAT, "/p", author="Bob", files=["new.dds"])
+        self.assertFalse(query.matches(other))
+        self.mod.author = "Bob"
+        self.assertFalse(query.matches(self.mod))
+
+    def test_scoped_queries_skip_title_lookup_and_unneeded_files(self):
+        with patch("src.core.mod_search.lookup_game_title") as lookup, patch(
+            "src.core.mod_search.serial_matches_query",
+        ) as alias:
+            self.assertTrue(self.matches(self.mod, "author:alice"))
+        lookup.assert_not_called()
+        alias.assert_not_called()
+
+    def test_title_alias_match_does_not_scan_large_file_list(self):
+        class UnneededFile(str):
+            def casefold(self):
+                raise AssertionError("Should not scan filenames after an alias match")
+        self.mod.files = [UnneededFile("many_files.dds")]
+        with patch("src.core.mod_search.serial_matches_query", return_value=True):
+            self.assertTrue(self.matches(self.mod, "game-alias"))
+
+    def test_whitespace_and_field_case_are_flexible(self):
+        self.assertTrue(self.matches(self.mod, '  AUTHOR:"Alice Example" \n TAG:HD\t-Tag:demo  '))
+
+
+class TestInstalledSearchPanels(unittest.TestCase):
+    """Both installed-mod views use the same query and compose existing filters."""
+
+    def setUp(self):
+        self.mods = [
+            ModInfo("a", "Pack Alpha", ModType.TEXTURE_PACK, "/a", author="Alice", tags=["HD"],
+                    game_id="SLUS-20062", enabled=True),
+            ModInfo("b", "Pack Demo", ModType.TEXTURE_PACK, "/b", author="Alice", tags=["HD"],
+                    game_id="SLUS-20062", enabled=False),
+            ModInfo("c", "Patch", ModType.PNACH, "/c", author="Bob", tags=["HD"], enabled=True),
+        ]
+
+    def _all_mods_pane(self):
+        from types import MethodType, SimpleNamespace
+        module = TestLibraryPanelStatePersistence()._import_library_panel()
+        pane = SimpleNamespace(
+            _search_edit=MagicMock(), _type_combo=MagicMock(), _status_combo=MagicMock(),
+            _rows=[SimpleNamespace(mod=mod, setVisible=MagicMock()) for mod in self.mods],
+            _count_lbl=MagicMock(), _empty_lbl=MagicMock(), _save_filter_state=MagicMock(),
+        )
+        pane._search_edit.text.return_value = ""
+        pane._search_edit.clear.side_effect = lambda: setattr(pane._search_edit.text, "return_value", "")
+        pane._type_combo.currentData.return_value = ""
+        pane._status_combo.currentData.return_value = "all"
+        for combo, value in ((pane._type_combo, ""), (pane._status_combo, "all")):
+            combo.setCurrentIndex.side_effect = lambda index, combo=combo, value=value: setattr(
+                combo.currentData, "return_value", value,
+            )
+        pane._apply_filter = MethodType(module._AllModsPane._apply_filter, pane)
+        return module, pane
+
+    def test_both_helpers_share_one_implementation(self):
+        from src.core.mod_search import mod_matches_query
+        mod_module = TestModPanelEmptyState()._import_mod_panel()
+        library_module = TestLibraryPanelStatePersistence()._import_library_panel()
+        self.assertIs(mod_module._mod_matches_query, mod_matches_query)
+        self.assertIs(library_module._mod_matches_query, mod_matches_query)
+
+    def test_mod_search_compiles_once_and_composes_existing_filters(self):
+        helper = TestModPanelEmptyState()
+        module = helper._import_mod_panel()
+        panel = helper._make_filter_panel(module, self.mods)
+        panel._search.text.return_value = 'author:Alice tag:hd -name:Demo'
+        panel._author_filter.currentData.return_value = "Alice"
+        panel._library_filter_check.isChecked.return_value = True
+        panel._status_filter.currentData.return_value = "enabled"
+        with patch.object(module, "compile_mod_query", wraps=module.compile_mod_query) as compile_query, patch.object(
+            module, "ModItemWidget",
+        ) as row:
+            panel._apply_filter()
+        compile_query.assert_called_once_with('author:Alice tag:hd -name:Demo')
+        self.assertEqual([call.args[0].id for call in row.call_args_list], ["a"])
+        self.assertIn("Showing 1 of 3", panel._count_lbl.setText.call_args.args[0])
+        self.assertEqual([mod.enabled for mod in self.mods], [True, False, True])
+
+    def test_all_mods_query_compiles_once_and_combines_type_and_status(self):
+        module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = 'game:"GTA III" tag:hd'
+        pane._type_combo.currentData.return_value = "texture_pack"
+        pane._status_combo.currentData.return_value = "disabled"
+        with patch.object(module, "compile_mod_query", wraps=module.compile_mod_query) as compile_query:
+            pane._apply_filter()
+        compile_query.assert_called_once_with('game:"GTA III" tag:hd')
+        self.assertEqual([row.setVisible.call_args.args[0] for row in pane._rows], [False, True, False])
+        pane._empty_lbl.setVisible.assert_called_once_with(False)
+        self.assertIn("Showing 1 of 3", pane._count_lbl.setText.call_args.args[0])
+
+    def test_empty_library_search_explains_recovery(self):
+        _module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = "author:nobody"
+        pane._apply_filter()
+        pane._empty_lbl.setVisible.assert_called_once_with(True)
+        self.assertIn("Clear Filters", pane._empty_lbl.setText.call_args.args[0])
+        self.assertIn("Showing 0 of 3", pane._count_lbl.setText.call_args.args[0])
+
+    def test_clear_library_filters_resets_every_filter_and_saves_once(self):
+        module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = "author:nobody"
+        pane._type_combo.currentData.return_value = "cheat"
+        pane._status_combo.currentData.return_value = "disabled"
+        module._AllModsPane._clear_filters(pane)
+        self.assertEqual(pane._search_edit.text(), "")
+        self.assertEqual(pane._type_combo.currentData(), "")
+        self.assertEqual(pane._status_combo.currentData(), "all")
+        pane._save_filter_state.assert_called_once_with("updating all-mods filters")
+        pane._empty_lbl.setVisible.assert_called_with(False)
+        for row in pane._rows:
+            row.setVisible.assert_called_once_with(True)
+        for widget in (pane._search_edit, pane._type_combo, pane._status_combo):
+            self.assertEqual(widget.blockSignals.call_args_list, [unittest.mock.call(True), unittest.mock.call(False)])
+
+    def test_empty_database_explains_where_to_import(self):
+        _module, pane = self._all_mods_pane()
+        pane._rows = []
+        pane._apply_filter()
+        pane._empty_lbl.setVisible.assert_called_once_with(True)
+        self.assertIn("Import", pane._empty_lbl.setText.call_args.args[0])
+        self.assertNotIn("Clear Filters", pane._empty_lbl.setText.call_args.args[0])
+
+    def test_structured_query_persists_without_rewriting_quotes_or_case(self):
+        module, pane = self._all_mods_pane()
+        query = 'author:"Alice Example" -tag:Demo file:hero.dds'
+        pane._search_edit.text.return_value = query
+        pane.config = AppConfig()
+        pane._state_persistence_enabled = True
+        pane._state_bucket = lambda: module._AllModsPane._state_bucket(pane)
+        pane.current_filter_state = lambda: module._AllModsPane.current_filter_state(pane)
+        with patch.object(module, "_save_library_config") as save:
+            module._AllModsPane._save_filter_state(pane, "searching")
+        self.assertEqual(pane.config.ui_state["library_panel"]["all_mods"]["search"], query)
+        save.assert_called_once_with(pane.config, "searching")
+
+
 class TestMemoryCardWrite(unittest.TestCase):
     """Tests for the new memory card write / backup / copy features."""
 

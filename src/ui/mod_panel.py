@@ -21,8 +21,11 @@ from PyQt6.QtWidgets import (
 )
 
 from src.core.config_manager import save_config
-from src.core.game_registry import serial_matches_query
 from src.core.mod_manager import ModDatabase, ModManager
+from src.core.mod_search import (
+    MOD_SEARCH_HELP, MOD_SEARCH_HINT, compile_mod_query,
+    mod_matches_query as _mod_matches_query,
+)
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
 from src.ui.import_dialog import EditModDialog, ImportModDialog
@@ -156,55 +159,6 @@ def _save_mod_panel_config(config: AppConfig, context: str) -> None:
         logger.warning("Could not save mod panel config after %s: %s", context, exc)
 
 
-def _mod_matches_query(mod: ModInfo, query: object) -> bool:
-    """Return True when *mod* matches the free-text search query."""
-    if not isinstance(query, str):
-        return False
-
-    needle = query.strip().casefold()
-    if not needle:
-        return True
-
-    compact = "".join(ch for ch in needle if ch.isalnum())
-
-    def _matches_text(value: object) -> bool:
-        if not isinstance(value, str):
-            return False
-        lowered = value.casefold()
-        if needle in lowered:
-            return True
-        if compact:
-            value_compact = "".join(ch for ch in lowered if ch.isalnum())
-            if compact in value_compact:
-                return True
-        return False
-
-    for value in (
-        mod.id,
-        mod.name,
-        mod.author,
-        mod.description,
-        mod.game_id,
-        mod.version,
-        mod.source_url,
-        mod.thumbnail_url,
-        mod.path,
-        getattr(mod.mod_type, "value", ""),
-    ):
-        if _matches_text(value):
-            return True
-
-    if any(_matches_text(tag) for tag in getattr(mod, "tags", []) if isinstance(tag, str)):
-        return True
-    if any(_matches_text(rel_path) for rel_path in getattr(mod, "files", []) if isinstance(rel_path, str)):
-        return True
-
-    if serial_matches_query(mod.game_id, query):
-        return True
-
-    return False
-
-
 class ModPanel(BasePanel):
     """
     Unified panel for managing mods of a specific type.
@@ -261,7 +215,10 @@ class ModPanel(BasePanel):
 
         # Search
         self._search = QLineEdit()
-        self._search.setPlaceholderText("🔍  Search…")
+        self._search.setPlaceholderText("Search mods, games, authors, tags, or files…")
+        self._search.setAccessibleName("Search installed mods")
+        self._search.setClearButtonEnabled(True)
+        self._search.setToolTip(MOD_SEARCH_HELP)
         self._search.setObjectName("search_bar")
         self._search.textChanged.connect(self._apply_filter)
         toolbar.addWidget(self._search, 1)
@@ -301,6 +258,10 @@ class ModPanel(BasePanel):
             toolbar.addWidget(builder_btn)
 
         content.addLayout(toolbar)
+        search_hint = QLabel(MOD_SEARCH_HINT)
+        search_hint.setWordWrap(True)
+        search_hint.setToolTip(MOD_SEARCH_HELP)
+        content.addWidget(search_hint)
 
         # ---- Author + library filter row ----
         author_row = QHBoxLayout()
@@ -672,7 +633,7 @@ class ModPanel(BasePanel):
         _save_mod_panel_config(self.config, context)
 
     def _apply_filter(self):
-        query = self._search.text().lower()
+        query = self._search.text()
         author_filter = self._author_filter.currentData() or ""
         library_only = self._library_filter_check.isChecked()
         all_mods = self._all_mods()
@@ -681,7 +642,8 @@ class ModPanel(BasePanel):
         sort_idx = self._sort_combo.currentIndex()
 
         if query:
-            mods = [m for m in mods if _mod_matches_query(m, query)]
+            search = compile_mod_query(query)
+            mods = [m for m in mods if search.matches(m)]
 
         if author_filter:
             mods = [m for m in mods if m.author == author_filter]
