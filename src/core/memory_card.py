@@ -184,7 +184,7 @@ def export_save(
             f.write(chunk)
 
         return str(out_path)
-    except OSError as exc:
+    except (OSError, RuntimeError) as exc:
         logger.warning(
             "Failed to export save %r from memory card %s to %s: %s",
             save_name,

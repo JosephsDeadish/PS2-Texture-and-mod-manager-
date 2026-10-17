@@ -702,6 +702,18 @@ class TestMemoryCard(unittest.TestCase):
         self.assertTrue(output.is_symlink())
         self.assertFalse(target.exists())
 
+    def test_export_save_cyclic_symlink_is_a_recoverable_export_error(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.symlink_to(output.name)
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertTrue(output.is_symlink())
+        self.assertEqual(card.read_bytes(), b"SAVE")
+
     def test_export_save_never_overwrites_source_or_hardlink(self):
         from src.core.memory_card import export_save, MemoryCardError
         card = Path(self.tmpdir) / "SAVE.bin"
