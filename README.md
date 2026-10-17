@@ -55,6 +55,8 @@
 - **Import** a save dump back into a memory card
 - **Copy** a save between memory card images
 - **Backup** any card with a timestamped copy
+- Search save names and directory IDs, with saved sorting and selection preserved across filters
+- Clear empty-state actions and selection-aware controls; browsed cards survive refresh and new cards open automatically
 
 ### ⚡ Cheats Manager
 - Manage widescreen and other `.pnach`-format cheat files

@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QInputDialog,
     QLabel,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
     QMessageBox,
@@ -35,9 +36,23 @@ from src.core.memory_card import (
 from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
-from src.ui.widgets import EmptyStateWidget
 
 logger = logging.getLogger(__name__)
+
+_SAVE_SORTS = ("Card order", "Name (A–Z)", "Largest first")
+
+
+def _filter_saves(saves, query, sort):
+    terms = query.casefold().split()
+    matches = [
+        save for save in saves
+        if all(term in f"{save.name} {save.dir_name}".casefold() for term in terms)
+    ]
+    if sort == "Name (A–Z)":
+        matches.sort(key=lambda save: save.name.casefold())
+    elif sort == "Largest first":
+        matches.sort(key=lambda save: save.size_bytes, reverse=True)
+    return matches
 
 
 class MemoryCardPanel(BasePanel):
@@ -47,6 +62,13 @@ class MemoryCardPanel(BasePanel):
         super().__init__("💾  Memory Cards", "Manage PS2 save files and memory cards", parent=parent)
         self.config = config
         self._current_card: str = ""
+        self._all_saves = []
+        self._card_exists = False
+        self._card_valid = False
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(200)
+        self._filter_timer.timeout.connect(self._on_save_filter_changed)
         self._build()
 
     def _last_paths_bucket(self) -> dict:
@@ -183,6 +205,13 @@ class MemoryCardPanel(BasePanel):
             return
 
         idx = self._card_combo.findData(selected)
+        if idx < 0 and isinstance(selected, str):
+            try:
+                if Path(selected).is_file():
+                    self._card_combo.addItem(Path(selected).name, selected)
+                    idx = self._card_combo.findData(selected)
+            except OSError as exc:
+                logger.warning("Could not inspect saved memory card %s: %s", selected, exc)
         if idx >= 0:
             self._card_combo.setCurrentIndex(idx)
             self._current_card = selected
@@ -226,12 +255,98 @@ class MemoryCardPanel(BasePanel):
                 self._save_selection_syncing = False
             return
 
+        if any(save.dir_name == save_name for save in self._all_saves):
+            return  # Filtering temporarily hides the selected save.
         logger.warning(
             "Saved memory card save %r for %r is no longer available; clearing selection",
             save_name,
             self._current_card,
         )
         self._clear_selected_save_state("clearing missing memory card save selection")
+
+    def _update_save_actions(self):
+        item = self._saves_list.currentItem()
+        selected = bool(item and item.data(Qt.ItemDataRole.UserRole))
+        self._export_btn.setEnabled(self._card_valid and selected)
+        self._copy_btn.setEnabled(self._card_valid and selected)
+        self._import_btn.setEnabled(self._card_valid)
+        self._export_all_btn.setEnabled(self._card_valid and bool(self._all_saves))
+        self._backup_btn.setEnabled(self._card_exists)
+
+    def _show_saves_empty(self, message, action, label):
+        self._saves_empty_message.setText(message)
+        self._empty_action = action
+        self._saves_empty_action.setText(label)
+        self._set_saves_placeholder_visible(True)
+
+    def _on_empty_action(self):
+        {
+            "browse": self._browse_card,
+            "import": self._import_save,
+            "refresh": self._load_saves,
+            "clear": self._clear_save_search,
+        }[self._empty_action]()
+
+    def _clear_save_search(self):
+        self._search_edit.blockSignals(True)
+        self._search_edit.clear()
+        self._search_edit.blockSignals(False)
+        self._on_save_filter_changed()
+
+    def _restore_save_filters(self):
+        bucket = self._panel_state_bucket()
+        query = bucket.get("query", "")
+        sort = bucket.get("sort", _SAVE_SORTS[0])
+        self._search_edit.setText(query if isinstance(query, str) else "")
+        self._sort_combo.setCurrentIndex(_SAVE_SORTS.index(sort) if sort in _SAVE_SORTS else 0)
+
+    def _on_save_filter_changed(self, *_args):
+        self._filter_timer.stop()
+        self._panel_state_bucket().update({
+            "query": self._search_edit.text().strip(),
+            "sort": self._sort_combo.currentText(),
+        })
+        try:
+            save_config(self.config)
+        except Exception as exc:
+            logger.warning("Could not save memory card search settings: %s", exc)
+        if self._card_valid:
+            self._apply_save_filters()
+
+    def hideEvent(self, event):
+        if self._filter_timer.isActive():
+            self._on_save_filter_changed()
+        super().hideEvent(event)
+
+    def _apply_save_filters(self):
+        self._saves_loading = True
+        try:
+            self._saves_list.clear()
+            saves = _filter_saves(
+                self._all_saves, self._search_edit.text(), self._sort_combo.currentText(),
+            )
+            total = len(self._all_saves)
+            self._saves_summary.setText(
+                f"Showing {len(saves)} of {total} saves · "
+                f"{sum(save.size_bytes for save in self._all_saves):,} bytes listed"
+            )
+            if not self._all_saves:
+                self._show_saves_empty("No saves found on this card.", "import", "Import Save")
+            elif not saves:
+                self._show_saves_empty("No saves match your search.", "clear", "Clear Search")
+            else:
+                self._set_saves_placeholder_visible(False)
+                for save in saves:
+                    item = QListWidgetItem(
+                        f"💾  {save.name}\n{save.dir_name} · {save.size_bytes:,} bytes"
+                    )
+                    item.setData(Qt.ItemDataRole.UserRole, save.dir_name)
+                    item.setToolTip(f"{save.dir_name}\nSize: {save.size_bytes:,} bytes")
+                    self._saves_list.addItem(item)
+            self._restore_selected_save()
+        finally:
+            self._saves_loading = False
+            self._update_save_actions()
 
     def _build(self):
         content = self._content_layout
@@ -246,7 +361,9 @@ class MemoryCardPanel(BasePanel):
             self._card_combo.sizePolicy().horizontalPolicy(),
             self._card_combo.sizePolicy().verticalPolicy()
         )
-        self._card_combo.setMinimumWidth(300)
+        self._card_combo.setMinimumWidth(180)
+        self._card_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        self._card_combo.setMinimumContentsLength(16)
         self._card_combo.currentIndexChanged.connect(self._on_card_selected)
         card_row.addWidget(self._card_combo, 1)
 
@@ -258,13 +375,18 @@ class MemoryCardPanel(BasePanel):
         browse_btn.clicked.connect(self._browse_card)
         card_row.addWidget(browse_btn)
 
+        content.addLayout(card_row)
+        card_actions = QHBoxLayout()
         new_btn = QPushButton("➕ New Card")
         new_btn.setToolTip("Create a new blank PS2 memory card")
         new_btn.setObjectName("primary_btn")
         new_btn.clicked.connect(self._create_card)
-        card_row.addWidget(new_btn)
+        card_actions.addWidget(new_btn)
+        safety_hint = QLabel("Close PCSX2 before changing saves. Back up your card first.")
+        safety_hint.setWordWrap(True)
+        card_actions.addWidget(safety_hint, 1)
 
-        content.addLayout(card_row)
+        content.addLayout(card_actions)
 
         # ---- Splitter: card info + saves list ----
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -283,14 +405,18 @@ class MemoryCardPanel(BasePanel):
         self._info_lbl = QLabel("No card selected")
         self._info_lbl.setStyleSheet("color: #7070a0; font-size: 12px;")
         self._info_lbl.setWordWrap(True)
+        self._info_lbl.setTextFormat(Qt.TextFormat.PlainText)
         info_layout.addWidget(self._info_lbl)
         info_layout.addStretch()
 
         export_all_btn = QPushButton("📤 Export All Saves")
+        self._export_all_btn = export_all_btn
+        export_all_btn.setToolTip("Export every save on the card, including saves hidden by search")
         export_all_btn.clicked.connect(self._export_all)
         info_layout.addWidget(export_all_btn)
 
         backup_btn = QPushButton("🗄 Backup Card")
+        self._backup_btn = backup_btn
         backup_btn.setToolTip("Create a timestamped backup copy of this memory card")
         backup_btn.clicked.connect(self._backup_card)
         info_layout.addWidget(backup_btn)
@@ -307,13 +433,37 @@ class MemoryCardPanel(BasePanel):
         saves_title.setStyleSheet("font-weight: bold; color: #b0b0d0;")
         right_layout.addWidget(saves_title)
 
-        self._saves_empty_state = EmptyStateWidget(
-            "💾",
-            "Choose a memory card to browse its saves.",
-        )
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Search save names or directory IDs…")
+        self._search_edit.setAccessibleName("Search memory card saves")
+        self._search_edit.setClearButtonEnabled(True)
+        right_layout.addWidget(self._search_edit)
+        sort_row = QHBoxLayout()
+        sort_row.addWidget(QLabel("Sort:"))
+        self._sort_combo = QComboBox()
+        self._sort_combo.addItems(_SAVE_SORTS)
+        sort_row.addWidget(self._sort_combo)
+        sort_row.addStretch()
+        right_layout.addLayout(sort_row)
+        self._saves_summary = QLabel()
+        self._saves_summary.setWordWrap(True)
+        right_layout.addWidget(self._saves_summary)
+
+        self._saves_empty_state = QWidget()
+        empty_layout = QVBoxLayout(self._saves_empty_state)
+        empty_layout.addStretch()
+        self._saves_empty_message = QLabel()
+        self._saves_empty_message.setWordWrap(True)
+        self._saves_empty_message.setTextFormat(Qt.TextFormat.PlainText)
+        empty_layout.addWidget(self._saves_empty_message)
+        self._saves_empty_action = QPushButton()
+        self._saves_empty_action.clicked.connect(self._on_empty_action)
+        empty_layout.addWidget(self._saves_empty_action)
+        empty_layout.addStretch()
         right_layout.addWidget(self._saves_empty_state, 1)
 
         self._saves_list = QListWidget()
+        self._saves_list.setWordWrap(True)
         self._saves_list.setStyleSheet(
             "QListWidget { background: #0f1830; border-radius: 6px; }"
             "QListWidget::item { padding: 8px; color: #e0e0e0; }"
@@ -327,22 +477,25 @@ class MemoryCardPanel(BasePanel):
 
         save_actions = QHBoxLayout()
         export_btn = QPushButton("📤 Export Selected")
+        self._export_btn = export_btn
         export_btn.clicked.connect(self._export_selected)
         save_actions.addWidget(export_btn)
 
-        import_btn = QPushButton("📥 Import Save")
-        import_btn.setToolTip("Import a .bin save dump into this memory card")
-        import_btn.setObjectName("primary_btn")
-        import_btn.clicked.connect(self._import_save)
-        save_actions.addWidget(import_btn)
-
         copy_btn = QPushButton("📋 Copy to Other Card")
+        self._copy_btn = copy_btn
         copy_btn.setToolTip("Copy selected save to another memory card")
         copy_btn.clicked.connect(self._copy_save_to_other_card)
         save_actions.addWidget(copy_btn)
 
         save_actions.addStretch()
         right_layout.addLayout(save_actions)
+
+        import_btn = QPushButton("📥 Import Save")
+        self._import_btn = import_btn
+        import_btn.setToolTip("Import a .bin save dump into this memory card")
+        import_btn.setObjectName("primary_btn")
+        import_btn.clicked.connect(self._import_save)
+        right_layout.addWidget(import_btn)
 
         splitter.addWidget(right_widget)
         splitter.setSizes([240, 460])
@@ -354,9 +507,13 @@ class MemoryCardPanel(BasePanel):
 
         content.addWidget(splitter, 1)
 
+        self._restore_save_filters()
+        self._search_edit.textChanged.connect(lambda *_: self._filter_timer.start())
+        self._sort_combo.currentIndexChanged.connect(self._on_save_filter_changed)
         self.refresh()
 
     def _on_save_selected(self, idx: int) -> None:
+        self._update_save_actions()
         if getattr(self, "_saves_loading", False) or getattr(self, "_save_selection_syncing", False):
             return
         item = self._saves_list.currentItem()
@@ -400,25 +557,30 @@ class MemoryCardPanel(BasePanel):
         )
         if path:
             self._remember_last_path("memcard_card_dir", str(Path(path).parent))
-            # Add to combo if not already there
-            for i in range(self._card_combo.count()):
-                if self._card_combo.itemData(i) == path:
-                    self._card_combo.setCurrentIndex(i)
-                    return
+            self._select_card_path(path)
+
+    def _select_card_path(self, path):
+        idx = self._card_combo.findData(path)
+        if idx < 0:
             self._card_combo.addItem(Path(path).name, path)
-            self._card_combo.setCurrentIndex(self._card_combo.count() - 1)
+            idx = self._card_combo.count() - 1
+        self._card_combo.setCurrentIndex(idx)
 
     def _load_saves(self):
         self._saves_loading = True
+        self._all_saves = []
+        self._card_exists = False
+        self._card_valid = False
+        self._saves_summary.setText("")
         try:
             self._saves_list.clear()
 
             if not self._current_card:
                 self._info_lbl.setText(
                     "No memory card selected\n"
-                    "Choose a card on the left to browse saves."
+                    "Choose a card above or browse for a card image."
                 )
-                self._set_saves_placeholder_visible(True)
+                self._show_saves_empty("Choose a memory card to browse its saves.", "browse", "Browse Cards")
                 return
 
             card_path = Path(self._current_card)
@@ -427,9 +589,10 @@ class MemoryCardPanel(BasePanel):
                     "File not found\n"
                     f"The selected memory card no longer exists:\n{card_path}"
                 )
-                self._set_saves_placeholder_visible(True)
+                self._show_saves_empty("The selected card no longer exists.", "browse", "Browse Cards")
                 return
 
+            self._card_exists = True
             size_mb = card_path.stat().st_size / (1024 * 1024)
             valid = is_valid_memcard(self._current_card)
             self._set_saves_placeholder_visible(False)
@@ -446,33 +609,24 @@ class MemoryCardPanel(BasePanel):
                     f"Size: {size_mb:.2f} MB\n"
                     "This file doesn't look like a valid PS2 memory card image."
                 )
-                self._set_saves_placeholder_visible(True)
+                self._show_saves_empty("This file is not a valid PS2 memory card.", "browse", "Choose Another Card")
                 return
 
             try:
-                saves = list_saves(self._current_card)
-                if not saves:
-                    self._info_lbl.setText(
-                        f"File: {card_path.name}\n"
-                        f"Size: {size_mb:.2f} MB\n"
-                        "Valid PS2 card: Yes ✅\n"
-                        "No saves found on this card."
-                    )
-                    item = QListWidgetItem("💾  (No saves found)")
-                    item.setForeground(Qt.GlobalColor.gray)
-                    self._saves_list.addItem(item)
-                else:
-                    for save in saves:
-                        item = QListWidgetItem(f"💾  {save.name}")
-                        item.setData(Qt.ItemDataRole.UserRole, save.dir_name)
-                        item.setToolTip(f"Size: {save.size_bytes} bytes")
-                        self._saves_list.addItem(item)
-                    self._restore_selected_save()
+                self._all_saves = list_saves(self._current_card)
+                self._card_valid = True
             except MemoryCardError as exc:
                 logger.warning("Failed to load memory card saves for %s: %s", self._current_card, exc)
-                self._saves_list.addItem(f"Error reading card: {exc}")
+                self._show_saves_empty(f"Error reading card: {exc}", "refresh", "Retry")
+                return
+            self._apply_save_filters()
+        except OSError as exc:
+            logger.warning("Could not inspect memory card %s: %s", self._current_card, exc)
+            self._info_lbl.setText(f"Could not read card: {exc}")
+            self._show_saves_empty(f"Could not read card: {exc}", "refresh", "Retry")
         finally:
             self._saves_loading = False
+            self._update_save_actions()
 
     def _create_card(self):
         """Create a new blank PCSX2-format memory card image."""
@@ -513,7 +667,7 @@ class MemoryCardPanel(BasePanel):
                 "PCSX2 will initialise the card structure the first time it is used.",
             )
             self.emit_status(f"Created memory card: {filename}")
-            self.refresh()
+            self._select_card_path(path)
         except MemoryCardError as exc:
             QMessageBox.critical(self, "Error", str(exc))
 

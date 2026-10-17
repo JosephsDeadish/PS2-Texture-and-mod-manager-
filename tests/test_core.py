@@ -8774,6 +8774,60 @@ class TestMainWindowNavigationState(unittest.TestCase):
 class TestMemoryCardPanelStatePersistence(unittest.TestCase):
     """Tests for memory-card panel last-path persistence."""
 
+    def _make_panel(self, module):
+        panel = module.MemoryCardPanel.__new__(module.MemoryCardPanel)
+        panel.config = AppConfig()
+        panel._current_card = ""
+        panel._all_saves = []
+        panel._card_exists = False
+        panel._card_valid = False
+        panel._filter_timer = MagicMock()
+        panel._filter_timer.isActive.return_value = False
+        panel._search_edit = MagicMock()
+        panel._search_edit.text.return_value = ""
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentText.return_value = "Card order"
+        for name in ("_export_btn", "_copy_btn", "_import_btn", "_export_all_btn",
+                     "_backup_btn", "_saves_summary", "_saves_empty_message",
+                     "_saves_empty_action", "_saves_empty_state", "_info_lbl"):
+            setattr(panel, name, MagicMock())
+        panel._saves_list = MagicMock()
+        panel._saves_list.currentItem.return_value = None
+        return panel
+
+    def _make_save_list(self, panel):
+        class SaveList:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+                self.visible = True
+
+            def clear(self):
+                self.items = []
+                self.current_row = -1
+                panel._on_save_selected(-1)
+
+            def addItem(self, item):
+                self.items.append(item)
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def currentItem(self):
+                return self.items[self.current_row] if 0 <= self.current_row < len(self.items) else None
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+                panel._on_save_selected(idx)
+
+            def setVisible(self, visible):
+                self.visible = visible
+
+        return SaveList()
+
     def _import_memcard_panel(self):
         import importlib
         import sys
@@ -8786,6 +8840,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             ItemDataRole=types.SimpleNamespace(UserRole=object()),
             GlobalColor=types.SimpleNamespace(gray=object()),
         )
+        qtcore.QTimer = type("QTimer", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         class FakeQListWidgetItem:
             def __init__(self, text=""):
@@ -8808,7 +8863,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
 
         for name in (
             "QComboBox", "QFileDialog", "QFrame", "QHBoxLayout", "QInputDialog",
-            "QLabel", "QListWidget", "QListWidgetItem", "QMessageBox", "QPushButton",
+            "QLabel", "QLineEdit", "QListWidget", "QListWidgetItem", "QMessageBox", "QPushButton",
             "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
         ):
             setattr(qtwidgets, name, type(name, (), {}))
@@ -8834,7 +8889,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         memcard_panel = self._import_memcard_panel()
         MemoryCardPanel = memcard_panel.MemoryCardPanel
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig()
 
         with patch.object(memcard_panel, "save_config") as save_mock:
@@ -8857,7 +8912,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def itemData(self, idx):
                 return self.items[idx][1]
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig()
         panel._card_combo = FakeComboBox()
         panel._current_card = ""
@@ -8889,7 +8944,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def currentItem(self):
                 return self._current
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig()
         panel._current_card = "/cards/a.ps2"
         panel._saves_loading = False
@@ -8936,7 +8991,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setCurrentIndex(self, index):
                 self.current_index = index
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(
             memcards_path="/cards",
             ui_state={"memcard_panel": {"selected_card": "/cards/beta.ps2"}},
@@ -8991,7 +9046,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
                     return self.items[self.current_row]
                 return None
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(
             memcards_path="/cards",
             ui_state={
@@ -9043,6 +9098,9 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def clear(self):
                 self.cleared = True
 
+            def currentItem(self):
+                return None
+
             def setVisible(self, value):
                 self.visible = bool(value)
 
@@ -9053,7 +9111,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setVisible(self, value):
                 self.visible = bool(value)
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel._current_card = ""
         panel._info_lbl = FakeLabel()
         panel._saves_list = FakeListWidget()
@@ -9065,6 +9123,227 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
         self.assertTrue(panel._saves_empty_state.visible)
         self.assertFalse(panel._saves_list.visible)
         self.assertTrue(panel._info_lbl.text.startswith("No memory card selected"))
+
+    def test_save_search_matches_all_terms_across_name_and_directory(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        saves = [
+            SaveEntry("Kingdom Hearts", "BASLUS-20370", 1024),
+            SaveEntry("Kingdom Hearts II", "BASLUS-21005", 2048),
+            SaveEntry("Silent Hill", "BASLES-50382", 2048),
+        ]
+        self.assertEqual(module._filter_saves(saves, "HEARTS slus-210", "Card order"), [saves[1]])
+        self.assertEqual(module._filter_saves(saves, "kingdom missing", "Card order"), [])
+        self.assertEqual(module._filter_saves(saves, " \t", "Card order"), saves)
+
+    def test_save_sorting_is_stable_and_keeps_cached_card_order(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        saves = [SaveEntry("Zulu", "1", 1), SaveEntry("alpha", "2", 10), SaveEntry("Alpha", "3", 10)]
+        for sort, expected in (
+            ("Card order", saves),
+            ("Name (A–Z)", [saves[1], saves[2], saves[0]]),
+            ("Largest first", [saves[1], saves[2], saves[0]]),
+        ):
+            with self.subTest(sort=sort):
+                self.assertEqual(module._filter_saves(saves, "", sort), expected)
+        self.assertEqual([save.dir_name for save in saves], ["1", "2", "3"])
+
+    def test_filtering_preserves_selection_without_reparsing_card(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._card_valid = panel._card_exists = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 1024)]
+        panel._saves_list = self._make_save_list(panel)
+        with patch.object(module, "list_saves") as read, patch.object(module, "save_config"):
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.items[0].data(module.Qt.ItemDataRole.UserRole), "A")
+            self.assertIn("512 bytes", panel._saves_list.items[0].text)
+            panel._saves_list.setCurrentRow(1)
+            panel._search_edit.text.return_value = "Alpha"
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.count(), 1)
+            panel._export_btn.setEnabled.assert_called_with(False)
+            self.assertEqual(panel._selected_save_bucket()[panel._current_card], "B")
+            panel._search_edit.text.return_value = "no match"
+            panel._apply_save_filters()
+            self.assertEqual(panel._empty_action, "clear")
+            self.assertFalse(panel._saves_list.visible)
+            panel._export_all_btn.setEnabled.assert_called_with(True)
+            panel._search_edit.text.return_value = ""
+            panel._sort_combo.currentText.return_value = "Largest first"
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.current_row, 0)
+            self.assertEqual(panel._saves_list.currentItem().data(module.Qt.ItemDataRole.UserRole), "B")
+            panel._export_btn.setEnabled.assert_called_with(True)
+        read.assert_not_called()
+
+    def test_save_filter_settings_restore_validate_and_persist(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"memcard_panel": {"query": "SLUS", "sort": "Largest first"}}
+        panel._restore_save_filters()
+        panel._search_edit.setText.assert_called_once_with("SLUS")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(2)
+        panel._search_edit.text.return_value = "  Hearts  "
+        panel._sort_combo.currentText.return_value = "Name (A–Z)"
+        panel._card_valid = True
+        panel._apply_save_filters = MagicMock()
+        with patch.object(module, "save_config") as save:
+            panel._on_save_filter_changed()
+        self.assertEqual(panel._panel_state_bucket()["query"], "Hearts")
+        self.assertEqual(panel._panel_state_bucket()["sort"], "Name (A–Z)")
+        panel._filter_timer.stop.assert_called_once()
+        save.assert_called_once_with(panel.config)
+        panel._apply_save_filters.assert_called_once()
+        panel.config.ui_state = {"memcard_panel": {"query": {}, "sort": []}}
+        panel._restore_save_filters()
+        panel._search_edit.setText.assert_called_with("")
+        panel._sort_combo.setCurrentIndex.assert_called_with(0)
+
+    def test_save_filter_save_failure_still_updates_results(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._apply_save_filters = MagicMock()
+        with patch.object(module, "save_config", side_effect=OSError("locked")):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+                panel._on_save_filter_changed()
+        self.assertTrue(any("search settings" in msg for msg in logs.output))
+        panel._apply_save_filters.assert_called_once()
+
+    def test_save_actions_follow_card_readiness_and_selection(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        for exists, valid, selected, has_saves in (
+            (False, False, False, False), (True, False, False, False),
+            (True, True, False, False), (True, True, False, True),
+            (True, True, True, True),
+        ):
+            with self.subTest(exists=exists, valid=valid, selected=selected, has_saves=has_saves):
+                panel._card_exists, panel._card_valid = exists, valid
+                panel._all_saves = [object()] if has_saves else []
+                panel._saves_list.currentItem.return_value = (
+                    SimpleNamespace(data=lambda role: "SAVE") if selected else None
+                )
+                panel._update_save_actions()
+                panel._backup_btn.setEnabled.assert_called_with(exists)
+                panel._import_btn.setEnabled.assert_called_with(valid)
+                panel._export_all_btn.setEnabled.assert_called_with(valid and has_saves)
+                panel._export_btn.setEnabled.assert_called_with(valid and selected)
+                panel._copy_btn.setEnabled.assert_called_with(valid and selected)
+
+    def test_card_load_states_offer_matching_recovery_actions(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._saves_list = self._make_save_list(panel)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "card.ps2"
+            panel._current_card = str(path)
+            panel._load_saves()
+            self.assertEqual(panel._empty_action, "browse")
+            panel._backup_btn.setEnabled.assert_called_with(False)
+            path.touch()
+            with patch.object(module, "is_valid_memcard", return_value=False):
+                panel._load_saves()
+            self.assertEqual(panel._empty_action, "browse")
+            panel._backup_btn.setEnabled.assert_called_with(True)
+            panel._import_btn.setEnabled.assert_called_with(False)
+            with patch.object(module, "is_valid_memcard", return_value=True):
+                with patch.object(module, "list_saves", return_value=[]):
+                    panel._load_saves()
+                self.assertEqual(panel._empty_action, "import")
+                self.assertFalse(panel._saves_list.visible)
+                panel._export_all_btn.setEnabled.assert_called_with(False)
+                panel._import_btn.setEnabled.assert_called_with(True)
+                self.assertIn("0 of 0", panel._saves_summary.setText.call_args.args[0])
+                with patch.object(module, "list_saves", side_effect=module.MemoryCardError("bad data")):
+                    with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                        panel._load_saves()
+                self.assertEqual(panel._empty_action, "refresh")
+                self.assertIn("bad data", panel._saves_empty_message.setText.call_args.args[0])
+                panel._import_btn.setEnabled.assert_called_with(False)
+        self.assertFalse(panel._saves_loading)
+
+    def test_card_inspection_failure_is_recoverable_and_clears_old_saves(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._all_saves = [object()]
+        with patch.object(module.Path, "is_file", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._load_saves()
+        self.assertEqual(panel._all_saves, [])
+        self.assertEqual(panel._empty_action, "refresh")
+        self.assertIn("denied", panel._info_lbl.setText.call_args.args[0])
+        panel._export_btn.setEnabled.assert_called_with(False)
+        self.assertFalse(panel._saves_loading)
+
+    def test_empty_state_actions_use_the_expected_workflows(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        for action, method in (
+            ("browse", "_browse_card"), ("import", "_import_save"),
+            ("refresh", "_load_saves"), ("clear", "_clear_save_search"),
+        ):
+            with self.subTest(action=action), patch.object(panel, method) as callback:
+                panel._empty_action = action
+                panel._on_empty_action()
+                callback.assert_called_once()
+
+    def test_clear_save_search_filters_once_and_retains_sorting(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._on_save_filter_changed = MagicMock()
+        panel._clear_save_search()
+        panel._search_edit.clear.assert_called_once()
+        panel._search_edit.blockSignals.assert_any_call(True)
+        panel._search_edit.blockSignals.assert_called_with(False)
+        panel._on_save_filter_changed.assert_called_once()
+        panel._sort_combo.setCurrentIndex.assert_not_called()
+
+    def test_restore_card_retains_browsed_file_outside_configured_directory(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_combo = MagicMock()
+        panel._card_combo.findData.side_effect = [-1, 1]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "external.ps2"
+            path.touch()
+            panel.config.ui_state = {"memcard_panel": {"selected_card": str(path)}}
+            panel._restore_selected_card()
+            self.assertEqual(panel._current_card, str(path))
+            panel._card_combo.addItem.assert_called_once_with(path.name, str(path))
+            panel._card_combo.setCurrentIndex.assert_called_once_with(1)
+
+    def test_select_card_path_reuses_existing_combo_entry(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_combo = MagicMock()
+        panel._card_combo.findData.return_value = 2
+        panel._select_card_path("/cards/a.ps2")
+        panel._card_combo.addItem.assert_not_called()
+        panel._card_combo.setCurrentIndex.assert_called_with(2)
+        panel._card_combo.findData.return_value = -1
+        panel._card_combo.count.return_value = 4
+        panel._select_card_path("/cards/b.ps2")
+        panel._card_combo.addItem.assert_called_once_with("b.ps2", "/cards/b.ps2")
+        panel._card_combo.setCurrentIndex.assert_called_with(3)
+
+    def test_new_card_opens_created_file_without_refreshing_away_external_path(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel.config.memcards_path = "/cards"
+        panel._select_card_path = MagicMock()
+        panel.emit_status = MagicMock()
+        with patch.object(module.QInputDialog, "getText", return_value=("NewCard", True), create=True):
+            with patch.object(module, "create_memcard", return_value="/cards/NewCard.ps2") as create:
+                with patch.object(module.QMessageBox, "information", create=True):
+                    panel._create_card()
+        create.assert_called_once_with("/cards/NewCard.ps2")
+        panel._select_card_path.assert_called_once_with("/cards/NewCard.ps2")
 
     def test_restore_selected_card_warns_when_missing(self):
         memcard_panel = self._import_memcard_panel()
@@ -9087,7 +9366,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setCurrentIndex(self, index):
                 self.current_index = index
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(ui_state={"memcard_panel": {"selected_card": "/cards/missing.ps2"}})
         panel._current_card = ""
         panel._card_combo = FakeComboBox()
@@ -9124,7 +9403,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setCurrentRow(self, idx):
                 self.current_row = idx
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(
             ui_state={
                 "memcard_panel": {
@@ -9160,7 +9439,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setSizes(self, sizes):
                 self._sizes = list(sizes)
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": [260, 420]}})
         panel._splitter = FakeSplitter([180, 500])
 
@@ -9184,7 +9463,7 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
             def setSizes(self, sizes):
                 self._sizes = list(sizes)
 
-        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel = self._make_panel(memcard_panel)
         panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": "broken"}})
         panel._splitter = FakeSplitter()
 
