@@ -9862,6 +9862,25 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 f"Entry {entry['id']} author_url is a member-search page (not a profile): {aurl!r}"
             )
 
+    def test_no_author_url_fragments_in_shipped_catalogue(self):
+        """Raw catalogue author_url values should already be canonical profile URLs."""
+        import json
+        from pathlib import Path
+
+        cat_dir = Path(__file__).parent.parent / "data" / "catalogue"
+        for path in cat_dir.glob("*.json"):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                aurl = entry.get("author_url", "")
+                if isinstance(aurl, str) and aurl:
+                    self.assertNotIn(
+                        "#",
+                        aurl,
+                        f"{path.name}:{entry.get('id')} author_url should not include fragments: {aurl!r}",
+                    )
+
     def test_no_gbatem_org_typo_in_author_url(self):
         """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net)."""
         for entry in self.catalogue:
