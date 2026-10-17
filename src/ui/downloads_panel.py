@@ -41,8 +41,8 @@ def _history_summary_message(entry_count: int, filters_active: bool) -> str:
     """Return a compact history summary for the current filter state."""
     if entry_count <= 0:
         if filters_active:
-            return "No history entries match the current filters."
-        return "No download history entries recorded yet."
+            return "No history entries match the current filters. Clear filters to see more."
+        return "No download history entries recorded yet. Finished downloads will appear here."
 
     noun = "entry" if entry_count == 1 else "entries"
     if filters_active:
@@ -334,8 +334,12 @@ class DownloadsPanel(BasePanel):
         self._active_layout.setContentsMargins(0, 0, 0, 0)
         self._active_layout.setSpacing(2)
 
-        self._active_placeholder = QLabel("No downloads in progress.")
+        self._active_placeholder = QLabel(
+            "No downloads in progress.\n"
+            "Start a download from Browse or Import to see live progress here."
+        )
         self._active_placeholder.setStyleSheet("color: #50507a; font-size: 12px;")
+        self._active_placeholder.setWordWrap(True)
         self._active_layout.addWidget(self._active_placeholder)
 
         content.addWidget(self._active_container)

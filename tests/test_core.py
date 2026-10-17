@@ -5755,6 +5755,23 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "context": "",
             "source": "",
             "url": "",
+            "source_url": "https://example.com/posts/texture-overhaul",
+            "author_url": "",
+            "direct_download_url": "https://example.com/direct.zip",
+            "thumbnail_url": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "texture overhaul"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "url": "",
             "author_url": "",
             "direct_download_url": "https://example.com/direct.zip",
             "thumbnail_url": "",
@@ -7041,18 +7058,21 @@ class TestDownloadsPanelHistoryHandling(unittest.TestCase):
         self.assertTrue(panel._list_widget.items)
         self.assertIn("No download history entries recorded yet.", panel._list_widget.items[0])
         self.assertIn("No download history entries recorded yet.", panel._detail_label.value)
-        self.assertEqual(panel._history_summary_lbl.value, "No download history entries recorded yet.")
+        self.assertEqual(
+            panel._history_summary_lbl.value,
+            "No download history entries recorded yet. Finished downloads will appear here.",
+        )
 
     def test_history_summary_message_reflects_filter_state(self):
         downloads_panel = self._import_downloads_panel()
 
         self.assertEqual(
             downloads_panel._history_summary_message(0, False),
-            "No download history entries recorded yet.",
+            "No download history entries recorded yet. Finished downloads will appear here.",
         )
         self.assertEqual(
             downloads_panel._history_summary_message(0, True),
-            "No history entries match the current filters.",
+            "No history entries match the current filters. Clear filters to see more.",
         )
         self.assertEqual(
             downloads_panel._history_summary_message(1, False),
@@ -8183,6 +8203,48 @@ class TestMemoryCardPanelStatePersistence(unittest.TestCase):
 
         self.assertEqual(panel._saves_list.current_row, 1)
         self.assertEqual(panel._info_lbl.text.splitlines()[0], "File: beta.ps2")
+
+    def test_load_saves_without_selected_card_shows_placeholder(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.visible = True
+
+            def clear(self):
+                self.cleared = True
+
+            def setVisible(self, value):
+                self.visible = bool(value)
+
+        class FakePlaceholder:
+            def __init__(self):
+                self.visible = False
+
+            def setVisible(self, value):
+                self.visible = bool(value)
+
+        panel = MemoryCardPanel.__new__(MemoryCardPanel)
+        panel._current_card = ""
+        panel._info_lbl = FakeLabel()
+        panel._saves_list = FakeListWidget()
+        panel._saves_empty_state = FakePlaceholder()
+
+        MemoryCardPanel._load_saves(panel)
+
+        self.assertTrue(panel._saves_list.cleared)
+        self.assertTrue(panel._saves_empty_state.visible)
+        self.assertFalse(panel._saves_list.visible)
+        self.assertTrue(panel._info_lbl.text.startswith("No memory card selected"))
 
     def test_restore_selected_card_warns_when_missing(self):
         memcard_panel = self._import_memcard_panel()

@@ -102,6 +102,25 @@ class MemoryCardPanel(BasePanel):
         except Exception as exc:
             logger.warning("Could not save memory card save selection after %s: %s", context, exc)
 
+    def _set_saves_placeholder_visible(self, visible: bool) -> None:
+        placeholder = getattr(self, "_saves_empty_state", None)
+        setter = getattr(placeholder, "setVisible", None)
+        if callable(setter):
+            setter(visible)
+        elif placeholder is not None:
+            toggler = getattr(placeholder, "show" if visible else "hide", None)
+            if callable(toggler):
+                toggler()
+
+        saves_list = getattr(self, "_saves_list", None)
+        setter = getattr(saves_list, "setVisible", None)
+        if callable(setter):
+            setter(not visible)
+        elif saves_list is not None:
+            toggler = getattr(saves_list, "hide" if visible else "show", None)
+            if callable(toggler):
+                toggler()
+
     def _validated_splitter_sizes(self, sizes, *, action: str):
         if not isinstance(sizes, (list, tuple)):
             logger.warning(
@@ -288,6 +307,12 @@ class MemoryCardPanel(BasePanel):
         saves_title.setStyleSheet("font-weight: bold; color: #b0b0d0;")
         right_layout.addWidget(saves_title)
 
+        self._saves_empty_state = EmptyStateWidget(
+            "💾",
+            "Choose a memory card to browse its saves.",
+        )
+        right_layout.addWidget(self._saves_empty_state, 1)
+
         self._saves_list = QListWidget()
         self._saves_list.setStyleSheet(
             "QListWidget { background: #0f1830; border-radius: 6px; }"
@@ -298,6 +323,7 @@ class MemoryCardPanel(BasePanel):
         if callable(getattr(save_selection_changed, "connect", None)):
             save_selection_changed.connect(self._on_save_selected)
         right_layout.addWidget(self._saves_list, 1)
+        self._set_saves_placeholder_visible(True)
 
         save_actions = QHBoxLayout()
         export_btn = QPushButton("📤 Export Selected")
@@ -388,16 +414,25 @@ class MemoryCardPanel(BasePanel):
             self._saves_list.clear()
 
             if not self._current_card:
-                self._info_lbl.setText("No card selected")
+                self._info_lbl.setText(
+                    "No memory card selected\n"
+                    "Choose a card on the left to browse saves."
+                )
+                self._set_saves_placeholder_visible(True)
                 return
 
             card_path = Path(self._current_card)
             if not card_path.is_file():
-                self._info_lbl.setText("File not found")
+                self._info_lbl.setText(
+                    "File not found\n"
+                    f"The selected memory card no longer exists:\n{card_path}"
+                )
+                self._set_saves_placeholder_visible(True)
                 return
 
             size_mb = card_path.stat().st_size / (1024 * 1024)
             valid = is_valid_memcard(self._current_card)
+            self._set_saves_placeholder_visible(False)
 
             self._info_lbl.setText(
                 f"File: {card_path.name}\n"
@@ -406,12 +441,23 @@ class MemoryCardPanel(BasePanel):
             )
 
             if not valid:
-                self._saves_list.addItem("(Not a recognized PS2 memory card)")
+                self._info_lbl.setText(
+                    f"File: {card_path.name}\n"
+                    f"Size: {size_mb:.2f} MB\n"
+                    "This file doesn't look like a valid PS2 memory card image."
+                )
+                self._set_saves_placeholder_visible(True)
                 return
 
             try:
                 saves = list_saves(self._current_card)
                 if not saves:
+                    self._info_lbl.setText(
+                        f"File: {card_path.name}\n"
+                        f"Size: {size_mb:.2f} MB\n"
+                        "Valid PS2 card: Yes ✅\n"
+                        "No saves found on this card."
+                    )
                     item = QListWidgetItem("💾  (No saves found)")
                     item.setForeground(Qt.GlobalColor.gray)
                     self._saves_list.addItem(item)
