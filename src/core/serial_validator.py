@@ -639,6 +639,13 @@ class SerialDatabase:
             sdb.is_demo_serial("SLUS-29001")  # True  — MGS2 demo
             sdb.is_demo_serial("SLUS-20210")  # False — retail Metal Gear Solid 2
         """
+        serial = (serial or "").upper()
+        if not serial:
+            return False
+        # PCPX serials are kiosk/trial-style discs surfaced in the informative
+        # serial docs; treat them like demos so title ranking prefers retail.
+        if serial.startswith("PCPX-"):
+            return True
         return serial in self._demo_serials
 
     def demo_titles(self) -> List[str]:

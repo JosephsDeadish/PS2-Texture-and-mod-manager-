@@ -3484,6 +3484,14 @@ class TestGameRegistryExpanded(unittest.TestCase):
         self.assertEqual(hits[0][0], "SCES-52424")
         self.assertTrue(any(serial.startswith("SCED-") for serial, _ in hits))
 
+        ico_hits = title_to_serials("Ico")
+        self.assertIn(("SCAJ-20099", "Ico"), ico_hits)
+        self.assertIn(("PCPX-96322", "Ico"), ico_hits)
+        self.assertLess(
+            ico_hits.index(("SCAJ-20099", "Ico")),
+            ico_hits.index(("PCPX-96322", "Ico")),
+        )
+
     def test_title_to_serials_punctuation_insensitive(self):
         from src.core.game_registry import title_to_serials
         hits = title_to_serials("Baldurs Gate")
@@ -28829,6 +28837,10 @@ class TestWave110DemoDatabase(unittest.TestCase):
     def test_is_demo_serial_kiosk(self):
         """Wave 110: Kiosk disc PBPX-95500 recognised as demo (kiosk is non-retail)."""
         self.assertTrue(self.sdb.is_demo_serial("PBPX-95500"))
+
+    def test_is_demo_serial_pcpx_trial_disc(self):
+        """Wave 110: PCPX trial discs should rank with other non-retail demo media."""
+        self.assertTrue(self.sdb.is_demo_serial("PCPX-96322"))
 
     def test_is_demo_serial_retail_gow(self):
         """Wave 110: God of War retail serial SCUS-97399 NOT a demo serial."""
