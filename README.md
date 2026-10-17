@@ -50,6 +50,12 @@
 - Profiles never copy or remove live memory-card files; PNACH and cheats sharing a folder are merged together
 - Existing profiles require overwrite confirmation, and failed saves leave saved profiles intact
 
+### ✏️ Mod Metadata
+- Edit names, authors, versions, Game IDs, descriptions, source links, and tags from a mod row or **Details → Edit Metadata**
+- Scrollable fields, inline validation, unsaved-change feedback, and **Revert Changes** keep editing manageable on smaller screens
+- Metadata and explicitly fetched thumbnails save together; failures keep the draft open for retry, and Save never waits for a network request
+- GameTDB thumbnail fetching runs in the background and discards results after a Game ID change, Revert, or dialog close
+
 ### 🖼️ Cover Art Manager
 - Store and deploy cover art for PCSX2's game browser
 - Cover art is automatically renamed to `{SERIAL}.png` (e.g. `SLUS-20062.png`) on deploy — the exact format PCSX2 expects

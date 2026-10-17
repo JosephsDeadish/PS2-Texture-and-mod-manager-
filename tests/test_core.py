@@ -1616,6 +1616,61 @@ class TestUpdateMetadata(unittest.TestCase):
         db, mgr = self._make_manager()
         mgr.update_metadata("nonexistent", name="Ghost")  # should not raise
 
+    def test_omitted_fields_remain_unchanged(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p", author="Author",
+                      description="Notes", game_id="SLUS-20062", source_url="https://example.com", tags=["hd"])
+        db.add(mod)
+        mgr.update_metadata("m", name="Renamed")
+        self.assertEqual((mod.author, mod.description, mod.game_id, mod.source_url, mod.tags),
+                         ("Author", "Notes", "SLUS-20062", "https://example.com", ["hd"]))
+
+    def test_explicit_blank_values_clear_optional_fields(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p", author="Author", description="Notes",
+                      game_id="SLUS-20062", source_url="https://example.com", tags=["hd"])
+        db.add(mod)
+        mgr.update_metadata("m", author="", description="", game_id="", version="", source_url="", tags=[])
+        loaded = type(db)().get("m")
+        self.assertEqual((loaded.author, loaded.description, loaded.game_id, loaded.version, loaded.source_url, loaded.tags),
+                         ("", "", "", "", "", []))
+
+    def test_metadata_and_thumbnail_saved_together_without_network(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p")
+        db.add(mod)
+        with patch.object(mgr, "_fetch_thumbnail") as fetch, patch.object(db, "save", wraps=db.save) as save:
+            mgr.update_metadata("m", name="Edited", game_id="SLUS-20062",
+                                thumbnail_path="/cache/art.png", fetch_thumbnail=False)
+        fetch.assert_not_called()
+        save.assert_called_once()
+        loaded = type(db)().get("m")
+        self.assertEqual((loaded.name, loaded.game_id, loaded.thumbnail_path), ("Edited", "SLUS-20062", "/cache/art.png"))
+
+    def test_changed_serial_without_thumbnail_does_not_fetch_when_disabled(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p")
+        db.add(mod)
+        with patch.object(mgr, "_fetch_thumbnail") as fetch:
+            mgr.update_metadata("m", game_id="SLUS-20062", fetch_thumbnail=False)
+        fetch.assert_not_called()
+        self.assertEqual(mod.game_id, "SLUS-20062")
+
+    def test_save_failure_restores_live_object_and_persisted_data_then_retries(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p", author="Author", tags=["old"])
+        db.add(mod)
+        with patch.object(db, "save", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                mgr.update_metadata("m", name="Edited", author="", game_id="SLUS-20062",
+                                    thumbnail_path="/cache/art.png", tags=["new"], fetch_thumbnail=False)
+        self.assertIs(db.get("m"), mod)
+        self.assertEqual((mod.name, mod.author, mod.game_id, mod.thumbnail_path, mod.tags),
+                         ("Original", "Author", "", "", ["old"]))
+        self.assertEqual(type(db)().get("m").name, "Original")
+        mgr.update_metadata("m", name="Edited", thumbnail_path="/cache/art.png", fetch_thumbnail=False)
+        self.assertEqual(type(db)().get("m").thumbnail_path, "/cache/art.png")
+
 
 class TestMemoryCardWrite(unittest.TestCase):
     """Tests for the new memory card write / backup / copy features."""
@@ -1843,6 +1898,7 @@ class TestImportDialogLogging(unittest.TestCase):
             qtcore = types.ModuleType("PyQt6.QtCore")
             qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
             qtcore.QTimer = type("QTimer", (), {})
+            qtcore.pyqtSignal = lambda *args: MagicMock()
             qtwidgets = types.ModuleType("PyQt6.QtWidgets")
             for name in (
                 "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -1876,6 +1932,7 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -1924,6 +1981,7 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -1969,6 +2027,7 @@ class TestImportDialogLogging(unittest.TestCase):
         qtcore = types.ModuleType("PyQt6.QtCore")
         qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
         qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
             "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
@@ -2064,6 +2123,9 @@ class TestImportDialogLogging(unittest.TestCase):
             fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "Desc")
             fake._url_edit = types.SimpleNamespace(text=lambda: "not-a-url")
             fake.accept = MagicMock()
+            fake._draft = lambda: import_dialog.EditModDialog._draft(fake)
+            fake._validation_problem = lambda draft: import_dialog.EditModDialog._validation_problem(fake, draft)
+            fake._update_readiness = MagicMock()
 
             with patch.object(QMessageBox, "warning", create=True) as warning:
                 import_dialog.EditModDialog._save(fake)
@@ -2163,6 +2225,211 @@ class TestImportDialogLogging(unittest.TestCase):
             fake._multipart_hint.hide.assert_called_once()
             fake._name_edit.setText.assert_not_called()
             fake._src_edit.setText.assert_called_once_with("/selected/pack")
+
+
+class TestEditModDialogWorkflows(unittest.TestCase):
+    """Metadata drafts stay recoverable and background images belong to their serial."""
+
+    def setUp(self):
+        from types import MethodType, SimpleNamespace
+        self.module, self.message_box = self.enterContext(TestImportDialogLogging()._import_dialog_module())
+        self.dialog_type = self.module.EditModDialog
+        self.mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p",
+                           game_id="SLUS-20062", description="<b>Literal notes</b>", tags=["hd"])
+        self.dialog = SimpleNamespace(
+            mod=self.mod, _save_callback=MagicMock(), _dialog_closed=False,
+            _fetching_game_id="", _discard_thumbnail_result=False,
+            _fetched_thumbnail="", _fetched_game_id="", _thumbnail_finished=MagicMock(),
+            _save_btn=MagicMock(), _revert_btn=MagicMock(), _fetch_thumb_btn=MagicMock(),
+            _readiness_lbl=MagicMock(), _thumb_status_lbl=MagicMock(), updated_meta={},
+            accept=MagicMock(),
+        )
+        for field, value in (
+            ("_name_edit", "Original"), ("_author_edit", "Unknown"), ("_version_edit", "1.0.0"),
+            ("_gameid_edit", "SLUS-20062"), ("_tags_edit", "hd"), ("_url_edit", ""),
+        ):
+            edit = MagicMock()
+            edit.text.return_value = value
+            edit.setText.side_effect = lambda text, edit=edit: setattr(edit.text, "return_value", text)
+            setattr(self.dialog, field, edit)
+        self.dialog._desc_edit = MagicMock()
+        self.dialog._desc_edit.toPlainText.return_value = self.mod.description
+        self.dialog._desc_edit.setPlainText.side_effect = lambda text: setattr(
+            self.dialog._desc_edit.toPlainText, "return_value", text,
+        )
+        for name in ("_draft", "_validation_problem", "_update_readiness", "_revert",
+                     "_on_thumbnail_finished", "_fetch_thumbnail", "_save"):
+            setattr(self.dialog, name, MethodType(getattr(self.dialog_type, name), self.dialog))
+        self.dialog._original_meta = self.dialog._draft()
+        self.warning = self.enterContext(patch.object(self.message_box, "warning", create=True))
+
+    def test_validation_and_readiness_cover_required_fields_and_malformed_urls(self):
+        cases = [
+            ("", "SLUS-20062", "", "Name Required"),
+            ("Name", "BAD", "", "Game ID Required"),
+            ("Name", "SLUS-20062", "https://[", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "https://example.com:bad", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "file:///tmp/source", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "******example.com", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "https://example.com/path", None),
+        ]
+        for name, serial, url, expected in cases:
+            with self.subTest(url=url, name=name, serial=serial):
+                self.dialog._name_edit.text.return_value = name
+                self.dialog._gameid_edit.text.return_value = serial
+                self.dialog._url_edit.text.return_value = url
+                problem = self.dialog._validation_problem(self.dialog._draft())
+                self.assertEqual(problem[0] if problem else None, expected)
+                self.dialog._update_readiness()
+                self.dialog._save_btn.setEnabled.assert_called_with(expected is None)
+
+    def test_non_texture_game_id_remains_optional(self):
+        self.mod.mod_type = ModType.PNACH
+        self.dialog._gameid_edit.text.return_value = ""
+        self.assertIsNone(self.dialog._validation_problem(self.dialog._draft()))
+
+    def test_draft_normalizes_serial_and_deduplicates_trimmed_tags(self):
+        self.dialog._gameid_edit.text.return_value = " slus_20062 "
+        self.dialog._tags_edit.text.return_value = " hd, ui,hd, , ui "
+        draft = self.dialog._draft()
+        self.assertEqual(draft["game_id"], "SLUS-20062")
+        self.assertEqual(draft["tags"], ["hd", "ui"])
+        self.assertEqual(draft["description"], "<b>Literal notes</b>")
+
+    def test_clean_draft_disables_save_and_revert(self):
+        self.dialog._update_readiness()
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+        self.dialog._revert_btn.setEnabled.assert_called_with(False)
+        self.assertIn("No unsaved changes", self.dialog._readiness_lbl.setText.call_args.args[0])
+
+    def test_revert_restores_all_fields_and_discards_pending_thumbnail(self):
+        self.dialog._name_edit.text.return_value = "New"
+        self.dialog._desc_edit.toPlainText.return_value = "Changed"
+        self.dialog._fetched_thumbnail = "/cache/new.png"
+        self.dialog._fetched_game_id = "SLUS-20062"
+        self.dialog._revert()
+        self.assertEqual(self.dialog._draft(), self.dialog._original_meta)
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.assertTrue(self.dialog._discard_thumbnail_result)
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+
+    def test_save_failure_keeps_draft_open_and_retryable(self):
+        self.dialog._name_edit.text.return_value = "Edited"
+        self.dialog._save_callback.side_effect = OSError("read only")
+        with self.assertLogs("src.ui.import_dialog", level="WARNING"):
+            self.dialog._save()
+        self.dialog.accept.assert_not_called()
+        self.assertEqual(self.dialog.updated_meta, {})
+        self.assertEqual(self.dialog._name_edit.text(), "Edited")
+        self.assertIn("retry Save", self.dialog._readiness_lbl.setText.call_args.args[0])
+        self.dialog._save_callback.side_effect = None
+        self.dialog._save()
+        self.dialog.accept.assert_called_once()
+        self.assertEqual(self.dialog.updated_meta["name"], "Edited")
+        self.assertEqual(self.mod.name, "Original")
+
+    def test_matching_fetched_thumbnail_is_part_of_one_save(self):
+        self.dialog._fetched_thumbnail = "/cache/new.png"
+        self.dialog._fetched_game_id = "SLUS-20062"
+        self.dialog._save()
+        self.dialog._save_callback.assert_called_once()
+        self.assertEqual(self.dialog._save_callback.call_args.args[0]["thumbnail_path"], "/cache/new.png")
+
+    def test_stale_thumbnail_not_attached_on_save(self):
+        self.dialog._fetched_thumbnail = "/cache/wrong.png"
+        self.dialog._fetched_game_id = "SLUS-99999"
+        self.dialog._save()
+        self.assertNotIn("thumbnail_path", self.dialog.updated_meta)
+
+    def test_validation_rechecked_before_callback(self):
+        self.dialog._url_edit.text.return_value = "https://["
+        self.dialog._save()
+        self.dialog._save_callback.assert_not_called()
+        self.dialog.accept.assert_not_called()
+        self.warning.assert_called_once()
+
+    def test_thumbnail_result_marks_dirty_without_mutating_mod(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/new.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "/cache/new.png")
+        self.assertEqual(self.mod.thumbnail_path, "")
+        self.dialog._save_btn.setEnabled.assert_called_with(True)
+        self.dialog._fetch_thumb_btn.setEnabled.assert_called_with(True)
+
+    def test_thumbnail_failures_and_not_found_allow_retry(self):
+        for error in ("timeout", ""):
+            self.dialog._fetching_game_id = "SLUS-20062"
+            self.dialog._on_thumbnail_finished("SLUS-20062", "", error)
+            self.dialog._fetch_thumb_btn.setEnabled.assert_called_with(True)
+            self.assertEqual(self.dialog._fetched_thumbnail, "")
+
+    def test_closed_dialog_ignores_thumbnail_result(self):
+        self.dialog._dialog_closed = True
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/new.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.dialog._thumb_status_lbl.setText.assert_not_called()
+
+    def test_serial_change_and_return_still_discards_inflight_image(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._gameid_edit.text.return_value = "SLUS-99999"
+        self.dialog._update_readiness()
+        self.dialog._gameid_edit.text.return_value = "SLUS-20062"
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/old.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.assertIn("ignored", self.dialog._thumb_status_lbl.setText.call_args.args[0])
+
+    def test_revert_during_fetch_discards_matching_result(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._revert()
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/old.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+
+    def test_fetch_emits_result_instead_of_touching_widgets_from_worker(self):
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", return_value="/cache/new.png",
+        ):
+            self.dialog._fetch_thumbnail()
+            self.dialog._thumb_status_lbl.setText.reset_mock()
+            thread.call_args.kwargs["target"]()
+        self.dialog._thumbnail_finished.emit.assert_called_once_with("SLUS-20062", "/cache/new.png", "")
+        self.dialog._thumb_status_lbl.setText.assert_not_called()
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+
+    def test_fetch_exception_logs_and_emits_error_for_retry(self):
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", side_effect=OSError("offline"),
+        ):
+            self.dialog._fetch_thumbnail()
+            with self.assertLogs("src.ui.import_dialog", level="WARNING"):
+                thread.call_args.kwargs["target"]()
+        self.dialog._thumbnail_finished.emit.assert_called_once_with("SLUS-20062", "", "offline")
+
+    def test_invalid_serial_or_active_fetch_cannot_start_duplicate_request(self):
+        with patch("threading.Thread") as thread:
+            self.dialog._gameid_edit.text.return_value = "BAD"
+            self.dialog._fetch_thumbnail()
+            self.dialog._gameid_edit.text.return_value = "SLUS-20062"
+            self.dialog._fetching_game_id = "SLUS-20062"
+            self.dialog._fetch_thumbnail()
+        thread.assert_not_called()
+
+    def test_deleted_dialog_signal_does_not_crash_worker(self):
+        self.dialog._thumbnail_finished.emit.side_effect = RuntimeError("wrapped object deleted")
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", return_value="/cache/new.png",
+        ):
+            self.dialog._fetch_thumbnail()
+            thread.call_args.kwargs["target"]()
+        self.dialog.accept.assert_not_called()
+
+    def test_save_while_fetching_does_not_wait_or_attach_pending_image(self):
+        self.dialog._name_edit.text.return_value = "Edited"
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._save()
+        self.dialog._save_callback.assert_called_once()
+        self.assertNotIn("thumbnail_path", self.dialog.updated_meta)
+        self.dialog.accept.assert_called_once()
 
 
 class TestSettingsDialogSaveFailures(unittest.TestCase):
@@ -10070,6 +10337,43 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel._invalidate_issue_state_cache.assert_called_once()
         panel._apply_filter.assert_called_once()
 
+    def test_metadata_editor_cancel_does_not_persist_or_refresh(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel._apply_filter = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.exec.return_value = 0
+            edit.return_value.DialogCode.Accepted = 1
+            panel._on_edit("a")
+        panel.manager.update_metadata.assert_not_called()
+        panel._apply_filter.assert_not_called()
+
+    def test_metadata_callback_rejects_removed_mod(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.db.get.side_effect = [ModInfo("a", "A", ModType.PNACH, "/a"), None]
+        panel.manager = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.exec.return_value = 0
+            edit.return_value.DialogCode.Accepted = 1
+            panel._on_edit("a")
+            with self.assertRaisesRegex(ValueError, "no longer installed"):
+                edit.call_args.kwargs["save_callback"]({"name": "Edited"})
+        panel.manager.update_metadata.assert_not_called()
+
+    def test_details_connects_edit_shortcut(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel._on_edit = MagicMock()
+        panel._on_see_more_by_author = MagicMock()
+        with patch.object(mod_panel, "ModDetailsDialog") as details:
+            panel._on_details("a")
+        details.return_value.edit_requested.connect.assert_called_once_with(panel._on_edit)
+
     def test_disable_all_cancelled_leaves_mods_unchanged(self):
         import types
 
@@ -10390,11 +10694,17 @@ class TestModPanelEmptyState(unittest.TestCase):
         panel.emit_status = MagicMock()
         panel._invalidate_issue_state_cache = MagicMock()
         panel._apply_filter = MagicMock()
+        panel._refresh_author_filter = MagicMock()
         with patch.object(mod_panel, "EditModDialog") as edit:
             edit.return_value.updated_meta = {"name": "Edited"}
             edit.return_value.exec.return_value = edit.return_value.DialogCode.Accepted
+            edit.return_value.exec.side_effect = lambda: (
+                edit.call_args.kwargs["save_callback"]({"name": "Edited"}),
+                edit.return_value.DialogCode.Accepted,
+            )[1]
             panel._on_edit("a")
-        panel.manager.update_metadata.assert_called_once()
+        panel.manager.update_metadata.assert_called_once_with("a", name="Edited", fetch_thumbnail=False)
+        panel._refresh_author_filter.assert_called_once()
         panel._invalidate_issue_state_cache.assert_called_once()
         panel._apply_filter.assert_called_once()
 

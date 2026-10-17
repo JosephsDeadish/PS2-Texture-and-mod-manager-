@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -593,13 +593,24 @@ class ImportModDialog(QDialog):
 class EditModDialog(QDialog):
     """Dialog for editing an existing mod's metadata fields."""
 
-    def __init__(self, mod: ModInfo, parent=None):
+    _thumbnail_finished = pyqtSignal(str, str, str)
+
+    def __init__(self, mod: ModInfo, parent=None, *, save_callback=None):
         super().__init__(parent)
         self.mod = mod
+        self._save_callback = save_callback
+        self._dialog_closed = False
+        self._fetching_game_id = ""
+        self._discard_thumbnail_result = False
+        self._fetched_thumbnail = ""
+        self._fetched_game_id = ""
         self.setWindowTitle(f"Edit — {mod.name}")
-        self.setMinimumSize(520, 420)
+        self.resize(560, 560)
         self.updated_meta: dict = {}
+        self._thumbnail_finished.connect(self._on_thumbnail_finished)
         self._build()
+        self._original_meta = self._draft()
+        self._update_readiness()
 
     def _build(self):
         layout = QVBoxLayout(self)
@@ -614,6 +625,13 @@ class EditModDialog(QDialog):
         sep.setFrameShape(QFrame.Shape.HLine)
         layout.addWidget(sep)
 
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        body = QVBoxLayout(content)
+        scroll.setWidget(content)
+        layout.addWidget(scroll, 1)
         form = QFormLayout()
         form.setSpacing(10)
         form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
@@ -642,7 +660,8 @@ class EditModDialog(QDialog):
         self._tags_edit.setPlaceholderText("comma-separated tags")
         form.addRow("Tags:", self._tags_edit)
 
-        self._desc_edit = QTextEdit(self.mod.description)
+        self._desc_edit = QTextEdit()
+        self._desc_edit.setPlainText(self.mod.description)
         self._desc_edit.setMaximumHeight(90)
         form.addRow("Description:", self._desc_edit)
 
@@ -650,7 +669,7 @@ class EditModDialog(QDialog):
         self._url_edit.setPlaceholderText("https://…")
         form.addRow("Source URL:", self._url_edit)
 
-        layout.addLayout(form)
+        body.addLayout(form)
 
         # Thumbnail refresh
         thumb_row = QHBoxLayout()
@@ -665,63 +684,159 @@ class EditModDialog(QDialog):
         thumb_row.addStretch()
 
         self._fetch_thumb_btn = QPushButton("🖼 Fetch from GameTDB")
-        self._fetch_thumb_btn.setEnabled(bool(self._gameid_edit.text()))
-        self._gameid_edit.textChanged.connect(
-            lambda t: self._fetch_thumb_btn.setEnabled(bool(t))
-        )
         self._fetch_thumb_btn.clicked.connect(self._fetch_thumbnail)
         thumb_row.addWidget(self._fetch_thumb_btn)
 
-        layout.addLayout(thumb_row)
+        body.addLayout(thumb_row)
 
         self._thumb_status_lbl = QLabel("")
         self._thumb_status_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
-        layout.addWidget(self._thumb_status_lbl)
+        self._thumb_status_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        self._thumb_status_lbl.setWordWrap(True)
+        body.addWidget(self._thumb_status_lbl)
+        body.addStretch()
 
-        layout.addStretch()
+        self._readiness_lbl = QLabel()
+        self._readiness_lbl.setWordWrap(True)
+        self._readiness_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addWidget(self._readiness_lbl)
+        self._revert_btn = QPushButton("Revert Changes")
+        self._revert_btn.clicked.connect(self._revert)
+        layout.addWidget(self._revert_btn)
 
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
-        btns.button(QDialogButtonBox.StandardButton.Save).setObjectName("primary_btn")
+        self._save_btn = btns.button(QDialogButtonBox.StandardButton.Save)
+        self._save_btn.setObjectName("primary_btn")
         btns.accepted.connect(self._save)
         btns.rejected.connect(self.reject)
         layout.addWidget(btns)
+        for edit in (
+            self._name_edit, self._author_edit, self._version_edit, self._gameid_edit,
+            self._tags_edit, self._url_edit,
+        ):
+            edit.textChanged.connect(self._update_readiness)
+        self._desc_edit.textChanged.connect(self._update_readiness)
+
+    def _draft(self):
+        from src.core.game_registry import is_valid_serial, normalise_serial
+        game_id = self._gameid_edit.text().strip()
+        if is_valid_serial(game_id):
+            game_id = normalise_serial(game_id)
+        tags = list(dict.fromkeys(
+            tag.strip() for tag in self._tags_edit.text().split(",") if tag.strip()
+        ))
+        return {
+            "name": self._name_edit.text().strip(),
+            "author": self._author_edit.text().strip(),
+            "version": self._version_edit.text().strip(),
+            "game_id": game_id,
+            "description": self._desc_edit.toPlainText().strip(),
+            "source_url": self._url_edit.text().strip(),
+            "tags": tags,
+        }
+
+    def _validation_problem(self, draft):
+        from src.core.game_registry import is_valid_serial
+        if not draft["name"]:
+            return "Name Required", "Enter a mod name."
+        if self.mod.mod_type == ModType.TEXTURE_PACK and not is_valid_serial(draft["game_id"]):
+            return "Game ID Required", "Texture packs need a valid PS2 serial, e.g. SLUS-20062."
+        if draft["source_url"]:
+            try:
+                parsed = urlparse(draft["source_url"])
+                valid = (
+                    parsed.scheme in ("http", "https") and bool(parsed.hostname)
+                    and parsed.username is None and parsed.password is None
+                )
+                parsed.port
+            except ValueError:
+                valid = False
+            if not valid:
+                return "Invalid Source URL", "Enter a valid http(s) source page URL without credentials, or leave it blank."
+        return None
+
+    def _update_readiness(self, *_):
+        from src.core.game_registry import is_valid_serial
+        draft = self._draft()
+        if self._fetching_game_id and draft["game_id"] != self._fetching_game_id:
+            self._discard_thumbnail_result = True
+        if draft["game_id"] != self._fetched_game_id:
+            if self._fetched_thumbnail:
+                self._thumb_status_lbl.setText("Game ID changed; fetched thumbnail cleared.")
+            self._fetched_thumbnail = ""
+        problem = self._validation_problem(draft)
+        dirty = draft != self._original_meta or bool(self._fetched_thumbnail)
+        self._save_btn.setEnabled(dirty and problem is None)
+        self._revert_btn.setEnabled(dirty)
+        self._fetch_thumb_btn.setEnabled(
+            not self._fetching_game_id and is_valid_serial(draft["game_id"])
+        )
+        self._readiness_lbl.setText(
+            problem[1] if problem else "Unsaved changes — ready to save." if dirty else "No unsaved changes."
+        )
+
+    def _revert(self):
+        self._discard_thumbnail_result = True
+        for field, edit in (
+            ("name", self._name_edit), ("author", self._author_edit),
+            ("version", self._version_edit), ("game_id", self._gameid_edit),
+            ("source_url", self._url_edit),
+        ):
+            edit.setText(self._original_meta[field])
+        self._tags_edit.setText(", ".join(self._original_meta["tags"]))
+        self._desc_edit.setPlainText(self._original_meta["description"])
+        self._fetched_thumbnail = ""
+        self._fetched_game_id = ""
+        self._thumb_status_lbl.clear()
+        self._update_readiness()
 
     def _fetch_thumbnail(self):
-        game_id = self._gameid_edit.text().strip()
-        if not game_id:
+        from src.core.game_registry import is_valid_serial
+        game_id = self._draft()["game_id"]
+        if self._fetching_game_id or not is_valid_serial(game_id):
             return
+        self._fetching_game_id = game_id
+        self._discard_thumbnail_result = False
         self._fetch_thumb_btn.setEnabled(False)
         self._thumb_status_lbl.setText("Fetching…")
-        self._dialog_closed = False
 
         import threading
-        import weakref
-        from PyQt6.QtCore import QTimer
         from src.core.downloader import fetch_gametdb_art
         import src.core.config_manager as _cfg
 
-        self_ref = weakref.ref(self)
+        finished = self._thumbnail_finished
 
         def _run():
-            path = fetch_gametdb_art(game_id, str(_cfg.THUMBNAILS_DIR))
-
-            def _update():
-                dlg = self_ref()
-                if dlg is None or getattr(dlg, "_dialog_closed", True):
-                    return
-                if path:
-                    dlg._thumb_status_lbl.setText(f"✅ Saved: {path}")
-                    dlg._fetched_thumbnail = path
-                else:
-                    dlg._thumb_status_lbl.setText("❌ Not found on GameTDB")
-                dlg._fetch_thumb_btn.setEnabled(True)
-
-            QTimer.singleShot(0, _update)
-
-        self._fetched_thumbnail = ""
+            error = ""
+            try:
+                path = fetch_gametdb_art(game_id, str(_cfg.THUMBNAILS_DIR)) or ""
+            except Exception as exc:
+                logger.warning("Could not fetch edit-dialog thumbnail for %s: %s", game_id, exc)
+                path, error = "", str(exc)
+            try:
+                finished.emit(game_id, path, error)
+            except RuntimeError:
+                # The dialog may have been deleted while the request was running.
+                return
         threading.Thread(target=_run, daemon=True).start()
+
+    def _on_thumbnail_finished(self, game_id, path, error):
+        if self._dialog_closed:
+            return
+        self._fetching_game_id = ""
+        if self._discard_thumbnail_result or game_id != self._draft()["game_id"]:
+            self._thumb_status_lbl.setText("Thumbnail result ignored after edits or Revert.")
+        elif path:
+            self._fetched_thumbnail = path
+            self._fetched_game_id = game_id
+            self._thumb_status_lbl.setText("Thumbnail ready — Save to keep this image.")
+        else:
+            self._thumb_status_lbl.setText(
+                f"Thumbnail fetch failed: {error}" if error else "No image found on GameTDB. You can retry."
+            )
+        self._update_readiness()
 
     def closeEvent(self, event):
         """Mark dialog as closed so background thumbnail fetch won't touch widgets."""
@@ -737,46 +852,23 @@ class EditModDialog(QDialog):
         super().accept()
 
     def _save(self):
-        game_id = self._gameid_edit.text().strip()
-        if self.mod.mod_type == ModType.TEXTURE_PACK:
-            from PyQt6.QtWidgets import QMessageBox
-            from src.core.game_registry import is_valid_serial
-
-            if not is_valid_serial(game_id):
-                QMessageBox.warning(
-                    self,
-                    "Game ID Required",
-                    "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
-                )
-                return
-
-        source_url = self._url_edit.text().strip()
-        if source_url:
-            parsed = urlparse(source_url)
-            if parsed.scheme not in ("http", "https") or not parsed.netloc:
-                from PyQt6.QtWidgets import QMessageBox
-                QMessageBox.warning(
-                    self,
-                    "Invalid Source URL",
-                    "Please enter a valid http(s) source page URL, or leave the field blank.",
-                )
-                return
-
-        tags_raw = self._tags_edit.text().strip()
-        tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
-        self.updated_meta = {
-            "name": self._name_edit.text().strip() or self.mod.name,
-            "author": self._author_edit.text().strip(),
-            "version": self._version_edit.text().strip(),
-            "game_id": game_id,
-            "description": self._desc_edit.toPlainText().strip(),
-            "source_url": source_url,
-            "tags": tags,
-        }
-        # Attach thumbnail path if we just fetched one
-        thumb = getattr(self, "_fetched_thumbnail", "")
-        if thumb:
-            self.updated_meta["thumbnail_path"] = thumb
+        from PyQt6.QtWidgets import QMessageBox
+        draft = self._draft()
+        problem = self._validation_problem(draft)
+        if problem:
+            self._update_readiness()
+            QMessageBox.warning(self, *problem)
+            return
+        if self._fetched_thumbnail and self._fetched_game_id == draft["game_id"]:
+            draft["thumbnail_path"] = self._fetched_thumbnail
+        try:
+            if self._save_callback:
+                self._save_callback(draft)
+        except Exception as exc:
+            logger.warning("Could not save metadata for %s: %s", self.mod.id, exc)
+            self._readiness_lbl.setText(f"Could not save: {exc}. Your changes are still here; retry Save.")
+            return
+        self.updated_meta = draft
         self.accept()
 
 

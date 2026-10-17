@@ -926,6 +926,7 @@ class ModPanel(BasePanel):
         if mod:
             dlg = ModDetailsDialog(mod, self)
             dlg.see_more_by_author.connect(self._on_see_more_by_author)
+            dlg.edit_requested.connect(self._on_edit)
             dlg.exec()
 
     def _on_see_more_by_author(self, author: str, target_type: object):
@@ -981,26 +982,16 @@ class ModPanel(BasePanel):
         mod = self.db.get(mod_id)
         if not mod:
             return
-        dlg = EditModDialog(mod, self)
+        def save_metadata(meta):
+            if self.db.get(mod_id) is None:
+                raise ValueError("This mod is no longer installed.")
+            self.manager.update_metadata(mod_id, **meta, fetch_thumbnail=False)
+
+        dlg = EditModDialog(mod, self, save_callback=save_metadata)
         if dlg.exec() == dlg.DialogCode.Accepted:
             meta = dlg.updated_meta
-            self.manager.update_metadata(
-                mod_id,
-                name=meta.get("name", ""),
-                author=meta.get("author", ""),
-                description=meta.get("description", ""),
-                game_id=meta.get("game_id", ""),
-                version=meta.get("version", ""),
-                source_url=meta.get("source_url", ""),
-                tags=meta.get("tags"),
-            )
-            # Apply thumbnail if explicitly fetched in dialog
-            if meta.get("thumbnail_path"):
-                updated = self.db.get(mod_id)
-                if updated:
-                    updated.thumbnail_path = meta["thumbnail_path"]
-                    self.db.update(updated)
             self.emit_status(f"Updated '{meta.get('name', mod.name)}'")
+            self._refresh_author_filter()
             self._invalidate_issue_state_cache()
             self._apply_filter()
 

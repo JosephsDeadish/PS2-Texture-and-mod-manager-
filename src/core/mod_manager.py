@@ -8,6 +8,7 @@ import re
 import shutil
 import tempfile
 import uuid
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -518,40 +519,42 @@ class ModManager:
     def update_metadata(
         self,
         mod_id: str,
-        name: str = "",
-        author: str = "",
-        description: str = "",
-        game_id: str = "",
-        version: str = "",
-        source_url: str = "",
+        name: Optional[str] = None,
+        author: Optional[str] = None,
+        description: Optional[str] = None,
+        game_id: Optional[str] = None,
+        version: Optional[str] = None,
+        source_url: Optional[str] = None,
         tags: Optional[List[str]] = None,
+        *,
+        thumbnail_path: Optional[str] = None,
+        fetch_thumbnail: bool = True,
     ):
         """Update editable metadata fields on an existing mod."""
         mod = self.db.get(mod_id)
         if not mod:
             return
-        if name:
-            mod.name = name
-        if author is not None:
-            mod.author = author
-        if description is not None:
-            mod.description = description
-        if version:
-            mod.version = version
-        if source_url is not None:
-            mod.source_url = source_url
-        if tags is not None:
-            mod.tags = tags
+        original = deepcopy(vars(mod))
+        try:
+            if name:
+                mod.name = name
+            for field, value in (
+                ("author", author), ("description", description), ("version", version),
+                ("source_url", source_url), ("tags", tags), ("thumbnail_path", thumbnail_path),
+            ):
+                if value is not None:
+                    setattr(mod, field, value)
 
-        # If game_id changed and we don't have a thumbnail yet, fetch one
-        if game_id is not None and game_id != mod.game_id:
-            mod.game_id = game_id
-            if game_id and not mod.thumbnail_path:
-                mod.thumbnail_path = self._fetch_thumbnail(game_id) or ""
-        elif game_id is not None:
-            mod.game_id = game_id
-
-        self.db.update(mod)
+            # UI editors fetch explicitly in the background instead of on Save.
+            if game_id is not None:
+                changed = game_id != mod.game_id
+                mod.game_id = game_id
+                if changed and game_id and not mod.thumbnail_path and fetch_thumbnail:
+                    mod.thumbnail_path = self._fetch_thumbnail(game_id) or ""
+            self.db.update(mod)
+        except Exception:
+            vars(mod).update(original)
+            raise
 
     # ------------------------------------------------------------------
     # Thumbnail helpers

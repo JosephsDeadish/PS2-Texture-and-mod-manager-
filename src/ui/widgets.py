@@ -708,6 +708,7 @@ class ModDetailsDialog(QDialog):
 
     # Emitted when the user clicks "See more by [author]" — (author, mod_type_or_None)
     see_more_by_author = pyqtSignal(str, object)
+    edit_requested = pyqtSignal(str)
 
     def __init__(self, mod: ModInfo, parent=None):
         super().__init__(parent)
@@ -728,8 +729,14 @@ class ModDetailsDialog(QDialog):
         header.addWidget(icon_lbl)
 
         title_col = QVBoxLayout()
-        title_col.addWidget(_make_label(self.mod.name, bold=True))
-        title_col.addWidget(_make_label(f"by {self.mod.author}  •  v{self.mod.version}"))
+        name_lbl = _make_label(self.mod.name, bold=True)
+        name_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        name_lbl.setWordWrap(True)
+        title_col.addWidget(name_lbl)
+        author_lbl = _make_label(f"by {self.mod.author}  •  v{self.mod.version}")
+        author_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        author_lbl.setWordWrap(True)
+        title_col.addWidget(author_lbl)
         if self.mod.game_id:
             # Issue #23: show game title alongside the serial
             _title = lookup_game_title(self.mod.game_id)
@@ -768,9 +775,10 @@ class ModDetailsDialog(QDialog):
             src_row = QHBoxLayout()
             src_row.addWidget(QLabel("Source:"))
             src_lbl = QLabel(
-                f'<a href="{self.mod.source_url}" style="color:#6090d0;">'
-                f"{self.mod.source_url[:60]}</a>"
+                f'<a href="{escape(self.mod.source_url, quote=True)}" style="color:#6090d0;">'
+                f"{escape(self.mod.source_url[:60])}</a>"
             )
+            src_lbl.setWordWrap(True)
             src_lbl.setOpenExternalLinks(True)
             src_row.addWidget(src_lbl, 1)
             layout.addLayout(src_row)
@@ -778,7 +786,10 @@ class ModDetailsDialog(QDialog):
         # Path
         path_row = QHBoxLayout()
         path_row.addWidget(QLabel("Location:"))
-        path_row.addWidget(QLabel(self.mod.path), 1)
+        path_lbl = QLabel(self.mod.path)
+        path_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        path_lbl.setWordWrap(True)
+        path_row.addWidget(path_lbl, 1)
         layout.addLayout(path_row)
 
         layout.addStretch()
@@ -833,6 +844,9 @@ class ModDetailsDialog(QDialog):
             layout.addLayout(author_nav_row)
 
         btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        edit_btn = QPushButton("Edit Metadata")
+        edit_btn.clicked.connect(lambda: (self.accept(), self.edit_requested.emit(self.mod.id)))
+        btns.addButton(edit_btn, QDialogButtonBox.ButtonRole.ActionRole)
         btns.rejected.connect(self.reject)
         layout.addWidget(btns)
 
