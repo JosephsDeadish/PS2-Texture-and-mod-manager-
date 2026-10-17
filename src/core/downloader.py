@@ -364,7 +364,7 @@ _PCSX2_WS_RAW = (
 )
 
 
-def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
+def list_pcsx2_widescreen_patches(timeout: int = 10, *, strict: bool = False) -> List[Dict]:
     """
     Fetch the list of available widescreen PNACH patches from the official
     PCSX2 GitHub repository (``bin/cheats_ws/``).
@@ -376,7 +376,8 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
 
     Returns an empty list on any network error. Unexpected errors are logged
     and suppressed.
-    This function is designed to be called from a background thread.
+    Set *strict* to raise DownloadError instead, distinguishing an unavailable
+    index from an empty one. Designed to be called from a background thread.
     """
     try:
         resp = requests.get(
@@ -385,16 +386,16 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
             headers=_GITHUB_HEADERS,
         )
         if resp.status_code != 200:
-            logger.warning(
-                "Failed to list PCSX2 widescreen patches: HTTP %s",
-                resp.status_code,
-            )
-            return []
+            raise DownloadError(f"GitHub returned HTTP {resp.status_code}")
         entries = resp.json()
+        if not isinstance(entries, list):
+            raise DownloadError("GitHub returned an invalid patch index")
         result = []
         for entry in entries:
+            if not isinstance(entry, dict):
+                raise DownloadError("GitHub returned an invalid patch entry")
             name = entry.get("name", "")
-            if name.lower().endswith(".pnach"):
+            if isinstance(name, str) and re.fullmatch(r"[0-9a-fA-F]{8}\.pnach", name, re.IGNORECASE):
                 crc = name[:-6].upper()
                 result.append({
                     "crc": crc,
@@ -407,6 +408,8 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
         return result
     except Exception as exc:
         logger.warning("Failed to list PCSX2 widescreen patches: %s", exc)
+        if strict:
+            raise DownloadError(f"Could not fetch patch index: {exc}") from exc
         return []
 
 
@@ -419,6 +422,8 @@ def download_pcsx2_widescreen_patch(crc: str, dest_dir: str, timeout: int = 15) 
     Returns the local file path on success, or ``None`` on failure.
     """
     crc_upper = crc.upper().strip()
+    if not re.fullmatch(r"[0-9A-F]{8}", crc_upper):
+        raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
     filename = f"{crc_upper}.pnach"
     url = f"{_PCSX2_WS_RAW}{filename}"
     dest = str(Path(dest_dir) / filename)
@@ -433,6 +438,8 @@ def download_pcsx2_widescreen_patch(crc: str, dest_dir: str, timeout: int = 15) 
 def search_pcsx2_patches_by_crc(
     crc: str,
     timeout: int = 10,
+    *,
+    strict: bool = False,
 ) -> Optional[Dict]:
     """
     Check whether a widescreen PNACH exists in the PCSX2 GitHub repository
@@ -440,9 +447,14 @@ def search_pcsx2_patches_by_crc(
 
     Returns a dict ``{"crc": ..., "filename": ..., "download_url": ...}``
     if found, or ``None`` if not found or on network error. Unexpected errors
-    are logged and suppressed.
+    are logged and suppressed. With *strict*, only a confirmed HTTP 404 returns
+    None; invalid input and network/API failures raise DownloadError.
     """
     crc_upper = crc.upper().strip()
+    if not re.fullmatch(r"[0-9A-F]{8}", crc_upper):
+        if strict:
+            raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
+        return None
     filename = f"{crc_upper}.pnach"
     url = f"{_PCSX2_WS_RAW}{filename}"
     try:
@@ -455,14 +467,12 @@ def search_pcsx2_patches_by_crc(
                 "download_url": url,
             }
         if resp.status_code != 404:
-            logger.warning(
-                "Failed to check PCSX2 patch for %s: HTTP %s",
-                crc_upper,
-                resp.status_code,
-            )
+            raise DownloadError(f"GitHub returned HTTP {resp.status_code}")
         return None
     except Exception as exc:
         logger.warning("Failed to check PCSX2 patch for %s: %s", crc_upper, exc)
+        if strict:
+            raise DownloadError(f"Could not check CRC {crc_upper}: {exc}") from exc
         return None
 
 

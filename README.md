@@ -145,6 +145,9 @@
 - Download cover art by game ID directly from GameTDB
 - **Download from URL** — paste any HTTPS link (ZIP, 7z, PNACH, PNG); Google Drive share links auto-converted
 - **🔧 Fetch PNACH from GitHub** — browse and install official PCSX2 widescreen patches
+- Patch index/CRC checks run in the background and distinguish network/API failures from a confirmed missing CRC; checks never replace the full index
+- CRC filtering is debounced, with **Clear Search**, shown/matching counts, and **Show More Patches** to reach results beyond the first 200
+- Patch installs remain visible in Downloads after closing the browser, with library/history updates; existing PNACH files are never overwritten, and failed transfers leave them intact
 - Patreon support banner links directly to the developer's creator page
 
 ### 🔍 Conflict Detection & Resolution

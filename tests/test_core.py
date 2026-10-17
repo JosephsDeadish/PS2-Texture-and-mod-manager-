@@ -6792,6 +6792,366 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
         result = search_pcsx2_patches_by_crc("f0a235b4")  # lower-case input
         self.assertEqual(result["crc"], "F0A235B4")
 
+    @patch("src.core.downloader.requests.get")
+    def test_strict_index_accepts_empty_and_filters_invalid_patch_names(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = []
+        self.assertEqual(list_pcsx2_widescreen_patches(strict=True), [])
+        mock_get.return_value.json.return_value = [
+            {"name": "f0a235b4.pnach"}, {"name": "../outside.pnach"},
+            {"name": "not-a-crc.pnach"}, {"name": "README.md"},
+        ]
+        patches = list_pcsx2_widescreen_patches(strict=True)
+        self.assertEqual([entry["crc"] for entry in patches], ["F0A235B4"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_strict_index_distinguishes_http_network_and_invalid_json_errors(self, mock_get):
+        from src.core.downloader import DownloadError, list_pcsx2_widescreen_patches
+        for status, payload in ((403, []), (500, []), (200, {}), (200, [None])):
+            with self.subTest(status=status, payload=payload):
+                mock_get.return_value.status_code = status
+                mock_get.return_value.json.return_value = payload
+                with self.assertRaises(DownloadError):
+                    list_pcsx2_widescreen_patches(strict=True)
+        mock_get.side_effect = OSError("offline")
+        with self.assertRaisesRegex(DownloadError, "offline"):
+            list_pcsx2_widescreen_patches(strict=True)
+        self.assertEqual(list_pcsx2_widescreen_patches(), [])
+
+    @patch("src.core.downloader.requests.head")
+    def test_strict_crc_distinguishes_not_found_from_failed_checks(self, mock_head):
+        from src.core.downloader import DownloadError, search_pcsx2_patches_by_crc
+        mock_head.return_value.status_code = 404
+        self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4", strict=True))
+        for status in (403, 429, 500):
+            with self.subTest(status=status):
+                mock_head.return_value.status_code = status
+                with self.assertRaisesRegex(DownloadError, str(status)):
+                    search_pcsx2_patches_by_crc("F0A235B4", strict=True)
+        mock_head.side_effect = OSError("offline")
+        with self.assertRaisesRegex(DownloadError, "offline"):
+            search_pcsx2_patches_by_crc("F0A235B4", strict=True)
+        self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+
+    def test_invalid_crc_cannot_start_network_or_choose_an_output_path(self):
+        from src.core.downloader import (
+            DownloadError, download_pcsx2_widescreen_patch, search_pcsx2_patches_by_crc,
+        )
+        with patch("src.core.downloader.requests.head") as head, patch(
+            "src.core.downloader.download_file",
+        ) as transfer:
+            for crc in ("../other", "ZZZZZZZZ", "123", "/tmp/bad"):
+                with self.subTest(crc=crc):
+                    self.assertIsNone(search_pcsx2_patches_by_crc(crc))
+                    with self.assertRaises(DownloadError):
+                        search_pcsx2_patches_by_crc(crc, strict=True)
+                    with self.assertRaises(DownloadError):
+                        download_pcsx2_widescreen_patch(crc, "/unused")
+            head.assert_not_called()
+            transfer.assert_not_called()
+
+
+class TestPnachBrowserFlows(unittest.TestCase):
+    def _fixture(self):
+        module = TestBrowsePanelStatePersistence()._import_browse_panel()
+        dialog = module.PnachGitHubDialog.__new__(module.PnachGitHubDialog)
+        dialog.config = AppConfig(pnach_path="/patches")
+        dialog.db = MagicMock()
+        dialog.parent = MagicMock(return_value=None)
+        dialog._patches = []
+        dialog._checked_patches = {}
+        dialog._installed_paths = {}
+        dialog._index_loaded = False
+        dialog._closed = False
+        dialog._request_id = ""
+        dialog._operation = ""
+        dialog._request_crc = ""
+        dialog._display_limit = module._MAX_PATCH_DISPLAY
+        for name in (
+            "_load_btn", "_check_btn", "_crc_edit", "_progress", "_status",
+            "_count_lbl", "_more_btn", "_filter_timer", "_populate_list",
+        ):
+            setattr(dialog, name, MagicMock())
+        dialog._crc_edit.text.return_value = ""
+        return module, dialog
+
+    @staticmethod
+    def _patch(crc):
+        return {"crc": crc, "filename": f"{crc}.pnach"}
+
+    def test_lookup_captures_no_dialog_and_blocks_duplicate_requests(self):
+        module, dialog = self._fixture()
+        with patch.object(module, "_PnachBrowserResult") as relay, patch.object(
+            module.threading, "Thread",
+        ) as thread:
+            dialog._load_index()
+            request_id = dialog._request_id
+            dialog._load_index()
+            dialog._crc_edit.text.return_value = "F0A235B4"
+            dialog._check_single_crc()
+            thread.assert_called_once()
+            kwargs = thread.call_args.kwargs
+            self.assertIs(kwargs["target"], module._run_pnach_lookup)
+            self.assertEqual(kwargs["args"], (relay.return_value, request_id, ""))
+            dialog._load_btn.setEnabled.assert_called_with(False)
+            dialog._check_btn.setEnabled.assert_called_with(False)
+            relay.return_value.finished.connect.assert_called_once_with(dialog._on_request_finished)
+
+    def test_lookup_workers_use_strict_helpers_and_always_release_relay(self):
+        module, _dialog = self._fixture()
+        for crc, failure in (("", False), ("F0A235B4", False), ("F0A235B4", True)):
+            with self.subTest(crc=crc, failure=failure), patch.object(
+                module, "list_pcsx2_widescreen_patches", return_value=[],
+            ) as index, patch.object(
+                module, "search_pcsx2_patches_by_crc", return_value=None,
+            ) as check:
+                relay = MagicMock()
+                if failure:
+                    check.side_effect = OSError("offline")
+                module._run_pnach_lookup(relay, "request", crc)
+                if crc:
+                    check.assert_called_once_with(crc, timeout=10, strict=True)
+                    index.assert_not_called()
+                else:
+                    index.assert_called_once_with(timeout=15, strict=True)
+                    check.assert_not_called()
+                self.assertEqual(relay.finished.emit.call_args.args[2], "offline" if failure else "")
+                relay.deleteLater.assert_called_once()
+
+    def test_index_completion_applies_current_search_and_retains_checked_results(self):
+        _module, dialog = self._fixture()
+        dialog._checked_patches["FFFFFFFF"] = self._patch("FFFFFFFF")
+        dialog._operation = "index"
+        dialog._request_id = "request"
+        dialog._crc_edit.text.return_value = "B4"
+        patches = [self._patch("A94060E1"), self._patch("F0A235B4")]
+        dialog._on_request_finished("request", patches, "")
+        self.assertIs(dialog._patches, patches)
+        self.assertTrue(dialog._index_loaded)
+        dialog._populate_list.assert_called_once_with([patches[1]])
+        self.assertIn("1 of 1 matches", dialog._count_lbl.setText.call_args.args[0])
+        self.assertIn("3 known", dialog._count_lbl.setText.call_args.args[0])
+        dialog._load_btn.setEnabled.assert_called_with(True)
+
+    def test_crc_results_never_replace_full_index_or_erase_new_search(self):
+        for payload in (None, self._patch("F0A235B4")):
+            with self.subTest(payload=payload):
+                _module, dialog = self._fixture()
+                patches = [self._patch("A94060E1")]
+                dialog._patches = patches
+                dialog._operation = "check"
+                dialog._request_id = "request"
+                dialog._request_crc = "F0A235B4"
+                dialog._crc_edit.text.return_value = "A940"
+                dialog._on_request_finished("request", payload, "")
+                self.assertIs(dialog._patches, patches)
+                dialog._populate_list.assert_called_once_with(patches)
+                dialog._crc_edit.setText.assert_not_called()
+                self.assertEqual(bool(dialog._checked_patches), bool(payload))
+                if payload is None:
+                    self.assertIn("404", dialog._status.setText.call_args.args[0])
+
+    def test_lookup_error_keeps_cached_results_and_reenables_retry(self):
+        _module, dialog = self._fixture()
+        dialog._patches = [self._patch("F0A235B4")]
+        dialog._operation = "index"
+        dialog._request_id = "request"
+        dialog._on_request_finished("request", None, "offline <b>not markup</b>")
+        self.assertEqual(dialog._operation, "")
+        dialog._populate_list.assert_called_with(dialog._patches)
+        dialog._load_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Retry", dialog._status.setText.call_args.args[0])
+        self.assertIn("<b>not markup</b>", dialog._status.setText.call_args.args[0])
+
+    def test_closed_or_stale_results_do_not_touch_widgets(self):
+        for closed, request in ((True, "request"), (False, "old")):
+            _module, dialog = self._fixture()
+            dialog._operation = "index"
+            dialog._closed = closed
+            dialog._request_id = "request"
+            dialog._on_request_finished(request, [], "")
+            dialog._status.setText.assert_not_called()
+            dialog._progress.hide.assert_not_called()
+            dialog._populate_list.assert_not_called()
+
+    def test_crc_validation_checks_hex_not_just_length(self):
+        _module, dialog = self._fixture()
+        dialog._start_request = MagicMock()
+        for value in ("GGGGGGGG", "../other", "1234"):
+            dialog._crc_edit.text.return_value = value
+            dialog._check_single_crc()
+        dialog._start_request.assert_not_called()
+        dialog._crc_edit.text.return_value = "f0a235b4"
+        dialog._check_single_crc()
+        dialog._start_request.assert_called_once_with("check", "F0A235B4")
+
+    def test_search_is_debounced_resets_page_and_can_reveal_all_matches(self):
+        module, dialog = self._fixture()
+        dialog._patches = [self._patch(f"{i:08X}") for i in range(405)]
+        dialog._refresh_list()
+        self.assertIn("200 of 405 matches", dialog._count_lbl.setText.call_args.args[0])
+        dialog._more_btn.setVisible.assert_called_with(True)
+        dialog._show_more()
+        self.assertEqual(dialog._display_limit, 400)
+        dialog._show_more()
+        self.assertIn("405 of 405", dialog._count_lbl.setText.call_args.args[0])
+        dialog._more_btn.setVisible.assert_called_with(False)
+        dialog._populate_list.reset_mock()
+        dialog._filter_list("001")
+        self.assertEqual(dialog._display_limit, module._MAX_PATCH_DISPLAY)
+        dialog._filter_timer.start.assert_called_once()
+        dialog._populate_list.assert_not_called()
+        dialog._crc_edit.text.return_value = "001"
+        dialog._refresh_list()
+        self.assertTrue(all("001" in patch["crc"] for patch in dialog._populate_list.call_args.args[0]))
+
+    def test_thread_start_failure_clears_busy_and_registry(self):
+        module, dialog = self._fixture()
+        with patch.object(module, "_PnachBrowserResult") as relay, patch.object(
+            module.threading, "Thread",
+        ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
+            thread.return_value.start.side_effect = RuntimeError("no threads")
+            dialog._start_request("install", "F0A235B4")
+            self.assertEqual(dialog._operation, "")
+            self.assertEqual(module.ActiveDownloads.all(), [])
+            self.assertIn("no threads", dialog._status.setText.call_args.args[0])
+            relay.return_value.deleteLater.assert_called_once()
+
+    def test_install_captures_config_without_retaining_dialog_or_button(self):
+        module, dialog = self._fixture()
+        button = MagicMock()
+        with patch.object(module, "_PnachBrowserResult"), patch.object(
+            module.threading, "Thread",
+        ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
+            dialog._install_patch(self._patch("F0A235B4"), button)
+            args = thread.call_args.kwargs["args"]
+            self.assertIs(thread.call_args.kwargs["target"], module._run_pnach_install)
+            self.assertIsNot(args[3], dialog.config)
+            dialog.config.pnach_path = "/changed"
+            self.assertEqual(args[3].pnach_path, "/patches")
+            self.assertIs(args[4], dialog.db)
+            self.assertNotIn(dialog, args)
+            self.assertNotIn(button, args)
+            self.assertEqual(module.ActiveDownloads.count(), 1)
+
+    def test_install_worker_stages_tracks_history_and_cleans_up(self):
+        module, _dialog = self._fixture()
+        for failure in ("", "transfer", "registration", "history"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as root:
+                config = AppConfig(pnach_path=str(Path(root) / "cheats"))
+                relay, db = MagicMock(), MagicMock()
+                staged = []
+
+                def download(crc, folder, timeout):
+                    staged.append(Path(folder))
+                    self.assertEqual(module.ActiveDownloads.all()[0]["phase"], "downloading")
+                    if failure == "transfer":
+                        return None
+                    target = Path(folder) / f"{crc}.pnach"
+                    target.write_bytes(b"// patch")
+                    return str(target)
+
+                with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                    "src.core.download_history.record_event",
+                ) as record, patch.object(module.ActiveDownloads, "_entries", {}):
+                    module.ActiveDownloads.register("request", "Patch")
+                    if failure == "registration":
+                        db.add.side_effect = OSError("db read-only")
+                    if failure == "history":
+                        record.side_effect = OSError("history read-only")
+                    module._run_pnach_install(relay, "request", "F0A235B4", config, db)
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+                    self.assertFalse(staged[0].exists())
+                    destination = Path(config.pnach_path) / "F0A235B4.pnach"
+                    request, payload, error = relay.finished.emit.call_args.args
+                    self.assertEqual(request, "request")
+                    if failure == "transfer":
+                        self.assertFalse(destination.exists())
+                        self.assertIsNone(payload)
+                        self.assertTrue(error)
+                        db.add.assert_not_called()
+                        relay.installed.emit.assert_not_called()
+                        self.assertEqual(record.call_args.kwargs["status"], "failed")
+                    else:
+                        self.assertEqual(destination.read_bytes(), b"// patch")
+                        self.assertFalse(error)
+                        self.assertEqual(bool(payload["warnings"]), failure in ("registration", "history"))
+                        self.assertEqual(db.add.call_args.args[0].path, str(destination))
+                        self.assertIn("/PCSX2/pcsx2/blob/", db.add.call_args.args[0].source_url)
+                        self.assertEqual(record.call_args.kwargs["status"], "success")
+                        relay.installed.emit.assert_called_once()
+                    relay.deleteLater.assert_called_once()
+
+    def test_existing_patch_and_symlink_are_never_downloaded_over(self):
+        module, _dialog = self._fixture()
+        for symlink in (False, True):
+            with self.subTest(symlink=symlink), tempfile.TemporaryDirectory() as root:
+                destination = Path(root) / "F0A235B4.pnach"
+                original = Path(root) / "original"
+                original.write_bytes(b"existing")
+                if symlink:
+                    destination.symlink_to(original)
+                else:
+                    destination.write_bytes(b"existing")
+                relay, db = MagicMock(), MagicMock()
+                with patch.object(module, "download_pcsx2_widescreen_patch") as transfer, patch(
+                    "src.core.download_history.record_event",
+                ):
+                    module._run_pnach_install(
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root), db,
+                    )
+                transfer.assert_not_called()
+                db.add.assert_not_called()
+                self.assertEqual(destination.read_bytes(), b"existing")
+                self.assertIn("No file was replaced", relay.finished.emit.call_args.args[2])
+
+    def test_patch_created_during_transfer_is_not_replaced(self):
+        module, _dialog = self._fixture()
+        with tempfile.TemporaryDirectory() as root:
+            destination = Path(root) / "F0A235B4.pnach"
+
+            def download(crc, folder, timeout):
+                destination.write_bytes(b"another install")
+                staged = Path(folder) / "F0A235B4.pnach"
+                staged.write_bytes(b"new")
+                return str(staged)
+
+            relay = MagicMock()
+            with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                "src.core.download_history.record_event",
+            ):
+                module._run_pnach_install(
+                    relay, "request", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                )
+            self.assertEqual(destination.read_bytes(), b"another install")
+            self.assertTrue(relay.finished.emit.call_args.args[2])
+
+    def test_failed_copy_removes_only_new_partial_patch_and_allows_retry(self):
+        module, _dialog = self._fixture()
+        with tempfile.TemporaryDirectory() as root:
+            destination = Path(root) / "F0A235B4.pnach"
+
+            def download(crc, folder, timeout):
+                staged = Path(folder) / "F0A235B4.pnach"
+                staged.write_bytes(b"new")
+                return str(staged)
+
+            with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                "src.core.download_history.record_event",
+            ):
+                relay = MagicMock()
+                with patch.object(module.shutil, "copyfileobj", side_effect=OSError("disk full")):
+                    module._run_pnach_install(
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                    )
+                self.assertFalse(destination.exists())
+                self.assertIn("disk full", relay.finished.emit.call_args.args[2])
+                module._run_pnach_install(
+                    MagicMock(), "retry", "F0A235B4", AppConfig(pnach_path=root), MagicMock(),
+                )
+                self.assertEqual(destination.read_bytes(), b"new")
+
 
 # =============================================================================
 # MediaFire URL resolver (mocked network)
@@ -32344,11 +32704,11 @@ class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
                       "browse_panel must call record_event for download history")
 
     def test_pnach_install_references_record_event(self):
-        """PnachGitHubDialog._install_patch must call record_event."""
+        """The PNACH installation worker must record download history."""
         bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
         src_text = bp_path.read_text(encoding="utf-8")
-        # Verify record_event appears after _install_patch definition
-        install_patch_pos = src_text.find("def _install_patch")
+        # Verify record_event appears after the installation worker definition
+        install_patch_pos = src_text.find("def _run_pnach_install")
         record_event_pos = src_text.find("record_event", install_patch_pos)
         self.assertGreater(record_event_pos, install_patch_pos,
                            "_install_patch must call record_event")

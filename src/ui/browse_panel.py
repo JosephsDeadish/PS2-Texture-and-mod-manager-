@@ -11,6 +11,8 @@ Features:
 
 import logging
 import os
+import re
+import shutil
 from functools import lru_cache
 import threading
 import tempfile
@@ -1991,8 +1993,99 @@ class DownloadInstallDialog(QDialog):
 
 #: Maximum number of widescreen-patch rows displayed at once in PnachGitHubDialog.
 #: The PCSX2 repo has 500+ patches; rendering them all at once degrades UI
-#: performance, so we cap the list and rely on the CRC search to narrow results.
+#: performance, so additional matches are revealed in batches.
 _MAX_PATCH_DISPLAY = 200
+
+
+class _PnachBrowserResult(QObject):
+    finished = pyqtSignal(str, object, str)
+    installed = pyqtSignal()
+
+
+def _run_pnach_lookup(result, request_id, crc):
+    try:
+        if crc:
+            patches = search_pcsx2_patches_by_crc(crc, timeout=10, strict=True)
+        else:
+            patches = list_pcsx2_widescreen_patches(timeout=15, strict=True)
+        result.finished.emit(request_id, patches, "")
+    except Exception as exc:
+        logger.warning("PCSX2 patch lookup failed: %s", exc)
+        result.finished.emit(request_id, None, str(exc) or type(exc).__name__)
+    finally:
+        result.deleteLater()
+
+
+def _run_pnach_install(result, request_id, crc, config, db):
+    """Stage transfers away from live patches and never replace existing files."""
+    source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
+    name = f"Widescreen Patch ({crc})"
+    payload = None
+    error = ""
+    try:
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
+            raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
+        destination = Path(config.pnach_path) / f"{crc}.pnach"
+        if destination.exists() or destination.is_symlink():
+            raise DownloadError(
+                f"{destination} already exists. No file was replaced. "
+                "Review or back up the existing patch before trying again."
+            )
+        with tempfile.TemporaryDirectory(prefix="ps2mm_pnach_") as staging:
+            path = download_pcsx2_widescreen_patch(crc, staging, timeout=15)
+            if not path:
+                raise DownloadError("The patch could not be downloaded. Check your connection and retry.")
+            ActiveDownloads.set_installing(request_id)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            created = False
+            try:
+                with open(path, "rb") as source, destination.open("xb") as target:
+                    created = True
+                    shutil.copyfileobj(source, target)
+            except Exception:
+                if created:
+                    destination.unlink()
+                raise
+        size = destination.stat().st_size
+        warnings = []
+        if db is not None:
+            try:
+                db.add(ModInfo(
+                    id=str(uuid.uuid4()), name=name, mod_type=ModType.PNACH,
+                    path=str(destination), author="PCSX2 Team", source_url=source_url,
+                    files=[str(destination)], size_bytes=size,
+                ))
+            except Exception as exc:
+                logger.warning("Could not save PNACH library registration for %s: %s", crc, exc)
+                warnings.append("The file was installed, but library registration could not be saved.")
+        else:
+            warnings.append("The file was installed without a library record (database unavailable).")
+        try:
+            from src.core.download_history import record_event, STATUS_SUCCESS
+            record_event(
+                config, mod_name=name, mod_type="pnach", source_url=source_url,
+                status=STATUS_SUCCESS, size_bytes=size, note="\n".join(warnings),
+            )
+        except Exception as exc:
+            logger.warning("Could not record PNACH download history for %s: %s", crc, exc)
+            warnings.append("The file was installed, but download history could not be saved.")
+        payload = {"crc": crc, "path": str(destination), "warnings": warnings}
+        result.installed.emit()
+    except Exception as exc:
+        error = str(exc) or type(exc).__name__
+        logger.warning("PCSX2 patch installation failed for %s: %s", crc, error)
+        try:
+            from src.core.download_history import record_event, STATUS_FAILED
+            record_event(
+                config, mod_name=name, mod_type="pnach", source_url=source_url,
+                status=STATUS_FAILED, note=error,
+            )
+        except Exception as history_exc:
+            logger.warning("Could not record failed PNACH history for %s: %s", crc, history_exc)
+    finally:
+        ActiveDownloads.finish(request_id)
+        result.finished.emit(request_id, payload, error)
+        result.deleteLater()
 
 
 class PnachGitHubDialog(QDialog):
@@ -2013,7 +2106,20 @@ class PnachGitHubDialog(QDialog):
         self.setWindowTitle("🔧 Fetch PNACH from PCSX2 GitHub")
         self.setMinimumSize(620, 500)
         self._patches: List[dict] = []
+        self._checked_patches = {}
+        self._installed_paths = {}
+        self._index_loaded = False
+        self._closed = False
+        self._request_id = ""
+        self._operation = ""
+        self._request_crc = ""
+        self._display_limit = _MAX_PATCH_DISPLAY
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(150)
+        self._filter_timer.timeout.connect(self._refresh_list)
         self._build()
+        self._refresh_list()
 
     def _build(self):
         layout = QVBoxLayout(self)
@@ -2034,9 +2140,14 @@ class PnachGitHubDialog(QDialog):
         search_row.addWidget(QLabel("Game CRC (8 hex digits):"))
         self._crc_edit = QLineEdit()
         self._crc_edit.setPlaceholderText("e.g. F0A235B4")
+        self._crc_edit.setAccessibleName("Filter patches by CRC")
         self._crc_edit.setMaxLength(8)
         self._crc_edit.textChanged.connect(self._filter_list)
+        self._crc_edit.returnPressed.connect(self._check_single_crc)
         search_row.addWidget(self._crc_edit, 1)
+        clear_btn = QPushButton("Clear Search")
+        clear_btn.clicked.connect(self._crc_edit.clear)
+        search_row.addWidget(clear_btn)
 
         self._check_btn = QPushButton("🔍 Check CRC")
         self._check_btn.clicked.connect(self._check_single_crc)
@@ -2068,6 +2179,9 @@ class PnachGitHubDialog(QDialog):
         self._list_layout.addStretch()
         self._list_widget.setWidget(self._list_container)
         layout.addWidget(self._list_widget, 1)
+        self._more_btn = QPushButton("Show More Patches")
+        self._more_btn.clicked.connect(self._show_more)
+        layout.addWidget(self._more_btn)
 
         # Progress / status
         self._progress = QProgressBar()
@@ -2076,7 +2190,9 @@ class PnachGitHubDialog(QDialog):
         layout.addWidget(self._progress)
 
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
+        self._status.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self._status.setStyleSheet("color: #9090b0; font-size: 12px;")
         layout.addWidget(self._status)
 
@@ -2088,61 +2204,104 @@ class PnachGitHubDialog(QDialog):
         layout.addLayout(btns)
 
     def _load_index(self):
-        self._load_btn.setEnabled(False)
-        self._progress.show()
-        self._status.setText("Fetching patch index from PCSX2 GitHub…")
-
-        def _run():
-            patches = list_pcsx2_widescreen_patches(timeout=15)
-
-            def _done():
-                self._patches = patches
-                self._progress.hide()
-                self._load_btn.setEnabled(True)
-                if patches:
-                    self._count_lbl.setText(f"  {len(patches)} patches available")
-                    self._status.setText(f"✅  Loaded {len(patches)} widescreen patches from PCSX2 GitHub.")
-                    self._populate_list(patches)
-                else:
-                    self._status.setText("❌  Could not fetch patch index. Check your internet connection.")
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._start_request("index")
 
     def _check_single_crc(self):
         crc = self._crc_edit.text().strip().upper()
-        if len(crc) != 8:
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
             self._status.setText("⚠  Please enter a valid 8-digit hex CRC (e.g. F0A235B4)")
+            self._crc_edit.setFocus()
             return
-        self._check_btn.setEnabled(False)
+        self._start_request("check", crc)
+
+    def _start_request(self, operation, crc=""):
+        if self._closed or self._operation:
+            return
+        self._operation = operation
+        self._request_crc = crc
+        self._request_id = request_id = uuid.uuid4().hex
+        result = _PnachBrowserResult()
+        result.finished.connect(self._on_request_finished)
+        if operation == "install":
+            parent = self.parent()
+            while parent is not None:
+                installed_signal = getattr(parent, "mod_installed", None)
+                if installed_signal is not None:
+                    result.installed.connect(installed_signal)
+                    break
+                parent = parent.parent()
+            config = deepcopy(self.config)
+            source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
+            ActiveDownloads.register(request_id, f"Widescreen Patch ({crc})", source_url=source_url)
+            target = _run_pnach_install
+            args = (result, request_id, crc, config, self.db)
+            text = f"Installing patch {crc}… You can close this dialog and follow progress in Downloads."
+        else:
+            target = _run_pnach_lookup
+            args = (result, request_id, crc)
+            text = f"Checking CRC {crc}…" if crc else "Fetching patch index from PCSX2 GitHub…"
         self._progress.show()
-        self._status.setText(f"Checking for widescreen patch for CRC {crc}…")
+        self._status.setText(text)
+        self._refresh_list()
+        try:
+            threading.Thread(target=target, args=args, daemon=True).start()
+        except RuntimeError as exc:
+            ActiveDownloads.finish(request_id)
+            result.deleteLater()
+            self._on_request_finished(request_id, None, f"Could not start worker: {exc}")
 
-        def _run():
-            result = search_pcsx2_patches_by_crc(crc, timeout=10)
-
-            def _done():
-                self._progress.hide()
-                self._check_btn.setEnabled(True)
-                if result:
-                    self._patches = [result]
-                    self._populate_list([result])
-                    self._status.setText(f"✅  Widescreen patch found for {crc}!")
-                else:
-                    self._populate_list([])
-                    self._status.setText(f"❌  No widescreen patch found for CRC {crc}.")
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    @pyqtSlot(str, object, str)
+    def _on_request_finished(self, request_id, payload, error):
+        if self._closed or request_id != self._request_id or not self._operation:
+            return
+        operation, crc = self._operation, self._request_crc
+        self._operation = ""
+        self._progress.hide()
+        if error:
+            text = f"❌  {error}\nPrevious results are kept. Retry with the same action."
+        elif operation == "index":
+            self._patches = payload
+            self._index_loaded = True
+            text = f"Loaded {len(payload)} patches. Search by CRC or check a complete CRC online."
+        elif operation == "check":
+            if payload:
+                self._checked_patches[crc] = payload
+                text = f"✅  Patch found for {crc}. The full index is unchanged."
+            else:
+                text = f"No patch found for {crc} (GitHub returned 404). Previous results are kept."
+        else:
+            self._installed_paths[crc] = payload["path"]
+            text = f"✅  Installed: {payload['path']}"
+            if payload["warnings"]:
+                text += "\n" + "\n".join(payload["warnings"])
+        self._status.setText(text)
+        self._filter_timer.stop()
+        self._refresh_list()
 
     def _filter_list(self, text: str):
-        if not self._patches:
+        self._display_limit = _MAX_PATCH_DISPLAY
+        self._filter_timer.start()
+
+    @pyqtSlot()
+    def _refresh_list(self):
+        if self._closed:
             return
-        q = text.strip().upper()
-        filtered = [p for p in self._patches if q in p["crc"]] if q else self._patches
+        patches = {patch["crc"]: patch for patch in self._patches}
+        patches.update(self._checked_patches)
+        q = self._crc_edit.text().strip().upper()
+        filtered = [patches[crc] for crc in sorted(patches) if q in crc]
+        self._count_lbl.setText(
+            f"Showing {min(len(filtered), self._display_limit)} of {len(filtered)} matches"
+            f" • {len(patches)} known patches"
+        )
+        self._load_btn.setEnabled(not self._operation)
+        self._check_btn.setEnabled(not self._operation)
+        self._more_btn.setVisible(len(filtered) > self._display_limit)
         self._populate_list(filtered)
+
+    def _show_more(self):
+        self._display_limit += _MAX_PATCH_DISPLAY
+        self._refresh_list()
 
     def _populate_list(self, patches: List[dict]):
         # Remove all existing widgets except the trailing stretch
@@ -2151,12 +2310,18 @@ class PnachGitHubDialog(QDialog):
             if item.widget():
                 item.widget().deleteLater()
 
-        for patch in patches[:_MAX_PATCH_DISPLAY]:
+        for patch in patches[:self._display_limit]:
             row = self._make_patch_row(patch)
             self._list_layout.insertWidget(self._list_layout.count() - 1, row)
 
         if not patches:
-            lbl = QLabel("No patches match the current filter.")
+            text = (
+                "Load Full Patch Index, or enter an 8-digit CRC and choose Check CRC."
+                if not self._index_loaded and not self._checked_patches else
+                "No patches match this CRC filter. Clear Search or check a complete CRC online."
+            )
+            lbl = QLabel(text)
+            lbl.setWordWrap(True)
             lbl.setStyleSheet("color: #606080; font-size: 12px; padding: 8px;")
             self._list_layout.insertWidget(0, lbl)
 
@@ -2168,24 +2333,38 @@ class PnachGitHubDialog(QDialog):
         row.setContentsMargins(8, 4, 8, 4)
         row.setSpacing(8)
 
-        crc_lbl = QLabel(f"<b>{patch['crc']}</b>")
+        crc_lbl = QLabel(patch["crc"])
+        crc_lbl.setTextFormat(Qt.TextFormat.PlainText)
         crc_lbl.setStyleSheet("font-family: monospace; font-size: 12px; color: #80b0ff;")
         crc_lbl.setFixedWidth(110)
         row.addWidget(crc_lbl)
 
         file_lbl = QLabel(patch["filename"])
+        file_lbl.setTextFormat(Qt.TextFormat.PlainText)
         file_lbl.setStyleSheet("color: #9090b0; font-size: 11px;")
         row.addWidget(file_lbl, 1)
 
         dl_btn = QPushButton("⬇ Install")
         dl_btn.setFixedWidth(80)
         dl_btn.setObjectName("primary_btn")
+        installed = self._installed_paths.get(patch["crc"])
+        if installed == str(Path(self.config.pnach_path) / f"{patch['crc']}.pnach"):
+            dl_btn.setText("Installed")
+            dl_btn.setEnabled(False)
+        else:
+            dl_btn.setEnabled(not self._operation)
         dl_btn.clicked.connect(lambda _checked, p=patch: self._install_patch(p, dl_btn))
         row.addWidget(dl_btn)
 
         return frame
 
     def _install_patch(self, patch: dict, btn: QPushButton):
+        if self._closed or self._operation:
+            return
+        crc = patch["crc"].strip().upper()
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
+            self._status.setText("⚠  The patch CRC must contain exactly 8 hexadecimal digits.")
+            return
         pnach_dir = self.config.pnach_path
         if not pnach_dir:
             QMessageBox.warning(
@@ -2193,98 +2372,12 @@ class PnachGitHubDialog(QDialog):
                 "Please configure a PNACH folder in Settings before installing patches.",
             )
             return
-        btn.setEnabled(False)
-        btn.setText("⏳")
-        self._status.setText(f"Downloading {patch['filename']}…")
+        self._start_request("install", crc)
 
-        def _run():
-            path = download_pcsx2_widescreen_patch(patch["crc"], pnach_dir, timeout=15)
-
-            def _done():
-                btn.setEnabled(True)
-                if path:
-                    btn.setText("✅")
-                    btn.setStyleSheet("color: #40c040;")
-                    self._status.setText(f"✅  Installed: {path}")
-                    # Register the patch in the mod database as a tracked entry.
-                    # We do NOT use install_from_folder here because the file is
-                    # already in pnach_dir (the PCSX2-visible location).  Using
-                    # install_from_folder would create a UUID subdirectory copy
-                    # alongside the real file, causing PCSX2 to load the patch
-                    # twice (in tools that scan subdirectories) or leaving a
-                    # confusing duplicate on disk.  Instead we register a ModInfo
-                    # that points directly at the downloaded file.
-                    if self.db is not None:
-                        try:
-                            pnach_file_path = Path(path)
-                            _sz = pnach_file_path.stat().st_size if pnach_file_path.exists() else 0
-                            mod_record = ModInfo(
-                                id=str(uuid.uuid4()),
-                                name=f"Widescreen Patch ({patch['crc']})",
-                                mod_type=ModType.PNACH,
-                                path=path,
-                                author="PCSX2 Team",
-                                source_url=(
-                                    "https://github.com/PCSX2/widescreen_patches/blob/"
-                                    f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
-                                ),
-                                files=[path],
-                                size_bytes=_sz,
-                            )
-                            self.db.add(mod_record)
-                            try:
-                                from src.core.download_history import record_event, STATUS_SUCCESS
-                                record_event(
-                                    self.config,
-                                    mod_name=f"Widescreen Patch ({patch['crc']})",
-                                    mod_type="pnach",
-                                    source_url=mod_record.source_url,
-                                    status=STATUS_SUCCESS,
-                                    size_bytes=_sz,
-                                )
-                            except Exception as exc:
-                                logger.warning(
-                                    "Could not record PNACH download history for %s: %s",
-                                    patch["crc"],
-                                    exc,
-                                )
-                            parent = self.parent()
-                            while parent is not None:
-                                installed_signal = getattr(parent, "mod_installed", None)
-                                if installed_signal is not None:
-                                    try:
-                                        installed_signal.emit()
-                                    except Exception as exc:
-                                        logger.warning("Could not emit browse install signal: %s", exc)
-                                    break
-                                parent = parent.parent() if hasattr(parent, "parent") else None
-                        except Exception as _reg_exc:  # DB registration is best-effort
-                            logger.warning(
-                                "PNACH DB registration warning for %s: %s",
-                                patch["crc"],
-                                _reg_exc,
-                            )
-                else:
-                    btn.setText("⬇ Install")
-                    self._status.setText(f"❌  Download failed for {patch['filename']}.")
-                    try:
-                        from src.core.download_history import record_event, STATUS_FAILED
-                        record_event(
-                            self.config,
-                            mod_name=f"Widescreen Patch ({patch['crc']})",
-                            mod_type="pnach",
-                            status=STATUS_FAILED,
-                        )
-                    except Exception as exc:
-                        logger.warning(
-                            "Could not record failed PNACH download history for %s: %s",
-                            patch["crc"],
-                            exc,
-                        )
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    def done(self, result):
+        self._closed = True
+        self._filter_timer.stop()
+        super().done(result)
 
 
 # ---------------------------------------------------------------------------
