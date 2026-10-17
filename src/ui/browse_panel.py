@@ -258,6 +258,38 @@ def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = 
     return False
 
 
+class _BrowseSerialLookupCache:
+    """Cache browse-time serial database lookups for a single filter pass."""
+
+    def __init__(self, serial_db: object):
+        self._serial_db = serial_db
+        self.title_matches_query = getattr(serial_db, "title_matches_query", None)
+        self._info_cache: dict[str, object] = {}
+        self._titles_cache: dict[str, tuple[str, ...]] = {}
+
+    def get_info(self, title: str):
+        if not isinstance(title, str) or not title:
+            return None
+        if title not in self._info_cache:
+            self._info_cache[title] = self._serial_db.get_info(title)
+        return self._info_cache[title]
+
+    def titles_for_serial(self, serial: str):
+        if not isinstance(serial, str) or not serial:
+            return ()
+        if serial not in self._titles_cache:
+            titles = self._serial_db.titles_for_serial(serial)
+            if titles is None:
+                cached: tuple[str, ...] = ()
+            else:
+                cached = tuple(titles)
+            self._titles_cache[serial] = cached
+        return self._titles_cache[serial]
+
+    def __getattr__(self, name: str):
+        return getattr(self._serial_db, name)
+
+
 def _save_browse_config(config: AppConfig, context: str) -> None:
     try:
         save_config(config)
@@ -2569,6 +2601,9 @@ class _CatalogueTabContent(QWidget):
                 logger.warning("Could not load serial database for alias-aware browse filters: %s", exc)
                 self._serial_db = False
                 _sdb = None
+
+        if q and _sdb not in (None, False):
+            _sdb = _BrowseSerialLookupCache(_sdb)
 
         filtered = []
         for e in self._all_entries:

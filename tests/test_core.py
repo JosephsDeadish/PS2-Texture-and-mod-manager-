@@ -5887,6 +5887,83 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "tags": [],
         }, "missing"))
 
+    def test_browse_search_cache_reuses_serial_database_lookups(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import _BrowseSerialLookupCache
+
+        class CountingSerialDB:
+            def __init__(self):
+                self.info_calls = []
+                self.serial_calls = []
+
+            def title_matches_query(self, title, query):
+                return False
+
+            def get_info(self, title):
+                self.info_calls.append(title)
+                if title == "Final Fantasy X":
+                    from types import SimpleNamespace
+                    return SimpleNamespace(
+                        release_date="2001-12-17",
+                        developer="Square Product Development Division 1",
+                        publisher="Square",
+                        genre="Role-playing",
+                    )
+                return None
+
+            def titles_for_serial(self, serial):
+                self.serial_calls.append(serial)
+                return ["Final Fantasy X"]
+
+        db = CountingSerialDB()
+        cache = _BrowseSerialLookupCache(db)
+
+        self.assertTrue(callable(cache.title_matches_query))
+        first_info = cache.get_info("Final Fantasy X")
+        second_info = cache.get_info("Final Fantasy X")
+        first_titles = cache.titles_for_serial("SLUS-12345")
+        second_titles = cache.titles_for_serial("SLUS-12345")
+
+        self.assertIs(first_info, second_info)
+        self.assertEqual(first_titles, ("Final Fantasy X",))
+        self.assertEqual(second_titles, ("Final Fantasy X",))
+        self.assertEqual(db.info_calls, ["Final Fantasy X"])
+        self.assertEqual(db.serial_calls, ["SLUS-12345"])
+
 
 class TestBrowsePanelStatePersistence(unittest.TestCase):
     """Tests for browse-panel filter state persistence helpers."""
