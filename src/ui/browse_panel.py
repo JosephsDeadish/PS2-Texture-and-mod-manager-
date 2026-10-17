@@ -3696,4 +3696,4 @@ class BrowsePanel(BasePanel):
         """
         if hasattr(self, "_search") and serial:
             self._search.setText(serial)
-            self._apply_filters()
+            self._on_search_timeout()

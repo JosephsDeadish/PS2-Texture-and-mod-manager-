@@ -6958,6 +6958,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         panel._tab_contents[2].apply_filters.assert_called_once_with(*args)
         self.assertEqual(panel._search_timer.stop.call_count, 2)
 
+    def test_library_serial_navigation_flushes_pending_search_state(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search = MagicMock()
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._refresh_active_tab = MagicMock()
+
+        panel.filter_by_serial("SLUS-20062")
+
+        panel._search.setText.assert_called_once_with("SLUS-20062")
+        panel._save_browse_state.assert_called_once_with("updating search filter")
+        panel._search_timer.stop.assert_called_once()
+        panel._refresh_active_tab.assert_called_once()
+
     def test_catalogue_filter_cache_preserves_pagination_and_invalidates(self):
         browse_panel = self._import_browse_panel()
         tab = browse_panel._CatalogueTabContent.__new__(browse_panel._CatalogueTabContent)
