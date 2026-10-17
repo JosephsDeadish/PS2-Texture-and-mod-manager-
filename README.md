@@ -69,6 +69,12 @@
 - **One cover art per game** — enabling a second cover for the same serial offers to auto-disable the other
 - Download cover art from **GameTDB** (free, by game serial ID)
 
+### ⚠️ Installed-Content Conflict Review
+- **Resolve Conflicts** in Library or Browse scans configured PCSX2 folders in the background without freezing the dialog
+- Search scan results by title, serial, CRC, description, or path; combine severity and auto-fixable filters, or **Clear Filters** to recover hidden results
+- Selection survives filtering and re-scans; scrollable details, selected-file **Open Folder**, and **Copy Paths** speed up manual review
+- Auto-Fix requires confirmation, affects only the selected result, and re-scans after success or failure; unavailable/error results cannot be fixed
+
 ### 💾 Memory Card & Save File Manager
 - Browse all `.ps2` / `.mcd` memory card images
 - List and export individual saves

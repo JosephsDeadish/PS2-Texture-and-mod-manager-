@@ -8,7 +8,7 @@ import textwrap
 from pathlib import Path
 from typing import Callable, Optional
 
-from PyQt6.QtCore import Qt, QSize, pyqtSignal, QThread
+from PyQt6.QtCore import QObject, Qt, QSize, pyqtSignal, pyqtSlot, QThread
 from PyQt6.QtGui import QPixmap, QFont, QIcon
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -3108,6 +3108,31 @@ class InstalledScannerDialog(QDialog):
 # ConflictResolverDialog — detect and resolve conflicts between installed content
 # ---------------------------------------------------------------------------
 
+class _ConflictScanResult(QObject):
+    finished = pyqtSignal(int, object, str)
+
+
+def _installed_conflict_key(conflict):
+    return conflict.conflict_type, tuple(sorted(str(path) for path in conflict.items))
+
+
+def _installed_conflict_matches(conflict, query):
+    values = (
+        conflict.title, conflict.description, conflict.resolution,
+        conflict.conflict_type, conflict.severity_label,
+        *(str(path) for path in conflict.items),
+    )
+    text = "\n".join(values).casefold()
+    compact = tuple("".join(ch for ch in value.casefold() if ch.isalnum()) for value in values)
+    return all(
+        term in text or (
+            bool(key := "".join(ch for ch in term if ch.isalnum()))
+            and any(key in value for value in compact)
+        )
+        for term in query.casefold().split()
+    )
+
+
 class ConflictResolverDialog(QDialog):
     """Scans installed PCSX2 content for conflicts — situations where two or
     more items would interfere with each other at runtime.
@@ -3133,10 +3158,22 @@ class ConflictResolverDialog(QDialog):
 
     def __init__(self, config, parent=None):
         super().__init__(parent)
-        self._config    = config
-        self._conflicts = []       # list[Conflict]
+        self._config = config
+        self._conflicts = []
+        self._visible_conflicts = []
+        self._selected_key = None
+        self._scanning = False
+        self._fixing = False
+        self._closed = False
+        self._scan_id = 0
+        self._scan_error = ""
+        from PyQt6.QtCore import QTimer
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(200)
+        self._search_timer.timeout.connect(self._apply_filters)
         self.setWindowTitle("⚠  Conflict Resolver")
-        self.setMinimumSize(860, 560)
+        self.resize(800, 560)
         self._build_ui()
         self._run_scan()
 
@@ -3147,12 +3184,44 @@ class ConflictResolverDialog(QDialog):
 
         # Header
         hdr = QLabel(
-            "PS2 Mod Manager has scanned your installed content for conflicts.\n"
-            "Select a conflict from the list on the left to see details and\n"
-            "suggested resolutions on the right."
+            "Review conflicts in configured PCSX2 folders. Search titles, serials, "
+            "CRCs, descriptions, or file paths. Filters only change this list; "
+            "Auto-Fix affects the selected conflict."
         )
         hdr.setWordWrap(True)
         layout.addWidget(hdr)
+        filter_row = QHBoxLayout()
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Search conflicts or files…")
+        self._search_edit.setAccessibleName("Search installed conflicts")
+        self._search_edit.setClearButtonEnabled(True)
+        self._search_edit.textChanged.connect(lambda *_: self._search_timer.start())
+        filter_row.addWidget(self._search_edit, 1)
+        self._severity_combo = QComboBox()
+        for label, value in (
+            ("All severities", ""), ("Errors", "error"),
+            ("Warnings", "warning"), ("Info", "info"),
+        ):
+            self._severity_combo.addItem(label, value)
+        self._severity_combo.setAccessibleName("Filter conflicts by severity")
+        self._severity_combo.currentIndexChanged.connect(self._apply_filters)
+        filter_row.addWidget(self._severity_combo)
+        layout.addLayout(filter_row)
+        recovery_row = QHBoxLayout()
+        self._autofix_only = QCheckBox("Auto-fixable only")
+        self._autofix_only.toggled.connect(self._apply_filters)
+        recovery_row.addWidget(self._autofix_only)
+        recovery_row.addStretch()
+        clear_btn = QPushButton("Clear Filters")
+        clear_btn.clicked.connect(self._clear_filters)
+        recovery_row.addWidget(clear_btn)
+        self._rescan_btn = QPushButton("Re-scan")
+        self._rescan_btn.clicked.connect(self._run_scan)
+        recovery_row.addWidget(self._rescan_btn)
+        layout.addLayout(recovery_row)
+        self._summary_label = QLabel()
+        self._summary_label.setWordWrap(True)
+        layout.addWidget(self._summary_label)
 
         # Splitter: conflict list (left) + detail panel (right)
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -3162,18 +3231,11 @@ class ConflictResolverDialog(QDialog):
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._summary_label = QLabel("")
-        self._summary_label.setWordWrap(True)
-        left_layout.addWidget(self._summary_label)
-
         self._list_widget = QListWidget()
         self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.setWordWrap(True)
         self._list_widget.currentRowChanged.connect(self._on_conflict_selected)
         left_layout.addWidget(self._list_widget)
-
-        rescan_btn = QPushButton("🔄 Re-scan")
-        rescan_btn.clicked.connect(self._run_scan)
-        left_layout.addWidget(rescan_btn)
 
         splitter.addWidget(left)
 
@@ -3182,10 +3244,10 @@ class ConflictResolverDialog(QDialog):
         right_layout = QVBoxLayout(right)
         right_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._detail_label = QLabel("← Select a conflict from the list")
-        self._detail_label.setWordWrap(True)
-        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self._detail_label.setTextFormat(Qt.TextFormat.RichText)
+        self._detail_label = QTextEdit()
+        self._detail_label.setReadOnly(True)
+        self._detail_label.setMinimumSize(0, 60)
+        self._detail_label.setAccessibleName("Conflict details")
         right_layout.addWidget(self._detail_label, 1)
 
         sep = QFrame()
@@ -3198,6 +3260,7 @@ class ConflictResolverDialog(QDialog):
 
         self._resolution_label = QLabel("")
         self._resolution_label.setWordWrap(True)
+        self._resolution_label.setTextFormat(Qt.TextFormat.PlainText)
         right_layout.addWidget(self._resolution_label)
 
         # Files involved
@@ -3218,13 +3281,16 @@ class ConflictResolverDialog(QDialog):
         self._autofix_btn.clicked.connect(self._on_auto_fix)
         action_row.addWidget(self._autofix_btn)
 
-        open_folder_btn = QPushButton("📂 Open Folder")
-        open_folder_btn.setToolTip("Open the folder containing the conflicting file(s)")
-        open_folder_btn.clicked.connect(self._on_open_folder)
-        action_row.addWidget(open_folder_btn)
-
+        self._open_folder_btn = QPushButton("📂 Open Folder")
+        self._open_folder_btn.setToolTip("Open the selected file's folder, or the first involved folder")
+        self._open_folder_btn.clicked.connect(self._on_open_folder)
+        action_row.addWidget(self._open_folder_btn)
         action_row.addStretch()
         right_layout.addLayout(action_row)
+        self._copy_files_btn = QPushButton("Copy Paths")
+        self._copy_files_btn.setToolTip("Copy all file paths for the selected conflict")
+        self._copy_files_btn.clicked.connect(self._on_copy_paths)
+        right_layout.addWidget(self._copy_files_btn)
 
         splitter.addWidget(right)
         splitter.setSizes([280, 560])
@@ -3237,94 +3303,165 @@ class ConflictResolverDialog(QDialog):
 
     # ------------------------------------------------------------------
     def _run_scan(self):
+        if self._closed or self._scanning or self._fixing:
+            return
+        import threading
+        self._search_timer.stop()
+        self._scanning = True
+        self._scan_error = ""
+        self._scan_id += 1
+        scan_id = self._scan_id
+        config = deepcopy(self._config)
+        self._conflicts = []
+        self._visible_conflicts = []
         self._list_widget.clear()
-        self._detail_label.setText("⏳ Scanning for conflicts…")
+        self._summary_label.setText("Scanning configured folders…")
+        self._detail_label.setPlainText("Scanning in the background. You can change filters or close this window.")
         self._resolution_label.setText("")
         self._files_list.clear()
         self._autofix_btn.setEnabled(False)
-        QApplication.processEvents()
+        self._open_folder_btn.setEnabled(False)
+        self._copy_files_btn.setEnabled(False)
+        self._rescan_btn.setEnabled(False)
+        # Keep the relay alive independently of the dialog during filesystem I/O.
+        result = _ConflictScanResult()
+        result.finished.connect(self._on_scan_finished)
+
+        def run():
+            conflicts, error = [], ""
+            try:
+                from src.core.conflict_resolver import resolve_all_conflicts
+                conflicts = resolve_all_conflicts(config)
+            except Exception as exc:
+                logger.warning("Could not scan installed conflicts: %s", exc)
+                error = str(exc) or type(exc).__name__
+            result.finished.emit(scan_id, conflicts, error)
+            result.deleteLater()
 
         try:
-            from src.core.conflict_resolver import resolve_all_conflicts
-        except Exception as exc:
-            logger.warning("Could not import conflict scan helpers: %s", exc)
-            self._detail_label.setText(f"Scan failed: {exc}")
+            threading.Thread(target=run, daemon=True).start()
+        except RuntimeError as exc:
+            logger.warning("Could not start installed-conflict scan: %s", exc)
+            result.deleteLater()
+            self._on_scan_finished(scan_id, [], str(exc) or type(exc).__name__)
+
+    @pyqtSlot(int, object, str)
+    def _on_scan_finished(self, scan_id, conflicts, error):
+        if self._closed or scan_id != self._scan_id:
             return
+        self._scanning = False
+        self._scan_error = error
+        self._conflicts = list(conflicts) if not error else []
+        self._rescan_btn.setEnabled(True)
+        self._apply_filters()
 
-        self._conflicts = resolve_all_conflicts(self._config)
-
-        if not self._conflicts:
-            self._summary_label.setText("✅ No conflicts found!")
-            self._detail_label.setText(
-                "✅ No conflicts detected.\n\n"
-                "All installed content appears consistent.  PNACH files, "
-                "texture packs, and cover art images are not conflicting with "
-                "each other."
-            )
+    def _apply_filters(self, *_):
+        self._search_timer.stop()
+        if self._scanning or self._closed:
             return
-
-        errors   = sum(1 for c in self._conflicts if c.severity == "error")
-        warnings = sum(1 for c in self._conflicts if c.severity == "warning")
-        infos    = sum(1 for c in self._conflicts if c.severity == "info")
-
-        parts = []
-        if errors:
-            parts.append(f"{errors} error(s)")
-        if warnings:
-            parts.append(f"{warnings} warning(s)")
-        if infos:
-            parts.append(f"{infos} info")
-        self._summary_label.setText(f"Found: {', '.join(parts)}")
-
-        for conflict in self._conflicts:
-            label = f"{conflict.severity_label}  {conflict.title}"
-            item = QListWidgetItem(label)
-            item.setForeground(
-                __import__('PyQt6.QtGui', fromlist=['QColor']).QColor(conflict.severity_color)
+        query = self._search_edit.text()
+        severity = self._severity_combo.currentData() or ""
+        fixable = self._autofix_only.isChecked()
+        if self._selected_key not in {_installed_conflict_key(c) for c in self._conflicts}:
+            self._selected_key = None
+        self._visible_conflicts = [
+            conflict for conflict in self._conflicts
+            if (not severity or conflict.severity == severity)
+            and (not fixable or conflict.can_auto_fix)
+            and _installed_conflict_matches(conflict, query)
+        ]
+        self._list_widget.blockSignals(True)
+        self._list_widget.clear()
+        for conflict in self._visible_conflicts:
+            item = QListWidgetItem(
+                f"{conflict.severity_label}  {conflict.title}\n"
+                f"{len(conflict.items)} file(s) • "
+                + ("Auto-fix available" if conflict.can_auto_fix else "Manual review")
             )
+            item.setToolTip("\n".join(str(path) for path in conflict.items))
             self._list_widget.addItem(item)
-
-        self._detail_label.setText(
-            f"Found <b>{len(self._conflicts)}</b> conflict(s).  "
-            "Select one for details."
+        keys = [_installed_conflict_key(conflict) for conflict in self._visible_conflicts]
+        if keys:
+            self._list_widget.setCurrentRow(keys.index(self._selected_key) if self._selected_key in keys else 0)
+        self._list_widget.blockSignals(False)
+        counts = [f"{sum(c.severity == value for c in self._conflicts)} {value}" for value in ("error", "warning", "info")]
+        self._summary_label.setText(
+            f"Showing {len(keys)} of {len(self._conflicts)} conflicts • " + ", ".join(counts)
+            if not self._scan_error else "Scan failed — use Re-scan to retry."
         )
+        self._on_conflict_selected(self._list_widget.currentRow(), remember=False)
+
+    def _clear_filters(self):
+        for widget in (self._search_edit, self._severity_combo, self._autofix_only):
+            widget.blockSignals(True)
+        self._search_edit.clear()
+        self._severity_combo.setCurrentIndex(0)
+        self._autofix_only.setChecked(False)
+        for widget in (self._search_edit, self._severity_combo, self._autofix_only):
+            widget.blockSignals(False)
+        self._apply_filters()
+
+    def _selected_conflict(self):
+        if self._closed or self._scanning or self._fixing:
+            return None
+        row = self._list_widget.currentRow()
+        return self._visible_conflicts[row] if 0 <= row < len(self._visible_conflicts) else None
 
     # ------------------------------------------------------------------
-    def _on_conflict_selected(self, row: int):
-        if row < 0 or row >= len(self._conflicts):
+    def _on_conflict_selected(self, row: int, remember=True):
+        conflict = self._selected_conflict()
+        self._autofix_btn.setEnabled(bool(conflict and conflict.can_auto_fix))
+        self._open_folder_btn.setEnabled(bool(conflict and conflict.items))
+        self._copy_files_btn.setEnabled(bool(conflict and conflict.items))
+        self._files_list.clear()
+        if conflict is None:
+            self._resolution_label.clear()
+            if self._scan_error:
+                message = f"Scan failed: {self._scan_error}\nUse Re-scan to retry. No fixes are available from a failed scan."
+            elif self._conflicts:
+                message = "No conflicts match these filters. Use Clear Filters to show all scan results."
+            elif not any(getattr(self._config, name, "") for name in (
+                "pnach_path", "cheats_path", "textures_path", "cover_art_path",
+            )):
+                message = "No PCSX2 content folders are configured. Set the paths in Settings, then Re-scan."
+            else:
+                message = "No conflicts found in configured folders.\nUnreadable or missing content may be skipped; see the log for scan warnings."
+            self._detail_label.setPlainText(message)
             return
 
-        conflict = self._conflicts[row]
-
-        color = conflict.severity_color
-        detail_html = (
-            f"<b style='color:{color}'>{conflict.severity_label}</b><br>"
-            f"<b>{conflict.title}</b><br><br>"
-            f"{conflict.description.replace(chr(10), '<br>')}"
+        if remember or self._selected_key is None:
+            self._selected_key = _installed_conflict_key(conflict)
+        self._detail_label.setPlainText(
+            f"{conflict.severity_label}\n{conflict.title}\n\n{conflict.description}"
         )
-        self._detail_label.setText(detail_html)
         self._resolution_label.setText(conflict.resolution)
-
-        self._files_list.clear()
         for path in conflict.items:
             self._files_list.addItem(str(path))
-
-        self._autofix_btn.setEnabled(conflict.can_auto_fix)
+        if conflict.items:
+            self._files_list.setCurrentRow(0)
 
     # ------------------------------------------------------------------
     def _on_auto_fix(self):
-        row = self._list_widget.currentRow()
-        if row < 0 or row >= len(self._conflicts):
+        conflict = self._selected_conflict()
+        if conflict is None or not conflict.can_auto_fix:
             return
 
-        conflict = self._conflicts[row]
+        self._fixing = True
+        self._autofix_btn.setEnabled(False)
+        self._rescan_btn.setEnabled(False)
         reply = QMessageBox.question(
             self,
             "Auto-Fix Conflict",
-            f"This will:\n{conflict.resolution}\n\nProceed?",
+            f"<p>Auto-fix '{escape(conflict.title)}'?</p>"
+            f"<p>{escape(conflict.resolution)}</p>"
+            "This can modify or delete the involved files. Back them up first. Proceed?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
         if reply != QMessageBox.StandardButton.Yes:
+            self._fixing = False
+            self._rescan_btn.setEnabled(True)
+            self._apply_filters()
             return
 
         try:
@@ -3332,28 +3469,25 @@ class ConflictResolverDialog(QDialog):
             ok, message = auto_fix_conflict(conflict)
         except Exception as exc:
             logger.warning("Could not auto-fix conflict %s: %s", conflict.conflict_type, exc)
-            QMessageBox.critical(self, "Auto-Fix Error", str(exc))
-            return
-
-        if ok:
-            QMessageBox.information(self, "✅ Fixed", message)
-            self._run_scan()
+            QMessageBox.critical(self, "Auto-Fix Error", f"<p>{escape(str(exc))}</p>")
         else:
-            QMessageBox.warning(self, "Auto-Fix Failed", message)
+            if ok:
+                QMessageBox.information(self, "✅ Fixed", f"<p>{escape(message)}</p>")
+            else:
+                QMessageBox.warning(self, "Auto-Fix Failed", f"<p>{escape(message)}</p>")
+        finally:
+            self._fixing = False
+            self._run_scan()
 
     # ------------------------------------------------------------------
     def _on_open_folder(self):
-        row = self._list_widget.currentRow()
-        if row < 0 or row >= len(self._conflicts):
+        conflict = self._selected_conflict()
+        if conflict is None or not conflict.items:
             return
 
-        conflict = self._conflicts[row]
-        if not conflict.items:
-            return
-
-        folder = conflict.items[0]
-        if folder.is_file():
-            folder = folder.parent
+        row = self._files_list.currentRow()
+        path = Path(conflict.items[row if 0 <= row < len(conflict.items) else 0])
+        folder = path if path.is_dir() else path.parent
         _open_local_folder(
             folder,
             self,
@@ -3361,6 +3495,16 @@ class ConflictResolverDialog(QDialog):
             failure_title="Folder Unavailable",
             failure_message="Could not open the folder for the selected conflict.",
         )
+
+    def _on_copy_paths(self):
+        conflict = self._selected_conflict()
+        if conflict and conflict.items:
+            QApplication.clipboard().setText("\n".join(str(path) for path in conflict.items))
+
+    def done(self, result):
+        self._closed = True
+        self._search_timer.stop()
+        super().done(result)
 
 
 # ---------------------------------------------------------------------------

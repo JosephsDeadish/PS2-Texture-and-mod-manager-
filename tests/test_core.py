@@ -3477,6 +3477,8 @@ class TestWidgetsLogging(unittest.TestCase):
         })
         qtcore.QSize = type("QSize", (), {})
         qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
         qtcore.QThread = type("QThread", (), {})
         qtwidgets = types.ModuleType("PyQt6.QtWidgets")
         for name in (
@@ -3632,10 +3634,10 @@ class TestWidgetsLogging(unittest.TestCase):
                 conflict_file.write_text("data", encoding="utf-8")
 
                 fake = SimpleNamespace(
-                    _list_widget=MagicMock(),
-                    _conflicts=[SimpleNamespace(items=[conflict_file])],
+                    _selected_conflict=lambda: SimpleNamespace(items=[conflict_file]),
+                    _files_list=MagicMock(),
                 )
-                fake._list_widget.currentRow.return_value = 0
+                fake._files_list.currentRow.return_value = 0
 
                 with patch("PyQt6.QtGui.QDesktopServices.openUrl", return_value=False):
                     with patch("src.ui.widgets.QMessageBox.warning") as warning:
@@ -3761,6 +3763,306 @@ class TestWidgetsLogging(unittest.TestCase):
         makedirs.assert_called_once()
         critical.assert_called_once()
         self.assertTrue(any("Could not write PNACH file" in msg for msg in logs.output))
+
+
+class TestInstalledConflictReview(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        import src.ui.widgets as module
+        self.module = module
+        stack.enter_context(patch.object(module, "QListWidgetItem", side_effect=lambda *args: MagicMock()))
+        self.error = Conflict(
+            "pnach_address_clash", ConflictSeverity.ERROR,
+            "Address clash: DEADBEEF", "Two files patch the same EE address.",
+            [Path("/pcsx2/cheats/DEADBEEF.pnach"), Path("/pcsx2/cheats_ws/DEADBEEF.pnach")],
+            "Remove overlapping lines.", True,
+        )
+        self.warning = Conflict(
+            "cover_art_duplicate", ConflictSeverity.WARNING,
+            "Duplicate cover: SLUS-20312", "Several images for Kingdom Hearts.",
+            [Path("/pcsx2/covers/SLUS-20312.png"), Path("/other/covers/SLUS-20312.jpg")],
+            "Remove redundant images.", True,
+        )
+        self.info = Conflict(
+            "texture_duplicate_hash", ConflictSeverity.INFO,
+            "Duplicate texture data", "Identical texture files.",
+            [Path("/pcsx2/textures/SLUS-20062/replacements/a.png")],
+            "Review files manually.", False,
+        )
+        self.dialog = SimpleNamespace(
+            _config=AppConfig(pnach_path="/pcsx2/cheats"),
+            _conflicts=[self.error, self.warning, self.info],
+            _visible_conflicts=[], _selected_key=None, _row=-1,
+            _scanning=False, _fixing=False, _closed=False, _scan_id=0, _scan_error="",
+        )
+        for name in (
+            "_search_timer", "_search_edit", "_severity_combo", "_autofix_only",
+            "_list_widget", "_files_list", "_summary_label", "_detail_label",
+            "_resolution_label", "_autofix_btn", "_open_folder_btn",
+            "_copy_files_btn", "_rescan_btn",
+        ):
+            setattr(self.dialog, name, MagicMock())
+        self.dialog._search_edit.text.return_value = ""
+        self.dialog._severity_combo.currentData.return_value = ""
+        self.dialog._autofix_only.isChecked.return_value = False
+        self.dialog._list_widget.currentRow.side_effect = lambda: self.dialog._row
+        self.dialog._list_widget.clear.side_effect = lambda: setattr(self.dialog, "_row", -1)
+        self.dialog._list_widget.setCurrentRow.side_effect = lambda row: setattr(self.dialog, "_row", row)
+        self.dialog._files_list.currentRow.return_value = 0
+        for name in (
+            "_run_scan", "_on_scan_finished", "_apply_filters", "_clear_filters",
+            "_selected_conflict", "_on_conflict_selected", "_on_auto_fix",
+            "_on_open_folder", "_on_copy_paths",
+        ):
+            setattr(self.dialog, name, MethodType(getattr(module.ConflictResolverDialog, name), self.dialog))
+        box = module.QMessageBox
+        box.StandardButton = SimpleNamespace(Yes=1, No=2)
+
+    def test_search_matches_across_fields_and_ignores_serial_punctuation(self):
+        matches = self.module._installed_conflict_matches
+        for query in ("kingdom SLUS20312", "WARNING png", "cover_art /other/covers", ""):
+            with self.subTest(query=query):
+                self.assertTrue(matches(self.warning, query))
+        for query in ("kingdom missing", "DEADBEEF", "!!!"):
+            with self.subTest(query=query):
+                self.assertFalse(matches(self.warning, query))
+
+    def test_stable_key_uses_type_and_paths_not_title_or_order(self):
+        from copy import deepcopy
+        other = deepcopy(self.warning)
+        other.title = "Updated count"
+        other.items.reverse()
+        self.assertEqual(self.module._installed_conflict_key(other),
+                         self.module._installed_conflict_key(self.warning))
+        other.conflict_type = "other"
+        self.assertNotEqual(self.module._installed_conflict_key(other),
+                            self.module._installed_conflict_key(self.warning))
+
+    def test_filters_compose_without_changing_source_results(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._severity_combo.currentData.return_value = "warning"
+        d._autofix_only.isChecked.return_value = True
+        d._apply_filters()
+        self.assertEqual(d._visible_conflicts, [self.warning])
+        self.assertEqual(d._conflicts, [self.error, self.warning, self.info])
+        self.assertIs(d._selected_conflict(), self.warning)
+        self.assertIn("Showing 1 of 3", d._summary_label.setText.call_args.args[0])
+        d._severity_combo.currentData.return_value = "error"
+        d._apply_filters()
+        self.assertEqual(d._visible_conflicts, [])
+
+    def test_auto_fix_filter_excludes_manual_results(self):
+        self.dialog._autofix_only.isChecked.return_value = True
+        self.dialog._apply_filters()
+        self.assertEqual(self.dialog._visible_conflicts, [self.error, self.warning])
+
+    def test_default_selection_and_manual_action_readiness(self):
+        d = self.dialog
+        d._severity_combo.currentData.return_value = "info"
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.info)
+        d._autofix_btn.setEnabled.assert_called_with(False)
+        d._open_folder_btn.setEnabled.assert_called_with(True)
+        d._copy_files_btn.setEnabled.assert_called_with(True)
+
+    def test_selection_survives_hiding_and_clearing_filters(self):
+        d = self.dialog
+        d._apply_filters()
+        d._row = 1
+        d._on_conflict_selected(1)
+        key = d._selected_key
+        d._search_edit.text.return_value = "DEADBEEF"
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.error)
+        self.assertEqual(d._selected_key, key)
+        d._search_edit.text.return_value = ""
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.warning)
+
+    def test_rescan_preserves_identity_after_reordering(self):
+        from copy import deepcopy
+        d = self.dialog
+        d._selected_key = self.module._installed_conflict_key(self.warning)
+        replacement = deepcopy(self.warning)
+        replacement.title = "New title"
+        d._on_scan_finished(0, [self.info, self.error, replacement], "")
+        self.assertIs(d._selected_conflict(), replacement)
+
+    def test_removed_selection_falls_back_to_first_result(self):
+        d = self.dialog
+        d._selected_key = self.module._installed_conflict_key(self.warning)
+        d._on_scan_finished(0, [self.info], "")
+        self.assertEqual(d._selected_key, self.module._installed_conflict_key(self.info))
+
+    def test_empty_filter_result_disables_all_actions(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "nothing matches"
+        d._apply_filters()
+        self.assertIn("Clear Filters", d._detail_label.setPlainText.call_args.args[0])
+        for button in (d._autofix_btn, d._open_folder_btn, d._copy_files_btn):
+            button.setEnabled.assert_called_with(False)
+        d._resolution_label.clear.assert_called()
+
+    def test_empty_scan_distinguishes_unconfigured_paths(self):
+        d = self.dialog
+        d._conflicts = []
+        d._apply_filters()
+        self.assertIn("No conflicts found in configured folders", d._detail_label.setPlainText.call_args.args[0])
+        d._config = AppConfig()
+        d._apply_filters()
+        self.assertIn("Settings", d._detail_label.setPlainText.call_args.args[0])
+
+    def test_clear_filters_resets_every_control(self):
+        d = self.dialog
+        d._clear_filters()
+        d._search_edit.clear.assert_called_once()
+        d._severity_combo.setCurrentIndex.assert_called_once_with(0)
+        d._autofix_only.setChecked.assert_called_once_with(False)
+        for widget in (d._search_edit, d._severity_combo, d._autofix_only):
+            self.assertEqual(widget.blockSignals.call_args_list, [unittest.mock.call(True), unittest.mock.call(False)])
+
+    def test_details_and_resolution_are_literal_text(self):
+        self.error.title = "<img src='local'>"
+        self.error.description = "<b>Do not render</b>"
+        self.error.resolution = "<a href='unsafe'>text</a>"
+        d = self.dialog
+        d._apply_filters()
+        text = d._detail_label.setPlainText.call_args.args[0]
+        self.assertIn(self.error.title, text)
+        self.assertIn(self.error.description, text)
+        d._detail_label.setHtml.assert_not_called()
+        d._resolution_label.setText.assert_called_with(self.error.resolution)
+
+    def test_folder_uses_selected_file_not_original_conflict_index(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        d._files_list.currentRow.return_value = 1
+        with patch.object(self.module, "_open_local_folder") as opener:
+            d._on_open_folder()
+        self.assertEqual(opener.call_args.args[0], Path("/other/covers"))
+
+    def test_copy_paths_uses_only_visible_selected_conflict(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        with patch.object(self.module.QApplication, "clipboard", create=True) as clipboard:
+            d._on_copy_paths()
+        clipboard.return_value.setText.assert_called_once_with("\n".join(map(str, self.warning.items)))
+
+    def test_auto_fix_confirms_filtered_item_and_defaults_to_no(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=2) as question:
+            with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                d._on_auto_fix()
+        fixer.assert_not_called()
+        self.assertIn(self.warning.title, question.call_args.args[2])
+        self.assertEqual(question.call_args.args[-1], 2)
+        self.assertFalse(d._fixing)
+        d._rescan_btn.setEnabled.assert_called_with(True)
+
+    def test_fix_attempt_always_rescans_including_partial_failure(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        for outcome in ((True, "Fixed"), (False, "Some files failed"), OSError("denied")):
+            with self.subTest(outcome=outcome):
+                with patch.object(self.module.QMessageBox, "question", return_value=1):
+                    with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                        if isinstance(outcome, Exception):
+                            fixer.side_effect = outcome
+                        else:
+                            fixer.return_value = outcome
+                        with patch.object(d, "_run_scan") as scan:
+                            with self.assertNoLogs("src.ui.widgets") if not isinstance(outcome, Exception) else self.assertLogs("src.ui.widgets", level="WARNING"):
+                                d._on_auto_fix()
+                fixer.assert_called_once_with(self.warning)
+                scan.assert_called_once()
+                self.assertFalse(d._fixing)
+
+    def test_scanning_fixing_and_invalid_rows_block_actions(self):
+        d = self.dialog
+        d._apply_filters()
+        for scanning, fixing, row in ((True, False, 0), (False, True, 0), (False, False, -1), (False, False, 99)):
+            d._scanning, d._fixing, d._row = scanning, fixing, row
+            self.assertIsNone(d._selected_conflict())
+            with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                with patch.object(self.module, "_open_local_folder") as opener:
+                    d._on_auto_fix()
+                    d._on_open_folder()
+            fixer.assert_not_called()
+            opener.assert_not_called()
+
+    def test_failed_scan_drops_stale_results_and_remains_retryable(self):
+        d = self.dialog
+        d._scanning = True
+        d._on_scan_finished(0, [self.error], "permission <denied>")
+        self.assertFalse(d._scanning)
+        self.assertEqual(d._conflicts, [])
+        self.assertIn("permission <denied>", d._detail_label.setPlainText.call_args.args[0])
+        d._rescan_btn.setEnabled.assert_called_with(True)
+        d._autofix_btn.setEnabled.assert_called_with(False)
+
+    def test_old_or_closed_scan_completion_is_ignored(self):
+        d = self.dialog
+        d._on_scan_finished(-1, [], "old failure")
+        d._rescan_btn.setEnabled.assert_not_called()
+        d._closed = True
+        d._on_scan_finished(0, [], "")
+        d._rescan_btn.setEnabled.assert_not_called()
+        self.assertIsNone(d._selected_conflict())
+
+    def test_scan_runs_worker_with_config_snapshot_and_no_direct_ui_updates(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult") as relay:
+            with patch("threading.Thread") as thread:
+                d._run_scan()
+                self.assertTrue(d._scanning)
+                self.assertEqual(d._conflicts, [])
+                d._rescan_btn.setEnabled.assert_called_with(False)
+                d._run_scan()
+                thread.assert_called_once()
+                d._config.pnach_path = "/changed"
+                d._summary_label.reset_mock()
+                with patch("src.core.conflict_resolver.resolve_all_conflicts", return_value=[self.warning]) as scanner:
+                    thread.call_args.kwargs["target"]()
+                self.assertEqual(scanner.call_args.args[0].pnach_path, "/pcsx2/cheats")
+                d._summary_label.setText.assert_not_called()
+                relay.return_value.finished.emit.assert_called_once_with(1, [self.warning], "")
+                relay.return_value.deleteLater.assert_called_once()
+                d._on_scan_finished(*relay.return_value.finished.emit.call_args.args)
+                self.assertIs(d._selected_conflict(), self.warning)
+
+    def test_worker_failure_with_empty_exception_message_is_not_success(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult") as relay:
+            with patch("threading.Thread") as thread:
+                d._run_scan()
+                with patch("src.core.conflict_resolver.resolve_all_conflicts", side_effect=OSError()):
+                    with self.assertLogs("src.ui.widgets", level="WARNING"):
+                        thread.call_args.kwargs["target"]()
+                self.assertEqual(relay.return_value.finished.emit.call_args.args, (1, [], "OSError"))
+
+    def test_thread_start_failure_unlocks_retry(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult"):
+            with patch("threading.Thread") as thread:
+                thread.return_value.start.side_effect = RuntimeError("no threads")
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    d._run_scan()
+        self.assertFalse(d._scanning)
+        self.assertEqual(d._scan_error, "no threads")
+        d._rescan_btn.setEnabled.assert_called_with(True)
 
 
 class TestAssetPaths(unittest.TestCase):
