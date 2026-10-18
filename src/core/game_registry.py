@@ -48,9 +48,61 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
+
+_GAME_SERIAL_DB_DIR = Path(__file__).parent.parent.parent / "data" / "game_serial_db"
+_PAL_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_pal.json"
+_JP_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_japan.json"
+_NTSC_U_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_ntsc_u.json"
+_DEMO_DB_FILE = _GAME_SERIAL_DB_DIR / "ps2_demos.json"
+
+
+def _normalise_search_text(text: str) -> str:
+    """Return a punctuation-insensitive search key for title matching."""
+    return "".join(ch for ch in text.lower() if ch.isalnum())
+
+
+def _load_serial_title_map(db_file: Path, label: str) -> dict[str, str]:
+    """Load a serial→title mapping from a curated JSON database."""
+    import json as _json
+
+    if not db_file.is_file():
+        return {}
+    try:
+        raw = _json.loads(db_file.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("Failed to load %s serial database %s: %s", label, db_file, exc)
+        return {}
+    if not isinstance(raw, dict):
+        logger.warning("Expected JSON object in %s serial database %s", label, db_file)
+        return {}
+    games = raw.get("games", {})
+    if not isinstance(games, dict):
+        logger.warning("Expected 'games' object in %s serial database %s", label, db_file)
+        return {}
+
+    result: dict[str, str] = {}
+    for title, info in games.items():
+        if not isinstance(info, dict):
+            continue
+        title = str(title)
+        serial = str(info.get("serial", "")).strip()
+        if serial:
+            result[serial] = title
+        alt_serials = info.get("alt_serials", [])
+        if not isinstance(alt_serials, list):
+            alt_serials = []
+        for alt in alt_serials:
+            alt = str(alt).strip()
+            if alt and alt not in result:
+                result[alt] = title
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -814,94 +866,81 @@ _KNOWN_SERIALS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 def _load_pal_serials() -> dict[str, str]:
     """Load PAL serial → title mappings from ps2_pal.json."""
-    import json as _json
-    _pal_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_pal.json"
-    if not _pal_db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_pal_db.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_PAL_DB_FILE, "PAL")
 
 
 def _load_japan_serials() -> dict[str, str]:
     """Load Japan (NTSC-J) serial → title mappings from ps2_japan.json."""
-    import json as _json
-    _jp_db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_japan.json"
-    if not _jp_db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_jp_db.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_JP_DB_FILE, "Japan")
 
 
 def _load_ntsc_u_serials() -> dict[str, str]:
     """Load NTSC-U serial → title mappings from ps2_ntsc_u.json (issue #23)."""
-    import json as _json
-    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_ntsc_u.json"
-    if not _db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_NTSC_U_DB_FILE, "NTSC-U")
 
 
 def _load_demos_serials() -> dict[str, str]:
     """Load PS2 demo serial → title mappings from ps2_demos.json."""
-    import json as _json
-    _db = Path(__file__).parent.parent.parent / "data" / "game_serial_db" / "ps2_demos.json"
-    if not _db.is_file():
-        return {}
-    try:
-        raw = _json.loads(_db.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    result: dict[str, str] = {}
-    for title, info in raw.get("games", {}).items():
-        serial = info.get("serial", "")
-        if serial:
-            result[serial] = title
-        for alt in info.get("alt_serials", []):
-            if alt and alt not in result:
-                result[alt] = title
-    return result
+    return _load_serial_title_map(_DEMO_DB_FILE, "demo")
+
+
+_STRICT_SERIAL_RE = re.compile(r"^[A-Z]{4}-\d{5}$")
+_EXTENDED_DASHED_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}$")
+_EXTENDED_COMPACT_SERIAL_RE = re.compile(r"^[A-Z][A-Z0-9]{5,15}$")
+_GENERIC_DASHED_SERIAL_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9]{0,9}[-_][A-Za-z0-9]{2,8})(?![A-Za-z0-9])",
+    re.IGNORECASE,
+)
+_GENERIC_COMPACT_SERIAL_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9])([A-Za-z][A-Za-z0-9]{5,15})(?![A-Za-z0-9])",
+    re.IGNORECASE,
+)
+
+
+def _normalise_informative_serial(raw_serial: str) -> str:
+    """Normalise an informative-doc serial and return ``""`` when invalid.
+
+    Supported forms:
+    - Strict PS2 style: ``XXXX-NNNNN`` (e.g. ``SLUS-20062``)
+    - Extended dashed IDs seen in source files: ``[A-Z][A-Z0-9]{0,9}-[A-Z0-9]{2,8}``
+      (e.g. ``ARP2-01201``, ``DMP-P201``)
+    - Extended compact IDs seen in source files: ``[A-Z][A-Z0-9]{5,15}``
+      (e.g. ``IIDX16COMP``)
+
+    """
+    serial = str(raw_serial).strip().upper().replace("_", "-")
+    if not serial:
+        return ""
+    # Source informative files contain noisy separators/punctuation in some
+    # otherwise valid IDs (e.g. "SLPM.-65987", "SLKA 25447", "SCPS-56014<").
+    serial = re.sub(r"[.\s]+", "-", serial)
+    serial = re.sub(r"[^A-Z0-9-]", "", serial)
+    serial = re.sub(r"-{2,}", "-", serial).strip("-")
+    # Some rows append a single trailing disc/media marker to a strict serial
+    # (e.g. "SLES-50330-T", "SLPM-55221-2"). Keep the canonical game serial.
+    m_trailing = re.match(r"^([A-Z]{4}-\d{5})-[A-Z0-9]$", serial)
+    if m_trailing:
+        serial = m_trailing.group(1)
+    if serial.endswith("-99999"):
+        return ""
+    if _STRICT_SERIAL_RE.match(serial):
+        return serial
+    if _EXTENDED_DASHED_SERIAL_RE.match(serial):
+        # Avoid non-ID labels such as "SONY-ID" by requiring at least one digit.
+        return serial if any(ch.isdigit() for ch in serial) else ""
+    if _EXTENDED_COMPACT_SERIAL_RE.match(serial):
+        # Compact IDs (e.g. IIDX16COMP) must contain both letters and digits.
+        has_alpha = any(ch.isalpha() for ch in serial)
+        has_digit = any(ch.isdigit() for ch in serial)
+        return serial if (has_alpha and has_digit) else ""
+    return ""
 
 
 def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]:
-    """Load additional serial → title mappings from informative-document JSON files."""
+    """Load additional serial → title mappings from informative-document files."""
     import json as _json
     import html as _html
     root = base_dir or (Path(__file__).parent.parent.parent / "Informative doccument")
-    serial_re = re.compile(r"^[A-Z]{4}-\d{5}$")
     result: dict[str, str] = {}
 
     # JSON maps: {serial: title} and {serial: {title: ...}}
@@ -910,15 +949,15 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
             continue
         try:
             raw = _json.loads(fp.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to load informative serial JSON %s: %s", fp, exc)
             continue
         if not isinstance(raw, dict):
+            logger.warning("Expected JSON object in informative serial file %s", fp)
             continue
         for key, value in raw.items():
-            serial = str(key).strip().upper().replace("_", "-")
-            if not serial_re.match(serial):
-                continue
-            if serial.endswith("-99999"):
+            serial = _normalise_informative_serial(str(key))
+            if not serial:
                 continue
             if isinstance(value, str):
                 title = value.strip()
@@ -940,36 +979,60 @@ def _load_informative_serials(base_dir: Optional[Path] = None) -> dict[str, str]
                 parts = line.split("\t", 1)
                 if len(parts) != 2:
                     continue
-                serial = parts[0].strip().upper().replace("_", "-")
+                serial = _normalise_informative_serial(parts[0])
                 title = parts[1].strip()
-                if serial.endswith("-99999"):
-                    continue
-                if serial_re.match(serial) and title and serial not in result:
+                if serial and title and serial not in result:
                     result[serial] = title
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to parse informative serial TXT %s: %s", txt_fp, exc)
 
-    # HTML table: first <td> is title, GAME ID appears in a <center> cell.
+    # HTML table: first <td> is title, GAME ID appears in one of the <center> cells.
     htm_fp = root / "PS2.ID.List.02.13.20.htm"
     if htm_fp.is_file():
         try:
             html_text = htm_fp.read_text(encoding="utf-8", errors="replace")
-            row_re = re.compile(
-                r"<tr><td>(.*?)</td>.*?<center>\s*([A-Z]{4}[-_]\d{5})\s*</center>",
-                re.IGNORECASE | re.DOTALL,
-            )
+            row_re = re.compile(r"<tr\b[^>]*>(.*?)</tr>", re.IGNORECASE | re.DOTALL)
+            td_re = re.compile(r"<td\b[^>]*>(.*?)</td>", re.IGNORECASE | re.DOTALL)
+            center_re = re.compile(r"<center>\s*([^<]+?)\s*</center>", re.IGNORECASE | re.DOTALL)
             strip_tags_re = re.compile(r"<[^>]+>")
-            for title_cell, serial_raw in row_re.findall(html_text):
-                serial = serial_raw.strip().upper().replace("_", "-")
-                if not serial_re.match(serial) or serial in result:
+            for row in row_re.findall(html_text):
+                cells = td_re.findall(row)
+                if not cells:
                     continue
-                if serial.endswith("-99999"):
+                title = _html.unescape(strip_tags_re.sub("", cells[0])).strip()
+                if not title:
                     continue
-                title = _html.unescape(strip_tags_re.sub("", title_cell)).strip()
-                if title:
+                centers: list[str] = []
+                for cell in cells[1:]:
+                    centers.extend(center_re.findall(cell))
+                if not centers:
+                    continue
+                serial = ""
+                # The informative HTML places the GAME ID in the final centered
+                # column; scan from the end so we pick that before earlier
+                # centered cells (region, media type, date, etc.).
+                for serial_raw in reversed(centers):
+                    serial = _normalise_informative_serial(serial_raw)
+                    if serial:
+                        break
+                if serial and serial not in result:
                     result[serial] = title
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to parse informative serial HTML %s: %s", htm_fp, exc)
+
+    # If a malformed 4-digit numeric variant exists alongside its canonical
+    # 5-digit counterpart (e.g. ALCH-0004 + ALCH-00004), keep only canonical.
+    typo_variants: list[str] = []
+    for serial in result:
+        m = re.match(r"^([A-Z]{4})-(\d{4})$", serial)
+        if not m:
+            continue
+        canonical = f"{m.group(1)}-{m.group(2).zfill(5)}"
+        if canonical in result:
+            typo_variants.append(serial)
+    for serial in typo_variants:
+        result.pop(serial, None)
+
     return result
 
 
@@ -1017,8 +1080,8 @@ def detect_game_serial(filename: str, file_content: Optional[bytes] = None) -> s
             serial = _parse_serial(text)
             if serial:
                 return serial
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to inspect serial content in %s: %s", filename, exc)
 
     return ""
 
@@ -1027,6 +1090,16 @@ def _parse_serial(text: str) -> str:
     """Extract and normalise the first PS2 serial found in *text*."""
     m = _SERIAL_PATTERN.search(text)
     if not m:
+        # Fallback: try non-standard informative-doc IDs and keep only
+        # candidates that are known serials in the loaded registry map.
+        for m2 in _GENERIC_DASHED_SERIAL_PATTERN.finditer(text):
+            candidate = _normalise_informative_serial(m2.group(1))
+            if candidate and candidate in _KNOWN_SERIALS:
+                return candidate
+        for m2 in _GENERIC_COMPACT_SERIAL_PATTERN.finditer(text):
+            candidate = _normalise_informative_serial(m2.group(1))
+            if candidate and candidate in _KNOWN_SERIALS:
+                return candidate
         return ""
     region = m.group(1).upper()
     number = m.group(2)
@@ -1052,8 +1125,8 @@ def detect_game_serial_from_file(path: str) -> str:
             serial = detect_game_serial(str(p), content)
             if serial:
                 return serial
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not inspect file content while detecting serial from %s: %s", p, exc)
 
     return ""
 
@@ -1132,6 +1205,12 @@ def lookup_game_title_with_online_fallback(serial: str, timeout: int = 5) -> str
     return lookup_game_title_online(serial, timeout=timeout)
 
 
+@lru_cache(maxsize=4)
+def _serial_database_for_title_lookup(serial_db_factory):
+    """Return a cached SerialDatabase instance for title/alias lookups."""
+    return serial_db_factory()
+
+
 def all_known_serials() -> list[tuple[str, str]]:
     """Return a sorted list of (serial, title) tuples from the built-in registry."""
     return sorted(_KNOWN_SERIALS.items(), key=lambda x: x[0])
@@ -1180,23 +1259,76 @@ def title_to_serials(title_fragment: str) -> List[Tuple[str, str]]:
     if not title_fragment:
         return []
     frag = title_fragment.lower()
+    frag_key = _normalise_search_text(frag)
+    if not frag_key:
+        return []
     pairs = {
         (serial, title) for serial, title in _KNOWN_SERIALS.items()
-        if frag in title.lower()
+        if frag in title.lower() or frag_key in _normalise_search_text(title)
+    }
+    exact_titles = {
+        _normalise_search_text(title) for _, title in pairs
+        if _normalise_search_text(title) == frag_key
     }
     # Also resolve via serial DB aliases so abbreviations like "GoW" work.
     try:
         from src.core.serial_validator import SerialDatabase
-        _sdb = SerialDatabase()
+        _sdb = _serial_database_for_title_lookup(SerialDatabase)
         seen_titles = {t for _, t in pairs}
         for title in _sdb.search_titles(title_fragment):
             if title not in seen_titles:
                 serial = _sdb.get_serial(title)
                 if serial:
                     pairs.add((serial, title))
-    except Exception:
-        pass
-    return sorted(pairs, key=lambda x: x[0])
+                    if _normalise_search_text(title) == frag_key:
+                        exact_titles.add(_normalise_search_text(title))
+    except Exception as exc:
+        logger.warning("Failed to resolve serial aliases for %r: %s", title_fragment, exc)
+    if exact_titles:
+        try:
+            from src.core.serial_validator import SerialDatabase
+            _sdb = _serial_database_for_title_lookup(SerialDatabase)
+            exact_matches = sorted(
+                [
+                    (serial, title)
+                    for serial, title in pairs
+                    if _normalise_search_text(title) in exact_titles
+                ],
+                key=lambda x: (_sdb.is_demo_serial(x[0]), x[0], x[1]),
+            )
+            other_matches = sorted(
+                [
+                    (serial, title)
+                    for serial, title in pairs
+                    if _normalise_search_text(title) not in exact_titles
+                ],
+                key=lambda x: (x[0], x[1]),
+            )
+            return exact_matches + other_matches
+        except Exception as exc:
+            logger.warning("Failed to prioritise exact title matches for %r: %s", title_fragment, exc)
+    return sorted(pairs, key=lambda x: (x[0], x[1]))
+
+
+@lru_cache(maxsize=256)
+def _serials_for_title_query(query: str) -> frozenset[str]:
+    """Return the set of serials that match *query* by title or alias."""
+    return frozenset(serial.upper() for serial, _title in title_to_serials(query))
+
+
+def serial_matches_query(serial: str, query: str) -> bool:
+    """Return True when *serial* matches a title/alias query string.
+
+    This is a lightweight helper for UI search fields that need to match a
+    game serial when the user types a title alias such as ``"GTA III"`` or
+    ``"DMC3"``.  The query lookup is cached so repeated filtering stays fast.
+    """
+    if not serial or not query:
+        return False
+    query = query.strip().casefold()
+    if not query:
+        return False
+    return normalise_serial(serial).upper() in _serials_for_title_query(query)
 
 
 def is_valid_serial(text: str) -> bool:

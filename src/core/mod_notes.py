@@ -43,6 +43,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import csv
 import datetime
 import json
@@ -52,6 +53,8 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -177,16 +180,47 @@ def get_notes_file(config=None) -> Path:
 # Internal I/O
 # ---------------------------------------------------------------------------
 
-def _load(config=None) -> List[NoteEntry]:
-    """Load all notes from disk.  Returns an empty list on any error."""
+def _load(config=None, *, strict: bool = False) -> List[NoteEntry]:
+    """Load notes; strict callers reject unreadable or malformed stores."""
     path = get_notes_file(config)
     if not path.exists():
         return []
     try:
         with open(path, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
-        return [NoteEntry.from_dict(d) for d in raw if isinstance(d, dict)]
-    except Exception:
+        if not isinstance(raw, list):
+            raise ValueError("expected a JSON array at the top level")
+        notes: List[NoteEntry] = []
+        entry_ids = set()
+        for idx, item in enumerate(raw):
+            if not isinstance(item, dict):
+                if strict:
+                    raise ValueError(f"note {idx}: expected a JSON object")
+                logger.warning(
+                    "Skipping malformed mod note %s[%s]: expected a JSON object, got %r",
+                    path,
+                    idx,
+                    item,
+                )
+                continue
+            try:
+                note = NoteEntry.from_dict(item)
+                if strict:
+                    if any(not isinstance(value, str) for value in note.to_dict().values()):
+                        raise ValueError(f"note {idx}: fields must be strings")
+                    if not note.entry_id or note.entry_id in entry_ids:
+                        raise ValueError(f"note {idx}: missing or duplicate entry ID")
+                    entry_ids.add(note.entry_id)
+                notes.append(note)
+            except Exception as exc:
+                if strict:
+                    raise
+                logger.warning("Skipping malformed mod note %s[%s]: %s", path, idx, exc)
+        return notes
+    except Exception as exc:
+        logger.warning("Could not load mod notes from %s: %s", path, exc)
+        if strict:
+            raise
         return []
 
 
@@ -202,8 +236,8 @@ def _save(notes: List[NoteEntry], config=None) -> None:
     except BaseException:
         try:
             os.unlink(tmp_path)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Could not remove temporary notes file %s: %s", tmp_path, exc)
         raise
 
 
@@ -246,7 +280,7 @@ def upsert_note(
         The created or updated note.
     """
     now = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="microseconds")
-    notes = _load(config)
+    notes = _load(config, strict=True)
     existing = next((n for n in notes if n.entry_id == entry_id), None)
 
     if existing is not None:
@@ -292,6 +326,8 @@ def list_notes(
     mod_type: Optional[str] = None,
     serial:   Optional[str] = None,
     query:    Optional[str] = None,
+    *,
+    strict: bool = False,
 ) -> List[NoteEntry]:
     """Return all notes, optionally filtered.
 
@@ -306,6 +342,8 @@ def list_notes(
     query:
         If given, only notes whose *entry_title* or *text* contain
         *query* (case-insensitive) are returned.
+    strict:
+        Raise on unreadable or malformed data instead of returning a fallback.
 
     Returns
     -------
@@ -314,7 +352,7 @@ def list_notes(
         first).  An empty list is returned when the notes file does not
         exist yet.
     """
-    notes = _load(config)
+    notes = _load(config, strict=strict)
     if mod_type:
         notes = [n for n in notes if n.mod_type == mod_type]
     if serial:
@@ -346,7 +384,7 @@ def delete_note(config, entry_id: str) -> bool:
     bool
         ``True`` if a note was found and deleted; ``False`` otherwise.
     """
-    notes = _load(config)
+    notes = _load(config, strict=True)
     new_notes = [n for n in notes if n.entry_id != entry_id]
     if len(new_notes) == len(notes):
         return False
@@ -362,7 +400,7 @@ def clear_notes(config) -> int:
     int
         The number of notes that were removed.
     """
-    notes = _load(config)
+    notes = _load(config, strict=True)
     count = len(notes)
     _save([], config)
     return count
@@ -389,7 +427,7 @@ def export_notes_csv(config, path: Optional[str] = None) -> str:
     if not path:
         path = str(Path(get_exe_dir()) / "mod_notes.csv")
 
-    notes = list_notes(config)
+    notes = list_notes(config, strict=True)
     fieldnames = [
         "id", "entry_id", "entry_title", "mod_type",
         "serial", "text", "created_at", "updated_at",

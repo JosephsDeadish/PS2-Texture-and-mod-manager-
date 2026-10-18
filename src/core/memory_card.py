@@ -15,6 +15,7 @@ References:
   mymc source (open source PS2 memory card manager, GPL-2.0)
 """
 
+import logging
 import os
 import struct
 from dataclasses import dataclass, field
@@ -34,6 +35,8 @@ MC_CLUSTERS_PER_CARD = 8192
 MC_CARD_SIZE = MC_PAGE_SIZE * MC_PAGES_PER_CLUSTER * MC_CLUSTERS_PER_CARD  # 8 MB
 
 SUPERBLOCK_OFFSET = 0
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -62,7 +65,8 @@ def is_valid_memcard(path: str) -> bool:
         with open(path, "rb") as f:
             magic = f.read(len(MC_SUPERBLOCK_MAGIC))
         return magic == MC_SUPERBLOCK_MAGIC
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not inspect memory card %s: %s", path, exc)
         return False
 
 
@@ -75,6 +79,7 @@ def list_saves(memcard_path: str) -> List[SaveEntry]:
     """
     path = Path(memcard_path)
     if not path.is_file():
+        logger.warning("Memory card file not found: %s", memcard_path)
         raise MemoryCardError(f"File not found: {memcard_path}")
 
     saves: List[SaveEntry] = []
@@ -84,6 +89,7 @@ def list_saves(memcard_path: str) -> List[SaveEntry]:
             data = f.read()
 
         if not data.startswith(MC_SUPERBLOCK_MAGIC):
+            logger.warning("Memory card %s has an invalid header", memcard_path)
             raise MemoryCardError("Not a valid PS2 memory card image")
 
         # Each directory entry starts at a cluster; do a simple scan for
@@ -117,40 +123,80 @@ def list_saves(memcard_path: str) -> List[SaveEntry]:
                 )
             )
     except (struct.error, UnicodeDecodeError, OSError) as exc:
+        logger.warning("Could not parse memory card %s: %s", memcard_path, exc)
         raise MemoryCardError(f"Failed to parse memory card: {exc}") from exc
 
     return saves
 
 
-def export_save(memcard_path: str, save_name: str, dest_dir: str) -> str:
+def export_save(
+    memcard_path: str, save_name: str, dest_dir: str, *, overwrite: bool = True,
+) -> str:
     """
     Export a save directory from a memory card to *dest_dir*.
     Returns the path of the exported file.
 
     This creates a raw binary dump of the relevant pages.
     For full compatibility, use mymc (GPL-2.0) as an external tool.
+    Set *overwrite* to False to create a new dump without replacing existing files.
     """
+    if (
+        not isinstance(save_name, str) or not save_name
+        or save_name.endswith((".", " "))
+        or any(ord(char) < 32 or char in '<>:"/\\|?*' for char in save_name)
+        or save_name.split(".")[0].upper() in (
+            "CON", "PRN", "AUX", "NUL",
+            *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10)),
+        )
+    ):
+        raise MemoryCardError("Save directory ID is not a safe export filename")
     dest = Path(dest_dir)
-    dest.mkdir(parents=True, exist_ok=True)
+    try:
+        dest.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.warning("Could not create export directory %s: %s", dest_dir, exc)
+        raise MemoryCardError(f"Export failed: {exc}") from exc
     out_path = dest / f"{save_name}.bin"
+    created = False
 
     try:
+        if out_path.resolve().parent != dest.resolve():
+            raise MemoryCardError("Export path escapes the destination folder")
+        if (
+            out_path.resolve() == Path(memcard_path).resolve()
+            or (out_path.exists() and out_path.samefile(memcard_path))
+        ):
+            raise MemoryCardError("Cannot export over the source memory card")
         with open(memcard_path, "rb") as f:
             data = f.read()
 
         start = data.find(save_name.encode("ascii", errors="replace"))
         if start == -1:
+            logger.warning("Save %r was not found in memory card %s", save_name, memcard_path)
             raise MemoryCardError(f"Save '{save_name}' not found in card")
 
         # Align to page boundary and copy 64 KB (rough heuristic)
         page_start = (start // MC_PAGE_SIZE) * MC_PAGE_SIZE
         chunk = data[page_start : page_start + 64 * 1024]
 
-        with open(out_path, "wb") as f:
+        with open(out_path, "wb" if overwrite else "xb") as f:
+            created = True
             f.write(chunk)
 
         return str(out_path)
-    except OSError as exc:
+    except (OSError, RuntimeError) as exc:
+        logger.warning(
+            "Failed to export save %r from memory card %s to %s: %s",
+            save_name,
+            memcard_path,
+            dest_dir,
+            exc,
+        )
+        if created:
+            try:
+                out_path.unlink(missing_ok=True)
+            except OSError as cleanup_exc:
+                logger.warning("Could not remove partial export %s: %s", out_path, cleanup_exc)
         raise MemoryCardError(f"Export failed: {exc}") from exc
 
 
@@ -159,7 +205,8 @@ def backup_memcard(src_path: str, backup_dir: str) -> str:
     Back up a memory card image by copying it to *backup_dir*.
 
     The backup filename is derived from the original filename with a
-    timestamp suffix, e.g. ``MemoryCard1_20240101_120000.ps2``.
+    timestamp suffix and a collision suffix when necessary. Existing files
+    (including symlinks) are never replaced.
 
     Returns the full path to the backup file.
     """
@@ -167,22 +214,36 @@ def backup_memcard(src_path: str, backup_dir: str) -> str:
     from datetime import datetime
 
     src = Path(src_path)
-    if not src.is_file():
-        raise MemoryCardError(f"Source card not found: {src_path}")
-
     dest = Path(backup_dir)
-    dest.mkdir(parents=True, exist_ok=True)
-
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_name = f"{src.stem}_backup_{stamp}{src.suffix}"
-    backup_path = dest / backup_name
-
+    backup_path = None
+    created = False
     try:
-        shutil.copy2(str(src), str(backup_path))
+        if not src.is_file():
+            raise MemoryCardError(f"Source card not found: {src_path}")
+        dest.mkdir(parents=True, exist_ok=True)
+        with src.open("rb") as source:
+            for attempt in range(10000):
+                suffix = f"_{attempt}" if attempt else ""
+                backup_path = dest / f"{src.stem}_backup_{stamp}{suffix}{src.suffix}"
+                try:
+                    output = backup_path.open("xb")
+                except FileExistsError:
+                    continue
+                created = True
+                with output:
+                    shutil.copyfileobj(source, output)
+                shutil.copystat(src, backup_path)
+                return str(backup_path)
+        raise MemoryCardError("Too many backup filename collisions; choose another folder")
     except OSError as exc:
+        logger.warning("Failed to back up memory card %s to %s: %s", src_path, backup_dir, exc)
+        if created:
+            try:
+                backup_path.unlink(missing_ok=True)
+            except OSError as cleanup_exc:
+                logger.warning("Could not remove partial backup %s: %s", backup_path, cleanup_exc)
         raise MemoryCardError(f"Backup failed: {exc}") from exc
-
-    return str(backup_path)
 
 
 def import_raw_save(src_path: str, memcard_path: str, save_name: str) -> bool:
@@ -202,13 +263,16 @@ def import_raw_save(src_path: str, memcard_path: str, save_name: str) -> bool:
     """
     src = Path(src_path)
     if not src.is_file():
+        logger.warning("Source save file not found: %s", src_path)
         raise MemoryCardError(f"Source save file not found: {src_path}")
 
     mc = Path(memcard_path)
     if not mc.is_file():
+        logger.warning("Memory card not found: %s", memcard_path)
         raise MemoryCardError(f"Memory card not found: {memcard_path}")
 
     if not is_valid_memcard(memcard_path):
+        logger.warning("Destination is not a valid PS2 memory card image: %s", memcard_path)
         raise MemoryCardError("Destination is not a valid PS2 memory card image")
 
     try:
@@ -249,6 +313,7 @@ def import_raw_save(src_path: str, memcard_path: str, save_name: str) -> bool:
 
         return found
     except OSError as exc:
+        logger.warning("Failed to import save %s into memory card %s: %s", src_path, memcard_path, exc)
         raise MemoryCardError(f"Import failed: {exc}") from exc
 
 
@@ -271,7 +336,11 @@ def copy_save_between_cards(
     import tempfile, shutil
 
     tmp = Path(temp_dir)
-    tmp.mkdir(parents=True, exist_ok=True)
+    try:
+        tmp.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.warning("Could not create temporary directory for save copy %s: %s", temp_dir, exc)
+        raise MemoryCardError(f"Copy failed: {exc}") from exc
 
     export_path = export_save(src_card, save_name, str(tmp))
     result = import_raw_save(export_path, dest_card, save_name)
@@ -279,8 +348,8 @@ def copy_save_between_cards(
     # Clean up temp file
     try:
         Path(export_path).unlink(missing_ok=True)
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Could not remove temporary exported save %s: %s", export_path, exc)
 
     return result
 
@@ -294,9 +363,12 @@ def list_memcard_files(memcards_dir: str) -> List[str]:
     d = Path(memcards_dir)
     if not d.is_dir():
         return result
-    for p in sorted(d.iterdir()):
-        if p.suffix.lower() in (".ps2", ".mcd", ".mc2", ".bin"):
-            result.append(str(p))
+    try:
+        for p in sorted(d.iterdir()):
+            if p.suffix.lower() in (".ps2", ".mcd", ".mc2", ".bin"):
+                result.append(str(p))
+    except OSError as exc:
+        logger.warning("Could not list memory card files under %s: %s", memcards_dir, exc)
     return result
 
 
@@ -317,15 +389,21 @@ def create_memcard(dest_path: str, size_mb: int = 8) -> str:
         The absolute path of the created file.
     """
     if not isinstance(size_mb, int) or size_mb < 1 or size_mb > 64:
+        logger.warning("Invalid memory card size requested for %s: %s MB", dest_path, size_mb)
         raise MemoryCardError(
             f"Invalid memory card size: {size_mb} MB. "
             "Valid range is 1–64 MB (standard PS2 card is 8 MB)."
         )
 
     dest = Path(dest_path)
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.warning("Could not create memory card directory %s: %s", dest.parent, exc)
+        raise MemoryCardError(f"Failed to create memory card: {exc}") from exc
 
     if dest.exists():
+        logger.warning("Memory card file already exists: %s", dest_path)
         raise MemoryCardError(f"File already exists: {dest_path}")
 
     total_bytes = size_mb * 1024 * 1024
@@ -341,7 +419,11 @@ def create_memcard(dest_path: str, size_mb: int = 8) -> str:
                 f.write(chunk[:to_write])
                 remaining -= to_write
     except OSError as exc:
-        dest.unlink(missing_ok=True)
+        logger.warning("Failed to create memory card %s: %s", dest_path, exc)
+        try:
+            dest.unlink(missing_ok=True)
+        except OSError as cleanup_exc:
+            logger.warning("Could not remove partially created memory card %s: %s", dest, cleanup_exc)
         raise MemoryCardError(f"Failed to create memory card: {exc}") from exc
 
     return str(dest)

@@ -1,5 +1,6 @@
 """Generic mod management panel for texture packs, pnach, cover art, saves, cheats."""
 
+import logging
 import os
 from pathlib import Path
 from typing import List
@@ -14,12 +15,18 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
     QComboBox,
 )
 
+from src.core.config_manager import save_config
 from src.core.mod_manager import ModDatabase, ModManager
+from src.core.mod_search import (
+    MOD_SEARCH_HELP, MOD_SEARCH_HINT, compile_mod_query,
+    mod_matches_query as _mod_matches_query,
+)
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
 from src.ui.import_dialog import EditModDialog, ImportModDialog
@@ -29,6 +36,8 @@ from src.ui.widgets import (
     ModDetailsDialog,
     ModItemWidget,
 )
+
+logger = logging.getLogger(__name__)
 
 
 _TYPE_META = {
@@ -75,6 +84,82 @@ _TYPE_META = {
 }
 
 
+_STATUS_FILTERS = [
+    ("All statuses", "all"),
+    ("Enabled", "enabled"),
+    ("Disabled", "disabled"),
+    ("Conflicts", "conflicts"),
+    ("Completely shadowed", "shadowed"),
+    ("Code issues (enabled)", "code_issues"),
+]
+
+
+def _mod_matches_status(mod: ModInfo, status: str, issue_state: dict) -> bool:
+    if status == "enabled":
+        return mod.enabled
+    if status == "disabled":
+        return not mod.enabled
+    if status == "conflicts":
+        return mod.id in issue_state["conflicting_ids"]
+    if status == "shadowed":
+        return mod.id in issue_state["shadowed_ids"]
+    if status == "code_issues":
+        validation = issue_state["pnach_validation"].get(mod.id, {})
+        return bool(validation.get("errors", 0) or validation.get("warnings", 0))
+    return True
+
+
+def _mod_panel_empty_message(
+    label: str, query: str, author: str, library_only: bool, status: str = "all",
+    has_mods: bool = True,
+) -> str:
+    active = []
+    if query.strip():
+        active.append(f"search {query!r}")
+    if author:
+        active.append(f"author {author!r}")
+    if library_only:
+        active.append("library-only filter")
+    if status != "all":
+        status_label = next((text for text, value in _STATUS_FILTERS if value == status), status)
+        active.append(f"status {status_label!r}")
+    if not has_mods or not active:
+        return f"No {label} yet.\nClick ➕ Import to add some."
+    return (
+        f"No {label.lower()} match the current filters.\n"
+        "Try clearing: " + ", ".join(active) + "."
+    )
+
+
+def _block_signals(widget, blocked: bool) -> None:
+    setter = getattr(widget, "blockSignals", None)
+    if callable(setter):
+        setter(blocked)
+
+
+def _mod_panel_state_bucket(config: AppConfig, mod_type: ModType) -> dict:
+    ui_state = getattr(config, "ui_state", None)
+    if not isinstance(ui_state, dict):
+        ui_state = {}
+        config.ui_state = ui_state
+    mod_panels = ui_state.setdefault("mod_panels", {})
+    if not isinstance(mod_panels, dict):
+        mod_panels = {}
+        ui_state["mod_panels"] = mod_panels
+    panel_state = mod_panels.setdefault(mod_type.value, {})
+    if not isinstance(panel_state, dict):
+        panel_state = {}
+        mod_panels[mod_type.value] = panel_state
+    return panel_state
+
+
+def _save_mod_panel_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save mod panel config after %s: %s", context, exc)
+
+
 class ModPanel(BasePanel):
     """
     Unified panel for managing mods of a specific type.
@@ -100,6 +185,13 @@ class ModPanel(BasePanel):
         self.db = db
         self.config = config
         self.manager = ModManager(db)
+        self._state_persistence_enabled = False
+        self._library_serials_cache_path = ""
+        self._library_serials_cache = frozenset()
+        self._issue_state_cache = None
+        self._shown_mod_ids = ()
+        self._batch_busy = False
+        self._batch_retry_states = {}
         self._build()
 
     def _all_mods(self) -> list:
@@ -127,7 +219,10 @@ class ModPanel(BasePanel):
 
         # Search
         self._search = QLineEdit()
-        self._search.setPlaceholderText("🔍  Search…")
+        self._search.setPlaceholderText("Search mods, games, authors, tags, or files…")
+        self._search.setAccessibleName("Search installed mods")
+        self._search.setClearButtonEnabled(True)
+        self._search.setToolTip(MOD_SEARCH_HELP)
         self._search.setObjectName("search_bar")
         self._search.textChanged.connect(self._apply_filter)
         toolbar.addWidget(self._search, 1)
@@ -167,6 +262,10 @@ class ModPanel(BasePanel):
             toolbar.addWidget(builder_btn)
 
         content.addLayout(toolbar)
+        search_hint = QLabel(MOD_SEARCH_HINT)
+        search_hint.setWordWrap(True)
+        search_hint.setToolTip(MOD_SEARCH_HELP)
+        content.addWidget(search_hint)
 
         # ---- Author + library filter row ----
         author_row = QHBoxLayout()
@@ -194,16 +293,45 @@ class ModPanel(BasePanel):
         self._library_filter_check.stateChanged.connect(self._apply_filter)
         author_row.addWidget(self._library_filter_check)
 
+        self._status_filter = QComboBox()
+        for label, value in _STATUS_FILTERS:
+            if value == "shadowed" and self.mod_type != ModType.TEXTURE_PACK:
+                continue
+            if value == "code_issues" and not any(
+                mt in (ModType.PNACH, ModType.CHEAT) for mt in [self.mod_type] + self.extra_types
+            ):
+                continue
+            self._status_filter.addItem(label, value)
+        self._status_filter.setAccessibleName("Filter mods by status")
+        self._status_filter.setToolTip(
+            "Narrow this list by enabled state or detected issues.\n"
+            "Code checks cover enabled PNACH/cheat mods only.\n"
+            "Enable All and Disable All still affect every mod in this panel."
+        )
+        self._status_filter.currentIndexChanged.connect(self._apply_filter)
+        author_row.addWidget(self._status_filter)
+
         author_row.addStretch()
+        content.addLayout(author_row)
 
         # ---- Enable-all / Disable-all ----
+        batch_row = QHBoxLayout()
+        batch_row.addWidget(QLabel("All mods in this panel:"))
         enable_all = QPushButton("✅ Enable All")
         enable_all.setObjectName("success_btn")
         enable_all.clicked.connect(self._enable_all)
-        author_row.addWidget(enable_all)
+        self._enable_all_btn = enable_all
+        batch_row.addWidget(enable_all)
         disable_all = QPushButton("🚫 Disable All")
         disable_all.clicked.connect(self._disable_all)
-        author_row.addWidget(disable_all)
+        self._disable_all_btn = disable_all
+        batch_row.addWidget(disable_all)
+        batch_row.addStretch()
+
+        clear_filters = QPushButton("✖ Clear Filters")
+        clear_filters.setToolTip("Reset search, sort, author, library, and status filters")
+        clear_filters.clicked.connect(self._clear_filters)
+        batch_row.addWidget(clear_filters)
 
         # Status / conflict label — acts as a clickable link when conflicts exist
         # Issue #20: placed on its own row below the toolbar to avoid triggering a scrollbar
@@ -212,7 +340,43 @@ class ModPanel(BasePanel):
         self._count_lbl.setStyleSheet("color: #7070a0; font-size: 12px; text-align: left; border: none;")
         self._count_lbl.setCursor(Qt.CursorShape.ArrowCursor)
         self._count_lbl.clicked.connect(self._on_count_lbl_clicked)
-        content.addLayout(author_row)
+        content.addLayout(batch_row)
+        shown_row = QHBoxLayout()
+        shown_row.addWidget(QLabel("Shown results only:"))
+        self._enable_shown_btn = QPushButton("Enable Shown")
+        self._enable_shown_btn.setToolTip("Enable only disabled mods matching the current search and filters.")
+        self._enable_shown_btn.clicked.connect(lambda: self._set_batch_enabled(True, shown=True))
+        shown_row.addWidget(self._enable_shown_btn)
+        self._disable_shown_btn = QPushButton("Disable Shown")
+        self._disable_shown_btn.setToolTip("Disable only enabled mods matching the current search and filters.")
+        self._disable_shown_btn.clicked.connect(lambda: self._set_batch_enabled(False, shown=True))
+        shown_row.addWidget(self._disable_shown_btn)
+        shown_row.addStretch()
+        content.addLayout(shown_row)
+        self._batch_feedback = QTextEdit()
+        self._batch_feedback.setReadOnly(True)
+        self._batch_feedback.setAccessibleName("Batch action result")
+        self._batch_feedback.setMaximumHeight(100)
+        self._batch_feedback.hide()
+        content.addWidget(self._batch_feedback)
+        recovery_row = QHBoxLayout()
+        self._batch_retry_btn = QPushButton("Retry Batch")
+        self._batch_retry_btn.setToolTip(
+            "Review and retry the original batch, not the current filtered results. "
+            "Already-saved enabled flags are reconciled again."
+        )
+        self._batch_retry_btn.clicked.connect(self._retry_batch)
+        self._batch_retry_btn.hide()
+        recovery_row.addWidget(self._batch_retry_btn)
+        self._batch_dismiss_btn = QPushButton("Dismiss Result")
+        self._batch_dismiss_btn.setToolTip(
+            "Hide this result and forget its retry snapshot. This does not undo saved flags or file changes."
+        )
+        self._batch_dismiss_btn.clicked.connect(self._dismiss_batch_result)
+        self._batch_dismiss_btn.hide()
+        recovery_row.addWidget(self._batch_dismiss_btn)
+        recovery_row.addStretch()
+        content.addLayout(recovery_row)
         content.addWidget(self._count_lbl)
 
         # ---- PCSX2 guidance banner (texture / pnach / cheat panels only) ----
@@ -236,7 +400,9 @@ class ModPanel(BasePanel):
         self._apply_panel_tooltips(import_btn, conflict_btn, enable_all, disable_all)
 
         self._refresh_author_filter()
+        self._restore_filter_state()
         self.refresh()
+        self._state_persistence_enabled = True
 
     def _apply_panel_tooltips(
         self,
@@ -260,8 +426,77 @@ class ModPanel(BasePanel):
     # ------------------------------------------------------------------
 
     def refresh(self):
+        self._invalidate_library_serial_cache()
+        self._invalidate_issue_state_cache()
         self._refresh_author_filter()
         self._apply_filter()
+
+    def _invalidate_library_serial_cache(self) -> None:
+        self._library_serials_cache_path = ""
+        self._library_serials_cache = frozenset()
+
+    def _invalidate_issue_state_cache(self) -> None:
+        self._issue_state_cache = None
+
+    def _issue_state(self) -> dict:
+        cache = getattr(self, "_issue_state_cache", None)
+        if isinstance(cache, dict):
+            return cache
+
+        conflicts = []
+        for mt in [self.mod_type] + self.extra_types:
+            try:
+                conflicts.extend(self.manager.detect_conflicts(mt))
+            except Exception as exc:
+                logger.warning("Could not detect conflicts for %s: %s", mt.value, exc)
+
+        pnach_conflicts = []
+        for mt in [self.mod_type] + self.extra_types:
+            if mt in (ModType.PNACH, ModType.CHEAT):
+                try:
+                    pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
+                except Exception as exc:
+                    logger.warning("Could not detect PNACH conflicts for %s: %s", mt.value, exc)
+
+        conflicting_ids = set()
+        for conflict in conflicts:
+            conflicting_ids.add(conflict.mod_a_id)
+            conflicting_ids.add(conflict.mod_b_id)
+        for conflict in pnach_conflicts:
+            conflicting_ids.update((conflict["mod_a_id"], conflict["mod_b_id"]))
+
+        shadowed_ids: set = set()
+        if self.mod_type == ModType.TEXTURE_PACK:
+            try:
+                shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
+                shadowed_ids = set(shadowed_map.keys())
+            except Exception as exc:
+                logger.warning(
+                    "Could not detect shadowed texture packs for %s: %s",
+                    self.mod_type.value,
+                    exc,
+                )
+
+        pnach_validation: dict = {}
+        if any(mt in (ModType.PNACH, ModType.CHEAT) for mt in [self.mod_type] + self.extra_types):
+            try:
+                raw = self.manager.validate_all_pnach()
+                for mid, issues in raw.items():
+                    errors = sum(1 for iss in issues if iss.severity == "error")
+                    warnings = sum(1 for iss in issues if iss.severity == "warning")
+                    pnach_validation[mid] = {"errors": errors, "warnings": warnings}
+            except Exception as exc:
+                logger.warning("Could not validate PNACH status for %s: %s", self.mod_type.value, exc)
+
+        cache = {
+            "conflicts": conflicts,
+            "pnach_conflicts": pnach_conflicts,
+            "conflicting_ids": conflicting_ids,
+            "shadowed_ids": shadowed_ids,
+            "pnach_validation": pnach_validation,
+        }
+        self._issue_state_cache = cache
+        return cache
 
     def _make_guidance_banner(self) -> QWidget:
         """Build a dismissable PCSX2 guidance banner for texture/pnach/cheat panels."""
@@ -311,6 +546,8 @@ class ModPanel(BasePanel):
         dismiss_btn = QPushButton("✕")
         dismiss_btn.setFixedSize(22, 22)
         dismiss_btn.setToolTip("Dismiss this hint")
+        dismiss_btn.setAccessibleName("Dismiss hint")
+        dismiss_btn.setAccessibleDescription("Hide this informational message")
         dismiss_btn.setStyleSheet(
             "QPushButton { background: transparent; color: #60a060; "
             "border: none; font-size: 12px; }"
@@ -324,7 +561,7 @@ class ModPanel(BasePanel):
     def _refresh_author_filter(self):
         """Rebuild the author dropdown from the current mod list."""
         current = self._author_filter.currentData() or ""
-        self._author_filter.blockSignals(True)
+        _block_signals(self._author_filter, True)
         self._author_filter.clear()
         self._author_filter.addItem("All Authors", "")
 
@@ -345,23 +582,110 @@ class ModPanel(BasePanel):
         idx = self._author_filter.findData(current)
         if idx >= 0:
             self._author_filter.setCurrentIndex(idx)
-        self._author_filter.blockSignals(False)
+        _block_signals(self._author_filter, False)
+
+    def _restore_filter_state(self):
+        """Restore the saved search/sort/author/library filter state."""
+        state = _mod_panel_state_bucket(self.config, self.mod_type)
+        if not state:
+            return
+
+        should_save = False
+        _block_signals(self._search, True)
+        _block_signals(self._sort_combo, True)
+        _block_signals(self._author_filter, True)
+        _block_signals(self._library_filter_check, True)
+        _block_signals(self._status_filter, True)
+        try:
+            query = str(state.get("query", ""))
+            self._search.setText(query)
+            state["query"] = query
+
+            sort_idx = state.get("sort_index", 0)
+            try:
+                sort_idx = int(sort_idx)
+            except (TypeError, ValueError):
+                sort_idx = 0
+            if 0 <= sort_idx < self._sort_combo.count():
+                self._sort_combo.setCurrentIndex(sort_idx)
+                state["sort_index"] = sort_idx
+            else:
+                logger.warning(
+                    "Saved mod-panel sort index %r is no longer available; using the default sort order",
+                    sort_idx,
+                )
+                self._sort_combo.setCurrentIndex(0)
+                state["sort_index"] = 0
+                should_save = True
+
+            author = str(state.get("author", "") or "")
+            if author:
+                idx = self._author_filter.findData(author)
+                if idx >= 0:
+                    self._author_filter.setCurrentIndex(idx)
+                    state["author"] = author
+                else:
+                    logger.warning(
+                        "Saved mod-panel author filter %r is no longer available; using All Authors",
+                        author,
+                    )
+                    self._author_filter.setCurrentIndex(0)
+                    state["author"] = ""
+                    should_save = True
+            else:
+                self._author_filter.setCurrentIndex(0)
+                state["author"] = ""
+
+            library_only = bool(state.get("library_only", False))
+            self._library_filter_check.setChecked(library_only)
+            state["library_only"] = library_only
+
+            status = state.get("status", "all")
+            status_idx = self._status_filter.findData(status)
+            if status_idx < 0:
+                logger.warning(
+                    "Saved mod-panel status filter %r is no longer available; using All statuses",
+                    status,
+                )
+                status_idx = 0
+                should_save = True
+            self._status_filter.setCurrentIndex(status_idx)
+            state["status"] = self._status_filter.currentData() or "all"
+        finally:
+            _block_signals(self._search, False)
+            _block_signals(self._sort_combo, False)
+            _block_signals(self._author_filter, False)
+            _block_signals(self._library_filter_check, False)
+            _block_signals(self._status_filter, False)
+
+        if should_save:
+            _save_mod_panel_config(self.config, "sanitizing mod panel filter state")
+
+    def _save_filter_state(self, context: str):
+        if not getattr(self, "_state_persistence_enabled", False):
+            return
+        state = _mod_panel_state_bucket(self.config, self.mod_type)
+        state.update({
+            "query": self._search.text(),
+            "sort_index": self._sort_combo.currentIndex(),
+            "author": self._author_filter.currentData() or "",
+            "library_only": self._library_filter_check.isChecked(),
+            "status": self._status_filter.currentData() or "all",
+        })
+        _save_mod_panel_config(self.config, context)
 
     def _apply_filter(self):
-        query = self._search.text().lower()
+        query = self._search.text()
         author_filter = self._author_filter.currentData() or ""
         library_only = self._library_filter_check.isChecked()
-        mods = self._all_mods()
+        all_mods = self._all_mods()
+        mods = all_mods
+        status_filter = self._status_filter.currentData() or "all"
         sort_idx = self._sort_combo.currentIndex()
 
         if query:
-            mods = [
-                m for m in mods
-                if query in m.name.lower()
-                or (m.author and query in m.author.lower())
-                or (m.game_id and query in m.game_id.lower())
-                or (m.description and query in m.description.lower())
-            ]
+            search = compile_mod_query(query)
+            mods = [m for m in mods if search.matches(m)]
 
         if author_filter:
             mods = [m for m in mods if m.author == author_filter]
@@ -387,32 +711,14 @@ class ModPanel(BasePanel):
         reverse = [False, True, False, True, True]
         mods = sorted(mods, key=sort_keys[sort_idx], reverse=reverse[sort_idx])
 
-        # Conflict info — aggregate across all managed types
-        conflicts = []
-        for mt in [self.mod_type] + self.extra_types:
-            conflicts.extend(self.manager.detect_conflicts(mt))
-        conflicting_ids = set()
-        for c in conflicts:
-            conflicting_ids.add(c.mod_a_id)
-            conflicting_ids.add(c.mod_b_id)
-
-        # Shadowed mod detection (only for texture packs where file-level tracking matters)
-        shadowed_ids: set = set()
-        if self.mod_type == ModType.TEXTURE_PACK:
-            shadowed_map = self.manager.detect_shadowed_mods(self.mod_type)
-            shadowed_ids = set(shadowed_map.keys())
-
-        # PNACH/Cheat validation — automatic, no button needed
-        pnach_validation: dict = {}  # mod_id → {"errors": int, "warnings": int}
-        if self.mod_type in (ModType.PNACH, ModType.CHEAT):
-            try:
-                raw = self.manager.validate_all_pnach()
-                for mid, issues in raw.items():
-                    errors = sum(1 for iss in issues if iss.severity == "error")
-                    warnings = sum(1 for iss in issues if iss.severity == "warning")
-                    pnach_validation[mid] = {"errors": errors, "warnings": warnings}
-            except Exception:
-                pass
+        issue_state = self._issue_state()
+        conflicts = issue_state["conflicts"]
+        conflicting_ids = issue_state["conflicting_ids"]
+        shadowed_ids = issue_state["shadowed_ids"]
+        pnach_validation = issue_state["pnach_validation"]
+        mods = [m for m in mods if _mod_matches_status(m, status_filter, issue_state)]
+        self._shown_mod_ids = tuple(mod.id for mod in mods)
+        self._update_batch_actions(all_mods)
 
         # Clear existing items (leave the trailing stretch)
         while self._list_layout.count() > 1:
@@ -423,8 +729,19 @@ class ModPanel(BasePanel):
         if not mods:
             empty = EmptyStateWidget(
                 _TYPE_META[self.mod_type]["icon"],
-                f"No {_TYPE_META[self.mod_type]['label']} yet.\nClick ➕ Import to add some."
+                _mod_panel_empty_message(
+                    _TYPE_META[self.mod_type]["label"],
+                    query,
+                    author_filter,
+                    library_only,
+                    status_filter,
+                    has_mods=bool(all_mods),
+                ),
             )
+            action = QPushButton("✖ Clear Filters" if all_mods else "➕ Import")
+            action.setObjectName("primary_btn")
+            action.clicked.connect(self._clear_filters if all_mods else self._import_mod)
+            empty.layout().addWidget(action)
             self._list_layout.insertWidget(0, empty)
         else:
             for i, mod in enumerate(mods):
@@ -445,33 +762,71 @@ class ModPanel(BasePanel):
                 widget.details_requested.connect(self._on_details)
                 widget.edit_requested.connect(self._on_edit)
                 widget.filter_by_author.connect(self._filter_by_author)
+                widget.conflicts_requested.connect(self._show_conflicts)
                 self._list_layout.insertWidget(i, widget)
 
-        all_mods = self._all_mods()
         enabled_count = sum(1 for m in all_mods if m.enabled)
         total_count = len(all_mods)
-        shadow_note = f"  •  {len(shadowed_ids)} shadowed" if shadowed_ids else ""
-        invalid_mods = sum(1 for v in pnach_validation.values() if v.get("errors", 0))
-        invalid_note = f"  •  ❌ {invalid_mods} invalid" if invalid_mods else ""
-        has_any_issue = bool(conflicts or shadowed_ids or invalid_mods)
+        panel_validation = [pnach_validation[m.id] for m in all_mods if m.id in pnach_validation]
+        invalid_mods = sum(1 for v in panel_validation if v.get("errors", 0))
+        warning_mods = sum(1 for v in panel_validation if v.get("warnings", 0) and not v.get("errors", 0))
+        pnach_conflicts = issue_state["pnach_conflicts"]
+        has_conflicts = bool(conflicts or pnach_conflicts)
+        has_any_issue = bool(has_conflicts or shadowed_ids or invalid_mods or warning_mods)
         # Issue #4: clarify what the count refers to using the panel's mod type label
         type_label = _TYPE_META[self.mod_type].get("label", "mod(s)")
-        status = (
-            f"{enabled_count}/{total_count} {type_label} enabled"
-            + (f"  •  ⚠ {len(conflicts)} conflict(s) — click to resolve" if conflicts else "")
-            + shadow_note
-            + invalid_note
-        )
+        status = f"Showing {len(mods)} of {total_count} {type_label}  •  {enabled_count} enabled"
+        issue_notes = []
+        if conflicts:
+            issue_notes.append(f"{len(conflicts)} file conflict pair(s)")
+        if pnach_conflicts:
+            issue_notes.append(f"{len(pnach_conflicts)} PNACH address overlap(s)")
+        if shadowed_ids:
+            issue_notes.append(f"{len(shadowed_ids)} shadowed")
+        if invalid_mods:
+            issue_notes.append(f"{invalid_mods} invalid")
+        if warning_mods:
+            issue_notes.append(f"{warning_mods} with code warnings")
+        if has_conflicts:
+            issue_notes.append("Click to review conflicts")
+        if issue_notes:
+            status += "\n" + "  •  ".join(issue_notes)
         self._count_lbl.setText(status)
-        # Make label clickable (pointer cursor) when there is something to resolve
+        self._count_lbl.setToolTip(
+            "Counts cover every mod in this panel, including hidden results.\n"
+            "Click to review file and PNACH address conflicts."
+            if has_conflicts else
+            "Counts cover every mod in this panel, including hidden results.\n"
+            "Use the status filter to find shadowed mods or code issues."
+        )
         self._count_lbl.setCursor(
-            Qt.CursorShape.PointingHandCursor if has_any_issue else Qt.CursorShape.ArrowCursor
+            Qt.CursorShape.PointingHandCursor if has_conflicts else Qt.CursorShape.ArrowCursor
         )
         self._count_lbl.setStyleSheet(
             "color: #ff8080; font-size: 12px; text-align: left; border: none;"
             if has_any_issue else
             "color: #7070a0; font-size: 12px; text-align: left; border: none;"
         )
+        self._save_filter_state("updating mod panel filters")
+
+    def _clear_filters(self):
+        """Reset the mod search, sort, author, library-only, and status filters."""
+        for widget in (self._search, self._sort_combo, self._author_filter,
+                       self._library_filter_check, self._status_filter):
+            _block_signals(widget, True)
+
+        self._search.clear()
+        self._sort_combo.setCurrentIndex(0)
+        self._author_filter.setCurrentIndex(0)
+        self._library_filter_check.setChecked(False)
+        self._status_filter.setCurrentIndex(0)
+
+        for widget in (self._search, self._sort_combo, self._author_filter,
+                       self._library_filter_check, self._status_filter):
+            _block_signals(widget, False)
+
+        self._save_filter_state("clearing mod panel filters")
+        self._apply_filter()
 
     # ------------------------------------------------------------------
     # Handlers
@@ -506,6 +861,7 @@ class ModPanel(BasePanel):
         if enabled and self.mod_type == ModType.COVER_ART:
             self._check_cover_art_duplicates(mod_id)
 
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _check_cover_art_duplicates(self, newly_enabled_id: str):
@@ -554,18 +910,21 @@ class ModPanel(BasePanel):
         if reply == QMessageBox.StandardButton.Yes:
             self.manager.remove_mod(mod_id)
             self.emit_status(f"Removed '{mod.name}'")
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_priority_up(self, mod_id: str):
         mod = self.db.get(mod_id)
         if mod:
             self.manager.set_priority(mod_id, mod.priority + 1)
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_priority_down(self, mod_id: str):
         mod = self.db.get(mod_id)
         if mod and mod.priority > 0:
             self.manager.set_priority(mod_id, mod.priority - 1)
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _on_details(self, mod_id: str):
@@ -573,6 +932,7 @@ class ModPanel(BasePanel):
         if mod:
             dlg = ModDetailsDialog(mod, self)
             dlg.see_more_by_author.connect(self._on_see_more_by_author)
+            dlg.edit_requested.connect(self._on_edit)
             dlg.exec()
 
     def _on_see_more_by_author(self, author: str, target_type: object):
@@ -594,12 +954,22 @@ class ModPanel(BasePanel):
         """
         path = getattr(self.config, "game_library_path", "")
         if not path:
+            self._invalidate_library_serial_cache()
             return frozenset()
+        if (
+            getattr(self, "_library_serials_cache_path", "") == path
+            and isinstance(getattr(self, "_library_serials_cache", None), frozenset)
+        ):
+            return self._library_serials_cache
         try:
             from src.core.game_library import get_library_serials
-            return get_library_serials(path)
-        except Exception:
-            return frozenset()
+            serials = get_library_serials(path)
+        except Exception as exc:
+            logger.warning("Could not load library serials for mod panel: %s", exc)
+            serials = frozenset()
+        self._library_serials_cache_path = path
+        self._library_serials_cache = serials
+        return serials
 
     def _filter_by_author(self, author: str):
         """Set the author filter dropdown to *author* and refresh the list."""
@@ -618,83 +988,188 @@ class ModPanel(BasePanel):
         mod = self.db.get(mod_id)
         if not mod:
             return
-        dlg = EditModDialog(mod, self)
+        def save_metadata(meta):
+            if self.db.get(mod_id) is None:
+                raise ValueError("This mod is no longer installed.")
+            self.manager.update_metadata(mod_id, **meta, fetch_thumbnail=False)
+
+        dlg = EditModDialog(mod, self, save_callback=save_metadata)
         if dlg.exec() == dlg.DialogCode.Accepted:
             meta = dlg.updated_meta
-            self.manager.update_metadata(
-                mod_id,
-                name=meta.get("name", ""),
-                author=meta.get("author", ""),
-                description=meta.get("description", ""),
-                game_id=meta.get("game_id", ""),
-                version=meta.get("version", ""),
-                source_url=meta.get("source_url", ""),
-                tags=meta.get("tags"),
-            )
-            # Apply thumbnail if explicitly fetched in dialog
-            if meta.get("thumbnail_path"):
-                updated = self.db.get(mod_id)
-                if updated:
-                    updated.thumbnail_path = meta["thumbnail_path"]
-                    self.db.update(updated)
             self.emit_status(f"Updated '{meta.get('name', mod.name)}'")
+            self._refresh_author_filter()
+            self._invalidate_issue_state_cache()
             self._apply_filter()
 
     def _enable_all(self):
-        meta = _TYPE_META[self.mod_type]
-        target_path = getattr(self.config, meta["deploy_key"], "")
-        all_types = [self.mod_type] + self.extra_types
-        for mod in self._all_mods():
-            if not mod.enabled:
-                mod.enabled = True
-                self.db.update(mod)
-        # Single bulk deploy after all flags are set
-        if target_path:
-            total = sum(self.manager.deploy(mt, target_path)[0] for mt in all_types)
-            self.emit_status(f"All {meta['label'].lower()} enabled — deployed {total} to PCSX2")
-        else:
-            self.emit_status(f"All {meta['label'].lower()} enabled (configure path in Settings to deploy)")
-        self._apply_filter()
+        self._set_batch_enabled(True)
 
     def _disable_all(self):
-        meta = _TYPE_META[self.mod_type]
-        target_path = getattr(self.config, meta["deploy_key"], "")
-        all_types = [self.mod_type] + self.extra_types
-        for mod in self._all_mods():
-            if mod.enabled:
-                mod.enabled = False
-                self.db.update(mod)
-        # Re-deploy (nothing enabled → clears deployed files via empty deploy)
-        if target_path:
-            for mt in all_types:
-                self.manager.deploy(mt, target_path)
-        self.emit_status(f"All {meta['label'].lower()} disabled")
-        self._apply_filter()
+        self._set_batch_enabled(False)
+
+    def _update_batch_actions(self, mods):
+        shown = set(self._shown_mod_ids)
+        for enabled, visible, button, label in (
+            (True, False, self._enable_all_btn, "Enable All"),
+            (False, False, self._disable_all_btn, "Disable All"),
+            (True, True, self._enable_shown_btn, "Enable Shown"),
+            (False, True, self._disable_shown_btn, "Disable Shown"),
+        ):
+            count = sum(mod.enabled != enabled and (not visible or mod.id in shown) for mod in mods)
+            button.setText(f"{label} ({count})")
+            button.setEnabled(bool(count) and not self._batch_busy)
+        self._batch_retry_btn.setVisible(bool(self._batch_retry_states))
+        self._batch_retry_btn.setEnabled(not self._batch_busy)
+        self._batch_dismiss_btn.setEnabled(not self._batch_busy)
+
+    def _set_batch_enabled(self, enabled, *, shown=False):
+        if self._batch_busy:
+            return
+        shown_ids = set(self._shown_mod_ids)
+        states = {
+            mod.id: enabled for mod in self._all_mods()
+            if mod.enabled != enabled and (not shown or mod.id in shown_ids)
+        }
+        if not states:
+            self.emit_status("No mods need this change in the chosen scope. Use Retry Batch for an earlier incomplete operation.")
+            return
+        self._run_batch(
+            states,
+            "Shown results captured before this action" if shown else "All mods in this panel, including hidden results",
+        )
+
+    def _confirm_batch(self, states, scope, skipped=0):
+        from src.core.pcsx2_layout import get_deploy_path
+        mods = [self.db.get(mid) for mid in states]
+        action = "Enable" if next(iter(states.values())) else "Disable"
+        changed = sum(mod.enabled != states[mod.id] for mod in mods)
+        box = QMessageBox(self)
+        box.setWindowTitle(f"{action} Mods")
+        box.setTextFormat(Qt.TextFormat.PlainText)
+        box.setText(
+            f"{action} {len(mods)} mod(s)?\nScope: {scope}\n"
+            f"{changed} enabled flag(s) will change; {len(mods) - changed} already match and will be reconciled again."
+        )
+        details = []
+        for kind in dict.fromkeys(mod.mod_type for mod in mods):
+            if kind == ModType.SAVE_FILE:
+                details.append("Save files: library flags only; live memory cards are never copied or removed.")
+            else:
+                target = get_deploy_path(self.config, kind) if self.config is not None else ""
+                details.append(f"{kind.value}: {target or 'No destination configured — set it in Settings, then retry.'}")
+        box.setInformativeText(
+            "Only the listed enabled flags change. Deployment rebuilds affected content using all enabled mods, "
+            "including hidden ones, to preserve shared files and priorities. Back up installed content first.\n\n"
+            + "\n".join(details)
+            + (f"\n{skipped} original mod(s) were removed or moved out of this panel and will be skipped." if skipped else "")
+            + ("\nApplying this batch replaces the earlier retry snapshot; it does not finish that earlier batch."
+               if self._batch_retry_states and self._batch_retry_states != states else "")
+            + "\n\nShow Details lists every mod in this batch."
+        )
+        box.setDetailedText("\n".join(
+            f"{mod.name} [{mod.id}] • {mod.mod_type.value} • "
+            f"{'Enabled' if mod.enabled else 'Disabled'} → {'Enabled' if states[mod.id] else 'Disabled'}"
+            for mod in mods
+        ))
+        box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        box.setDefaultButton(QMessageBox.StandardButton.No)
+        return box.exec() == QMessageBox.StandardButton.Yes
+
+    def _run_batch(self, states, scope, *, skipped=0):
+        if self._batch_busy:
+            return
+        self._batch_busy = True
+        self._update_batch_actions(self._all_mods())
+        attempted = False
+        try:
+            if not self._confirm_batch(states, scope, skipped):
+                self.emit_status("Batch action cancelled; no changes made.")
+                return
+            # Freeze the confirmed IDs before status filters can hide changed mods.
+            self._batch_retry_states = dict(states)
+            attempted = True
+            action = "Enable" if next(iter(states.values())) else "Disable"
+            self.emit_status(f"{action}: applying batch of {len(states)} mod(s)…")
+            try:
+                count, warnings = self.manager.set_enabled_many(states, self.config)
+            except Exception as exc:
+                logger.warning("Could not complete mod batch (%s): %s", scope, exc)
+                message = (
+                    f"{action} batch could not finish: {exc or type(exc).__name__}\nScope: {scope}\n"
+                    "Library changes may already be saved, but installed files may be incomplete. "
+                    "Correct the problem and use Retry Batch to review the original mods, even if filters now hide them."
+                )
+            else:
+                message = f"{action} batch: saved enabled flags for {len(states)} mod(s).\nScope: {scope}"
+                if self.config is None:
+                    message += "\nNo deployment configuration supplied; installed files were not changed."
+                elif all(self.db.get(mid).mod_type == ModType.SAVE_FILE for mid in states):
+                    message += "\nLive memory-card files were not changed."
+                elif not warnings:
+                    message += f"\nDeployment reconciled ({count} item(s)); live memory cards were not changed."
+                if warnings:
+                    message += "\n" + "\n".join(warnings) + "\nCorrect the problem and use Retry Batch."
+                else:
+                    self._batch_retry_states = {}
+            if skipped:
+                message += f"\nSkipped {skipped} original mod(s) no longer in this panel."
+            self._batch_feedback.setPlainText(message)
+            self._batch_feedback.show()
+            self._batch_dismiss_btn.show()
+            self.emit_status(message.splitlines()[0])
+        finally:
+            self._batch_busy = False
+            if attempted:
+                self._invalidate_issue_state_cache()
+                self._apply_filter()
+            else:
+                self._update_batch_actions(self._all_mods())
+
+    def _retry_batch(self):
+        if self._batch_busy or not self._batch_retry_states:
+            return
+        panel_ids = {mod.id for mod in self._all_mods()}
+        states = {mid: enabled for mid, enabled in self._batch_retry_states.items() if mid in panel_ids}
+        skipped = len(self._batch_retry_states) - len(states)
+        if not states:
+            self._batch_retry_states = {}
+            self._batch_feedback.setPlainText(
+                "None of the original batch mods remain in this panel. No changes made."
+            )
+            self._update_batch_actions(self._all_mods())
+            return
+        self._run_batch(states, "Retry original batch — not current filters", skipped=skipped)
+
+    def _dismiss_batch_result(self):
+        if self._batch_busy:
+            return
+        self._batch_retry_states = {}
+        self._batch_feedback.hide()
+        self._batch_dismiss_btn.hide()
+        self._update_batch_actions(self._all_mods())
 
     def _on_count_lbl_clicked(self):
         """Click handler for the status/count label — opens conflict resolver if issues exist."""
-        self._show_conflicts()
+        issues = self._issue_state()
+        if issues["conflicts"] or issues["pnach_conflicts"]:
+            self._show_conflicts()
 
     def _show_conflicts(self):
-        all_types = [self.mod_type] + self.extra_types
-        conflicts = []
-        for mt in all_types:
-            conflicts.extend(self.manager.detect_conflicts(mt))
-        pnach_conflicts = []
-        for mt in all_types:
-            if mt in (ModType.PNACH, ModType.CHEAT):
-                try:
-                    pnach_conflicts.extend(self.manager.detect_pnach_conflicts(mt))
-                except Exception:
-                    pass
+        issue_state = self._issue_state()
+        conflicts = list(issue_state["conflicts"])
+        pnach_conflicts = list(issue_state["pnach_conflicts"])
 
         if not conflicts and not pnach_conflicts:
             QMessageBox.information(
                 self, "No Conflicts", "No conflicts detected between enabled mods! ✅"
             )
             return
-        dlg = ConflictDialog(conflicts, self.db, self, pnach_conflicts=pnach_conflicts)
+        dlg = ConflictDialog(
+            conflicts, self.db, self, pnach_conflicts=pnach_conflicts,
+            manager=self.manager, config=self.config,
+        )
         dlg.exec()
+        self._invalidate_issue_state_cache()
         self._apply_filter()
 
     def _open_code_builder(self):
@@ -711,8 +1186,8 @@ class ModPanel(BasePanel):
                 from src.core.pcsx2_layout import detect_pcsx2_subfolders
                 paths = detect_pcsx2_subfolders(pcsx2_root)
                 cheats_dir = paths.get("pnach_path", "")
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not determine cheats folder for PNACH code builder: %s", exc)
 
         # Try to pre-fill the game serial from the current library filter
         serial = ""
@@ -723,8 +1198,8 @@ class ModPanel(BasePanel):
                 enabled_serials = {m.game_id for m in mods if m.enabled and m.game_id}
                 if len(enabled_serials) == 1:
                     serial = enabled_serials.pop()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not infer current game serial for PNACH code builder: %s", exc)
 
         dlg = PnachCodeBuilderDialog(
             game_serial=serial,
@@ -733,6 +1208,8 @@ class ModPanel(BasePanel):
             parent=self,
         )
         dlg.exec()
+        self._invalidate_issue_state_cache()
+        self._apply_filter()
 
     def _check_updates(self):
         """
@@ -849,6 +1326,8 @@ class ModPanel(BasePanel):
                 self.emit_status(
                     f"Imported '{mod.name}' (configure PCSX2 path in Settings to deploy)"
                 )
+            self._invalidate_issue_state_cache()
             self._apply_filter()
         except Exception as exc:
+            logger.warning("Could not import mod in mod panel: %s", exc)
             QMessageBox.critical(self, "Import Error", str(exc))

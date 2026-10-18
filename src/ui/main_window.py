@@ -1,5 +1,7 @@
 """Main application window for PS2 Mod Manager."""
 
+import logging
+
 from PyQt6.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtWidgets import (
@@ -17,7 +19,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from src.core.config_manager import load_config, save_config
+from src.core.config_manager import load_config, save_config, ui_state_bucket
+from src.core.app_info import APP_NAME, PATREON_URL
 from src.core.mod_manager import ModDatabase, ModManager
 from src.models.mod import AppConfig, ModType
 from src.ui.browse_panel import BrowsePanel
@@ -28,8 +31,9 @@ from src.ui.memcard_panel import MemoryCardPanel
 from src.ui.mod_panel import ModPanel
 from src.ui.settings_panel import SettingsPanel
 from src.ui.setup_wizard import SetupWizard
+from src.ui.url_helpers import open_external_url
 
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -38,6 +42,40 @@ PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
 
 class _UpdateSignals(QObject):
     updates_found = pyqtSignal(int)   # number of mods with updates
+
+
+def _main_window_state(config: AppConfig) -> dict:
+    return ui_state_bucket(config, "main_window")
+
+
+def _save_main_window_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save main window config after %s: %s", context, exc)
+
+
+def _selected_nav_index_from_state(state: dict, nav_count: int) -> int:
+    """Return a safe nav index from saved state."""
+    raw_index = state.get("selected_nav_index", 0)
+    try:
+        selected = int(raw_index or 0)
+    except (TypeError, ValueError):
+        logger.warning(
+            "Saved main window panel index %r is invalid; using the first panel",
+            raw_index,
+        )
+        return 0
+    if nav_count <= 0:
+        return 0
+    clamped = max(0, min(selected, nav_count - 1))
+    if clamped != selected:
+        logger.warning(
+            "Saved main window panel index %r is no longer available; using %d",
+            raw_index,
+            clamped,
+        )
+    return clamped
 
 
 # ---------------------------------------------------------------------------
@@ -66,7 +104,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.config = config
         self.db = ModDatabase()
-        self.setWindowTitle("PS2 Mod Manager")
+        self.setWindowTitle(APP_NAME)
         self.setMinimumSize(1100, 720)
         self._nav_buttons: list[NavButton] = []
         self._update_signals = _UpdateSignals()
@@ -90,8 +128,8 @@ class MainWindow(QMainWindow):
             x = max(available.left(), min(geo.x(), available.right() - geo.width()))
             y = max(available.top(), min(geo.y(), available.bottom() - geo.height()))
             self.move(x, y)
-        except Exception:
-            pass  # Never crash startup due to geometry calculation
+        except Exception as exc:
+            logger.warning("Failed to clamp main window to screen: %s", exc)
 
     # ------------------------------------------------------------------
     # UI Construction
@@ -179,6 +217,7 @@ class MainWindow(QMainWindow):
 
         # Pages (must match nav_items order + settings at end)
         self._dashboard = DashboardPanel(self.db, self.config)
+        self._dashboard.action_requested.connect(self._on_dashboard_action)
         self._stack.addWidget(self._dashboard)          # index 0
 
         self._browse_panel = BrowsePanel(self.config)
@@ -190,7 +229,8 @@ class MainWindow(QMainWindow):
         self._library_panel.browse_game.connect(self._on_library_browse_game)
         self._stack.addWidget(self._library_panel)      # index 2
 
-        self._downloads_panel = DownloadsPanel(self.config)
+        self._downloads_panel = DownloadsPanel(self.config, db=self.db)
+        self._downloads_panel.mod_installed.connect(self._on_mod_installed)
         self._stack.addWidget(self._downloads_panel)    # index 3
 
         self._texture_panel = ModPanel(ModType.TEXTURE_PACK, self.db, self.config)
@@ -239,7 +279,6 @@ class MainWindow(QMainWindow):
             self._browse_panel,
             self._library_panel,
             self._downloads_panel,
-            self._gif_panel,
             self._settings_panel,
         ):
             panel.status_message.connect(self._show_status)
@@ -250,7 +289,9 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self._status_bar)
 
         # Activate first nav button
-        self._activate_nav(0)
+        state = _main_window_state(self.config)
+        initial_index = _selected_nav_index_from_state(state, len(self._nav_buttons))
+        self._activate_nav(initial_index, persist=False)
 
     # ------------------------------------------------------------------
     # Navigation
@@ -261,7 +302,7 @@ class MainWindow(QMainWindow):
             self._activate_nav(index)
         return _handler
 
-    def _activate_nav(self, index: int):
+    def _activate_nav(self, index: int, *, persist: bool = True):
         for i, btn in enumerate(self._nav_buttons):
             btn.setChecked(i == index)
         self._stack.setCurrentIndex(index)
@@ -269,6 +310,9 @@ class MainWindow(QMainWindow):
         panel = self._stack.currentWidget()
         if hasattr(panel, "refresh"):
             panel.refresh()
+        if persist:
+            _main_window_state(self.config)["selected_nav_index"] = index
+            _save_main_window_config(self.config, f"switching to panel {index}")
 
     def _navigate_to_author_type(self, author: str, mod_type, nav_index: dict):
         """Navigate to the target mod panel and pre-filter by *author*."""
@@ -285,6 +329,23 @@ class MainWindow(QMainWindow):
     # Handlers
     # ------------------------------------------------------------------
 
+    def _on_dashboard_action(self, action: str):
+        routes = {
+            "discover": 1,
+            "import_textures": 4,
+            "download_url": 1,
+            "downloads": 3,
+            "settings": 8,
+        }
+        index = routes.get(action)
+        if index is None:
+            return
+        self._activate_nav(index)
+        if action == "import_textures":
+            self._texture_panel._import_mod()
+        elif action == "download_url":
+            self._browse_panel._open_download_dialog()
+
     def _on_mod_installed(self):
         """Refresh all mod panels after a mod is installed from the Discover panel."""
         for panel in (
@@ -293,13 +354,17 @@ class MainWindow(QMainWindow):
             self._cover_panel,
         ):
             try:
-                panel._apply_filter()
-            except Exception:
-                pass  # Never crash the UI if a panel isn't ready
+                panel.refresh()
+            except Exception as exc:
+                logger.warning(
+                    "Failed to refresh %s after mod install: %s",
+                    panel.__class__.__name__,
+                    exc,
+                )
         try:
             self._library_panel.refresh()
-        except Exception:
-            pass  # Never crash the UI if the library panel isn't ready
+        except Exception as exc:
+            logger.warning("Failed to refresh library panel after mod install: %s", exc)
 
     def _on_library_browse_game(self, serial: str):
         """Navigate to the Discover panel and pre-filter by *serial*."""
@@ -324,9 +389,15 @@ class MainWindow(QMainWindow):
         self._status_bar.showMessage(msg, 5000)
 
     def _open_patreon(self):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(PATREON_URL))
+        open_external_url(
+            PATREON_URL,
+            parent=self,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
 
     # ------------------------------------------------------------------
     # First-run / Setup Wizard
@@ -361,8 +432,8 @@ class MainWindow(QMainWindow):
             self._update_checker.start(
                 on_complete=self._update_signals.updates_found.emit
             )
-        except Exception:
-            pass  # Never crash the UI over an update check
+        except Exception as exc:
+            logger.warning("Failed to start update checker: %s", exc)
 
     def _on_updates_found(self, count: int):
         if count > 0:
@@ -378,9 +449,13 @@ class MainWindow(QMainWindow):
             ):
                 try:
                     panel._apply_filter()
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning(
+                        "Failed to refresh %s after update check: %s",
+                        panel.__class__.__name__,
+                        exc,
+                    )
             try:
                 self._library_panel.refresh()
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Failed to refresh library panel after update check: %s", exc)

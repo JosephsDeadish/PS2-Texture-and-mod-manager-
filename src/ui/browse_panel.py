@@ -2,23 +2,29 @@
 
 Features:
 - Tabbed browsing per mod type (All / Textures / PNACH / Covers / Saves / Cheats)
-- Live search across catalogue entries (name, game, author, tags)
+- Live search across catalogue entries (name, game, serial, source, author, tags)
 - Source filter dropdown (filter by hosting site)
 - Author filter / favorite authors (❤ toggle to mark favorite)
 - "Download from URL" dialog with Google Drive conversion
 - Rich catalogue entries with upscale info, author links, context
 """
 
+import logging
 import os
+import re
+import shutil
+from functools import lru_cache
 import threading
 import tempfile
+import time
 import uuid
+from copy import deepcopy
 from pathlib import Path
 from typing import List, Optional
 from urllib.parse import unquote, urlparse
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import QObject, Qt, QTimer, pyqtSignal, pyqtSlot
+from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import (
     QComboBox,
     QFrame,
@@ -40,8 +46,9 @@ from PyQt6.QtWidgets import (
     QCheckBox,
 )
 
-from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES
-from src.core.config_manager import THUMBNAILS_DIR, save_config
+from src.core.catalogue_loader import CATALOGUE, ALL_SOURCES, is_placeholder_author
+from src.core.browse_layout import calculate_catalogue_columns
+from src.core.config_manager import THUMBNAILS_DIR, save_config, ui_state_bucket
 from src.core.downloader import (
     DownloadError,
     download_file,
@@ -51,7 +58,25 @@ from src.core.downloader import (
 )
 from src.models.mod import AppConfig, ModInfo, ModType
 from src.ui.base_panel import BasePanel
+from src.ui.downloads_panel import ActiveDownloads, _download_size
+from src.ui.url_helpers import open_external_url
 
+logger = logging.getLogger(__name__)
+
+
+
+# ---------------------------------------------------------------------------
+# Browse cover-art cache
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=256)
+def _fetch_browse_cover_art_data(url: str) -> bytes:
+    """Return cached image bytes for a browse-panel thumbnail URL."""
+    import urllib.request
+
+    with urllib.request.urlopen(url, timeout=8) as resp:
+        return resp.read()
 
 
 # ---------------------------------------------------------------------------
@@ -69,6 +94,17 @@ _ACCOUNT_REQUIRED_SOURCES: frozenset = frozenset({
     "ScreenScraper",
     "Patreon",
 })
+
+_DOWNLOAD_INSTALL_STATE_KEY = "download_install_dialog"
+
+_SORT_OPTIONS = [
+    ("⭐ Featured order", "featured"),
+    ("🅰 Name (A→Z)", "name"),
+    ("🎮 Game (A→Z)", "game"),
+    ("👤 Author (A→Z)", "author"),
+    ("🌐 Source (A→Z)", "source"),
+    ("🆔 Serial (A→Z)", "serial"),
+]
 
 
 def _entry_is_free(entry: dict) -> bool:
@@ -95,6 +131,11 @@ def _entry_is_complete(entry: dict) -> bool:
     return bool(entry.get("is_complete", True))
 
 
+def _entry_has_named_author(entry: dict) -> bool:
+    author = entry.get("author", "")
+    return isinstance(author, str) and bool(author.strip()) and not is_placeholder_author(author)
+
+
 def _entry_is_in_app_downloadable(entry: dict) -> bool:
     """Return True if this entry can be fully downloaded and installed within the app.
 
@@ -103,6 +144,8 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
 
     * ``cover_by_id``  — cover art fetched automatically from GameTDB by serial.
     * ``cover_by_url`` — cover art fetched directly from a known URL.
+    * ``pnach_crc``, ``gdrive`` and ``yandex`` — the app can resolve the direct
+      download automatically when a ``direct_download_url`` is present.
     * empty action **with** a ``direct_download_url`` — the app can download the
       file directly (MediaFire and Google Drive links are resolved automatically).
 
@@ -115,9 +158,247 @@ def _entry_is_in_app_downloadable(entry: dict) -> bool:
     action = entry.get("download_action", "")
     if action in ("cover_by_id", "cover_by_url"):
         return True
+    if action in ("pnach_crc", "gdrive", "yandex") and bool(entry.get("direct_download_url", "")):
+        return True
     if action == "" and bool(entry.get("direct_download_url", "")):
         return True
     return False
+
+
+def _entry_copy_url(entry: dict) -> str:
+    """Return the most useful URL to copy for *entry*."""
+    for field_name in ("direct_download_url", "url", "author_url"):
+        value = entry.get(field_name, "")
+        if isinstance(value, str):
+            value = value.strip()
+            if value:
+                return value
+    return ""
+
+
+def _entry_matches_query(entry: dict, query: str, serial_db: Optional[object] = None) -> bool:
+    """Return True when *entry* matches the browse search query."""
+    needle = query.strip().casefold()
+    if not needle:
+        return True
+
+    compact = "".join(ch for ch in needle if ch.isalnum())
+
+    def _matches_text(value: object) -> bool:
+        if not isinstance(value, str):
+            return False
+        lowered = value.casefold()
+        if needle in lowered:
+            return True
+        if compact:
+            value_compact = "".join(ch for ch in lowered if ch.isalnum())
+            if compact in value_compact:
+                return True
+        return False
+
+    for field_name in (
+        "name", "description", "author", "context", "source",
+        "download_action",
+        "upscale_tech", "size_label", "url", "source_url", "author_url",
+        "direct_download_url", "thumbnail_url",
+    ):
+        if _matches_text(entry.get(field_name, "")):
+            return True
+
+    if _matches_text(entry.get("game_serial", "")):
+        return True
+
+    tags = entry.get("tags", [])
+    if isinstance(tags, list) and any(_matches_text(tag) for tag in tags):
+        return True
+
+    game_field = entry.get("game", "")
+    if _matches_text(game_field):
+        return True
+    title_matches_query = getattr(serial_db, "title_matches_query", None)
+    get_info = getattr(serial_db, "get_info", None)
+    titles_for_serial = getattr(serial_db, "titles_for_serial", None)
+
+    def _matches_game_info(game_info: object) -> bool:
+        if game_info is None:
+            return False
+        for field_name in ("release_date", "developer", "publisher", "genre"):
+            if _matches_text(getattr(game_info, field_name, "")):
+                return True
+        return False
+
+    if (
+        callable(title_matches_query)
+        and isinstance(game_field, str)
+        and game_field
+        and title_matches_query(game_field, needle)
+    ):
+        return True
+
+    if callable(get_info) and isinstance(game_field, str) and game_field:
+        try:
+            game_info = get_info(game_field)
+        except Exception as exc:
+            logger.warning("Could not inspect browse game metadata for %s: %s", game_field, exc)
+        else:
+            if _matches_game_info(game_info):
+                return True
+
+    serial = entry.get("game_serial", "")
+    if callable(titles_for_serial) and isinstance(serial, str) and serial.strip():
+        try:
+            serial_titles = titles_for_serial(serial)
+        except Exception as exc:
+            logger.warning("Could not resolve browse game titles for serial %s: %s", serial, exc)
+        else:
+            for title in serial_titles:
+                if _matches_text(title):
+                    return True
+                if (
+                    callable(title_matches_query)
+                    and isinstance(title, str)
+                    and title
+                    and title_matches_query(title, needle)
+                ):
+                    return True
+                if callable(get_info) and isinstance(title, str) and title:
+                    try:
+                        game_info = get_info(title)
+                    except Exception as exc:
+                        logger.warning("Could not inspect browse game metadata for %s: %s", title, exc)
+                        continue
+                    if _matches_game_info(game_info):
+                        return True
+
+    return False
+
+
+class _BrowseSerialLookupCache:
+    """Cache browse-time serial database lookups for a single filter pass."""
+
+    def __init__(self, serial_db: object):
+        self._serial_db = serial_db
+        self.title_matches_query = getattr(serial_db, "title_matches_query", None)
+        self._info_cache: dict[str, object] = {}
+        self._titles_cache: dict[str, tuple[str, ...]] = {}
+
+    def get_info(self, title: str):
+        if not isinstance(title, str) or not title:
+            return None
+        if title not in self._info_cache:
+            self._info_cache[title] = self._serial_db.get_info(title)
+        return self._info_cache[title]
+
+    def titles_for_serial(self, serial: str):
+        if not isinstance(serial, str) or not serial:
+            return ()
+        if serial not in self._titles_cache:
+            titles = self._serial_db.titles_for_serial(serial)
+            if titles is None:
+                cached: tuple[str, ...] = ()
+            else:
+                cached = tuple(titles)
+            self._titles_cache[serial] = cached
+        return self._titles_cache[serial]
+
+    def __getattr__(self, name: str):
+        return getattr(self._serial_db, name)
+
+
+def _save_browse_config(config: AppConfig, context: str) -> None:
+    try:
+        save_config(config)
+    except Exception as exc:
+        logger.warning("Could not save browse panel config after %s: %s", context, exc)
+
+
+def _browse_authors(entries: List[dict]) -> List[str]:
+    """Return browse-filter author names, skipping placeholder values."""
+    authors = {
+        entry["author"].strip()
+        for entry in entries
+        if _entry_has_named_author(entry)
+    }
+    return sorted(authors, key=str.casefold)
+
+
+def _normalise_sort_mode(sort_mode: object) -> str:
+    if not isinstance(sort_mode, str):
+        return "featured"
+    sort_mode = sort_mode.strip().casefold()
+    valid = {value for _, value in _SORT_OPTIONS}
+    return sort_mode if sort_mode in valid else "featured"
+
+
+def _sort_catalogue_entries(entries: List[dict], sort_mode: object) -> List[dict]:
+    """Return *entries* sorted according to the browse sort mode."""
+    sort_mode = _normalise_sort_mode(sort_mode)
+    if sort_mode == "featured":
+        return list(entries)
+
+    def _field_key(entry: dict, field: str) -> tuple[bool, str]:
+        value = entry.get(field, "")
+        if not isinstance(value, str):
+            value = "" if value is None else str(value)
+        value = value.strip().casefold()
+        return (value == "", value)
+
+    sort_fields = {
+        "name": ("name", "game", "author"),
+        "game": ("game", "name", "author"),
+        "author": ("author", "name", "game"),
+        "source": ("source", "name", "author"),
+        "serial": ("game_serial", "name", "author"),
+    }
+    fields = sort_fields.get(sort_mode)
+    if not fields:
+        return list(entries)
+    return sorted(entries, key=lambda entry: tuple(_field_key(entry, field) for field in fields))
+
+
+def _catalogue_empty_state_message(
+    query: str,
+    source: str,
+    author: str,
+    favs_only: bool,
+    show_nsfw: bool,
+    show_paid: bool,
+    show_account_required: bool,
+    show_incomplete: bool,
+    in_app_only: bool,
+    has_entries: bool = True,
+) -> str:
+    filters = []
+    if query.strip():
+        filters.append("search text")
+    if source:
+        filters.append("source")
+    if author:
+        filters.append("author")
+    if favs_only:
+        filters.append("favorites only")
+    if not show_nsfw:
+        filters.append("NSFW hidden")
+    if not show_paid:
+        filters.append("paid content hidden")
+    if not show_account_required:
+        filters.append("account-required hidden")
+    if not show_incomplete:
+        filters.append("partial packs hidden")
+    if in_app_only:
+        filters.append("in-app downloads only")
+
+    if not has_entries or not filters:
+        return (
+            "No catalogue entries are available in this tab. "
+            "Use Reload to re-read the catalogue files."
+        )
+
+    return (
+        "No catalogue entries match the current filters. "
+        "Use Clear Filters to reset the search and filters, or loosen: "
+        + ", ".join(filters) + "."
+    )
 
 
 # Human-readable labels for each ModType in catalogue cards
@@ -128,6 +409,23 @@ _TYPE_LABELS = {
     ModType.SAVE_FILE: "Game Save",
     ModType.CHEAT: "Cheat",
 }
+
+_SOURCE_ICONS = {
+    "GBAtemp": "🧵",
+    "GitHub": "🐙",
+    "PCSX2 CheatDB": "🧪",
+}
+
+
+def _source_badge_text(source: object) -> str:
+    """Return a compact source label with a small site-specific icon."""
+    if not isinstance(source, str):
+        return ""
+    label = source.strip()
+    if not label:
+        return ""
+    icon = _SOURCE_ICONS.get(label, "🌐")
+    return f"{icon} {label}"
 
 
 def _download_cover_by_url_async(
@@ -165,6 +463,7 @@ def _download_cover_by_url_async(
                 f"Cover art saved to:\n{dest}"
             ))
         except Exception as exc:
+            logger.warning("Could not download browse cover art from %s: %s", url, exc)
             err = str(exc)
             QTimer.singleShot(0, lambda: QMessageBox.warning(
                 parent_widget, "Download Failed",
@@ -181,6 +480,7 @@ class CatalogueCard(QFrame):
     """A card in the mod browser showing one catalogue entry."""
 
     open_url = pyqtSignal(str)
+    copy_url = pyqtSignal(str)
     download_cover = pyqtSignal(dict)
     favorite_toggled = pyqtSignal(str, bool)   # author, is_favorite
     install_direct = pyqtSignal(dict)           # entry dict — in-app install requested
@@ -193,11 +493,14 @@ class CatalogueCard(QFrame):
         self.setMinimumWidth(260)  # issue #21: give cards enough room for button text
         self.setMaximumWidth(420)
         self._fav_btn = None   # set to a QLabel widget inside _build() for non-hub entries; hub entries skip the favourite button entirely, so callers must guard with `if self._fav_btn`
+        self._detail_widgets = []
         self._build()
+        self.set_compact(bool(ui_state_bucket(config, "browse_panel").get("compact_cards", False)))
 
     def _build(self):
         # Outer layout: cover art on the left, all existing content on the right
         outer = QHBoxLayout(self)
+        self._outer_layout = outer
         outer.setContentsMargins(10, 10, 10, 10)
         outer.setSpacing(10)
 
@@ -251,6 +554,7 @@ class CatalogueCard(QFrame):
 
         # ── Right: all existing card content ────────────────────────────────
         layout = QVBoxLayout()
+        self._body_layout = layout
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
         outer.addLayout(layout, 1)
@@ -267,11 +571,13 @@ class CatalogueCard(QFrame):
         header.addWidget(type_lbl)
 
         # Source badge
-        src_lbl = QLabel(self.entry.get("source", ""))
+        source_label = _source_badge_text(self.entry.get("source", ""))
+        src_lbl = QLabel(source_label)
         src_lbl.setStyleSheet(
             "background:#1a2050; color:#8080c0; border-radius:9px;"
             "padding: 2px 8px; font-size:10px;"
         )
+        src_lbl.setToolTip(f"Source site: {self.entry.get('source', '')}")
         header.addWidget(src_lbl)
 
         # Status badges: 💰 Paid / 🔐 Account Required / 🔧 WIP or Partial
@@ -312,6 +618,15 @@ class CatalogueCard(QFrame):
         title = QLabel(self.entry["name"])
         title.setStyleSheet("font-weight: bold; font-size: 13px; color: #ffffff;")
         title.setWordWrap(True)
+        details = "\n\n".join(
+            text for text in (
+                self.entry["description"],
+                self.entry.get("context", ""),
+                ", ".join(self.entry.get("tags", [])),
+            ) if text
+        )
+        title.setToolTip(details)
+        self.setAccessibleDescription(details)
         layout.addWidget(title)
 
         # Game badge — shows game name AND serial (e.g. "🎮 God of War  ·  SCUS-97399")
@@ -349,27 +664,40 @@ class CatalogueCard(QFrame):
             )
             author_row.addWidget(author_lbl, 1)
         else:
-            # Specific person: show their name with profile link
-            author_lbl = QLabel(f"👤 {self.entry['author']}")
-            author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+            author_name = self.entry.get("author", "")
+            has_named_author = _entry_has_named_author(self.entry)
+            if has_named_author:
+                # Specific person: show their name with a generic linked-page button.
+                author_lbl = QLabel(f"👤 {author_name}")
+                author_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
+            else:
+                # Placeholder/unknown author: treat the linked page as the source entry.
+                author_lbl = QLabel("🔍 Source page" if self.entry.get("author_url") else f"👤 {author_name or 'Unknown'}")
+                author_lbl.setStyleSheet(
+                    "color: #607090; font-size: 11px; font-style: italic;"
+                )
             author_row.addWidget(author_lbl)
             author_row.addStretch()
 
-            # Favorite author button (only for known individuals)
-            is_fav = self.entry["author"] in getattr(self.config, "favorite_authors", [])
-            self._fav_btn = QPushButton("❤" if is_fav else "🤍")
-            self._fav_btn.setFixedSize(26, 22)
-            self._fav_btn.setStyleSheet(
-                "border: none; background: transparent; font-size: 14px;"
-                + ("color: #e94560;" if is_fav else "color: #505080;")
-            )
-            self._fav_btn.setToolTip(
-                "Remove from favorites" if is_fav else "Add author to favorites"
-            )
-            self._fav_btn.clicked.connect(self._toggle_favorite)
-            author_row.addWidget(self._fav_btn)
+            if has_named_author:
+                # Favorite author button (only for known individuals)
+                is_fav = author_name in getattr(self.config, "favorite_authors", [])
+                self._fav_btn = QPushButton("❤" if is_fav else "🤍")
+                self._fav_btn.setFixedSize(26, 22)
+                self._fav_btn.setStyleSheet(
+                    "border: none; background: transparent; font-size: 14px;"
+                    + ("color: #e94560;" if is_fav else "color: #505080;")
+                )
+                self._fav_btn.setToolTip(
+                    "Remove from favorites" if is_fav else "Add author to favorites"
+                )
+                self._fav_btn.setAccessibleName("Toggle favorite author")
+                self._fav_btn.setAccessibleDescription(
+                    f"{'Remove' if is_fav else 'Add'} {author_name} {'from' if is_fav else 'to'} favorite authors"
+                )
+                self._fav_btn.clicked.connect(self._toggle_favorite)
+                author_row.addWidget(self._fav_btn)
 
-            # Profile link button
             if self.entry.get("author_url"):
                 author_link = QPushButton("🔗")
                 author_link.setFixedSize(26, 22)
@@ -377,7 +705,11 @@ class CatalogueCard(QFrame):
                     "border: none; background: transparent; font-size: 14px; color: #5080d0;"
                 )
                 author_link.setToolTip(
-                    f"View {self.entry['author']}'s profile on {self.entry.get('source', 'source site')}"
+                    f"Open the linked page for this entry on {self.entry.get('source', 'the source site')}"
+                )
+                author_link.setAccessibleName("Open author link")
+                author_link.setAccessibleDescription(
+                    f"Open the linked page for this entry on {self.entry.get('source', 'the source site')}"
                 )
                 author_link.clicked.connect(
                     lambda: self.open_url.emit(self.entry["author_url"])
@@ -395,6 +727,10 @@ class CatalogueCard(QFrame):
             browse_link.setToolTip(
                 f"Browse all mods on {self.entry.get('source', 'this source')}"
             )
+            browse_link.setAccessibleName("Browse source entries")
+            browse_link.setAccessibleDescription(
+                f"Browse all mods on {self.entry.get('source', 'this source')}"
+            )
             browse_link.clicked.connect(
                 lambda: self.open_url.emit(self.entry["author_url"])
             )
@@ -408,6 +744,7 @@ class CatalogueCard(QFrame):
         desc.setWordWrap(True)
         desc.setMaximumHeight(60)
         layout.addWidget(desc)
+        self._detail_widgets.append(desc)
 
         # Context info (collapsible-style tooltip hint)
         if self.entry.get("context"):
@@ -419,6 +756,7 @@ class CatalogueCard(QFrame):
             ctx_lbl.setWordWrap(True)
             ctx_lbl.setToolTip(self.entry["context"])
             layout.addWidget(ctx_lbl)
+            self._detail_widgets.append(ctx_lbl)
 
         # Upscale tech + size label row
         meta_row = QHBoxLayout()
@@ -440,7 +778,9 @@ class CatalogueCard(QFrame):
 
         # Tags
         if self.entry.get("tags"):
-            tags_row = QHBoxLayout()
+            tags_widget = QWidget()
+            tags_row = QHBoxLayout(tags_widget)
+            tags_row.setContentsMargins(0, 0, 0, 0)
             tags_row.setSpacing(4)
             for tag in self.entry["tags"][:4]:
                 tag_lbl = QLabel(tag)
@@ -450,7 +790,8 @@ class CatalogueCard(QFrame):
                 )
                 tags_row.addWidget(tag_lbl)
             tags_row.addStretch()
-            layout.addLayout(tags_row)
+            layout.addWidget(tags_widget)
+            self._detail_widgets.append(tags_widget)
 
         layout.addStretch()
 
@@ -462,6 +803,19 @@ class CatalogueCard(QFrame):
         visit_btn.setObjectName("primary_btn")
         visit_btn.clicked.connect(lambda: self.open_url.emit(self.entry["url"]))
         action_row.addWidget(visit_btn, 1)
+
+        copy_btn = QPushButton("📋 Copy")
+        copy_btn.setToolTip(
+            "Copy the direct download link if available, otherwise the source page URL."
+        )
+        copy_btn.setAccessibleName("Copy catalogue link")
+        copy_btn.setAccessibleDescription(
+            "Copy the most useful link for this catalogue entry to the clipboard."
+        )
+        copy_target = _entry_copy_url(self.entry)
+        copy_btn.setEnabled(bool(copy_target))
+        copy_btn.clicked.connect(lambda: self.copy_url.emit(copy_target))
+        action_row.addWidget(copy_btn, 1)
 
         download_action = self.entry.get("download_action", "")
         has_direct = bool(self.entry.get("direct_download_url"))
@@ -530,6 +884,15 @@ class CatalogueCard(QFrame):
 
         layout.addLayout(action_row)
 
+    def set_compact(self, compact: bool) -> None:
+        """Change card density without restarting thumbnail downloads."""
+        margin = 6 if compact else 10
+        self._outer_layout.setContentsMargins(margin, margin, margin, margin)
+        self._outer_layout.setSpacing(6 if compact else 10)
+        self._body_layout.setSpacing(4 if compact else 8)
+        for widget in self._detail_widgets:
+            widget.setVisible(not compact)
+
     def _toggle_favorite(self):
         author = self.entry["author"]
         favs = list(getattr(self.config, "favorite_authors", []))
@@ -539,10 +902,7 @@ class CatalogueCard(QFrame):
         else:
             favs.append(author)
         self.config.favorite_authors = favs
-        try:
-            save_config(self.config)
-        except Exception:
-            pass
+        _save_browse_config(self.config, "updating favorites")
 
         new_fav = not is_fav
         self._fav_btn.setText("❤" if new_fav else "🤍")
@@ -551,6 +911,9 @@ class CatalogueCard(QFrame):
             + ("color: #e94560;" if new_fav else "color: #505080;")
         )
         self._fav_btn.setToolTip("Remove from favorites" if new_fav else "Add author to favorites")
+        self._fav_btn.setAccessibleDescription(
+            f"{'Remove' if new_fav else 'Add'} {author} {'from' if new_fav else 'to'} favorite authors"
+        )
         self.favorite_toggled.emit(author, new_fav)
 
     def _load_cover_with_fallback(self, primary_url: str, fallback_url: str):
@@ -569,48 +932,124 @@ class CatalogueCard(QFrame):
         if not url:
             return False
         try:
-            import urllib.request
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
-                tmp = f.name
-            with urllib.request.urlopen(url, timeout=8) as resp:
-                data = resp.read()
-            if len(data) < 512:
-                # Too small — likely a 404 placeholder or empty response
-                return False
-            with open(tmp, "wb") as f:
-                f.write(data)
-
-            loaded = [False]
-
-            def _update():
-                if not self._cover_lbl:
-                    return
-                pix = QPixmap(tmp).scaled(
-                    60, 88,
-                    Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation,
-                )
-                if not pix.isNull():
-                    self._cover_lbl.setPixmap(pix)
-                    self._cover_lbl.setText("")
-                    self._cover_lbl.setStyleSheet(
-                        "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
-                    )
-                    loaded[0] = True
-                try:
-                    os.unlink(tmp)
-                except OSError:
-                    pass
-
-            QTimer.singleShot(0, _update)
-            return True
-        except Exception:
+            data = _fetch_browse_cover_art_data(url)
+        except Exception as exc:
+            logger.warning("Could not fetch browse cover art from %s: %s", url, exc)
             return False
+        if len(data) < 512:
+            # Too small — likely a 404 placeholder or empty response
+            logger.warning(
+                "Browse cover art response from %s was too small (%d bytes); "
+                "keeping placeholder icon",
+                url,
+                len(data),
+            )
+            return False
+        image = QImage.fromData(data)
+        if image.isNull():
+            logger.warning(
+                "Browse cover art from %s was not a valid image; "
+                "keeping placeholder icon",
+                url,
+            )
+            return False
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            tmp = f.name
+            f.write(data)
+
+        def _update():
+            if not self._cover_lbl:
+                return
+            pix = QPixmap(tmp).scaled(
+                60, 88,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            if not pix.isNull():
+                self._cover_lbl.setPixmap(pix)
+                self._cover_lbl.setText("")
+                self._cover_lbl.setStyleSheet(
+                    "background: #0a0f20; border: 1px solid #1a2050; border-radius: 4px;"
+                )
+            else:
+                logger.warning(
+                    "Browse cover art from %s was not a valid image; "
+                    "keeping placeholder icon",
+                    url,
+                )
+            try:
+                os.unlink(tmp)
+            except OSError as exc:
+                logger.warning("Could not remove temporary browse cover art file %s: %s", tmp, exc)
+
+        QTimer.singleShot(0, _update)
+        return True
 
 
 # ---------------------------------------------------------------------------
 # Cover art download dialog
 # ---------------------------------------------------------------------------
+
+class _CoverDownloadResult(QObject):
+    finished = pyqtSignal(str, object, str)
+    progress = pyqtSignal(str, int, str)
+
+
+def _run_cover_job(result, request_id, operation, values, stop):
+    """Perform cover I/O without retaining any dialog or widget."""
+    from src.core.downloader import fetch_gametdb_art, normalize_cover_serial
+
+    payload = None
+    error = ""
+    try:
+        if operation == "scan":
+            from src.core.game_library import scan_library
+            from src.core.game_registry import lookup_game_title
+            seen = set()
+            payload = []
+            for game in scan_library(values["library"], strict=True):
+                serial = normalize_cover_serial(game.serial or "")
+                if serial and serial not in seen:
+                    seen.add(serial)
+                    payload.append((serial, game.title or lookup_game_title(serial) or serial))
+            payload.sort(key=lambda item: (item[1].casefold(), item[0]))
+        elif operation == "single":
+            payload = fetch_gametdb_art(values["serial"], values["destination"], values["region"])
+        else:
+            ok = skipped = failed = 0
+            remaining = []
+            serials = values["serials"]
+            for index, (serial, title) in enumerate(serials):
+                if stop.is_set():
+                    remaining.extend(serials[index:])
+                    break
+                result.progress.emit(request_id, index, "downloading")
+                try:
+                    if values["skip_existing"] and (Path(values["destination"]) / f"{serial}.jpg").is_file():
+                        skipped += 1
+                        outcome = "skipped, exists"
+                    elif fetch_gametdb_art(serial, values["destination"], values["region"]):
+                        ok += 1
+                        outcome = "downloaded"
+                    else:
+                        failed += 1
+                        remaining.append((serial, title))
+                        outcome = "not found or failed"
+                except Exception as exc:
+                    logger.warning("Could not download cover for %s: %s", serial, exc)
+                    failed += 1
+                    remaining.append((serial, title))
+                    outcome = "not found or failed"
+                result.progress.emit(request_id, index, outcome)
+            payload = {"ok": ok, "skipped": skipped, "failed": failed, "remaining": remaining,
+                       "stopped": stop.is_set()}
+    except Exception as exc:
+        logger.warning("Cover %s failed: %s", operation, exc)
+        error = str(exc) or type(exc).__name__
+    finally:
+        result.finished.emit(request_id, payload, error)
+        result.deleteLater()
+
 
 class CoverDownloadDialog(QDialog):
     """Download PS2 cover art from GameTDB by game serial or game title.
@@ -625,11 +1064,21 @@ class CoverDownloadDialog(QDialog):
     def __init__(self, config: AppConfig, parent=None, initial_serial: str = ""):
         super().__init__(parent)
         self.config = config
+        self._closed = False
+        self._operation = ""
+        self._request_id = ""
+        self._stop_event = None
+        self._retry_serials = []
+        self._bulk_library = ""
+        self._job_values = {}
         self.setWindowTitle("Download Cover Art")
         self.setMinimumWidth(560)
         self.setMinimumHeight(480)
         self._build()
+        self._restore_state()
+        self._wire_state_persistence()
         if initial_serial:
+            self._tabs.setCurrentIndex(0)
             self._id_edit.setText(initial_serial)
 
     def _build(self):
@@ -674,6 +1123,8 @@ class CoverDownloadDialog(QDialog):
         clear_search_btn = QPushButton("✕")
         clear_search_btn.setFixedWidth(28)
         clear_search_btn.setToolTip("Clear search")
+        clear_search_btn.setAccessibleName("Clear search field")
+        clear_search_btn.setAccessibleDescription("Clear the browse search query")
         clear_search_btn.clicked.connect(self._search_edit.clear)
         search_row.addWidget(clear_search_btn)
         single_layout.addLayout(search_row)
@@ -711,6 +1162,7 @@ class CoverDownloadDialog(QDialog):
 
         # Status + progress
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
         single_layout.addWidget(self._status)
 
@@ -729,6 +1181,7 @@ class CoverDownloadDialog(QDialog):
         btns.addWidget(self._dl_btn)
         close_btn1 = QPushButton("Close")
         close_btn1.clicked.connect(self.reject)
+        close_btn1.setAutoDefault(False)
         btns.addWidget(close_btn1)
         single_layout.addLayout(btns)
 
@@ -752,8 +1205,9 @@ class CoverDownloadDialog(QDialog):
         lib_row = QHBoxLayout()
         lib_row.addWidget(QLabel("Library folder:"))
         self._lib_lbl = QLabel(
-            self.config.game_library_path or "<i>not configured — set in Settings</i>"
+            self.config.game_library_path or "Not configured — set in Settings"
         )
+        self._lib_lbl.setTextFormat(Qt.TextFormat.PlainText)
         self._lib_lbl.setWordWrap(True)
         self._lib_lbl.setStyleSheet("color: #8090b0; font-size: 11px;")
         lib_row.addWidget(self._lib_lbl, 1)
@@ -778,6 +1232,7 @@ class CoverDownloadDialog(QDialog):
         bulk_layout.addWidget(self._bulk_list, 1)
 
         self._bulk_status = QLabel("")
+        self._bulk_status.setTextFormat(Qt.TextFormat.PlainText)
         self._bulk_status.setWordWrap(True)
         bulk_layout.addWidget(self._bulk_status)
 
@@ -795,8 +1250,17 @@ class CoverDownloadDialog(QDialog):
         self._bulk_dl_btn.setEnabled(False)
         self._bulk_dl_btn.clicked.connect(self._bulk_download)
         bulk_btns.addWidget(self._bulk_dl_btn)
+        self._bulk_retry_btn = QPushButton("Retry Remaining")
+        self._bulk_retry_btn.setEnabled(False)
+        self._bulk_retry_btn.clicked.connect(self._retry_bulk_download)
+        bulk_btns.addWidget(self._bulk_retry_btn)
+        self._bulk_stop_btn = QPushButton("Stop After Current")
+        self._bulk_stop_btn.setEnabled(False)
+        self._bulk_stop_btn.clicked.connect(self._stop_bulk_download)
+        bulk_layout.addWidget(self._bulk_stop_btn)
         close_btn2 = QPushButton("Close")
         close_btn2.clicked.connect(self.reject)
+        close_btn2.setAutoDefault(False)
         bulk_btns.addWidget(close_btn2)
         bulk_layout.addLayout(bulk_btns)
 
@@ -806,10 +1270,120 @@ class CoverDownloadDialog(QDialog):
         self._title_to_serials = title_to_serials
         # Cache for bulk scan results: list of (serial, display_name)
         self._bulk_serials: list = []
+        for button in (self._dl_btn, self._bulk_scan_btn, self._bulk_dl_btn,
+                       self._bulk_retry_btn, self._bulk_stop_btn):
+            button.setAutoDefault(False)
+
+    def _cover_state_bucket(self) -> dict:
+        return ui_state_bucket(self.config, _COVER_DOWNLOAD_STATE_KEY)
+
+    def _cover_state(self) -> dict:
+        try:
+            selected_tab = int(getattr(self._tabs, "currentIndex", lambda: 0)() or 0)
+        except (TypeError, ValueError):
+            selected_tab = 0
+        search_query = getattr(self._search_edit, "text", lambda: "")() or ""
+        single_region = getattr(self._region_combo, "currentText", lambda: "EN")() or "EN"
+        bulk_region = getattr(self._bulk_region_combo, "currentText", lambda: "EN")() or "EN"
+        skip_existing = bool(getattr(self._skip_existing_check, "isChecked", lambda: True)())
+        return {
+            "selected_tab": selected_tab,
+            "search_query": search_query.strip(),
+            "single_region": single_region,
+            "bulk_region": bulk_region,
+            "skip_existing": skip_existing,
+        }
+
+    def _save_state(self, *_args, context: str = "updating cover download dialog state") -> None:
+        bucket = self._cover_state_bucket()
+        bucket.update(self._cover_state())
+        _save_browse_config(self.config, context)
+
+    def _restore_state(self) -> None:
+        bucket = self._cover_state_bucket()
+        state_changed = False
+        search_query = str(bucket.get("search_query", "") or "")
+        stripped_query = search_query.strip()
+        if stripped_query != search_query:
+            state_changed = True
+        search_query = stripped_query
+        if hasattr(self, "_search_edit") and hasattr(self._search_edit, "setText"):
+            self._search_edit.setText(search_query)
+        single_region = bucket.get("single_region", "EN")
+        if not self._set_combo_text(self._region_combo, single_region):
+            logger.warning(
+                "Saved cover download single-region %r is no longer available; using EN",
+                single_region,
+            )
+            state_changed = True
+        bulk_region = bucket.get("bulk_region", "EN")
+        if not self._set_combo_text(self._bulk_region_combo, bulk_region):
+            logger.warning(
+                "Saved cover download bulk-region %r is no longer available; using EN",
+                bulk_region,
+            )
+            state_changed = True
+        self._skip_existing_check.setChecked(bool(bucket.get("skip_existing", True)))
+        raw_selected_tab = bucket.get("selected_tab", 0)
+        try:
+            selected_tab = int(raw_selected_tab or 0)
+        except (TypeError, ValueError):
+            logger.warning(
+                "Saved cover download tab index %r is invalid; using the first tab",
+                raw_selected_tab,
+            )
+            selected_tab = 0
+            state_changed = True
+        tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
+        if tab_count > 0:
+            clamped_tab = max(0, min(selected_tab, tab_count - 1))
+            if clamped_tab != selected_tab:
+                logger.warning(
+                    "Saved cover download tab index %r is no longer available; using %d",
+                    raw_selected_tab,
+                    clamped_tab,
+                )
+                state_changed = True
+            self._tabs.setCurrentIndex(clamped_tab)
+        elif selected_tab != 0:
+            logger.warning(
+                "Saved cover download tab index %r is invalid for an empty dialog; using the first tab",
+                raw_selected_tab,
+            )
+            state_changed = True
+        if state_changed:
+            self._save_state(context="sanitizing cover download dialog state")
+
+    def _wire_state_persistence(self) -> None:
+        self._tabs.currentChanged.connect(self._save_state)
+        self._region_combo.currentIndexChanged.connect(self._save_state)
+        self._bulk_region_combo.currentIndexChanged.connect(self._save_state)
+        self._skip_existing_check.stateChanged.connect(self._save_state)
+
+    @staticmethod
+    def _set_combo_text(combo, value: object) -> bool:
+        text = value if isinstance(value, str) else str(value or "")
+        finder = getattr(combo, "findText", None)
+        index = finder(text) if callable(finder) else -1
+        if index >= 0:
+            combo.setCurrentIndex(index)
+            return True
+        return False
 
     # ------------------------------------------------------------------
     # Game-name search helpers
     # ------------------------------------------------------------------
+
+    def _apply_serial_selection(self, serial: str):
+        """Fill the serial field and show the download hint for *serial*."""
+        if not serial:
+            return
+        self._id_edit.setText(serial)
+        self._suggestions.hide()
+        if hasattr(self, "_status"):
+            self._status.setText(
+                f"Serial set to {serial} — click Download to fetch cover art."
+            )
 
     def _on_search_changed(self, text: str):
         """Populate the suggestions list from the game registry."""
@@ -822,6 +1396,10 @@ class CoverDownloadDialog(QDialog):
         if not hits:
             self._suggestions.hide()
             return
+        if len(hits) == 1:
+            serial, _title = hits[0]
+            self._apply_serial_selection(serial)
+            return
         for serial, title in hits[:20]:
             item = QListWidgetItem(f"{serial}  —  {title}")
             item.setData(Qt.ItemDataRole.UserRole, serial)
@@ -832,41 +1410,27 @@ class CoverDownloadDialog(QDialog):
         """Fill the serial field when the user clicks a suggestion."""
         serial = item.data(Qt.ItemDataRole.UserRole)
         if serial:
-            self._id_edit.setText(serial)
-            self._suggestions.hide()
-            self._status.setText(
-                f"Serial set to <b>{serial}</b> — click Download to fetch cover art."
-            )
-            self._status.setTextFormat(Qt.TextFormat.RichText)
+            self._apply_serial_selection(serial)
 
     # ------------------------------------------------------------------
     # Single download
     # ------------------------------------------------------------------
 
     def _download(self):
-        from src.core.downloader import fetch_gametdb_art
-        game_id = self._id_edit.text().strip()
-        if not game_id:
-            self._status.setText("⚠  Please enter a Game ID or search by name above")
+        from src.core.downloader import normalize_cover_serial
+        if self._closed or self._operation:
             return
-        dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
-        region = self._region_combo.currentText()
-        self._dl_btn.setEnabled(False)
+        game_id = normalize_cover_serial(self._id_edit.text())
+        if not game_id:
+            self._status.setText("⚠  Enter a serial such as SLUS-20062, or search by name above.")
+            return
+        self._id_edit.setText(game_id)
         self._progress.show()
         self._status.setText(f"Downloading cover for {game_id}…")
-
-        def _run():
-            path = fetch_gametdb_art(game_id, dest_dir, region)
-            msg = f"✅  Saved to: {path}" if path else "❌  Cover not found or download failed."
-
-            def _done():
-                self._status.setText(msg)
-                self._dl_btn.setEnabled(True)
-                self._progress.hide()
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._start_cover_job("single", {
+            "serial": game_id, "destination": self.config.cover_art_path or str(THUMBNAILS_DIR),
+            "region": self._region_combo.currentText(),
+        })
 
     # ------------------------------------------------------------------
     # Bulk download helpers
@@ -874,9 +1438,8 @@ class CoverDownloadDialog(QDialog):
 
     def _bulk_scan(self):
         """Scan the game library and populate the list with found serials."""
-        from src.core.game_library import scan_library
-        from src.core.game_registry import lookup_game_title
-
+        if self._closed or self._operation:
+            return
         lib_path = self.config.game_library_path or ""
         if not lib_path:
             self._bulk_status.setText(
@@ -884,139 +1447,285 @@ class CoverDownloadDialog(QDialog):
             )
             return
 
-        self._bulk_scan_btn.setEnabled(False)
         self._bulk_status.setText("Scanning library…")
         self._bulk_list.clear()
         self._bulk_serials = []
-
-        def _run():
-            try:
-                games = scan_library(lib_path)
-            except Exception as exc:
-                err = str(exc)
-
-                def _err():
-                    self._bulk_status.setText(f"❌  Scan failed: {err}")
-                    self._bulk_scan_btn.setEnabled(True)
-
-                QTimer.singleShot(0, _err)
-                return
-
-            seen: set = set()
-            results = []
-            for g in games:
-                serial = g.serial or ""
-                if not serial or serial in seen:
-                    continue
-                seen.add(serial)
-                title = g.title or lookup_game_title(serial) or serial
-                results.append((serial, title))
-
-            self._bulk_serials = results
-
-            def _update():
-                self._bulk_list.clear()
-                if not results:
-                    item = QListWidgetItem("No games with recognisable serials found.")
-                    item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
-                    self._bulk_list.addItem(item)
-                    self._bulk_dl_btn.setEnabled(False)
-                else:
-                    for serial, title in results:
-                        self._bulk_list.addItem(f"{serial}  —  {title}")
-                    self._bulk_dl_btn.setEnabled(True)
-
-                self._bulk_status.setText(
-                    f"Found {len(results)} game(s) with recognised serials."
-                )
-                self._bulk_scan_btn.setEnabled(True)
-
-            QTimer.singleShot(0, _update)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._retry_serials = []
+        self._bulk_library = lib_path
+        self._lib_lbl.setText(lib_path)
+        self._start_cover_job("scan", {"library": lib_path})
 
     def _bulk_download(self):
         """Download covers for all serials found by the last scan."""
-        from src.core.downloader import fetch_gametdb_art
-        from pathlib import Path as _Path
+        self._begin_bulk_download(self._bulk_serials)
 
-        if not self._bulk_serials:
+    def _retry_bulk_download(self):
+        self._begin_bulk_download(self._retry_serials)
+
+    def _begin_bulk_download(self, serials):
+        if self._closed or self._operation or not serials:
             return
-
-        dest_dir = self.config.cover_art_path or str(THUMBNAILS_DIR)
-        region = self._bulk_region_combo.currentText()
-        skip_existing = self._skip_existing_check.isChecked()
-        total = len(self._bulk_serials)
-
-        self._bulk_dl_btn.setEnabled(False)
-        self._bulk_scan_btn.setEnabled(False)
+        if self._bulk_library != (self.config.game_library_path or ""):
+            self._bulk_status.setText("Library folder changed. Scan Library again before downloading.")
+            return
+        serials = tuple(serials)
+        self._bulk_list.clear()
+        for serial, title in serials:
+            self._bulk_list.addItem(f"{serial}  —  {title}")
         self._bulk_progress.setValue(0)
-        self._bulk_progress.setRange(0, total)
+        self._bulk_progress.setRange(0, len(serials))
         self._bulk_progress.show()
+        self._bulk_status.setText(f"Starting {len(serials)} cover download(s)…")
+        self._start_cover_job("bulk", {
+            "serials": serials, "destination": self.config.cover_art_path or str(THUMBNAILS_DIR),
+            "region": self._bulk_region_combo.currentText(),
+            "skip_existing": self._skip_existing_check.isChecked(),
+        })
 
-        def _run():
-            ok = 0
-            skipped = 0
-            failed = 0
-            for i, (serial, title) in enumerate(self._bulk_serials, 1):
-                def _set_progress(idx=i, ser=serial, ttl=title):
-                    self._bulk_status.setText(
-                        f"Downloading {idx}/{total}: {ser} — {ttl}…"
-                    )
-                    self._bulk_progress.setValue(idx)
+    def _start_cover_job(self, operation, values):
+        self._operation = operation
+        self._job_values = values
+        self._stop_event = threading.Event()
+        self.destroyed.connect(lambda _obj=None, stop=self._stop_event: stop.set())
+        self._request_id = request_id = uuid.uuid4().hex
+        result = _CoverDownloadResult()
+        result.finished.connect(self._on_cover_finished)
+        result.progress.connect(self._on_cover_progress)
+        self._update_cover_controls()
+        try:
+            threading.Thread(target=_run_cover_job,
+                             args=(result, request_id, operation, values, self._stop_event),
+                             daemon=True).start()
+        except RuntimeError as exc:
+            result.deleteLater()
+            self._on_cover_finished(request_id, None, str(exc))
 
-                QTimer.singleShot(0, _set_progress)
+    def _update_cover_controls(self):
+        busy = bool(self._operation)
+        for widget in (self._dl_btn, self._id_edit, self._search_edit, self._suggestions,
+                       self._region_combo, self._bulk_region_combo, self._skip_existing_check,
+                       self._bulk_scan_btn):
+            widget.setEnabled(not busy)
+        self._bulk_dl_btn.setEnabled(not busy and bool(self._bulk_serials))
+        self._bulk_retry_btn.setEnabled(not busy and bool(self._retry_serials))
+        self._bulk_stop_btn.setEnabled(self._operation == "bulk")
 
-                dest_file = _Path(dest_dir) / f"{serial}.jpg"
-                if skip_existing and dest_file.exists():
-                    skipped += 1
+    def _stop_bulk_download(self):
+        if self._operation == "bulk":
+            self._stop_event.set()
+            self._bulk_stop_btn.setEnabled(False)
+            self._bulk_status.setText("Stopping after the current file; remaining games can be retried.")
 
-                    def _skip(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"⏭  {ser}  —  {ttl}  (skipped, exists)")
+    @pyqtSlot(str, int, str)
+    def _on_cover_progress(self, request_id, index, outcome):
+        if self._closed or self._operation != "bulk" or request_id != self._request_id:
+            return
+        serials = self._job_values["serials"]
+        serial, title = serials[index]
+        item = self._bulk_list.item(index)
+        if item:
+            item.setText(f"{serial}  —  {title}  ({outcome})")
+        self._bulk_progress.setValue(index if outcome == "downloading" else index + 1)
+        if not self._stop_event.is_set():
+            self._bulk_status.setText(f"{index + 1}/{len(serials)}: {serial} — {outcome}")
 
-                    QTimer.singleShot(0, _skip)
-                    continue
-
-                path = fetch_gametdb_art(serial, dest_dir, region)
-                if path:
-                    ok += 1
-
-                    def _ok(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"✅  {ser}  —  {ttl}")
-
-                    QTimer.singleShot(0, _ok)
-                else:
-                    failed += 1
-
-                    def _fail(idx=i, ser=serial, ttl=title):
-                        item = self._bulk_list.item(idx - 1)
-                        if item:
-                            item.setText(f"❌  {ser}  —  {ttl}  (not found)")
-
-                    QTimer.singleShot(0, _fail)
-
-            ok_final, skipped_final, failed_final = ok, skipped, failed
-
-            def _done():
+    @pyqtSlot(str, object, str)
+    def _on_cover_finished(self, request_id, payload, error):
+        if self._closed or not self._operation or request_id != self._request_id:
+            return
+        operation, values = self._operation, self._job_values
+        self._operation = ""
+        self._progress.hide()
+        self._bulk_progress.hide()
+        if operation == "single":
+            self._status.setText(
+                f"✅  Saved to: {payload}" if payload and not error else
+                f"❌  {error or 'Cover not found or download failed.'} Try another region or retry."
+            )
+        elif operation == "scan":
+            if values["library"] != (self.config.game_library_path or ""):
+                self._bulk_status.setText("Library folder changed. Scan Library again.")
+            elif error:
+                self._bulk_status.setText(f"❌  Scan failed: {error}\nCheck the folder and retry Scan Library.")
+            else:
+                self._bulk_serials = list(payload)
+                for serial, title in payload:
+                    self._bulk_list.addItem(f"{serial}  —  {title}")
                 self._bulk_status.setText(
-                    f"Done — {ok_final} downloaded, {skipped_final} skipped, {failed_final} not found."
+                    f"Found {len(payload)} game(s) with recognised serials." if payload else
+                    "No games with recognisable serials found. Check filenames or use Single Download."
                 )
-                self._bulk_progress.hide()
-                self._bulk_dl_btn.setEnabled(True)
-                self._bulk_scan_btn.setEnabled(True)
+        elif error:
+            self._retry_serials = list(values["serials"])
+            self._bulk_status.setText(f"❌  Could not start/finish downloads: {error}\nRetry Remaining to try again.")
+        else:
+            self._retry_serials = list(payload["remaining"])
+            self._bulk_status.setText(
+                f"{'Stopped' if payload['stopped'] else 'Done'} — {payload['ok']} downloaded, "
+                f"{payload['skipped']} skipped, {payload['failed']} failed/not found. "
+                f"{len(self._retry_serials)} remaining."
+            )
+        self._update_cover_controls()
 
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    def done(self, result):
+        self._closed = True
+        if self._stop_event is not None:
+            self._stop_event.set()
+        self._save_state(context="closing cover download dialog")
+        super().done(result)
 
 
 # ---------------------------------------------------------------------------
 # Download-from-URL install dialog
 # ---------------------------------------------------------------------------
+
+class _DownloadInstallResult(QObject):
+    phase = pyqtSignal(str, str)
+    progress = pyqtSignal(str, object, object)
+    finished = pyqtSignal(str, bool, str)
+    installed = pyqtSignal()
+    prepared = pyqtSignal(object, str)
+    registration_failed = pyqtSignal(str, object)
+
+    def __init__(self, request_id, state, mod_type, config, db):
+        from PyQt6.QtCore import QCoreApplication
+
+        super().__init__(QCoreApplication.instance())
+        self._request_id = request_id
+        self._state = state
+        self._mod_type = mod_type
+        self._config = config
+        self._db = db
+        self._completed = False
+        self.prepared.connect(self._complete_install)
+
+    @pyqtSlot(object, str)
+    def _complete_install(self, payload, error):
+        """Commit shared state on the UI thread, independently of dialog lifetime."""
+        if self._completed:
+            return
+        self._completed = True
+        state = self._state
+        success = False
+        message = error
+        try:
+            if payload is not None:
+                mod = payload["mod"]
+                try:
+                    if not Path(mod.path).is_dir():
+                        raise FileNotFoundError(f"The prepared folder is missing: {mod.path}")
+                    self._db.add(mod)
+                except Exception as exc:
+                    logger.warning("Could not register downloaded mod %s: %s", mod.name, exc)
+                    message = (
+                        f"❌  Library save failed: {exc}\n"
+                        f"Prepared folder: {mod.path}\n"
+                        "Retry Library Save reuses these files without downloading again. "
+                        "If you close this dialog, use Import with that folder to recover them."
+                    )
+                    self.registration_failed.emit(self._request_id, {
+                        **payload, "state": state, "config": self._config,
+                    })
+                else:
+                    success = True
+                    message = f"✅  Installed: {mod.name}"
+            try:
+                from src.core.download_history import record_event, STATUS_SUCCESS, STATUS_FAILED
+                record_event(
+                    self._config, mod_name=payload["mod"].name if payload else (
+                        state["name"] or Path(urlparse(state["url"]).path).name or "downloaded_mod"
+                    ),
+                    mod_type=self._mod_type.value, serial=state["game"],
+                    source_url=state["source_url"] or state["url"],
+                    status=STATUS_SUCCESS if success else STATUS_FAILED,
+                    size_bytes=payload["size"] if payload else 0,
+                    note="" if success else message,
+                )
+            except Exception as exc:
+                if success:
+                    logger.warning("Could not record browse download history for %s: %s", state["name"], exc)
+                else:
+                    logger.warning("Could not record failed browse download history for %s: %s", state["name"], exc)
+                message += "\nDownload history could not be saved."
+            if success:
+                self.installed.emit()
+        finally:
+            ActiveDownloads.finish(self._request_id)
+            self.finished.emit(self._request_id, success, message)
+            self.deleteLater()
+
+
+def _is_download_url(url: str) -> bool:
+    try:
+        parsed = urlparse(url)
+        return parsed.scheme in ("http", "https") and bool(parsed.hostname)
+    except ValueError:
+        return False
+
+
+def _run_direct_download(result, request_id, state, mod_type, config, url=None):
+    """Run from immutable request values, never retaining a dialog or its widgets."""
+    tmpdir = None
+    phase = "resolving"
+    source_url = state["source_url"] or state["url"]
+    payload = None
+    error = ""
+    try:
+        if url is None:
+            url = DownloadInstallDialog._convert_url(state["url"])
+        if not url or not _is_download_url(url):
+            raise DownloadError(
+                "Could not resolve a direct file URL. Open the source in your browser "
+                "and copy a direct file link, or download manually and use Import."
+            )
+        phase = "downloading"
+        ActiveDownloads.set_phase(request_id, phase)
+        result.phase.emit(request_id, phase)
+        fname = Path(unquote(urlparse(url).path)).name
+        if fname in ("", ".", ".."):
+            fname = "downloaded_mod"
+        if not Path(fname).suffix:
+            fname += ".zip"
+        tmpdir = tempfile.mkdtemp(prefix="ps2mm_dl_")
+        dest = str(Path(tmpdir) / fname)
+        last_progress = 0.0
+
+        def progress(received, total):
+            nonlocal last_progress
+            ActiveDownloads.update(request_id, received, total)
+            now = time.monotonic()
+            if now - last_progress >= 0.1 or (total > 0 and received >= total):
+                result.progress.emit(request_id, received, total)
+                last_progress = now
+
+        download_file(url, dest, progress)
+        phase = "installing"
+        ActiveDownloads.set_installing(request_id)
+        result.phase.emit(request_id, phase)
+        from src.core.mod_manager import ModManager
+        mod = ModManager.prepare_install(
+            source_path=dest, mod_type=mod_type, dest_base=config.mods_storage_path,
+            name=state["name"] or Path(fname).stem, author=state["author"],
+            game_id=state["game"], description=state["description"], source_url=source_url,
+        )
+        try:
+            installed_size = Path(dest).stat().st_size
+        except OSError as exc:
+            logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
+            installed_size = 0
+        payload = {"mod": mod, "size": installed_size}
+    except Exception as exc:
+        error = str(exc) or type(exc).__name__
+        logger.warning("Direct download %s failed: %s", phase, error)
+        error = (
+            f"❌  {phase.capitalize()} failed: {error}\n"
+            "Your entries are preserved. Retry starts a new download; it does not resume a partial file."
+        )
+    finally:
+        if tmpdir:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+        result.prepared.emit(payload, error)
+
 
 class DownloadInstallDialog(QDialog):
     """
@@ -1028,12 +1737,20 @@ class DownloadInstallDialog(QDialog):
         super().__init__(parent)
         self.config = config
         self.db = db
+        self._busy = False
+        self._closed = False
+        self._request_id = ""
+        self._prepared_download = None
         self.setWindowTitle("Download & Install Mod from URL")
-        self.setMinimumSize(580, 440)
+        self.setMinimumSize(480, 380)
+        self.resize(640, 620)
         self._build()
+        self._restore_state()
 
     def _build(self):
-        layout = QVBoxLayout(self)
+        outer = QVBoxLayout(self)
+        body = QWidget()
+        layout = QVBoxLayout(body)
         layout.setSpacing(12)
         layout.setContentsMargins(20, 20, 20, 20)
 
@@ -1056,6 +1773,7 @@ class DownloadInstallDialog(QDialog):
         url_row = QHBoxLayout()
         url_row.addWidget(QLabel("URL:"))
         self._url_edit = QLineEdit()
+        self._url_edit.setAccessibleName("Download file URL")
         self._url_edit.setPlaceholderText("https://example.com/texture_pack.zip")
         url_row.addWidget(self._url_edit, 1)
         layout.addLayout(url_row)
@@ -1100,12 +1818,20 @@ class DownloadInstallDialog(QDialog):
             row = QHBoxLayout()
             lbl = QLabel(label)
             lbl.setFixedWidth(60)
+            lbl.setBuddy(edit)
             row.addWidget(lbl)
             row.addWidget(edit, 1)
             meta_layout.addLayout(row)
         layout.addWidget(meta_frame)
 
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setWidget(body)
+        outer.addWidget(scroll, 1)
+        layout = outer
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
         self._status.setStyleSheet("color: #9090b0;")
         layout.addWidget(self._status)
@@ -1120,10 +1846,93 @@ class DownloadInstallDialog(QDialog):
         self._dl_btn.setObjectName("primary_btn")
         self._dl_btn.clicked.connect(self._download)
         btns.addWidget(self._dl_btn)
-        close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.reject)
-        btns.addWidget(close_btn)
+        self._new_download_btn = QPushButton("New Download")
+        self._new_download_btn.setToolTip(
+            "Keep the prepared files for manual recovery and edit a new download request."
+        )
+        self._new_download_btn.clicked.connect(self._new_download)
+        self._new_download_btn.hide()
+        btns.addWidget(self._new_download_btn)
+        self._close_btn = QPushButton("Close")
+        self._close_btn.clicked.connect(self.reject)
+        btns.addWidget(self._close_btn)
         layout.addLayout(btns)
+
+    def _dialog_state_bucket(self) -> dict:
+        return ui_state_bucket(self.config, _DOWNLOAD_INSTALL_STATE_KEY)
+
+    def _dialog_state(self) -> dict:
+        mod_type = self._type_combo.currentData()
+        if hasattr(mod_type, "value"):
+            mod_type = mod_type.value
+        elif mod_type is None:
+            mod_type = ""
+        else:
+            mod_type = str(mod_type)
+        return {
+            "url": self._url_edit.text().strip(),
+            "type": mod_type,
+            "name": self._name_edit.text().strip(),
+            "author": self._author_edit.text().strip(),
+            "game": self._game_edit.text().strip(),
+            "description": self._desc_edit.text().strip(),
+            "source_url": self._source_url_edit.text().strip(),
+        }
+
+    def _save_state(self, context: str) -> None:
+        bucket = self._dialog_state_bucket()
+        bucket.update(self._dialog_state())
+        _save_browse_config(self.config, context)
+
+    def _restore_state(self) -> None:
+        bucket = self._dialog_state_bucket()
+        self._url_edit.setText(str(bucket.get("url", "") or ""))
+        self._name_edit.setText(str(bucket.get("name", "") or ""))
+        self._author_edit.setText(str(bucket.get("author", "") or ""))
+        self._game_edit.setText(str(bucket.get("game", "") or ""))
+        self._desc_edit.setText(str(bucket.get("description", "") or ""))
+        self._source_url_edit.setText(str(bucket.get("source_url", "") or ""))
+        saved_type = bucket.get("type", "")
+        state_changed = False
+        if saved_type and not self._set_combo_value(self._type_combo, saved_type):
+            logger.warning(
+                "Saved direct-download mod type %r is no longer available; using default",
+                saved_type,
+            )
+            state_changed = True
+        if state_changed:
+            self._save_state("sanitizing direct download dialog state")
+
+    @staticmethod
+    def _set_combo_value(combo, value: object) -> bool:
+        if combo is None:
+            return False
+        if hasattr(value, "value") and not isinstance(value, str):
+            value = getattr(value, "value")
+        if value in (None, ""):
+            return False
+        target = str(value)
+        count = getattr(combo, "count", lambda: 0)()
+        item_data = getattr(combo, "itemData", None)
+        if not callable(item_data):
+            return False
+        for index in range(count):
+            data = item_data(index)
+            if data == value:
+                combo.setCurrentIndex(index)
+                return True
+            if hasattr(data, "value") and getattr(data, "value") == value:
+                combo.setCurrentIndex(index)
+                return True
+            if str(data) == target:
+                combo.setCurrentIndex(index)
+                return True
+        return False
+
+    def done(self, result):
+        self._closed = True
+        self._save_state("closing direct download dialog")
+        super().done(result)
 
     @staticmethod
     def _convert_url(url: str) -> Optional[str]:
@@ -1155,7 +1964,8 @@ class DownloadInstallDialog(QDialog):
             _psd = _up.urlparse(url)
             _netloc = _psd.netloc.lower()
             _path = _psd.path.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not inspect browse download URL %s: %s", url, exc)
             return url
 
         # Google Drive folder pages are not direct file downloads.
@@ -1184,11 +1994,18 @@ class DownloadInstallDialog(QDialog):
         return url
 
     def _download(self):
-        raw_url = self._url_edit.text().strip()
-        if not raw_url:
-            self._status.setText("⚠  Please enter a URL")
+        if self._busy or self._closed:
             return
-        if "mega.nz" in raw_url or "mega.co.nz" in raw_url:
+        if self._prepared_download is not None:
+            self._retry_registration()
+            return
+        raw_url = self._url_edit.text().strip()
+        if not _is_download_url(raw_url):
+            self._status.setText("⚠  Enter a complete http(s) file URL.")
+            self._url_edit.setFocus()
+            return
+        host = urlparse(raw_url).hostname.lower()
+        if any(host == domain or host.endswith("." + domain) for domain in ("mega.nz", "mega.co.nz")):
             QMessageBox.information(
                 self, "MEGA Link",
                 "MEGA links require the MEGA desktop client.\n\n"
@@ -1196,222 +2013,141 @@ class DownloadInstallDialog(QDialog):
                 "the ➕ Import button in the relevant mod panel.",
             )
             return
-        try:
-            import urllib.parse as _up
-            _psd2 = _up.urlparse(raw_url)
-            _nl2 = _psd2.netloc.lower()
-            _is_mf_raw = (_nl2 in ("www.mediafire.com", "mediafire.com")
-                          and "/file/" in _psd2.path.lower())
-        except Exception:
-            _is_mf_raw = False
-        if _is_mf_raw:
-            self._dl_btn.setEnabled(False)
-            self._progress.show()
-            self._status.setText("🔍 Resolving MediaFire link…")
+        self._run_download(raw_url)
 
-            def _resolve_then_download():
-                url = self._convert_url(raw_url)
-                if not url:
-                    def _mf_err():
-                        self._status.setText(
-                            "❌  Could not resolve MediaFire download link.\n"
-                            "Please open the MediaFire page in your browser, click Download,\n"
-                            "and paste the resulting direct URL here."
-                        )
-                        self._progress.hide()
-                        self._dl_btn.setEnabled(True)
-                    QTimer.singleShot(0, _mf_err)
-                    return
-                # Schedule _run_download back on the main thread so that Qt
-                # widget reads (mod type combo, etc.) happen on the correct thread.
-                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                QTimer.singleShot(0, lambda r=url: self._run_download(raw_url, r))
-
-            threading.Thread(target=_resolve_then_download, daemon=True).start()
-            return
-
-        # Resolve Yandex share links in a background thread (network API call).
-        try:
-            import urllib.parse as _up
-            _psd3 = _up.urlparse(raw_url)
-            _nl3 = _psd3.netloc.lower()
-            _is_yandex_raw = _nl3 in ("disk.yandex.ru", "www.disk.yandex.ru", "yadi.sk", "www.yadi.sk")
-        except Exception:
-            _is_yandex_raw = False
-        if _is_yandex_raw:
-            self._dl_btn.setEnabled(False)
-            self._progress.show()
-            self._status.setText("🔍 Resolving Yandex link…")
-
-            def _resolve_yandex_then_download():
-                resolved_url = self._convert_url(raw_url)
-                if not resolved_url:
-                    def _yd_err():
-                        self._status.setText(
-                            "❌  Could not resolve Yandex direct download link.\n"
-                            "Please open the source page in your browser and copy a direct file URL."
-                        )
-                        self._progress.hide()
-                        self._dl_btn.setEnabled(True)
-                    QTimer.singleShot(0, _yd_err)
-                    return
-                QTimer.singleShot(0, lambda: self._status.setText("Downloading…"))
-                QTimer.singleShot(0, lambda r=resolved_url: self._run_download(raw_url, r))
-
-            threading.Thread(target=_resolve_yandex_then_download, daemon=True).start()
-            return
-
-        url = self._convert_url(raw_url)
-        if url is None:
-            self._status.setText(
-                "❌  This URL cannot be resolved as a direct download.\n"
-                "Use 🌐 Visit Source to open the page, then copy a direct file link."
-            )
-            self._progress.hide()
-            self._dl_btn.setEnabled(True)
+    def _run_download(self, raw_url: str, url: Optional[str] = None):
+        """Capture a request on the UI thread before any network work starts."""
+        if self._busy or self._closed or self._prepared_download is not None:
             return
         mod_type = self._type_combo.currentData()
-        storage = self.config.mods_storage_path
-        if not storage:
-            QMessageBox.warning(self, "Storage Not Configured",
-                "Please configure a Mod Storage folder in Settings first.")
+        if not self.config.mods_storage_path:
+            self._status.setText("⚠  Configure a Mod Storage folder in Settings before downloading.")
             return
-        self._dl_btn.setEnabled(False)
-        self._progress.show()
-        self._status.setText("Downloading...")
-        self._run_download(raw_url, url)
-
-    def _run_download(self, raw_url: str, url: str):
-        """Perform the actual file download + install on a background thread."""
-        mod_type = self._type_combo.currentData()
-        storage = self.config.mods_storage_path
-        if not storage:
-            def _no_storage():
-                QMessageBox.warning(self, "Storage Not Configured",
-                    "Please configure a Mod Storage folder in Settings first.")
-                self._progress.hide()
-                self._dl_btn.setEnabled(True)
-            QTimer.singleShot(0, _no_storage)
-            return
-
         if self.db is None:
-            def _no_db():
-                QMessageBox.warning(self, "Database Not Ready",
-                    "The mod database is not loaded yet.\n"
-                    "Please wait for the application to finish starting up and try again.")
-                self._progress.hide()
-                self._dl_btn.setEnabled(True)
-            QTimer.singleShot(0, _no_db)
+            self._status.setText("⚠  The mod database is not ready. Please try again after startup.")
             return
+        if not isinstance(mod_type, ModType):
+            self._status.setText("⚠  Choose a mod type before downloading.")
+            return
+        state = self._dialog_state()
+        state["url"] = raw_url
+        config = deepcopy(self.config)
+        self._save_state("starting direct download")
+        self._request_id = request_id = uuid.uuid4().hex
+        result = self._download_result(state, mod_type, config)
+        self._set_download_busy(True)
+        self._on_download_phase(request_id, "resolving")
+        ActiveDownloads.register(
+            request_id, state["name"] or Path(urlparse(raw_url).path).name or "downloaded_mod",
+            source_url=state["source_url"] or raw_url, phase="resolving",
+        )
+        try:
+            threading.Thread(
+                target=_run_direct_download,
+                args=(result, request_id, state, mod_type, config, url),
+                daemon=True,
+            ).start()
+        except RuntimeError as exc:
+            logger.warning("Could not start direct download worker: %s", exc)
+            result._complete_install(None, f"Could not start download: {exc}\nPlease retry.")
 
-        # Capture widget text NOW on the main thread before the background thread
-        # starts — Qt widget reads must not be made from non-main threads.
-        _name_text = self._name_edit.text().strip()
-        _author_text = self._author_edit.text().strip()
-        _game_text = self._game_edit.text().strip()
-        _desc_text = self._desc_edit.text().strip()
-        _source_url_text = self._source_url_edit.text().strip()
+    def _download_result(self, state, mod_type, config):
+        result = _DownloadInstallResult(self._request_id, state, mod_type, config, self.db)
+        result.phase.connect(self._on_download_phase)
+        result.progress.connect(self._on_download_progress)
+        result.finished.connect(self._on_download_finished)
+        result.registration_failed.connect(self._on_registration_failed)
+        parent = self.parent()
+        while parent is not None:
+            installed_signal = getattr(parent, "mod_installed", None)
+            if installed_signal is not None:
+                # Signal-to-signal delivery survives closing/deleting this dialog.
+                result.installed.connect(installed_signal)
+                break
+            parent = parent.parent()
+        return result
 
-        def _run():
-            try:
-                parsed = urlparse(url)
-                fname = Path(unquote(parsed.path)).name or "downloaded_mod"
-                if not Path(fname).suffix:
-                    fname += ".zip"
-                tmpdir = tempfile.mkdtemp(prefix="ps2mm_dl_")
-                dest = str(Path(tmpdir) / fname)
+    @pyqtSlot(str, object)
+    def _on_registration_failed(self, request_id, payload):
+        if not self._closed and self._busy and request_id == self._request_id:
+            self._prepared_download = payload
 
-                def _progress(recv, total):
-                    if total > 0:
-                        pct = int(recv / total * 100)
-                        QTimer.singleShot(0, lambda: self._progress.setValue(pct))
-                    else:
-                        QTimer.singleShot(0, lambda: self._progress.setRange(0, 0))
+    def _retry_registration(self):
+        payload = self._prepared_download
+        self._request_id = uuid.uuid4().hex
+        result = self._download_result(payload["state"], payload["mod"].mod_type, payload["config"])
+        self._set_download_busy(True)
+        ActiveDownloads.register(
+            self._request_id, payload["mod"].name,
+            source_url=payload["mod"].source_url, phase="installing",
+        )
+        result._complete_install(payload, "")
 
-                download_file(url, dest, _progress)
-                from src.core.mod_manager import ModManager
-                mgr = ModManager(self.db)
-                name = _name_text or Path(fname).stem
-                author = _author_text
-                game = _game_text
-                description = _desc_text
-                source_url = _source_url_text or raw_url
-                mod = mgr.install_from_folder(
-                    source_path=dest, mod_type=mod_type, dest_base=storage,
-                    name=name, author=author, game_id=game,
-                    description=description, source_url=source_url,
-                )
-                import shutil
-                try:
-                    installed_size = sum(
-                        f.stat().st_size for f in Path(dest).rglob('*') if f.is_file()
-                    ) if Path(dest).exists() else 0
-                except Exception:
-                    installed_size = 0
-                shutil.rmtree(tmpdir, ignore_errors=True)
+    def _new_download(self):
+        if self._busy or self._closed or self._prepared_download is None:
+            return
+        path = self._prepared_download["mod"].path
+        self._prepared_download = None
+        self._set_download_busy(False)
+        self._dl_btn.setText("⬇ Download & Install")
+        self._status.setText(f"Previous prepared files were kept at: {path}\nEdit the fields to start a new download.")
 
-                try:
-                    from src.core.download_history import record_event, STATUS_SUCCESS
-                    record_event(
-                        self.config,
-                        mod_name=mod.name,
-                        mod_type=mod_type.value,
-                        serial=game,
-                        source_url=source_url,
-                        status=STATUS_SUCCESS,
-                        size_bytes=installed_size,
-                    )
-                except Exception:
-                    pass
+    def _set_download_busy(self, busy):
+        self._busy = busy
+        for widget in (
+            self._url_edit, self._type_combo, self._name_edit, self._author_edit,
+            self._game_edit, self._desc_edit, self._source_url_edit,
+        ):
+            widget.setEnabled(not busy and self._prepared_download is None)
+        self._dl_btn.setEnabled(not busy)
+        self._new_download_btn.setVisible(self._prepared_download is not None)
+        self._new_download_btn.setEnabled(not busy)
+        self._close_btn.setText("Continue in Background" if busy else "Close")
 
-                def _done():
-                    self._progress.setRange(0, 100)
-                    self._progress.setValue(100)
-                    self._status.setText(f"✅  Installed: {mod.name}")
-                    self._dl_btn.setEnabled(True)
-                QTimer.singleShot(0, _done)
-            except DownloadError as exc:
-                _download_err_msg = str(exc)
-                try:
-                    from src.core.download_history import record_event, STATUS_FAILED
-                    record_event(
-                        self.config,
-                        mod_name=_name_text or Path(urlparse(url).path).name,
-                        mod_type=mod_type.value,
-                        serial=_game_text,
-                        source_url=_source_url_text or raw_url,
-                        status=STATUS_FAILED,
-                        note=_download_err_msg,
-                    )
-                except Exception:
-                    pass
-                def _err():
-                    self._status.setText(f"❌  Download failed: {_download_err_msg}")
-                    self._progress.hide()
-                    self._dl_btn.setEnabled(True)
-                QTimer.singleShot(0, _err)
-            except Exception as exc:
-                _general_err_msg = str(exc)
-                try:
-                    from src.core.download_history import record_event, STATUS_FAILED
-                    record_event(
-                        self.config,
-                        mod_name=_name_text or Path(urlparse(url).path).name,
-                        mod_type=mod_type.value,
-                        serial=_game_text,
-                        source_url=_source_url_text or raw_url,
-                        status=STATUS_FAILED,
-                        note=_general_err_msg,
-                    )
-                except Exception:
-                    pass
-                def _err2():
-                    self._status.setText(f"❌  Error: {_general_err_msg}")
-                    self._progress.hide()
-                    self._dl_btn.setEnabled(True)
-                QTimer.singleShot(0, _err2)
+    @pyqtSlot(str, str)
+    def _on_download_phase(self, request_id, phase):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        text = {
+            "resolving": "Resolving download link…",
+            "downloading": "Downloading…",
+            "installing": "Installing into managed storage…",
+        }.get(phase, phase)
+        self._status.setText(text + "\nYou can close this dialog; work continues in Downloads while the app is open.")
+        self._progress.setRange(0, 0)
+        self._progress.show()
 
-        threading.Thread(target=_run, daemon=True).start()
+    @pyqtSlot(str, object, object)
+    def _on_download_progress(self, request_id, received, total):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        if total > 0:
+            percent = min(100, max(0, received) * 100 // total)
+            self._progress.setRange(0, 100)
+            self._progress.setValue(percent)
+            text = f"Downloading • {percent}% • {_download_size(received)} / {_download_size(total)}"
+        else:
+            self._progress.setRange(0, 0)
+            text = f"Downloading • {_download_size(received)} received • total unknown"
+        self._status.setText(text + "\nYou can close this dialog; work continues in Downloads while the app is open.")
+
+    @pyqtSlot(str, bool, str)
+    def _on_download_finished(self, request_id, success, message):
+        if self._closed or not self._busy or request_id != self._request_id:
+            return
+        if success:
+            self._prepared_download = None
+        self._set_download_busy(False)
+        self._dl_btn.setText(
+            "Retry Library Save" if self._prepared_download is not None else
+            "⬇ Download & Install" if success else "Retry Download"
+        )
+        if success:
+            self._progress.setRange(0, 100)
+            self._progress.setValue(100)
+        else:
+            self._progress.hide()
+        self._status.setText(message)
 
 
 # ---------------------------------------------------------------------------
@@ -1420,8 +2156,123 @@ class DownloadInstallDialog(QDialog):
 
 #: Maximum number of widescreen-patch rows displayed at once in PnachGitHubDialog.
 #: The PCSX2 repo has 500+ patches; rendering them all at once degrades UI
-#: performance, so we cap the list and rely on the CRC search to narrow results.
+#: performance, so additional matches are revealed in batches.
 _MAX_PATCH_DISPLAY = 200
+
+
+class _PnachBrowserResult(QObject):
+    finished = pyqtSignal(str, object, str)
+    installed = pyqtSignal()
+
+
+class _PnachInstallResult(_PnachBrowserResult):
+    transferred = pyqtSignal(object, str)
+
+    def __init__(self, request_id, crc, config, db):
+        from PyQt6.QtCore import QCoreApplication
+
+        super().__init__(QCoreApplication.instance())
+        self._request_id = request_id
+        self._crc = crc
+        self._config = config
+        self._db = db
+        self.transferred.connect(self._complete_install)
+
+    @pyqtSlot(object, str)
+    def _complete_install(self, payload, error):
+        """Persist on the UI thread, even after the initiating dialog is deleted."""
+        crc = self._crc
+        source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
+        name = f"Widescreen Patch ({crc})"
+        try:
+            if payload:
+                warnings = payload["warnings"]
+                if self._db is not None:
+                    try:
+                        self._db.add(ModInfo(
+                            id=str(uuid.uuid4()), name=name, mod_type=ModType.PNACH,
+                            path=payload["path"], author="PCSX2 Team", source_url=source_url,
+                            files=[payload["path"]], size_bytes=payload["size"],
+                        ))
+                    except Exception as exc:
+                        logger.warning("PNACH DB registration warning for %s: %s", crc, exc)
+                        warnings.append("The file was installed, but library registration could not be saved.")
+                else:
+                    warnings.append("The file was installed without a library record (database unavailable).")
+            try:
+                from src.core.download_history import record_event, STATUS_FAILED, STATUS_SUCCESS
+                record_event(
+                    self._config, mod_name=name, mod_type="pnach", source_url=source_url,
+                    status=STATUS_SUCCESS if payload else STATUS_FAILED,
+                    size_bytes=payload["size"] if payload else 0,
+                    note="\n".join(payload["warnings"]) if payload else error,
+                )
+            except Exception as exc:
+                if payload:
+                    logger.warning("Could not record PNACH download history for %s: %s", crc, exc)
+                else:
+                    logger.warning("Could not record failed PNACH download history for %s: %s", crc, exc)
+                if payload:
+                    payload["warnings"].append("The file was installed, but download history could not be saved.")
+            if payload:
+                self.installed.emit()
+        finally:
+            ActiveDownloads.finish(self._request_id)
+            self.finished.emit(self._request_id, payload, error)
+            self.deleteLater()
+
+
+def _run_pnach_lookup(result, request_id, crc):
+    try:
+        if crc:
+            patches = search_pcsx2_patches_by_crc(crc, timeout=10, strict=True)
+        else:
+            patches = list_pcsx2_widescreen_patches(timeout=15, strict=True)
+        result.finished.emit(request_id, patches, "")
+    except Exception as exc:
+        logger.warning("PCSX2 patch lookup failed: %s", exc)
+        result.finished.emit(request_id, None, str(exc) or type(exc).__name__)
+    finally:
+        result.deleteLater()
+
+
+def _run_pnach_install(result, request_id, crc, config):
+    """Stage transfers away from live patches and never replace existing files."""
+    payload = None
+    error = ""
+    try:
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
+            raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
+        destination = Path(config.pnach_path) / f"{crc}.pnach"
+        if destination.exists() or destination.is_symlink():
+            raise DownloadError(
+                f"{destination} already exists. No file was replaced. "
+                "Review or back up the existing patch before trying again."
+            )
+        with tempfile.TemporaryDirectory(prefix="ps2mm_pnach_") as staging:
+            path = download_pcsx2_widescreen_patch(crc, staging, timeout=15)
+            if not path:
+                raise DownloadError("The patch could not be downloaded. Check your connection and retry.")
+            ActiveDownloads.set_installing(request_id)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            created = False
+            try:
+                with open(path, "rb") as source, destination.open("xb") as target:
+                    created = True
+                    shutil.copyfileobj(source, target)
+            except Exception:
+                if created:
+                    destination.unlink()
+                raise
+        payload = {
+            "crc": crc, "path": str(destination),
+            "size": destination.stat().st_size, "warnings": [],
+        }
+    except Exception as exc:
+        error = str(exc) or type(exc).__name__
+        logger.warning("PCSX2 patch installation failed for %s: %s", crc, error)
+    finally:
+        result.transferred.emit(payload, error)
 
 
 class PnachGitHubDialog(QDialog):
@@ -1442,7 +2293,20 @@ class PnachGitHubDialog(QDialog):
         self.setWindowTitle("🔧 Fetch PNACH from PCSX2 GitHub")
         self.setMinimumSize(620, 500)
         self._patches: List[dict] = []
+        self._checked_patches = {}
+        self._installed_paths = {}
+        self._index_loaded = False
+        self._closed = False
+        self._request_id = ""
+        self._operation = ""
+        self._request_crc = ""
+        self._display_limit = _MAX_PATCH_DISPLAY
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(150)
+        self._filter_timer.timeout.connect(self._refresh_list)
         self._build()
+        self._refresh_list()
 
     def _build(self):
         layout = QVBoxLayout(self)
@@ -1463,11 +2327,17 @@ class PnachGitHubDialog(QDialog):
         search_row.addWidget(QLabel("Game CRC (8 hex digits):"))
         self._crc_edit = QLineEdit()
         self._crc_edit.setPlaceholderText("e.g. F0A235B4")
+        self._crc_edit.setAccessibleName("Filter patches by CRC")
         self._crc_edit.setMaxLength(8)
         self._crc_edit.textChanged.connect(self._filter_list)
         search_row.addWidget(self._crc_edit, 1)
+        clear_btn = QPushButton("Clear Search")
+        clear_btn.setAutoDefault(False)
+        clear_btn.clicked.connect(self._crc_edit.clear)
+        search_row.addWidget(clear_btn)
 
         self._check_btn = QPushButton("🔍 Check CRC")
+        self._check_btn.setDefault(True)
         self._check_btn.clicked.connect(self._check_single_crc)
         search_row.addWidget(self._check_btn)
         layout.addLayout(search_row)
@@ -1475,6 +2345,7 @@ class PnachGitHubDialog(QDialog):
         # Index browser
         index_row = QHBoxLayout()
         self._load_btn = QPushButton("📋 Load Full Patch Index")
+        self._load_btn.setAutoDefault(False)
         self._load_btn.setObjectName("primary_btn")
         self._load_btn.setToolTip("Fetch the complete list of widescreen patches from PCSX2 GitHub (requires internet)")
         self._load_btn.clicked.connect(self._load_index)
@@ -1497,6 +2368,10 @@ class PnachGitHubDialog(QDialog):
         self._list_layout.addStretch()
         self._list_widget.setWidget(self._list_container)
         layout.addWidget(self._list_widget, 1)
+        self._more_btn = QPushButton("Show More Patches")
+        self._more_btn.setAutoDefault(False)
+        self._more_btn.clicked.connect(self._show_more)
+        layout.addWidget(self._more_btn)
 
         # Progress / status
         self._progress = QProgressBar()
@@ -1505,73 +2380,120 @@ class PnachGitHubDialog(QDialog):
         layout.addWidget(self._progress)
 
         self._status = QLabel("")
+        self._status.setTextFormat(Qt.TextFormat.PlainText)
         self._status.setWordWrap(True)
+        self._status.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self._status.setStyleSheet("color: #9090b0; font-size: 12px;")
         layout.addWidget(self._status)
 
         btns = QHBoxLayout()
         close_btn = QPushButton("Close")
+        close_btn.setAutoDefault(False)
         close_btn.clicked.connect(self.reject)
         btns.addStretch()
         btns.addWidget(close_btn)
         layout.addLayout(btns)
 
     def _load_index(self):
-        self._load_btn.setEnabled(False)
-        self._progress.show()
-        self._status.setText("Fetching patch index from PCSX2 GitHub…")
-
-        def _run():
-            patches = list_pcsx2_widescreen_patches(timeout=15)
-
-            def _done():
-                self._patches = patches
-                self._progress.hide()
-                self._load_btn.setEnabled(True)
-                if patches:
-                    self._count_lbl.setText(f"  {len(patches)} patches available")
-                    self._status.setText(f"✅  Loaded {len(patches)} widescreen patches from PCSX2 GitHub.")
-                    self._populate_list(patches)
-                else:
-                    self._status.setText("❌  Could not fetch patch index. Check your internet connection.")
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+        self._start_request("index")
 
     def _check_single_crc(self):
         crc = self._crc_edit.text().strip().upper()
-        if len(crc) != 8:
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
             self._status.setText("⚠  Please enter a valid 8-digit hex CRC (e.g. F0A235B4)")
+            self._crc_edit.setFocus()
             return
-        self._check_btn.setEnabled(False)
+        self._start_request("check", crc)
+
+    def _start_request(self, operation, crc=""):
+        if self._closed or self._operation:
+            return
+        self._operation = operation
+        self._request_crc = crc
+        self._request_id = request_id = uuid.uuid4().hex
+        if operation == "install":
+            config = deepcopy(self.config)
+            result = _PnachInstallResult(request_id, crc, config, self.db)
+            parent = self.parent()
+            while parent is not None:
+                installed_signal = getattr(parent, "mod_installed", None)
+                if installed_signal is not None:
+                    result.installed.connect(installed_signal)
+                    break
+                parent = parent.parent()
+            source_url = f"https://github.com/PCSX2/pcsx2/blob/master/bin/cheats_ws/{crc}.pnach"
+            ActiveDownloads.register(request_id, f"Widescreen Patch ({crc})", source_url=source_url)
+            target = _run_pnach_install
+            args = (result, request_id, crc, config)
+            text = f"Installing patch {crc}… You can close this dialog and follow progress in Downloads."
+        else:
+            result = _PnachBrowserResult()
+            target = _run_pnach_lookup
+            args = (result, request_id, crc)
+            text = f"Checking CRC {crc}…" if crc else "Fetching patch index from PCSX2 GitHub…"
+        result.finished.connect(self._on_request_finished)
         self._progress.show()
-        self._status.setText(f"Checking for widescreen patch for CRC {crc}…")
+        self._status.setText(text)
+        self._refresh_list()
+        try:
+            threading.Thread(target=target, args=args, daemon=True).start()
+        except RuntimeError as exc:
+            ActiveDownloads.finish(request_id)
+            result.deleteLater()
+            self._on_request_finished(request_id, None, f"Could not start worker: {exc}")
 
-        def _run():
-            result = search_pcsx2_patches_by_crc(crc, timeout=10)
-
-            def _done():
-                self._progress.hide()
-                self._check_btn.setEnabled(True)
-                if result:
-                    self._patches = [result]
-                    self._populate_list([result])
-                    self._status.setText(f"✅  Widescreen patch found for {crc}!")
-                else:
-                    self._populate_list([])
-                    self._status.setText(f"❌  No widescreen patch found for CRC {crc}.")
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    @pyqtSlot(str, object, str)
+    def _on_request_finished(self, request_id, payload, error):
+        if self._closed or request_id != self._request_id or not self._operation:
+            return
+        operation, crc = self._operation, self._request_crc
+        self._operation = ""
+        self._progress.hide()
+        if error:
+            text = f"❌  {error}\nPrevious results are kept. Retry with the same action."
+        elif operation == "index":
+            self._patches = payload
+            self._index_loaded = True
+            text = f"Loaded {len(payload)} patches. Search by CRC or check a complete CRC online."
+        elif operation == "check":
+            if payload:
+                self._checked_patches[crc] = payload
+                text = f"✅  Patch found for {crc}. The full index is unchanged."
+            else:
+                text = f"No patch found for {crc} (GitHub returned 404). Previous results are kept."
+        else:
+            self._installed_paths[crc] = payload["path"]
+            text = f"✅  Installed: {payload['path']}"
+            if payload["warnings"]:
+                text += "\n" + "\n".join(payload["warnings"])
+        self._status.setText(text)
+        self._filter_timer.stop()
+        self._refresh_list()
 
     def _filter_list(self, text: str):
-        if not self._patches:
+        self._display_limit = _MAX_PATCH_DISPLAY
+        self._filter_timer.start()
+
+    @pyqtSlot()
+    def _refresh_list(self):
+        if self._closed:
             return
-        q = text.strip().upper()
-        filtered = [p for p in self._patches if q in p["crc"]] if q else self._patches
+        patches = {patch["crc"]: patch for patch in self._patches}
+        patches.update(self._checked_patches)
+        q = self._crc_edit.text().strip().upper()
+        filtered = [patches[crc] for crc in sorted(patches) if q in crc]
+        self._count_lbl.setText(
+            f"Showing {min(len(filtered), self._display_limit)} of {len(filtered)} matches"
+            f" • {len(patches)} known patches"
+        )
+        self._load_btn.setEnabled(not self._operation)
+        self._check_btn.setEnabled(not self._operation)
+        self._more_btn.setVisible(len(filtered) > self._display_limit)
         self._populate_list(filtered)
+
+    def _show_more(self):
+        self._display_limit += _MAX_PATCH_DISPLAY
+        self._refresh_list()
 
     def _populate_list(self, patches: List[dict]):
         # Remove all existing widgets except the trailing stretch
@@ -1580,12 +2502,18 @@ class PnachGitHubDialog(QDialog):
             if item.widget():
                 item.widget().deleteLater()
 
-        for patch in patches[:_MAX_PATCH_DISPLAY]:
+        for patch in patches[:self._display_limit]:
             row = self._make_patch_row(patch)
             self._list_layout.insertWidget(self._list_layout.count() - 1, row)
 
         if not patches:
-            lbl = QLabel("No patches match the current filter.")
+            text = (
+                "Load Full Patch Index, or enter an 8-digit CRC and choose Check CRC."
+                if not self._index_loaded and not self._checked_patches else
+                "No patches match this CRC filter. Clear Search or check a complete CRC online."
+            )
+            lbl = QLabel(text)
+            lbl.setWordWrap(True)
             lbl.setStyleSheet("color: #606080; font-size: 12px; padding: 8px;")
             self._list_layout.insertWidget(0, lbl)
 
@@ -1597,24 +2525,39 @@ class PnachGitHubDialog(QDialog):
         row.setContentsMargins(8, 4, 8, 4)
         row.setSpacing(8)
 
-        crc_lbl = QLabel(f"<b>{patch['crc']}</b>")
+        crc_lbl = QLabel(patch["crc"])
+        crc_lbl.setTextFormat(Qt.TextFormat.PlainText)
         crc_lbl.setStyleSheet("font-family: monospace; font-size: 12px; color: #80b0ff;")
         crc_lbl.setFixedWidth(110)
         row.addWidget(crc_lbl)
 
         file_lbl = QLabel(patch["filename"])
+        file_lbl.setTextFormat(Qt.TextFormat.PlainText)
         file_lbl.setStyleSheet("color: #9090b0; font-size: 11px;")
         row.addWidget(file_lbl, 1)
 
         dl_btn = QPushButton("⬇ Install")
+        dl_btn.setAutoDefault(False)
         dl_btn.setFixedWidth(80)
         dl_btn.setObjectName("primary_btn")
+        installed = self._installed_paths.get(patch["crc"])
+        if installed == str(Path(self.config.pnach_path) / f"{patch['crc']}.pnach"):
+            dl_btn.setText("Installed")
+            dl_btn.setEnabled(False)
+        else:
+            dl_btn.setEnabled(not self._operation)
         dl_btn.clicked.connect(lambda _checked, p=patch: self._install_patch(p, dl_btn))
         row.addWidget(dl_btn)
 
         return frame
 
     def _install_patch(self, patch: dict, btn: QPushButton):
+        if self._closed or self._operation:
+            return
+        crc = patch["crc"].strip().upper()
+        if not re.fullmatch(r"[0-9A-F]{8}", crc):
+            self._status.setText("⚠  The patch CRC must contain exactly 8 hexadecimal digits.")
+            return
         pnach_dir = self.config.pnach_path
         if not pnach_dir:
             QMessageBox.warning(
@@ -1622,77 +2565,12 @@ class PnachGitHubDialog(QDialog):
                 "Please configure a PNACH folder in Settings before installing patches.",
             )
             return
-        btn.setEnabled(False)
-        btn.setText("⏳")
-        self._status.setText(f"Downloading {patch['filename']}…")
+        self._start_request("install", crc)
 
-        def _run():
-            path = download_pcsx2_widescreen_patch(patch["crc"], pnach_dir, timeout=15)
-
-            def _done():
-                btn.setEnabled(True)
-                if path:
-                    btn.setText("✅")
-                    btn.setStyleSheet("color: #40c040;")
-                    self._status.setText(f"✅  Installed: {path}")
-                    # Register the patch in the mod database as a tracked entry.
-                    # We do NOT use install_from_folder here because the file is
-                    # already in pnach_dir (the PCSX2-visible location).  Using
-                    # install_from_folder would create a UUID subdirectory copy
-                    # alongside the real file, causing PCSX2 to load the patch
-                    # twice (in tools that scan subdirectories) or leaving a
-                    # confusing duplicate on disk.  Instead we register a ModInfo
-                    # that points directly at the downloaded file.
-                    if self.db is not None:
-                        try:
-                            pnach_file_path = Path(path)
-                            _sz = pnach_file_path.stat().st_size if pnach_file_path.exists() else 0
-                            mod_record = ModInfo(
-                                id=str(uuid.uuid4()),
-                                name=f"Widescreen Patch ({patch['crc']})",
-                                mod_type=ModType.PNACH,
-                                path=path,
-                                author="PCSX2 Team",
-                                source_url=(
-                                    "https://github.com/PCSX2/widescreen_patches/blob/"
-                                    f"master/{patch.get('filename', patch['crc'] + '.pnach')}"
-                                ),
-                                files=[path],
-                                size_bytes=_sz,
-                            )
-                            self.db.add(mod_record)
-                            try:
-                                from src.core.download_history import record_event, STATUS_SUCCESS
-                                record_event(
-                                    self.config,
-                                    mod_name=f"Widescreen Patch ({patch['crc']})",
-                                    mod_type="pnach",
-                                    source_url=mod_record.source_url,
-                                    status=STATUS_SUCCESS,
-                                    size_bytes=_sz,
-                                )
-                            except Exception:
-                                pass
-                        except Exception as _reg_exc:  # DB registration is best-effort
-                            import sys
-                            print(f"[PS2MM] PNACH DB registration warning: {_reg_exc}", file=sys.stderr)
-                else:
-                    btn.setText("⬇ Install")
-                    self._status.setText(f"❌  Download failed for {patch['filename']}.")
-                    try:
-                        from src.core.download_history import record_event, STATUS_FAILED
-                        record_event(
-                            self.config,
-                            mod_name=f"Widescreen Patch ({patch['crc']})",
-                            mod_type="pnach",
-                            status=STATUS_FAILED,
-                        )
-                    except Exception:
-                        pass
-
-            QTimer.singleShot(0, _done)
-
-        threading.Thread(target=_run, daemon=True).start()
+    def done(self, result):
+        self._closed = True
+        self._filter_timer.stop()
+        super().done(result)
 
 
 # ---------------------------------------------------------------------------
@@ -1777,7 +2655,8 @@ class GBATempScraperDialog(QDialog):
         import urllib.parse as _up
         try:
             netloc = _up.urlparse(url).netloc.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Could not classify browse URL %s: %s", url, exc)
             return ""
         # Match exact domain or subdomain (e.g. www.gbatemp.net)
         if netloc == "gbatemp.net" or netloc.endswith(".gbatemp.net"):
@@ -1895,10 +2774,14 @@ class GBATempScraperDialog(QDialog):
             open_btn.setToolTip("Open in browser")
             open_btn.setStyleSheet("border: none; background: transparent; font-size: 14px;")
             dl_url = dl["url"]  # capture for lambda
-            from PyQt6.QtGui import QDesktopServices
-            from PyQt6.QtCore import QUrl
             open_btn.clicked.connect(
-                lambda _checked, u=dl_url: QDesktopServices.openUrl(QUrl(u))
+                lambda _checked, u=dl_url: open_external_url(
+                    u,
+                    parent=self,
+                    context="download link",
+                    title="Download Link Unavailable",
+                    failure_message="Could not open this download link. Please copy the URL into your browser.",
+                )
             )
             row_layout.addWidget(open_btn)
 
@@ -1945,12 +2828,16 @@ class GBATempScraperDialog(QDialog):
 #: Limiting the initial render to _PAGE_SIZE cards keeps startup instant while
 #: the user can still load more entries on demand.
 _PAGE_SIZE = 30
+_COVER_DOWNLOAD_STATE_KEY = "cover_download_dialog"
 
 
 class _CatalogueTabContent(QWidget):
     favorite_toggled = pyqtSignal(str, bool)
+    copy_url = pyqtSignal(str)
     install_direct = pyqtSignal(dict)   # emitted when a card's Install button is clicked
     result_count_changed = pyqtSignal(int, int)  # (visible, total)
+    clear_filters_requested = pyqtSignal()
+    reload_requested = pyqtSignal()
 
     def __init__(self, entries: list, config: AppConfig, parent=None):
         super().__init__(parent)
@@ -1959,16 +2846,24 @@ class _CatalogueTabContent(QWidget):
         self._current_query = ""
         self._current_source = ""
         self._current_author = ""
+        self._current_sort = "featured"
         self._show_favs_only = False
         self._show_nsfw = False
         self._show_paid = False
         self._show_account_required = False
         self._show_incomplete = True
+        self._in_app_only = False
+        self._last_filter_key = None
+        self._compact = bool(ui_state_bucket(config, "browse_panel").get("compact_cards", False))
+        self._cards = []
+        self._empty_widget = None
 
         # Pagination state – updated by _populate / _append_cards
         self._all_filtered: list = []   # current filter-result set
         self._shown_count: int = 0      # how many cards are currently in the grid
         self._load_more_btn = None      # QPushButton or None
+        self._current_columns = 3
+        self._serial_db = None
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -1978,16 +2873,10 @@ class _CatalogueTabContent(QWidget):
         self._cards_container = QWidget()
         self._cards_layout = QGridLayout(self._cards_container)
         self._cards_layout.setContentsMargins(4, 8, 4, 8)
-        self._cards_layout.setSpacing(14)
+        self._cards_layout.setSpacing(8 if self._compact else 14)
         self._scroll.setWidget(self._cards_container)
         layout.addWidget(self._scroll, 1)
-        # Populate with NSFW, paid, and account-required content hidden by default
-        initial = [
-            e for e in entries
-            if not e.get("nsfw", False) and _entry_is_free(e)
-            and not _entry_requires_account(e)
-        ]
-        self._populate(initial)
+        # Cards are created only when this tab becomes active.
 
     def apply_filters(self, query: str = "", source: str = "",
                       author: str = "", favs_only: bool = False,
@@ -1995,10 +2884,20 @@ class _CatalogueTabContent(QWidget):
                       show_paid: bool = False,
                       show_account_required: bool = False,
                       show_incomplete: bool = True,
-                      in_app_only: bool = False):
+                      in_app_only: bool = False,
+                      sort_mode: str = "featured"):
+        filter_key = (
+            query, source, author, favs_only, show_nsfw, show_paid,
+            show_account_required, show_incomplete, in_app_only, sort_mode,
+            tuple(getattr(self.config, "favorite_authors", [])),
+        )
+        if filter_key == self._last_filter_key:
+            self.result_count_changed.emit(len(self._all_filtered), len(self._all_entries))
+            return
         self._current_query = query
         self._current_source = source
         self._current_author = author
+        self._current_sort = sort_mode
         self._show_favs_only = favs_only
         self._show_nsfw = show_nsfw
         self._show_paid = show_paid
@@ -2006,19 +2905,25 @@ class _CatalogueTabContent(QWidget):
         self._show_incomplete = show_incomplete
         self._in_app_only = in_app_only
 
-        q = query.lower()
+        q = query.strip()
         fav_authors = getattr(self.config, "favorite_authors", [])
 
         # Resolve alias-aware game title matching via the serial database.
         # This lets users search "DMC3", "GoW", "GTA III" etc. and find entries
         # whose catalogue "game" field uses the full canonical title.
-        _sdb = None
-        if q:
+        _sdb = self._serial_db
+        if q and _sdb is None:
             try:
                 from src.core.serial_validator import SerialDatabase
                 _sdb = SerialDatabase()
-            except Exception:
-                pass
+                self._serial_db = _sdb
+            except Exception as exc:
+                logger.warning("Could not load serial database for alias-aware browse filters: %s", exc)
+                self._serial_db = False
+                _sdb = None
+
+        if q and _sdb not in (None, False):
+            _sdb = _BrowseSerialLookupCache(_sdb)
 
         filtered = []
         for e in self._all_entries:
@@ -2037,27 +2942,8 @@ class _CatalogueTabContent(QWidget):
             # In-app download filter — hide entries that require a browser or external tool
             if in_app_only and not _entry_is_in_app_downloadable(e):
                 continue
-            if q:
-                game_field = e.get("game", "")
-                # Alias-aware game field matching: if the query doesn't match
-                # the raw game string, check via SerialDatabase aliases.
-                game_matches = (
-                    q in game_field.lower()
-                    or (
-                        _sdb is not None
-                        and game_field
-                        and _sdb.title_matches_query(game_field, q)
-                    )
-                )
-                if not (
-                    q in e.get("name", "").lower()
-                    or q in e.get("description", "").lower()
-                    or q in e.get("author", "").lower()
-                    or game_matches
-                    or q in e.get("context", "").lower()
-                    or any(q in t.lower() for t in e.get("tags", []))
-                ):
-                    continue
+            if q and not _entry_matches_query(e, q, _sdb):
+                continue
             if source and e.get("source", "") != source:
                 continue
             if author and e.get("author", "") != author:
@@ -2066,9 +2952,22 @@ class _CatalogueTabContent(QWidget):
                 continue
             filtered.append(e)
 
+        filtered = _sort_catalogue_entries(filtered, sort_mode)
         self._populate(filtered)
+        self._last_filter_key = filter_key
 
-    def _populate(self, entries: list):
+    def set_entries(self, entries: list) -> None:
+        """Replace the backing catalogue entries for this tab."""
+        self._all_entries = entries
+        self._last_filter_key = None
+
+    def set_compact(self, compact: bool) -> None:
+        self._compact = compact
+        self._cards_layout.setSpacing(8 if compact else 14)
+        for card in self._cards:
+            card.set_compact(compact)
+
+    def _populate(self, entries: list, shown_count: Optional[int] = None):
         # Clear every widget currently in the grid (cards, spacers, load-more btn)
         while self._cards_layout.count():
             item = self._cards_layout.takeAt(0)
@@ -2078,8 +2977,49 @@ class _CatalogueTabContent(QWidget):
         self._all_filtered = entries
         self._shown_count = 0
         self._load_more_btn = None
+        self._cards = []
+        self._empty_widget = None
 
-        self._append_cards(_PAGE_SIZE)
+        initial_count = _PAGE_SIZE if shown_count is None else shown_count
+        if not entries:
+            self._empty_widget = QWidget()
+            empty_layout = QVBoxLayout(self._empty_widget)
+            empty_lbl = QLabel(
+                _catalogue_empty_state_message(
+                    self._current_query,
+                    self._current_source,
+                    self._current_author,
+                    self._show_favs_only,
+                    self._show_nsfw,
+                    self._show_paid,
+                    self._show_account_required,
+                    self._show_incomplete,
+                    self._in_app_only,
+                    has_entries=bool(self._all_entries),
+                )
+            )
+            empty_lbl.setWordWrap(True)
+            empty_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            empty_lbl.setStyleSheet(
+                "color: #7080a0; font-size: 13px; padding: 30px 20px;"
+            )
+            empty_layout.addWidget(empty_lbl)
+            actions = QHBoxLayout()
+            actions.addStretch()
+            if self._all_entries:
+                clear_btn = QPushButton("✖ Clear Filters")
+                clear_btn.setObjectName("primary_btn")
+                clear_btn.clicked.connect(lambda: self.clear_filters_requested.emit())
+                actions.addWidget(clear_btn)
+            reload_btn = QPushButton("🔄 Reload catalogue")
+            reload_btn.clicked.connect(lambda: self.reload_requested.emit())
+            actions.addWidget(reload_btn)
+            actions.addStretch()
+            empty_layout.addLayout(actions)
+            self._reflow_cards()
+            self.result_count_changed.emit(0, len(self._all_entries))
+            return
+        self._append_cards(initial_count)
 
         # Emit filter-match count (total entries that pass the filter, not how
         # many cards are rendered — the result-count label reflects the filter).
@@ -2090,27 +3030,35 @@ class _CatalogueTabContent(QWidget):
         entries = self._all_filtered
         start = self._shown_count
         end = min(start + count, len(entries))
-        cols = 3
-
         for i in range(start, end):
             entry = entries[i]
             card = CatalogueCard(entry, self.config)
             card.open_url.connect(self._open_url)
+            card.copy_url.connect(self.copy_url.emit)
             card.download_cover.connect(self._download_cover)
             card.favorite_toggled.connect(self.favorite_toggled)
             card.install_direct.connect(self.install_direct.emit)
-            self._cards_layout.addWidget(card, i // cols, i % cols)
+            self._cards.append(card)
 
         self._shown_count = end
+        self._reflow_cards()
 
-        # Remove the previous "Load More" button (if any) before deciding
-        # whether a new one is needed.
-        if self._load_more_btn is not None:
-            self._cards_layout.removeWidget(self._load_more_btn)
-            self._load_more_btn.deleteLater()
-            self._load_more_btn = None
+    def _reflow_cards(self):
+        """Move existing cards to their new grid positions without rebuilding them."""
+        while self._cards_layout.count():
+            widget = self._cards_layout.takeAt(0).widget()
+            if widget is not None and widget not in self._cards and widget is not self._empty_widget:
+                widget.deleteLater()
+        self._load_more_btn = None
+        cols = calculate_catalogue_columns(self._scroll.viewport().width())
+        self._current_columns = cols
+        if self._empty_widget is not None:
+            self._cards_layout.addWidget(self._empty_widget, 0, 0, 1, cols)
+            return
+        for i, card in enumerate(self._cards):
+            self._cards_layout.addWidget(card, i // cols, i % cols)
 
-        n_remaining = len(entries) - self._shown_count
+        n_remaining = len(self._all_filtered) - self._shown_count
         if n_remaining > 0:
             # Place "Load More" button spanning all columns in the next row
             load_row = (self._shown_count + cols - 1) // cols
@@ -2123,7 +3071,7 @@ class _CatalogueTabContent(QWidget):
             # Last page — fill any incomplete row with invisible spacers so
             # cards in the last row don't stretch to fill the full width.
             remainder = self._shown_count % cols
-            if remainder and entries:
+            if remainder and self._cards:
                 for j in range(cols - remainder):
                     spacer = QWidget()
                     spacer.setSizePolicy(
@@ -2133,14 +3081,24 @@ class _CatalogueTabContent(QWidget):
                         spacer, self._shown_count // cols, remainder + j
                     )
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        cols = calculate_catalogue_columns(self._scroll.viewport().width())
+        if cols != self._current_columns:
+            self._reflow_cards()
+
     def _load_more(self):
         """Append the next page of catalogue cards."""
         self._append_cards(_PAGE_SIZE)
 
     def _open_url(self, url: str):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(url))
+        return open_external_url(
+            url,
+            parent=self,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
 
     def _download_cover(self, entry: dict):
         download_action = entry.get("download_action", "")
@@ -2165,7 +3123,7 @@ class _CatalogueTabContent(QWidget):
 class BrowsePanel(BasePanel):
     """Panel for discovering and downloading mods from public sources."""
 
-    mod_installed = pyqtSignal()   # emitted after any install dialog closes
+    mod_installed = pyqtSignal()   # emitted after a successful browse-triggered install
 
     def __init__(self, config: AppConfig, parent=None):
         super().__init__(
@@ -2180,6 +3138,153 @@ class BrowsePanel(BasePanel):
     def set_db(self, db):
         self._db = db
 
+    def _browse_state(self) -> tuple[str, str, str, bool, str, int]:
+        tabs = getattr(self, "_tabs", None)
+        tab_count = tabs.count() if tabs and hasattr(tabs, "count") else 0
+        tab_index = tabs.currentIndex() if tabs and hasattr(tabs, "currentIndex") else 0
+        if tab_count > 0:
+            tab_index = max(0, min(tab_index, tab_count - 1))
+        else:
+            tab_index = 0
+        return (
+            getattr(self._search, "text", lambda: "")(),
+            getattr(self._source_filter, "currentData", lambda: "")() or "",
+            getattr(self._author_filter, "currentData", lambda: "")() or "",
+            bool(getattr(self._favs_check, "isChecked", lambda: False)()),
+            getattr(self._sort_filter, "currentData", lambda: "featured")() or "featured",
+            tab_index,
+        )
+
+    def _restore_browse_state(self) -> None:
+        state_changed = False
+        query = getattr(self.config, "browse_query", "")
+        if query is None:
+            query = ""
+        elif not isinstance(query, str):
+            logger.warning(
+                "Saved browse search query %r is invalid; using text form",
+                query,
+            )
+            query = str(query)
+            state_changed = True
+
+        source = getattr(self.config, "browse_source_filter", "")
+        if source is None:
+            source = ""
+        elif not isinstance(source, str):
+            logger.warning(
+                "Saved browse source filter %r is invalid; using text form",
+                source,
+            )
+            source = str(source)
+            state_changed = True
+
+        author = getattr(self.config, "browse_author_filter", "")
+        if author is None:
+            author = ""
+        elif not isinstance(author, str):
+            logger.warning(
+                "Saved browse author filter %r is invalid; using text form",
+                author,
+            )
+            author = str(author)
+            state_changed = True
+
+        raw_sort_mode = getattr(self.config, "browse_sort_mode", "featured")
+        sort_mode = _normalise_sort_mode(raw_sort_mode)
+        if not isinstance(raw_sort_mode, str):
+            logger.warning(
+                "Saved browse sort mode %r is invalid; using featured order",
+                raw_sort_mode,
+            )
+            state_changed = True
+        elif raw_sort_mode and raw_sort_mode.strip() != sort_mode:
+            logger.warning(
+                "Saved browse sort mode %r is no longer available; using %r",
+                raw_sort_mode,
+                sort_mode,
+            )
+            state_changed = True
+        favs_only = bool(getattr(self.config, "browse_favorites_only", False))
+        try:
+            selected_tab = int(getattr(self.config, "browse_selected_tab", 0) or 0)
+        except (TypeError, ValueError):
+            logger.warning(
+                "Saved browse tab index %r is invalid; using the first tab",
+                getattr(self.config, "browse_selected_tab", 0),
+            )
+            selected_tab = 0
+            state_changed = True
+
+        self._search.setText(query)
+
+        source_index = self._source_filter.findData(source) if source else -1
+        if source_index >= 0:
+            self._source_filter.setCurrentIndex(source_index)
+        elif source:
+            logger.warning(
+                "Saved browse source filter %r is no longer available; using All Sources",
+                source,
+            )
+            source = ""
+            state_changed = True
+
+        author_index = self._author_filter.findData(author) if author else -1
+        if author_index >= 0:
+            self._author_filter.setCurrentIndex(author_index)
+        elif author:
+            logger.warning(
+                "Saved browse author filter %r is no longer available; using All Authors",
+                author,
+            )
+            author = ""
+            state_changed = True
+
+        sort_index = self._sort_filter.findData(sort_mode) if sort_mode else -1
+        if sort_index >= 0:
+            self._sort_filter.setCurrentIndex(sort_index)
+        elif sort_mode:
+            logger.warning(
+                "Saved browse sort mode %r is no longer available; using featured order",
+                sort_mode,
+            )
+            sort_mode = "featured"
+            state_changed = True
+
+        self._favs_check.setChecked(favs_only)
+        browse_state = ui_state_bucket(self.config, "browse_panel")
+        self._in_app_check.setChecked(bool(browse_state.get("in_app_only", False)))
+
+        if getattr(self, "_tabs", None) is not None:
+            tab_count = self._tabs.count() if hasattr(self._tabs, "count") else 0
+            if tab_count > 0:
+                clamped = max(0, min(selected_tab, tab_count - 1))
+                if clamped != selected_tab:
+                    logger.warning(
+                        "Saved browse tab index %s is out of range for %s tabs; using %s",
+                        selected_tab,
+                        tab_count,
+                        clamped,
+                    )
+                    selected_tab = clamped
+                    state_changed = True
+                self._tabs.setCurrentIndex(clamped)
+
+        if state_changed:
+            self._save_browse_state("sanitizing browse state")
+
+    def _save_browse_state(self, context: str) -> None:
+        query, source, author, favs_only, sort_mode, tab_index = self._browse_state()
+        browse_state = ui_state_bucket(self.config, "browse_panel")
+        self.config.browse_query = query
+        self.config.browse_source_filter = source
+        self.config.browse_author_filter = author
+        self.config.browse_favorites_only = favs_only
+        self.config.browse_sort_mode = _normalise_sort_mode(sort_mode)
+        self.config.browse_selected_tab = tab_index
+        browse_state["in_app_only"] = self._in_app_check.isChecked()
+        _save_browse_config(self.config, context)
+
     def _build(self):
         content = self._content_layout
 
@@ -2190,7 +3295,6 @@ class BrowsePanel(BasePanel):
         self._search = QLineEdit()
         self._search.setPlaceholderText("🔍  Search by name, game, author, tag…")
         self._search.setObjectName("search_bar")
-        self._search.textChanged.connect(self._apply_filters)
         toolbar.addWidget(self._search, 1)
 
         dl_btn = QPushButton("⬇ Download from URL")
@@ -2241,6 +3345,16 @@ class BrowsePanel(BasePanel):
         tools_row.addWidget(backup_btn)
 
         tools_row.addStretch()
+        self._compact_check = QCheckBox("Compact cards")
+        self._compact_check.setChecked(
+            bool(ui_state_bucket(self.config, "browse_panel").get("compact_cards", False))
+        )
+        self._compact_check.setToolTip(
+            "Show more entries with tighter spacing and fewer detail rows.\n"
+            "Hover over a title for its description, context, and tags."
+        )
+        self._compact_check.toggled.connect(self._on_compact_toggled)
+        tools_row.addWidget(self._compact_check)
         content.addLayout(tools_row)
 
         # ── Filter row ───────────────────────────────────────────────────
@@ -2254,7 +3368,6 @@ class BrowsePanel(BasePanel):
         self._source_filter.addItem("All Sources", "")
         for src in ALL_SOURCES:
             self._source_filter.addItem(src, src)
-        self._source_filter.currentIndexChanged.connect(self._apply_filters)
         filter_row.addWidget(self._source_filter)
 
         # Author filter — only shows named (non-hub) authors with a real profile
@@ -2262,18 +3375,22 @@ class BrowsePanel(BasePanel):
         self._author_filter = QComboBox()
         self._author_filter.setMinimumWidth(150)
         self._author_filter.addItem("All Authors", "")
-        # Only include non-empty author values (hub entries have author="")
-        named_authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        named_authors = _browse_authors(CATALOGUE)
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
-        self._author_filter.currentIndexChanged.connect(self._apply_filters)
         filter_row.addWidget(self._author_filter)
+
+        filter_row.addWidget(QLabel("⇅ Sort:"))
+        self._sort_filter = QComboBox()
+        self._sort_filter.setMinimumWidth(150)
+        for label, value in _SORT_OPTIONS:
+            self._sort_filter.addItem(label, value)
+        filter_row.addWidget(self._sort_filter)
 
         # Favorites only checkbox
         self._favs_check = QCheckBox("❤ Favorites Only")
         self._favs_check.setStyleSheet("color: #c08090; font-size: 12px;")
-        self._favs_check.stateChanged.connect(self._apply_filters)
         filter_row.addWidget(self._favs_check)
 
         # NSFW toggle — hidden by default; LoversLab results etc. are NSFW-adjacent
@@ -2284,7 +3401,6 @@ class BrowsePanel(BasePanel):
             "LoversLab and similar sources may contain adult content.\n"
             "Enable this to show those results in the browser."
         )
-        self._nsfw_check.stateChanged.connect(self._on_nsfw_toggled)
         filter_row.addWidget(self._nsfw_check)
 
         filter_row.addStretch()
@@ -2302,7 +3418,6 @@ class BrowsePanel(BasePanel):
             "By default only free content is shown.\n"
             "Enable this to also see paid / subscription-only texture packs and mods."
         )
-        self._paid_check.stateChanged.connect(self._on_paid_toggled)
         type_filter_row.addWidget(self._paid_check)
 
         # Account-required toggle
@@ -2314,7 +3429,6 @@ class BrowsePanel(BasePanel):
             "require a free or paid account to download files.\n"
             "Uncheck to hide those entries and only show account-free sources."
         )
-        self._acct_check.stateChanged.connect(self._on_acct_toggled)
         type_filter_row.addWidget(self._acct_check)
 
         # Incomplete / partial packs toggle
@@ -2327,12 +3441,13 @@ class BrowsePanel(BasePanel):
             "or body types rather than covering the whole game.\n"
             "Uncheck to show only complete, whole-game texture packs."
         )
-        self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
         type_filter_row.addWidget(self._incomplete_check)
 
         # In-app download toggle
         self._in_app_check = QCheckBox("📥 In-App Downloads Only")
-        self._in_app_check.setChecked(getattr(self.config, "in_app_only", False))
+        self._in_app_check.setChecked(
+            bool(ui_state_bucket(self.config, "browse_panel").get("in_app_only", False))
+        )
         self._in_app_check.setStyleSheet("color: #50d090; font-size: 12px;")
         self._in_app_check.setToolTip(
             "Show only entries that can be downloaded and installed directly\n"
@@ -2343,7 +3458,6 @@ class BrowsePanel(BasePanel):
             "\n"
             "When unchecked, all entries (including manual downloads) are shown."
         )
-        self._in_app_check.stateChanged.connect(self._on_in_app_toggled)
         type_filter_row.addWidget(self._in_app_check)
 
         type_filter_row.addStretch()
@@ -2388,6 +3502,7 @@ class BrowsePanel(BasePanel):
         ]
 
         self._tab_contents: List[_CatalogueTabContent] = []
+        self._tab_mod_types: List[Optional[ModType]] = []
         for label, mod_type in tab_defs:
             entries = (
                 CATALOGUE if mod_type is None
@@ -2395,80 +3510,132 @@ class BrowsePanel(BasePanel):
             )
             tab = _CatalogueTabContent(entries, self.config)
             tab.favorite_toggled.connect(self._on_favorite_toggled)
+            tab.copy_url.connect(self._copy_url)
             tab.install_direct.connect(self._install_catalogue_entry)
             tab.result_count_changed.connect(self._on_result_count_changed)
+            tab.clear_filters_requested.connect(self._clear_filters)
+            tab.reload_requested.connect(self._reload_catalogue)
             self._tab_contents.append(tab)
+            self._tab_mod_types.append(mod_type)
             self._tabs.addTab(tab, label)
 
-        self._tabs.currentChanged.connect(self._on_tab_changed)
         content.addWidget(self._tabs, 1)
 
-    def _apply_filters(self):
+        self._restore_browse_state()
+
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(200)
+        self._search_timer.timeout.connect(self._on_search_timeout)
+        self._search.textChanged.connect(self._on_search_changed)
+        self._search.editingFinished.connect(self._on_search_timeout)
+        self._source_filter.currentIndexChanged.connect(self._on_source_filter_changed)
+        self._author_filter.currentIndexChanged.connect(self._on_author_filter_changed)
+        self._sort_filter.currentIndexChanged.connect(self._on_sort_changed)
+        self._favs_check.stateChanged.connect(self._on_favs_only_toggled)
+        self._nsfw_check.stateChanged.connect(self._on_nsfw_toggled)
+        self._paid_check.stateChanged.connect(self._on_paid_toggled)
+        self._acct_check.stateChanged.connect(self._on_acct_toggled)
+        self._incomplete_check.stateChanged.connect(self._on_incomplete_toggled)
+        self._in_app_check.stateChanged.connect(self._on_in_app_toggled)
+        self._tabs.currentChanged.connect(self._on_tab_changed)
+
+        self._apply_filters()
+
+    def _filter_args(self):
         query = self._search.text()
         source = self._source_filter.currentData() or ""
         author = self._author_filter.currentData() or ""
+        sort_mode = self._sort_filter.currentData() or "featured"
         favs_only = self._favs_check.isChecked()
         show_nsfw = self._nsfw_check.isChecked()
         show_paid = self._paid_check.isChecked()
         show_account_required = self._acct_check.isChecked()
         show_incomplete = self._incomplete_check.isChecked()
         in_app_only = self._in_app_check.isChecked()
+        return (
+            query, source, author, favs_only, show_nsfw,
+            show_paid, show_account_required, show_incomplete,
+            in_app_only, sort_mode,
+        )
+
+    def _active_tab_index(self) -> int:
+        tabs = getattr(self, "_tabs", None)
+        if tabs is None or not hasattr(tabs, "currentIndex"):
+            return -1
+        try:
+            return tabs.currentIndex()
+        except Exception as exc:
+            logger.warning("Could not read active browse tab index: %s", exc)
+            return -1
+
+    def _refresh_active_tab(self):
+        args = self._filter_args()
+        index = self._active_tab_index()
+        if 0 <= index < len(self._tab_contents):
+            self._tab_contents[index].apply_filters(*args)
+
+    def _apply_filters(self):
+        self._search_timer.stop()
+        self._refresh_active_tab()
+
+    def _on_search_changed(self, _text: str):
+        self._search_timer.start()
+
+    def _on_search_timeout(self):
+        self._save_browse_state("updating search filter")
+        self._apply_filters()
+
+    def _on_compact_toggled(self, compact: bool):
+        ui_state_bucket(self.config, "browse_panel")["compact_cards"] = compact
+        _save_browse_config(self.config, "updating browse card density")
         for tab in self._tab_contents:
-            tab.apply_filters(
-                query, source, author, favs_only, show_nsfw,
-                show_paid, show_account_required, show_incomplete,
-                in_app_only=in_app_only,
-            )
+            tab.set_compact(compact)
+
+    def _on_source_filter_changed(self, _index: int):
+        self._save_browse_state("updating source filter")
+        self._apply_filters()
+
+    def _on_author_filter_changed(self, _index: int):
+        self._save_browse_state("updating author filter")
+        self._apply_filters()
+
+    def _on_sort_changed(self, _index: int):
+        self._save_browse_state("updating sort order")
+        self._apply_filters()
+
+    def _on_favs_only_toggled(self, _state: int):
+        self._save_browse_state("updating favorites filter")
+        self._apply_filters()
 
     def _on_nsfw_toggled(self, state: int):
         """Persist the NSFW preference and re-apply filters."""
         show_nsfw = bool(state)
         self.config.show_nsfw = show_nsfw
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        self._save_browse_state("updating NSFW preference")
         self._apply_filters()
 
     def _on_paid_toggled(self, state: int):
         """Persist the show-paid preference and re-apply filters."""
         self.config.show_paid = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        self._save_browse_state("updating paid-content preference")
         self._apply_filters()
 
     def _on_acct_toggled(self, state: int):
         """Persist the show-account-required preference and re-apply filters."""
         self.config.show_account_required = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        self._save_browse_state("updating account-required preference")
         self._apply_filters()
 
     def _on_incomplete_toggled(self, state: int):
         """Persist the show-incomplete preference and re-apply filters."""
         self.config.show_incomplete = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        self._save_browse_state("updating incomplete-content preference")
         self._apply_filters()
 
     def _on_in_app_toggled(self, state: int):
         """Persist the in-app-only preference and re-apply filters."""
-        self.config.in_app_only = bool(state)
-        try:
-            from src.core.config_manager import save_config
-            save_config(self.config)
-        except Exception:
-            pass
+        self._save_browse_state("updating in-app-only preference")
         self._apply_filters()
 
     def _on_result_count_changed(self, visible: int, total: int):
@@ -2481,21 +3648,8 @@ class BrowsePanel(BasePanel):
     def _on_tab_changed(self, index: int):
         """Sync the result count label when the user switches tabs."""
         if 0 <= index < len(self._tab_contents):
-            tab = self._tab_contents[index]
-            # Ask the tab to re-emit its count by retrieving from its private state
-            total = len(tab._all_entries)
-            # Count visible by running the filter logic again (cheaply via signal)
-            tab.apply_filters(
-                self._search.text(),
-                self._source_filter.currentData() or "",
-                self._author_filter.currentData() or "",
-                self._favs_check.isChecked(),
-                self._nsfw_check.isChecked(),
-                self._paid_check.isChecked(),
-                self._acct_check.isChecked(),
-                self._incomplete_check.isChecked(),
-                in_app_only=self._in_app_check.isChecked(),
-            )
+            self._save_browse_state("switching browse tabs")
+            self._apply_filters()
 
     def _clear_filters(self):
         """Reset all search and filter controls to their default state."""
@@ -2504,6 +3658,7 @@ class BrowsePanel(BasePanel):
             self._search,
             self._source_filter,
             self._author_filter,
+            self._sort_filter,
             self._favs_check,
             self._nsfw_check,
             self._paid_check,
@@ -2516,17 +3671,23 @@ class BrowsePanel(BasePanel):
         self._search.clear()
         self._source_filter.setCurrentIndex(0)
         self._author_filter.setCurrentIndex(0)
+        self._sort_filter.setCurrentIndex(0)
         self._favs_check.setChecked(False)
         self._nsfw_check.setChecked(getattr(self.config, "show_nsfw", False))
         self._paid_check.setChecked(False)
-        self._acct_check.setChecked(True)
+        self.config.show_paid = False
+        self._acct_check.setChecked(False)
+        self.config.show_account_required = False
         self._incomplete_check.setChecked(True)
+        self.config.show_incomplete = True
         self._in_app_check.setChecked(False)
+        ui_state_bucket(self.config, "browse_panel")["in_app_only"] = False
 
         for widget in (
             self._search,
             self._source_filter,
             self._author_filter,
+            self._sort_filter,
             self._favs_check,
             self._nsfw_check,
             self._paid_check,
@@ -2536,28 +3697,63 @@ class BrowsePanel(BasePanel):
         ):
             widget.blockSignals(False)
 
+        self._save_browse_state("clearing browse filters")
         self._apply_filters()
 
     def _on_favorite_toggled(self, author: str, is_fav: bool):
         """Rebuild author dropdown when favorites change."""
-        self._author_filter.blockSignals(True)
         current = self._author_filter.currentData() or ""
+        self._refresh_author_filter(CATALOGUE, current)
+        self._refresh_active_tab()
+
+    def _refresh_source_filter(self, sources: List[str], selected: str = "") -> None:
+        """Rebuild the source filter dropdown from the supplied source list."""
+        self._source_filter.blockSignals(True)
+        self._source_filter.clear()
+        self._source_filter.addItem("All Sources", "")
+        for src in sources:
+            self._source_filter.addItem(src, src)
+        if selected:
+            idx = self._source_filter.findData(selected)
+            if idx >= 0:
+                self._source_filter.setCurrentIndex(idx)
+        self._source_filter.blockSignals(False)
+
+    def _refresh_author_filter(self, entries: List[dict], selected: str = "") -> None:
+        """Rebuild the author filter dropdown from the supplied entries."""
+        self._author_filter.blockSignals(True)
         self._author_filter.clear()
         self._author_filter.addItem("All Authors", "")
-        # Only show named (non-hub) authors — hub entries have author=""
-        named_authors = sorted({e["author"] for e in CATALOGUE if e.get("author")})
+        named_authors = _browse_authors(entries)
         for a in named_authors:
             fav = a in getattr(self.config, "favorite_authors", [])
             self._author_filter.addItem(("❤ " if fav else "") + a, a)
-        idx = self._author_filter.findData(current)
-        if idx >= 0:
-            self._author_filter.setCurrentIndex(idx)
+        if selected:
+            idx = self._author_filter.findData(selected)
+            if idx >= 0:
+                self._author_filter.setCurrentIndex(idx)
         self._author_filter.blockSignals(False)
+
+    def _refresh_catalogue_data(self, entries: List[dict]) -> None:
+        """Replace the in-memory catalogue data and refresh all browse tabs."""
+        selected_source = self._source_filter.currentData() or ""
+        selected_author = self._author_filter.currentData() or ""
+
+        CATALOGUE[:] = list(entries)
+        ALL_SOURCES[:] = sorted({e["source"] for e in CATALOGUE})
+
+        self._refresh_source_filter(ALL_SOURCES, selected_source)
+        self._refresh_author_filter(CATALOGUE, selected_author)
+
+        for tab, mod_type in zip(self._tab_contents, self._tab_mod_types):
+            tab_entries = CATALOGUE if mod_type is None else [e for e in CATALOGUE if e["type"] == mod_type]
+            tab.set_entries(tab_entries)
+
+        self._apply_filters()
 
     def _open_download_dialog(self):
         dlg = DownloadInstallDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _install_catalogue_entry(self, entry: dict):
         """Open the appropriate download dialog pre-filled from a catalogue entry."""
@@ -2579,7 +3775,6 @@ class BrowsePanel(BasePanel):
                     "Texture Packs panel to install it."
                 )
                 dlg.exec()
-                self.mod_installed.emit()
             else:
                 # No direct MEGA link — send user to the source page
                 msg = (
@@ -2627,7 +3822,6 @@ class BrowsePanel(BasePanel):
                 hint += f"\n\nSource page: {source_url}"
             dlg._status.setText(hint)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _prefill_dialog(self, dlg, entry: dict):
         """Prefill a DownloadInstallDialog with metadata from a catalogue entry."""
@@ -2651,12 +3845,10 @@ class BrowsePanel(BasePanel):
     def _open_pnach_github_dialog(self):
         dlg = PnachGitHubDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _open_gbatemp_scraper(self):
         dlg = GBATempScraperDialog(self.config, self._db, self)
         dlg.exec()
-        self.mod_installed.emit()
 
     def _open_cover_art_dialog(self):
         """Open the Cover Art download dialog from the toolbar."""
@@ -2700,9 +3892,32 @@ class BrowsePanel(BasePanel):
         dlg.exec()
 
     def _open_url(self, url: str):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(url))
+        return open_external_url(
+            url,
+            parent=self,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
+
+    def _copy_url(self, url: str):
+        url = (url or "").strip()
+        if not url:
+            self.emit_status("No link is available to copy for this entry.")
+            return False
+        try:
+            from PyQt6.QtWidgets import QApplication
+
+            clipboard = QApplication.clipboard()
+            if clipboard is None:
+                raise RuntimeError("clipboard unavailable")
+            clipboard.setText(url)
+        except Exception as exc:
+            logger.warning("Could not copy browse link %s: %s", url, exc)
+            self.emit_status("Could not copy the selected link.")
+            return False
+        self.emit_status("Copied the selected link to the clipboard.")
+        return True
 
     def _reload_catalogue(self):
         """Reload catalogue from disk, refresh filters and cards.
@@ -2714,23 +3929,17 @@ class BrowsePanel(BasePanel):
         import importlib
         import src.core.catalogue_loader as _cl
 
-        # Reload the module from disk so freshly-added JSON entries are picked up
-        # even if Python has already cached the old catalogue in memory.
-        importlib.reload(_cl)
-        new_entries = _cl.CATALOGUE
+        try:
+            # Reload the module from disk so freshly-added JSON entries are picked up
+            # even if Python has already cached the old catalogue in memory.
+            importlib.reload(_cl)
+        except Exception as exc:
+            logger.warning("Could not reload catalogue from disk: %s", exc)
+            self.emit_status(f"Could not reload catalogue: {exc}")
+            return
 
-        # Sync the module-level lists so all other references in this module
-        # see the updated data without needing to re-import.
-        _cl.CATALOGUE[:] = new_entries
-        _cl.ALL_SOURCES[:] = sorted({e["source"] for e in new_entries})
-
-        # Rebuild source filter options
-        self._source_filter.clear()
-        self._source_filter.addItem("All Sources", "")
-        for src in _cl.ALL_SOURCES:
-            self._source_filter.addItem(src, src)
-
-        self._clear_filters()
+        new_entries = list(_cl.CATALOGUE)
+        self._refresh_catalogue_data(new_entries)
         self.emit_status(f"Catalogue reloaded — {len(new_entries)} entries")
 
     def refresh(self):
@@ -2744,4 +3953,4 @@ class BrowsePanel(BasePanel):
         """
         if hasattr(self, "_search") and serial:
             self._search.setText(serial)
-            self._apply_filters()
+            self._on_search_timeout()

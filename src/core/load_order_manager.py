@@ -51,11 +51,14 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import json
 import os
 import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class LoadOrderManager:
@@ -85,13 +88,20 @@ class LoadOrderManager:
             return
         try:
             raw = json.loads(self._path.read_text(encoding="utf-8"))
+            if not isinstance(raw, dict):
+                logger.warning(
+                    "Failed to load load-order file %s: expected JSON object, got %s",
+                    self._path,
+                    type(raw).__name__,
+                )
+                return
             orders = raw.get("orders", {})
             if isinstance(orders, dict):
                 for serial, lst in orders.items():
                     if isinstance(lst, list):
                         self._orders[serial] = [str(x) for x in lst]
-        except (json.JSONDecodeError, TypeError):
-            pass
+        except (json.JSONDecodeError, TypeError) as exc:
+            logger.warning("Failed to load load-order file %s: %s", self._path, exc)
 
     def save(self) -> None:
         """Persist the current load orders to disk atomically."""
@@ -108,11 +118,16 @@ class LoadOrderManager:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 fh.write(payload)
             os.replace(tmp, str(self._path))
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to save load-order file %s: %s", self._path, exc)
             try:
                 os.unlink(tmp)
-            except OSError:
-                pass
+            except OSError as cleanup_exc:
+                logger.warning(
+                    "Could not remove temporary load-order file %s after save failure: %s",
+                    tmp,
+                    cleanup_exc,
+                )
             raise
 
     # ------------------------------------------------------------------
@@ -130,15 +145,29 @@ class LoadOrderManager:
     def set_order(self, serial: str, order: List[str]) -> None:
         """Replace the load order for *serial* with *order*.
 
-        Duplicate pack IDs in *order* are silently deduplicated while
-        preserving the first occurrence.
+        Duplicate pack IDs in *order* are deduplicated while preserving the
+        first occurrence. A warning is logged when duplicates are dropped so
+        the caller can surface the correction if needed.
         """
         seen: set = set()
         deduped: List[str] = []
+        dropped: List[str] = []
         for item in order:
             if item not in seen:
                 seen.add(item)
                 deduped.append(item)
+            else:
+                dropped.append(item)
+        if dropped:
+            preview = ", ".join(repr(item) for item in dropped[:5])
+            if len(dropped) > 5:
+                preview += ", ..."
+            logger.warning(
+                "Ignored %d duplicate pack id(s) while setting load order for %s: %s",
+                len(dropped),
+                serial,
+                preview,
+            )
         self._orders[serial] = deduped
 
     def add_pack(self, serial: str, pack_id: str) -> None:

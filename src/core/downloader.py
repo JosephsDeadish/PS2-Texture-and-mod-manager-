@@ -5,15 +5,19 @@ No copyrighted content is fetched — only metadata/thumbnails from
 open public APIs (GameTDB, GitHub, etc.) or user-provided URLs.
 """
 
+import logging
 import json
 import os
 import re
+import tempfile
 import threading
 import urllib.parse
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 # Common User-Agent header used across all requests from this module
 _USER_AGENT = "PS2ModManager/1.0 (+https://github.com/JosephsDeadish/PS2-Texture-and-mod-manager-)"
@@ -38,7 +42,8 @@ def convert_share_url(url: str) -> str:
 
     try:
         parsed = urllib.parse.urlparse(url)
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to inspect share URL %s: %s", url, exc)
         return url
 
     netloc = parsed.netloc.lower()
@@ -103,14 +108,26 @@ def download_file(
     Returns the destination path on success.
     Raises DownloadError on failure.
     """
+    if not isinstance(url, str) or not url.strip():
+        raise DownloadError(f"Invalid download URL: {url!r}")
+
     dest = Path(dest_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
 
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme not in ("http", "https"):
         raise DownloadError(f"Only http/https URLs are supported, got: {url!r}")
+    if not parsed.netloc:
+        raise DownloadError(f"Download URL must include a host, got: {url!r}")
+
+    def _remove_partial_file() -> None:
+        try:
+            dest.unlink(missing_ok=True)
+        except OSError as cleanup_exc:
+            logger.warning("Could not remove partial download %s: %s", dest, cleanup_exc)
 
     try:
+        dest.parent.mkdir(parents=True, exist_ok=True)
         with requests.get(
             url,
             stream=True,
@@ -124,33 +141,43 @@ def download_file(
             content_type = resp.headers.get("Content-Type", "").lower()
             content_disp = resp.headers.get("Content-Disposition", "").lower()
             has_attachment = "attachment" in content_disp
-            total = int(resp.headers.get("Content-Length", 0))
-            received = 0
+            content_length = resp.headers.get("Content-Length", 0)
             try:
-                with open(dest, "wb") as f:
-                    first_chunk = True
-                    for chunk in resp.iter_content(chunk_size=65536):
-                        if not chunk:
-                            continue
-                        if first_chunk:
-                            first_chunk = False
-                            if "text/html" in content_type and not has_attachment:
-                                if _looks_like_html(chunk):
-                                    raise DownloadError(
-                                        f"Server returned an HTML page instead of a file.\n"
-                                        f"The URL may require a login or the file may no longer be available.\n"
-                                        f"URL: {url}"
-                                    )
-                        f.write(chunk)
-                        received += len(chunk)
-                        if progress_callback:
-                            progress_callback(received, total)
-            except BaseException:
-                # Remove any partially-written file so callers never see a
-                # truncated download artifact.
-                dest.unlink(missing_ok=True)
-                raise
+                total = int(content_length)
+            except (TypeError, ValueError) as exc:
+                logger.warning("Invalid Content-Length for %s: %r (%s)", url, content_length, exc)
+                total = 0
+            received = 0
+            with open(dest, "wb") as f:
+                first_chunk = True
+                for chunk in resp.iter_content(chunk_size=65536):
+                    if not chunk:
+                        continue
+                    if first_chunk:
+                        first_chunk = False
+                        if not has_attachment and _looks_like_html(chunk):
+                            raise DownloadError(
+                                f"Server returned an HTML page instead of a file.\n"
+                                f"The URL may require a login or the file may no longer be available.\n"
+                                f"URL: {url}"
+                            )
+                    f.write(chunk)
+                    received += len(chunk)
+                    if progress_callback:
+                        progress_callback(received, total)
+            if received == 0:
+                raise DownloadError(
+                    f"Server returned an empty response instead of a file.\nURL: {url}"
+                )
     except requests.RequestException as exc:
+        logger.warning("Download failed for %s: %s", url, exc)
+        _remove_partial_file()
+        raise DownloadError(f"Download failed: {exc}") from exc
+    except Exception as exc:
+        logger.warning("Download failed for %s: %s", url, exc)
+        _remove_partial_file()
+        if isinstance(exc, DownloadError):
+            raise
         raise DownloadError(f"Download failed: {exc}") from exc
 
     return str(dest)
@@ -193,6 +220,11 @@ class AsyncDownloader:
                 if on_complete:
                     on_complete(path)
             except DownloadError as exc:
+                logger.warning("Async download failed for %s: %s", url, exc)
+                if on_error:
+                    on_error(str(exc))
+            except Exception as exc:
+                logger.warning("Unexpected async download failure for %s: %s", url, exc)
                 if on_error:
                     on_error(str(exc))
 
@@ -207,6 +239,12 @@ class AsyncDownloader:
         return self._thread is not None and self._thread.is_alive()
 
 
+def normalize_cover_serial(game_id: str) -> str:
+    """Return a filename-safe, dashed disc serial, or an empty string."""
+    match = re.fullmatch(r"([A-Z]{4})[-_]?([0-9]{5})", game_id.strip().upper())
+    return f"{match[1]}-{match[2]}" if match else ""
+
+
 def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Optional[str]:
     """
     Download cover art from GameTDB (https://www.gametdb.com) for *game_id*.
@@ -214,12 +252,26 @@ def fetch_gametdb_art(game_id: str, dest_dir: str, region: str = "EN") -> Option
     beyond what is publicly hosted by the service.
     Returns local path or None on failure.
     """
-    url = f"https://art.gametdb.com/ps2/cover/{region}/{game_id}.jpg"
-    dest = str(Path(dest_dir) / f"{game_id}.jpg")
     try:
-        download_file(url, dest, timeout=10)
+        serial = normalize_cover_serial(game_id)
+        region = {"JP": "JA", "EU": "EN"}.get(region.upper(), region.upper())
+        if not serial or region not in ("EN", "US", "JA", "KO", "ZHCN"):
+            raise ValueError("Invalid cover serial or region")
+        url = f"https://art.gametdb.com/ps2/cover/{region}/{serial.replace('-', '')}.jpg"
+        directory = Path(dest_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        dest = str(directory / f"{serial}.jpg")
+        # Stage beside the destination so failure cannot truncate an existing cover.
+        with tempfile.TemporaryDirectory(prefix=".ps2mm_cover_", dir=directory) as staging:
+            staged = str(Path(staging) / f"{serial}.jpg")
+            download_file(url, staged, timeout=10)
+            os.replace(staged, dest)
         return dest
-    except DownloadError:
+    except DownloadError as exc:
+        logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
+        return None
+    except Exception as exc:
+        logger.warning("Failed to fetch GameTDB art for %s: %s", game_id, exc)
         return None
 
 
@@ -229,9 +281,11 @@ def gametdb_cover_url(serial: str) -> str:
     Infers the correct region code from the serial prefix so callers do not
     need to know the region:
 
-    * ``SLUS`` / ``SCUS`` → ``US``
-    * ``SLES`` / ``SCES`` / ``SLEH`` / ``SCEH`` → ``EN``
-    * ``SLPS`` / ``SCPS`` / ``SLPM`` / ``SCPM`` → ``JA``
+    * ``SLUS`` / ``SCUS`` / ``SLCD`` / ``SCCD`` → ``US``
+    * ``SLES`` / ``SCES`` / ``SLEH`` / ``SCEH`` / ``SLED`` / ``SCED`` → ``EN``
+    * ``SLPS`` / ``SCPS`` / ``SLPM`` / ``SCPM`` / ``SLPD`` / ``SCPD`` → ``JA``
+    * ``SLAJ`` / ``SCAJ`` → ``ZHCN``
+    * ``SLKA`` / ``SCKA`` → ``KO``
     * Everything else → ``US`` (safe fallback)
 
     The serial is stripped of hyphens/underscores to match GameTDB's filename
@@ -246,11 +300,11 @@ def gametdb_cover_url(serial: str) -> str:
         return ""
     clean = serial.upper().replace("-", "").replace("_", "")
     prefix = clean[:4]
-    if prefix in ("SLUS", "SCUS"):
+    if prefix in ("SLUS", "SCUS", "SLCD", "SCCD"):
         region = "US"
-    elif prefix in ("SLES", "SCES", "SLEH", "SCEH"):
+    elif prefix in ("SLES", "SCES", "SLEH", "SCEH", "SLED", "SCED"):
         region = "EN"
-    elif prefix in ("SLPS", "SCPS", "SLPM", "SCPM"):
+    elif prefix in ("SLPS", "SCPS", "SLPM", "SCPM", "SLPD", "SCPD"):
         region = "JA"
     elif prefix in ("SLKA", "SCKA"):
         region = "KO"
@@ -274,7 +328,7 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
     GameTDB is a free, community-maintained database (https://www.gametdb.com).
 
     Returns the game title string, or ``""`` on any error or if not found.
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     if not serial:
         return ""
@@ -288,6 +342,11 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to look up GameTDB title for %s: HTTP %s",
+                serial_clean,
+                resp.status_code,
+            )
             return ""
         # Parse game title from HTML (GameTDB page title follows pattern "<title>SERIAL - Game Title | GameTDB</title>")
         import re
@@ -297,8 +356,10 @@ def lookup_game_title_online(serial: str, timeout: int = 5) -> str:
             # Filter out "GameTDB" itself
             if title and title.lower() not in ("gametdb", "ps2", ""):
                 return title
+        logger.warning("Failed to parse GameTDB title for %s", serial_clean)
         return ""
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up GameTDB title for %s: %s", serial_clean, exc)
         return ""
 
 
@@ -320,7 +381,7 @@ _PCSX2_WS_RAW = (
 )
 
 
-def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
+def list_pcsx2_widescreen_patches(timeout: int = 10, *, strict: bool = False) -> List[Dict]:
     """
     Fetch the list of available widescreen PNACH patches from the official
     PCSX2 GitHub repository (``bin/cheats_ws/``).
@@ -330,8 +391,10 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
         ``filename``     — e.g. ``F0A235B4.pnach``
         ``download_url`` — direct raw download URL
 
-    Returns an empty list on any network error.
-    This function is designed to be called from a background thread.
+    Returns an empty list on any network error. Unexpected errors are logged
+    and suppressed.
+    Set *strict* to raise DownloadError instead, distinguishing an unavailable
+    index from an empty one. Designed to be called from a background thread.
     """
     try:
         resp = requests.get(
@@ -339,12 +402,17 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
             timeout=timeout,
             headers=_GITHUB_HEADERS,
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            raise DownloadError(f"GitHub returned HTTP {resp.status_code}")
         entries = resp.json()
+        if not isinstance(entries, list):
+            raise DownloadError("GitHub returned an invalid patch index")
         result = []
         for entry in entries:
+            if not isinstance(entry, dict):
+                raise DownloadError("GitHub returned an invalid patch entry")
             name = entry.get("name", "")
-            if name.lower().endswith(".pnach"):
+            if isinstance(name, str) and re.fullmatch(r"[0-9a-fA-F]{8}\.pnach", name, re.IGNORECASE):
                 crc = name[:-6].upper()
                 result.append({
                     "crc": crc,
@@ -355,7 +423,10 @@ def list_pcsx2_widescreen_patches(timeout: int = 10) -> List[Dict]:
                     ),
                 })
         return result
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to list PCSX2 widescreen patches: %s", exc)
+        if strict:
+            raise DownloadError(f"Could not fetch patch index: {exc}") from exc
         return []
 
 
@@ -368,28 +439,39 @@ def download_pcsx2_widescreen_patch(crc: str, dest_dir: str, timeout: int = 15) 
     Returns the local file path on success, or ``None`` on failure.
     """
     crc_upper = crc.upper().strip()
+    if not re.fullmatch(r"[0-9A-F]{8}", crc_upper):
+        raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
     filename = f"{crc_upper}.pnach"
     url = f"{_PCSX2_WS_RAW}{filename}"
     dest = str(Path(dest_dir) / filename)
     try:
         download_file(url, dest, timeout=timeout)
         return dest
-    except DownloadError:
+    except DownloadError as exc:
+        logger.warning("Failed to download PCSX2 widescreen patch %s: %s", crc_upper, exc)
         return None
 
 
 def search_pcsx2_patches_by_crc(
     crc: str,
     timeout: int = 10,
+    *,
+    strict: bool = False,
 ) -> Optional[Dict]:
     """
     Check whether a widescreen PNACH exists in the PCSX2 GitHub repository
     for the given 8-digit CRC.
 
     Returns a dict ``{"crc": ..., "filename": ..., "download_url": ...}``
-    if found, or ``None`` if not found or on network error.
+    if found, or ``None`` if not found or on network error. Unexpected errors
+    are logged and suppressed. With *strict*, only a confirmed HTTP 404 returns
+    None; invalid input and network/API failures raise DownloadError.
     """
     crc_upper = crc.upper().strip()
+    if not re.fullmatch(r"[0-9A-F]{8}", crc_upper):
+        if strict:
+            raise DownloadError("A patch CRC must contain exactly 8 hexadecimal digits")
+        return None
     filename = f"{crc_upper}.pnach"
     url = f"{_PCSX2_WS_RAW}{filename}"
     try:
@@ -401,8 +483,13 @@ def search_pcsx2_patches_by_crc(
                 "filename": filename,
                 "download_url": url,
             }
+        if resp.status_code != 404:
+            raise DownloadError(f"GitHub returned HTTP {resp.status_code}")
         return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to check PCSX2 patch for %s: %s", crc_upper, exc)
+        if strict:
+            raise DownloadError(f"Could not check CRC {crc_upper}: {exc}") from exc
         return None
 
 
@@ -436,7 +523,7 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
     page could not be fetched, no link was found, or *page_url* is not a
     MediaFire file page.
 
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     if not page_url:
         return None
@@ -448,7 +535,8 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         if "/file/" not in _parsed.path.lower():
             return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve MediaFire URL %s: %s", page_url, exc)
         return None
     try:
         resp = requests.get(
@@ -458,6 +546,11 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to resolve MediaFire URL %s: HTTP %s",
+                page_url,
+                resp.status_code,
+            )
             return None
         html = resp.text
 
@@ -475,8 +568,10 @@ def resolve_mediafire_url(page_url: str, timeout: int = 15) -> Optional[str]:
         if m2:
             return m2.group(1)
 
+        logger.warning("Failed to resolve MediaFire URL %s: no download link found", page_url)
         return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve MediaFire URL %s: %s", page_url, exc)
         return None
 
 
@@ -490,7 +585,7 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
 
     Uses Yandex's public API endpoint to obtain a temporary direct download
     ``href``. Returns ``None`` when the URL is not a supported Yandex share
-    page or cannot be resolved.
+    page or cannot be resolved. Unexpected errors are logged and suppressed.
     """
     if not page_url:
         return None
@@ -501,7 +596,8 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             return None
         if "/d/" not in parsed.path.lower() and "/i/" not in parsed.path.lower():
             return None
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
         return None
     try:
         api = "https://cloud-api.yandex.net/v1/disk/public/resources/download"
@@ -513,14 +609,25 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: HTTP %s",
+                page_url,
+                resp.status_code,
+            )
             return None
         data = resp.json()
         href = data.get("href", "")
         if not (isinstance(href, str) and href.startswith(("http://", "https://"))):
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: unusable href %r",
+                page_url,
+                href,
+            )
             return None
         try:
             href_netloc = urllib.parse.urlparse(href).netloc.lower()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
             return None
         if not (
             href_netloc.endswith(".yandex.ru")
@@ -528,9 +635,15 @@ def resolve_yandex_disk_url(page_url: str, timeout: int = 15) -> Optional[str]:
             or href_netloc == "yandex.ru"
             or href_netloc == "yandex.net"
         ):
+            logger.warning(
+                "Failed to resolve Yandex Disk URL %s: untrusted href %s",
+                page_url,
+                href,
+            )
             return None
         return href
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to resolve Yandex Disk URL %s: %s", page_url, exc)
         return None
 
 
@@ -643,7 +756,7 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
     * **source_url** — echoes back *thread_url*
 
     Returns a dict with the above keys (all empty/empty-list on failure).
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     result: Dict = {
         "title": "",
@@ -662,6 +775,11 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to scrape GBAtemp page %s: HTTP %s",
+                thread_url,
+                resp.status_code,
+            )
             return result
         html = resp.text
 
@@ -674,6 +792,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
         )
         if m:
             result["title"] = re.sub(r"<[^>]+>", "", m.group(1)).strip()
+        if not result["title"]:
+            logger.warning("Failed to parse GBAtemp page title for %s", thread_url)
 
         # ── Author name ─────────────────────────────────────────────────────
         # XenForo: itemprop="name" inside first message — works for threads
@@ -771,8 +891,8 @@ def scrape_gbatemp_thread(thread_url: str, timeout: int = 15) -> Dict:
                 result["game_serial"] = m_ser.group(1).upper()
                 break
 
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to scrape GBAtemp page %s: %s", thread_url, exc)
 
     return result
 
@@ -794,7 +914,7 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
     * **source_url** — echoes back *post_url*
 
     Returns a dict with the above keys (all empty/empty-list on failure).
-    This function never raises; all errors are silently suppressed.
+    This function never raises; unexpected errors are logged and suppressed.
     """
     result: Dict = {
         "title": "",
@@ -813,6 +933,11 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
             allow_redirects=True,
         )
         if resp.status_code != 200:
+            logger.warning(
+                "Failed to scrape PS2-Home post %s: HTTP %s",
+                post_url,
+                resp.status_code,
+            )
             return result
         html = resp.text
 
@@ -834,6 +959,8 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 if " - " in raw:
                     raw = raw.split(" - ", 1)[-1].strip()
                 result["title"] = raw
+        if not result["title"]:
+            logger.warning("Failed to parse PS2-Home post title for %s", post_url)
 
         # ── Author (first post) ─────────────────────────────────────────────
         # phpBB: <p class="author"> or <strong class="postauthor">
@@ -900,7 +1027,7 @@ def scrape_ps2home_post(post_url: str, timeout: int = 15) -> Dict:
                 result["game_serial"] = m_ser.group(1).upper()
                 break
 
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to scrape PS2-Home post %s: %s", post_url, exc)
 
     return result

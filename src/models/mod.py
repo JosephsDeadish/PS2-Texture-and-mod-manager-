@@ -122,6 +122,16 @@ class AppConfig:
     show_paid: bool = False
     show_account_required: bool = False
     show_incomplete: bool = True
+    browse_query: str = ""
+    browse_source_filter: str = ""
+    browse_author_filter: str = ""
+    browse_favorites_only: bool = False
+    browse_sort_mode: str = "featured"
+    browse_selected_tab: int = 0
+    download_history_status_filter: str = "All"
+    download_history_type_filter: str = "All"
+    download_history_serial_filter: str = ""
+    ui_state: dict = field(default_factory=dict)
     tooltip_mode: str = "normal"  # "normal", "dumbed_down", "no_filter"
 
     def to_dict(self) -> dict:
@@ -144,6 +154,16 @@ class AppConfig:
             "show_paid": self.show_paid,
             "show_account_required": self.show_account_required,
             "show_incomplete": self.show_incomplete,
+            "browse_query": self.browse_query,
+            "browse_source_filter": self.browse_source_filter,
+            "browse_author_filter": self.browse_author_filter,
+            "browse_favorites_only": self.browse_favorites_only,
+            "browse_sort_mode": self.browse_sort_mode,
+            "browse_selected_tab": self.browse_selected_tab,
+            "download_history_status_filter": self.download_history_status_filter,
+            "download_history_type_filter": self.download_history_type_filter,
+            "download_history_serial_filter": self.download_history_serial_filter,
+            "ui_state": self.ui_state,
             "tooltip_mode": self.tooltip_mode,
         }
 

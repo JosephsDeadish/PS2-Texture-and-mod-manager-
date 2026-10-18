@@ -1,8 +1,10 @@
 """Import and Edit Mod Metadata dialogs for PS2 Mod Manager."""
 
+import logging
 from pathlib import Path
+from urllib.parse import urlparse
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -21,7 +23,54 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.config_manager import save_config, ui_state_bucket
 from src.models.mod import ModInfo, ModType
+
+logger = logging.getLogger(__name__)
+
+
+_REPLACEMENT_HINT_TEXT = (
+    "⚠  This pack uses a folder named 'replacement'.\n"
+    "Enter the Game ID (e.g. SLUS-21228) so PS2 Mod Manager can\n"
+    "automatically place files in the correct PCSX2 location:\n"
+    "  textures/<SERIAL>/replacements/"
+)
+
+
+def _import_validation_problem(
+    mod_type: ModType, source: str, game_id: str, source_url: str,
+) -> tuple[str, str] | None:
+    if not source:
+        return "No Source", "Please select a source folder or file."
+    try:
+        exists = Path(source).exists()
+    except OSError as exc:
+        logger.warning("Could not inspect import source %s: %s", source, exc)
+        return "Source Unavailable", "The selected source cannot be inspected. Please choose it again."
+    if not exists:
+        return (
+            "Missing Source",
+            "The selected source folder or file no longer exists.\nPlease choose it again.",
+        )
+    if mod_type == ModType.TEXTURE_PACK:
+        from src.core.game_registry import is_valid_serial
+        if not is_valid_serial(game_id):
+            return (
+                "Game ID Required",
+                "Texture packs need a valid PS2 serial so PCSX2 can place the files correctly.",
+            )
+    if source_url:
+        try:
+            parsed = urlparse(source_url)
+            valid_url = parsed.scheme in ("http", "https") and bool(parsed.netloc)
+        except ValueError:
+            valid_url = False
+        if not valid_url:
+            return (
+                "Invalid Source URL",
+                "Please enter a valid http(s) source page URL, or leave the field blank.",
+            )
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -47,9 +96,18 @@ class ImportModDialog(QDialog):
         self._build()
 
     def _build(self):
-        layout = QVBoxLayout(self)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(20, 20, 20, 20)
+        root.setSpacing(10)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        body = QWidget()
+        layout = QVBoxLayout(body)
         layout.setSpacing(14)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(0, 0, 0, 0)
+        scroll.setWidget(body)
+        root.addWidget(scroll, 1)
 
         # ---- Header ----
         header = QLabel(f"{_type_icon(self.mod_type)}  Import {_type_label(self.mod_type)}")
@@ -76,7 +134,8 @@ class ImportModDialog(QDialog):
             folder_btn.clicked.connect(self._choose_folder)
             src_row.addWidget(folder_btn)
 
-        archive_btn = QPushButton("📦 Archive (.zip/.7z)")
+        archive_btn = QPushButton("📦 Archive")
+        archive_btn.setToolTip("Choose a ZIP, 7z, RAR, or supported split archive part")
         archive_btn.clicked.connect(self._choose_archive)
         src_row.addWidget(archive_btn)
 
@@ -120,12 +179,7 @@ class ImportModDialog(QDialog):
         form.addRow(game_id_label, self._gameid_edit)
 
         # Hint shown when a "replacement" folder pattern is detected
-        self._replacement_hint = QLabel(
-            "⚠  This pack uses a folder named 'replacement'.\n"
-            "Enter the Game ID (e.g. SLUS-21228) so PS2 Mod Manager can\n"
-            "automatically place files in the correct PCSX2 location:\n"
-            "  textures/<SERIAL>/replacements/"
-        )
+        self._replacement_hint = QLabel(_REPLACEMENT_HINT_TEXT)
         self._replacement_hint.setStyleSheet(
             "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
             "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
@@ -175,26 +229,73 @@ class ImportModDialog(QDialog):
 
         layout.addStretch()
 
+        self._readiness_lbl = QLabel()
+        self._readiness_lbl.setWordWrap(True)
+        self._readiness_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        root.addWidget(self._readiness_lbl)
+
         # ---- Buttons ----
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
-        btns.button(QDialogButtonBox.StandardButton.Ok).setText("Import →")
-        btns.button(QDialogButtonBox.StandardButton.Ok).setObjectName("primary_btn")
+        self._import_btn = btns.button(QDialogButtonBox.StandardButton.Ok)
+        self._import_btn.setText("Import →")
+        self._import_btn.setObjectName("primary_btn")
         btns.accepted.connect(self._accept)
         btns.rejected.connect(self.reject)
-        layout.addWidget(btns)
+        root.addWidget(btns)
+        for field in (self._src_edit, self._gameid_edit, self._url_edit):
+            field.textChanged.connect(self._update_import_state)
+        self._update_import_state()
+
+    def _update_import_state(self, *_args):
+        problem = _import_validation_problem(
+            self.mod_type, self._src_edit.text().strip(),
+            self._gameid_edit.text().strip(), self._url_edit.text().strip(),
+        )
+        self._import_btn.setEnabled(problem is None)
+        self._readiness_lbl.setText(
+            problem[1] if problem else "✅ Ready to import. Your original source files will be kept."
+        )
+        self._readiness_lbl.setStyleSheet(
+            f"color: {'#e0a040' if problem else '#60c090'}; font-size: 12px;"
+        )
 
     # ------------------------------------------------------------------
     # Source pickers
     # ------------------------------------------------------------------
 
+    def _dialog_config(self):
+        parent = self.parent()
+        return getattr(parent, "config", None)
+
+    def _last_paths_bucket(self) -> dict:
+        config = self._dialog_config()
+        if config is None:
+            return {}
+        return ui_state_bucket(config, "last_paths")
+
+    def _remember_last_path(self, key: str, path: str) -> None:
+        config = self._dialog_config()
+        if config is None:
+            return
+        ui_state_bucket(config, "last_paths")[key] = path
+        try:
+            save_config(config)
+        except Exception as exc:
+            logger.warning("Could not save import dialog state after %s: %s", key, exc)
+
     def _choose_folder(self):
+        last_paths = self._last_paths_bucket()
         d = QFileDialog.getExistingDirectory(
-            self, f"Select {_type_label(self.mod_type)} Folder"
+            self,
+            f"Select {_type_label(self.mod_type)} Folder",
+            last_paths.get("import_folder", ""),
         )
         if d:
+            self._multipart_hint.hide()
             self._src_edit.setText(d)
+            self._remember_last_path("import_folder", d)
             # Auto-fill name from folder
             if not self._name_edit.text():
                 self._name_edit.setText(Path(d).name)
@@ -205,14 +306,16 @@ class ImportModDialog(QDialog):
                 self._check_replacement_pattern(d)
 
     def _choose_archive(self):
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getOpenFileName(
             self,
             f"Select {_type_label(self.mod_type)} Archive",
-            "",
-            "Archives (*.zip *.7z *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;All Files (*)",
+            last_paths.get("import_archive", ""),
+            "Archives (*.zip *.7z *.rar *.z01 *.001);;ZIP Files (*.zip);;7z Files (*.7z);;RAR Files (*.rar);;All Files (*)",
         )
         if path:
             self._src_edit.setText(path)
+            self._remember_last_path("import_archive", str(Path(path).parent))
             if not self._name_edit.text():
                 # Strip extension for default name; handle .7z.001 → stem up to first .7z
                 stem = Path(path).stem
@@ -232,11 +335,14 @@ class ImportModDialog(QDialog):
         ext_filter = _TYPE_META.get(self.mod_type, {}).get(
             "ext_filter", "All Files (*)"
         )
+        last_paths = self._last_paths_bucket()
         path, _ = QFileDialog.getOpenFileName(
-            self, f"Select {_type_label(self.mod_type)}", "", ext_filter
+            self, f"Select {_type_label(self.mod_type)}", last_paths.get("import_file", ""), ext_filter
         )
         if path:
+            self._multipart_hint.hide()
             self._src_edit.setText(path)
+            self._remember_last_path("import_file", str(Path(path).parent))
             if not self._name_edit.text():
                 self._name_edit.setText(Path(path).stem)
             # Auto-detect game serial
@@ -292,8 +398,16 @@ class ImportModDialog(QDialog):
                         QTimer.singleShot(0, _update)
 
                     threading.Thread(target=_online_lookup, daemon=True).start()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Could not inspect import source %s: %s", path, exc)
+            self._gameid_edit.setToolTip(
+                "Could not inspect the selected source path. Enter the Game ID manually."
+            )
+            self._gameid_edit.setPlaceholderText("Could not inspect source path")
+            self._gameid_edit.setStyleSheet(
+                "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
+                "border-radius: 4px; padding: 6px 8px;"
+            )
 
     def _check_replacement_pattern(self, path: str) -> None:
         """Show a hint if the selected path looks like a 'replacement'-named pack.
@@ -307,6 +421,7 @@ class ImportModDialog(QDialog):
         if not hasattr(self, '_replacement_hint'):
             return  # hint widget not built (shouldn't happen for TEXTURE_PACK)
 
+        self._replacement_hint.setText(_REPLACEMENT_HINT_TEXT)
         needs_hint = False
         p = Path(path)
 
@@ -329,8 +444,18 @@ class ImportModDialog(QDialog):
                     top_names = {n.split("/")[0].lower() for n in names}
                     if "replacement" in top_names or "replacements" in top_names:
                         needs_hint = True
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Could not inspect archive %s for replacement folders: %s", p, exc)
+                self._replacement_hint.setStyleSheet(
+                    "background: #1a1000; color: #e0a040; border: 1px solid #604010;"
+                    "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+                )
+                self._replacement_hint.setText(
+                    "⚠  Could not inspect this archive for replacement folders.\n"
+                    "If this is a texture pack, please verify the archive contents manually or select the extracted folder."
+                )
+                self._replacement_hint.show()
+                return
 
         if needs_hint:
             self._replacement_hint.show()
@@ -358,17 +483,40 @@ class ImportModDialog(QDialog):
         try:
             from src.core.archive import (
                 is_multipart_archive,
-                find_multipart_parts,
                 check_multipart_completeness,
             )
-        except ImportError:
+        except ImportError as exc:
+            logger.warning("Could not import archive helpers for multipart detection: %s", exc)
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+            self._multipart_hint.setText(
+                "⚠  Could not inspect this archive for multipart parts.\n"
+                "If this is a split archive, make sure all parts are in the same folder."
+            )
+            self._multipart_hint.show()
             return
 
-        if not is_multipart_archive(path):
-            self._multipart_hint.hide()
+        try:
+            if not is_multipart_archive(path):
+                self._multipart_hint.hide()
+                return
+
+            is_complete, parts, missing = check_multipart_completeness(path)
+        except Exception as exc:
+            logger.warning("Could not inspect multipart archive %s: %s", path, exc)
+            self._multipart_hint.setStyleSheet(
+                "background: #1a0800; color: #e09040; border: 1px solid #604020;"
+                "border-radius: 4px; padding: 6px 8px; font-size: 11px;"
+            )
+            self._multipart_hint.setText(
+                "⚠  Could not inspect this archive for multipart parts.\n"
+                "If this looks like a split archive, make sure all parts are in the same folder."
+            )
+            self._multipart_hint.show()
             return
 
-        is_complete, parts, missing = check_multipart_completeness(path)
         count = len(parts)
 
         part_names = [Path(p).name for p in parts]
@@ -417,18 +565,23 @@ class ImportModDialog(QDialog):
 
     def _accept(self):
         """Collect metadata and accept the dialog."""
-        if not self._src_edit.text():
+        source = self._src_edit.text().strip()
+        game_id = self._gameid_edit.text().strip()
+        source_url = self._url_edit.text().strip()
+        problem = _import_validation_problem(self.mod_type, source, game_id, source_url)
+        if problem:
             from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "No Source", "Please select a source folder or file.")
+            QMessageBox.warning(self, *problem)
             return
-        self.source_path = self._src_edit.text()
+
+        self.source_path = source
         self.meta = {
             "name": self._name_edit.text().strip(),
             "author": self._author_edit.text().strip(),
             "version": self._version_edit.text().strip(),
-            "game_id": self._gameid_edit.text().strip(),
+            "game_id": game_id,
             "description": self._desc_edit.toPlainText().strip(),
-            "source_url": self._url_edit.text().strip(),
+            "source_url": source_url,
         }
         self.accept()
 
@@ -437,16 +590,28 @@ class ImportModDialog(QDialog):
 # Edit Mod Metadata Dialog
 # ---------------------------------------------------------------------------
 
+class _ThumbnailResult(QObject):
+    finished = pyqtSignal(str, str, str)
+
+
 class EditModDialog(QDialog):
     """Dialog for editing an existing mod's metadata fields."""
 
-    def __init__(self, mod: ModInfo, parent=None):
+    def __init__(self, mod: ModInfo, parent=None, *, save_callback=None):
         super().__init__(parent)
         self.mod = mod
+        self._save_callback = save_callback
+        self._dialog_closed = False
+        self._fetching_game_id = ""
+        self._discard_thumbnail_result = False
+        self._fetched_thumbnail = ""
+        self._fetched_game_id = ""
         self.setWindowTitle(f"Edit — {mod.name}")
-        self.setMinimumSize(520, 420)
+        self.resize(560, 560)
         self.updated_meta: dict = {}
         self._build()
+        self._original_meta = self._draft()
+        self._update_readiness()
 
     def _build(self):
         layout = QVBoxLayout(self)
@@ -461,6 +626,13 @@ class EditModDialog(QDialog):
         sep.setFrameShape(QFrame.Shape.HLine)
         layout.addWidget(sep)
 
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        content = QWidget()
+        body = QVBoxLayout(content)
+        scroll.setWidget(content)
+        layout.addWidget(scroll, 1)
         form = QFormLayout()
         form.setSpacing(10)
         form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
@@ -481,15 +653,16 @@ class EditModDialog(QDialog):
             from src.core.game_registry import serial_to_display
             if self.mod.game_id:
                 self._gameid_edit.setToolTip(serial_to_display(self.mod.game_id))
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.warning("Could not import game registry for edit dialog: %s", exc)
         form.addRow("Game ID:", self._gameid_edit)
 
         self._tags_edit = QLineEdit(", ".join(self.mod.tags))
         self._tags_edit.setPlaceholderText("comma-separated tags")
         form.addRow("Tags:", self._tags_edit)
 
-        self._desc_edit = QTextEdit(self.mod.description)
+        self._desc_edit = QTextEdit()
+        self._desc_edit.setPlainText(self.mod.description)
         self._desc_edit.setMaximumHeight(90)
         form.addRow("Description:", self._desc_edit)
 
@@ -497,7 +670,7 @@ class EditModDialog(QDialog):
         self._url_edit.setPlaceholderText("https://…")
         form.addRow("Source URL:", self._url_edit)
 
-        layout.addLayout(form)
+        body.addLayout(form)
 
         # Thumbnail refresh
         thumb_row = QHBoxLayout()
@@ -512,63 +685,161 @@ class EditModDialog(QDialog):
         thumb_row.addStretch()
 
         self._fetch_thumb_btn = QPushButton("🖼 Fetch from GameTDB")
-        self._fetch_thumb_btn.setEnabled(bool(self._gameid_edit.text()))
-        self._gameid_edit.textChanged.connect(
-            lambda t: self._fetch_thumb_btn.setEnabled(bool(t))
-        )
         self._fetch_thumb_btn.clicked.connect(self._fetch_thumbnail)
         thumb_row.addWidget(self._fetch_thumb_btn)
 
-        layout.addLayout(thumb_row)
+        body.addLayout(thumb_row)
 
         self._thumb_status_lbl = QLabel("")
         self._thumb_status_lbl.setStyleSheet("color: #7070a0; font-size: 11px;")
-        layout.addWidget(self._thumb_status_lbl)
+        self._thumb_status_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        self._thumb_status_lbl.setWordWrap(True)
+        body.addWidget(self._thumb_status_lbl)
+        body.addStretch()
 
-        layout.addStretch()
+        self._readiness_lbl = QLabel()
+        self._readiness_lbl.setWordWrap(True)
+        self._readiness_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addWidget(self._readiness_lbl)
+        self._revert_btn = QPushButton("Revert Changes")
+        self._revert_btn.clicked.connect(self._revert)
+        layout.addWidget(self._revert_btn)
 
         btns = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
         )
-        btns.button(QDialogButtonBox.StandardButton.Save).setObjectName("primary_btn")
+        self._save_btn = btns.button(QDialogButtonBox.StandardButton.Save)
+        self._save_btn.setObjectName("primary_btn")
         btns.accepted.connect(self._save)
         btns.rejected.connect(self.reject)
         layout.addWidget(btns)
+        for edit in (
+            self._name_edit, self._author_edit, self._version_edit, self._gameid_edit,
+            self._tags_edit, self._url_edit,
+        ):
+            edit.textChanged.connect(self._update_readiness)
+        self._desc_edit.textChanged.connect(self._update_readiness)
+
+    def _draft(self):
+        from src.core.game_registry import is_valid_serial, normalise_serial
+        game_id = self._gameid_edit.text().strip()
+        if is_valid_serial(game_id):
+            game_id = normalise_serial(game_id)
+        tags = list(dict.fromkeys(
+            tag.strip() for tag in self._tags_edit.text().split(",") if tag.strip()
+        ))
+        return {
+            "name": self._name_edit.text().strip(),
+            "author": self._author_edit.text().strip(),
+            "version": self._version_edit.text().strip(),
+            "game_id": game_id,
+            "description": self._desc_edit.toPlainText().strip(),
+            "source_url": self._url_edit.text().strip(),
+            "tags": tags,
+        }
+
+    def _validation_problem(self, draft):
+        from src.core.game_registry import is_valid_serial
+        if not draft["name"]:
+            return "Name Required", "Enter a mod name."
+        if self.mod.mod_type == ModType.TEXTURE_PACK and not is_valid_serial(draft["game_id"]):
+            return "Game ID Required", "Texture packs need a valid PS2 serial, e.g. SLUS-20062."
+        if draft["source_url"]:
+            try:
+                parsed = urlparse(draft["source_url"])
+                valid = (
+                    parsed.scheme in ("http", "https") and bool(parsed.hostname)
+                    and parsed.username is None and parsed.password is None
+                )
+                parsed.port
+            except ValueError:
+                valid = False
+            if not valid:
+                return "Invalid Source URL", "Enter a valid http(s) source page URL without credentials, or leave it blank."
+        return None
+
+    def _update_readiness(self, *_):
+        from src.core.game_registry import is_valid_serial
+        draft = self._draft()
+        if self._fetching_game_id and draft["game_id"] != self._fetching_game_id:
+            self._discard_thumbnail_result = True
+        if draft["game_id"] != self._fetched_game_id:
+            if self._fetched_thumbnail:
+                self._thumb_status_lbl.setText("Game ID changed; fetched thumbnail cleared.")
+            self._fetched_thumbnail = ""
+        problem = self._validation_problem(draft)
+        dirty = draft != self._original_meta or bool(self._fetched_thumbnail)
+        self._save_btn.setEnabled(dirty and problem is None)
+        self._revert_btn.setEnabled(dirty)
+        self._fetch_thumb_btn.setEnabled(
+            not self._fetching_game_id and is_valid_serial(draft["game_id"])
+        )
+        self._readiness_lbl.setText(
+            problem[1] if problem else "Unsaved changes — ready to save." if dirty else "No unsaved changes."
+        )
+
+    def _revert(self):
+        self._discard_thumbnail_result = True
+        for field, edit in (
+            ("name", self._name_edit), ("author", self._author_edit),
+            ("version", self._version_edit), ("game_id", self._gameid_edit),
+            ("source_url", self._url_edit),
+        ):
+            edit.setText(self._original_meta[field])
+        self._tags_edit.setText(", ".join(self._original_meta["tags"]))
+        self._desc_edit.setPlainText(self._original_meta["description"])
+        self._fetched_thumbnail = ""
+        self._fetched_game_id = ""
+        self._thumb_status_lbl.clear()
+        self._update_readiness()
 
     def _fetch_thumbnail(self):
-        game_id = self._gameid_edit.text().strip()
-        if not game_id:
+        from src.core.game_registry import is_valid_serial
+        game_id = self._draft()["game_id"]
+        if self._fetching_game_id or not is_valid_serial(game_id):
             return
+        self._fetching_game_id = game_id
+        self._discard_thumbnail_result = False
         self._fetch_thumb_btn.setEnabled(False)
-        self._thumb_status_lbl.setText("Fetching…")
-        self._dialog_closed = False
+        self._thumb_status_lbl.setText(
+            "Fetching… You can save metadata now; a pending image will not be kept."
+        )
 
         import threading
-        import weakref
-        from PyQt6.QtCore import QTimer
         from src.core.downloader import fetch_gametdb_art
         import src.core.config_manager as _cfg
 
-        self_ref = weakref.ref(self)
+        # No dialog parent: the worker must keep this relay alive after close.
+        result = _ThumbnailResult()
+        result.finished.connect(self._on_thumbnail_finished)
 
         def _run():
-            path = fetch_gametdb_art(game_id, str(_cfg.THUMBNAILS_DIR))
-
-            def _update():
-                dlg = self_ref()
-                if dlg is None or getattr(dlg, "_dialog_closed", True):
-                    return
-                if path:
-                    dlg._thumb_status_lbl.setText(f"✅ Saved: {path}")
-                    dlg._fetched_thumbnail = path
-                else:
-                    dlg._thumb_status_lbl.setText("❌ Not found on GameTDB")
-                dlg._fetch_thumb_btn.setEnabled(True)
-
-            QTimer.singleShot(0, _update)
-
-        self._fetched_thumbnail = ""
+            error = ""
+            try:
+                path = fetch_gametdb_art(game_id.replace("-", ""), str(_cfg.THUMBNAILS_DIR)) or ""
+            except Exception as exc:
+                logger.warning("Could not fetch edit-dialog thumbnail for %s: %s", game_id, exc)
+                path, error = "", str(exc)
+            result.finished.emit(game_id, path, error)
+            result.deleteLater()
         threading.Thread(target=_run, daemon=True).start()
+
+    @pyqtSlot(str, str, str)
+    def _on_thumbnail_finished(self, game_id, path, error):
+        if self._dialog_closed:
+            return
+        self._fetching_game_id = ""
+        if self._discard_thumbnail_result or game_id != self._draft()["game_id"]:
+            self._thumb_status_lbl.setText("Thumbnail result ignored after edits or Revert.")
+        elif path:
+            self._fetched_thumbnail = path
+            self._fetched_game_id = game_id
+            self._thumb_status_lbl.setText("Thumbnail ready — Save to keep this image.")
+        else:
+            self._thumb_status_lbl.setText(
+                f"Thumbnail fetch failed: {error}" if error else "No image found on GameTDB. You can retry."
+            )
+        self._update_readiness()
 
     def closeEvent(self, event):
         """Mark dialog as closed so background thumbnail fetch won't touch widgets."""
@@ -584,21 +855,23 @@ class EditModDialog(QDialog):
         super().accept()
 
     def _save(self):
-        tags_raw = self._tags_edit.text().strip()
-        tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
-        self.updated_meta = {
-            "name": self._name_edit.text().strip() or self.mod.name,
-            "author": self._author_edit.text().strip(),
-            "version": self._version_edit.text().strip(),
-            "game_id": self._gameid_edit.text().strip(),
-            "description": self._desc_edit.toPlainText().strip(),
-            "source_url": self._url_edit.text().strip(),
-            "tags": tags,
-        }
-        # Attach thumbnail path if we just fetched one
-        thumb = getattr(self, "_fetched_thumbnail", "")
-        if thumb:
-            self.updated_meta["thumbnail_path"] = thumb
+        from PyQt6.QtWidgets import QMessageBox
+        draft = self._draft()
+        problem = self._validation_problem(draft)
+        if problem:
+            self._update_readiness()
+            QMessageBox.warning(self, *problem)
+            return
+        if self._fetched_thumbnail and self._fetched_game_id == draft["game_id"]:
+            draft["thumbnail_path"] = self._fetched_thumbnail
+        try:
+            if self._save_callback:
+                self._save_callback(draft)
+        except Exception as exc:
+            logger.warning("Could not save metadata for %s: %s", self.mod.id, exc)
+            self._readiness_lbl.setText(f"Could not save: {exc}. Your changes are still here; retry Save.")
+            return
+        self.updated_meta = draft
         self.accept()
 
 

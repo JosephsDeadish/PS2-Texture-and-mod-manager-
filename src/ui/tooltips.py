@@ -128,16 +128,16 @@ _TIPS: dict[str, dict[str, str]] = {
 
     # ── Mod panel: Enable All ───────────────────────────────────────────────
     "enable_all": {
-        "normal": "Enable all mods in the current list at once.",
-        "dumbed_down": "Turn everything on.  May cause conflicts if packs overlap!",
-        "no_filter": "Enable all mods.  Watch out for conflicts if you stack incompatible packs.",
+        "normal": "Enable every disabled mod in this panel, including hidden results. Review the batch before applying.",
+        "dumbed_down": "Turn on all mods in this panel, even hidden ones. Use Enable Shown for only your filtered results.",
+        "no_filter": "Enable all mods in this panel, not just search results. Overlapping packs can conflict; review before applying.",
     },
 
     # ── Mod panel: Disable All ──────────────────────────────────────────────
     "disable_all": {
-        "normal": "Disable all mods in the current list at once.",
-        "dumbed_down": "Turn everything off.  Safe to do any time.",
-        "no_filter": "Disable all mods — undeploys everything from PCSX2.",
+        "normal": "Disable every enabled mod in this panel, including hidden results. Live memory-card files are not removed.",
+        "dumbed_down": "Turn off all mods in this panel, even hidden ones. Use Disable Shown for only your filtered results. Live saves stay untouched.",
+        "no_filter": "Disable all mods in this panel and reconcile affected deployed content. Live memory cards are never deleted.",
     },
 
     # ── Mod panel: My Library Only ──────────────────────────────────────────

@@ -157,6 +157,7 @@ def scan_library(
     directory: str,
     *,
     recursive: bool = False,
+    strict: bool = False,
 ) -> List[GameEntry]:
     """Scan *directory* for PS2 disc image files and return a list of
     :class:`GameEntry` objects sorted by display name.
@@ -168,6 +169,9 @@ def scan_library(
     recursive:
         When *True*, descend into sub-directories.  Defaults to *False*
         because most users keep all ISOs in a single flat folder.
+    strict:
+        Raise folder traversal errors instead of treating unreadable or missing
+        folders as empty. Metadata lookup failures remain recoverable.
 
     Returns
     -------
@@ -177,13 +181,23 @@ def scan_library(
     """
     root = Path(directory)
     if not root.is_dir():
-        log.debug("game_library: directory not found: %s", directory)
+        log.warning("game_library: directory not found: %s", directory)
+        if strict:
+            raise FileNotFoundError(f"Game library folder not found: {directory}")
         return []
 
     entries: List[GameEntry] = []
     seen_paths: set = set()
 
-    walk_fn = os.walk if recursive else _flat_walk
+    def _walk_with_errors(root_dir: str):
+        def _onerror(exc: OSError) -> None:
+            log.warning("Could not scan game library folder %s: %s", exc.filename or root_dir, exc)
+            if strict:
+                raise exc
+
+        yield from os.walk(root_dir, onerror=_onerror)
+
+    walk_fn = _walk_with_errors if recursive else lambda path: _flat_walk(path, strict=strict)
     for dirpath, _dirs, filenames in walk_fn(str(root)):
         for fname in filenames:
             ext = Path(fname).suffix.lower()
@@ -195,23 +209,36 @@ def scan_library(
                 continue
             seen_paths.add(full)
 
-            serial = detect_game_serial(fname)
-            if not serial:
-                # Try detecting from the full path (e.g. if folder name contains serial)
-                serial = detect_game_serial(full)
+            try:
+                serial = detect_game_serial(fname)
+                if not serial:
+                    # Try detecting from the full path (e.g. if folder name contains serial)
+                    serial = detect_game_serial(full)
+            except Exception as exc:
+                log.warning("Failed to detect game serial for %s: %s", full, exc)
+                serial = ""
 
             title = ""
             crcs: List[str] = []
             if serial:
-                display = serial_to_display(serial)
+                try:
+                    display = serial_to_display(serial)
+                except Exception as exc:
+                    log.warning("Failed to resolve game title for %s: %s", serial, exc)
+                    display = serial
                 # serial_to_display returns "SERIAL — Title" or just "SERIAL"
                 if " — " in display:
                     title = display.split(" — ", 1)[1]
-                crcs = _get_sdb().crcs_for_serial(serial)
+                try:
+                    crcs = _get_sdb().crcs_for_serial(serial)
+                except Exception as exc:
+                    log.warning("Failed to resolve CRCs for %s (%s): %s", serial, full, exc)
+                    crcs = []
 
             try:
                 size = Path(full).stat().st_size
-            except OSError:
+            except OSError as exc:
+                log.warning("Could not determine file size for %s: %s", full, exc)
                 size = 0
 
             entries.append(GameEntry(
@@ -245,13 +272,16 @@ def get_library_serials(directory: str) -> frozenset:
 # Internal helpers
 # ---------------------------------------------------------------------------
 
-def _flat_walk(root: str):
+def _flat_walk(root: str, *, strict: bool = False):
     """Yield a single ``(dirpath, dirs, files)`` tuple for the top-level
     directory only — equivalent to ``os.walk`` with depth=1."""
     p = Path(root)
     try:
         names = list(os.scandir(root))
-    except PermissionError:
+    except PermissionError as exc:
+        log.warning("Could not scan game library folder %s: %s", root, exc)
+        if strict:
+            raise
         return
     files = [e.name for e in names if e.is_file(follow_symlinks=True)]
     dirs = [e.name for e in names if e.is_dir(follow_symlinks=True)]

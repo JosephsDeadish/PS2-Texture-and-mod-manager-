@@ -18,19 +18,40 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Dict, List, Optional
+
+from src.core.catalogue_loader import (
+    VALID_DOWNLOAD_ACTIONS,
+    _infer_author,
+    _is_placeholder_thumbnail_url,
+    _placeholder_thumbnail_reason,
+    _normalise_source,
+    is_placeholder_author,
+)
+
+logger = logging.getLogger(__name__)
 
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 _CAT_DIR   = _REPO_ROOT / "data" / "catalogue"
 
 # URL fields that may appear in a catalogue entry
-_URL_FIELDS = ("url", "author_url", "download_url", "direct_download_url",
-               "thumbnail_url", "cover_url")
+_URL_FIELDS = ("url", "source_url", "author_url", "direct_download_url", "thumbnail_url")
+
+# File/type kinds where missing author credits are data-quality problems.
+_CATALOGUE_KINDS = frozenset({
+    "texture_pack",
+    "save_file",
+    "cheat",
+    "cover_art",
+    "pnach",
+})
 
 # Domains known to be fake/deprecated in this project's history
 _BAD_DOMAINS = frozenset({
@@ -52,6 +73,8 @@ _TRUSTED_DOMAINS = frozenset({
     "drive.google.com",
     "docs.google.com",
     "archive.org",
+    "disk.yandex.ru",
+    "mega.nz",
     "pcsx2.net",
     "youtube.com",
     "youtu.be",
@@ -80,6 +103,21 @@ _URL_RE = re.compile(
 )
 
 
+def _split_url_host_path(url: str) -> tuple[str, str]:
+    """Return the host/path pair for *url* (normalising ``www.`` prefixes)."""
+    parts = urlsplit(url)
+    host = parts.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    return host, parts.path.lower()
+
+
+def _user_catalogue_dir() -> Path:
+    from src.core.config_manager import get_exe_dir
+
+    return get_exe_dir() / "user_catalogue"
+
+
 # ---------------------------------------------------------------------------
 # Public types
 # ---------------------------------------------------------------------------
@@ -91,7 +129,7 @@ class LinkIssue:
     entry_index: int
     field_name: str
     url: str
-    issue_type: str   # "malformed", "bad_domain", "empty_required"
+    issue_type: str   # "malformed", "bad_domain", "suspicious_domain", "empty_required", "empty_author", "placeholder_author", "invalid_download_action", "noncanonical_source", "generic_author_url", "generic_thumbnail_url"
     detail: str = ""
 
     def __str__(self) -> str:
@@ -128,15 +166,41 @@ class LinkChecker:
 
     def _is_bad_domain(self, url: str) -> Optional[str]:
         """Return the offending domain if *url* uses a known-bad domain, else None."""
-        # Extract host from URL
-        m = re.match(r'^https?://([^/]+)', url, re.IGNORECASE)
-        if not m:
+        # Extract host and path from URL so path-scoped bad-domain rules can
+        # match entries like ``gamefaqs.gamespot.com/ps2/invalid``.
+        host, path = _split_url_host_path(url)
+        if not host:
             return None
-        host = m.group(1).lower().lstrip("www.")
+        host_and_path = host + path
         for bad in _BAD_DOMAINS:
+            if "/" in bad:
+                if host_and_path == bad or host_and_path.startswith(bad + "/"):
+                    return bad
+                continue
             if host == bad or host.endswith("." + bad):
                 return bad
         return None
+
+    def _is_trusted_domain(self, url: str) -> bool:
+        """Return True if *url* uses one of the known trusted domains."""
+        host, _path = _split_url_host_path(url)
+        if not host:
+            return False
+        for trusted in _TRUSTED_DOMAINS:
+            if host == trusted or host.endswith("." + trusted):
+                return True
+        return False
+
+    def _is_suspicious_domain(self, url: str) -> Optional[str]:
+        """Return the host if *url* looks valid but points to an untrusted domain."""
+        if self._is_malformed(url):
+            return None
+        if self._is_bad_domain(url):
+            return None
+        if self._is_trusted_domain(url):
+            return None
+        host, _path = _split_url_host_path(url)
+        return host or None
 
     # ------------------------------------------------------------------
     # Entry-level checking
@@ -167,9 +231,158 @@ class LinkChecker:
             All issues found.
         """
         issues: List[LinkIssue] = []
+        source_kind = {
+            "cheats": "cheat",
+            "saves": "save_file",
+            "texture_packs": "texture_pack",
+            "cover_art": "cover_art",
+        }.get(Path(source_file).stem.lower(), Path(source_file).stem.lower())
         for idx, entry in enumerate(entries):
+            if not isinstance(entry, dict):
+                logger.warning(
+                    "Skipping malformed catalogue entry in %s[%s]: expected a JSON object, got %r",
+                    source_file,
+                    idx,
+                    entry,
+                )
+                issues.append(LinkIssue(
+                    source_file=source_file,
+                    entry_index=idx,
+                    field_name="(entry)",
+                    url="",
+                    issue_type="malformed_entry",
+                    detail="catalogue entry must be a JSON object",
+                ))
+                continue
+            entry_kind = str(entry.get("type", "")).lower() or source_kind
+
+            raw_source = entry.get("source", "")
+            if isinstance(raw_source, str):
+                source_label = raw_source.strip()
+                if source_label:
+                    canonical_source = _normalise_source(source_label)
+                    if canonical_source != source_label:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="source",
+                            url=source_label,
+                            issue_type="noncanonical_source",
+                            detail=f"normalize source label to {canonical_source!r}",
+                        ))
+
+            if (entry_kind in _CATALOGUE_KINDS or source_kind in _CATALOGUE_KINDS) and not entry.get("is_hub", False):
+                author = entry.get("author", "")
+                if not isinstance(author, str) or not author.strip():
+                    inferred_author = _infer_author(
+                        str(entry.get("name", "")),
+                        str(entry.get("author_url", "")),
+                    )
+                    if not inferred_author:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="author",
+                            url="",
+                            issue_type="empty_author",
+                            detail="missing author credit",
+                        ))
+                elif is_placeholder_author(author):
+                    inferred_author = _infer_author(
+                        str(entry.get("name", "")),
+                        str(entry.get("author_url", "")),
+                    )
+                    if not inferred_author:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="author",
+                            url="",
+                            issue_type="placeholder_author",
+                            detail=(
+                                "generic placeholder author; replace with a credited author "
+                                "or a more specific source-page label"
+                            ),
+                        ))
+
+            action = ""
+            raw_action = entry.get("download_action", "")
+            if raw_action not in ("", None):
+                if not isinstance(raw_action, str):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="download_action",
+                        url="",
+                        issue_type="malformed",
+                        detail="expected a string action",
+                    ))
+                else:
+                    action = raw_action.strip().lower()
+                    if action and action not in VALID_DOWNLOAD_ACTIONS:
+                        issues.append(LinkIssue(
+                            source_file=source_file,
+                            entry_index=idx,
+                            field_name="download_action",
+                            url="",
+                            issue_type="invalid_download_action",
+                            detail=f"unrecognised download action {raw_action!r}",
+                        ))
+
+            direct_download_required = (
+                bool(required_url_fields)
+                and entry_kind in {"pnach", "cheat", "save_file"}
+                and "direct_download_url" in required_url_fields
+            )
+            if action in {"pnach_crc", "gdrive", "yandex"}:
+                direct_download_required = True
+
+            if required_url_fields and entry_kind in {"pnach", "cheat", "save_file"}:
+                for field_name in required_url_fields:
+                    if field_name == "direct_download_url":
+                        continue
+                    raw_required = entry.get(field_name, "")
+                    if isinstance(raw_required, str) and raw_required.strip():
+                        continue
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url="",
+                        issue_type="empty_required",
+                        detail=f"missing required {field_name!r} for {entry_kind} entry",
+                    ))
+
+            if direct_download_required:
+                raw_required = entry.get("direct_download_url", "")
+                if not (isinstance(raw_required, str) and raw_required.strip()):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name="direct_download_url",
+                        url="",
+                        issue_type="empty_required",
+                        detail=(
+                            f"missing required 'direct_download_url' for {entry_kind} entry"
+                            + (f" with {action!r} download_action" if action else "")
+                        ),
+                    ))
+
             for field_name in _URL_FIELDS:
                 raw = entry.get(field_name, "")
+                if raw in ("", None):
+                    continue
+                if not isinstance(raw, str):
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url="",
+                        issue_type="malformed",
+                        detail="expected a string URL",
+                    ))
+                    continue
+                raw = raw.strip()
                 if not raw:
                     continue
                 # Malformed URL check
@@ -194,18 +407,75 @@ class LinkChecker:
                         issue_type="bad_domain",
                         detail=f"domain {bad_dom!r} is known fake/deprecated",
                     ))
+                    continue
+                if field_name == "thumbnail_url" and _is_placeholder_thumbnail_url(raw):
+                    reason = _placeholder_thumbnail_reason(raw)
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url=raw,
+                        issue_type="generic_thumbnail_url",
+                        detail=(
+                            f"thumbnail_url uses a {reason or 'generic placeholder'} instead of cover art"
+                        ),
+                    ))
+                    continue
+                suspicious_dom = self._is_suspicious_domain(raw)
+                if suspicious_dom:
+                    issues.append(LinkIssue(
+                        source_file=source_file,
+                        entry_index=idx,
+                        field_name=field_name,
+                        url=raw,
+                        issue_type="suspicious_domain",
+                        detail=(
+                            f"host {suspicious_dom!r} is not on the trusted catalogue "
+                            "domain list"
+                        ),
+                    ))
+                    continue
+
+                if field_name == "author_url" and not entry.get("is_hub", False):
+                    host, path = _split_url_host_path(raw)
+                    if host and self._is_trusted_domain(raw):
+                        if not path or path == "/":
+                            issues.append(LinkIssue(
+                                source_file=source_file,
+                                entry_index=idx,
+                                field_name=field_name,
+                                url=raw,
+                                issue_type="generic_author_url",
+                                detail="author_url points to a bare homepage instead of a profile or thread page",
+                            ))
+                        elif "search/members" in path:
+                            issues.append(LinkIssue(
+                                source_file=source_file,
+                                entry_index=idx,
+                                field_name=field_name,
+                                url=raw,
+                                issue_type="generic_author_url",
+                                detail=                                "author_url points to a member search page instead of a direct profile",
+                            ))
         return issues
 
     # ------------------------------------------------------------------
     # Catalogue-level checking
     # ------------------------------------------------------------------
 
-    def check_file(self, path: Path, source_file: Optional[str] = None) -> List[LinkIssue]:
+    def check_file(
+        self,
+        path: Path,
+        source_file: Optional[str] = None,
+        *,
+        required_url_fields: Optional[List[str]] = None,
+    ) -> List[LinkIssue]:
         """Check all URL fields in a single JSON catalogue file."""
         label = source_file or path.name
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except Exception as exc:
+            logger.warning("Could not parse catalogue link file %s: %s", path, exc)
             return [LinkIssue(
                 source_file=label,
                 entry_index=-1,
@@ -215,8 +485,23 @@ class LinkChecker:
                 detail=str(exc),
             )]
         if not isinstance(data, list):
-            return []
-        return self.check_entries(data, source_file=label)
+            logger.warning(
+                "Could not parse catalogue link file %s: expected a JSON array at the top level",
+                path,
+            )
+            return [LinkIssue(
+                source_file=label,
+                entry_index=-1,
+                field_name="(file)",
+                url="",
+                issue_type="parse_error",
+                detail="expected a JSON array at the top level",
+            )]
+        return self.check_entries(
+            data,
+            source_file=label,
+            required_url_fields=required_url_fields,
+        )
 
     def check_all_catalogues(self) -> Dict:
         """Check all standard catalogue files and return a structured report.
@@ -244,7 +529,41 @@ class LinkChecker:
             if not path.is_file():
                 continue
             checked.append(fname)
-            all_issues.extend(self.check_file(path, source_file=fname))
+            all_issues.extend(
+                self.check_file(
+                    path,
+                    source_file=fname,
+                    required_url_fields=["direct_download_url"],
+                )
+            )
+
+        if self._cat_dir == _CAT_DIR:
+            try:
+                user_dir = _user_catalogue_dir()
+            except Exception as exc:
+                logger.warning("Could not resolve user catalogue directory: %s", exc)
+            else:
+                if user_dir.is_dir():
+                    try:
+                        user_files = [
+                            path
+                            for path in sorted(user_dir.glob("*.json"))
+                            # Ignore helper manifests like _index.json.
+                            if not path.name.startswith("_")
+                        ]
+                    except Exception as exc:
+                        logger.warning("Could not list user catalogue files under %s: %s", user_dir, exc)
+                        user_files = []
+                    for path in user_files:
+                        label = f"user_catalogue/{path.name}"
+                        checked.append(label)
+                        all_issues.extend(
+                            self.check_file(
+                                path,
+                                source_file=label,
+                                required_url_fields=["direct_download_url"],
+                            )
+                        )
 
         # Count by type
         type_counts: Dict[str, int] = {}

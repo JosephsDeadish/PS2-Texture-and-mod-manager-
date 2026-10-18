@@ -33,7 +33,9 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 from typing import Dict, List, Optional
 
 from src.models.mod import ModType
@@ -95,6 +97,136 @@ _OPTIONAL_DEFAULTS: Dict[str, object] = {
     "size_label":         "",
 }
 
+# Valid download actions used by the shipped catalogue and supported by the UI.
+VALID_DOWNLOAD_ACTIONS = frozenset({
+    "",
+    "cover_by_id",
+    "cover_by_url",
+    "download_save",
+    "gdrive",
+    "manual",
+    "manual_mega",
+    "pnach_crc",
+    "yandex",
+})
+
+
+def _clone_default(value: object) -> object:
+    if isinstance(value, list):
+        return list(value)
+    return value
+
+_SOURCE_ALIASES = {
+    "gbatemp": "GBAtemp",
+    "gbatempnet": "GBAtemp",
+    "github": "GitHub",
+    "githubcom": "GitHub",
+    "pcsx2cheatdb": "PCSX2 CheatDB",
+    "personal": "Personal",
+}
+
+_PLACEHOLDER_THUMBNAIL_HOSTS = frozenset({
+    "dummyimage.com",
+    "placehold.co",
+    "placehold.it",
+    "via.placeholder.com",
+})
+
+# Catalogue names often use em dashes to separate variant labels, so only
+# explicit "by <name>" suffixes and matching profile URLs are treated as
+# author cues.
+_AUTHOR_BY_RE = re.compile(r"\bby\s+(.+?)\s*$", re.IGNORECASE)
+_GBATEMP_MEMBER_RE = re.compile(r"gbatemp\.net/members/([^./#?]+)", re.IGNORECASE)
+_PLACEHOLDER_AUTHORS = {
+    "unknown": "Unknown",
+    "anonymous": "Anonymous",
+}
+
+
+def is_placeholder_author(author: object) -> bool:
+    """Return True when *author* is one of the generic placeholder labels."""
+    if not isinstance(author, str):
+        return False
+    return author.strip().casefold() in _PLACEHOLDER_AUTHORS
+
+
+def _normalise_author_token(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", text.casefold())
+
+
+def _normalise_mod_type(type_str: str) -> str:
+    if not isinstance(type_str, str):
+        raise ValueError(f"mod type must be a string, got {type(type_str).__name__}")
+    return re.sub(r"[\s\-]+", "_", type_str.strip().lower())
+
+
+def _normalise_source(source: str) -> str:
+    source = source.strip()
+    if not source:
+        return "Personal"
+    key = re.sub(r"[^a-z0-9]+", "", source.casefold())
+    return _SOURCE_ALIASES.get(key, source)
+
+
+def _normalise_url(url: str, *, preserve_fragment: bool = False) -> str:
+    url = url.strip()
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return url
+    if preserve_fragment or not parts.fragment:
+        return url
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, parts.query, ""))
+
+
+def _placeholder_thumbnail_reason(url: str) -> str:
+    """Return a human-readable reason when *url* is obviously placeholder art."""
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return ""
+    host = parts.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host == "github.githubassets.com" and parts.path.lower().startswith("/favicons/favicon"):
+        return "generic favicon placeholder"
+    if host in _PLACEHOLDER_THUMBNAIL_HOSTS:
+        return "generic placeholder image host"
+    return ""
+
+
+def _is_placeholder_thumbnail_url(url: str) -> bool:
+    """Return True for generic placeholder thumbnail URLs."""
+    return bool(_placeholder_thumbnail_reason(url))
+
+
+def _infer_author(name: str, author_url: str) -> str:
+    match = _AUTHOR_BY_RE.search(name)
+    if match:
+        author = match.group(1).strip()
+        if author:
+            return author
+
+    match = _GBATEMP_MEMBER_RE.search(author_url)
+    if match:
+        author = match.group(1).strip()
+        prefix_match = re.match(r"^\s*(.+?)\s+[–—]\s+", name)
+        if prefix_match:
+            prefix = prefix_match.group(1).strip()
+            if prefix and _normalise_author_token(prefix) == _normalise_author_token(author):
+                return prefix
+        return author
+
+    return ""
+
+
+def _placeholder_author(author: str) -> str:
+    return _PLACEHOLDER_AUTHORS.get(author.strip().casefold(), "")
+
 
 def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     """Validate *entry* from *source_file*, inject *type_str*, fill defaults.
@@ -103,6 +235,137 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     early rather than causing mysterious runtime errors.
     """
     entry = dict(entry)  # shallow copy — don't mutate the caller's dict
+
+    # Normalise common text fields before validation so user catalogue files
+    # can recover from stray whitespace and older naming conventions.
+    for field in (
+        "id",
+        "name",
+        "description",
+        "author",
+        "url",
+        "game",
+        "game_serial",
+        "context",
+        "author_url",
+        "thumbnail_url",
+        "download_action",
+        "direct_download_url",
+        "upscale_tech",
+        "size_label",
+    ):
+        if isinstance(entry.get(field), str):
+            entry[field] = entry[field].strip()
+
+    for field in (
+        "id",
+        "name",
+        "description",
+        "author",
+        "url",
+        "source_url",
+        "source",
+        "game",
+        "game_serial",
+        "context",
+        "author_url",
+        "thumbnail_url",
+        "download_action",
+        "direct_download_url",
+        "upscale_tech",
+        "size_label",
+    ):
+        if field in entry and entry[field] is not None and not isinstance(entry[field], str):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"{field!r} must be a string"
+            )
+
+    if not entry.get("url") and isinstance(entry.get("source_url"), str) and entry["source_url"]:
+        log.warning(
+            "[%s] entry %r: url missing; using source_url as a fallback",
+            source_file.name,
+            entry.get("id", "?"),
+        )
+        entry["url"] = entry["source_url"]
+
+    for field in ("url", "author_url", "thumbnail_url", "source_url"):
+        if isinstance(entry.get(field), str):
+            entry[field] = _normalise_url(entry[field])
+    if isinstance(entry.get("thumbnail_url"), str) and _is_placeholder_thumbnail_url(entry["thumbnail_url"]):
+        # Generic placeholder images are not useful cover art and only add
+        # noise when the game-specific cover lookup fails, so treat them as absent.
+        reason = _placeholder_thumbnail_reason(entry["thumbnail_url"])
+        log.warning(
+            "[%s] entry %r: thumbnail_url uses a %s; clearing it",
+            source_file.name,
+            entry.get("id", "?"),
+            reason or "generic placeholder",
+        )
+        entry["thumbnail_url"] = ""
+    if isinstance(entry.get("direct_download_url"), str):
+        # Preserve fragments for hosts such as MEGA where the file key lives in
+        # the URL fragment and is required for the link to keep working.
+        entry["direct_download_url"] = _normalise_url(
+            entry["direct_download_url"],
+            preserve_fragment=True,
+        )
+    for field in ("url", "author_url", "thumbnail_url", "direct_download_url", "source_url"):
+        value = entry.get(field, "")
+        if value and isinstance(value, str):
+            lowered = value.lower()
+            if not lowered.startswith(("http://", "https://")):
+                raise ValueError(
+                    f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                    f"{field!r} must be an http(s) URL"
+                )
+    if isinstance(entry.get("game_serial"), str):
+        from src.core.game_registry import is_valid_serial, normalise_serial
+        entry["game_serial"] = normalise_serial(entry["game_serial"])
+        if entry["game_serial"] and not is_valid_serial(entry["game_serial"]):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"invalid game_serial {entry['game_serial']!r}"
+            )
+    if isinstance(entry.get("download_action"), str):
+        entry["download_action"] = entry["download_action"].lower()
+        if entry["download_action"] not in VALID_DOWNLOAD_ACTIONS:
+            raise ValueError(
+                f"[{source_file.name}] entry {entry.get('id', '?')!r}: "
+                f"unknown download_action {entry['download_action']!r}"
+            )
+    if isinstance(entry.get("source"), str):
+        raw_source = entry["source"]
+        normalised_source = _normalise_source(raw_source)
+        if raw_source and normalised_source != raw_source:
+            log.warning(
+                "[%s] entry %r: source %r normalized to %r",
+                source_file.name,
+                entry.get("id", "?"),
+                raw_source,
+                normalised_source,
+            )
+        entry["source"] = normalised_source
+    if isinstance(entry.get("tags"), list):
+        entry["tags"] = [tag.strip() for tag in entry["tags"] if isinstance(tag, str) and tag.strip()]
+    author = entry.get("author", "")
+    if isinstance(author, str):
+        author = author.strip()
+    else:
+        author = ""
+    placeholder_author = _placeholder_author(author) if author else ""
+    is_hub = bool(entry.get("is_hub", False))
+    if placeholder_author:
+        author = ""
+    if not author:
+        author = _infer_author(
+            entry.get("name", ""),
+            entry.get("author_url", ""),
+        )
+        if not author and not is_hub:
+            author = placeholder_author
+    entry["author"] = author
+    type_str = _normalise_mod_type(type_str)
 
     # Inject type from the file name as a ModType enum (callers do not need
     # to repeat it in every record, and the UI compares against enum values).
@@ -124,27 +387,53 @@ def _validate_and_fill(entry: dict, type_str: str, source_file: Path) -> dict:
     # Fill optional fields with defaults
     for field, default in _OPTIONAL_DEFAULTS.items():
         if field not in entry:
-            entry[field] = default
+            entry[field] = _clone_default(default)
 
     # Basic type checks on critical fields
-    if not isinstance(entry["id"], str) or not entry["id"]:
+    if not entry["id"].strip():
         raise ValueError(
             f"[{source_file.name}] 'id' must be a non-empty string; "
             f"got {entry['id']!r}"
         )
-    if not isinstance(entry["name"], str) or not entry["name"]:
+    if not entry["name"].strip():
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: "
             f"'name' must be a non-empty string"
+        )
+    if not entry["description"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'description' must be a non-empty string"
+        )
+    if not entry["url"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'url' must be a non-empty string"
+        )
+    if not entry["source"].strip():
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'source' must be a non-empty string"
+        )
+    if not entry["author"].strip() and not entry.get("is_hub", False):
+        raise ValueError(
+            f"[{source_file.name}] entry {entry['id']!r}: "
+            f"'author' must be a non-empty string for non-hub entries"
         )
     if not isinstance(entry.get("tags", []), list):
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: 'tags' must be a list"
         )
-    if not isinstance(entry.get("is_hub", False), bool):
+    for flag in ("is_hub", "nsfw", "is_free", "requires_account", "is_complete"):
+        if not isinstance(entry.get(flag, False), bool):
+            raise ValueError(
+                f"[{source_file.name}] entry {entry['id']!r}: "
+                f"'{flag}' must be a bool"
+            )
+    if not isinstance(entry.get("download_action", ""), str):
         raise ValueError(
             f"[{source_file.name}] entry {entry['id']!r}: "
-            f"'is_hub' must be a bool"
+            f"'download_action' must be a string"
         )
 
     return entry
@@ -154,7 +443,7 @@ def _load_from_dir(
     base: Path,
     type_files: Optional[Dict[str, str]],
     entries: List[dict],
-    seen_ids: set,
+    seen_entries: Dict[str, dict],
     *,
     strict: bool = False,
 ) -> None:
@@ -171,8 +460,14 @@ def _load_from_dir(
     else:
         # User catalogue: each .json file may contain mixed types
         try:
-            json_files = sorted(base.glob("*.json"))
-        except Exception:
+            json_files = [
+                path
+                for path in sorted(base.glob("*.json"))
+                # Ignore helper manifests like _index.json; only actual entry files belong here.
+                if not path.name.startswith("_")
+            ]
+        except Exception as exc:
+            log.warning("Could not list catalogue files under %s: %s", base, exc)
             json_files = []
         file_iter = [(f.name, None) for f in json_files]
 
@@ -183,7 +478,16 @@ def _load_from_dir(
             continue
 
         try:
-            raw: List[dict] = json.loads(path.read_text(encoding="utf-8"))
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            msg = f"Failed to read catalogue file {path}: {exc}"
+            if strict:
+                raise ValueError(msg) from exc
+            log.warning(msg)
+            continue
+
+        try:
+            raw: List[dict] = json.loads(text)
         except json.JSONDecodeError as exc:
             msg = f"Failed to parse catalogue file {path}: {exc}"
             if strict:
@@ -224,14 +528,24 @@ def _load_from_dir(
                 continue
 
             eid = entry["id"]
-            if eid in seen_ids:
+            if eid in seen_entries:
                 msg = f"Duplicate catalogue ID {eid!r} found in {path.name}"
+                existing = seen_entries[eid]
+                differing_fields = sorted(
+                    field for field in set(existing) | set(entry)
+                    if existing.get(field) != entry.get(field)
+                )
+                if differing_fields:
+                    preview = ", ".join(differing_fields[:8])
+                    if len(differing_fields) > 8:
+                        preview += ", ..."
+                    msg += f" — fields differ: {preview}"
                 if strict:
                     raise ValueError(msg)
                 log.warning(msg + " — keeping first occurrence")
                 continue
 
-            seen_ids.add(eid)
+            seen_entries[eid] = entry
             entries.append(entry)
 
 
@@ -250,8 +564,9 @@ def load_catalogue(
     strict:
         When *True*, any schema violation (missing required field, duplicate ID,
         unparseable JSON) raises ``ValueError`` immediately and stops loading.
-        When *False* (the default), bad entries are logged via the module
-        logger and silently skipped so the rest of the catalogue still loads.
+        When *False* (the default), bad entries or unreadable files are logged
+        via the module logger and skipped so the rest of the catalogue still
+        loads.
     user_catalogue_dir:
         Override the user catalogue directory.  When ``None`` the default
         ``user_catalogue/`` folder next to the exe is used (via
@@ -270,10 +585,10 @@ def load_catalogue(
     """
     base = Path(catalogue_dir) if catalogue_dir else CATALOGUE_DIR
     entries: List[dict] = []
-    seen_ids: set = set()
+    seen_entries: dict[str, dict] = {}
 
     # 1. Load built-in catalogue files
-    _load_from_dir(base, _TYPE_FILES, entries, seen_ids, strict=strict)
+    _load_from_dir(base, _TYPE_FILES, entries, seen_entries, strict=strict)
 
     # 2. Load user catalogue files (next to exe)
     if user_catalogue_dir is not False:  # False means "skip entirely" (tests)
@@ -282,7 +597,7 @@ def load_catalogue(
                 from src.core.config_manager import get_user_catalogue_dir
                 user_catalogue_dir = get_user_catalogue_dir()
             except Exception as exc:
-                log.debug("Could not resolve user_catalogue_dir: %s", exc)
+                log.warning("Could not resolve user catalogue directory: %s", exc)
                 user_catalogue_dir = None
 
         if user_catalogue_dir is not None:
@@ -290,7 +605,7 @@ def load_catalogue(
                 Path(user_catalogue_dir),
                 None,  # type comes from each entry
                 entries,
-                seen_ids,
+                seen_entries,
                 strict=False,  # user files never cause strict failures
             )
 
@@ -323,12 +638,12 @@ def load_user_catalogue(
         user_catalogue_dir = get_user_catalogue_dir()
 
     entries: List[dict] = []
-    seen_ids: set = set()
+    seen_entries: dict[str, dict] = {}
     _load_from_dir(
         Path(user_catalogue_dir),
         None,
         entries,
-        seen_ids,
+        seen_entries,
         strict=strict,
     )
     return entries

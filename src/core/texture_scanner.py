@@ -27,11 +27,14 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Set
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # PS2 serial pattern
@@ -56,10 +59,14 @@ def _dir_size_and_count(path: Path):
                 try:
                     total += (Path(root) / fname).stat().st_size
                     count += 1
-                except OSError:
-                    pass
-    except PermissionError:
-        pass
+                except OSError as exc:
+                    logger.warning(
+                        "Could not stat texture file %s: %s",
+                        Path(root) / fname,
+                        exc,
+                    )
+    except PermissionError as exc:
+        logger.warning("Could not read files under %s: %s", path, exc)
     return total, count
 
 
@@ -147,21 +154,29 @@ def scan_unmanaged_texture_packs(
 
     root = Path(textures_root)
     if not root.is_dir():
+        logger.warning("Could not scan texture pack root %s: not a directory", root)
         return []
 
-    managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
+    managed = set()
+    for p in (managed_paths or set()):
+        try:
+            managed.add(str(Path(p).resolve()))
+        except Exception as exc:
+            logger.warning("Could not resolve managed texture path %s: %s", p, exc)
 
     # Try to import game registry for title lookup
     try:
         from src.core.game_registry import lookup_game_title as get_game_title
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to import game registry for texture scanning: %s", exc)
         get_game_title = None  # type: ignore[assignment]
 
     results: List[UnmanagedPack] = []
 
     try:
         candidates = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan texture pack root %s: %s", root, exc)
         return []
 
     for serial_dir in candidates:
@@ -175,7 +190,11 @@ def scan_unmanaged_texture_packs(
             # Some packs store textures directly under the serial folder
             replacements = serial_dir
 
-        resolved = str(replacements.resolve())
+        try:
+            resolved = str(replacements.resolve())
+        except Exception as exc:
+            logger.warning("Could not resolve texture pack path %s: %s", replacements, exc)
+            continue
         if resolved in managed:
             continue
 
@@ -187,7 +206,8 @@ def scan_unmanaged_texture_packs(
         if get_game_title is not None:
             try:
                 suggested = get_game_title(serial_dir.name.upper()) or ""
-            except Exception:
+            except Exception as exc:
+                logger.warning("Failed to look up game title for texture serial %s: %s", serial_dir.name, exc)
                 suggested = ""
 
         results.append(

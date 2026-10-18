@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from typing import List
 from unittest.mock import patch, MagicMock
@@ -16,7 +17,7 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 from src.models.mod import AppConfig, ConflictInfo, ModInfo, ModStatus, ModType
-from src.core.config_manager import detect_pcsx2_paths, load_config, save_config
+from src.core.config_manager import detect_pcsx2_paths, load_config, save_config, ui_state_bucket
 from src.core.mod_manager import ModDatabase, ModManager
 
 
@@ -133,6 +134,21 @@ class TestConfigManager(unittest.TestCase):
             cfg = load_config()
             self.assertIsInstance(cfg, AppConfig)
             self.assertTrue(cfg.first_run)
+        finally:
+            cm.CONFIG_FILE = orig_file
+
+    def test_load_config_invalid_json_logs_warning(self):
+        import src.core.config_manager as cm
+        orig_file = cm.CONFIG_FILE
+        cfg_file = Path(self.tmpdir) / "config.json"
+        cfg_file.write_text("{not-json", encoding="utf-8")
+        cm.CONFIG_FILE = cfg_file
+        try:
+            with self.assertLogs("src.core.config_manager", level="WARNING") as logs:
+                cfg = load_config()
+            self.assertIsInstance(cfg, AppConfig)
+            self.assertTrue(cfg.first_run)
+            self.assertTrue(any("Failed to load config file" in msg for msg in logs.output))
         finally:
             cm.CONFIG_FILE = orig_file
 
@@ -264,6 +280,26 @@ class TestModDatabase(unittest.TestCase):
         self.assertEqual(db.get("good").name, "Good Mod")
         self.assertIsNone(db.get("bad"))
 
+    def test_load_with_corrupted_json_returns_empty(self):
+        import src.core.config_manager as cm
+
+        cm.MODS_DB_FILE.write_text("{not valid json", encoding="utf-8")
+
+        db = self._make_db()
+        self.assertEqual(db.all(), [])
+
+    def test_load_with_non_object_root_returns_empty(self):
+        import json
+        import src.core.config_manager as cm
+
+        cm.MODS_DB_FILE.write_text(json.dumps(["not", "an", "object"]), encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            db = self._make_db()
+
+        self.assertEqual(db.all(), [])
+        self.assertTrue(any("expected a JSON object at the top level" in msg for msg in logs.output))
+
     def test_save_is_atomic(self):
         """ModDatabase.save() must not corrupt the DB file on failure."""
         import json
@@ -283,6 +319,21 @@ class TestModDatabase(unittest.TestCase):
         # No leftover .tmp files in the same directory
         tmp_files = list(Path(self.tmpdir).glob("*.tmp"))
         self.assertEqual(tmp_files, [])
+
+    def test_save_logs_cleanup_warning(self):
+        """Temp-file cleanup failures should be logged before the error escapes."""
+        from src.core.mod_manager import ModDatabase
+
+        db = self._make_db()
+
+        with patch("src.core.mod_manager.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.mod_manager.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    db.save()
+
+        self.assertTrue(any("Could not remove temporary mod database file" in msg for msg in logs.output))
 
 
 class TestModManager(unittest.TestCase):
@@ -357,6 +408,82 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(mod.mod_type, ModType.PNACH)
         self.assertIn("hack.pnach", mod.files)
 
+    def test_prepare_install_leaves_database_untouched_until_registration(self):
+        db, mgr = self._make_manager()
+        source = Path(self.tmpdir) / "pack"
+        source.mkdir()
+        (source / "texture.png").write_bytes(b"texture")
+        with patch.object(type(mgr), "_fetch_thumbnail", return_value="/cover.jpg"):
+            mod = type(mgr).prepare_install(
+                str(source), ModType.TEXTURE_PACK, str(Path(self.tmpdir) / "storage"),
+                name="Prepared pack", author="Author", game_id="SLUS-20062",
+                source_url="https://example.com/pack",
+            )
+        self.assertEqual(db.all(), [])
+        self.assertEqual(mod.size_bytes, 7)
+        self.assertEqual(mod.thumbnail_path, "/cover.jpg")
+        self.assertTrue((Path(mod.path) / "SLUS-20062" / "replacements" / "texture.png").exists())
+        db.add(mod)
+        self.assertEqual(type(db)().get(mod.id).source_url, "https://example.com/pack")
+
+    def test_prepare_install_cleans_only_its_new_folder_after_file_failures(self):
+        from src.core.mod_manager import ModManager
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        storage = Path(self.tmpdir) / "storage"
+        existing = storage / "existing"
+        existing.mkdir(parents=True)
+        (existing / "keep").write_bytes(b"existing")
+        for failure in ("copy", "inventory", "archive", "normalization"):
+            with self.subTest(failure=failure):
+                target = {
+                    "copy": "src.core.mod_manager.shutil.copy2",
+                    "inventory": "src.core.mod_manager.ModManager._list_files",
+                    "archive": "src.core.mod_manager.extract_archive",
+                    "normalization": "src.core.mod_manager.ModManager._normalize_texture_structure",
+                }[failure]
+                with patch(target, side_effect=OSError("disk error")), patch(
+                    "src.core.mod_manager.is_archive", return_value=failure == "archive",
+                ):
+                    with self.assertRaises(OSError):
+                        ModManager.prepare_install(str(source), ModType.TEXTURE_PACK, str(storage),
+                                                   game_id="SLUS-20062")
+                self.assertEqual(list(storage.iterdir()), [existing])
+                self.assertEqual((existing / "keep").read_bytes(), b"existing")
+
+    def test_prepare_install_does_not_reuse_or_delete_colliding_folder(self):
+        from src.core.mod_manager import ModManager
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        storage = Path(self.tmpdir) / "storage"
+        existing = storage / "existing"
+        existing.mkdir(parents=True)
+        (existing / "keep").write_bytes(b"existing")
+        with patch("src.core.mod_manager.uuid.uuid4", return_value="existing"):
+            with self.assertRaises(FileExistsError):
+                ModManager.prepare_install(str(source), ModType.PNACH, str(storage))
+        self.assertEqual((existing / "keep").read_bytes(), b"existing")
+
+    def test_failed_registration_restores_database_and_preserves_prepared_files_for_retry(self):
+        db, mgr = self._make_manager()
+        existing = ModInfo(id="existing", name="Existing", mod_type=ModType.PNACH, path="/existing")
+        db.add(existing)
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        mod = mgr.prepare_install(str(source), ModType.PNACH, str(Path(self.tmpdir) / "storage"))
+        with patch.object(db, "save", side_effect=OSError("database read-only")):
+            with self.assertRaises(OSError):
+                db.add(mod)
+            with self.assertRaises(OSError):
+                db.add(ModInfo(id="existing", name="Replacement", mod_type=ModType.CHEAT, path="/new"))
+        self.assertIs(db.get("existing"), existing)
+        self.assertIsNone(db.get(mod.id))
+        self.assertEqual(type(db)().get("existing").name, "Existing")
+        self.assertIsNone(type(db)().get(mod.id))
+        self.assertEqual((Path(mod.path) / "hack.pnach").read_bytes(), b"patch")
+        db.add(mod)
+        self.assertEqual(type(db)().get(mod.id).path, mod.path)
+
     def test_remove_mod(self):
         db, mgr = self._make_manager()
         src_dir = Path(self.tmpdir) / "src_mod2"
@@ -413,6 +540,46 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(len(conflicts), 1)
         self.assertIn("shared.png", conflicts[0].conflicting_files)
 
+    def test_folder_has_serial_structure_logs_permission_error(self):
+        from src.core.mod_manager import _folder_has_serial_structure
+        folder = Path(self.tmpdir) / "pack"
+        folder.mkdir()
+
+        with patch("pathlib.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                self.assertFalse(_folder_has_serial_structure(folder))
+
+        self.assertTrue(any("Could not inspect folder structure" in msg for msg in logs.output))
+
+    def test_validate_all_pnach_logs_validation_failure(self):
+        db, mgr = self._make_manager()
+        pnach = Path(self.tmpdir) / "bad.pnach"
+        pnach.write_text("patch=1,EE,00123456,word,00000001", encoding="utf-8")
+        db.add(ModInfo(
+            id="bad-pnach",
+            name="Bad PNACH",
+            mod_type=ModType.PNACH,
+            path=str(pnach),
+            enabled=True,
+        ))
+
+        with patch("src.core.pnach.validate_pnach_file", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                result = mgr.validate_all_pnach()
+
+        self.assertEqual(result, {})
+        self.assertTrue(any("Could not validate PNACH file" in msg for msg in logs.output))
+
+    def test_file_hash_logs_read_failure(self):
+        from src.core.mod_manager import ModManager
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                digest = ModManager.file_hash("/tmp/missing-file")
+
+        self.assertEqual(digest, "")
+        self.assertTrue(any("Could not hash file" in msg for msg in logs.output))
+
     def test_disabled_mod_no_conflict(self):
         db, mgr = self._make_manager()
         db.add(ModInfo(id="x", name="X", mod_type=ModType.TEXTURE_PACK, path="/p",
@@ -462,6 +629,81 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(count, 0)
         self.assertFalse((Path(target) / "tex.png").exists())
 
+    def test_deploy_pnach_merge_failure_logs_warning(self):
+        db, mgr = self._make_manager()
+
+        high_dir = Path(self.tmpdir) / "pnach_high"
+        high_dir.mkdir()
+        (high_dir / "ABCDEF12.pnach").write_text("high priority", encoding="utf-8")
+
+        low_dir = Path(self.tmpdir) / "pnach_low"
+        low_dir.mkdir()
+        (low_dir / "ABCDEF12.pnach").write_text("low priority", encoding="utf-8")
+
+        db.add(ModInfo(
+            id="pnach-high",
+            name="High Priority Patch",
+            mod_type=ModType.PNACH,
+            path=str(high_dir),
+            enabled=True,
+            priority=10,
+        ))
+        db.add(ModInfo(
+            id="pnach-low",
+            name="Low Priority Patch",
+            mod_type=ModType.PNACH,
+            path=str(low_dir),
+            enabled=True,
+            priority=0,
+        ))
+
+        target = str(Path(self.tmpdir) / "pcsx2_cheats")
+        with patch("src.core.pnach.merge_pnach_files", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                count, warnings = mgr.deploy(ModType.PNACH, target)
+
+        output = Path(target) / "ABCDEF12.pnach"
+        self.assertEqual(count, 1)
+        self.assertTrue(output.exists())
+        self.assertEqual(output.read_text(encoding="utf-8"), "high priority")
+        self.assertTrue(any("Failed to merge PNACH for CRC ABCDEF12" in msg for msg in warnings))
+        self.assertTrue(any("Failed to merge PNACH for CRC ABCDEF12" in msg for msg in logs.output))
+
+    def test_resolve_conflict_logs_missing_mod(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        db.add(ModInfo(id="winner", name="Winner", mod_type=ModType.TEXTURE_PACK, path="/p"))
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict(conflict, "winner"))
+
+        self.assertTrue(any("missing mod(s)" in msg for msg in logs.output))
+
+    def test_resolve_conflict_disable_loser_logs_missing_loser(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        db.add(ModInfo(id="winner", name="Winner", mod_type=ModType.TEXTURE_PACK, path="/p"))
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict_disable_loser(conflict, "winner"))
+
+        self.assertTrue(any("missing mod" in msg for msg in logs.output))
+
+    def test_resolve_conflict_disable_loser_logs_invalid_winner(self):
+        from src.core.mod_manager import ConflictInfo
+
+        db, mgr = self._make_manager()
+        conflict = ConflictInfo(mod_a_id="winner", mod_b_id="loser", conflicting_files=["a.png"])
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+            self.assertFalse(mgr.resolve_conflict_disable_loser(conflict, "not-in-conflict"))
+
+        self.assertTrue(any("not part of the conflict" in msg for msg in logs.output))
+
 
 class TestMemoryCard(unittest.TestCase):
     """Test memory card utilities."""
@@ -471,6 +713,127 @@ class TestMemoryCard(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def test_export_save_preserves_default_replacement_and_raw_dump_format(self):
+        from src.core.memory_card import export_save
+        card = Path(self.tmpdir) / "card.ps2"
+        payload = b"\x00" * 512 + b"SAVE" + b"x" * 70000
+        card.write_bytes(payload)
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"old export")
+        self.assertEqual(export_save(str(card), "SAVE", self.tmpdir), str(output))
+        self.assertEqual(output.read_bytes(), payload[512:512 + 65536])
+        self.assertEqual(card.read_bytes(), payload)
+
+    def test_export_save_exclusive_mode_preserves_existing_dump(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE" + b"x" * 1024)
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"keep this export")
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertEqual(output.read_bytes(), b"keep this export")
+
+    def test_export_save_exclusive_mode_creates_dump(self):
+        from src.core.memory_card import export_save
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE" + b"x" * 1024)
+        output = Path(export_save(str(card), "SAVE", self.tmpdir, overwrite=False))
+        self.assertEqual(output.read_bytes(), card.read_bytes())
+
+    def test_export_save_rejects_unsafe_cross_platform_filenames(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        destination = Path(self.tmpdir) / "exports"
+        for name in ("", ".", "..", "../outside", "/outside", r"..\outside",
+                     r"C:\outside", "a:b", "a\x00b", "a\nb", "trailing.",
+                     "trailing ", "NUL", "con.txt", "COM1", "LPT9"):
+            with self.subTest(name=name), self.assertRaises(MemoryCardError):
+                export_save("/missing.ps2", name, str(destination), overwrite=False)
+        self.assertFalse(destination.exists())
+
+    def test_export_save_rejects_symlink_outside_destination(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        destination = Path(self.tmpdir) / "exports"
+        destination.mkdir()
+        outside = Path(self.tmpdir) / "outside.bin"
+        outside.write_bytes(b"keep")
+        (destination / "SAVE.bin").symlink_to(outside)
+        with self.assertRaises(MemoryCardError):
+            export_save("/missing.ps2", "SAVE", str(destination))
+        self.assertEqual(outside.read_bytes(), b"keep")
+        self.assertTrue((destination / "SAVE.bin").is_symlink())
+
+    def test_export_save_exclusive_mode_preserves_dangling_symlink(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        target = Path(self.tmpdir) / "missing.bin"
+        output.symlink_to(target)
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertTrue(output.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_export_save_cyclic_symlink_is_a_recoverable_export_error(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.symlink_to(output.name)
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertTrue(output.is_symlink())
+        self.assertEqual(card.read_bytes(), b"SAVE")
+
+    def test_export_save_never_overwrites_source_or_hardlink(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "SAVE.bin"
+        card.write_bytes(b"SAVE")
+        with self.assertRaises(MemoryCardError):
+            export_save(str(card), "SAVE", self.tmpdir)
+        alias = Path(self.tmpdir) / "ALIAS.bin"
+        alias.hardlink_to(card)
+        with self.assertRaises(MemoryCardError):
+            export_save(str(card), "ALIAS", self.tmpdir)
+        self.assertEqual(card.read_bytes(), b"SAVE")
+        self.assertEqual(alias.read_bytes(), b"SAVE")
+
+    def test_export_save_read_failure_does_not_remove_existing_output(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        output = Path(self.tmpdir) / "SAVE.bin"
+        output.write_bytes(b"keep")
+        with self.assertLogs("src.core.memory_card", level="WARNING"):
+            with self.assertRaises(MemoryCardError):
+                export_save(str(Path(self.tmpdir) / "missing.ps2"), "SAVE", self.tmpdir)
+        self.assertEqual(output.read_bytes(), b"keep")
+
+    def test_export_save_removes_only_new_partial_output_on_write_failure(self):
+        from src.core.memory_card import export_save, MemoryCardError
+        card = Path(self.tmpdir) / "card.ps2"
+        card.write_bytes(b"SAVE")
+        output = Path(self.tmpdir) / "SAVE.bin"
+        real_open = open
+
+        def failing_write(path, mode):
+            handle = real_open(path, mode)
+            if mode == "xb":
+                handle.close()
+                broken = MagicMock()
+                broken.__enter__.return_value.write.side_effect = OSError("disk full")
+                return broken
+            return handle
+
+        with patch("builtins.open", side_effect=failing_write):
+            with self.assertLogs("src.core.memory_card", level="WARNING"):
+                with self.assertRaises(MemoryCardError):
+                    export_save(str(card), "SAVE", self.tmpdir, overwrite=False)
+        self.assertFalse(output.exists())
+        self.assertEqual(card.read_bytes(), b"SAVE")
 
     def test_is_valid_memcard_returns_false_for_nonexistent(self):
         from src.core.memory_card import is_valid_memcard
@@ -490,10 +853,30 @@ class TestMemoryCard(unittest.TestCase):
         p.write_bytes(MC_SUPERBLOCK_MAGIC + b"\x00" * 512)
         self.assertTrue(is_valid_memcard(str(p)))
 
+    def test_is_valid_memcard_logs_warning_on_io_error(self):
+        from src.core.memory_card import is_valid_memcard
+
+        with patch.object(Path, "is_file", return_value=True), \
+             patch.object(Path, "stat", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertFalse(is_valid_memcard(str(Path(self.tmpdir) / "card.ps2")))
+
+        self.assertTrue(any("Could not inspect memory card" in msg for msg in logs.output))
+
     def test_list_memcard_files_empty_dir(self):
         from src.core.memory_card import list_memcard_files
         result = list_memcard_files(self.tmpdir)
         self.assertEqual(result, [])
+
+    def test_list_memcard_files_logs_warning_on_io_error(self):
+        from src.core.memory_card import list_memcard_files
+
+        with patch.object(Path, "is_dir", return_value=True), \
+             patch.object(Path, "iterdir", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertEqual(list_memcard_files(self.tmpdir), [])
+
+        self.assertTrue(any("Could not list memory card files under" in msg for msg in logs.output))
 
     def test_list_memcard_files_finds_ps2_files(self):
         from src.core.memory_card import list_memcard_files
@@ -507,12 +890,77 @@ class TestMemoryCard(unittest.TestCase):
         from src.core.memory_card import list_saves, MemoryCardError
         p = Path(self.tmpdir) / "bad.ps2"
         p.write_bytes(b"BADDATA" + b"\x00" * 512)
-        with self.assertRaises(MemoryCardError):
-            list_saves(str(p))
+        with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+            with self.assertRaises(MemoryCardError):
+                list_saves(str(p))
+        self.assertTrue(any("invalid header" in msg for msg in logs.output))
+
+    def test_list_saves_logs_warning_on_parse_error(self):
+        from src.core.memory_card import create_memcard, list_saves, MemoryCardError
+        import struct
+
+        card = Path(self.tmpdir) / "card.ps2"
+        create_memcard(str(card), size_mb=1)
+
+        with patch("src.core.memory_card.struct.unpack_from", side_effect=struct.error("boom")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                with self.assertRaises(MemoryCardError):
+                    list_saves(str(card))
+
+        self.assertTrue(any("Could not parse memory card" in msg for msg in logs.output))
 
 
 class TestDownloader(unittest.TestCase):
     """Test downloader (mocked network)."""
+
+    def test_cover_serial_normalization_rejects_unsafe_or_malformed_names(self):
+        from src.core.downloader import normalize_cover_serial
+        for value in ("slus20062", " SLUS_20062 ", "SLUS-20062"):
+            self.assertEqual(normalize_cover_serial(value), "SLUS-20062")
+        for value in ("../SLUS-20062", "SLUS-20062/../other", "SLUS-2006", "SLUS-２００６２", ""):
+            self.assertEqual(normalize_cover_serial(value), "")
+
+    def test_cover_fetch_normalizes_endpoint_and_atomically_replaces_file(self):
+        from src.core.downloader import fetch_gametdb_art
+        for region, expected in (("EN", "EN"), ("EU", "EN"), ("JP", "JA"), ("US", "US")):
+            with self.subTest(region=region), tempfile.TemporaryDirectory() as directory:
+                target = Path(directory) / "SLUS-20062.jpg"
+                target.write_bytes(b"old cover")
+
+                def transfer(url, dest, timeout):
+                    self.assertEqual(url, f"https://art.gametdb.com/ps2/cover/{expected}/SLUS20062.jpg")
+                    self.assertEqual(target.read_bytes(), b"old cover")
+                    self.assertNotEqual(Path(dest), target)
+                    Path(dest).write_bytes(b"new cover")
+
+                with patch("src.core.downloader.download_file", side_effect=transfer):
+                    self.assertEqual(fetch_gametdb_art("slus_20062", directory, region), str(target))
+                self.assertEqual(target.read_bytes(), b"new cover")
+                self.assertEqual(list(Path(directory).iterdir()), [target])
+
+    def test_cover_fetch_failure_preserves_existing_file_and_cleans_staging(self):
+        from src.core.downloader import fetch_gametdb_art
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "SLUS-20062.jpg"
+            target.write_bytes(b"old cover")
+
+            def transfer(url, dest, timeout):
+                Path(dest).write_bytes(b"partial")
+                raise OSError("connection lost")
+
+            with patch("src.core.downloader.download_file", side_effect=transfer):
+                with self.assertLogs("src.core.downloader", level="WARNING"):
+                    self.assertIsNone(fetch_gametdb_art("SLUS-20062", directory))
+            self.assertEqual(target.read_bytes(), b"old cover")
+            self.assertEqual(list(Path(directory).iterdir()), [target])
+
+    def test_cover_fetch_rejects_unsafe_serial_and_region_before_network(self):
+        from src.core.downloader import fetch_gametdb_art
+        for serial, region in (("../other", "EN"), ("SLUS-20062", "../US")):
+            with patch("src.core.downloader.download_file") as transfer:
+                with self.assertLogs("src.core.downloader", level="WARNING"):
+                    self.assertIsNone(fetch_gametdb_art(serial, "/unused", region))
+            transfer.assert_not_called()
 
     def test_download_rejects_non_http_scheme(self):
         from src.core.downloader import download_file, DownloadError
@@ -523,6 +971,11 @@ class TestDownloader(unittest.TestCase):
         from src.core.downloader import download_file, DownloadError
         with self.assertRaises(DownloadError):
             download_file("file:///etc/passwd", "/tmp/out.zip")
+
+    def test_download_rejects_missing_host(self):
+        from src.core.downloader import download_file, DownloadError
+        with self.assertRaises(DownloadError):
+            download_file("https:///file.zip", "/tmp/out.zip")
 
     @patch("src.core.downloader.requests.get")
     def test_download_success(self, mock_get):
@@ -543,6 +996,94 @@ class TestDownloader(unittest.TestCase):
             self.assertEqual(result, dest)
             with open(dest, "rb") as f:
                 self.assertEqual(f.read(), b"hello")
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_rejects_empty_response(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "0"}
+        mock_resp.iter_content.return_value = []
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_rejects_mislabeled_html(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {
+            "Content-Length": "32",
+            "Content-Type": "application/octet-stream",
+        }
+        mock_resp.iter_content.return_value = [b"<html><body>login</body></html>"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertRaises(DownloadError):
+                download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_ignores_invalid_content_length(self, mock_get):
+        from src.core.downloader import download_file
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "not-a-number"}
+        mock_resp.iter_content.return_value = [b"hello"]
+        mock_get.return_value = mock_resp
+
+        progress = []
+
+        def _progress(received, total):
+            progress.append((received, total))
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            result = download_file("https://example.com/file.bin", dest, progress_callback=_progress)
+            self.assertEqual(result, dest)
+            with open(dest, "rb") as f:
+                self.assertEqual(f.read(), b"hello")
+
+        self.assertEqual(progress, [(5, 0)])
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_wraps_write_errors(self, mock_get):
+        import tempfile
+        from src.core.downloader import download_file, DownloadError
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "5"}
+        mock_resp.iter_content.return_value = [b"hello"]
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with patch("builtins.open", side_effect=OSError("disk full")):
+                with self.assertRaises(DownloadError):
+                    download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
 
     @patch("src.core.downloader.requests.get")
     def test_download_removes_partial_file_on_network_error(self, mock_get):
@@ -596,6 +1137,248 @@ class TestDownloader(unittest.TestCase):
                               progress_callback=_cancel_callback)
             # Partial file must have been removed
             self.assertFalse(Path(dest).exists())
+
+
+class TestDownloaderLogging(unittest.TestCase):
+    """Downloader helpers should log unexpected failures before falling back."""
+
+    @patch("src.core.downloader.requests.get")
+    def test_download_file_logs_and_cleans_up_on_unexpected_failure(self, mock_get):
+        from src.core.downloader import download_file, DownloadError
+        import tempfile
+
+        mock_resp = MagicMock()
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.headers = {"Content-Length": "1000"}
+
+        def _iter_content(chunk_size=None):
+            yield b"partial"
+            raise RuntimeError("boom")
+
+        mock_resp.iter_content.side_effect = _iter_content
+        mock_get.return_value = mock_resp
+
+        with tempfile.TemporaryDirectory() as d:
+            dest = os.path.join(d, "out.bin")
+            with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+                with self.assertRaises(DownloadError):
+                    download_file("https://example.com/file.bin", dest)
+            self.assertFalse(Path(dest).exists())
+
+        self.assertTrue(any("Download failed for https://example.com/file.bin" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.download_file")
+    def test_fetch_gametdb_art_logs_failure(self, mock_download):
+        from src.core.downloader import fetch_gametdb_art, DownloadError
+
+        mock_download.side_effect = DownloadError("network down")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(fetch_gametdb_art("SLUS-20062", "/tmp"))
+        self.assertTrue(any("Failed to fetch GameTDB art" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.download_file")
+    def test_fetch_gametdb_art_logs_unexpected_failure(self, mock_download):
+        from src.core.downloader import fetch_gametdb_art
+
+        mock_download.side_effect = OSError("boom")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(fetch_gametdb_art("SLUS-20062", "/tmp"))
+        self.assertTrue(any("Failed to fetch GameTDB art" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_http_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to look up GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_lookup_game_title_online_logs_parse_failure(self, mock_get):
+        from src.core.downloader import lookup_game_title_online
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><head><title>GameTDB</title></head><body>no title</body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(lookup_game_title_online("SLUS-20062"), "")
+        self.assertTrue(any("Failed to parse GameTDB title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_pcsx2_widescreen_patches_logs_failure(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(list_pcsx2_widescreen_patches(), [])
+        self.assertTrue(any("Failed to list PCSX2 widescreen patches" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_list_pcsx2_widescreen_patches_logs_http_failure(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertEqual(list_pcsx2_widescreen_patches(), [])
+        self.assertTrue(any("Failed to list PCSX2 widescreen patches" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_pcsx2_patches_by_crc_logs_failure(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_head.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+        self.assertTrue(any("Failed to check PCSX2 patch" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.head")
+    def test_search_pcsx2_patches_by_crc_logs_http_failure(self, mock_head):
+        from src.core.downloader import search_pcsx2_patches_by_crc
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_head.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+        self.assertTrue(any("Failed to check PCSX2 patch" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_http_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape GBAtemp page" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_gbatemp_thread_logs_title_parse_failure(self, mock_get):
+        from src.core.downloader import scrape_gbatemp_thread
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>no title here</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_gbatemp_thread("https://gbatemp.net/threads/test.1/")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to parse GBAtemp page title" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_resolve_mediafire_url_logs_http_failure(self, mock_get):
+        from src.core.downloader import resolve_mediafire_url
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_mediafire_url("https://www.mediafire.com/file/abc"))
+        self.assertTrue(any("Failed to resolve MediaFire URL" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_get.side_effect = Exception("timeout")
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape PS2-Home post" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_http_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 503
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to scrape PS2-Home post" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_scrape_ps2home_post_logs_title_parse_failure(self, mock_get):
+        from src.core.downloader import scrape_ps2home_post
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "<html><body><p>no title here</p></body></html>"
+        mock_get.return_value = mock_resp
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = scrape_ps2home_post("https://www.ps2-home.com/forum/viewtopic.php?t=1")
+        self.assertEqual(result["title"], "")
+        self.assertTrue(any("Failed to parse PS2-Home post title" in msg for msg in logs.output))
+
+    def test_convert_share_url_logs_parse_failure(self):
+        from src.core.downloader import convert_share_url
+
+        with patch("src.core.downloader.urllib.parse.urlparse", side_effect=ValueError("bad url")):
+            with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+                self.assertEqual(convert_share_url("not a real url"), "not a real url")
+
+        self.assertTrue(any("Failed to inspect share URL" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.download_file")
+    def test_async_downloader_surfaces_unexpected_errors(self, mock_download):
+        from src.core.downloader import AsyncDownloader
+        import threading
+
+        mock_download.side_effect = OSError("boom")
+        done = threading.Event()
+        messages = []
+
+        def _on_error(msg):
+            messages.append(msg)
+            done.set()
+
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            downloader = AsyncDownloader()
+            downloader.start("https://example.com/file.zip", "/tmp/out.zip", on_error=_on_error)
+            self.assertTrue(done.wait(timeout=2), "AsyncDownloader did not report the failure")
+
+        self.assertTrue(messages)
+        self.assertIn("boom", messages[0])
+        self.assertTrue(any("Unexpected async download failure" in msg for msg in logs.output))
 
 
 class TestArchiveExtraction(unittest.TestCase):
@@ -685,6 +1468,95 @@ class TestArchiveExtraction(unittest.TestCase):
         with self.assertRaises(ArchiveError) as ctx:
             extract_archive(rar_path, self.tmpdir)
         self.assertIn("RAR", str(ctx.exception))
+
+    def test_extract_7z_logs_unexpected_failure(self):
+        import sys
+        import types
+
+        fake_py7zr = types.SimpleNamespace()
+
+        class FakeSevenZipFile:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def getnames(self):
+                return ["safe.txt"]
+
+            def extractall(self, path=None):
+                raise RuntimeError("boom")
+
+        fake_py7zr.SevenZipFile = FakeSevenZipFile
+
+        with patch.dict(sys.modules, {"py7zr": fake_py7zr}):
+            from src.core.archive import _extract_7z, ArchiveError
+
+            src = Path(self.tmpdir) / "mod.7z"
+            src.write_bytes(b"fake")
+            dest = Path(self.tmpdir) / "out7z"
+
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                with self.assertRaises(ArchiveError):
+                    _extract_7z(src, dest)
+
+        self.assertTrue(any("7z extraction failed" in msg for msg in logs.output))
+
+    def test_extract_rar_logs_unexpected_failure(self):
+        import sys
+        import types
+
+        fake_rarfile = types.SimpleNamespace()
+
+        class FakeMember:
+            def __init__(self, filename):
+                self.filename = filename
+
+            def is_dir(self):
+                return False
+
+        class FakeRarFile:
+            def __init__(self, *args, **kwargs):
+                pass
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def infolist(self):
+                return [FakeMember("safe.txt")]
+
+            def extractall(self, path):
+                raise RuntimeError("boom")
+
+        fake_rarfile.RarFile = FakeRarFile
+        class FakeBadRarFile(Exception):
+            pass
+
+        class FakeRarCannotExec(Exception):
+            pass
+
+        fake_rarfile.BadRarFile = FakeBadRarFile
+        fake_rarfile.RarCannotExec = FakeRarCannotExec
+
+        with patch.dict(sys.modules, {"rarfile": fake_rarfile}):
+            from src.core.archive import _extract_rar, ArchiveError
+
+            src = Path(self.tmpdir) / "mod.rar"
+            src.write_bytes(b"fake")
+            dest = Path(self.tmpdir) / "outrar"
+
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                with self.assertRaises(ArchiveError):
+                    _extract_rar(src, dest)
+
+        self.assertTrue(any("RAR extraction failed" in msg for msg in logs.output))
 
     def test_extract_unsupported_format_raises(self):
         from src.core.archive import extract_archive, ArchiveError
@@ -786,6 +1658,26 @@ class TestMultipartArchive(unittest.TestCase):
         p = str(Path(self.tmpdir) / "single.zip")
         Path(p).write_bytes(b"data")
         self.assertEqual(find_multipart_parts(p), [])
+
+    def test_find_logs_permission_errors_and_returns_partial_results(self):
+        from src.core.archive import find_multipart_parts
+
+        with patch("pathlib.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                parts = find_multipart_parts(str(Path(self.tmpdir) / "Pack_Part1.zip"))
+
+        self.assertEqual(parts, [])
+        self.assertTrue(any("Could not inspect multipart archive parts" in msg for msg in logs.output))
+
+    def test_find_logs_os_errors_and_returns_partial_results(self):
+        from src.core.archive import find_multipart_parts
+
+        with patch("pathlib.Path.iterdir", side_effect=FileNotFoundError("missing")):
+            with self.assertLogs("src.core.archive", level="WARNING") as logs:
+                parts = find_multipart_parts(str(Path(self.tmpdir) / "Pack_Part1.zip"))
+
+        self.assertEqual(parts, [])
+        self.assertTrue(any("Could not inspect multipart archive parts" in msg for msg in logs.output))
 
     # -- check_multipart_completeness ----------------------------------------
 
@@ -955,10 +1847,327 @@ class TestUpdateMetadata(unittest.TestCase):
             mgr.update_metadata("m4", game_id="SLUS-20062")
         self.assertEqual(db.get("m4").game_id, "SLUS-20062")
 
+    def test_fetch_thumbnail_logs_failure(self):
+        from src.core.mod_manager import ModManager
+
+        with self.assertLogs("src.core.mod_manager", level="WARNING") as cm:
+            with patch("src.core.downloader.fetch_gametdb_art", side_effect=OSError("network down")):
+                result = ModManager._fetch_thumbnail("SLUS-20062")
+
+        self.assertIsNone(result)
+        self.assertTrue(any("Thumbnail fetch failed" in msg for msg in cm.output))
+
     def test_update_nonexistent_mod_is_noop(self):
         """Calling update_metadata on a missing id should not raise."""
         db, mgr = self._make_manager()
         mgr.update_metadata("nonexistent", name="Ghost")  # should not raise
+
+    def test_omitted_fields_remain_unchanged(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p", author="Author",
+                      description="Notes", game_id="SLUS-20062", source_url="https://example.com", tags=["hd"])
+        db.add(mod)
+        mgr.update_metadata("m", name="Renamed")
+        self.assertEqual((mod.author, mod.description, mod.game_id, mod.source_url, mod.tags),
+                         ("Author", "Notes", "SLUS-20062", "https://example.com", ["hd"]))
+
+    def test_explicit_blank_values_clear_optional_fields(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p", author="Author", description="Notes",
+                      game_id="SLUS-20062", source_url="https://example.com", tags=["hd"])
+        db.add(mod)
+        mgr.update_metadata("m", author="", description="", game_id="", version="", source_url="", tags=[])
+        loaded = type(db)().get("m")
+        self.assertEqual((loaded.author, loaded.description, loaded.game_id, loaded.version, loaded.source_url, loaded.tags),
+                         ("", "", "", "", "", []))
+
+    def test_metadata_and_thumbnail_saved_together_without_network(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p")
+        db.add(mod)
+        with patch.object(mgr, "_fetch_thumbnail") as fetch, patch.object(db, "save", wraps=db.save) as save:
+            mgr.update_metadata("m", name="Edited", game_id="SLUS-20062",
+                                thumbnail_path="/cache/art.png", fetch_thumbnail=False)
+        fetch.assert_not_called()
+        save.assert_called_once()
+        loaded = type(db)().get("m")
+        self.assertEqual((loaded.name, loaded.game_id, loaded.thumbnail_path), ("Edited", "SLUS-20062", "/cache/art.png"))
+
+    def test_changed_serial_without_thumbnail_does_not_fetch_when_disabled(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.PNACH, "/p")
+        db.add(mod)
+        with patch.object(mgr, "_fetch_thumbnail") as fetch:
+            mgr.update_metadata("m", game_id="SLUS-20062", fetch_thumbnail=False)
+        fetch.assert_not_called()
+        self.assertEqual(mod.game_id, "SLUS-20062")
+
+    def test_save_failure_restores_live_object_and_persisted_data_then_retries(self):
+        db, mgr = self._make_manager()
+        mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p", author="Author", tags=["old"])
+        db.add(mod)
+        with patch.object(db, "save", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                mgr.update_metadata("m", name="Edited", author="", game_id="SLUS-20062",
+                                    thumbnail_path="/cache/art.png", tags=["new"], fetch_thumbnail=False)
+        self.assertIs(db.get("m"), mod)
+        self.assertEqual((mod.name, mod.author, mod.game_id, mod.thumbnail_path, mod.tags),
+                         ("Original", "Author", "", "", ["old"]))
+        self.assertEqual(type(db)().get("m").name, "Original")
+        mgr.update_metadata("m", name="Edited", thumbnail_path="/cache/art.png", fetch_thumbnail=False)
+        self.assertEqual(type(db)().get("m").thumbnail_path, "/cache/art.png")
+
+
+class TestInstalledModSearch(unittest.TestCase):
+    """Structured search is shared, local, and independent of Qt."""
+
+    def setUp(self):
+        from src.core.mod_search import compile_mod_query, mod_matches_query
+        self.compile = compile_mod_query
+        self.matches = mod_matches_query
+        self.mod = ModInfo(
+            "pack-123", "High-Res UI", ModType.TEXTURE_PACK, r"C:\Mods\High Res",
+            author="Alice Example", description="Improves the menu and HUD",
+            game_id="SLUS-20062", version="1.2.3",
+            source_url="https://github.com/example/high-res",
+            thumbnail_url="https://images.example/preview.jpg",
+            thumbnail_path="/covers/local-preview.png",
+            tags=["HD", "4k"], files=["textures/hero.dds", "readme.txt"],
+        )
+
+    def test_blank_and_non_string_queries_keep_existing_semantics(self):
+        for query in ("", " \n ", '""'):
+            self.assertTrue(self.matches(self.mod, query))
+        for query in (None, 0, ["hd"], {}):
+            self.assertFalse(self.matches(self.mod, query))
+
+    def test_all_words_may_match_different_fields(self):
+        self.assertTrue(self.matches(self.mod, "alice hd hero.dds 1.2"))
+        self.assertFalse(self.matches(self.mod, "alice hd missing"))
+
+    def test_phrases_stay_within_one_metadata_value(self):
+        self.assertTrue(self.matches(self.mod, '"high res"'))
+        self.assertTrue(self.matches(self.mod, 'author:"alice example"'))
+        self.assertFalse(self.matches(self.mod, '"alice hd"'))
+        self.assertFalse(self.matches(self.mod, 'author:"example alice"'))
+
+    def test_unfinished_quote_is_a_phrase_without_error(self):
+        self.assertTrue(self.matches(self.mod, 'name:"high res'))
+        self.assertTrue(self.matches(self.mod, '"high res'))
+        self.assertFalse(self.matches(self.mod, '"high missing'))
+
+    def test_field_filters_do_not_leak_into_other_fields(self):
+        self.assertTrue(self.matches(self.mod, "author:alice tag:hd file:hero.dds"))
+        self.assertFalse(self.matches(self.mod, "name:alice"))
+        self.assertFalse(self.matches(self.mod, "tag:alice"))
+        self.assertFalse(self.matches(self.mod, "author:hd"))
+        self.assertFalse(self.matches(self.mod, "source:preview.jpg"))
+
+    def test_all_supported_fields_and_aliases(self):
+        for query in (
+            "id:pack123", "name:highres", "author:ALICE", "serial:slus_20062",
+            "tag:4k", "tags:hd", "file:hero.dds", "files:readme", "source:github",
+            "url:github", 'path:"high res"', "description:menu", "desc:hud",
+            "version:1.2", "type:texture_pack",
+        ):
+            with self.subTest(query=query):
+                self.assertTrue(self.matches(self.mod, query))
+
+    def test_exclusions_and_negative_only_queries(self):
+        self.assertTrue(self.matches(self.mod, "hd -demo -author:bob"))
+        self.assertFalse(self.matches(self.mod, "hd -author:alice"))
+        self.assertFalse(self.matches(self.mod, "-file:hero.dds"))
+        self.assertTrue(self.matches(self.mod, "-demo"))
+        self.assertFalse(self.matches(self.mod, '-"high res"'))
+
+    def test_quoted_operators_are_literals_not_filters(self):
+        self.mod.description = "A -demo label and author:Alice text"
+        self.assertTrue(self.matches(self.mod, '"-demo" "author:Alice"'))
+        self.assertFalse(self.matches(self.mod, '-"author:Alice"'))
+        self.assertTrue(self.matches(self.mod, "author:alice"))
+
+    def test_unknown_fields_and_empty_scopes_are_not_silently_ignored(self):
+        self.assertFalse(self.matches(self.mod, "unknown:hd"))
+        self.assertFalse(self.matches(self.mod, "author:"))
+        self.mod.description += " unknown:hd author:"
+        self.assertTrue(self.matches(self.mod, "unknown:hd author:"))
+
+    def test_urls_and_windows_paths_remain_literal(self):
+        self.assertTrue(self.matches(self.mod, "https://github.com/example/high-res"))
+        self.assertTrue(self.matches(self.mod, r'"C:\Mods\High Res"'))
+        self.assertTrue(self.matches(self.mod, r'path:"C:\Mods\High Res"'))
+        self.assertFalse(self.matches(self.mod, r'path:"C:\Other Mods"'))
+
+    def test_apostrophes_are_not_quote_delimiters(self):
+        self.mod.name = "Dante's Awakening"
+        self.assertTrue(self.matches(self.mod, "dante's"))
+        self.assertTrue(self.matches(self.mod, '"dantes awakening"'))
+
+    def test_casefold_and_punctuation_matching(self):
+        self.mod.name = "Straße: HD — Edition"
+        self.assertTrue(self.matches(self.mod, 'name:"STRASSE HD"'))
+        self.assertTrue(self.matches(self.mod, "serial:SLUS20062"))
+        self.assertTrue(self.matches(self.mod, "file:hero_dds"))
+
+    def test_game_titles_aliases_and_serial_fragments(self):
+        self.assertTrue(self.matches(self.mod, "gta iii hd"))
+        self.assertTrue(self.matches(self.mod, 'game:"Grand Theft Auto III"'))
+        self.assertTrue(self.matches(self.mod, 'game:"GTA III" tag:hd'))
+        self.assertTrue(self.matches(self.mod, "serial:20062"))
+        self.assertFalse(self.matches(self.mod, 'serial:"GTA III"'))
+        self.assertFalse(self.matches(self.mod, 'hd -game:"GTA III"'))
+
+    def test_no_serial_and_optional_malformed_lists_are_safe(self):
+        self.mod.game_id = ""
+        self.mod.tags = None
+        self.mod.files = [None, 12, "hero.dds"]
+        self.assertTrue(self.matches(self.mod, "high file:hero"))
+        self.assertFalse(self.matches(self.mod, "tag:hd"))
+        self.assertFalse(self.matches(self.mod, "game:gta"))
+        self.mod.files = "hero.dds"
+        self.assertFalse(self.matches(self.mod, "file:hero"))
+
+    def test_reused_compiled_query_reflects_metadata_changes_and_different_mods(self):
+        query = self.compile("author:alice file:new.dds")
+        self.assertFalse(query.matches(self.mod))
+        self.mod.files.append("new.dds")
+        self.assertTrue(query.matches(self.mod))
+        other = ModInfo("other", "Other", ModType.CHEAT, "/p", author="Bob", files=["new.dds"])
+        self.assertFalse(query.matches(other))
+        self.mod.author = "Bob"
+        self.assertFalse(query.matches(self.mod))
+
+    def test_scoped_queries_skip_title_lookup_and_unneeded_files(self):
+        with patch("src.core.mod_search.lookup_game_title") as lookup, patch(
+            "src.core.mod_search.serial_matches_query",
+        ) as alias:
+            self.assertTrue(self.matches(self.mod, "author:alice"))
+        lookup.assert_not_called()
+        alias.assert_not_called()
+
+    def test_title_alias_match_does_not_scan_large_file_list(self):
+        class UnneededFile(str):
+            def casefold(self):
+                raise AssertionError("Should not scan filenames after an alias match")
+        self.mod.files = [UnneededFile("many_files.dds")]
+        with patch("src.core.mod_search.serial_matches_query", return_value=True):
+            self.assertTrue(self.matches(self.mod, "game-alias"))
+
+    def test_whitespace_and_field_case_are_flexible(self):
+        self.assertTrue(self.matches(self.mod, '  AUTHOR:"Alice Example" \n TAG:HD\t-Tag:demo  '))
+
+
+class TestInstalledSearchPanels(unittest.TestCase):
+    """Both installed-mod views use the same query and compose existing filters."""
+
+    def setUp(self):
+        self.mods = [
+            ModInfo("a", "Pack Alpha", ModType.TEXTURE_PACK, "/a", author="Alice", tags=["HD"],
+                    game_id="SLUS-20062", enabled=True),
+            ModInfo("b", "Pack Demo", ModType.TEXTURE_PACK, "/b", author="Alice", tags=["HD"],
+                    game_id="SLUS-20062", enabled=False),
+            ModInfo("c", "Patch", ModType.PNACH, "/c", author="Bob", tags=["HD"], enabled=True),
+        ]
+
+    def _all_mods_pane(self):
+        from types import MethodType, SimpleNamespace
+        module = TestLibraryPanelStatePersistence()._import_library_panel()
+        pane = SimpleNamespace(
+            _search_edit=MagicMock(), _type_combo=MagicMock(), _status_combo=MagicMock(),
+            _rows=[SimpleNamespace(mod=mod, setVisible=MagicMock()) for mod in self.mods],
+            _count_lbl=MagicMock(), _empty_lbl=MagicMock(), _save_filter_state=MagicMock(),
+        )
+        pane._search_edit.text.return_value = ""
+        pane._search_edit.clear.side_effect = lambda: setattr(pane._search_edit.text, "return_value", "")
+        pane._type_combo.currentData.return_value = ""
+        pane._status_combo.currentData.return_value = "all"
+        for combo, value in ((pane._type_combo, ""), (pane._status_combo, "all")):
+            combo.setCurrentIndex.side_effect = lambda index, combo=combo, value=value: setattr(
+                combo.currentData, "return_value", value,
+            )
+        pane._apply_filter = MethodType(module._AllModsPane._apply_filter, pane)
+        return module, pane
+
+    def test_both_helpers_share_one_implementation(self):
+        from src.core.mod_search import mod_matches_query
+        mod_module = TestModPanelEmptyState()._import_mod_panel()
+        library_module = TestLibraryPanelStatePersistence()._import_library_panel()
+        self.assertIs(mod_module._mod_matches_query, mod_matches_query)
+        self.assertIs(library_module._mod_matches_query, mod_matches_query)
+
+    def test_mod_search_compiles_once_and_composes_existing_filters(self):
+        helper = TestModPanelEmptyState()
+        module = helper._import_mod_panel()
+        panel = helper._make_filter_panel(module, self.mods)
+        panel._search.text.return_value = 'author:Alice tag:hd -name:Demo'
+        panel._author_filter.currentData.return_value = "Alice"
+        panel._library_filter_check.isChecked.return_value = True
+        panel._status_filter.currentData.return_value = "enabled"
+        with patch.object(module, "compile_mod_query", wraps=module.compile_mod_query) as compile_query, patch.object(
+            module, "ModItemWidget",
+        ) as row:
+            panel._apply_filter()
+        compile_query.assert_called_once_with('author:Alice tag:hd -name:Demo')
+        self.assertEqual([call.args[0].id for call in row.call_args_list], ["a"])
+        self.assertIn("Showing 1 of 3", panel._count_lbl.setText.call_args.args[0])
+        self.assertEqual([mod.enabled for mod in self.mods], [True, False, True])
+
+    def test_all_mods_query_compiles_once_and_combines_type_and_status(self):
+        module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = 'game:"GTA III" tag:hd'
+        pane._type_combo.currentData.return_value = "texture_pack"
+        pane._status_combo.currentData.return_value = "disabled"
+        with patch.object(module, "compile_mod_query", wraps=module.compile_mod_query) as compile_query:
+            pane._apply_filter()
+        compile_query.assert_called_once_with('game:"GTA III" tag:hd')
+        self.assertEqual([row.setVisible.call_args.args[0] for row in pane._rows], [False, True, False])
+        pane._empty_lbl.setVisible.assert_called_once_with(False)
+        self.assertIn("Showing 1 of 3", pane._count_lbl.setText.call_args.args[0])
+
+    def test_empty_library_search_explains_recovery(self):
+        _module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = "author:nobody"
+        pane._apply_filter()
+        pane._empty_lbl.setVisible.assert_called_once_with(True)
+        self.assertIn("Clear Filters", pane._empty_lbl.setText.call_args.args[0])
+        self.assertIn("Showing 0 of 3", pane._count_lbl.setText.call_args.args[0])
+
+    def test_clear_library_filters_resets_every_filter_and_saves_once(self):
+        module, pane = self._all_mods_pane()
+        pane._search_edit.text.return_value = "author:nobody"
+        pane._type_combo.currentData.return_value = "cheat"
+        pane._status_combo.currentData.return_value = "disabled"
+        module._AllModsPane._clear_filters(pane)
+        self.assertEqual(pane._search_edit.text(), "")
+        self.assertEqual(pane._type_combo.currentData(), "")
+        self.assertEqual(pane._status_combo.currentData(), "all")
+        pane._save_filter_state.assert_called_once_with("updating all-mods filters")
+        pane._empty_lbl.setVisible.assert_called_with(False)
+        for row in pane._rows:
+            row.setVisible.assert_called_once_with(True)
+        for widget in (pane._search_edit, pane._type_combo, pane._status_combo):
+            self.assertEqual(widget.blockSignals.call_args_list, [unittest.mock.call(True), unittest.mock.call(False)])
+
+    def test_empty_database_explains_where_to_import(self):
+        _module, pane = self._all_mods_pane()
+        pane._rows = []
+        pane._apply_filter()
+        pane._empty_lbl.setVisible.assert_called_once_with(True)
+        self.assertIn("Import", pane._empty_lbl.setText.call_args.args[0])
+        self.assertNotIn("Clear Filters", pane._empty_lbl.setText.call_args.args[0])
+
+    def test_structured_query_persists_without_rewriting_quotes_or_case(self):
+        module, pane = self._all_mods_pane()
+        query = 'author:"Alice Example" -tag:Demo file:hero.dds'
+        pane._search_edit.text.return_value = query
+        pane.config = AppConfig()
+        pane._state_persistence_enabled = True
+        pane._state_bucket = lambda: module._AllModsPane._state_bucket(pane)
+        pane.current_filter_state = lambda: module._AllModsPane.current_filter_state(pane)
+        with patch.object(module, "_save_library_config") as save:
+            module._AllModsPane._save_filter_state(pane, "searching")
+        self.assertEqual(pane.config.ui_state["library_panel"]["all_mods"]["search"], query)
+        save.assert_called_once_with(pane.config, "searching")
 
 
 class TestMemoryCardWrite(unittest.TestCase):
@@ -990,6 +2199,75 @@ class TestMemoryCardWrite(unittest.TestCase):
         from src.core.memory_card import backup_memcard, MemoryCardError
         with self.assertRaises(MemoryCardError):
             backup_memcard("/nonexistent/card.ps2", self.tmpdir)
+
+    def test_backup_same_timestamp_preserves_previous_versions_and_metadata(self):
+        from src.core.memory_card import backup_memcard
+        from datetime import datetime
+        card = Path(self._make_card("Card.ps2"))
+        first_data = card.read_bytes()
+        with patch("datetime.datetime") as clock:
+            clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+            first = Path(backup_memcard(str(card), self.tmpdir))
+            card.write_bytes(first_data + b"new version")
+            card.chmod(0o640)
+            second = Path(backup_memcard(str(card), self.tmpdir))
+        self.assertNotEqual(first, second)
+        self.assertEqual(first.read_bytes(), first_data)
+        self.assertEqual(second.read_bytes(), card.read_bytes())
+        self.assertEqual(second.stat().st_mode, card.stat().st_mode)
+        self.assertEqual(second.stat().st_mtime_ns, card.stat().st_mtime_ns)
+
+    def test_backup_never_follows_existing_symlinks_or_hardlinks(self):
+        from src.core.memory_card import backup_memcard
+        from datetime import datetime
+        card = Path(self._make_card("Card.ps2"))
+        original = card.read_bytes()
+        occupied = Path(self.tmpdir) / "Card_backup_20261017_230000.ps2"
+        for kind in ("symlink", "dangling", "hardlink"):
+            with self.subTest(kind=kind), patch("datetime.datetime") as clock:
+                clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+                if kind == "hardlink":
+                    occupied.hardlink_to(card)
+                else:
+                    occupied.symlink_to(card if kind == "symlink" else Path(self.tmpdir) / "missing.ps2")
+                result = Path(backup_memcard(str(card), self.tmpdir))
+                self.assertNotEqual(result, occupied)
+                self.assertEqual(result.read_bytes(), original)
+                self.assertEqual(card.read_bytes(), original)
+                self.assertTrue(occupied.is_symlink() if kind != "hardlink" else occupied.samefile(card))
+                result.unlink()
+                occupied.unlink()
+
+    def test_backup_failed_copy_removes_only_new_partial_file(self):
+        from src.core.memory_card import backup_memcard, MemoryCardError
+        from datetime import datetime
+        card = self._make_card("Card.ps2")
+        occupied = Path(self.tmpdir) / "Card_backup_20261017_230000.ps2"
+        occupied.write_bytes(b"keep previous backup")
+
+        def fail_copy(source, output):
+            output.write(b"partial")
+            raise OSError("disk full")
+
+        with patch("datetime.datetime") as clock, \
+             patch("shutil.copyfileobj", side_effect=fail_copy):
+            clock.now.return_value = datetime(2026, 10, 17, 23, 0, 0)
+            with self.assertLogs("src.core.memory_card", level="WARNING"), \
+                 self.assertRaises(MemoryCardError):
+                backup_memcard(card, self.tmpdir)
+        self.assertEqual(occupied.read_bytes(), b"keep previous backup")
+        self.assertEqual(sorted(p.name for p in Path(self.tmpdir).iterdir()), [Path(card).name, occupied.name])
+
+    def test_backup_source_open_failure_does_not_remove_existing_backup(self):
+        from src.core.memory_card import backup_memcard, MemoryCardError
+        card = self._make_card("Card.ps2")
+        occupied = Path(self.tmpdir) / "Card_backup_existing.ps2"
+        occupied.write_bytes(b"keep")
+        with patch.object(Path, "open", side_effect=PermissionError("locked")), \
+             self.assertLogs("src.core.memory_card", level="WARNING"), \
+             self.assertRaises(MemoryCardError):
+            backup_memcard(card, self.tmpdir)
+        self.assertEqual(occupied.read_bytes(), b"keep")
 
     def test_import_raw_save_into_valid_card(self):
         """Import a .bin save into a valid memory card."""
@@ -1033,7 +2311,6 @@ class TestMemoryCardWrite(unittest.TestCase):
         from src.core.memory_card import (
             copy_save_between_cards,
             MemoryCardError,
-            export_save,
         )
         src_card = self._make_card("SrcCard.ps2")
         dst_card = self._make_card("DstCard.ps2")
@@ -1044,6 +2321,17 @@ class TestMemoryCardWrite(unittest.TestCase):
             copy_save_between_cards(src_card, "FAKE-00001", dst_card, self.tmpdir)
         except MemoryCardError:
             pass  # Expected — save not found in blank card
+
+    def test_copy_save_between_cards_logs_cleanup_failure(self):
+        from src.core.memory_card import copy_save_between_cards
+
+        with patch("src.core.memory_card.export_save", return_value=str(Path(self.tmpdir) / "export.bin")), \
+             patch("src.core.memory_card.import_raw_save", return_value=True), \
+             patch("src.core.memory_card.Path.unlink", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.memory_card", level="WARNING") as logs:
+                self.assertTrue(copy_save_between_cards("/src.ps2", "SAVE-00001", "/dst.ps2", self.tmpdir))
+
+        self.assertTrue(any("Could not remove temporary exported save" in msg for msg in logs.output))
 
 
 class TestUpdateChecker(unittest.TestCase):
@@ -1091,6 +2379,2829 @@ class TestUpdateChecker(unittest.TestCase):
         mod_id, has_update = _check_single_mod(mod)
         self.assertEqual(mod_id, "no-url")
         self.assertFalse(has_update)
+
+    def test_checker_handles_github_fetch_failure(self):
+        """Network failures while checking GitHub releases should be ignored."""
+        from src.core.updater import _check_single_mod
+
+        mod = ModInfo(
+            id="git-fail",
+            name="GitHub Mod",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/tmp",
+            version="1.0",
+            source_url="https://github.com/example/repo",
+        )
+
+        with patch("urllib.request.urlopen", side_effect=OSError("network down")):
+            mod_id, has_update = _check_single_mod(mod)
+
+        self.assertEqual(mod_id, "git-fail")
+        self.assertFalse(has_update)
+
+    def test_checker_logs_invalid_source_url(self):
+        """Malformed source URLs should be ignored after logging a warning."""
+        from src.core.updater import _check_single_mod
+
+        mod = ModInfo(
+            id="bad-url",
+            name="Bad URL Mod",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/tmp",
+            version="1.0",
+            source_url="https://github.com/example/repo",
+        )
+
+        with patch("urllib.parse.urlparse", side_effect=ValueError("bad url")):
+            with self.assertLogs("src.core.updater", level="WARNING") as logs:
+                mod_id, has_update = _check_single_mod(mod)
+
+        self.assertEqual(mod_id, "bad-url")
+        self.assertFalse(has_update)
+        self.assertTrue(any("Failed to inspect source URL" in msg for msg in logs.output))
+
+    def test_checker_logs_callback_failure_but_completes(self):
+        """Callback failures must not abort the update-check thread."""
+        import threading
+        from src.core.updater import UpdateChecker
+
+        db = ModDatabase()
+        db.add(
+            ModInfo(
+                id="cb-fail",
+                name="Callback Fail Mod",
+                mod_type=ModType.TEXTURE_PACK,
+                path="/tmp",
+                source_url="",
+            )
+        )
+        checker = UpdateChecker(db)
+        done = threading.Event()
+
+        def _on_result(*_args):
+            raise RuntimeError("callback boom")
+
+        with self.assertLogs("src.core.updater", level="WARNING") as logs:
+            checker.start(on_result=_on_result, on_complete=lambda n: done.set())
+            done.wait(timeout=2)
+
+        self.assertTrue(done.is_set(), "UpdateChecker did not complete after callback failure")
+        self.assertTrue(any("Update-check result callback failed" in msg for msg in logs.output))
+
+
+class TestImportDialogLogging(unittest.TestCase):
+    """Import dialog fallback paths should log recoverable failures."""
+
+    def _import_dialog_module(self):
+        import importlib
+        import sys
+        import types
+        from contextlib import contextmanager
+
+        @contextmanager
+        def _ctx():
+            pyqt_pkg = types.ModuleType("PyQt6")
+            pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+            qtcore = types.ModuleType("PyQt6.QtCore")
+            qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+            qtcore.QTimer = type("QTimer", (), {})
+            qtcore.pyqtSignal = lambda *args: MagicMock()
+            qtcore.pyqtSlot = lambda *args: lambda method: method
+            qtcore.QObject = type("QObject", (), {})
+            qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+            for name in (
+                "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+                "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+                "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+            ):
+                setattr(qtwidgets, name, type(name, (), {}))
+            qtwidgets.QMessageBox = type("QMessageBox", (), {})
+            qtgui = types.ModuleType("PyQt6.QtGui")
+            qtgui.QIcon = type("QIcon", (), {})
+
+            with patch.dict(
+                sys.modules,
+                {
+                    "PyQt6": pyqt_pkg,
+                    "PyQt6.QtCore": qtcore,
+                    "PyQt6.QtWidgets": qtwidgets,
+                    "PyQt6.QtGui": qtgui,
+                },
+            ):
+                yield importlib.import_module("src.ui.import_dialog"), qtwidgets.QMessageBox
+
+        return _ctx()
+
+    def test_replacement_pattern_logs_archive_failure(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+            "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QIcon = type("QIcon", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.import_dialog import ImportModDialog
+
+            fake = type("FakeDialog", (), {})()
+            fake._replacement_hint = MagicMock()
+            fake._gameid_edit = MagicMock()
+            fake._gameid_edit.text.return_value = ""
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                archive = Path(tmpdir) / "broken.zip"
+                archive.write_text("not a real archive", encoding="utf-8")
+
+                with patch("zipfile.is_zipfile", side_effect=RuntimeError("bad archive")):
+                    with self.assertLogs("src.ui.import_dialog", level="WARNING") as logs:
+                        ImportModDialog._check_replacement_pattern(fake, str(archive))
+
+        self.assertTrue(any("Could not inspect archive" in msg for msg in logs.output))
+        fake._replacement_hint.show.assert_called()
+        fake._replacement_hint.setText.assert_called()
+        fake._replacement_hint.setStyleSheet.assert_called()
+
+    def test_multipart_archive_failure_logs_and_shows_warning(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+            "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QIcon = type("QIcon", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.import_dialog import ImportModDialog
+
+            fake = type("FakeDialog", (), {})()
+            fake._multipart_hint = MagicMock()
+
+            with patch("src.core.archive.is_multipart_archive", return_value=True):
+                with patch(
+                    "src.core.archive.check_multipart_completeness",
+                    side_effect=RuntimeError("boom"),
+                ):
+                    with self.assertLogs("src.ui.import_dialog", level="WARNING") as logs:
+                        ImportModDialog._check_multipart_archive(fake, "/tmp/archive.zip")
+
+        self.assertTrue(any("Could not inspect multipart archive" in msg for msg in logs.output))
+        fake._multipart_hint.setText.assert_called()
+        fake._multipart_hint.show.assert_called()
+
+    def test_auto_detect_game_id_failure_shows_manual_entry_hint(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(AlignmentFlag=types.SimpleNamespace(AlignRight=0))
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QDialog", "QDialogButtonBox", "QFileDialog", "QFormLayout",
+            "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QIcon = type("QIcon", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.import_dialog import ImportModDialog
+
+            fake = type("FakeDialog", (), {})()
+            fake._gameid_edit = MagicMock()
+            fake._gameid_edit.text.return_value = ""
+
+            with patch("src.core.game_registry.detect_game_serial_from_file", side_effect=ValueError("bad source")):
+                with self.assertLogs("src.ui.import_dialog", level="WARNING") as logs:
+                    ImportModDialog._auto_detect_game_id(fake, "/tmp/bad-source.zip")
+
+        self.assertTrue(any("Could not inspect import source" in msg for msg in logs.output))
+        fake._gameid_edit.setToolTip.assert_called()
+        fake._gameid_edit.setPlaceholderText.assert_called()
+        fake._gameid_edit.setStyleSheet.assert_called()
+
+    def test_import_accept_rejects_missing_source_path(self):
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            fake = types.SimpleNamespace()
+            fake.mod_type = import_dialog.ModType.TEXTURE_PACK
+            fake._src_edit = types.SimpleNamespace(text=lambda: "")
+            fake._gameid_edit = types.SimpleNamespace(text=lambda: "SLUS-20062")
+            fake._url_edit = types.SimpleNamespace(text=lambda: "")
+            fake._name_edit = types.SimpleNamespace(text=lambda: "")
+            fake._author_edit = types.SimpleNamespace(text=lambda: "")
+            fake._version_edit = types.SimpleNamespace(text=lambda: "")
+            fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "")
+            fake.accept = MagicMock()
+
+            with patch.object(QMessageBox, "warning", create=True) as warning:
+                import_dialog.ImportModDialog._accept(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_import_accept_rejects_invalid_texture_game_id(self):
+        import tempfile
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                src = Path(tmpdir) / "pack.zip"
+                src.write_text("placeholder", encoding="utf-8")
+
+                fake = types.SimpleNamespace()
+                fake.mod_type = import_dialog.ModType.TEXTURE_PACK
+                fake._src_edit = types.SimpleNamespace(text=lambda: str(src))
+                fake._gameid_edit = types.SimpleNamespace(text=lambda: "BAD-ID")
+                fake._url_edit = types.SimpleNamespace(text=lambda: "")
+                fake._name_edit = types.SimpleNamespace(text=lambda: "")
+                fake._author_edit = types.SimpleNamespace(text=lambda: "")
+                fake._version_edit = types.SimpleNamespace(text=lambda: "")
+                fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "")
+                fake.accept = MagicMock()
+
+                with patch.object(QMessageBox, "warning", create=True) as warning:
+                    import_dialog.ImportModDialog._accept(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_edit_save_rejects_invalid_source_url(self):
+        import types
+
+        with self._import_dialog_module() as (import_dialog, QMessageBox):
+            fake = types.SimpleNamespace()
+            fake.mod = types.SimpleNamespace(name="Example Mod", mod_type=import_dialog.ModType.TEXTURE_PACK)
+            fake._name_edit = types.SimpleNamespace(text=lambda: "Example Mod")
+            fake._author_edit = types.SimpleNamespace(text=lambda: "Author")
+            fake._version_edit = types.SimpleNamespace(text=lambda: "1.0")
+            fake._gameid_edit = types.SimpleNamespace(text=lambda: "SLUS-20062")
+            fake._tags_edit = types.SimpleNamespace(text=lambda: "")
+            fake._desc_edit = types.SimpleNamespace(toPlainText=lambda: "Desc")
+            fake._url_edit = types.SimpleNamespace(text=lambda: "not-a-url")
+            fake.accept = MagicMock()
+            fake._draft = lambda: import_dialog.EditModDialog._draft(fake)
+            fake._validation_problem = lambda draft: import_dialog.EditModDialog._validation_problem(fake, draft)
+            fake._update_readiness = MagicMock()
+
+            with patch.object(QMessageBox, "warning", create=True) as warning:
+                import_dialog.EditModDialog._save(fake)
+
+        warning.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_import_readiness_covers_source_serial_and_optional_url(self):
+        with self._import_dialog_module() as (module, _):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                cases = [
+                    (ModType.TEXTURE_PACK, "", "SLUS-20062", "", "No Source"),
+                    (ModType.TEXTURE_PACK, str(Path(tmpdir) / "missing"), "SLUS-20062", "", "Missing Source"),
+                    (ModType.TEXTURE_PACK, tmpdir, "BAD", "", "Game ID Required"),
+                    (ModType.TEXTURE_PACK, tmpdir, "SLUS-20062", "", None),
+                    (ModType.PNACH, tmpdir, "", "", None),
+                    (ModType.PNACH, tmpdir, "", "https://example.com/pack", None),
+                    (ModType.PNACH, tmpdir, "", "not-a-url", "Invalid Source URL"),
+                    (ModType.PNACH, tmpdir, "", "https://[", "Invalid Source URL"),
+                    (ModType.PNACH, tmpdir, "", "file:///tmp/pack", "Invalid Source URL"),
+                ]
+                for mod_type, source, serial, url, expected in cases:
+                    with self.subTest(source=source, serial=serial, url=url):
+                        problem = module._import_validation_problem(mod_type, source, serial, url)
+                        self.assertEqual(problem[0] if problem else None, expected)
+
+    def test_import_readiness_button_and_inline_hint_follow_validation(self):
+        with self._import_dialog_module() as (module, _):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake = SimpleNamespace(
+                    mod_type=ModType.TEXTURE_PACK, _src_edit=MagicMock(),
+                    _gameid_edit=MagicMock(), _url_edit=MagicMock(),
+                    _import_btn=MagicMock(), _readiness_lbl=MagicMock(),
+                )
+                fake._src_edit.text.return_value = tmpdir
+                fake._url_edit.text.return_value = ""
+                for serial, enabled in (("", False), ("BAD", False), ("SLUS-20062", True)):
+                    fake._gameid_edit.text.return_value = serial
+                    module.ImportModDialog._update_import_state(fake)
+                    fake._import_btn.setEnabled.assert_called_with(enabled)
+                self.assertIn("original source files will be kept", fake._readiness_lbl.setText.call_args.args[0])
+                fake._url_edit.text.return_value = "bad-url"
+                module.ImportModDialog._update_import_state(fake)
+                fake._import_btn.setEnabled.assert_called_with(False)
+                self.assertIn("http(s)", fake._readiness_lbl.setText.call_args.args[0])
+
+    def test_import_accept_rechecks_disappearing_source_and_preserves_metadata(self):
+        with self._import_dialog_module() as (module, box):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                source = Path(tmpdir) / "pack.zip"
+                source.touch()
+                fake = SimpleNamespace(
+                    mod_type=ModType.TEXTURE_PACK,
+                    _src_edit=SimpleNamespace(text=lambda: f" {source} "),
+                    _gameid_edit=SimpleNamespace(text=lambda: " SLUS-20062 "),
+                    _url_edit=SimpleNamespace(text=lambda: " https://example.com/pack "),
+                    _name_edit=SimpleNamespace(text=lambda: " A pack "),
+                    _author_edit=SimpleNamespace(text=lambda: " Creator "),
+                    _version_edit=SimpleNamespace(text=lambda: " 1.0 "),
+                    _desc_edit=SimpleNamespace(toPlainText=lambda: " Description "),
+                    accept=MagicMock(),
+                )
+                module.ImportModDialog._accept(fake)
+                fake.accept.assert_called_once()
+                self.assertEqual(fake.source_path, str(source))
+                self.assertEqual(fake.meta, {
+                    "name": "A pack", "author": "Creator", "version": "1.0",
+                    "game_id": "SLUS-20062", "source_url": "https://example.com/pack",
+                    "description": "Description",
+                })
+                fake.accept.reset_mock()
+                source.unlink()
+                with patch.object(box, "warning", create=True) as warning:
+                    module.ImportModDialog._accept(fake)
+                warning.assert_called_once()
+                self.assertEqual(warning.call_args.args[1], "Missing Source")
+                fake.accept.assert_not_called()
+
+    def test_archive_picker_exposes_rar_files(self):
+        with self._import_dialog_module() as (module, _):
+            fake = SimpleNamespace(mod_type=ModType.TEXTURE_PACK, _last_paths_bucket=lambda: {})
+            with patch.object(module.QFileDialog, "getOpenFileName", return_value=("", ""), create=True) as choose:
+                module.ImportModDialog._choose_archive(fake)
+            self.assertIn("*.rar", choose.call_args.args[3])
+
+    def test_switching_from_archive_to_folder_clears_multipart_hint(self):
+        with self._import_dialog_module() as (module, _):
+            fake = SimpleNamespace(
+                mod_type=ModType.TEXTURE_PACK, _last_paths_bucket=lambda: {},
+                _remember_last_path=MagicMock(), _src_edit=MagicMock(),
+                _name_edit=MagicMock(), _multipart_hint=MagicMock(),
+                _auto_detect_game_id=MagicMock(), _check_replacement_pattern=MagicMock(),
+            )
+            fake._name_edit.text.return_value = "Keep user name"
+            with patch.object(module.QFileDialog, "getExistingDirectory", return_value="/selected/pack", create=True):
+                module.ImportModDialog._choose_folder(fake)
+            fake._multipart_hint.hide.assert_called_once()
+            fake._name_edit.setText.assert_not_called()
+            fake._src_edit.setText.assert_called_once_with("/selected/pack")
+
+
+class TestEditModDialogWorkflows(unittest.TestCase):
+    """Metadata drafts stay recoverable and background images belong to their serial."""
+
+    def setUp(self):
+        from types import MethodType, SimpleNamespace
+        self.module, self.message_box = self.enterContext(TestImportDialogLogging()._import_dialog_module())
+        self.dialog_type = self.module.EditModDialog
+        self.mod = ModInfo("m", "Original", ModType.TEXTURE_PACK, "/p",
+                           game_id="SLUS-20062", description="<b>Literal notes</b>", tags=["hd"])
+        self.dialog = SimpleNamespace(
+            mod=self.mod, _save_callback=MagicMock(), _dialog_closed=False,
+            _fetching_game_id="", _discard_thumbnail_result=False,
+            _fetched_thumbnail="", _fetched_game_id="",
+            _save_btn=MagicMock(), _revert_btn=MagicMock(), _fetch_thumb_btn=MagicMock(),
+            _readiness_lbl=MagicMock(), _thumb_status_lbl=MagicMock(), updated_meta={},
+            accept=MagicMock(),
+        )
+        for field, value in (
+            ("_name_edit", "Original"), ("_author_edit", "Unknown"), ("_version_edit", "1.0.0"),
+            ("_gameid_edit", "SLUS-20062"), ("_tags_edit", "hd"), ("_url_edit", ""),
+        ):
+            edit = MagicMock()
+            edit.text.return_value = value
+            edit.setText.side_effect = lambda text, edit=edit: setattr(edit.text, "return_value", text)
+            setattr(self.dialog, field, edit)
+        self.dialog._desc_edit = MagicMock()
+        self.dialog._desc_edit.toPlainText.return_value = self.mod.description
+        self.dialog._desc_edit.setPlainText.side_effect = lambda text: setattr(
+            self.dialog._desc_edit.toPlainText, "return_value", text,
+        )
+        for name in ("_draft", "_validation_problem", "_update_readiness", "_revert",
+                     "_on_thumbnail_finished", "_fetch_thumbnail", "_save"):
+            setattr(self.dialog, name, MethodType(getattr(self.dialog_type, name), self.dialog))
+        self.dialog._original_meta = self.dialog._draft()
+        self.relay = MagicMock()
+        self.enterContext(patch.object(self.module, "_ThumbnailResult", return_value=self.relay))
+        self.warning = self.enterContext(patch.object(self.message_box, "warning", create=True))
+
+    def test_validation_and_readiness_cover_required_fields_and_malformed_urls(self):
+        cases = [
+            ("", "SLUS-20062", "", "Name Required"),
+            ("Name", "BAD", "", "Game ID Required"),
+            ("Name", "SLUS-20062", "https://[", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "https://example.com:bad", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "file:///tmp/source", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "******example.com", "Invalid Source URL"),
+            ("Name", "SLUS-20062", "https://example.com/path", None),
+        ]
+        for name, serial, url, expected in cases:
+            with self.subTest(url=url, name=name, serial=serial):
+                self.dialog._name_edit.text.return_value = name
+                self.dialog._gameid_edit.text.return_value = serial
+                self.dialog._url_edit.text.return_value = url
+                problem = self.dialog._validation_problem(self.dialog._draft())
+                self.assertEqual(problem[0] if problem else None, expected)
+                self.dialog._update_readiness()
+                self.dialog._save_btn.setEnabled.assert_called_with(expected is None)
+
+    def test_non_texture_game_id_remains_optional(self):
+        self.mod.mod_type = ModType.PNACH
+        self.dialog._gameid_edit.text.return_value = ""
+        self.assertIsNone(self.dialog._validation_problem(self.dialog._draft()))
+
+    def test_draft_normalizes_serial_and_deduplicates_trimmed_tags(self):
+        self.dialog._gameid_edit.text.return_value = " slus_20062 "
+        self.dialog._tags_edit.text.return_value = " hd, ui,hd, , ui "
+        draft = self.dialog._draft()
+        self.assertEqual(draft["game_id"], "SLUS-20062")
+        self.assertEqual(draft["tags"], ["hd", "ui"])
+        self.assertEqual(draft["description"], "<b>Literal notes</b>")
+
+    def test_clean_draft_disables_save_and_revert(self):
+        self.dialog._update_readiness()
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+        self.dialog._revert_btn.setEnabled.assert_called_with(False)
+        self.assertIn("No unsaved changes", self.dialog._readiness_lbl.setText.call_args.args[0])
+
+    def test_revert_restores_all_fields_and_discards_pending_thumbnail(self):
+        self.dialog._name_edit.text.return_value = "New"
+        self.dialog._desc_edit.toPlainText.return_value = "Changed"
+        self.dialog._fetched_thumbnail = "/cache/new.png"
+        self.dialog._fetched_game_id = "SLUS-20062"
+        self.dialog._revert()
+        self.assertEqual(self.dialog._draft(), self.dialog._original_meta)
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.assertTrue(self.dialog._discard_thumbnail_result)
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+
+    def test_save_failure_keeps_draft_open_and_retryable(self):
+        self.dialog._name_edit.text.return_value = "Edited"
+        self.dialog._save_callback.side_effect = OSError("read only")
+        with self.assertLogs("src.ui.import_dialog", level="WARNING"):
+            self.dialog._save()
+        self.dialog.accept.assert_not_called()
+        self.assertEqual(self.dialog.updated_meta, {})
+        self.assertEqual(self.dialog._name_edit.text(), "Edited")
+        self.assertIn("retry Save", self.dialog._readiness_lbl.setText.call_args.args[0])
+        self.dialog._save_callback.side_effect = None
+        self.dialog._save()
+        self.dialog.accept.assert_called_once()
+        self.assertEqual(self.dialog.updated_meta["name"], "Edited")
+        self.assertEqual(self.mod.name, "Original")
+
+    def test_matching_fetched_thumbnail_is_part_of_one_save(self):
+        self.dialog._fetched_thumbnail = "/cache/new.png"
+        self.dialog._fetched_game_id = "SLUS-20062"
+        self.dialog._save()
+        self.dialog._save_callback.assert_called_once()
+        self.assertEqual(self.dialog._save_callback.call_args.args[0]["thumbnail_path"], "/cache/new.png")
+
+    def test_stale_thumbnail_not_attached_on_save(self):
+        self.dialog._fetched_thumbnail = "/cache/wrong.png"
+        self.dialog._fetched_game_id = "SLUS-99999"
+        self.dialog._save()
+        self.assertNotIn("thumbnail_path", self.dialog.updated_meta)
+
+    def test_validation_rechecked_before_callback(self):
+        self.dialog._url_edit.text.return_value = "https://["
+        self.dialog._save()
+        self.dialog._save_callback.assert_not_called()
+        self.dialog.accept.assert_not_called()
+        self.warning.assert_called_once()
+
+    def test_thumbnail_result_marks_dirty_without_mutating_mod(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/new.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "/cache/new.png")
+        self.assertEqual(self.mod.thumbnail_path, "")
+        self.dialog._save_btn.setEnabled.assert_called_with(True)
+        self.dialog._fetch_thumb_btn.setEnabled.assert_called_with(True)
+
+    def test_thumbnail_failures_and_not_found_allow_retry(self):
+        for error in ("timeout", ""):
+            self.dialog._fetching_game_id = "SLUS-20062"
+            self.dialog._on_thumbnail_finished("SLUS-20062", "", error)
+            self.dialog._fetch_thumb_btn.setEnabled.assert_called_with(True)
+            self.assertEqual(self.dialog._fetched_thumbnail, "")
+
+    def test_closed_dialog_ignores_thumbnail_result(self):
+        self.dialog._dialog_closed = True
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/new.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.dialog._thumb_status_lbl.setText.assert_not_called()
+
+    def test_serial_change_and_return_still_discards_inflight_image(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._gameid_edit.text.return_value = "SLUS-99999"
+        self.dialog._update_readiness()
+        self.dialog._gameid_edit.text.return_value = "SLUS-20062"
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/old.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.assertIn("ignored", self.dialog._thumb_status_lbl.setText.call_args.args[0])
+
+    def test_revert_during_fetch_discards_matching_result(self):
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._revert()
+        self.dialog._on_thumbnail_finished("SLUS-20062", "/cache/old.png", "")
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+        self.dialog._save_btn.setEnabled.assert_called_with(False)
+
+    def test_fetch_emits_result_instead_of_touching_widgets_from_worker(self):
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", return_value="/cache/new.png",
+        ):
+            self.dialog._fetch_thumbnail()
+            self.dialog._thumb_status_lbl.setText.reset_mock()
+            thread.call_args.kwargs["target"]()
+        self.relay.finished.emit.assert_called_once_with("SLUS-20062", "/cache/new.png", "")
+        self.relay.deleteLater.assert_called_once()
+        self.dialog._thumb_status_lbl.setText.assert_not_called()
+        self.assertEqual(self.dialog._fetched_thumbnail, "")
+
+    def test_fetch_exception_logs_and_emits_error_for_retry(self):
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", side_effect=OSError("offline"),
+        ):
+            self.dialog._fetch_thumbnail()
+            with self.assertLogs("src.ui.import_dialog", level="WARNING"):
+                thread.call_args.kwargs["target"]()
+        self.relay.finished.emit.assert_called_once_with("SLUS-20062", "", "offline")
+
+    def test_fetch_uses_compact_serial_but_emits_normalized_identity(self):
+        import src.core.config_manager as config
+        self.dialog._gameid_edit.text.return_value = "sles_50386"
+        with tempfile.TemporaryDirectory() as directory, patch.object(config, "THUMBNAILS_DIR", Path(directory)):
+            with patch("threading.Thread") as thread, patch(
+                "src.core.downloader.download_file",
+                side_effect=lambda url, dest, timeout: Path(dest).write_bytes(b"cover"),
+            ) as download:
+                self.dialog._fetch_thumbnail()
+                thread.call_args.kwargs["target"]()
+            staged = download.call_args.args[1]
+            download.assert_called_once_with(
+                "https://art.gametdb.com/ps2/cover/EN/SLES50386.jpg", staged, timeout=10,
+            )
+            destination = str(Path(directory) / "SLES-50386.jpg")
+            self.assertNotEqual(staged, destination)
+            self.assertEqual(Path(destination).read_bytes(), b"cover")
+            self.assertFalse(Path(staged).exists())
+            self.relay.finished.emit.assert_called_once_with("SLES-50386", destination, "")
+
+    def test_invalid_serial_or_active_fetch_cannot_start_duplicate_request(self):
+        with patch("threading.Thread") as thread:
+            self.dialog._gameid_edit.text.return_value = "BAD"
+            self.dialog._fetch_thumbnail()
+            self.dialog._gameid_edit.text.return_value = "SLUS-20062"
+            self.dialog._fetching_game_id = "SLUS-20062"
+            self.dialog._fetch_thumbnail()
+        thread.assert_not_called()
+
+    def test_worker_retains_independent_signal_relay_until_completion(self):
+        with patch("threading.Thread") as thread, patch(
+            "src.core.downloader.fetch_gametdb_art", return_value="/cache/new.png",
+        ):
+            self.dialog._fetch_thumbnail()
+            self.relay.finished.connect.assert_called_once_with(self.dialog._on_thumbnail_finished)
+            self.relay.finished.emit.assert_not_called()
+            thread.call_args.kwargs["target"]()
+        self.relay.finished.emit.assert_called_once()
+        self.relay.deleteLater.assert_called_once()
+        self.dialog.accept.assert_not_called()
+
+    def test_save_while_fetching_does_not_wait_or_attach_pending_image(self):
+        self.dialog._name_edit.text.return_value = "Edited"
+        self.dialog._fetching_game_id = "SLUS-20062"
+        self.dialog._save()
+        self.dialog._save_callback.assert_called_once()
+        self.assertNotIn("thumbnail_path", self.dialog.updated_meta)
+        self.dialog.accept.assert_called_once()
+
+
+class TestSettingsDialogSaveFailures(unittest.TestCase):
+    """Settings/setup dialogs should log and surface save failures."""
+
+    def _import_settings_panel(self):
+        import importlib
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            return importlib.import_module("src.ui.settings_panel")
+
+    def _make_settings_panel(self, module):
+        panel = module.SettingsPanel.__new__(module.SettingsPanel)
+        panel.config = AppConfig()
+        panel._syncing = False
+        panel._validation_timer = MagicMock()
+        panel._path_status_labels = {}
+        for chooser, key, _label in module._PATH_FIELDS:
+            field = MagicMock()
+            field.get_path.return_value = ""
+            setattr(panel, chooser, field)
+            panel._path_status_labels[key] = MagicMock()
+        panel._conflicts_check = MagicMock()
+        panel._conflicts_check.isChecked.return_value = panel.config.show_conflict_warnings
+        panel._updates_check = MagicMock()
+        panel._updates_check.isChecked.return_value = panel.config.check_updates_on_start
+        panel._theme_combo = MagicMock()
+        panel._theme_combo.currentData.return_value = "dark"
+        panel._theme_combo.findData.return_value = 0
+        panel._tooltip_combo = MagicMock()
+        panel._tooltip_combo.currentData.return_value = "normal"
+        panel._tooltip_combo.findData.return_value = 0
+        panel._fav_authors_edit = MagicMock()
+        panel._fav_authors_edit.toPlainText.return_value = ""
+        panel._feedback_lbl = MagicMock()
+        panel._save_btn = MagicMock()
+        panel._revert_btn = MagicMock()
+        panel._game_lib_count_lbl = MagicMock()
+        panel.settings_saved = MagicMock()
+        panel.emit_status = MagicMock()
+        panel._saved_values = panel._draft_values()
+        return panel
+
+    def _stub_ui_modules(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QDialogButtonBox", "QFileDialog",
+            "QFrame", "QFormLayout", "QHBoxLayout", "QLabel", "QLineEdit",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSizePolicy",
+            "QStackedWidget", "QTextEdit", "QVBoxLayout", "QWidget",
+        ):
+            cls = type(name, (), {})
+            if name == "QMessageBox":
+                cls.critical = staticmethod(lambda *args, **kwargs: None)
+                cls.information = staticmethod(lambda *args, **kwargs: None)
+                cls.warning = staticmethod(lambda *args, **kwargs: None)
+                cls.question = staticmethod(lambda *args, **kwargs: None)
+            setattr(qtwidgets, name, cls)
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        widgets_stub = types.ModuleType("src.ui.widgets")
+        widgets_stub.PathChooser = type("PathChooser", (), {})
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+        theme_stub = types.ModuleType("src.ui.theme")
+        theme_stub.THEME_KEYS = {}
+        theme_stub.apply_theme = lambda *args, **kwargs: None
+
+        return patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.widgets": widgets_stub,
+                "src.ui.base_panel": base_panel_stub,
+                "src.ui.theme": theme_stub,
+            },
+        )
+
+    def test_settings_panel_save_failure_logs_and_shows_error(self):
+        import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                valid_paths = {}
+                for name in (
+                    "pcsx2",
+                    "textures",
+                    "pnach",
+                    "covers",
+                    "memcards",
+                    "partial",
+                    "mods",
+                    "games",
+                ):
+                    path = Path(tmpdir) / name
+                    path.mkdir()
+                    valid_paths[name] = str(path)
+
+                fake = SimpleNamespace(
+                    config=AppConfig(),
+                    _pcsx2_chooser=MagicMock(),
+                    _tex_chooser=MagicMock(),
+                    _pnach_chooser=MagicMock(),
+                    _covers_chooser=MagicMock(),
+                    _memcards_chooser=MagicMock(),
+                    _partial_tex_chooser=MagicMock(),
+                    _storage_chooser=MagicMock(),
+                    _game_lib_chooser=MagicMock(),
+                    _conflicts_check=MagicMock(),
+                    _updates_check=MagicMock(),
+                    _theme_combo=MagicMock(),
+                    _tooltip_combo=MagicMock(),
+                    _fav_authors_edit=MagicMock(),
+                    settings_saved=MagicMock(),
+                    emit_status=MagicMock(),
+                    _validation_timer=MagicMock(),
+                    _feedback_lbl=MagicMock(),
+                    _update_form_state=MagicMock(),
+                )
+                for chooser, value in (
+                    (fake._pcsx2_chooser, valid_paths["pcsx2"]),
+                    (fake._tex_chooser, valid_paths["textures"]),
+                    (fake._pnach_chooser, valid_paths["pnach"]),
+                    (fake._covers_chooser, valid_paths["covers"]),
+                    (fake._memcards_chooser, valid_paths["memcards"]),
+                    (fake._partial_tex_chooser, valid_paths["partial"]),
+                    (fake._storage_chooser, valid_paths["mods"]),
+                    (fake._game_lib_chooser, valid_paths["games"]),
+                ):
+                    chooser.get_path.return_value = value
+                fake._conflicts_check.isChecked.return_value = True
+                fake._updates_check.isChecked.return_value = False
+                fake._theme_combo.currentData.return_value = "dark"
+                fake._tooltip_combo.currentData.return_value = "normal"
+                fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+                fake._draft_values = lambda: SettingsPanel._draft_values(fake)
+
+                with patch("src.ui.settings_panel.save_config", side_effect=OSError("denied")):
+                    with patch("src.ui.settings_panel.QMessageBox.critical") as critical:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._save(fake)
+
+        self.assertTrue(any("Could not save settings" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.settings_saved.emit.assert_not_called()
+        fake.emit_status.assert_not_called()
+        self.assertEqual(fake.config.pcsx2_path, "")
+        self.assertEqual(fake.config.favorite_authors, [])
+        self.assertIn("retry", fake._feedback_lbl.setText.call_args.args[0])
+
+    def test_settings_panel_rejects_invalid_paths_before_saving(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+                _storage_chooser=MagicMock(),
+                _game_lib_chooser=MagicMock(),
+                _conflicts_check=MagicMock(),
+                _updates_check=MagicMock(),
+                _theme_combo=MagicMock(),
+                _tooltip_combo=MagicMock(),
+                _fav_authors_edit=MagicMock(),
+                settings_saved=MagicMock(),
+                emit_status=MagicMock(),
+                _validation_timer=MagicMock(),
+                _update_form_state=MagicMock(),
+            )
+            for chooser, value in (
+                (fake._pcsx2_chooser, "/definitely/not/a/real/folder"),
+                (fake._tex_chooser, ""),
+                (fake._pnach_chooser, ""),
+                (fake._covers_chooser, ""),
+                (fake._memcards_chooser, ""),
+                (fake._partial_tex_chooser, ""),
+                (fake._storage_chooser, ""),
+                (fake._game_lib_chooser, ""),
+            ):
+                chooser.get_path.return_value = value
+            fake._conflicts_check.isChecked.return_value = True
+            fake._updates_check.isChecked.return_value = False
+            fake._theme_combo.currentData.return_value = "dark"
+            fake._tooltip_combo.currentData.return_value = "normal"
+            fake._fav_authors_edit.toPlainText.return_value = "Alpha\nBeta"
+            fake._draft_values = lambda: SettingsPanel._draft_values(fake)
+
+            with patch("src.ui.settings_panel.save_config") as save_mock:
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                    with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                        SettingsPanel._save(fake)
+
+        save_mock.assert_not_called()
+        warning.assert_called_once()
+        fake.settings_saved.emit.assert_not_called()
+        fake.emit_status.assert_not_called()
+        self.assertEqual(fake.config.pcsx2_path, "")
+        self.assertTrue(any("invalid" in msg.lower() for msg in logs.output))
+
+    def test_folder_readiness_distinguishes_optional_missing_and_file_paths(self):
+        module = self._import_settings_panel()
+        self.assertTrue(module._folder_status("")[0])
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(module._folder_status(tmp), (True, "Folder found."))
+            file = Path(tmp) / "file"
+            file.touch()
+            valid, message = module._folder_status(str(file))
+            self.assertFalse(valid)
+            self.assertIn("not a folder", message)
+            valid, message = module._folder_status(str(Path(tmp) / "missing"))
+            self.assertFalse(valid)
+            self.assertIn("not found", message)
+        with patch.object(module.Path, "is_dir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                valid, message = module._folder_status("/restricted")
+        self.assertFalse(valid)
+        self.assertIn("permissions", message)
+
+    def test_settings_form_tracks_dirty_validity_and_optional_paths(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(False)
+        panel._updates_check.isChecked.return_value = not panel.config.check_updates_on_start
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(True)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("ready to save", panel._feedback_lbl.setText.call_args.args[0])
+        panel._tex_chooser.get_path.return_value = "/definitely/not/a/real/folder"
+        panel._update_form_state()
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Textures Folder", panel._feedback_lbl.setText.call_args.args[0])
+        self.assertIn("not found", panel._path_status_labels["textures_path"].setText.call_args.args[0])
+
+    def test_settings_form_debounces_validation_without_saving_draft(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._updates_check.isChecked.return_value = not panel.config.check_updates_on_start
+        with patch.object(module, "save_config") as save:
+            panel._on_form_changed()
+            panel._on_form_changed()
+        self.assertEqual(panel._validation_timer.start.call_count, 2)
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Unsaved", panel._feedback_lbl.setText.call_args.args[0])
+        save.assert_not_called()
+        panel._syncing = True
+        panel._validation_timer.reset_mock()
+        panel._on_form_changed()
+        panel._validation_timer.start.assert_not_called()
+
+    def test_settings_save_commits_only_after_persistence_and_needs_no_success_modal(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        original = panel.config
+        panel.config.ui_state = {"browse_panel": {"query": "existing"}}
+        panel._fav_authors_edit.toPlainText.return_value = " Alpha \n\n Beta \n"
+        with tempfile.TemporaryDirectory() as tmp:
+            panel._pnach_chooser.get_path.return_value = f" {tmp} "
+            def persist(candidate):
+                self.assertIsNot(candidate, original)
+                self.assertEqual(original.pnach_path, "")
+                self.assertEqual(candidate.pnach_path, tmp)
+                self.assertEqual(candidate.cheats_path, tmp)
+                self.assertEqual(candidate.ui_state, original.ui_state)
+            with patch.object(module, "save_config", side_effect=persist) as save:
+                with patch.object(module.QMessageBox, "information") as modal:
+                    panel._save()
+            self.assertEqual(original.pnach_path, tmp)
+        self.assertIs(panel.config, original)
+        self.assertEqual(original.favorite_authors, ["Alpha", "Beta"])
+        panel.settings_saved.emit.assert_called_once_with(original)
+        save.assert_called_once()
+        modal.assert_not_called()
+        self.assertEqual(panel._saved_values, panel._draft_values())
+        panel._save_btn.setEnabled.assert_called_with(False)
+        panel._revert_btn.setEnabled.assert_called_with(False)
+        panel._feedback_lbl.setText.assert_called_with("Settings saved ✅")
+
+    def test_settings_failed_save_preserves_shared_config_and_retryable_draft(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        original = panel.config
+        panel._fav_authors_edit.toPlainText.return_value = "New author"
+        with patch.object(module, "save_config", side_effect=OSError("locked")):
+            with patch.object(module.QMessageBox, "critical") as error:
+                with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                    panel._save()
+        self.assertIs(panel.config, original)
+        self.assertEqual(original.favorite_authors, [])
+        self.assertEqual(panel._saved_values["favorite_authors"], [])
+        self.assertEqual(panel._draft_values()["favorite_authors"], ["New author"])
+        panel._save_btn.setEnabled.assert_called_with(True)
+        panel.settings_saved.emit.assert_not_called()
+        error.assert_called_once()
+        with patch.object(module, "save_config"):
+            panel._save()
+        self.assertEqual(original.favorite_authors, ["New author"])
+
+    def test_settings_save_rechecks_folders_that_disappear_after_readiness(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "textures"
+            folder.mkdir()
+            panel._tex_chooser.get_path.return_value = str(folder)
+            panel._update_form_state()
+            panel._save_btn.setEnabled.assert_called_with(True)
+            folder.rmdir()
+            with patch.object(module, "save_config") as save, patch.object(module.QMessageBox, "warning") as warning:
+                with self.assertLogs("src.ui.settings_panel", level="WARNING"):
+                    panel._save()
+        save.assert_not_called()
+        warning.assert_called_once()
+        self.assertEqual(panel.config.textures_path, "")
+        panel._save_btn.setEnabled.assert_called_with(False)
+
+    def test_settings_game_library_edits_clear_stale_counts_without_scanning(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        with patch("src.core.game_library.scan_library") as scan:
+            panel._on_game_lib_changed("/new")
+            self.assertIn("Scan Library", panel._game_lib_count_lbl.setText.call_args.args[0])
+            panel._on_game_lib_changed("")
+            panel._game_lib_count_lbl.setText.assert_called_with("  No folder selected")
+        scan.assert_not_called()
+
+    def test_settings_reload_resets_draft_without_library_scan_or_theme_preview(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel._on_theme_changed = MagicMock()
+        config = AppConfig(game_library_path="/games", favorite_authors=["Author"])
+        with patch("src.core.game_library.scan_library") as scan, patch.object(module, "save_config") as save:
+            panel.reload_config(config)
+        scan.assert_not_called()
+        save.assert_not_called()
+        panel._on_theme_changed.assert_not_called()
+        panel._game_lib_chooser.set_path.assert_called_once_with("/games")
+        panel._fav_authors_edit.setPlainText.assert_called_once_with("Author")
+        self.assertFalse(panel._syncing)
+        self.assertIs(panel.config, config)
+        panel._save_btn.setEnabled.assert_called_with(False)
+
+    def test_settings_revert_reloads_saved_config_and_restores_previewed_theme(self):
+        module = self._import_settings_panel()
+        panel = self._make_settings_panel(module)
+        panel.reload_config = MagicMock()
+        panel._on_theme_changed = MagicMock()
+        with patch.object(module, "save_config") as save:
+            panel._revert_changes()
+        panel.reload_config.assert_called_once_with(panel.config)
+        panel._on_theme_changed.assert_called_once_with(0)
+        panel._feedback_lbl.setText.assert_called_with("Changes reverted.")
+        save.assert_not_called()
+
+    def test_settings_panel_missing_game_library_logs_and_shows_fallback(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(_game_lib_count_lbl=MagicMock())
+            with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                SettingsPanel._update_game_lib_label(fake, "/definitely/not/a/real/folder")
+
+        fake._game_lib_count_lbl.setText.assert_called_once_with("  Folder not found")
+        self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
+
+    def test_settings_panel_auto_detect_missing_path_preserves_existing_values(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            fake._pcsx2_chooser.get_path.return_value = "/definitely/not/a/real/folder"
+
+            with patch("src.core.config_manager.detect_pcsx2_paths") as detect_paths:
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                    with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                        SettingsPanel._auto_detect(fake)
+
+        detect_paths.assert_not_called()
+        warning.assert_called_once()
+        self.assertTrue(any("PCSX2 config directory not found" in msg for msg in logs.output))
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._partial_tex_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
+    def test_settings_panel_auto_detect_warns_when_no_pcx2_folders_exist(self):
+        import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake._pcsx2_chooser.get_path.return_value = tmpdir
+                detected = {
+                    "textures_path": f"{tmpdir}/textures",
+                    "pnach_path": f"{tmpdir}/cheats",
+                    "cover_art_path": f"{tmpdir}/covers",
+                    "memcards_path": f"{tmpdir}/memcards",
+                    "partial_textures_path": f"{tmpdir}/textures",
+                }
+                with patch("src.core.config_manager.detect_pcsx2_paths", return_value=detected):
+                    with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._auto_detect(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not recognize any PCSX2 subfolders" in msg for msg in logs.output))
+        fake._tex_chooser.set_path.assert_called_once_with(detected["textures_path"])
+        fake._pnach_chooser.set_path.assert_called_once_with(detected["pnach_path"])
+        fake._covers_chooser.set_path.assert_called_once_with(detected["cover_art_path"])
+        fake._memcards_chooser.set_path.assert_called_once_with(detected["memcards_path"])
+        fake._partial_tex_chooser.set_path.assert_called_once_with(detected["partial_textures_path"])
+
+    def test_settings_panel_auto_detect_failure_preserves_existing_values(self):
+        import sys
+        import tempfile
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _partial_tex_chooser=MagicMock(),
+            )
+            with tempfile.TemporaryDirectory() as tmpdir:
+                fake._pcsx2_chooser.get_path.return_value = tmpdir
+                with patch(
+                    "src.core.config_manager.detect_pcsx2_paths",
+                    side_effect=RuntimeError("boom"),
+                ) as detect_paths:
+                    with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.settings_panel", level="WARNING") as logs:
+                            SettingsPanel._auto_detect(fake)
+
+        detect_paths.assert_called_once_with(tmpdir)
+        warning.assert_called_once()
+        self.assertTrue(any("Could not auto-detect PCSX2 paths" in msg for msg in logs.output))
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._partial_tex_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
+    def test_settings_panel_catalogue_check_reports_issues(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace()
+            report = {
+                "catalogues_checked": ["cheats.json"],
+                "total_issues": 1,
+                "summary": "⚠ 1 link issue(s) found across 1 catalogues: suspicious_domain×1",
+                "issues_by_file": {
+                    "cheats.json": [
+                        {
+                            "entry_index": 2,
+                            "field": "url",
+                            "url": "https://example.com/abc",
+                            "issue_type": "suspicious_domain",
+                            "detail": "host 'example.com' is not on the trusted catalogue domain list",
+                        }
+                    ]
+                },
+                "issue_count_by_type": {"suspicious_domain": 1},
+            }
+
+            with patch("src.ui.settings_panel.LinkChecker") as checker_cls:
+                checker_cls.return_value.check_all_catalogues.return_value = report
+                with patch("src.ui.settings_panel.QMessageBox.warning") as warning:
+                    SettingsPanel._check_catalogue_links(fake)
+
+        checker_cls.return_value.check_all_catalogues.assert_called_once()
+        warning.assert_called_once()
+        self.assertIn("suspicious_domain", warning.call_args.args[2])
+        self.assertIn("cheats.json", warning.call_args.args[2])
+
+    def test_settings_panel_patreon_button_uses_shared_helper(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.settings_panel", None)
+            from src.ui.settings_panel import SettingsPanel
+
+            fake = SimpleNamespace()
+            with patch("src.ui.settings_panel.open_external_url", return_value=False) as open_mock:
+                SettingsPanel._open_patreon(fake)
+
+        from src.core.app_info import PATREON_URL
+
+        open_mock.assert_called_once_with(
+            PATREON_URL,
+            parent=fake,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
+
+    def test_setup_wizard_finish_failure_logs_and_blocks_close(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                _collect_current_page=MagicMock(),
+                setup_complete=MagicMock(),
+                accept=MagicMock(),
+                reject=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.save_config", side_effect=OSError("denied")):
+                with patch("src.ui.setup_wizard.QMessageBox.critical") as critical:
+                    with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                        SetupWizard._finish(fake)
+
+        self.assertTrue(any("Could not save setup wizard configuration" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake._collect_current_page.assert_called_once()
+        fake.setup_complete.emit.assert_not_called()
+        fake.accept.assert_not_called()
+
+    def test_setup_wizard_skip_failure_logs_and_blocks_close(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(),
+                setup_complete=MagicMock(),
+                accept=MagicMock(),
+                reject=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.save_config", side_effect=OSError("denied")):
+                with patch("src.ui.setup_wizard.QMessageBox.critical") as critical:
+                    with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                        SetupWizard._skip(fake)
+
+        self.assertTrue(any("Could not save skipped setup configuration" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.setup_complete.emit.assert_not_called()
+        fake.reject.assert_not_called()
+
+    def test_setup_wizard_auto_detect_failure_shows_status(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                _pcsx2_chooser=MagicMock(),
+                _pcsx2_status=MagicMock(),
+                _auto_fill_from_path=MagicMock(),
+            )
+
+            with patch("src.core.pcsx2_layout.auto_detect_pcsx2", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._auto_detect(fake)
+
+        self.assertTrue(any("Auto-detecting PCSX2 failed" in msg for msg in logs.output))
+        fake._pcsx2_status.setText.assert_called()
+        self.assertTrue(
+            any(
+                "Please browse for the folder manually" in call.args[0]
+                for call in fake._pcsx2_status.setText.call_args_list
+            )
+        )
+
+    def test_setup_wizard_auto_fill_failure_shows_status(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                _pcsx2_status=MagicMock(),
+                _tex_chooser=MagicMock(),
+                _pnach_chooser=MagicMock(),
+                _covers_chooser=MagicMock(),
+                _memcards_chooser=MagicMock(),
+                _cheats_chooser=MagicMock(),
+            )
+
+            with patch("src.ui.setup_wizard.detect_pcsx2_paths", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._auto_fill_from_path(fake, "/tmp/pcsx2")
+
+        self.assertTrue(any("Could not auto-fill PCSX2 subfolders" in msg for msg in logs.output))
+        fake._pcsx2_status.setText.assert_called_once()
+        self.assertTrue(
+            any(
+                "Please browse for the folder manually" in call.args[0]
+                for call in fake._pcsx2_status.setText.call_args_list
+            )
+        )
+        for chooser in (
+            fake._tex_chooser,
+            fake._pnach_chooser,
+            fake._covers_chooser,
+            fake._memcards_chooser,
+            fake._cheats_chooser,
+        ):
+            chooser.set_path.assert_not_called()
+
+    def test_setup_wizard_game_library_scan_failure_is_recovered(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            fake = SimpleNamespace(
+                config=AppConfig(game_library_path="/games"),
+                _done_summary=MagicMock(),
+            )
+
+            with patch("src.core.game_library.scan_library", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.setup_wizard", level="WARNING") as logs:
+                    SetupWizard._run_automatic_setup(fake)
+
+        self.assertTrue(any("Could not scan game library during setup" in msg for msg in logs.output))
+        fake._done_summary.setText.assert_called_once()
+        self.assertTrue(
+            any(
+                "Could not scan game library" in call.args[0]
+                for call in fake._done_summary.setText.call_args_list
+            )
+        )
+
+    def test_setup_summary_distinguishes_missing_destinations_from_ready_setup(self):
+        with self._stub_ui_modules():
+            sys.modules.pop("src.ui.setup_wizard", None)
+            from src.ui.setup_wizard import SetupWizard
+
+            for complete in (False, True):
+                with self.subTest(complete=complete):
+                    config = AppConfig(
+                        textures_path="/textures" if complete else "",
+                        pnach_path="/cheats" if complete else "",
+                        cover_art_path="/covers" if complete else "",
+                        memcards_path="/memcards" if complete else "",
+                        mods_storage_path="/mods",
+                    )
+                    fake = SimpleNamespace(config=config, _done_summary=MagicMock())
+                    SetupWizard._run_automatic_setup(fake)
+                    summary = fake._done_summary.setText.call_args.args[0]
+                    self.assertIn("Mod Storage: /mods", summary)
+                    if complete:
+                        self.assertIn("Memory Cards: /memcards", summary)
+                        self.assertIn("deploy automatically", summary)
+                        self.assertNotIn("Not configured", summary)
+                    else:
+                        self.assertIn("Not configured", summary)
+                        self.assertIn("Settings", summary)
+                        self.assertIn("browse and import", summary)
+                        self.assertNotIn("deploy automatically", summary)
+
+
+class TestWidgetsLogging(unittest.TestCase):
+    """Widgets with recoverable failures should log before surfacing errors."""
+
+    def _stub_widget_modules(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AlignmentFlag=types.SimpleNamespace(AlignRight=0),
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            TextFormat=types.SimpleNamespace(RichText=0),
+            CursorShape=types.SimpleNamespace(PointingHandCursor=0),
+            ItemDataRole=types.SimpleNamespace(UserRole=256),
+            ItemFlag=types.SimpleNamespace(ItemIsEnabled=1),
+        )
+        qtcore.QUrl = type("QUrl", (), {
+            "fromLocalFile": staticmethod(lambda path: path),
+        })
+        qtcore.QSize = type("QSize", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.QThread = type("QThread", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QApplication", "QCheckBox", "QComboBox", "QDialog", "QDialogButtonBox",
+            "QFileDialog", "QFrame", "QGridLayout", "QHBoxLayout", "QLabel",
+            "QLineEdit", "QListWidget", "QListWidgetItem", "QProgressBar",
+            "QPushButton", "QScrollArea", "QSizePolicy", "QSpacerItem",
+            "QSplitter", "QTabWidget", "QTextEdit", "QVBoxLayout", "QWidget",
+            "QMessageBox",
+        ):
+            cls = type(name, (), {})
+            if name == "QMessageBox":
+                cls.critical = staticmethod(lambda *args, **kwargs: None)
+                cls.information = staticmethod(lambda *args, **kwargs: None)
+                cls.warning = staticmethod(lambda *args, **kwargs: None)
+                cls.question = staticmethod(lambda *args, **kwargs: None)
+            setattr(qtwidgets, name, cls)
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        for name in ("QPixmap", "QFont", "QIcon"):
+            setattr(qtgui, name, type(name, (), {}))
+        qtgui.QDesktopServices = type("QDesktopServices", (), {
+            "openUrl": staticmethod(lambda *args, **kwargs: True),
+        })
+
+        return patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        )
+
+    def test_custom_card_save_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import CustomCardDialog
+
+            fake = SimpleNamespace(
+                _type_combo=MagicMock(),
+                _name_edit=MagicMock(),
+                _game_edit=MagicMock(),
+                _serial_edit=MagicMock(),
+                _author_edit=MagicMock(),
+                _url_edit=MagicMock(),
+                _desc_edit=MagicMock(),
+                _source_edit=MagicMock(),
+                _size_edit=MagicMock(),
+                _status=MagicMock(),
+                card_created=MagicMock(),
+                accept=MagicMock(),
+            )
+            fake._type_combo.currentData.return_value = "texture_pack"
+            fake._name_edit.text.return_value = "Pack"
+            fake._game_edit.text.return_value = "Game"
+            fake._serial_edit.text.return_value = "SLUS-20062"
+            fake._author_edit.text.return_value = "Author"
+            fake._url_edit.text.return_value = ""
+            fake._desc_edit.toPlainText.return_value = ""
+            fake._source_edit.text.return_value = ""
+            fake._size_edit.text.return_value = ""
+
+            entry = object()
+            with patch("src.core.custom_card_builder.build_entry", return_value=entry):
+                with patch("src.core.custom_card_builder.save_entry", side_effect=OSError("denied")):
+                    with patch("src.ui.widgets.QMessageBox.critical") as critical:
+                        with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                            CustomCardDialog._on_accept(fake)
+
+        self.assertTrue(any("Could not save custom catalogue card" in msg for msg in logs.output))
+        critical.assert_called_once()
+        fake.accept.assert_not_called()
+
+    def test_custom_card_validation_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import CustomCardDialog
+
+            fake = SimpleNamespace(
+                _type_combo=MagicMock(),
+                _name_edit=MagicMock(),
+                _game_edit=MagicMock(),
+                _serial_edit=MagicMock(),
+                _author_edit=MagicMock(),
+                _url_edit=MagicMock(),
+                _desc_edit=MagicMock(),
+                _source_edit=MagicMock(),
+                _size_edit=MagicMock(),
+                _status=MagicMock(),
+                card_created=MagicMock(),
+                accept=MagicMock(),
+            )
+            fake._type_combo.currentData.return_value = "texture_pack"
+            fake._name_edit.text.return_value = "Pack"
+            fake._game_edit.text.return_value = "Game"
+            fake._serial_edit.text.return_value = "SLUS-20062"
+            fake._author_edit.text.return_value = "Author"
+            fake._url_edit.text.return_value = ""
+            fake._desc_edit.toPlainText.return_value = ""
+            fake._source_edit.text.return_value = ""
+            fake._size_edit.text.return_value = ""
+
+            with patch("src.core.custom_card_builder.build_entry", side_effect=ValueError("bad entry")):
+                with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                    CustomCardDialog._on_accept(fake)
+
+        self.assertTrue(any("Could not build custom catalogue card" in msg for msg in logs.output))
+        fake._status.setText.assert_called_once_with("bad entry")
+        fake.accept.assert_not_called()
+
+    def test_open_external_url_failure_logs_warning_and_warns(self):
+        import sys
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.url_helpers", None)
+            from src.ui.url_helpers import open_external_url
+
+            with patch("src.ui.url_helpers.webbrowser.open", return_value=False):
+                with patch("PyQt6.QtWidgets.QMessageBox.warning") as warning:
+                    with self.assertLogs("src.ui.url_helpers", level="WARNING") as logs:
+                        ok = open_external_url(
+                            "https://patreon.com/ps2modmanager",
+                            parent=object(),
+                            context="Patreon page",
+                            title="Patreon Link Unavailable",
+                            failure_message=(
+                                "Could not open the Patreon page. Please copy the URL into your browser."
+                            ),
+                        )
+
+        self.assertFalse(ok)
+        warning.assert_called_once()
+        self.assertTrue(any("Failed to open Patreon page" in msg for msg in logs.output))
+
+    def test_conflict_folder_open_failure_logs_warning_and_warns(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import ConflictResolverDialog
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                conflict_file = Path(tmpdir) / "conflict" / "texture.png"
+                conflict_file.parent.mkdir(parents=True)
+                conflict_file.write_text("data", encoding="utf-8")
+
+                fake = SimpleNamespace(
+                    _selected_conflict=lambda: SimpleNamespace(items=[conflict_file]),
+                    _files_list=MagicMock(),
+                )
+                fake._files_list.currentRow.return_value = 0
+
+                with patch("PyQt6.QtGui.QDesktopServices.openUrl", return_value=False):
+                    with patch("src.ui.widgets.QMessageBox.warning") as warning:
+                        with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                            ConflictResolverDialog._on_open_folder(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not open conflict folder" in msg for msg in logs.output))
+
+    def test_backup_folder_open_failure_logs_warning_and_warns(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import BackupManagerDialog
+
+            fake = SimpleNamespace(_config=AppConfig())
+            with tempfile.TemporaryDirectory() as tmpdir:
+                backup_dir = Path(tmpdir) / "backups"
+
+                with patch("src.core.backup_manager.get_backup_dir", return_value=backup_dir):
+                    with patch("PyQt6.QtGui.QDesktopServices.openUrl", return_value=False):
+                        with patch("src.ui.widgets.QMessageBox.warning") as warning:
+                            with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                                BackupManagerDialog._on_open_dir(fake)
+
+        warning.assert_called_once()
+        self.assertTrue(any("Could not open backup folder" in msg for msg in logs.output))
+
+    def test_mod_notes_refresh_failure_logs_warning(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import ModNotesDialog
+
+            fake = SimpleNamespace(
+                _config=AppConfig(),
+                _confirm_leave=MagicMock(return_value=True),
+                _status_label=MagicMock(),
+                _list_widget=MagicMock(),
+            )
+
+            with patch("src.core.mod_notes.list_notes", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                    ModNotesDialog._refresh(fake)
+
+        self.assertTrue(any("Could not refresh mod notes list" in msg for msg in logs.output))
+        fake._list_widget.clear.assert_not_called()
+        self.assertIn("Previous results are kept", fake._status_label.setText.call_args.args[0])
+
+    def test_pnach_builder_logs_invalid_custom_value_and_falls_back(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import PnachCodeBuilderDialog
+
+            fake = SimpleNamespace(
+                _patch_widgets=[{
+                    "check": MagicMock(),
+                    "value_combo": MagicMock(),
+                    "custom_edit": MagicMock(),
+                    "value_type": "int",
+                    "crc": "AABBCCDD",
+                    "proc": "EE",
+                    "addr": "00123456",
+                    "description": "Test patch",
+                    "value_map": {"00000006": "Option"},
+                    "exclusion_group": "",
+                    "exclusion_note": "",
+                    "patch_type": "word",
+                    "verification_status": "estimated",
+                    "code_method": "static_write",
+                }]
+            )
+            fake._patch_widgets[0]["check"].isChecked.return_value = True
+            fake._patch_widgets[0]["custom_edit"].text.return_value = "not-a-number"
+            fake._patch_widgets[0]["value_combo"].isEnabled.return_value = True
+            fake._patch_widgets[0]["value_combo"].currentData.return_value = "00000006"
+
+            with patch("src.core.pnach_analyzer.value_to_pnach_hex", return_value=(None, "invalid int")):
+                with patch("src.core.pnach_analyzer.check_exclusion_conflicts", return_value=[]):
+                    with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                        selected, conflicts = PnachCodeBuilderDialog._collect_selected_patches(fake)
+
+        self.assertEqual(conflicts, [])
+        self.assertEqual(selected[0]["value"], "00000006")
+        self.assertTrue(any("Could not convert custom PNACH value" in msg for msg in logs.output))
+
+    def test_pnach_install_logs_write_error(self):
+        import sys
+        from types import SimpleNamespace
+
+        with self._stub_widget_modules():
+            sys.modules.pop("src.ui.widgets", None)
+            from src.ui.widgets import PnachCodeBuilderDialog
+
+            fake = SimpleNamespace(
+                _get_pnach_text=MagicMock(return_value=("patch=1,EE,00123456,word,12345678\n", "AABBCCDD")),
+                _dir_edit=MagicMock(),
+            )
+            fake._dir_edit.text.return_value = "/tmp/cheats"
+
+            with patch("os.makedirs") as makedirs:
+                with patch("os.path.exists", return_value=False):
+                    with patch("builtins.open", side_effect=OSError("disk full")):
+                        with patch("src.ui.widgets.QMessageBox.critical") as critical:
+                            with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
+                                PnachCodeBuilderDialog._install_pnach(fake)
+
+        makedirs.assert_called_once()
+        critical.assert_called_once()
+        self.assertTrue(any("Could not write PNACH file" in msg for msg in logs.output))
+
+
+class TestInstalledConflictReview(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        from src.core.conflict_resolver import Conflict, ConflictSeverity
+
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        import src.ui.widgets as module
+        self.module = module
+        stack.enter_context(patch.object(module, "QListWidgetItem", side_effect=lambda *args: MagicMock()))
+        self.error = Conflict(
+            "pnach_address_clash", ConflictSeverity.ERROR,
+            "Address clash: DEADBEEF", "Two files patch the same EE address.",
+            [Path("/pcsx2/cheats/DEADBEEF.pnach"), Path("/pcsx2/cheats_ws/DEADBEEF.pnach")],
+            "Remove overlapping lines.", True,
+        )
+        self.warning = Conflict(
+            "cover_art_duplicate", ConflictSeverity.WARNING,
+            "Duplicate cover: SLUS-20312", "Several images for Kingdom Hearts.",
+            [Path("/pcsx2/covers/SLUS-20312.png"), Path("/other/covers/SLUS-20312.jpg")],
+            "Remove redundant images.", True,
+        )
+        self.info = Conflict(
+            "texture_duplicate_hash", ConflictSeverity.INFO,
+            "Duplicate texture data", "Identical texture files.",
+            [Path("/pcsx2/textures/SLUS-20062/replacements/a.png")],
+            "Review files manually.", False,
+        )
+        self.dialog = SimpleNamespace(
+            _config=AppConfig(pnach_path="/pcsx2/cheats"),
+            _conflicts=[self.error, self.warning, self.info],
+            _visible_conflicts=[], _selected_key=None, _row=-1,
+            _scanning=False, _fixing=False, _closed=False, _scan_id=0, _scan_error="",
+        )
+        for name in (
+            "_search_timer", "_search_edit", "_severity_combo", "_autofix_only",
+            "_list_widget", "_files_list", "_summary_label", "_detail_label",
+            "_resolution_label", "_autofix_btn", "_open_folder_btn",
+            "_copy_files_btn", "_rescan_btn",
+        ):
+            setattr(self.dialog, name, MagicMock())
+        self.dialog._search_edit.text.return_value = ""
+        self.dialog._severity_combo.currentData.return_value = ""
+        self.dialog._autofix_only.isChecked.return_value = False
+        self.dialog._list_widget.currentRow.side_effect = lambda: self.dialog._row
+        self.dialog._list_widget.clear.side_effect = lambda: setattr(self.dialog, "_row", -1)
+        self.dialog._list_widget.setCurrentRow.side_effect = lambda row: setattr(self.dialog, "_row", row)
+        self.dialog._files_list.currentRow.return_value = 0
+        for name in (
+            "_run_scan", "_on_scan_finished", "_apply_filters", "_clear_filters",
+            "_selected_conflict", "_on_conflict_selected", "_on_auto_fix",
+            "_on_open_folder", "_on_copy_paths",
+        ):
+            setattr(self.dialog, name, MethodType(getattr(module.ConflictResolverDialog, name), self.dialog))
+        box = module.QMessageBox
+        box.StandardButton = SimpleNamespace(Yes=1, No=2)
+
+    def test_search_matches_across_fields_and_ignores_serial_punctuation(self):
+        matches = self.module._installed_conflict_matches
+        for query in ("kingdom SLUS20312", "WARNING png", "cover_art /other/covers", ""):
+            with self.subTest(query=query):
+                self.assertTrue(matches(self.warning, query))
+        for query in ("kingdom missing", "DEADBEEF", "!!!"):
+            with self.subTest(query=query):
+                self.assertFalse(matches(self.warning, query))
+
+    def test_stable_key_uses_type_and_paths_not_title_or_order(self):
+        from copy import deepcopy
+        other = deepcopy(self.warning)
+        other.title = "Updated count"
+        other.items.reverse()
+        self.assertEqual(self.module._installed_conflict_key(other),
+                         self.module._installed_conflict_key(self.warning))
+        other.conflict_type = "other"
+        self.assertNotEqual(self.module._installed_conflict_key(other),
+                            self.module._installed_conflict_key(self.warning))
+
+    def test_filters_compose_without_changing_source_results(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._severity_combo.currentData.return_value = "warning"
+        d._autofix_only.isChecked.return_value = True
+        d._apply_filters()
+        self.assertEqual(d._visible_conflicts, [self.warning])
+        self.assertEqual(d._conflicts, [self.error, self.warning, self.info])
+        self.assertIs(d._selected_conflict(), self.warning)
+        self.assertIn("Showing 1 of 3", d._summary_label.setText.call_args.args[0])
+        d._severity_combo.currentData.return_value = "error"
+        d._apply_filters()
+        self.assertEqual(d._visible_conflicts, [])
+
+    def test_auto_fix_filter_excludes_manual_results(self):
+        self.dialog._autofix_only.isChecked.return_value = True
+        self.dialog._apply_filters()
+        self.assertEqual(self.dialog._visible_conflicts, [self.error, self.warning])
+
+    def test_default_selection_and_manual_action_readiness(self):
+        d = self.dialog
+        d._severity_combo.currentData.return_value = "info"
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.info)
+        d._autofix_btn.setEnabled.assert_called_with(False)
+        d._open_folder_btn.setEnabled.assert_called_with(True)
+        d._copy_files_btn.setEnabled.assert_called_with(True)
+
+    def test_selection_survives_hiding_and_clearing_filters(self):
+        d = self.dialog
+        d._apply_filters()
+        d._row = 1
+        d._on_conflict_selected(1)
+        key = d._selected_key
+        d._search_edit.text.return_value = "DEADBEEF"
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.error)
+        self.assertEqual(d._selected_key, key)
+        d._search_edit.text.return_value = ""
+        d._apply_filters()
+        self.assertIs(d._selected_conflict(), self.warning)
+
+    def test_rescan_preserves_identity_after_reordering(self):
+        from copy import deepcopy
+        d = self.dialog
+        d._selected_key = self.module._installed_conflict_key(self.warning)
+        replacement = deepcopy(self.warning)
+        replacement.title = "New title"
+        d._on_scan_finished(0, [self.info, self.error, replacement], "")
+        self.assertIs(d._selected_conflict(), replacement)
+
+    def test_removed_selection_falls_back_to_first_result(self):
+        d = self.dialog
+        d._selected_key = self.module._installed_conflict_key(self.warning)
+        d._on_scan_finished(0, [self.info], "")
+        self.assertEqual(d._selected_key, self.module._installed_conflict_key(self.info))
+
+    def test_empty_filter_result_disables_all_actions(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "nothing matches"
+        d._apply_filters()
+        self.assertIn("Clear Filters", d._detail_label.setPlainText.call_args.args[0])
+        for button in (d._autofix_btn, d._open_folder_btn, d._copy_files_btn):
+            button.setEnabled.assert_called_with(False)
+        d._resolution_label.clear.assert_called()
+
+    def test_empty_scan_distinguishes_unconfigured_paths(self):
+        d = self.dialog
+        d._conflicts = []
+        d._apply_filters()
+        self.assertIn("No conflicts found in configured folders", d._detail_label.setPlainText.call_args.args[0])
+        d._config = AppConfig()
+        d._apply_filters()
+        self.assertIn("Settings", d._detail_label.setPlainText.call_args.args[0])
+
+    def test_clear_filters_resets_every_control(self):
+        d = self.dialog
+        d._clear_filters()
+        d._search_edit.clear.assert_called_once()
+        d._severity_combo.setCurrentIndex.assert_called_once_with(0)
+        d._autofix_only.setChecked.assert_called_once_with(False)
+        for widget in (d._search_edit, d._severity_combo, d._autofix_only):
+            self.assertEqual(widget.blockSignals.call_args_list, [unittest.mock.call(True), unittest.mock.call(False)])
+
+    def test_details_and_resolution_are_literal_text(self):
+        self.error.title = "<img src='local'>"
+        self.error.description = "<b>Do not render</b>"
+        self.error.resolution = "<a href='unsafe'>text</a>"
+        d = self.dialog
+        d._apply_filters()
+        text = d._detail_label.setPlainText.call_args.args[0]
+        self.assertIn(self.error.title, text)
+        self.assertIn(self.error.description, text)
+        d._detail_label.setHtml.assert_not_called()
+        d._resolution_label.setText.assert_called_with(self.error.resolution)
+
+    def test_folder_uses_selected_file_not_original_conflict_index(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        d._files_list.currentRow.return_value = 1
+        with patch.object(self.module, "_open_local_folder") as opener:
+            d._on_open_folder()
+        self.assertEqual(opener.call_args.args[0], Path("/other/covers"))
+
+    def test_copy_paths_uses_only_visible_selected_conflict(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        with patch.object(self.module.QApplication, "clipboard", create=True) as clipboard:
+            d._on_copy_paths()
+        clipboard.return_value.setText.assert_called_once_with("\n".join(map(str, self.warning.items)))
+
+    def test_auto_fix_confirms_filtered_item_and_defaults_to_no(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=2) as question:
+            with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                d._on_auto_fix()
+        fixer.assert_not_called()
+        self.assertIn(self.warning.title, question.call_args.args[2])
+        self.assertEqual(question.call_args.args[-1], 2)
+        self.assertFalse(d._fixing)
+        d._rescan_btn.setEnabled.assert_called_with(True)
+
+    def test_fix_attempt_always_rescans_including_partial_failure(self):
+        d = self.dialog
+        d._search_edit.text.return_value = "SLUS20312"
+        d._apply_filters()
+        for outcome in ((True, "Fixed"), (False, "Some files failed"), OSError("denied")):
+            with self.subTest(outcome=outcome):
+                with patch.object(self.module.QMessageBox, "question", return_value=1):
+                    with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                        if isinstance(outcome, Exception):
+                            fixer.side_effect = outcome
+                        else:
+                            fixer.return_value = outcome
+                        with patch.object(d, "_run_scan") as scan:
+                            with self.assertNoLogs("src.ui.widgets") if not isinstance(outcome, Exception) else self.assertLogs("src.ui.widgets", level="WARNING"):
+                                d._on_auto_fix()
+                fixer.assert_called_once_with(self.warning)
+                scan.assert_called_once()
+                self.assertFalse(d._fixing)
+
+    def test_scanning_fixing_and_invalid_rows_block_actions(self):
+        d = self.dialog
+        d._apply_filters()
+        for scanning, fixing, row in ((True, False, 0), (False, True, 0), (False, False, -1), (False, False, 99)):
+            d._scanning, d._fixing, d._row = scanning, fixing, row
+            self.assertIsNone(d._selected_conflict())
+            with patch("src.core.conflict_resolver.auto_fix_conflict") as fixer:
+                with patch.object(self.module, "_open_local_folder") as opener:
+                    d._on_auto_fix()
+                    d._on_open_folder()
+            fixer.assert_not_called()
+            opener.assert_not_called()
+
+    def test_failed_scan_drops_stale_results_and_remains_retryable(self):
+        d = self.dialog
+        d._scanning = True
+        d._on_scan_finished(0, [self.error], "permission <denied>")
+        self.assertFalse(d._scanning)
+        self.assertEqual(d._conflicts, [])
+        self.assertIn("permission <denied>", d._detail_label.setPlainText.call_args.args[0])
+        d._rescan_btn.setEnabled.assert_called_with(True)
+        d._autofix_btn.setEnabled.assert_called_with(False)
+
+    def test_old_or_closed_scan_completion_is_ignored(self):
+        d = self.dialog
+        d._on_scan_finished(-1, [], "old failure")
+        d._rescan_btn.setEnabled.assert_not_called()
+        d._closed = True
+        d._on_scan_finished(0, [], "")
+        d._rescan_btn.setEnabled.assert_not_called()
+        self.assertIsNone(d._selected_conflict())
+
+    def test_scan_runs_worker_with_config_snapshot_and_no_direct_ui_updates(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult") as relay:
+            with patch("threading.Thread") as thread:
+                d._run_scan()
+                self.assertTrue(d._scanning)
+                self.assertEqual(d._conflicts, [])
+                d._rescan_btn.setEnabled.assert_called_with(False)
+                d._run_scan()
+                thread.assert_called_once()
+                d._config.pnach_path = "/changed"
+                d._summary_label.reset_mock()
+                with patch("src.core.conflict_resolver.resolve_all_conflicts", return_value=[self.warning]) as scanner:
+                    thread.call_args.kwargs["target"]()
+                self.assertEqual(scanner.call_args.args[0].pnach_path, "/pcsx2/cheats")
+                d._summary_label.setText.assert_not_called()
+                relay.return_value.finished.emit.assert_called_once_with(1, [self.warning], "")
+                relay.return_value.deleteLater.assert_called_once()
+                d._on_scan_finished(*relay.return_value.finished.emit.call_args.args)
+                self.assertIs(d._selected_conflict(), self.warning)
+
+    def test_worker_failure_with_empty_exception_message_is_not_success(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult") as relay:
+            with patch("threading.Thread") as thread:
+                d._run_scan()
+                with patch("src.core.conflict_resolver.resolve_all_conflicts", side_effect=OSError()):
+                    with self.assertLogs("src.ui.widgets", level="WARNING"):
+                        thread.call_args.kwargs["target"]()
+                self.assertEqual(relay.return_value.finished.emit.call_args.args, (1, [], "OSError"))
+
+    def test_thread_start_failure_unlocks_retry(self):
+        d = self.dialog
+        with patch.object(self.module, "_ConflictScanResult"):
+            with patch("threading.Thread") as thread:
+                thread.return_value.start.side_effect = RuntimeError("no threads")
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    d._run_scan()
+        self.assertFalse(d._scanning)
+        self.assertEqual(d._scan_error, "no threads")
+        d._rescan_btn.setEnabled.assert_called_with(True)
+
+
+class TestModPanelBatchActions(unittest.TestCase):
+    def setUp(self):
+        from types import MethodType
+        helper = TestModPanelEmptyState()
+        self.module = helper._import_mod_panel()
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    author="Alice", game_id="SLUS-20062", enabled=False),
+            ModInfo("b", "Beta", ModType.TEXTURE_PACK, "/mods/b",
+                    author="Bob", game_id="SLUS-21075", enabled=True),
+            ModInfo("c", "Gamma", ModType.TEXTURE_PACK, "/mods/c",
+                    author="Alice", game_id="SLUS-20062", enabled=False),
+        ]
+        p = self.panel = helper._make_filter_panel(self.module, self.mods)
+        p.mod_type = ModType.TEXTURE_PACK
+        p.extra_types = []
+        p.config = AppConfig(textures_path="/pcsx2/textures")
+        p.db = MagicMock()
+        p.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        p.db.all.side_effect = lambda: list(self.mods)
+        p.db.by_type.side_effect = lambda kind: [mod for mod in self.mods if mod.mod_type == kind]
+        p._all_mods = MethodType(self.module.ModPanel._all_mods, p)
+        p.emit_status = MagicMock()
+        p._invalidate_issue_state_cache = MagicMock()
+        p._confirm_batch = MagicMock(return_value=True)
+        p.manager = MagicMock()
+        p.manager.set_enabled_many.side_effect = self._persist
+        for name in ("ModItemWidget", "EmptyStateWidget", "QPushButton"):
+            patcher = patch.object(self.module, name, MagicMock())
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        p._apply_filter()
+
+    def _persist(self, states, config):
+        for mid, enabled in states.items():
+            self.panel.db.get(mid).enabled = enabled
+        return len(states), []
+
+    def test_enable_shown_composes_search_author_status_and_library_filters(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._author_filter.currentData.return_value = "Alice"
+        p._status_filter.currentData.return_value = "disabled"
+        p._library_filter_check.isChecked.return_value = True
+        p._apply_filter()
+        self.assertEqual(p._shown_mod_ids, ("a",))
+        p._set_batch_enabled(True, shown=True)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertEqual([mod.enabled for mod in self.mods], [True, True, False])
+        self.assertEqual(p._shown_mod_ids, ())
+        self.assertIn("Shown results captured", p._confirm_batch.call_args.args[1])
+
+    def test_enable_all_still_includes_hidden_disabled_mods(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._apply_filter()
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "c": True}, p.config)
+        self.assertIn("including hidden", p._confirm_batch.call_args.args[1])
+
+    def test_disable_all_reconciles_hidden_mods_without_manual_flag_updates(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._apply_filter()
+        p._disable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"b": False}, p.config)
+        p.db.update.assert_not_called()
+        p.manager.deploy.assert_not_called()
+        self.assertFalse(self.mods[1].enabled)
+
+    def test_empty_shown_scope_never_falls_back_to_all_mods(self):
+        p = self.panel
+        p._search.text.return_value = "no such mod"
+        p._apply_filter()
+        p._set_batch_enabled(True, shown=True)
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        p._enable_shown_btn.setEnabled.assert_called_with(False)
+        p._enable_all_btn.setEnabled.assert_called_with(True)
+
+    def test_readiness_counts_match_scope_and_change_not_total_count(self):
+        p = self.panel
+        p._search.text.return_value = "name:Beta"
+        p._apply_filter()
+        for button, text, enabled in (
+            (p._enable_all_btn, "Enable All (2)", True),
+            (p._disable_all_btn, "Disable All (1)", True),
+            (p._enable_shown_btn, "Enable Shown (0)", False),
+            (p._disable_shown_btn, "Disable Shown (1)", True),
+        ):
+            button.setText.assert_called_with(text)
+            button.setEnabled.assert_called_with(enabled)
+
+    def test_no_pending_states_needs_explicit_retry_not_new_batch(self):
+        p = self.panel
+        for mod in self.mods:
+            mod.enabled = True
+        p._enable_all()
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertIn("Retry Batch", p.emit_status.call_args.args[0])
+
+    def test_cancel_preserves_previous_retry_and_makes_no_changes(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._confirm_batch.return_value = False
+        p._enable_all()
+        self.assertEqual(p._batch_retry_states, {"b": False})
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+        p._invalidate_issue_state_cache.assert_not_called()
+        self.assertFalse(p._batch_busy)
+
+    def test_failure_after_flag_save_retries_original_ids_even_when_filtered_out(self):
+        p = self.panel
+        p._search.text.return_value = "name:Alpha"
+        p._status_filter.currentData.return_value = "disabled"
+        p._apply_filter()
+        def partial(states, config):
+            self._persist(states, config)
+            raise OSError("disk <full>")
+        p.manager.set_enabled_many.side_effect = partial
+        with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+            p._set_batch_enabled(True, shown=True)
+        self.assertEqual(p._shown_mod_ids, ())
+        self.assertEqual(p._batch_retry_states, {"a": True})
+        self.assertIn("disk <full>", p._batch_feedback.setPlainText.call_args.args[0])
+        p._batch_retry_btn.setVisible.assert_called_with(True)
+        # A later import and a different filter must not widen the retry.
+        self.mods.append(ModInfo("new", "New", ModType.TEXTURE_PACK, "/new", enabled=False))
+        p._search.text.return_value = "name:New"
+        p._apply_filter()
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"a": True})
+        self.assertFalse(self.mods[-1].enabled)
+        self.assertEqual(p._batch_retry_states, {})
+        self.assertIn("not current filters", p._confirm_batch.call_args.args[1])
+
+    def test_save_failure_keeps_original_snapshot_and_retry_remains_available(self):
+        p = self.panel
+        p.manager.set_enabled_many.side_effect = OSError("database <locked>")
+        with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+            p._enable_all()
+        self.assertEqual(p._batch_retry_states, {"a": True, "c": True})
+        self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+        self.assertFalse(p._batch_busy)
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertTrue(all(mod.enabled for mod in self.mods))
+        self.assertEqual(p._batch_retry_states, {})
+
+    def test_warning_keeps_snapshot_and_never_claims_reconciled_files(self):
+        p = self.panel
+        def warning(states, config):
+            self._persist(states, config)
+            return 0, ["No target configured <path>"]
+        p.manager.set_enabled_many.side_effect = warning
+        p._enable_all()
+        text = p._batch_feedback.setPlainText.call_args.args[0]
+        self.assertIn("No target configured <path>", text)
+        self.assertIn("Retry Batch", text)
+        self.assertNotIn("Deployment reconciled", text)
+        self.assertEqual(p._batch_retry_states, {"a": True, "c": True})
+
+    def test_disable_warning_retries_cleanup_even_though_flags_already_false(self):
+        p = self.panel
+        def warning(states, config):
+            self._persist(states, config)
+            return 0, ["Could not remove deployed file"]
+        p.manager.set_enabled_many.side_effect = warning
+        p._disable_all()
+        self.assertFalse(self.mods[1].enabled)
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_batch()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"b": False})
+        self.assertEqual(p._batch_retry_states, {})
+
+    def test_retry_skips_removed_or_moved_mods_and_never_includes_new_mods(self):
+        p = self.panel
+        p._batch_retry_states = {"a": True, "b": False, "removed": True}
+        self.mods[0].mod_type = ModType.COVER_ART
+        p._retry_batch()
+        p.manager.set_enabled_many.assert_called_once_with({"b": False}, p.config)
+        self.assertEqual(p._confirm_batch.call_args.args[2], 2)
+        self.assertIn("Skipped 2", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_retry_with_no_remaining_mods_does_not_enable_any_new_mod(self):
+        p = self.panel
+        p._batch_retry_states = {"removed": True}
+        p._retry_batch()
+        p.manager.set_enabled_many.assert_not_called()
+        p._confirm_batch.assert_not_called()
+        self.assertEqual(p._batch_retry_states, {})
+        self.assertIn("No changes made", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_busy_batch_blocks_duplicate_actions_retries_and_dismissal(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._batch_busy = True
+        p._enable_all()
+        p._retry_batch()
+        p._dismiss_batch_result()
+        p._run_batch({"a": True}, "scope")
+        p._update_batch_actions(self.mods)
+        p._confirm_batch.assert_not_called()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._batch_retry_states, {"b": False})
+        for button in (p._enable_all_btn, p._disable_all_btn, p._enable_shown_btn, p._disable_shown_btn):
+            button.setEnabled.assert_called_with(False)
+
+    def test_dismiss_clears_retry_without_changing_mods(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        p._dismiss_batch_result()
+        p._batch_feedback.hide.assert_called_once()
+        p._batch_dismiss_btn.hide.assert_called_once()
+        p._batch_retry_btn.setVisible.assert_called_with(False)
+        self.assertEqual(p._batch_retry_states, {})
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_combined_panel_passes_both_code_types_to_one_batch_call(self):
+        p = self.panel
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[2].mod_type = ModType.CHEAT
+        p.mod_type = ModType.PNACH
+        p.extra_types = [ModType.CHEAT, ModType.PNACH]
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "c": True}, p.config)
+        p.manager.deploy.assert_not_called()
+        self.assertTrue(self.mods[1].enabled)
+
+    def test_success_without_config_explicitly_says_files_unchanged(self):
+        p = self.panel
+        p.config = None
+        p._enable_all()
+        self.assertIn("installed files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_save_file_result_does_not_claim_live_files_deployed(self):
+        p = self.panel
+        p.mod_type = ModType.SAVE_FILE
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        p._enable_all()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertIn("Live memory-card files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def test_confirmation_defaults_no_and_lists_full_literal_batch_with_destinations(self):
+        p = self.panel
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[2].mod_type = ModType.CHEAT
+        p.config.pnach_path = "/pcsx2/cheats"
+        p.config.cheats_path = "/other/cheats_ws"
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt") as qt:
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            box.return_value.exec.return_value = 1
+            confirmed = self.module.ModPanel._confirm_batch(p, {"a": True, "c": True}, "Original scope", 1)
+        self.assertTrue(confirmed)
+        box.return_value.setTextFormat.assert_called_once_with(qt.TextFormat.PlainText)
+        box.return_value.setDefaultButton.assert_called_once_with(2)
+        self.assertIn("Original scope", box.return_value.setText.call_args.args[0])
+        self.assertIn("2 enabled flag(s) will change", box.return_value.setText.call_args.args[0])
+        info = box.return_value.setInformativeText.call_args.args[0]
+        self.assertIn("/pcsx2/cheats", info)
+        self.assertIn("/other/cheats_ws", info)
+        self.assertIn("1 original mod(s)", info)
+        self.assertIn("including hidden ones", info)
+        detail = box.return_value.setDetailedText.call_args.args[0]
+        self.assertIn("Alpha <literal> [a]", detail)
+        self.assertIn("Gamma [c]", detail)
+        self.assertNotIn("Beta", detail)
+
+    def test_retry_confirmation_counts_already_saved_flags_and_missing_destinations(self):
+        p = self.panel
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt"):
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            box.return_value.exec.return_value = 2
+            p.config.textures_path = ""
+            confirmed = self.module.ModPanel._confirm_batch(p, {"b": True}, "Retry original batch")
+        self.assertFalse(confirmed)
+        self.assertIn("0 enabled flag(s)", box.return_value.setText.call_args.args[0])
+        self.assertIn("1 already match", box.return_value.setText.call_args.args[0])
+        self.assertIn("No destination configured", box.return_value.setInformativeText.call_args.args[0])
+
+    def test_confirmation_warns_before_replacing_an_unfinished_batch(self):
+        p = self.panel
+        p._batch_retry_states = {"b": False}
+        with patch.object(self.module, "QMessageBox") as box, patch.object(self.module, "Qt"):
+            box.StandardButton = SimpleNamespace(Yes=1, No=2)
+            self.module.ModPanel._confirm_batch(p, {"a": True}, "Shown")
+        self.assertIn("replaces the earlier retry snapshot", box.return_value.setInformativeText.call_args.args[0])
+
+    def test_real_disable_all_removes_deployed_files_and_saves_once(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            p.manager = ModManager(p.db)
+            for mod in self.mods:
+                mod.enabled = True
+            p.manager.deploy(ModType.TEXTURE_PACK, p.config.textures_path)
+            p._search.text.return_value = "name:Alpha"
+            p._apply_filter()
+            p._disable_all()
+            self.assertFalse(any(mod.enabled for mod in self.mods))
+            self.assertEqual(list((root / "target").rglob("*.png")), [])
+            p.db.save.assert_called_once()
+            p.db.update.assert_not_called()
+            self.assertIn("Deployment reconciled", p._batch_feedback.setPlainText.call_args.args[0])
+
+    def _prepare_real_sources(self, root):
+        p = self.panel
+        p.config.textures_path = str(root / "target")
+        for index, mod in enumerate(self.mods):
+            source = root / f"source{index}"
+            source.mkdir()
+            (source / "shared.png").write_bytes(f"pack{index}".encode())
+            (source / f"unique{index}.png").write_bytes(b"unique")
+            mod.path = str(source)
+            mod.files = ["shared.png", f"unique{index}.png"]
+
+    def test_real_missing_source_warning_retries_original_hidden_mod_after_restore(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            source = Path(self.mods[0].path)
+            shutil.rmtree(source)
+            p.manager = ModManager(p.db)
+            p._search.text.return_value = "name:Alpha"
+            p._status_filter.currentData.return_value = "disabled"
+            p._apply_filter()
+            p._set_batch_enabled(True, shown=True)
+            self.assertEqual(p._batch_retry_states, {"a": True})
+            self.assertEqual(p._shown_mod_ids, ())
+            self.assertFalse(self.mods[2].enabled)
+            source.mkdir()
+            (source / "restored.png").write_bytes(b"restored")
+            p._retry_batch()
+            self.assertTrue((root / "target" / "restored.png").exists())
+            self.assertFalse(self.mods[2].enabled)
+            self.assertEqual(p._batch_retry_states, {})
+            self.assertEqual(p.db.save.call_count, 2)
+
+    def test_real_save_failure_restores_flags_and_retry_does_not_include_new_mods(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self._prepare_real_sources(root)
+            p.manager = ModManager(p.db)
+            p.db.save.side_effect = OSError("locked")
+            with self.assertLogs("src.ui.mod_panel", level="WARNING"):
+                p._enable_all()
+            self.assertEqual([mod.enabled for mod in self.mods], [False, True, False])
+            self.assertFalse((root / "target").exists())
+            self.mods.append(ModInfo("later", "Later", ModType.TEXTURE_PACK, "/later", enabled=False))
+            p.db.save.side_effect = None
+            p._retry_batch()
+            self.assertEqual([mod.enabled for mod in self.mods], [True, True, True, False])
+            self.assertTrue((root / "target" / "unique0.png").exists())
+            self.assertEqual(p._batch_retry_states, {})
+
+    def test_real_combined_code_panel_uses_each_types_actual_destination(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for mod, kind, value in ((self.mods[0], ModType.PNACH, "01"), (self.mods[2], ModType.CHEAT, "02")):
+                source = root / mod.id
+                source.mkdir()
+                (source / "DEADBEEF.pnach").write_text(
+                    f"patch=1,EE,20300000,word,000000{value}\n", encoding="utf-8",
+                )
+                mod.path = str(source)
+                mod.mod_type = kind
+                mod.files = ["DEADBEEF.pnach"]
+            p.mod_type = ModType.PNACH
+            p.extra_types = [ModType.CHEAT]
+            p.config.pnach_path = str(root / "cheats")
+            p.config.cheats_path = str(root / "cheats_ws")
+            p.manager = ModManager(p.db)
+            p._enable_all()
+            self.assertIn("00000001", (root / "cheats" / "DEADBEEF.pnach").read_text())
+            self.assertIn("00000002", (root / "cheats_ws" / "DEADBEEF.pnach").read_text())
+            p.db.save.assert_called_once()
+            self.assertTrue(self.mods[1].enabled)
+
+    def test_real_shared_code_destination_combines_both_types_once(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for index, mod in enumerate((self.mods[0], self.mods[2])):
+                source = root / mod.id
+                source.mkdir()
+                (source / "DEADBEEF.pnach").write_text(
+                    f"patch=1,EE,2030000{index},word,00000001\n", encoding="utf-8",
+                )
+                mod.path = str(source)
+                mod.mod_type = ModType.PNACH if index == 0 else ModType.CHEAT
+            p.mod_type = ModType.PNACH
+            p.extra_types = [ModType.CHEAT]
+            p.config.pnach_path = p.config.cheats_path = str(root / "cheats")
+            p.manager = ModManager(p.db)
+            with patch.object(p.manager, "_deploy_pnach", wraps=p.manager._deploy_pnach) as deploy:
+                p._enable_all()
+            deploy.assert_called_once()
+            text = (root / "cheats" / "DEADBEEF.pnach").read_text()
+            self.assertIn("20300000", text)
+            self.assertIn("20300001", text)
+            p.db.save.assert_called_once()
+
+    def test_real_save_file_batches_preserve_live_card_on_enable_and_disable(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "card.ps2"
+            source.write_bytes(b"stored")
+            target = root / "memcards"
+            target.mkdir()
+            live = target / source.name
+            live.write_bytes(b"live progress")
+            p.mod_type = ModType.SAVE_FILE
+            self.mods[0].mod_type = ModType.SAVE_FILE
+            self.mods[0].path = str(source)
+            self.mods[0].files = [source.name]
+            p.config.memcards_path = str(target)
+            p.manager = ModManager(p.db)
+            p._enable_all()
+            p._disable_all()
+            self.assertEqual(live.read_bytes(), b"live progress")
+            self.assertFalse(self.mods[0].enabled)
+            self.assertIn("Live memory-card files were not changed", p._batch_feedback.setPlainText.call_args.args[0])
+
+
+class TestManagedConflictReview(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        import src.ui.widgets as module
+        self.module = module
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    author="Alice", game_id="SLUS-20062", priority=1),
+            ModInfo("b", "Beta", ModType.TEXTURE_PACK, "/mods/b", priority=3),
+            ModInfo("c", "Gamma", ModType.PNACH, "/mods/c", priority=9),
+        ]
+        self.db = MagicMock()
+        self.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        self.db.all.side_effect = lambda: list(self.mods)
+        self.conflicts = [ConflictInfo("b", "a", [f"texture{i}.png" for i in range(35)])]
+        self.addresses = [
+            dict(mod_a_id="c", mod_b_id="a", value_a="CCCC", value_b="AAAA",
+                 address="20300000", processor="EE", game_crc="DEADBEEF"),
+        ]
+        d = self.dialog = SimpleNamespace(
+            db=self.db, manager=MagicMock(), config=AppConfig(textures_path="/target"),
+            _busy=False, _selected_pair=None, _visible_pairs=[], _row=-1,
+            _pairs=module.ConflictDialog._group_conflicts(self.conflicts, self.addresses),
+            _texture_conflicts=self.conflicts, pnach_conflicts=self.addresses,
+        )
+        for name in ("_search", "_kind", "_pair_list", "_summary", "_details", "_feedback", "_search_timer"):
+            setattr(d, name, MagicMock())
+        d._search.text.return_value = ""
+        d._kind.currentData.return_value = ""
+        d._action_buttons = [MagicMock() for _ in range(4)]
+        d._pair_list.currentRow.side_effect = lambda: d._row
+        d._pair_list.clear.side_effect = lambda: setattr(d, "_row", -1)
+        d._pair_list.setCurrentRow.side_effect = lambda row: setattr(d, "_row", row)
+        for name in ("_current_pair", "_apply_filters", "_on_pair_selected", "_clear_filters",
+                     "_apply_action", "_open_texture_picker", "_open_code_picker"):
+            setattr(d, name, MethodType(getattr(module.ConflictDialog, name), d))
+        module.QMessageBox.StandardButton = SimpleNamespace(Yes=1, No=2)
+        d.manager.set_priority.return_value = (2, [])
+        d.manager.set_enabled_many.return_value = (1, [])
+
+    def test_grouping_combines_files_and_addresses_without_mutating_inputs(self):
+        conflict = ConflictInfo("c", "a", ["same.pnach", "same.pnach"])
+        pairs = self.module.ConflictDialog._group_conflicts([conflict], self.addresses)
+        self.assertEqual(list(pairs), [("a", "c")])
+        self.assertEqual(pairs[("a", "c")]["files"], {"same.pnach"})
+        entry = pairs[("a", "c")]["addresses"][0]
+        self.assertEqual((entry["mod_a_id"], entry["value_a"]), ("a", "AAAA"))
+        self.assertEqual((entry["mod_b_id"], entry["value_b"]), ("c", "CCCC"))
+        self.assertEqual(self.addresses[0]["value_a"], "CCCC")
+
+    def test_first_selection_has_complete_file_details_and_plain_text(self):
+        d = self.dialog
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "b"))
+        text = d._details.setPlainText.call_args.args[0]
+        self.assertIn("A: Alpha <literal>", text)
+        self.assertIn("texture34.png", text)
+        self.assertIn("Shared relative files (35)", text)
+        d._details.setHtml.assert_not_called()
+        self.assertIn("Showing 2 of 2 mod pairs", d._summary.setText.call_args.args[0])
+
+    def test_address_values_follow_canonical_a_b_labels(self):
+        d = self.dialog
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        text = d._details.setPlainText.call_args.args[0]
+        self.assertIn("A: Alpha", text)
+        self.assertIn("B: Gamma", text)
+        self.assertIn("A: AAAA • B: CCCC", text)
+        self.assertIn("DEADBEEF", text)
+
+    def test_query_combines_name_author_serial_and_file_terms(self):
+        d = self.dialog
+        d._search.text.return_value = "alice slus20062 texture34"
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [("a", "b")])
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [])
+        self.assertIn("Clear Filters", d._details.setPlainText.call_args.args[0])
+        for button in d._action_buttons:
+            button.setEnabled.assert_called_with(False)
+
+    def test_query_matches_code_values_crcs_and_addresses(self):
+        self.dialog._search.text.return_value = "DEAD-BEEF 20300000 CCCC"
+        self.dialog._apply_filters()
+        self.assertEqual(self.dialog._visible_pairs, [("a", "c")])
+
+    def test_selection_survives_filter_hiding_and_clear(self):
+        d = self.dialog
+        d._apply_filters()
+        d._row = 1
+        d._on_pair_selected()
+        d._kind.currentData.return_value = "files"
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "b"))
+        self.assertEqual(d._selected_pair, ("a", "c"))
+        d._kind.currentData.return_value = ""
+        d._apply_filters()
+        self.assertEqual(d._current_pair(), ("a", "c"))
+        d._clear_filters()
+        d._search.clear.assert_called_once()
+        d._kind.setCurrentIndex.assert_called_once_with(0)
+
+    def test_deleted_pair_members_are_omitted_and_cannot_be_changed(self):
+        self.mods.pop(0)
+        d = self.dialog
+        d._apply_filters()
+        self.assertEqual(d._visible_pairs, [])
+        d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_not_called()
+
+    def test_cancel_action_defaults_to_no_and_keeps_state(self):
+        d = self.dialog
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=2) as question:
+            d._apply_action(0, "Prioritize")
+        self.assertEqual(question.call_args.args[-1], 2)
+        self.assertIn("Alpha &lt;literal&gt;", question.call_args.args[2])
+        self.assertIn("whole library", question.call_args.args[2])
+        d.manager.set_priority.assert_not_called()
+        self.assertFalse(d._busy)
+        self.assertEqual(self.mods[0].priority, 1)
+
+    def test_filtered_priority_targets_selected_mod_and_exceeds_third_mod(self):
+        d = self.dialog
+        d._kind.currentData.return_value = "addresses"
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_called_once_with("a", 10, d.config)
+        self.assertIn("Deployment reconciled", d._feedback.setPlainText.call_args.args[0])
+        self.assertFalse(d._busy)
+
+    def test_retry_priority_does_not_keep_increasing_already_highest_priority(self):
+        d = self.dialog
+        self.mods[0].priority = 20
+        d._apply_filters()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Prioritize")
+            d._apply_action(0, "Prioritize")
+        self.assertEqual([call.args[1] for call in d.manager.set_priority.call_args_list], [20, 20])
+
+    def test_disabled_mods_keep_disable_retry_but_not_priority_actions(self):
+        d = self.dialog
+        self.mods[0].enabled = False
+        d._apply_filters()
+        d._action_buttons[0].setEnabled.assert_called_with(False)
+        d._action_buttons[2].setEnabled.assert_called_with(True)
+        d._action_buttons[2].setText.assert_called_with("Retry Disable A")
+        d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_not_called()
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_called_once_with({"a": False}, d.config)
+
+    def test_partial_failure_keeps_retry_available_and_feedback_literal(self):
+        d = self.dialog
+        d._apply_filters()
+        d.manager.set_priority.side_effect = OSError("<denied>")
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                d._apply_action(0, "Prioritize")
+        self.assertFalse(d._busy)
+        self.assertIn("<denied>", d._feedback.setPlainText.call_args.args[0])
+        self.assertIn("Retry the same action", d._feedback.setPlainText.call_args.args[0])
+        d._action_buttons[0].setEnabled.assert_called_with(True)
+
+    def test_warning_or_absent_config_never_claims_installed_files_reconciled(self):
+        d = self.dialog
+        d._apply_filters()
+        for config, warnings in ((None, []), (d.config, ["Missing path <source>"])):
+            d.config = config
+            d.manager.set_enabled_many.return_value = (0, warnings)
+            with patch.object(self.module.QMessageBox, "question", return_value=1):
+                d._apply_action(0, "Disable")
+            text = d._feedback.setPlainText.call_args.args[0]
+            self.assertNotIn("Deployment reconciled", text)
+            self.assertIn("not changed" if config is None else "retry", text)
+
+    def test_busy_actions_do_not_reenter_manager(self):
+        d = self.dialog
+        d._apply_filters()
+        d._busy = True
+        d._apply_action(0, "Disable")
+        d.manager.set_enabled_many.assert_not_called()
+
+    def test_save_file_priority_blocked_and_disable_explains_card_safety(self):
+        d = self.dialog
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        d._apply_filters()
+        d._apply_action(0, "Prioritize")
+        d.manager.set_priority.assert_not_called()
+        self.assertIn("Live memory-card", d._details.setPlainText.call_args.args[0])
+        with patch.object(self.module.QMessageBox, "question", return_value=1):
+            d._apply_action(0, "Disable")
+        self.assertIn("Live memory-card files were not changed", d._feedback.setPlainText.call_args.args[0])
+
+    def test_pickers_drop_disabled_pairs_without_exporting_stale_snapshot(self):
+        d = self.dialog
+        self.mods[0].enabled = False
+        with patch.object(self.module, "TextureFilePickerDialog") as textures:
+            with patch.object(self.module, "PnachCodePickerDialog") as codes:
+                d._open_texture_picker()
+                d._open_code_picker()
+        textures.assert_not_called()
+        codes.assert_not_called()
+
+
+class TestManagedConflictDeployment(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.target = self.root / "target"
+        self.mods = []
+        for index in range(3):
+            source = self.root / f"source{index}"
+            source.mkdir()
+            (source / "shared.png").write_text(f"pack{index}", encoding="utf-8")
+            (source / f"unique{index}.png").write_text("unique", encoding="utf-8")
+            self.mods.append(ModInfo(str(index), f"Pack {index}", ModType.TEXTURE_PACK, str(source), priority=index))
+        self.db = MagicMock()
+        self.db.all.side_effect = lambda: list(self.mods)
+        self.db.by_type.side_effect = lambda kind: [mod for mod in self.mods if mod.mod_type == kind]
+        self.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        self.manager = ModManager(self.db)
+        self.config = AppConfig(textures_path=str(self.target))
+
+    def test_priority_redeploys_highest_last_regardless_of_database_order(self):
+        for mods in (self.mods[:], list(reversed(self.mods))):
+            self.mods[:] = mods
+            count, warnings = self.manager.set_priority("0", 10, self.config)
+            self.assertEqual((count, warnings), (3, []))
+            self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+            self.assertTrue((self.target / "unique2.png").exists())
+        self.assertEqual(self.db.update.call_count, 2)
+        self.db.save.assert_not_called()
+
+    def test_single_file_texture_sources_follow_highest_priority(self):
+        for mod in self.mods:
+            mod.path = str(Path(mod.path) / "shared.png")
+        self.manager.set_priority("1", 50, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack1")
+
+    def test_failed_save_restores_priority_and_does_not_touch_installed_files(self):
+        self.db.update.side_effect = OSError("database locked")
+        with self.assertRaises(OSError):
+            self.manager.set_priority("0", 100, self.config)
+        self.assertEqual(self.mods[0].priority, 0)
+        self.assertFalse(self.target.exists())
+
+    def test_reapplying_priority_retries_deployment_after_exception(self):
+        with patch.object(self.manager, "deploy", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(self.mods[0].priority, 30)
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+
+    def test_no_target_reports_warning_and_can_retry_after_configured(self):
+        self.config.textures_path = ""
+        count, warnings = self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(count, 0)
+        self.assertIn("No target path configured", warnings[0])
+        self.config.textures_path = str(self.target)
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "shared.png").read_text(), "pack0")
+
+    def test_no_config_only_persists_priority(self):
+        self.assertEqual(self.manager.set_priority("0", 30), (0, []))
+        self.assertEqual(self.mods[0].priority, 30)
+        self.assertFalse(self.target.exists())
+
+    def test_missing_mod_does_not_persist_or_deploy(self):
+        count, warnings = self.manager.set_priority("missing", 30, self.config)
+        self.assertEqual(count, 0)
+        self.assertIn("not found", warnings[0])
+        self.db.update.assert_not_called()
+        self.assertFalse(self.target.exists())
+
+    def test_disable_removes_unique_files_and_restores_surviving_priority(self):
+        self.manager.set_priority("0", 30, self.config)
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+        self.assertFalse(self.mods[0].enabled)
+
+    def test_disable_with_missing_source_warns_instead_of_claiming_complete_cleanup(self):
+        self.manager.set_priority("0", 30, self.config)
+        shutil.rmtree(self.mods[0].path)
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(any("Could not verify complete deployed-file cleanup" in notice for notice in warnings))
+        self.assertTrue((self.target / "unique0.png").exists())
+
+    def test_disable_removes_recorded_texture_file_even_if_source_file_is_missing(self):
+        self.mods[0].files = ["shared.png", "unique0.png"]
+        self.manager.set_priority("0", 30, self.config)
+        (Path(self.mods[0].path) / "unique0.png").unlink()
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(warnings, [])
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+
+    def test_missing_source_directory_uses_recorded_inventory_and_warns(self):
+        self.mods[0].files = ["shared.png", "unique0.png"]
+        self.manager.set_priority("0", 30, self.config)
+        shutil.rmtree(self.mods[0].path)
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(warnings)
+        self.assertFalse((self.target / "unique0.png").exists())
+        self.assertEqual((self.target / "shared.png").read_text(), "pack2")
+
+    def test_inventory_cleanup_rejects_escaping_absolute_and_windows_paths(self):
+        self.manager.set_priority("0", 30, self.config)
+        outside = self.root / "outside.png"
+        outside.write_bytes(b"outside")
+        self.mods[0].files = [
+            "../outside.png", str(outside), r"C:\outside.png",
+            r"..\outside.png", ".", "shared.png",
+        ]
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(outside.read_bytes(), b"outside")
+        self.assertEqual(sum("unsafe" in notice for notice in warnings), 5)
+
+    def test_cleanup_does_not_follow_destination_symlinks_outside_target(self):
+        self.manager.set_priority("0", 30, self.config)
+        outside = self.root / "outside"
+        outside.mkdir()
+        (outside / "keep.png").write_bytes(b"keep")
+        try:
+            (self.target / "linked").symlink_to(outside, target_is_directory=True)
+        except OSError:
+            self.skipTest("Directory symlinks unavailable")
+        self.mods[0].files = ["linked/keep.png"]
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual((outside / "keep.png").read_bytes(), b"keep")
+        self.assertTrue(any("outside target" in notice for notice in warnings))
+
+    def test_pnach_inventory_cleanup_removes_flattened_output_for_missing_nested_file(self):
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[0].files = ["nested/deadbeef.pnach"]
+        self.config.pnach_path = str(self.target)
+        self.target.mkdir()
+        output = self.target / "DEADBEEF.pnach"
+        output.write_text("deployed code", encoding="utf-8")
+        _count, warnings = self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertEqual(warnings, [])
+        self.assertFalse(output.exists())
+
+    def _code_mods(self, filename="DEADBEEF.pnach"):
+        for index, mod in enumerate(self.mods):
+            mod.mod_type = ModType.PNACH if index != 1 else ModType.CHEAT
+            mod.path = str(Path(mod.path) / filename)
+            Path(mod.path).write_text(
+                f"patch=1,EE,20300000,word,0000000{index}\n"
+                f"patch=1,EE,2030000{index + 1},word,000000FF\n", encoding="utf-8",
+            )
+        self.config.pnach_path = str(self.target)
+        self.config.cheats_path = str(self.target / ".")
+
+    def test_priority_redeploy_merges_shared_pnach_cheat_destination(self):
+        self._code_mods()
+        count, warnings = self.manager.set_priority("1", 30, self.config)
+        self.assertEqual((count, warnings), (1, []))
+        text = (self.target / "DEADBEEF.pnach").read_text()
+        self.assertIn("20300000,word,00000001", text)
+        self.assertNotIn("20300000,word,00000002", text)
+        for index in range(3):
+            self.assertIn(f"2030000{index + 1}", text)
+
+    def test_no_crc_filename_collision_uses_highest_priority(self):
+        self._code_mods("custom.pnach")
+        self.manager.set_priority("0", 30, self.config)
+        self.assertEqual((self.target / "custom.pnach").read_text(), Path(self.mods[0].path).read_text())
+
+    def test_priority_reconciliation_never_touches_live_memory_cards(self):
+        self.target.mkdir()
+        live = self.target / "shared.png"
+        live.write_bytes(b"active card")
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        self.config.memcards_path = str(self.target)
+        result = self.manager.set_priority("0", 30, self.config)
+        self.assertEqual(result, (0, []))
+        self.assertEqual(live.read_bytes(), b"active card")
 
 
 class TestAssetPaths(unittest.TestCase):
@@ -1246,6 +5357,23 @@ class TestPnachParser(unittest.TestCase):
         with self.assertRaises(ValueError):
             merge_pnach_files([], self.tmpdir)
 
+    def test_merge_skips_unreadable_files(self):
+        from src.core.pnach import merge_pnach_files, parse_pnach
+
+        valid = self._write_pnach("ABCD1234", [
+            "gametitle=Valid Game",
+            "patch=1,EE,00000001,word,11111111",
+        ])
+        missing = str(Path(self.tmpdir) / "missing.pnach")
+        out_dir = str(Path(self.tmpdir) / "merged4")
+
+        merged_path = merge_pnach_files([missing, valid], out_dir, game_crc="ABCD1234")
+        merged = parse_pnach(merged_path)
+
+        self.assertEqual(merged.game_crc, "ABCD1234")
+        self.assertEqual(len(merged.patches), 1)
+        self.assertEqual(merged.patches[0].value, "11111111")
+
     def test_merge_preserves_game_title(self):
         from src.core.pnach import merge_pnach_files, parse_pnach
         a = self._write_pnach("12345678", [
@@ -1291,6 +5419,16 @@ class TestPnachParser(unittest.TestCase):
         # Disabled patches should not generate conflicts
         self.assertEqual(len(conflicts), 0)
 
+    def test_conflicts_skip_unreadable_files(self):
+        from src.core.pnach import find_pnach_conflicts
+
+        valid = self._write_pnach("AACC2222", ["patch=1,EE,00001234,word,AAAA0000"])
+        missing = str(Path(self.tmpdir) / "missing_conflict.pnach")
+
+        conflicts = find_pnach_conflicts([missing, valid])
+
+        self.assertEqual(conflicts, [])
+
 
 
 
@@ -1324,6 +5462,14 @@ class TestGameRegistry(unittest.TestCase):
     def test_detect_slps_japan(self):
         from src.core.game_registry import detect_game_serial
         self.assertEqual(detect_game_serial("SLPS25516.pnach"), "SLPS-25516")
+
+    def test_detect_informative_alnum_prefix_serial(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("ARP2-01201_cover.png"), "ARP2-01201")
+
+    def test_detect_informative_compact_serial(self):
+        from src.core.game_registry import detect_game_serial
+        self.assertEqual(detect_game_serial("IIDX16COMP.txt"), "IIDX16COMP")
 
     def test_detect_from_content(self):
         from src.core.game_registry import detect_game_serial
@@ -1390,6 +5536,7 @@ class TestGameRegistry(unittest.TestCase):
             (info_dir / "PS2.data.json").write_text(
                 json.dumps({
                     "ABCD-12345": "Title From Flat Map",
+                    "ALCH-00004": "Canonical 5-digit Title",
                     "BADSERIAL": "ignored",
                 }),
                 encoding="utf-8",
@@ -1398,19 +5545,32 @@ class TestGameRegistry(unittest.TestCase):
                 json.dumps({
                     "EFGH-54321": {"title": "Title From Object Map"},
                     "WXYZ_00001": {"title": "Title With Underscore Serial"},
+                    "ARP2-01201": {"title": "Title With Alnum Prefix"},
+                    "DMP-P201": {"title": "Title With Alnum Suffix"},
+                    "IIDX16COMP": {"title": "Title With Compact ID"},
+                    "SNS-P-M4": {"title": "Non-PS2 Should Be Ignored"},
                     "12AB-12345": {"title": "ignored non-letter prefix"},
                 }),
                 encoding="utf-8",
             )
             (info_dir / "PS2 codes and name 4.txt").write_text(
-                "IJKL-11111\tTitle From TXT\nBADLINEWITHOUTTAB\n",
+                (
+                    "IJKL-11111\tTitle From TXT\n"
+                    "ALCH-0004\tTypo 4-digit Variant\n"
+                    "SCPS-56014<\tTitle With Trailing Punctuation\n"
+                    "SLKA 25447\tTitle With Spaced Serial\n"
+                    "SLPM.-65987\tTitle With Dot-Dash Noise\n"
+                    "SLES-50330-T\tTitle With Trailing Disc Marker\n"
+                    "SLPM-55221-2\tTitle With Trailing Disc Number\n"
+                    "BADLINEWITHOUTTAB\n"
+                ),
                 encoding="utf-8",
             )
             (info_dir / "PS2.ID.List.02.13.20.htm").write_text(
                 (
                     "<html><body><table>"
                     "<tr><td>Title From HTML</td><td><center>MNOP-22222</center></td></tr>"
-                    "<tr><td>Ignored Prefix</td><td><center>1NOP-22222</center></td></tr>"
+                    "<tr><td>Ignored Non-ID Cell</td><td><center>SONY ID</center></td></tr>"
                     "</table></body></html>"
                 ),
                 encoding="utf-8",
@@ -1419,9 +5579,22 @@ class TestGameRegistry(unittest.TestCase):
             self.assertEqual(loaded.get("ABCD-12345"), "Title From Flat Map")
             self.assertEqual(loaded.get("EFGH-54321"), "Title From Object Map")
             self.assertEqual(loaded.get("WXYZ-00001"), "Title With Underscore Serial")
+            self.assertEqual(loaded.get("ARP2-01201"), "Title With Alnum Prefix")
+            self.assertEqual(loaded.get("DMP-P201"), "Title With Alnum Suffix")
+            self.assertEqual(loaded.get("IIDX16COMP"), "Title With Compact ID")
             self.assertEqual(loaded.get("IJKL-11111"), "Title From TXT")
             self.assertEqual(loaded.get("MNOP-22222"), "Title From HTML")
+            self.assertEqual(loaded.get("ALCH-00004"), "Canonical 5-digit Title")
+            self.assertEqual(loaded.get("SCPS-56014"), "Title With Trailing Punctuation")
+            self.assertEqual(loaded.get("SLKA-25447"), "Title With Spaced Serial")
+            self.assertEqual(loaded.get("SLPM-65987"), "Title With Dot-Dash Noise")
+            self.assertEqual(loaded.get("SLES-50330"), "Title With Trailing Disc Marker")
+            self.assertEqual(loaded.get("SLPM-55221"), "Title With Trailing Disc Number")
+            self.assertNotIn("ALCH-0004", loaded)
+            self.assertNotIn("SLES-50330-T", loaded)
+            self.assertNotIn("SLPM-55221-2", loaded)
             self.assertNotIn("BADSERIAL", loaded)
+            self.assertNotIn("SNS-P-M4", loaded)
             self.assertNotIn("12AB-12345", loaded)
 
     # ------------------------------------------------------------------
@@ -1560,6 +5733,26 @@ class TestGameRegistryExpanded(unittest.TestCase):
         from src.core.game_registry import detect_serial_from_path
         self.assertEqual(detect_serial_from_path("SLUS-20672.png"), "SLUS-20672")
 
+    def test_serial_matches_query_uses_title_aliases(self):
+        from src.core.game_registry import serial_matches_query
+        self.assertTrue(serial_matches_query("SLUS-20062", "gta iii"))
+        self.assertFalse(serial_matches_query("SLUS-20062", "yakuza"))
+
+    def test_detect_game_serial_logs_file_read_failure(self):
+        from src.core.game_registry import detect_game_serial_from_file
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            path = tmp.name
+        try:
+            with patch("builtins.open", side_effect=OSError("denied")):
+                with self.assertLogs("src.core.game_registry", level="WARNING") as logs:
+                    self.assertEqual(detect_game_serial_from_file(path), "")
+            self.assertTrue(any("Could not inspect file content while detecting serial" in msg for msg in logs.output))
+        finally:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+
     # ------------------------------------------------------------------
     # title_to_serials
     # ------------------------------------------------------------------
@@ -1596,6 +5789,38 @@ class TestGameRegistryExpanded(unittest.TestCase):
         hits = title_to_serials("Gran Turismo")
         serials = [s for s, _ in hits]
         self.assertEqual(serials, sorted(serials))
+
+    def test_title_to_serials_prefers_retail_over_demo_collisions(self):
+        from src.core.game_registry import title_to_serials
+
+        hits = title_to_serials("Ace Combat: Squadron Leader (PAL)")
+        self.assertGreater(len(hits), 1)
+        self.assertEqual(hits[0][0], "SCES-52424")
+        self.assertTrue(any(serial.startswith("SCED-") for serial, _ in hits))
+
+        ico_hits = title_to_serials("Ico")
+        self.assertIn(("SCAJ-20099", "Ico"), ico_hits)
+        self.assertIn(("PCPX-96322", "Ico"), ico_hits)
+        self.assertLess(
+            ico_hits.index(("SCAJ-20099", "Ico")),
+            ico_hits.index(("PCPX-96322", "Ico")),
+        )
+
+    def test_title_to_serials_punctuation_insensitive(self):
+        from src.core.game_registry import title_to_serials
+        hits = title_to_serials("Baldurs Gate")
+        self.assertTrue(any("baldur's gate" in title.lower() for _, title in hits),
+                        f"Expected Baldur's Gate hits, got: {hits}")
+
+    def test_title_to_serials_logs_when_alias_lookup_fails(self):
+        from src.core.game_registry import title_to_serials
+
+        with patch("src.core.serial_validator.SerialDatabase", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.game_registry", level="WARNING") as cm:
+                hits = title_to_serials("God of War")
+
+        self.assertGreater(len(hits), 0)
+        self.assertTrue(any("Failed to resolve serial aliases" in msg for msg in cm.output))
 
     # ------------------------------------------------------------------
     # Expanded _KNOWN_SERIALS coverage
@@ -1644,11 +5869,14 @@ class TestGameRegistryExpanded(unittest.TestCase):
         self.assertGreaterEqual(len(serials), 200, f"Got only {len(serials)} entries")
 
     def test_all_keys_normalised_form(self):
-        """Every key in _KNOWN_SERIALS must be in XXXX-NNNNN form."""
-        from src.core.game_registry import all_known_serials
+        """Every key in _KNOWN_SERIALS must already be in supported normalized form."""
+        from src.core.game_registry import all_known_serials, _normalise_informative_serial
         for serial, _ in all_known_serials():
-            self.assertRegex(serial, r"^[A-Z]{4}-\d{5}$",
-                             f"Malformed serial key: {serial}")
+            self.assertEqual(
+                _normalise_informative_serial(serial),
+                serial,
+                f"Malformed or non-normalized serial key: {serial}",
+            )
 
 
 
@@ -1984,6 +6212,27 @@ class TestBrowseCatalogueEntries(unittest.TestCase):
         ids = self._load_catalogue()
         self.assertGreaterEqual(len(ids), 40, f"Expected ≥40 entries, got {len(ids)}")
 
+    def test_builtin_catalogue_index_matches_entries(self):
+        from src.core.catalogue_loader import load_catalogue
+
+        built_in = load_catalogue(
+            catalogue_dir=self.catalogue_dir,
+            strict=True,
+            user_catalogue_dir=False,
+        )
+        manifest = json.loads((self.catalogue_dir / "_index.json").read_text(encoding="utf-8"))
+        ids = [entry["id"] for entry in built_in]
+        self.assertEqual(manifest["count"], len(ids))
+        self.assertEqual(manifest["ids"], ids)
+
+    def test_catalogue_column_helper_is_responsive(self):
+        from src.core.browse_layout import calculate_catalogue_columns
+        self.assertEqual(calculate_catalogue_columns(0), 3)
+        self.assertEqual(calculate_catalogue_columns(200), 1)
+        self.assertEqual(calculate_catalogue_columns(600), 2)
+        self.assertEqual(calculate_catalogue_columns(900), 3)
+        self.assertEqual(calculate_catalogue_columns(1500), 4)
+
 
 # =============================================================================
 # PCSX2 Layout module
@@ -2244,6 +6493,70 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertFalse(restored.show_account_required)
         self.assertFalse(restored.show_incomplete)
 
+    def test_browse_state_fields_default_and_round_trip(self):
+        cfg = AppConfig()
+        self.assertEqual(cfg.browse_query, "")
+        self.assertEqual(cfg.browse_source_filter, "")
+        self.assertEqual(cfg.browse_author_filter, "")
+        self.assertFalse(cfg.browse_favorites_only)
+        self.assertEqual(cfg.browse_selected_tab, 0)
+
+        cfg = AppConfig(
+            browse_query="gta",
+            browse_source_filter="GBAtemp",
+            browse_author_filter="Curse_Arms",
+            browse_favorites_only=True,
+            browse_selected_tab=3,
+        )
+        d = cfg.to_dict()
+        self.assertEqual(d["browse_query"], "gta")
+        self.assertEqual(d["browse_source_filter"], "GBAtemp")
+        self.assertEqual(d["browse_author_filter"], "Curse_Arms")
+        self.assertTrue(d["browse_favorites_only"])
+        self.assertEqual(d["browse_selected_tab"], 3)
+
+        restored = AppConfig.from_dict(d)
+        self.assertEqual(restored.browse_query, "gta")
+        self.assertEqual(restored.browse_source_filter, "GBAtemp")
+        self.assertEqual(restored.browse_author_filter, "Curse_Arms")
+        self.assertTrue(restored.browse_favorites_only)
+        self.assertEqual(restored.browse_selected_tab, 3)
+
+    def test_ui_state_round_trip(self):
+        cfg = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 2,
+                        "author": "TexMaster",
+                        "library_only": True,
+                    }
+                }
+            }
+        )
+        self.assertEqual(cfg.ui_state["mod_panels"]["texture_pack"]["query"], "gta")
+
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(
+            restored.ui_state["mod_panels"]["texture_pack"],
+            {
+                "query": "gta",
+                "sort_index": 2,
+                "author": "TexMaster",
+                "library_only": True,
+            },
+        )
+
+    def test_ui_state_bucket_round_trip(self):
+        cfg = AppConfig()
+        ui_state_bucket(cfg, "main_window")["selected_nav_index"] = 3
+        ui_state_bucket(cfg, "last_paths")["import_folder"] = "/tmp/imports"
+
+        restored = AppConfig.from_dict(cfg.to_dict())
+        self.assertEqual(restored.ui_state["main_window"]["selected_nav_index"], 3)
+        self.assertEqual(restored.ui_state["last_paths"]["import_folder"], "/tmp/imports")
+
     def test_old_config_without_browse_filter_fields_uses_defaults(self):
         """Configs saved before the browse-filter fields were added should load fine."""
         old = {"pcsx2_path": "", "textures_path": "", "pnach_path": "",
@@ -2255,6 +6568,12 @@ class TestAppConfigFieldChanges(unittest.TestCase):
         self.assertFalse(cfg.show_paid)
         self.assertFalse(cfg.show_account_required)
         self.assertTrue(cfg.show_incomplete)
+        self.assertEqual(cfg.browse_query, "")
+        self.assertEqual(cfg.browse_source_filter, "")
+        self.assertEqual(cfg.browse_author_filter, "")
+        self.assertFalse(cfg.browse_favorites_only)
+        self.assertEqual(cfg.browse_selected_tab, 0)
+        self.assertEqual(cfg.ui_state, {})
 
 
 # =============================================================================
@@ -2444,6 +6763,24 @@ class TestSetEnabledAutoDeployBehaviour(unittest.TestCase):
         # After disabling the only mod, no .pnach files should remain
         remaining = [f for f in deploy_dir.iterdir() if f.suffix == ".pnach"]
         self.assertEqual(len(remaining), 0, f"Stale pnach files remain: {remaining}")
+
+    def test_set_enabled_false_logs_cleanup_warning(self):
+        """Undeploy cleanup failures should surface as warnings, not crashes."""
+        deploy_dir = Path(self.tmpdir) / "pcsx2_cheats3"
+        deploy_dir.mkdir()
+
+        db, mgr, mod = self._make_pnach_mod("CAFEBABE")
+        config = AppConfig(pnach_path=str(deploy_dir))
+
+        mgr.set_enabled(mod.id, True, config)
+
+        with patch("pathlib.Path.unlink", side_effect=OSError("permission denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                count, warnings = mgr.set_enabled(mod.id, False, config)
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("Could not remove deployed file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove deployed file" in msg for msg in warnings))
 
     def test_set_enabled_no_path_returns_warning(self):
         """When config path is empty, a warning is returned (no crash)."""
@@ -2647,6 +6984,381 @@ class TestPcsx2PnachFetcher(unittest.TestCase):
         result = search_pcsx2_patches_by_crc("f0a235b4")  # lower-case input
         self.assertEqual(result["crc"], "F0A235B4")
 
+    @patch("src.core.downloader.requests.get")
+    def test_strict_index_accepts_empty_and_filters_invalid_patch_names(self, mock_get):
+        from src.core.downloader import list_pcsx2_widescreen_patches
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = []
+        self.assertEqual(list_pcsx2_widescreen_patches(strict=True), [])
+        mock_get.return_value.json.return_value = [
+            {"name": "f0a235b4.pnach"}, {"name": "../outside.pnach"},
+            {"name": "not-a-crc.pnach"}, {"name": "README.md"},
+        ]
+        patches = list_pcsx2_widescreen_patches(strict=True)
+        self.assertEqual([entry["crc"] for entry in patches], ["F0A235B4"])
+
+    @patch("src.core.downloader.requests.get")
+    def test_strict_index_distinguishes_http_network_and_invalid_json_errors(self, mock_get):
+        from src.core.downloader import DownloadError, list_pcsx2_widescreen_patches
+        for status, payload in ((403, []), (500, []), (200, {}), (200, [None])):
+            with self.subTest(status=status, payload=payload):
+                mock_get.return_value.status_code = status
+                mock_get.return_value.json.return_value = payload
+                with self.assertRaises(DownloadError):
+                    list_pcsx2_widescreen_patches(strict=True)
+        mock_get.side_effect = OSError("offline")
+        with self.assertRaisesRegex(DownloadError, "offline"):
+            list_pcsx2_widescreen_patches(strict=True)
+        self.assertEqual(list_pcsx2_widescreen_patches(), [])
+
+    @patch("src.core.downloader.requests.head")
+    def test_strict_crc_distinguishes_not_found_from_failed_checks(self, mock_head):
+        from src.core.downloader import DownloadError, search_pcsx2_patches_by_crc
+        mock_head.return_value.status_code = 404
+        self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4", strict=True))
+        for status in (403, 429, 500):
+            with self.subTest(status=status):
+                mock_head.return_value.status_code = status
+                with self.assertRaisesRegex(DownloadError, str(status)):
+                    search_pcsx2_patches_by_crc("F0A235B4", strict=True)
+        mock_head.side_effect = OSError("offline")
+        with self.assertRaisesRegex(DownloadError, "offline"):
+            search_pcsx2_patches_by_crc("F0A235B4", strict=True)
+        self.assertIsNone(search_pcsx2_patches_by_crc("F0A235B4"))
+
+    def test_invalid_crc_cannot_start_network_or_choose_an_output_path(self):
+        from src.core.downloader import (
+            DownloadError, download_pcsx2_widescreen_patch, search_pcsx2_patches_by_crc,
+        )
+        with patch("src.core.downloader.requests.head") as head, patch(
+            "src.core.downloader.download_file",
+        ) as transfer:
+            for crc in ("../other", "ZZZZZZZZ", "123", "/tmp/bad"):
+                with self.subTest(crc=crc):
+                    self.assertIsNone(search_pcsx2_patches_by_crc(crc))
+                    with self.assertRaises(DownloadError):
+                        search_pcsx2_patches_by_crc(crc, strict=True)
+                    with self.assertRaises(DownloadError):
+                        download_pcsx2_widescreen_patch(crc, "/unused")
+            head.assert_not_called()
+            transfer.assert_not_called()
+
+
+class TestPnachBrowserFlows(unittest.TestCase):
+    def _fixture(self):
+        module = TestBrowsePanelStatePersistence()._import_browse_panel()
+        dialog = module.PnachGitHubDialog.__new__(module.PnachGitHubDialog)
+        dialog.config = AppConfig(pnach_path="/patches")
+        dialog.db = MagicMock()
+        dialog.parent = MagicMock(return_value=None)
+        dialog._patches = []
+        dialog._checked_patches = {}
+        dialog._installed_paths = {}
+        dialog._index_loaded = False
+        dialog._closed = False
+        dialog._request_id = ""
+        dialog._operation = ""
+        dialog._request_crc = ""
+        dialog._display_limit = module._MAX_PATCH_DISPLAY
+        for name in (
+            "_load_btn", "_check_btn", "_crc_edit", "_progress", "_status",
+            "_count_lbl", "_more_btn", "_filter_timer", "_populate_list",
+        ):
+            setattr(dialog, name, MagicMock())
+        dialog._crc_edit.text.return_value = ""
+        return module, dialog
+
+    @staticmethod
+    def _patch(crc):
+        return {"crc": crc, "filename": f"{crc}.pnach"}
+
+    def test_lookup_captures_no_dialog_and_blocks_duplicate_requests(self):
+        module, dialog = self._fixture()
+        with patch.object(module, "_PnachBrowserResult") as relay, patch.object(
+            module.threading, "Thread",
+        ) as thread:
+            dialog._load_index()
+            request_id = dialog._request_id
+            dialog._load_index()
+            dialog._crc_edit.text.return_value = "F0A235B4"
+            dialog._check_single_crc()
+            thread.assert_called_once()
+            kwargs = thread.call_args.kwargs
+            self.assertIs(kwargs["target"], module._run_pnach_lookup)
+            self.assertEqual(kwargs["args"], (relay.return_value, request_id, ""))
+            dialog._load_btn.setEnabled.assert_called_with(False)
+            dialog._check_btn.setEnabled.assert_called_with(False)
+            relay.return_value.finished.connect.assert_called_once_with(dialog._on_request_finished)
+
+    def test_lookup_workers_use_strict_helpers_and_always_release_relay(self):
+        module, _dialog = self._fixture()
+        for crc, failure in (("", False), ("F0A235B4", False), ("F0A235B4", True)):
+            with self.subTest(crc=crc, failure=failure), patch.object(
+                module, "list_pcsx2_widescreen_patches", return_value=[],
+            ) as index, patch.object(
+                module, "search_pcsx2_patches_by_crc", return_value=None,
+            ) as check:
+                relay = MagicMock()
+                if failure:
+                    check.side_effect = OSError("offline")
+                module._run_pnach_lookup(relay, "request", crc)
+                if crc:
+                    check.assert_called_once_with(crc, timeout=10, strict=True)
+                    index.assert_not_called()
+                else:
+                    index.assert_called_once_with(timeout=15, strict=True)
+                    check.assert_not_called()
+                self.assertEqual(relay.finished.emit.call_args.args[2], "offline" if failure else "")
+                relay.deleteLater.assert_called_once()
+
+    def test_index_completion_applies_current_search_and_retains_checked_results(self):
+        _module, dialog = self._fixture()
+        dialog._checked_patches["FFFFFFFF"] = self._patch("FFFFFFFF")
+        dialog._operation = "index"
+        dialog._request_id = "request"
+        dialog._crc_edit.text.return_value = "B4"
+        patches = [self._patch("A94060E1"), self._patch("F0A235B4")]
+        dialog._on_request_finished("request", patches, "")
+        self.assertIs(dialog._patches, patches)
+        self.assertTrue(dialog._index_loaded)
+        dialog._populate_list.assert_called_once_with([patches[1]])
+        self.assertIn("1 of 1 matches", dialog._count_lbl.setText.call_args.args[0])
+        self.assertIn("3 known", dialog._count_lbl.setText.call_args.args[0])
+        dialog._load_btn.setEnabled.assert_called_with(True)
+
+    def test_crc_results_never_replace_full_index_or_erase_new_search(self):
+        for payload in (None, self._patch("F0A235B4")):
+            with self.subTest(payload=payload):
+                _module, dialog = self._fixture()
+                patches = [self._patch("A94060E1")]
+                dialog._patches = patches
+                dialog._operation = "check"
+                dialog._request_id = "request"
+                dialog._request_crc = "F0A235B4"
+                dialog._crc_edit.text.return_value = "A940"
+                dialog._on_request_finished("request", payload, "")
+                self.assertIs(dialog._patches, patches)
+                dialog._populate_list.assert_called_once_with(patches)
+                dialog._crc_edit.setText.assert_not_called()
+                self.assertEqual(bool(dialog._checked_patches), bool(payload))
+                if payload is None:
+                    self.assertIn("404", dialog._status.setText.call_args.args[0])
+
+    def test_lookup_error_keeps_cached_results_and_reenables_retry(self):
+        _module, dialog = self._fixture()
+        dialog._patches = [self._patch("F0A235B4")]
+        dialog._operation = "index"
+        dialog._request_id = "request"
+        dialog._on_request_finished("request", None, "offline <b>not markup</b>")
+        self.assertEqual(dialog._operation, "")
+        dialog._populate_list.assert_called_with(dialog._patches)
+        dialog._load_btn.setEnabled.assert_called_with(True)
+        self.assertIn("Retry", dialog._status.setText.call_args.args[0])
+        self.assertIn("<b>not markup</b>", dialog._status.setText.call_args.args[0])
+
+    def test_closed_or_stale_results_do_not_touch_widgets(self):
+        for closed, request in ((True, "request"), (False, "old")):
+            _module, dialog = self._fixture()
+            dialog._operation = "index"
+            dialog._closed = closed
+            dialog._request_id = "request"
+            dialog._on_request_finished(request, [], "")
+            dialog._status.setText.assert_not_called()
+            dialog._progress.hide.assert_not_called()
+            dialog._populate_list.assert_not_called()
+
+    def test_crc_validation_checks_hex_not_just_length(self):
+        _module, dialog = self._fixture()
+        dialog._start_request = MagicMock()
+        for value in ("GGGGGGGG", "../other", "1234"):
+            dialog._crc_edit.text.return_value = value
+            dialog._check_single_crc()
+        dialog._start_request.assert_not_called()
+        dialog._crc_edit.text.return_value = "f0a235b4"
+        dialog._check_single_crc()
+        dialog._start_request.assert_called_once_with("check", "F0A235B4")
+
+    def test_search_is_debounced_resets_page_and_can_reveal_all_matches(self):
+        module, dialog = self._fixture()
+        dialog._patches = [self._patch(f"{i:08X}") for i in range(405)]
+        dialog._refresh_list()
+        self.assertIn("200 of 405 matches", dialog._count_lbl.setText.call_args.args[0])
+        dialog._more_btn.setVisible.assert_called_with(True)
+        dialog._show_more()
+        self.assertEqual(dialog._display_limit, 400)
+        dialog._show_more()
+        self.assertIn("405 of 405", dialog._count_lbl.setText.call_args.args[0])
+        dialog._more_btn.setVisible.assert_called_with(False)
+        dialog._populate_list.reset_mock()
+        dialog._filter_list("001")
+        self.assertEqual(dialog._display_limit, module._MAX_PATCH_DISPLAY)
+        dialog._filter_timer.start.assert_called_once()
+        dialog._populate_list.assert_not_called()
+        dialog._crc_edit.text.return_value = "001"
+        dialog._refresh_list()
+        self.assertTrue(all("001" in patch["crc"] for patch in dialog._populate_list.call_args.args[0]))
+
+    def test_thread_start_failure_clears_busy_and_registry(self):
+        module, dialog = self._fixture()
+        with patch.object(module, "_PnachInstallResult") as relay, patch.object(
+            module.threading, "Thread",
+        ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
+            thread.return_value.start.side_effect = RuntimeError("no threads")
+            dialog._start_request("install", "F0A235B4")
+            self.assertEqual(dialog._operation, "")
+            self.assertEqual(module.ActiveDownloads.all(), [])
+            self.assertIn("no threads", dialog._status.setText.call_args.args[0])
+            relay.return_value.deleteLater.assert_called_once()
+
+    def test_install_captures_config_without_retaining_dialog_or_button(self):
+        module, dialog = self._fixture()
+        button = MagicMock()
+        with patch.object(module, "_PnachInstallResult") as relay, patch.object(
+            module.threading, "Thread",
+        ) as thread, patch.object(module.ActiveDownloads, "_entries", {}):
+            dialog._install_patch(self._patch("F0A235B4"), button)
+            args = thread.call_args.kwargs["args"]
+            self.assertIs(thread.call_args.kwargs["target"], module._run_pnach_install)
+            self.assertIsNot(args[3], dialog.config)
+            dialog.config.pnach_path = "/changed"
+            self.assertEqual(args[3].pnach_path, "/patches")
+            relay.assert_called_once_with(args[1], "F0A235B4", args[3], dialog.db)
+            self.assertEqual(len(args), 4)
+            self.assertNotIn(dialog, args)
+            self.assertNotIn(button, args)
+            self.assertEqual(module.ActiveDownloads.count(), 1)
+
+    def test_install_worker_stages_tracks_history_and_cleans_up(self):
+        module, _dialog = self._fixture()
+        for failure in ("", "transfer", "registration", "history"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as root:
+                config = AppConfig(pnach_path=str(Path(root) / "cheats"))
+                db = MagicMock()
+                relay = module._PnachInstallResult.__new__(module._PnachInstallResult)
+                relay._request_id = "request"
+                relay._crc = "F0A235B4"
+                relay._config = config
+                relay._db = db
+                relay.transferred = MagicMock()
+                relay.finished = MagicMock()
+                relay.installed = MagicMock()
+                relay.deleteLater = MagicMock()
+                staged = []
+
+                def download(crc, folder, timeout):
+                    staged.append(Path(folder))
+                    self.assertEqual(module.ActiveDownloads.all()[0]["phase"], "downloading")
+                    if failure == "transfer":
+                        return None
+                    target = Path(folder) / f"{crc}.pnach"
+                    target.write_bytes(b"// patch")
+                    return str(target)
+
+                with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                    "src.core.download_history.record_event",
+                ) as record, patch.object(module.ActiveDownloads, "_entries", {}):
+                    module.ActiveDownloads.register("request", "Patch")
+                    if failure == "registration":
+                        db.add.side_effect = OSError("db read-only")
+                    if failure == "history":
+                        record.side_effect = OSError("history read-only")
+                    module._run_pnach_install(relay, "request", "F0A235B4", config)
+                    db.add.assert_not_called()
+                    record.assert_not_called()
+                    self.assertEqual(module.ActiveDownloads.count(), 1)
+                    relay.finished.emit.assert_not_called()
+                    relay._complete_install(*relay.transferred.emit.call_args.args)
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+                    self.assertFalse(staged[0].exists())
+                    destination = Path(config.pnach_path) / "F0A235B4.pnach"
+                    request, payload, error = relay.finished.emit.call_args.args
+                    self.assertEqual(request, "request")
+                    if failure == "transfer":
+                        self.assertFalse(destination.exists())
+                        self.assertIsNone(payload)
+                        self.assertTrue(error)
+                        db.add.assert_not_called()
+                        relay.installed.emit.assert_not_called()
+                        self.assertEqual(record.call_args.kwargs["status"], "failed")
+                    else:
+                        self.assertEqual(destination.read_bytes(), b"// patch")
+                        self.assertFalse(error)
+                        self.assertEqual(bool(payload["warnings"]), failure in ("registration", "history"))
+                        self.assertEqual(db.add.call_args.args[0].path, str(destination))
+                        self.assertIn("/PCSX2/pcsx2/blob/", db.add.call_args.args[0].source_url)
+                        self.assertEqual(record.call_args.kwargs["status"], "success")
+                        relay.installed.emit.assert_called_once()
+                    relay.deleteLater.assert_called_once()
+
+    def test_existing_patch_and_symlink_are_never_downloaded_over(self):
+        module, _dialog = self._fixture()
+        for symlink in (False, True):
+            with self.subTest(symlink=symlink), tempfile.TemporaryDirectory() as root:
+                destination = Path(root) / "F0A235B4.pnach"
+                original = Path(root) / "original"
+                original.write_bytes(b"existing")
+                if symlink:
+                    destination.symlink_to(original)
+                else:
+                    destination.write_bytes(b"existing")
+                relay, db = MagicMock(), MagicMock()
+                with patch.object(module, "download_pcsx2_widescreen_patch") as transfer, patch(
+                    "src.core.download_history.record_event",
+                ):
+                    module._run_pnach_install(
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root),
+                    )
+                transfer.assert_not_called()
+                db.add.assert_not_called()
+                self.assertEqual(destination.read_bytes(), b"existing")
+                self.assertIn("No file was replaced", relay.transferred.emit.call_args.args[1])
+
+    def test_patch_created_during_transfer_is_not_replaced(self):
+        module, _dialog = self._fixture()
+        with tempfile.TemporaryDirectory() as root:
+            destination = Path(root) / "F0A235B4.pnach"
+
+            def download(crc, folder, timeout):
+                destination.write_bytes(b"another install")
+                staged = Path(folder) / "F0A235B4.pnach"
+                staged.write_bytes(b"new")
+                return str(staged)
+
+            relay = MagicMock()
+            with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                "src.core.download_history.record_event",
+            ):
+                module._run_pnach_install(
+                    relay, "request", "F0A235B4", AppConfig(pnach_path=root),
+                )
+            self.assertEqual(destination.read_bytes(), b"another install")
+            self.assertTrue(relay.transferred.emit.call_args.args[1])
+
+    def test_failed_copy_removes_only_new_partial_patch_and_allows_retry(self):
+        module, _dialog = self._fixture()
+        with tempfile.TemporaryDirectory() as root:
+            destination = Path(root) / "F0A235B4.pnach"
+
+            def download(crc, folder, timeout):
+                staged = Path(folder) / "F0A235B4.pnach"
+                staged.write_bytes(b"new")
+                return str(staged)
+
+            with patch.object(module, "download_pcsx2_widescreen_patch", side_effect=download), patch(
+                "src.core.download_history.record_event",
+            ):
+                relay = MagicMock()
+                with patch.object(module.shutil, "copyfileobj", side_effect=OSError("disk full")):
+                    module._run_pnach_install(
+                        relay, "request", "F0A235B4", AppConfig(pnach_path=root),
+                    )
+                self.assertFalse(destination.exists())
+                self.assertIn("disk full", relay.transferred.emit.call_args.args[1])
+                module._run_pnach_install(
+                    MagicMock(), "retry", "F0A235B4", AppConfig(pnach_path=root),
+                )
+                self.assertEqual(destination.read_bytes(), b"new")
+
 
 # =============================================================================
 # MediaFire URL resolver (mocked network)
@@ -2735,10 +7447,12 @@ class TestMediaFireResolver(unittest.TestCase):
         mock_resp.text = "<html><body><p>No download link here.</p></body></html>"
         mock_get.return_value = mock_resp
 
-        result = resolve_mediafire_url(
-            "https://www.mediafire.com/file/abc/texture.zip/file"
-        )
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            result = resolve_mediafire_url(
+                "https://www.mediafire.com/file/abc/texture.zip/file"
+            )
         self.assertIsNone(result)
+        self.assertTrue(any("no download link found" in msg for msg in logs.output))
 
 
 # =============================================================================
@@ -2783,7 +7497,9 @@ class TestYandexDiskResolver(unittest.TestCase):
         mock_resp = MagicMock()
         mock_resp.status_code = 403
         mock_get.return_value = mock_resp
-        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("Failed to resolve Yandex Disk URL" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
     def test_untrusted_href_domain_returns_none(self, mock_get):
@@ -2792,7 +7508,20 @@ class TestYandexDiskResolver(unittest.TestCase):
         mock_resp.status_code = 200
         mock_resp.json.return_value = {"href": "https://evil.example.com/file.bin"}
         mock_get.return_value = mock_resp
-        self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("untrusted href" in msg for msg in logs.output))
+
+    @patch("src.core.downloader.requests.get")
+    def test_missing_href_returns_none_and_logs_warning(self, mock_get):
+        from src.core.downloader import resolve_yandex_disk_url
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {}
+        mock_get.return_value = mock_resp
+        with self.assertLogs("src.core.downloader", level="WARNING") as logs:
+            self.assertIsNone(resolve_yandex_disk_url("https://disk.yandex.ru/d/3ipL6dszlVh-aA"))
+        self.assertTrue(any("unusable href" in msg for msg in logs.output))
 
     @patch("src.core.downloader.requests.get")
     def test_network_error_returns_none(self, mock_get):
@@ -3370,6 +8099,8145 @@ class TestScraperDialogClassifier(unittest.TestCase):
             "",
         )
 
+    def test_invalid_url_logs_warning_and_returns_empty(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter",
+            "QTabWidget", "QVBoxLayout", "QWidget", "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import GBATempScraperDialog
+
+            with patch("urllib.parse.urlparse", side_effect=ValueError("boom")):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = GBATempScraperDialog._classify_url("not a url")
+
+        self.assertEqual(result, "")
+        self.assertTrue(any("Could not classify browse URL" in msg for msg in logs.output))
+
+    def test_cover_art_preview_logs_when_payload_too_small(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"abc")):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = CatalogueCard._fetch_and_display(
+                        card,
+                        "https://example.com/thumb.jpg",
+                    )
+
+        self.assertFalse(result)
+        self.assertTrue(any("too small" in msg for msg in logs.output))
+        card._cover_lbl.setPixmap.assert_not_called()
+        card._cover_lbl.setText.assert_not_called()
+
+    def test_cover_art_preview_logs_when_payload_is_not_image(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda *args, **kwargs: None)})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            with patch("urllib.request.urlopen", return_value=io.BytesIO(b"X" * 600)):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                    result = CatalogueCard._fetch_and_display(
+                        card,
+                        "https://example.com/thumb.jpg",
+                    )
+
+        self.assertFalse(result)
+        self.assertTrue(any("not a valid image" in msg for msg in logs.output))
+        card._cover_lbl.setPixmap.assert_not_called()
+        card._cover_lbl.setText.assert_not_called()
+
+    def test_cover_art_preview_caches_successful_fetches(self):
+        import io
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            AspectRatioMode=types.SimpleNamespace(KeepAspectRatio=1),
+            TransformationMode=types.SimpleNamespace(SmoothTransformation=1),
+        )
+        qtcore.QTimer = type("QTimer", (), {"singleShot": staticmethod(lambda _ms, fn: fn())})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+
+        class _FakePixmap:
+            def __init__(self, path):
+                self.path = path
+
+            def scaled(self, *args, **kwargs):
+                return self
+
+            def isNull(self):
+                return False
+
+        qtgui.QPixmap = _FakePixmap
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: False))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            import importlib
+            from src.ui import browse_panel
+            browse_panel = importlib.reload(browse_panel)
+            browse_panel._fetch_browse_cover_art_data.cache_clear()
+            from src.ui.browse_panel import CatalogueCard
+
+            card = CatalogueCard.__new__(CatalogueCard)
+            card._cover_lbl = types.SimpleNamespace(
+                setPixmap=MagicMock(),
+                setText=MagicMock(),
+                setStyleSheet=MagicMock(),
+            )
+            response = io.BytesIO(b"X" * 600)
+            with patch("urllib.request.urlopen", return_value=response) as mock_urlopen:
+                first = CatalogueCard._fetch_and_display(card, "https://example.com/cached-thumb.jpg")
+                second = CatalogueCard._fetch_and_display(card, "https://example.com/cached-thumb.jpg")
+
+        self.assertTrue(first)
+        self.assertTrue(second)
+        self.assertEqual(mock_urlopen.call_count, 1)
+        self.assertEqual(card._cover_lbl.setPixmap.call_count, 2)
+
+    def test_browse_search_helper_matches_source_serial_and_alias(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import _entry_matches_query
+
+        class DummySerialDB:
+            def title_matches_query(self, title, query):
+                return title == "Grand Theft Auto III" and query == "gta iii"
+
+            def titles_for_serial(self, serial):
+                if serial == "SLUS-20370":
+                    return ["Grand Theft Auto III"]
+                if serial == "SLUS-12345":
+                    return ["Final Fantasy X"]
+                return []
+
+            def get_info(self, title):
+                if title == "Final Fantasy X":
+                    from types import SimpleNamespace
+                    return SimpleNamespace(
+                        release_date="2001-12-17",
+                        developer="Square Product Development Division 1",
+                        publisher="Square",
+                        genre="Role-playing",
+                    )
+                return None
+
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "GBAtemp",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "gbatemp"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Final Fantasy X HD Texture Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "finalfantasyx"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "SLUS-20370",
+            "game": "",
+            "tags": [],
+        }, "slus20370"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "4x AI upscale",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "4x"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "url": "",
+            "source_url": "https://example.com/posts/texture-overhaul",
+            "author_url": "",
+            "direct_download_url": "https://example.com/direct.zip",
+            "thumbnail_url": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "texture overhaul"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "url": "",
+            "author_url": "",
+            "direct_download_url": "https://example.com/direct.zip",
+            "thumbnail_url": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "directzip"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "download_action": "manual_mega",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "manual mega"))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Grand Theft Auto III",
+            "tags": [],
+        }, "gta iii", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "SLUS-20370",
+            "game": "",
+            "tags": [],
+        }, "gta iii", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "square", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "roleplaying", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "SLUS-12345",
+            "game": "",
+            "tags": [],
+        }, "roleplaying", DummySerialDB()))
+        self.assertTrue(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "Final Fantasy X",
+            "tags": [],
+        }, "2001-12-17", DummySerialDB()))
+        self.assertFalse(_entry_matches_query({
+            "name": "Some Pack",
+            "description": "",
+            "author": "",
+            "context": "",
+            "source": "",
+            "upscale_tech": "",
+            "size_label": "",
+            "game_serial": "",
+            "game": "",
+            "tags": [],
+        }, "missing"))
+
+    def test_browse_search_cache_reuses_serial_database_lookups(self):
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            from src.ui.browse_panel import _BrowseSerialLookupCache
+
+        class CountingSerialDB:
+            def __init__(self):
+                self.info_calls = []
+                self.serial_calls = []
+
+            def title_matches_query(self, title, query):
+                return False
+
+            def get_info(self, title):
+                self.info_calls.append(title)
+                if title == "Final Fantasy X":
+                    from types import SimpleNamespace
+                    return SimpleNamespace(
+                        release_date="2001-12-17",
+                        developer="Square Product Development Division 1",
+                        publisher="Square",
+                        genre="Role-playing",
+                    )
+                return None
+
+            def titles_for_serial(self, serial):
+                self.serial_calls.append(serial)
+                return ["Final Fantasy X"]
+
+        db = CountingSerialDB()
+        cache = _BrowseSerialLookupCache(db)
+
+        self.assertTrue(callable(cache.title_matches_query))
+        first_info = cache.get_info("Final Fantasy X")
+        second_info = cache.get_info("Final Fantasy X")
+        first_titles = cache.titles_for_serial("SLUS-12345")
+        second_titles = cache.titles_for_serial("SLUS-12345")
+
+        self.assertIs(first_info, second_info)
+        self.assertEqual(first_titles, ("Final Fantasy X",))
+        self.assertEqual(second_titles, ("Final Fantasy X",))
+        self.assertEqual(db.info_calls, ["Final Fantasy X"])
+        self.assertEqual(db.serial_calls, ["SLUS-12345"])
+
+
+class TestBrowsePanelStatePersistence(unittest.TestCase):
+    """Tests for browse-panel filter state persistence helpers."""
+
+    def _cover_dialog_fixture(self, module):
+        dialog = module.CoverDownloadDialog.__new__(module.CoverDownloadDialog)
+        dialog.config = AppConfig(game_library_path="/library", cover_art_path="/covers")
+        dialog._closed = False
+        dialog._operation = ""
+        dialog._request_id = ""
+        dialog._stop_event = None
+        dialog._retry_serials = []
+        dialog._bulk_library = "/library"
+        dialog._bulk_serials = [("SLUS-20062", "First"), ("SLUS-20063", "Second")]
+        dialog._job_values = {}
+        for name in ("_dl_btn", "_id_edit", "_search_edit", "_suggestions", "_region_combo",
+                     "_bulk_region_combo", "_skip_existing_check", "_bulk_scan_btn",
+                     "_bulk_dl_btn", "_bulk_retry_btn", "_bulk_stop_btn", "_status",
+                     "_bulk_status", "_progress", "_bulk_progress", "_bulk_list", "_lib_lbl",
+                     "destroyed"):
+            setattr(dialog, name, MagicMock())
+        dialog._id_edit.text.return_value = "slus20062"
+        dialog._region_combo.currentText.return_value = "US"
+        dialog._bulk_region_combo.currentText.return_value = "EN"
+        dialog._skip_existing_check.isChecked.return_value = True
+        return dialog
+
+    def test_cover_jobs_capture_values_and_block_duplicate_cross_tab_requests(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult"):
+            dialog._download()
+            dialog._download()
+            dialog._bulk_scan()
+            dialog._bulk_download()
+        thread.assert_called_once()
+        self.assertIs(thread.call_args.kwargs["target"], module._run_cover_job)
+        args = thread.call_args.kwargs["args"]
+        self.assertNotIn(dialog, args)
+        self.assertEqual(args[2], "single")
+        dialog.config.cover_art_path = "/changed"
+        self.assertEqual(args[3], {"serial": "SLUS-20062", "destination": "/covers", "region": "US"})
+        dialog._bulk_scan_btn.setEnabled.assert_called_with(False)
+
+    def test_cover_invalid_serial_or_closed_dialog_does_not_start_worker(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread:
+            dialog._id_edit.text.return_value = "../SLUS-20062"
+            dialog._download()
+            dialog._closed = True
+            dialog._bulk_scan()
+            dialog._bulk_download()
+            dialog._retry_bulk_download()
+        thread.assert_not_called()
+
+    def test_cover_thread_start_failure_restores_controls_and_retry(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult") as relay:
+            thread.return_value.start.side_effect = RuntimeError("no thread")
+            dialog._bulk_download()
+        self.assertEqual(dialog._operation, "")
+        self.assertEqual(dialog._retry_serials, dialog._bulk_serials)
+        dialog._bulk_retry_btn.setEnabled.assert_called_with(True)
+        relay.return_value.deleteLater.assert_called_once()
+
+    def test_cover_scan_worker_deduplicates_normalizes_sorts_and_uses_strict_scan(self):
+        import types
+        import threading
+        module = self._import_browse_panel()
+        games = [types.SimpleNamespace(serial=serial, title=title) for serial, title in
+                 (("slus20062", "Zebra"), ("SLUS-20062", "Duplicate"), ("SLUS-20063", "Alpha"),
+                  ("../escape", "Invalid"), ("", "Unknown"))]
+        relay = MagicMock()
+        with patch("src.core.game_library.scan_library", return_value=games) as scan:
+            module._run_cover_job(relay, "r", "scan", {"library": "/games"}, threading.Event())
+        scan.assert_called_once_with("/games", strict=True)
+        relay.finished.emit.assert_called_once_with(
+            "r", [("SLUS-20063", "Alpha"), ("SLUS-20062", "Zebra")], "")
+        relay.deleteLater.assert_called_once()
+
+    def test_cover_scan_error_reaches_ui_and_allows_retry(self):
+        import threading
+        module = self._import_browse_panel()
+        relay = MagicMock()
+        with patch("src.core.game_library.scan_library", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                module._run_cover_job(relay, "r", "scan", {"library": "/games"}, threading.Event())
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "scan", "r"
+        dialog._job_values = {"library": "/library"}
+        dialog._bulk_serials = []
+        dialog._on_cover_finished(*relay.finished.emit.call_args.args)
+        self.assertIn("denied", dialog._bulk_status.setText.call_args.args[0])
+        dialog._bulk_scan_btn.setEnabled.assert_called_with(True)
+        dialog._bulk_dl_btn.setEnabled.assert_called_with(False)
+
+    def test_cover_scan_rejects_changed_folder_result(self):
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "scan", "r"
+        dialog._job_values = {"library": "/old"}
+        dialog._bulk_serials = []
+        dialog._on_cover_finished("r", [("SLUS-20062", "Game")], "")
+        self.assertEqual(dialog._bulk_serials, [])
+        dialog._bulk_list.addItem.assert_not_called()
+        dialog._start_cover_job = MagicMock()
+        dialog._bulk_download()
+        dialog._bulk_serials = [("SLUS-20062", "Game")]
+        dialog._bulk_library = "/old"
+        dialog._bulk_download()
+        dialog._start_cover_job.assert_not_called()
+
+    def test_cover_bulk_worker_tracks_skips_failures_and_keeps_processing_after_error(self):
+        import threading
+        module = self._import_browse_panel()
+        serials = tuple((f"SLUS-{number}", str(number)) for number in range(20062, 20066))
+        with tempfile.TemporaryDirectory() as directory:
+            (Path(directory) / "SLUS-20062.jpg").write_bytes(b"existing")
+            relay = MagicMock()
+            with patch("src.core.downloader.fetch_gametdb_art",
+                       side_effect=[OSError("offline"), None, "/saved"]) as fetch:
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    module._run_cover_job(relay, "r", "bulk", {
+                        "serials": serials, "destination": directory,
+                        "region": "EN", "skip_existing": True,
+                    }, threading.Event())
+            self.assertEqual(fetch.call_count, 3)
+        payload = relay.finished.emit.call_args.args[1]
+        self.assertEqual((payload["ok"], payload["skipped"], payload["failed"]), (1, 1, 2))
+        self.assertEqual(payload["remaining"], list(serials[1:3]))
+        self.assertEqual(relay.progress.emit.call_count, 8)
+        relay.deleteLater.assert_called_once()
+
+    def test_cover_stop_finishes_current_and_retries_only_failed_or_unprocessed_serials(self):
+        import threading
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        stop = threading.Event()
+        relay = MagicMock()
+
+        def fetch(*args):
+            stop.set()
+            return "/saved"
+
+        values = {"serials": tuple(dialog._bulk_serials), "destination": "/covers",
+                  "region": "EN", "skip_existing": False}
+        with patch("src.core.downloader.fetch_gametdb_art", side_effect=fetch) as transfer:
+            module._run_cover_job(relay, "r", "bulk", values, stop)
+        transfer.assert_called_once()
+        dialog._operation, dialog._request_id = "bulk", "r"
+        dialog._job_values = values
+        dialog._on_cover_finished(*relay.finished.emit.call_args.args)
+        self.assertEqual(dialog._retry_serials, dialog._bulk_serials[1:])
+        with patch.object(module.threading, "Thread") as thread, patch.object(module, "_CoverDownloadResult"):
+            dialog._retry_bulk_download()
+        retry_values = thread.call_args.kwargs["args"][3]
+        self.assertEqual(retry_values["serials"], tuple(dialog._bulk_serials[1:]))
+        dialog._retry_serials.clear()
+        self.assertEqual(len(retry_values["serials"]), 1)
+
+    def test_cover_progress_counts_completed_files_and_filters_stale_or_closed_results(self):
+        import threading
+        module = self._import_browse_panel()
+        dialog = self._cover_dialog_fixture(module)
+        dialog._operation, dialog._request_id = "bulk", "r"
+        dialog._job_values = {"serials": tuple(dialog._bulk_serials)}
+        dialog._stop_event = threading.Event()
+        dialog._on_cover_progress("r", 0, "downloading")
+        dialog._bulk_progress.setValue.assert_called_with(0)
+        dialog._on_cover_progress("r", 0, "downloaded")
+        dialog._bulk_progress.setValue.assert_called_with(1)
+        dialog._stop_bulk_download()
+        dialog._bulk_status.reset_mock()
+        dialog._on_cover_progress("r", 1, "downloading")
+        dialog._bulk_status.setText.assert_not_called()
+        dialog._bulk_progress.reset_mock()
+        dialog._on_cover_progress("old", 0, "downloaded")
+        dialog._on_cover_finished("old", {}, "")
+        self.assertEqual(dialog._operation, "bulk")
+        dialog._closed = True
+        dialog._on_cover_progress("r", 0, "downloaded")
+        dialog._on_cover_finished("r", {}, "")
+        dialog._bulk_progress.setValue.assert_not_called()
+
+    def _import_browse_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace()
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda func: func
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QDialog", "QFrame", "QGridLayout",
+            "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QListWidgetItem", "QMessageBox", "QPushButton", "QScrollArea",
+            "QSplitter", "QTabWidget", "QVBoxLayout", "QWidget",
+            "QProgressBar", "QSizePolicy",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+        qtgui.QImage = type(
+            "QImage",
+            (),
+            {"fromData": staticmethod(lambda *args, **kwargs: types.SimpleNamespace(isNull=lambda: True))},
+        )
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            return importlib.import_module("src.ui.browse_panel")
+
+    def test_restore_browse_state_applies_saved_values(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def count(self):
+                return len(self.items)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            browse_query="gta",
+            browse_source_filter="GBAtemp",
+            browse_author_filter="Curse_Arms",
+            browse_favorites_only=True,
+            browse_sort_mode="game",
+            browse_selected_tab=5,
+            ui_state={"browse_panel": {"in_app_only": True}},
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("Curse_Arms", "Curse_Arms"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._sort_filter = FakeComboBox([
+            ("Featured", "featured"),
+            ("Name", "name"),
+            ("Game", "game"),
+        ])
+        panel._sort_filter.index = 2
+        panel._favs_check = FakeCheckBox()
+        panel._in_app_check = FakeCheckBox()
+        panel._tabs = FakeTabs(count=3)
+
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            panel._restore_browse_state()
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
+        self.assertEqual(panel._author_filter.currentData(), "Curse_Arms")
+        self.assertEqual(panel._sort_filter.currentData(), "game")
+        self.assertTrue(panel._favs_check.checked)
+        self.assertTrue(panel._in_app_check.checked)
+        self.assertEqual(panel._tabs.currentIndex(), 2)
+        self.assertTrue(any("tab index" in msg for msg in logs.output))
+
+    def test_restore_browse_state_warns_on_stale_values(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item[0] == value or item[1] == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            browse_query="gta",
+            browse_source_filter="Missing Source",
+            browse_author_filter="Missing Author",
+            browse_sort_mode="not_a_valid_sort",
+            browse_selected_tab=99,
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("Curse_Arms", "Curse_Arms"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._sort_filter = FakeComboBox([
+            ("Featured", "featured"),
+            ("Name", "name"),
+            ("Game", "game"),
+        ])
+        panel._favs_check = FakeCheckBox()
+        panel._in_app_check = FakeCheckBox()
+        panel._tabs = FakeTabs(count=2)
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                panel._restore_browse_state()
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._source_filter.currentData(), "")
+        self.assertEqual(panel._author_filter.currentData(), "")
+        self.assertEqual(panel._sort_filter.currentData(), "featured")
+        self.assertEqual(panel._tabs.currentIndex(), 1)
+        self.assertEqual(panel.config.browse_source_filter, "")
+        self.assertEqual(panel.config.browse_author_filter, "")
+        self.assertEqual(panel.config.browse_sort_mode, "featured")
+        self.assertEqual(panel.config.browse_selected_tab, 1)
+        self.assertTrue(any("source filter" in msg for msg in logs.output))
+        self.assertTrue(any("author filter" in msg for msg in logs.output))
+        self.assertTrue(any("sort mode" in msg for msg in logs.output))
+        self.assertTrue(any("tab index" in msg for msg in logs.output))
+        save_mock.assert_called_once_with(panel.config, "sanitizing browse state")
+
+    def test_download_install_dialog_state_restores_and_saves(self):
+        browse_panel = self._import_browse_panel()
+        DownloadInstallDialog = browse_panel.DownloadInstallDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def count(self):
+                return len(self.items)
+
+            def itemData(self, index):
+                return self.items[index][1]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        dialog = DownloadInstallDialog.__new__(DownloadInstallDialog)
+        dialog.config = AppConfig(
+            ui_state={
+                "download_install_dialog": {
+                    "url": "https://example.com/download.zip",
+                    "type": "cheat",
+                    "name": "Last Used Name",
+                    "author": "Last Used Author",
+                    "game": "SLUS-20062",
+                    "description": "Last used description",
+                    "source_url": "https://example.com/source",
+                }
+            }
+        )
+        dialog._url_edit = FakeLineEdit()
+        dialog._type_combo = FakeComboBox([
+            ("Texture Pack", ModType.TEXTURE_PACK),
+            ("PNACH Patch", ModType.PNACH),
+            ("Cover Art", ModType.COVER_ART),
+            ("Save File", ModType.SAVE_FILE),
+            ("Cheat", ModType.CHEAT),
+        ])
+        dialog._name_edit = FakeLineEdit()
+        dialog._author_edit = FakeLineEdit()
+        dialog._game_edit = FakeLineEdit()
+        dialog._desc_edit = FakeLineEdit()
+        dialog._source_url_edit = FakeLineEdit()
+
+        with patch.object(browse_panel, "save_config") as save_mock:
+            dialog._restore_state()
+            self.assertEqual(dialog._url_edit.value, "https://example.com/download.zip")
+            self.assertEqual(dialog._name_edit.value, "Last Used Name")
+            self.assertEqual(dialog._author_edit.value, "Last Used Author")
+            self.assertEqual(dialog._game_edit.value, "SLUS-20062")
+            self.assertEqual(dialog._desc_edit.value, "Last used description")
+            self.assertEqual(dialog._source_url_edit.value, "https://example.com/source")
+            self.assertEqual(dialog._type_combo.currentData(), ModType.CHEAT)
+
+            dialog._save_state("closing direct download dialog")
+
+        self.assertEqual(
+            dialog.config.ui_state["download_install_dialog"]["type"],
+            "cheat",
+        )
+        self.assertEqual(
+            dialog.config.ui_state["download_install_dialog"]["url"],
+            "https://example.com/download.zip",
+        )
+        save_mock.assert_called_once_with(dialog.config)
+
+    def test_download_install_dialog_logs_stale_saved_type(self):
+        browse_panel = self._import_browse_panel()
+        DownloadInstallDialog = browse_panel.DownloadInstallDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def count(self):
+                return len(self.items)
+
+            def itemData(self, index):
+                return self.items[index][1]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        dialog = DownloadInstallDialog.__new__(DownloadInstallDialog)
+        dialog.config = AppConfig(
+            ui_state={
+                "download_install_dialog": {
+                    "type": "not-a-real-mod-type",
+                }
+            }
+        )
+        dialog._url_edit = FakeLineEdit()
+        dialog._type_combo = FakeComboBox([
+            ("Texture Pack", ModType.TEXTURE_PACK),
+            ("PNACH Patch", ModType.PNACH),
+            ("Cover Art", ModType.COVER_ART),
+            ("Save File", ModType.SAVE_FILE),
+            ("Cheat", ModType.CHEAT),
+        ])
+        dialog._name_edit = FakeLineEdit()
+        dialog._author_edit = FakeLineEdit()
+        dialog._game_edit = FakeLineEdit()
+        dialog._desc_edit = FakeLineEdit()
+        dialog._source_url_edit = FakeLineEdit()
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                dialog._restore_state()
+
+        self.assertEqual(dialog._type_combo.currentData(), ModType.TEXTURE_PACK)
+        self.assertEqual(
+            dialog.config.ui_state[browse_panel._DOWNLOAD_INSTALL_STATE_KEY]["type"],
+            "texture_pack",
+        )
+        self.assertTrue(
+            any("Saved direct-download mod type" in msg for msg in logs.output),
+            logs.output,
+        )
+        save_mock.assert_called_once_with(dialog.config, "sanitizing direct download dialog state")
+
+    def _download_dialog_fixture(self, module):
+        dialog = module.DownloadInstallDialog.__new__(module.DownloadInstallDialog)
+        dialog.config = AppConfig(mods_storage_path="/managed-mods")
+        dialog.db = MagicMock()
+        dialog._busy = False
+        dialog._closed = False
+        dialog._request_id = ""
+        dialog._prepared_download = None
+        dialog.parent = MagicMock(return_value=None)
+        dialog._type_combo = MagicMock()
+        dialog._type_combo.currentData.return_value = ModType.TEXTURE_PACK
+        for name, value in (
+            ("_url_edit", "https://example.com/shared"),
+            ("_name_edit", "Texture pack"), ("_author_edit", "Author"),
+            ("_game_edit", "SLUS-20062"), ("_desc_edit", "Description"),
+            ("_source_url_edit", "https://example.com/original"),
+        ):
+            widget = MagicMock()
+            widget.text.return_value = value
+            setattr(dialog, name, widget)
+        dialog._status = MagicMock()
+        dialog._progress = MagicMock()
+        dialog._dl_btn = MagicMock()
+        dialog._close_btn = MagicMock()
+        dialog._new_download_btn = MagicMock()
+        dialog._save_state = MagicMock()
+        return dialog
+
+    def _download_result_fixture(self, module, request_id, state, mod_type, config, db, dialog=None):
+        result = module._DownloadInstallResult.__new__(module._DownloadInstallResult)
+        result._request_id, result._state, result._mod_type = request_id, state, mod_type
+        result._config, result._db, result._completed = config, db, False
+        for signal in ("prepared", "phase", "progress", "finished", "installed", "registration_failed"):
+            setattr(result, signal, MagicMock())
+        result.deleteLater = MagicMock()
+        if dialog is not None:
+            result.finished.emit.side_effect = dialog._on_download_finished
+            result.registration_failed.emit.side_effect = dialog._on_registration_failed
+        return result
+
+    def test_download_worker_tracks_transfer_then_install_and_always_finishes(self):
+        import types
+        module = self._import_browse_panel()
+        for outcome in ("success", "download_error", "install_error"):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as storage:
+                dialog = self._download_dialog_fixture(module)
+                dialog.config = AppConfig(mods_storage_path=storage)
+                registry = module.ActiveDownloads
+                destinations = []
+
+                def transfer(url, dest, progress):
+                    destinations.append(dest)
+                    entry = registry.all()[0]
+                    self.assertEqual(entry["name"], "Texture pack")
+                    self.assertEqual(entry["source_url"], "https://example.com/original")
+                    self.assertEqual(entry["phase"], "downloading")
+                    progress(3, 3)
+                    self.assertEqual(registry.all()[0]["received"], 3)
+                    if outcome == "download_error":
+                        raise module.DownloadError("offline")
+                    Path(dest).write_bytes(b"abc")
+                    return dest
+
+                def install(**kwargs):
+                    entry = registry.all()[0]
+                    self.assertEqual(entry["phase"], "installing")
+                    self.assertEqual(entry["received"], 3)
+                    if outcome == "install_error":
+                        raise OSError("storage full")
+                    return types.SimpleNamespace(name="Installed pack", path=storage)
+
+                result = None
+
+                def make_result(request_id, state, mod_type, config, db):
+                    nonlocal result
+                    result = self._download_result_fixture(module, request_id, state, mod_type, config, db, dialog)
+                    return result
+
+                with patch.object(registry, "_entries", {}), patch.object(
+                    module.threading, "Thread",
+                ) as thread, patch.object(
+                    dialog, "_download_result", side_effect=lambda *args: make_result(dialog._request_id, *args, dialog.db),
+                ), patch.object(module, "download_file", side_effect=transfer), patch(
+                    "src.core.mod_manager.ModManager",
+                ) as manager, patch("src.core.download_history.record_event") as record:
+                    manager.prepare_install.side_effect = install
+                    dialog._run_download("https://example.com/shared", "https://cdn.example.com/file.zip")
+                    self.assertEqual(registry.all()[0]["phase"], "resolving")
+                    run = thread.call_args.kwargs["target"]
+                    args = thread.call_args.kwargs["args"]
+                    self.assertIs(run, module._run_direct_download)
+                    self.assertNotIn(dialog, args)
+                    self.assertNotIn(dialog.db, args)
+                    dialog.config.mods_storage_path = "/changed"
+                    dialog._name_edit.text.return_value = "Changed name"
+                    if outcome == "success":
+                        run(*args)
+                    else:
+                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                            run(*args)
+                    dialog.db.add.assert_not_called()
+                    record.assert_not_called()
+                    self.assertEqual(registry.count(), 1)
+                    result._complete_install(*result.prepared.emit.call_args.args)
+                    self.assertEqual(registry.all(), [])
+                    self.assertEqual(registry.count(), 0)
+                    self.assertFalse(Path(destinations[0]).parent.exists())
+                    self.assertEqual(record.call_args.kwargs["status"],
+                                     "success" if outcome == "success" else "failed")
+                    if outcome == "download_error":
+                        manager.prepare_install.assert_not_called()
+                    else:
+                        installed = manager.prepare_install.call_args.kwargs
+                        self.assertEqual(installed["dest_base"], storage)
+                        self.assertEqual(installed["name"], "Texture pack")
+                    self.assertEqual(result.finished.emit.call_args.args[1], outcome == "success")
+                    self.assertEqual(result.installed.emit.call_count, int(outcome == "success"))
+                    result.deleteLater.assert_called_once()
+
+    def test_download_rejects_invalid_urls_without_starting_worker(self):
+        module = self._import_browse_panel()
+        for url in ("", "relative.zip", "file:///etc/passwd", "https://", "https://["):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                dialog._url_edit.text.return_value = url
+                with patch.object(module.threading, "Thread") as thread:
+                    dialog._download()
+                thread.assert_not_called()
+                dialog._url_edit.setFocus.assert_called_once()
+                self.assertFalse(dialog._busy)
+
+    def test_download_validates_storage_database_and_type_before_resolution(self):
+        module = self._import_browse_panel()
+        for missing in ("storage", "database", "type"):
+            with self.subTest(missing=missing):
+                dialog = self._download_dialog_fixture(module)
+                if missing == "storage":
+                    dialog.config.mods_storage_path = ""
+                elif missing == "database":
+                    dialog.db = None
+                else:
+                    dialog._type_combo.currentData.return_value = "stale"
+                with patch.object(module.threading, "Thread") as thread:
+                    dialog._download()
+                thread.assert_not_called()
+                self.assertFalse(dialog._busy)
+                dialog._status.setText.assert_called_once()
+
+    def test_download_mega_detection_uses_hostname_not_arbitrary_url_text(self):
+        module = self._import_browse_panel()
+        for url, manual in (
+            ("https://mega.nz/file/abc", True),
+            ("https://www.mega.co.nz/file/abc", True),
+            ("https://example.com/mega.nz/file.zip", False),
+            ("https://mega.nz.example.com/file.zip", False),
+        ):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                dialog._url_edit.text.return_value = url
+                dialog._run_download = MagicMock()
+                with patch.object(module, "QMessageBox") as box:
+                    dialog._download()
+                self.assertEqual(box.information.call_count, int(manual))
+                self.assertEqual(dialog._run_download.call_count, int(not manual))
+
+    def test_download_freezes_fields_and_blocks_duplicate_or_closed_starts(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        with patch.object(module, "_DownloadInstallResult"), patch.object(module.threading, "Thread") as thread:
+            with patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+                dialog._download()
+                thread.assert_called_once()
+                self.assertTrue(dialog._busy)
+                for widget in (dialog._url_edit, dialog._type_combo, dialog._name_edit, dialog._dl_btn):
+                    widget.setEnabled.assert_called_with(False)
+                dialog._close_btn.setText.assert_called_with("Continue in Background")
+                dialog._closed = True
+                dialog._download()
+                thread.assert_called_once()
+
+    def test_download_thread_start_failure_restores_retry_and_cleans_registry(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        result = self._download_result_fixture(module, "id", dialog._dialog_state(), ModType.TEXTURE_PACK,
+                                               dialog.config, dialog.db, dialog)
+        with patch.object(dialog, "_download_result", return_value=result), patch.object(
+            module.uuid, "uuid4", return_value=MagicMock(hex="id"),
+        ):
+            with patch.object(module.threading, "Thread") as thread:
+                thread.return_value.start.side_effect = RuntimeError("no threads")
+                with patch.object(module.ActiveDownloads, "_entries", {}):
+                    with patch("src.core.download_history.record_event"):
+                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                            dialog._download()
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+        self.assertFalse(dialog._busy)
+        dialog._dl_btn.setText.assert_called_with("Retry Download")
+        result.deleteLater.assert_called_once()
+
+    def test_download_completion_notification_connects_to_surviving_ancestor_signal(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        ancestor = MagicMock()
+        parent = type("Parent", (), {"parent": lambda self: ancestor})()
+        dialog.parent.return_value = parent
+        with patch.object(module, "_DownloadInstallResult") as relay:
+            with patch.object(module.threading, "Thread"), patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+        relay.return_value.installed.connect.assert_called_once_with(ancestor.mod_installed)
+
+    def test_download_registration_failure_freezes_metadata_and_retry_reuses_prepared_files(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._busy, dialog._request_id = True, "initial"
+            mod = ModInfo("prepared", "Pack", ModType.TEXTURE_PACK, directory,
+                          game_id="SLUS-20062", source_url="https://example.com/original")
+            source = Path(directory) / "texture.png"
+            source.write_bytes(b"texture")
+            state = dialog._dialog_state()
+            config = AppConfig(mods_storage_path="/original-storage")
+            payload = {"mod": mod, "size": 100}
+            result = self._download_result_fixture(module, "initial", state, mod.mod_type, config, dialog.db, dialog)
+            dialog.db.add.side_effect = OSError("read-only database")
+            with patch("src.core.download_history.record_event") as record, patch.object(
+                module.ActiveDownloads, "_entries", {},
+            ):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    result._complete_install(payload, "")
+                self.assertIs(dialog._prepared_download["mod"], mod)
+                self.assertFalse(dialog._busy)
+                dialog._name_edit.setEnabled.assert_called_with(False)
+                dialog._dl_btn.setText.assert_called_with("Retry Library Save")
+                dialog._new_download_btn.setVisible.assert_called_with(True)
+                self.assertIn(directory, record.call_args.kwargs["note"])
+                self.assertEqual(record.call_args.kwargs["status"], "failed")
+                result.installed.emit.assert_not_called()
+                result.deleteLater.assert_called_once()
+                dialog.config.mods_storage_path = "/changed-storage"
+                dialog._name_edit.text.return_value = "Not the prepared name"
+                retry_result = None
+
+                def make_retry(retry_state, mod_type, retry_config):
+                    nonlocal retry_result
+                    self.assertIs(retry_state, state)
+                    self.assertIs(retry_config, config)
+                    retry_result = self._download_result_fixture(
+                        module, dialog._request_id, retry_state, mod_type, retry_config, dialog.db, dialog,
+                    )
+                    return retry_result
+
+                dialog.db.add.side_effect = None
+                with patch.object(dialog, "_download_result", side_effect=make_retry), patch.object(
+                    module.threading, "Thread",
+                ) as thread, patch.object(module.DownloadInstallDialog, "_convert_url") as resolve:
+                    dialog._run_download("https://example.com/another.zip")
+                    dialog._download()
+                thread.assert_not_called()
+                resolve.assert_not_called()
+                self.assertIs(dialog.db.add.call_args.args[0], mod)
+                self.assertEqual(dialog.db.add.call_count, 2)
+                self.assertEqual(source.read_bytes(), b"texture")
+                self.assertEqual(record.call_count, 2)
+                self.assertEqual(record.call_args.kwargs["status"], "success")
+                self.assertEqual(record.call_args.kwargs["size_bytes"], 100)
+                self.assertEqual(record.call_args.args[0].mods_storage_path, "/original-storage")
+                self.assertIsNone(dialog._prepared_download)
+                self.assertFalse(dialog._busy)
+                dialog._name_edit.setEnabled.assert_called_with(True)
+                dialog._new_download_btn.setVisible.assert_called_with(False)
+                retry_result.installed.emit.assert_called_once()
+                self.assertEqual(module.ActiveDownloads.all(), [])
+
+    def test_new_download_keeps_prepared_files_and_restores_editable_form(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            source = Path(directory) / "texture.png"
+            source.write_bytes(b"texture")
+            dialog._prepared_download = {"mod": ModInfo("id", "Pack", ModType.TEXTURE_PACK, directory)}
+            for busy, closed in ((True, False), (False, True)):
+                dialog._busy, dialog._closed = busy, closed
+                dialog._new_download()
+                self.assertIsNotNone(dialog._prepared_download)
+            dialog._busy, dialog._closed = False, False
+            dialog._new_download()
+            self.assertIsNone(dialog._prepared_download)
+            dialog._name_edit.setEnabled.assert_called_with(True)
+            dialog._name_edit.setText.assert_not_called()
+            dialog._dl_btn.setText.assert_called_with("⬇ Download & Install")
+            self.assertIn(directory, dialog._status.setText.call_args.args[0])
+            self.assertEqual(source.read_bytes(), b"texture")
+            dialog.db.add.assert_not_called()
+
+    def test_download_registration_survives_closed_receiver_and_completes_only_once(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._closed = True
+            mod = ModInfo("id", "Pack", ModType.TEXTURE_PACK, directory)
+            result = self._download_result_fixture(
+                module, "id", dialog._dialog_state(), mod.mod_type, dialog.config, dialog.db, dialog,
+            )
+            with patch("src.core.download_history.record_event", side_effect=OSError("history read-only")) as record:
+                with patch.object(module.ActiveDownloads, "_entries", {}):
+                    module.ActiveDownloads.register("id", "Pack")
+                    with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                        result._complete_install({"mod": mod, "size": 10}, "")
+                    result._complete_install({"mod": mod, "size": 10}, "")
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+            dialog.db.add.assert_called_once_with(mod)
+            result.installed.emit.assert_called_once()
+            result.finished.emit.assert_called_once()
+            self.assertTrue(result.finished.emit.call_args.args[1])
+            self.assertIn("history could not be saved", result.finished.emit.call_args.args[2])
+            self.assertEqual(record.call_args.kwargs["status"], "success")
+            dialog._status.setText.assert_not_called()
+            result.deleteLater.assert_called_once()
+
+    def test_download_registration_does_not_save_missing_prepared_folder(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._busy, dialog._request_id = True, "id"
+            mod = ModInfo("id", "Pack", ModType.TEXTURE_PACK, str(Path(directory) / "missing"))
+            result = self._download_result_fixture(
+                module, "id", dialog._dialog_state(), mod.mod_type, dialog.config, dialog.db, dialog,
+            )
+            with patch("src.core.download_history.record_event") as record:
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    result._complete_install({"mod": mod, "size": 10}, "")
+            dialog.db.add.assert_not_called()
+            result.installed.emit.assert_not_called()
+            self.assertIn("prepared folder is missing", result.finished.emit.call_args.args[2])
+            self.assertEqual(record.call_args.kwargs["status"], "failed")
+            self.assertIs(dialog._prepared_download["mod"], mod)
+
+    def test_download_failure_history_has_a_name_when_optional_metadata_is_blank(self):
+        module = self._import_browse_panel()
+        for url, expected in (("https://example.com/pack.zip", "pack.zip"), ("https://example.com/", "downloaded_mod")):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                state = {**dialog._dialog_state(), "name": "", "url": url}
+                result = self._download_result_fixture(module, "id", state, ModType.PNACH, dialog.config, dialog.db)
+                with patch("src.core.download_history.record_event") as record:
+                    result._complete_install(None, "Resolving failed")
+                self.assertEqual(record.call_args.kwargs["mod_name"], expected)
+                self.assertEqual(record.call_args.kwargs["status"], "failed")
+                dialog.db.add.assert_not_called()
+
+    def test_download_progress_recovers_from_unknown_total_and_handles_large_files(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        dialog._busy = True
+        dialog._request_id = "active"
+        dialog._on_download_progress("active", 10, 0)
+        dialog._progress.setRange.assert_called_with(0, 0)
+        dialog._on_download_progress("active", 5 * 1024**3, 10 * 1024**3)
+        dialog._progress.setRange.assert_called_with(0, 100)
+        dialog._progress.setValue.assert_called_with(50)
+        self.assertIn("5.0 GiB", dialog._status.setText.call_args.args[0])
+        dialog._on_download_progress("active", 1000, 1)
+        dialog._progress.setValue.assert_called_with(100)
+        dialog._on_download_progress("active", -1, 100)
+        dialog._progress.setValue.assert_called_with(0)
+
+    def test_download_slots_ignore_closed_stale_and_finished_requests(self):
+        module = self._import_browse_panel()
+        for closed, busy, request_id in ((True, True, "active"), (False, True, "old"), (False, False, "active")):
+            with self.subTest(closed=closed, busy=busy, request=request_id):
+                dialog = self._download_dialog_fixture(module)
+                dialog._closed, dialog._busy, dialog._request_id = closed, busy, "active"
+                dialog._on_download_phase(request_id, "installing")
+                dialog._on_download_progress(request_id, 100, 100)
+                dialog._on_download_finished(request_id, True, "Done")
+                dialog._on_registration_failed(request_id, {"mod": MagicMock()})
+                self.assertIsNone(dialog._prepared_download)
+                dialog._status.setText.assert_not_called()
+                dialog._progress.setValue.assert_not_called()
+                dialog._dl_btn.setEnabled.assert_not_called()
+
+    def test_download_error_preserves_form_and_allows_new_request(self):
+        module = self._import_browse_panel()
+        dialog = self._download_dialog_fixture(module)
+        dialog._busy, dialog._request_id = True, "old"
+        dialog._on_download_finished("old", False, "<b>network error</b>")
+        self.assertFalse(dialog._busy)
+        dialog._name_edit.setEnabled.assert_called_with(True)
+        dialog._name_edit.setText.assert_not_called()
+        dialog._progress.hide.assert_called_once()
+        dialog._dl_btn.setText.assert_called_with("Retry Download")
+        with patch.object(module, "_DownloadInstallResult"), patch.object(module.threading, "Thread") as thread:
+            with patch.object(module.ActiveDownloads, "_entries", {}):
+                dialog._download()
+        self.assertTrue(dialog._busy)
+        self.assertNotEqual(dialog._request_id, "old")
+        thread.assert_called_once()
+
+    def test_download_resolution_failure_and_history_failure_are_recoverable(self):
+        module = self._import_browse_panel()
+        for failure in (None, OSError("resolver offline")):
+            with self.subTest(failure=failure):
+                state = {"url": "https://disk.yandex.ru/d/id", "name": "Pack", "game": "",
+                         "source_url": "", "author": "", "description": ""}
+                result = self._download_result_fixture(module, "id", state, ModType.CHEAT, AppConfig(), MagicMock())
+                with patch.object(module.DownloadInstallDialog, "_convert_url",
+                                  return_value=None, side_effect=failure):
+                    with patch.object(module, "download_file") as transfer:
+                        with patch.object(module.ActiveDownloads, "_entries", {}):
+                            module.ActiveDownloads.register("id", "Pack", phase="resolving")
+                            with patch("src.core.download_history.record_event", side_effect=OSError("read only")):
+                                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                                    module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig())
+                                    result._complete_install(*result.prepared.emit.call_args.args)
+                            self.assertEqual(module.ActiveDownloads.all(), [])
+                transfer.assert_not_called()
+                self.assertFalse(result.finished.emit.call_args.args[1])
+                self.assertIn("Resolving failed", result.finished.emit.call_args.args[2])
+                result.installed.emit.assert_not_called()
+                result.deleteLater.assert_called_once()
+
+    def test_download_worker_throttles_progress_without_losing_registry_bytes(self):
+        from unittest.mock import call
+        module = self._import_browse_panel()
+        result = MagicMock()
+        state = {"url": "https://example.com/file.zip", "name": "Pack", "game": "",
+                 "source_url": "", "author": "", "description": ""}
+
+        def transfer(url, dest, progress):
+            for size in (1, 2, 3, 4):
+                progress(size, 4)
+                self.assertEqual(module.ActiveDownloads.all()[0]["received"], size)
+            Path(dest).write_bytes(b"test")
+
+        with patch.object(module.ActiveDownloads, "_entries", {}):
+            module.ActiveDownloads.register("id", "Pack")
+            with patch.object(module.time, "monotonic", side_effect=(1.0, 1.01, 1.02, 1.03)):
+                with patch.object(module, "download_file", side_effect=transfer):
+                    with patch("src.core.mod_manager.ModManager"), patch("src.core.download_history.record_event"):
+                        module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig(),
+                                                    state["url"])
+        self.assertEqual(result.progress.emit.call_args_list, [call("id", 1, 4), call("id", 4, 4)])
+
+    def test_cover_dialog_auto_fills_single_serial_match(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeSuggestions:
+            def __init__(self):
+                self.cleared = False
+                self.hidden = False
+
+            def clear(self):
+                self.cleared = True
+
+            def hide(self):
+                self.hidden = True
+
+            def show(self):
+                self.hidden = False
+
+        class FakeStatus:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, value):
+                self.text = value
+
+            def setTextFormat(self, _value):
+                pass
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg._title_to_serials = lambda text: [("SLUS-20062", "Grand Theft Auto III")]
+        dlg._suggestions = FakeSuggestions()
+        dlg._id_edit = FakeLineEdit()
+        dlg._status = FakeStatus()
+
+        dlg._on_search_changed("Grand Theft Auto III")
+
+        self.assertTrue(dlg._suggestions.cleared)
+        self.assertTrue(dlg._suggestions.hidden)
+        self.assertEqual(dlg._id_edit.value, "SLUS-20062")
+        self.assertIn("Serial set to", dlg._status.text)
+
+    def test_cover_dialog_restore_applies_saved_state(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig(
+            ui_state={
+                browse_panel._COVER_DOWNLOAD_STATE_KEY: {
+                    "selected_tab": 1,
+                    "search_query": "God of War",
+                    "single_region": "JP",
+                    "bulk_region": "EU",
+                    "skip_existing": False,
+                }
+            }
+        )
+        dlg._tabs = FakeTabs(count=2)
+        dlg._search_edit = FakeLineEdit()
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._skip_existing_check = FakeCheckBox()
+
+        dlg._restore_state()
+
+        self.assertEqual(dlg._tabs.currentIndex(), 1)
+        self.assertEqual(dlg._search_edit.value, "God of War")
+        self.assertEqual(dlg._region_combo.currentText(), "JP")
+        self.assertEqual(dlg._bulk_region_combo.currentText(), "EU")
+        self.assertFalse(dlg._skip_existing_check.isChecked())
+
+    def test_cover_dialog_restore_sanitizes_invalid_state(self):
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findText(self, value):
+                for idx, item in enumerate(self.items):
+                    if item == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeTabs:
+            def __init__(self, count):
+                self._count = count
+                self.index = 0
+
+            def count(self):
+                return self._count
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig(
+            ui_state={
+                browse_panel._COVER_DOWNLOAD_STATE_KEY: {
+                    "selected_tab": 99,
+                    "search_query": "  God of War  ",
+                    "single_region": "Not a region",
+                    "bulk_region": "Still not a region",
+                    "skip_existing": False,
+                }
+            }
+        )
+        dlg._tabs = FakeTabs(count=2)
+        dlg._search_edit = FakeLineEdit()
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP", "KO", "ZHCN"])
+        dlg._skip_existing_check = FakeCheckBox()
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+                dlg._restore_state()
+
+        self.assertEqual(dlg._tabs.currentIndex(), 1)
+        self.assertEqual(dlg._search_edit.value, "God of War")
+        self.assertEqual(dlg._region_combo.currentText(), "EN")
+        self.assertEqual(dlg._bulk_region_combo.currentText(), "EN")
+        self.assertFalse(dlg._skip_existing_check.isChecked())
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["selected_tab"],
+            1,
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["search_query"],
+            "God of War",
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["single_region"],
+            "EN",
+        )
+        self.assertEqual(
+            dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]["bulk_region"],
+            "EN",
+        )
+        save_mock.assert_called_once_with(dlg.config, "sanitizing cover download dialog state")
+        self.assertTrue(
+            any("single-region" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("bulk-region" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("tab index" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_cover_dialog_save_persists_state(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        CoverDownloadDialog = browse_panel.CoverDownloadDialog
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+
+            def currentText(self):
+                return self.items[self.index]
+
+        class FakeCheckBox:
+            def __init__(self, checked=False):
+                self.checked = checked
+
+            def isChecked(self):
+                return self.checked
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        dlg = CoverDownloadDialog.__new__(CoverDownloadDialog)
+        dlg.config = AppConfig()
+        dlg._tabs = types.SimpleNamespace(currentIndex=lambda: 1, count=lambda: 2)
+        dlg._search_edit = FakeLineEdit("God of War")
+        dlg._region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=3)
+        dlg._bulk_region_combo = FakeComboBox(["EN", "US", "EU", "JP"], index=2)
+        dlg._skip_existing_check = FakeCheckBox(False)
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            dlg._save_state("updating cover download dialog state")
+
+        state = dlg.config.ui_state[browse_panel._COVER_DOWNLOAD_STATE_KEY]
+        self.assertEqual(state["selected_tab"], 1)
+        self.assertEqual(state["search_query"], "God of War")
+        self.assertEqual(state["single_region"], "JP")
+        self.assertEqual(state["bulk_region"], "EU")
+        self.assertFalse(state["skip_existing"])
+        save_mock.assert_called_once_with(dlg.config, "updating cover download dialog state")
+
+    def test_active_tab_index_logs_when_tabs_fail(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class BrokenTabs:
+            def currentIndex(self):
+                raise RuntimeError("tab lookup failed")
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel._tabs = BrokenTabs()
+
+        with self.assertLogs("src.ui.browse_panel", level="WARNING") as logs:
+            index = panel._active_tab_index()
+
+        self.assertEqual(index, -1)
+        self.assertTrue(any("Could not read active browse tab index" in msg for msg in logs.output))
+
+    def test_catalogue_card_open_url_uses_shared_helper(self):
+        browse_panel = self._import_browse_panel()
+        CatalogueTabContent = browse_panel._CatalogueTabContent
+
+        tab = CatalogueTabContent.__new__(CatalogueTabContent)
+
+        with patch.object(browse_panel, "open_external_url", return_value=True) as open_mock:
+            ok = tab._open_url("https://example.com/mod")
+
+        self.assertTrue(ok)
+        open_mock.assert_called_once_with(
+            "https://example.com/mod",
+            parent=tab,
+            context="browse link",
+            title="Browse Link Unavailable",
+            failure_message="Could not open the selected link. Please copy the URL into your browser.",
+        )
+
+    def test_save_browse_state_updates_config(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig()
+        panel._search = types.SimpleNamespace(text=lambda: "gta")
+        panel._source_filter = types.SimpleNamespace(currentData=lambda: "GBAtemp")
+        panel._author_filter = types.SimpleNamespace(currentData=lambda: "Curse_Arms")
+        panel._sort_filter = types.SimpleNamespace(currentData=lambda: "name")
+        panel._favs_check = types.SimpleNamespace(isChecked=lambda: True)
+        panel._in_app_check = types.SimpleNamespace(isChecked=lambda: True)
+        panel._tabs = types.SimpleNamespace(count=lambda: 4, currentIndex=lambda: 2)
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            panel._save_browse_state("persisting browse state")
+
+        self.assertEqual(panel.config.browse_query, "gta")
+        self.assertEqual(panel.config.browse_source_filter, "GBAtemp")
+        self.assertEqual(panel.config.browse_author_filter, "Curse_Arms")
+        self.assertTrue(panel.config.browse_favorites_only)
+        self.assertEqual(panel.config.browse_sort_mode, "name")
+        self.assertEqual(panel.config.browse_selected_tab, 2)
+        self.assertTrue(panel.config.ui_state["browse_panel"]["in_app_only"])
+        save_mock.assert_called_once_with(panel.config, "persisting browse state")
+
+    def test_clear_filters_resets_defaults_and_persists_ui_state(self):
+        import types
+
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeWidget:
+            def __init__(self):
+                self.blocked = False
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit(FakeWidget):
+            def __init__(self):
+                super().__init__()
+                self.value = "gta"
+
+            def text(self):
+                return self.value
+
+            def clear(self):
+                self.value = ""
+
+        class FakeComboBox(FakeWidget):
+            def __init__(self):
+                super().__init__()
+                self.index = 1
+                self.values = ["", "value"]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                return self.values[self.index]
+
+        class FakeCheckBox(FakeWidget):
+            def __init__(self, checked=False):
+                super().__init__()
+                self.checked = checked
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(
+            show_nsfw=True,
+            show_paid=True,
+            show_account_required=True,
+            show_incomplete=False,
+            ui_state={"browse_panel": {"in_app_only": True}},
+        )
+        panel._search = FakeLineEdit()
+        panel._source_filter = FakeComboBox()
+        panel._author_filter = FakeComboBox()
+        panel._sort_filter = FakeComboBox()
+        panel._favs_check = FakeCheckBox(True)
+        panel._nsfw_check = FakeCheckBox(True)
+        panel._paid_check = FakeCheckBox(True)
+        panel._acct_check = FakeCheckBox(True)
+        panel._incomplete_check = FakeCheckBox(False)
+        panel._in_app_check = FakeCheckBox(True)
+        panel._tabs = types.SimpleNamespace(count=lambda: 1, currentIndex=lambda: 0)
+        panel._apply_filters = lambda: None
+
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            panel._clear_filters()
+
+        self.assertEqual(panel._search.value, "")
+        self.assertEqual(panel._source_filter.index, 0)
+        self.assertEqual(panel._author_filter.index, 0)
+        self.assertEqual(panel._sort_filter.index, 0)
+        self.assertFalse(panel._favs_check.checked)
+        self.assertTrue(panel._nsfw_check.checked)
+        self.assertFalse(panel._paid_check.checked)
+        self.assertFalse(panel._acct_check.checked)
+        self.assertTrue(panel._incomplete_check.checked)
+        self.assertFalse(panel._in_app_check.checked)
+        self.assertFalse(panel.config.show_paid)
+        self.assertFalse(panel.config.show_account_required)
+        self.assertTrue(panel.config.show_incomplete)
+        self.assertFalse(panel.config.ui_state["browse_panel"]["in_app_only"])
+        save_mock.assert_called_once_with(panel.config, "clearing browse filters")
+
+    def test_sort_catalogue_entries_orders_by_requested_field(self):
+        browse_panel = self._import_browse_panel()
+
+        entries = [
+            {"name": "Zulu", "game": "Game Z", "author": "B", "source": "GitHub", "game_serial": "SLUS-00002"},
+            {"name": "Alpha", "game": "Game A", "author": "A", "source": "GBAtemp", "game_serial": "SLUS-00001"},
+            {"name": "Bravo", "game": "", "author": "C", "source": "Patreon", "game_serial": ""},
+        ]
+
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "name")],
+            ["Alpha", "Bravo", "Zulu"],
+        )
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "game")],
+            ["Alpha", "Zulu", "Bravo"],
+        )
+        self.assertEqual(
+            [e["name"] for e in browse_panel._sort_catalogue_entries(entries, "featured")],
+            ["Zulu", "Alpha", "Bravo"],
+        )
+
+    def test_catalogue_empty_state_message_mentions_filters(self):
+        browse_panel = self._import_browse_panel()
+
+        message = browse_panel._catalogue_empty_state_message(
+            query="gta",
+            source="GBAtemp",
+            author="",
+            favs_only=True,
+            show_nsfw=False,
+            show_paid=False,
+            show_account_required=True,
+            show_incomplete=False,
+            in_app_only=True,
+        )
+
+        self.assertIn("No catalogue entries match", message)
+        self.assertIn("search text", message)
+        self.assertIn("source", message)
+        self.assertIn("favorites only", message)
+        self.assertIn("in-app downloads only", message)
+        self.assertIn("Clear Filters", message)
+
+    def test_catalogue_empty_state_message_mentions_reload(self):
+        browse_panel = self._import_browse_panel()
+
+        message = browse_panel._catalogue_empty_state_message(
+            query="",
+            source="",
+            author="",
+            favs_only=False,
+            show_nsfw=True,
+            show_paid=True,
+            show_account_required=True,
+            show_incomplete=True,
+            in_app_only=False,
+        )
+
+        self.assertIn("No catalogue entries are available in this tab.", message)
+        self.assertIn("Reload", message)
+
+    def test_browse_authors_skip_placeholders(self):
+        browse_panel = self._import_browse_panel()
+        authors = browse_panel._browse_authors([
+            {"author": "Unknown"},
+            {"author": "Anonymous"},
+            {"author": "Curse_Arms"},
+            {"author": "TexMaster"},
+            {"author": ""},
+        ])
+
+        self.assertEqual(authors, ["Curse_Arms", "TexMaster"])
+
+    def test_compact_cards_preserve_detail_widgets_and_persist_preference(self):
+        browse_panel = self._import_browse_panel()
+        card = SimpleNamespace(
+            _outer_layout=MagicMock(),
+            _body_layout=MagicMock(),
+            _detail_widgets=[MagicMock(), MagicMock()],
+        )
+        for compact in (True, False):
+            browse_panel.CatalogueCard.set_compact(card, compact)
+            for widget in card._detail_widgets:
+                widget.setVisible.assert_called_with(not compact)
+            card._body_layout.setSpacing.assert_called_with(4 if compact else 8)
+
+        panel = SimpleNamespace(config=AppConfig(), _tab_contents=[MagicMock(), MagicMock()])
+        with patch.object(browse_panel, "_save_browse_config") as save_mock:
+            browse_panel.BrowsePanel._on_compact_toggled(panel, True)
+        for tab in panel._tab_contents:
+            tab.set_compact.assert_called_once_with(True)
+        restored = AppConfig.from_dict(panel.config.to_dict())
+        self.assertTrue(restored.ui_state["browse_panel"]["compact_cards"])
+        save_mock.assert_called_once_with(panel.config, "updating browse card density")
+
+    def test_browse_search_debounces_rendering_and_config_writes(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._refresh_active_tab = MagicMock()
+
+        panel._on_search_changed("g")
+        panel._on_search_changed("gta")
+        self.assertEqual(panel._search_timer.start.call_count, 2)
+        panel._save_browse_state.assert_not_called()
+        panel._refresh_active_tab.assert_not_called()
+
+        panel._on_search_timeout()
+        panel._search_timer.stop.assert_called_once()
+        panel._save_browse_state.assert_called_once_with("updating search filter")
+        panel._refresh_active_tab.assert_called_once()
+
+    def test_filters_render_only_active_tab_and_switch_uses_latest_filters(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._tab_contents = [MagicMock(), MagicMock(), MagicMock()]
+        panel._tabs = MagicMock()
+        panel._tabs.currentIndex.return_value = 1
+        args = ("gta", "GitHub", "", False, False, False, False, True, True, "name")
+        panel._filter_args = MagicMock(return_value=args)
+
+        panel._apply_filters()
+        panel._tab_contents[0].apply_filters.assert_not_called()
+        panel._tab_contents[1].apply_filters.assert_called_once_with(*args)
+        panel._tab_contents[2].apply_filters.assert_not_called()
+
+        panel._tabs.currentIndex.return_value = 2
+        panel._on_tab_changed(2)
+        panel._tab_contents[2].apply_filters.assert_called_once_with(*args)
+        self.assertEqual(panel._search_timer.stop.call_count, 2)
+
+    def test_library_serial_navigation_flushes_pending_search_state(self):
+        browse_panel = self._import_browse_panel()
+        panel = browse_panel.BrowsePanel.__new__(browse_panel.BrowsePanel)
+        panel._search = MagicMock()
+        panel._search_timer = MagicMock()
+        panel._save_browse_state = MagicMock()
+        panel._refresh_active_tab = MagicMock()
+
+        panel.filter_by_serial("SLUS-20062")
+
+        panel._search.setText.assert_called_once_with("SLUS-20062")
+        panel._save_browse_state.assert_called_once_with("updating search filter")
+        panel._search_timer.stop.assert_called_once()
+        panel._refresh_active_tab.assert_called_once()
+
+    def test_catalogue_filter_cache_preserves_pagination_and_invalidates(self):
+        browse_panel = self._import_browse_panel()
+        tab = browse_panel._CatalogueTabContent.__new__(browse_panel._CatalogueTabContent)
+        tab.config = AppConfig()
+        tab._all_entries = [{"name": "Alpha", "author": "Alice", "source": "GitHub"}]
+        tab._last_filter_key = None
+        tab._serial_db = False
+        tab.result_count_changed = MagicMock()
+
+        def populate(entries):
+            tab._all_filtered = entries
+            tab._shown_count = len(entries)
+
+        tab._populate = MagicMock(side_effect=populate)
+        tab.apply_filters(sort_mode="name")
+        tab._shown_count = 42
+        tab.apply_filters(sort_mode="name")
+        tab._populate.assert_called_once()
+        self.assertEqual(tab._shown_count, 42)
+        tab.result_count_changed.emit.assert_called_once_with(1, 1)
+
+        tab.config.favorite_authors.append("Alice")
+        tab.apply_filters(sort_mode="name")
+        self.assertEqual(tab._populate.call_count, 2)
+        tab.set_entries([])
+        tab.apply_filters(sort_mode="name")
+        self.assertEqual(tab._populate.call_count, 3)
+        self.assertEqual(tab._all_filtered, [])
+
+    def test_catalogue_reflow_keeps_cards_pagination_and_load_more(self):
+        browse_panel = self._import_browse_panel()
+
+        class FakeGrid:
+            def __init__(self, widgets):
+                self.items = [(widget, ()) for widget in widgets]
+
+            def count(self):
+                return len(self.items)
+
+            def takeAt(self, index):
+                widget, _ = self.items.pop(index)
+                return SimpleNamespace(widget=lambda: widget)
+
+            def addWidget(self, widget, *position):
+                self.items.append((widget, position))
+
+        cards = [MagicMock() for _ in range(4)]
+        old_button = MagicMock()
+        width = [600]
+        tab = SimpleNamespace(
+            _cards=cards,
+            _empty_widget=None,
+            _cards_layout=FakeGrid(cards + [old_button]),
+            _all_filtered=[{}] * 6,
+            _shown_count=4,
+            _scroll=SimpleNamespace(viewport=lambda: SimpleNamespace(width=lambda: width[0])),
+            _load_more=MagicMock(),
+        )
+        with patch.object(browse_panel, "CatalogueCard") as card_class, \
+                patch.object(browse_panel, "QPushButton") as button_class:
+            browse_panel._CatalogueTabContent._reflow_cards(tab)
+            self.assertEqual([pos for _, pos in tab._cards_layout.items[:4]],
+                             [(0, 0), (0, 1), (1, 0), (1, 1)])
+            old_button.deleteLater.assert_called_once()
+            button_class.assert_called_with("⬇  Load more  (2 remaining)")
+            width[0] = 300
+            browse_panel._CatalogueTabContent._reflow_cards(tab)
+            self.assertEqual([pos for _, pos in tab._cards_layout.items[:4]],
+                             [(0, 0), (1, 0), (2, 0), (3, 0)])
+            card_class.assert_not_called()
+        self.assertEqual(tab._shown_count, 4)
+        for card in cards:
+            card.deleteLater.assert_not_called()
+
+    def test_catalogue_empty_states_offer_recovery_actions(self):
+        browse_panel = self._import_browse_panel()
+        for has_entries in (True, False):
+            with self.subTest(has_entries=has_entries):
+                tab = SimpleNamespace(
+                    _cards_layout=MagicMock(),
+                    _all_entries=[{}] if has_entries else [],
+                    _current_query="missing",
+                    _current_source="",
+                    _current_author="",
+                    _show_favs_only=False,
+                    _show_nsfw=False,
+                    _show_paid=False,
+                    _show_account_required=False,
+                    _show_incomplete=True,
+                    _in_app_only=False,
+                    _reflow_cards=MagicMock(),
+                    result_count_changed=MagicMock(),
+                    clear_filters_requested=MagicMock(),
+                    reload_requested=MagicMock(),
+                )
+                tab._cards_layout.count.return_value = 0
+                buttons = []
+
+                def make_button(text):
+                    button = MagicMock()
+                    buttons.append((text, button))
+                    return button
+
+                with patch.multiple(
+                    browse_panel,
+                    QWidget=MagicMock(), QVBoxLayout=MagicMock(),
+                    QHBoxLayout=MagicMock(), QLabel=MagicMock(),
+                    QPushButton=MagicMock(side_effect=make_button),
+                    Qt=SimpleNamespace(AlignmentFlag=SimpleNamespace(AlignCenter=0)),
+                ):
+                    browse_panel._CatalogueTabContent._populate(tab, [])
+                self.assertEqual(
+                    [text for text, _ in buttons],
+                    (["✖ Clear Filters"] if has_entries else []) + ["🔄 Reload catalogue"],
+                )
+                for _, button in buttons:
+                    button.clicked.connect.call_args.args[0]()
+                self.assertEqual(tab.clear_filters_requested.emit.call_count, int(has_entries))
+                tab.reload_requested.emit.assert_called_once()
+                tab.result_count_changed.emit.assert_called_once_with(0, int(has_entries))
+                message = browse_panel._catalogue_empty_state_message(
+                    "", "", "", False, False, False, False, True, False,
+                    has_entries=has_entries,
+                )
+                self.assertIn("match the current filters" if has_entries else "available in this tab", message)
+
+    def test_source_badge_text_uses_site_icons(self):
+        browse_panel = self._import_browse_panel()
+        self.assertEqual(browse_panel._source_badge_text("GBAtemp"), "🧵 GBAtemp")
+        self.assertEqual(browse_panel._source_badge_text("GitHub"), "🐙 GitHub")
+        self.assertEqual(browse_panel._source_badge_text("PCSX2 CheatDB"), "🧪 PCSX2 CheatDB")
+        self.assertEqual(browse_panel._source_badge_text(" Patreon "), "🌐 Patreon")
+
+    def test_entry_copy_url_prefers_direct_download_url(self):
+        browse_panel = self._import_browse_panel()
+        self.assertEqual(
+            browse_panel._entry_copy_url({
+                "direct_download_url": "https://example.com/direct.zip",
+                "url": "https://example.com/source",
+                "author_url": "https://example.com/author",
+            }),
+            "https://example.com/direct.zip",
+        )
+        self.assertEqual(
+            browse_panel._entry_copy_url({
+                "url": "https://example.com/source",
+                "author_url": "https://example.com/author",
+            }),
+            "https://example.com/source",
+        )
+
+    def test_entry_has_named_author_helper_skips_placeholders(self):
+        browse_panel = self._import_browse_panel()
+        self.assertTrue(browse_panel._entry_has_named_author({"author": "TexMaster"}))
+        self.assertFalse(browse_panel._entry_has_named_author({"author": "Unknown"}))
+        self.assertFalse(browse_panel._entry_has_named_author({"author": " Anonymous "}))
+
+    def test_copy_url_uses_clipboard_and_status_message(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeClipboard:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        messages = []
+        panel.emit_status = messages.append
+
+        clipboard = FakeClipboard()
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+        class FakeQApplication:
+            @staticmethod
+            def clipboard():
+                return clipboard
+
+        qtwidgets.QApplication = FakeQApplication
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            result = BrowsePanel._copy_url(panel, "https://example.com/direct.zip")
+
+        self.assertTrue(result)
+        self.assertEqual(clipboard.value, "https://example.com/direct.zip")
+        self.assertEqual(messages[-1], "Copied the selected link to the clipboard.")
+
+    def test_reload_catalogue_refreshes_tabs_and_filters(self):
+        browse_panel = self._import_browse_panel()
+        BrowsePanel = browse_panel.BrowsePanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+            def clear(self):
+                self.items = []
+                self.index = 0
+
+            def addItem(self, label, data):
+                self.items.append((label, data))
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+        class FakeTab:
+            def __init__(self):
+                self.entries = None
+
+            def set_entries(self, entries):
+                self.entries = list(entries)
+
+        panel = BrowsePanel.__new__(BrowsePanel)
+        panel.config = AppConfig(favorite_authors=["TexMaster"])
+        panel._source_filter = FakeComboBox([
+            ("All Sources", ""),
+            ("GBAtemp", "GBAtemp"),
+            ("GitHub", "GitHub"),
+        ], index=1)
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+            ("Curse_Arms", "Curse_Arms"),
+        ], index=1)
+        panel._tab_contents = [FakeTab(), FakeTab()]
+        panel._tab_mod_types = [None, browse_panel.ModType.TEXTURE_PACK]
+        applied = []
+        panel._apply_filters = lambda: applied.append(True)
+
+        original_catalogue = list(browse_panel.CATALOGUE)
+        original_sources = list(browse_panel.ALL_SOURCES)
+        new_entries = [
+            {
+                "id": "new_texture",
+                "type": browse_panel.ModType.TEXTURE_PACK,
+                "source": "GBAtemp",
+                "author": "TexMaster",
+            },
+            {
+                "id": "new_save",
+                "type": browse_panel.ModType.SAVE_FILE,
+                "source": "GitHub",
+                "author": "Curse_Arms",
+            },
+        ]
+
+        try:
+            browse_panel.CATALOGUE[:] = original_catalogue[:1]
+            browse_panel.ALL_SOURCES[:] = ["Old"]
+            panel._refresh_catalogue_data(new_entries)
+            updated_catalogue = list(browse_panel.CATALOGUE)
+            updated_sources = list(browse_panel.ALL_SOURCES)
+        finally:
+            browse_panel.CATALOGUE[:] = original_catalogue
+            browse_panel.ALL_SOURCES[:] = original_sources
+
+        self.assertEqual(updated_catalogue, new_entries)
+        self.assertEqual(updated_sources, ["GBAtemp", "GitHub"])
+        self.assertEqual(panel._source_filter.currentData(), "GBAtemp")
+        self.assertEqual(panel._author_filter.currentData(), "TexMaster")
+        self.assertEqual(panel._tab_contents[0].entries, new_entries)
+        self.assertEqual(panel._tab_contents[1].entries, [new_entries[0]])
+        self.assertEqual(applied, [True])
+
+
+class TestDownloadsPanelHistoryHandling(unittest.TestCase):
+    """Tests for DownloadsPanel history error handling."""
+
+    def _make_panel(self, module):
+        panel = module.DownloadsPanel.__new__(module.DownloadsPanel)
+        panel.config = AppConfig()
+        panel._all_history_entries = []
+        panel._history_entries = []
+        panel._history_stamp = None
+        panel._search_edit = MagicMock()
+        panel._search_edit.text.return_value = ""
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentText.return_value = "Newest first"
+        panel._filter_timer = MagicMock()
+        panel._filter_timer.isActive.return_value = False
+        panel._empty_filters_btn = MagicMock()
+        return panel
+
+    def _import_downloads_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            AlignmentFlag=types.SimpleNamespace(AlignTop=0),
+            TextFormat=types.SimpleNamespace(RichText=0),
+        )
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QApplication", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QListWidget",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            return importlib.import_module("src.ui.downloads_panel")
+
+    def _make_active_panel(self, module):
+        panel = module.DownloadsPanel.__new__(module.DownloadsPanel)
+        panel._active_rows = {}
+        panel._active_layout = MagicMock()
+        panel._active_placeholder = MagicMock()
+        panel._active_summary = MagicMock()
+        return panel
+
+    def _make_review_panel(self, module):
+        from src.core.download_history import HistoryEntry
+        panel = self._make_panel(module)
+        panel._db = MagicMock()
+        panel._history_download_open = False
+        panel._review_download_btn = MagicMock()
+        panel._selected_source_url = "https://example.com/source"
+        panel._list_widget = MagicMock()
+        panel._list_widget.currentRow.return_value = 0
+        panel._history_entries = [HistoryEntry(
+            id="original", timestamp="2026-10-17T10:00:00",
+            mod_name="<b>Texture & Pack</b>", mod_type="texture_pack",
+            serial="SLUS-12345", source_url=" https://example.com/source ",
+            status="failed", note="installing: old error, not a description",
+        )]
+        panel._notify_status = MagicMock()
+        return panel
+
+    def test_history_download_details_support_all_types_and_legacy_saves(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        for raw_type, expected in [
+            ("texture_pack", ModType.TEXTURE_PACK), ("pnach", ModType.PNACH),
+            ("cover_art", ModType.COVER_ART), ("save_file", ModType.SAVE_FILE),
+            ("save", ModType.SAVE_FILE), ("cheat", ModType.CHEAT),
+        ]:
+            for status in ("success", "failed", "skipped"):
+                with self.subTest(mod_type=raw_type, status=status):
+                    entry = HistoryEntry(
+                        id="old", timestamp="", mod_name="Name", mod_type=raw_type,
+                        serial="SLUS-12345", source_url=" https://example.com/source ",
+                        status=status, note="Not metadata",
+                    )
+                    before = entry.to_dict()
+                    self.assertEqual(module._history_download_details(entry), {
+                        "type": expected, "url": "https://example.com/source",
+                        "source_url": "https://example.com/source",
+                        "name": "Name", "game": "SLUS-12345",
+                    })
+                    self.assertEqual(entry.to_dict(), before)
+
+    def test_history_download_details_reject_invalid_sources_and_unknown_types(self):
+        module = self._import_downloads_panel()
+        entry = self._make_review_panel(module)._history_entries[0]
+        for source in ("", " ", "relative.zip", "https://", "file:///tmp/mod.zip",
+                       "javascript:alert(1)", "https://[broken", None, 123):
+            with self.subTest(source=source):
+                entry.source_url = source
+                self.assertIsNone(module._history_download_details(entry))
+        entry.source_url = "https://example.com/file.zip"
+        for raw_type in ("other", "", None, [], 123):
+            with self.subTest(mod_type=raw_type):
+                entry.mod_type = raw_type
+                self.assertIsNone(module._history_download_details(entry))
+        self.assertIsNone(module._history_download_details(None))
+
+    def test_history_review_action_tracks_selection_database_and_open_dialog(self):
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        entry = panel._history_entries[0]
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(True)
+        panel._update_history_source_actions()
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+        panel._history_download_open = True
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+        panel._history_download_open = False
+        panel._db = None
+        panel._update_history_source_actions(entry)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+
+    def test_history_review_prefills_only_available_metadata_without_starting(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        before = panel._history_entries[0].to_dict()
+        dialog = MagicMock()
+        dialog._type_combo.findData.return_value = 2
+        dialog.exec.side_effect = lambda: panel._review_history_download()
+        factory = MagicMock(return_value=dialog)
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+        }):
+            panel._review_history_download()
+        factory.assert_called_once_with(panel.config, panel._db, panel)
+        dialog._url_edit.setText.assert_called_once_with("https://example.com/source")
+        dialog._source_url_edit.setText.assert_called_once_with("https://example.com/source")
+        dialog._name_edit.setText.assert_called_once_with("<b>Texture & Pack</b>")
+        dialog._game_edit.setText.assert_called_once_with("SLUS-12345")
+        dialog._author_edit.clear.assert_called_once()
+        dialog._desc_edit.clear.assert_called_once()
+        dialog._type_combo.findData.assert_called_once_with(ModType.TEXTURE_PACK)
+        dialog._type_combo.setCurrentIndex.assert_called_once_with(2)
+        message = dialog._status.setText.call_args.args[0]
+        self.assertIn("web page", message)
+        self.assertIn("not a resume", message)
+        self.assertIn("duplicate", message)
+        dialog.exec.assert_called_once()
+        dialog._download.assert_not_called()
+        dialog._run_download.assert_not_called()
+        dialog.deleteLater.assert_called_once()
+        self.assertEqual(panel._history_entries[0].to_dict(), before)
+        self.assertFalse(panel._history_download_open)
+        panel._review_download_btn.setEnabled.assert_called_with(True)
+
+    def test_history_review_rechecks_current_selection_and_invalid_entries(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        factory = MagicMock()
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+        }):
+            for row in (-1, 1, 100):
+                panel._list_widget.currentRow.return_value = row
+                panel._review_history_download()
+            panel._list_widget.currentRow.return_value = 0
+            entry = panel._history_entries[0]
+            entry.source_url = "file:///tmp/mod.zip"
+            panel._review_history_download()
+            entry.source_url = "https://example.com/source"
+            entry.mod_type = "other"
+            panel._review_history_download()
+            entry.mod_type = "texture_pack"
+            panel._db = None
+            panel._review_history_download()
+        factory.assert_not_called()
+        self.assertEqual(panel._notify_status.call_count, 6)
+
+    def test_history_review_uses_snapshot_and_rechecks_selection_after_close(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        dialog = MagicMock()
+
+        def make_dialog(*args):
+            panel._history_entries[0].mod_name = "Changed after opening"
+            return dialog
+
+        def close_dialog():
+            panel._history_entries = []
+            panel._list_widget.currentRow.return_value = -1
+            panel._selected_source_url = ""
+
+        dialog.exec.side_effect = close_dialog
+        with patch.dict(sys.modules, {
+            "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=make_dialog),
+        }):
+            panel._review_history_download()
+        dialog._name_edit.setText.assert_called_once_with("<b>Texture & Pack</b>")
+        self.assertFalse(panel._history_download_open)
+        panel._review_download_btn.setEnabled.assert_called_with(False)
+
+    def test_history_review_failures_allow_retry_and_dispose_created_dialog(self):
+        import types
+        module = self._import_downloads_panel()
+        panel = self._make_review_panel(module)
+        dialog = MagicMock()
+        dialog.exec.side_effect = RuntimeError("dialog failed")
+        for factory in (MagicMock(side_effect=RuntimeError("constructor failed")),
+                        MagicMock(return_value=dialog)):
+            with self.subTest(factory=factory), patch.dict(sys.modules, {
+                "src.ui.browse_panel": types.SimpleNamespace(DownloadInstallDialog=factory),
+            }), self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                panel._review_history_download()
+            self.assertFalse(panel._history_download_open)
+            panel._review_download_btn.setEnabled.assert_called_with(True)
+        dialog.deleteLater.assert_called_once()
+        self.assertEqual(panel._notify_status.call_count, 2)
+
+    def _make_active_row(self, module):
+        row = module._ActiveDownloadRow.__new__(module._ActiveDownloadRow)
+        for name in (
+            "_name_lbl", "_status_lbl", "_bar", "_open_source_btn", "_copy_source_btn",
+            "setAccessibleName", "status_message",
+        ):
+            setattr(row, name, MagicMock())
+        row._source_url = ""
+        return row
+
+    def test_active_registry_returns_detached_id_based_snapshots(self):
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}):
+            registry.register("one", "Same name", source_url="https://example.com/source")
+            registry.register("two", "Same name")
+            registry.update("one", 1024, 4096)
+            before = registry.all()
+            self.assertEqual([entry["id"] for entry in before], ["one", "two"])
+            self.assertEqual(before[0]["source_url"], "https://example.com/source")
+            self.assertEqual(before[0]["phase"], "downloading")
+            registry.set_installing("one")
+            registry.update("one", 4096, 4096)
+            self.assertEqual(before[0]["received"], 1024)
+            self.assertEqual(before[0]["phase"], "downloading")
+            before[0]["name"] = "Modified snapshot"
+            before.clear()
+            current = registry.all()
+            self.assertEqual(current[0]["name"], "Same name")
+            self.assertEqual(current[0]["phase"], "installing")
+            self.assertEqual(registry.count(), 2)
+            registry.finish("one")
+            registry.update("one", 9999, 9999)
+            registry.set_installing("one")
+            self.assertEqual([entry["id"] for entry in registry.all()], ["two"])
+            registry.finish("two")
+            registry.finish("missing")
+            self.assertEqual(registry.all(), [])
+            self.assertEqual(registry.count(), 0)
+
+    def test_active_registry_snapshot_is_consistent_during_worker_updates(self):
+        import threading
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}):
+            registry.register("one", "Download")
+            def update():
+                for count in range(1, 1001):
+                    registry.update("one", count, count * 2)
+            thread = threading.Thread(target=update)
+            thread.start()
+            snapshots = [registry.all()[0] for _ in range(1000)]
+            thread.join(timeout=2)
+            self.assertFalse(thread.is_alive())
+            for snapshot in snapshots:
+                self.assertEqual(snapshot["total"], snapshot["received"] * 2)
+            registry.update("one", 2000, 4000)
+            self.assertTrue(all(snapshot["received"] <= 1000 for snapshot in snapshots))
+
+    def test_resolving_downloads_are_visible_and_not_counted_as_transfers(self):
+        module = self._import_downloads_panel()
+        registry = module.ActiveDownloads
+        panel = self._make_active_panel(module)
+        row = self._make_active_row(module)
+        with patch.object(registry, "_entries", {}), patch.object(module, "_ActiveDownloadRow", return_value=row):
+            registry.register("id", "Pack", phase="resolving")
+            panel._refresh_active()
+            self.assertIn("0 downloading • 0 installing • 1 resolving",
+                          panel._active_summary.setText.call_args.args[0])
+            self.assertIn("Resolving", row._status_lbl.setText.call_args.args[0])
+            row._bar.setRange.assert_called_with(0, 0)
+            row._bar.setValue.assert_not_called()
+            registry.set_phase("id", "downloading")
+            panel._refresh_active()
+            self.assertIn("1 downloading", panel._active_summary.setText.call_args.args[0])
+            self.assertNotIn("resolving", panel._active_summary.setText.call_args.args[0])
+            registry.finish("id")
+            registry.set_phase("id", "resolving")
+            self.assertEqual(registry.all(), [])
+
+    def test_active_poll_reuses_rows_and_only_removes_finished_ids(self):
+        module = self._import_downloads_panel()
+        panel = self._make_active_panel(module)
+        registry = module.ActiveDownloads
+        with patch.object(registry, "_entries", {}), patch.object(module, "_ActiveDownloadRow") as constructor:
+            first, second, third = MagicMock(), MagicMock(), MagicMock()
+            constructor.side_effect = [first, second, third]
+            registry.register("one", "Same name")
+            registry.register("two", "Same name")
+            panel._refresh_active()
+            self.assertEqual(panel._active_rows, {"one": first, "two": second})
+            self.assertEqual(constructor.call_count, 2)
+            registry.update("one", 300, 400)
+            registry.set_installing("two")
+            panel._refresh_active()
+            self.assertEqual(constructor.call_count, 2)
+            self.assertEqual(first.update_entry.call_args.args[0]["received"], 300)
+            self.assertEqual(second.update_entry.call_args.args[0]["phase"], "installing")
+            self.assertIn("2 • 1 downloading • 1 installing", panel._active_summary.setText.call_args.args[0])
+            registry.finish("one")
+            registry.register("three", "New")
+            panel._refresh_active()
+            self.assertEqual(panel._active_rows, {"two": second, "three": third})
+            panel._active_layout.removeWidget.assert_called_once_with(first)
+            first.hide.assert_called_once()
+            first.deleteLater.assert_called_once()
+            second.deleteLater.assert_not_called()
+            self.assertEqual(panel._active_layout.addWidget.call_count, 3)
+            first.status_message.connect.assert_called_once_with(panel._notify_status)
+            panel._active_placeholder.setVisible.assert_called_with(False)
+            # The prior row's detached snapshot does not change after a worker update.
+            self.assertEqual(first.update_entry.call_args_list[0].args[0]["received"], 0)
+
+    def test_idle_active_polls_reuse_placeholder_without_allocating_rows(self):
+        module = self._import_downloads_panel()
+        panel = self._make_active_panel(module)
+        with patch.object(module.ActiveDownloads, "_entries", {}), patch.object(module, "_ActiveDownloadRow") as row:
+            for _ in range(3):
+                panel._refresh_active()
+        row.assert_not_called()
+        panel._active_placeholder.setVisible.assert_called_with(True)
+        panel._active_layout.addWidget.assert_not_called()
+        self.assertEqual(panel._active_summary.setText.call_args.args[0], "⬇  Active Downloads: none")
+
+    def test_active_progress_supports_bytes_larger_than_qt_integer_range(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({
+            "name": "<b>Large texture pack</b>", "received": 3 * 1024 ** 3,
+            "total": 6 * 1024 ** 3, "phase": "downloading",
+        })
+        row._bar.setRange.assert_called_with(0, 1000)
+        row._bar.setValue.assert_called_with(500)
+        row._name_lbl.setText.assert_called_with("<b>Large texture pack</b>")
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Downloading • 50% • 3.0 GiB / 6.0 GiB")
+        row._bar.setAccessibleName.assert_called_with(row._status_lbl.setText.call_args.args[0])
+
+    def test_active_progress_clamps_overrun_and_negative_received_counts(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        for received, expected in ((200, 1000), (-5, 0), (0, 0), (50, 500)):
+            with self.subTest(received=received):
+                row.update_entry({"name": "File", "received": received, "total": 100})
+                row._bar.setValue.assert_called_with(expected)
+                self.assertIn(f"{expected // 10}%", row._status_lbl.setText.call_args.args[0])
+
+    def test_active_unknown_total_and_connecting_states_stay_indeterminate(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({"name": "File", "received": 0, "total": 0})
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertIn("Connecting", row._status_lbl.setText.call_args.args[0])
+        row.update_entry({"name": "File", "received": 1048576, "total": -1})
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Downloading • 1.0 MiB received • total unknown")
+        row._bar.setValue.assert_not_called()
+
+    def test_active_installing_phase_does_not_claim_installation_is_complete(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row.update_entry({
+            "name": "File", "received": 1024, "total": 1024, "phase": "installing",
+        })
+        row._bar.setRange.assert_called_with(0, 0)
+        self.assertEqual(row._status_lbl.setText.call_args.args[0],
+                         "Installing • transfer finished • 1.0 KiB received")
+        row._bar.setValue.assert_not_called()
+
+    def test_active_source_actions_accept_only_complete_http_urls(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        for url in ("", None, "javascript:alert(1)", "file:///etc/passwd", "https:///missing",
+                    "https://[invalid", "ftp://example.com/file"):
+            with self.subTest(url=url):
+                row.update_entry({"name": "File", "received": 0, "total": 0, "source_url": url})
+                self.assertEqual(row._source_url, "")
+                row._open_source_btn.setEnabled.assert_called_with(False)
+                row._copy_source_btn.setEnabled.assert_called_with(False)
+                with patch.object(module, "open_external_url") as open_url:
+                    row._open_source()
+                open_url.assert_not_called()
+        row.update_entry({"name": "File", "received": 0, "total": 0,
+                          "source_url": "  https://example.com/original  "})
+        self.assertEqual(row._source_url, "https://example.com/original")
+        row._open_source_btn.setEnabled.assert_called_with(True)
+        row._copy_source_btn.setEnabled.assert_called_with(True)
+
+    def test_active_source_opens_original_url_and_reports_success(self):
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row._source_url = "https://example.com/source"
+        with patch.object(module, "open_external_url", return_value=True) as open_url:
+            row._open_source()
+        open_url.assert_called_once_with(row._source_url, parent=row, context="active download source")
+        row.status_message.emit.assert_called_once_with("Opened the active download source in your browser.")
+        row.status_message.emit.reset_mock()
+        with patch.object(module, "open_external_url", return_value=False):
+            row._open_source()
+        row.status_message.emit.assert_not_called()
+
+    def test_active_source_copy_reports_clipboard_errors(self):
+        import sys
+        import types
+        module = self._import_downloads_panel()
+        row = self._make_active_row(module)
+        row._source_url = "https://example.com/source"
+        widgets = types.ModuleType("PyQt6.QtWidgets")
+        widgets.QApplication = MagicMock()
+        clipboard = widgets.QApplication.clipboard.return_value
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": widgets}):
+            row._copy_source()
+            clipboard.setText.assert_called_once_with(row._source_url)
+            self.assertIn("Copied", row.status_message.emit.call_args.args[0])
+            clipboard.setText.side_effect = RuntimeError("locked")
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                row._copy_source()
+            self.assertIn("Could not copy", row.status_message.emit.call_args.args[0])
+            widgets.QApplication.clipboard.return_value = None
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING"):
+                row._copy_source()
+            self.assertIn("Could not copy", row.status_message.emit.call_args.args[0])
+
+    def test_download_size_uses_binary_units_and_safe_zero(self):
+        module = self._import_downloads_panel()
+        for value, expected in ((0, "0 B"), (-1, "0 B"), (1023, "1023 B"),
+                                (1024, "1.0 KiB"), (1536, "1.5 KiB"),
+                                (1024 ** 4, "1.0 TiB")):
+            with self.subTest(value=value):
+                self.assertEqual(module._download_size(value), expected)
+
+    def test_history_load_failure_keeps_error_message(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def text(self):
+                return ""
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.items = []
+
+            def clear(self):
+                self.cleared = True
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = True
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._history_summary_lbl = FakeLabel()
+        panel._delete_btn = FakeButton()
+
+        with patch("src.core.download_history.list_history", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._refresh_history()
+
+        self.assertTrue(panel._list_widget.cleared)
+        self.assertTrue(panel._list_widget.items)
+        self.assertIn("Could not read history: boom", panel._list_widget.items[0])
+        self.assertEqual(panel._history_entries, [])
+        self.assertIn("Could not read history: boom", panel._detail_label.value)
+        self.assertEqual(panel._history_summary_lbl.value, "Could not read download history.")
+        self.assertFalse(panel._delete_btn.enabled)
+        self.assertTrue(any("Failed to load download history" in msg for msg in logs.output))
+
+    def test_history_empty_state_shows_placeholder(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.items = []
+
+            def clear(self):
+                self.cleared = True
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = True
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._history_summary_lbl = FakeLabel()
+        panel._delete_btn = FakeButton()
+
+        with patch("src.core.download_history.list_history", return_value=[]):
+            panel._refresh_history()
+
+        self.assertTrue(panel._list_widget.items)
+        self.assertIn("No download history entries recorded yet.", panel._list_widget.items[0])
+        self.assertIn("No download history entries recorded yet.", panel._detail_label.value)
+        self.assertEqual(
+            panel._history_summary_lbl.value,
+            "No download history entries recorded yet. Finished downloads will appear here.",
+        )
+
+    def test_history_summary_message_reflects_filter_state(self):
+        downloads_panel = self._import_downloads_panel()
+
+        self.assertEqual(
+            downloads_panel._history_summary_message(0, False),
+            "No download history entries recorded yet. Finished downloads will appear here.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(0, True),
+            "No history entries match the current filters. Clear filters to see more.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(1, False),
+            "Showing 1 download history entry.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(2, True),
+            "Showing 2 matching download history entries.",
+        )
+        self.assertEqual(
+            downloads_panel._history_summary_message(2, True, 10),
+            "Showing 2 of 10 download history entries.",
+        )
+
+    def test_history_search_composes_filters_and_matches_metadata(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("1", "", "Silent Hill HD", "texture_pack", serial="SLUS-20228",
+                         source_url="https://example.com/packs", note="CRC mismatch", status="failed"),
+            HistoryEntry("2", "", "Silent Hill HD", "texture_pack", serial="SLES-50382",
+                         source_url="https://example.com/packs", status="success"),
+            HistoryEntry("3", "", "Silent Hill Save", "save_file", serial="SLUS-20228",
+                         status="failed"),
+        ]
+        result = module._filter_history(
+            entries, "failed", "texture_pack", "slus202", "HILL example mismatch", "Newest first",
+        )
+        self.assertEqual([entry.id for entry in result], ["1"])
+        for query in ("silent", "slus-20228", "EXAMPLE.COM", "mismatch", "failed"):
+            with self.subTest(query=query):
+                self.assertIn(entries[0], module._filter_history(
+                    entries, None, None, "", query, "Newest first",
+                ))
+        self.assertEqual(
+            module._filter_history(entries, None, None, "", "hill missing", "Newest first"), [],
+        )
+
+    def test_history_save_filter_includes_both_recorded_type_spellings(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("1", "", "Legacy save", "save"),
+            HistoryEntry("2", "", "New save", "save_file"),
+            HistoryEntry("3", "", "Pack", "texture_pack"),
+        ]
+        self.assertEqual(
+            module._filter_history(entries, None, "save", "", "", "Newest first"), entries[:2],
+        )
+
+    def test_history_sorting_is_stable_and_does_not_mutate_cached_entries(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        entries = [
+            HistoryEntry("new", "2026-10-17", "Zulu", "pnach", size_bytes=10),
+            HistoryEntry("mid", "2026-10-16", "alpha", "pnach", size_bytes=30),
+            HistoryEntry("old", "2026-10-15", "Alpha", "pnach", size_bytes=30),
+        ]
+        for sort, ids in (
+            ("Newest first", ["new", "mid", "old"]),
+            ("Oldest first", ["old", "mid", "new"]),
+            ("Name (A–Z)", ["mid", "old", "new"]),
+            ("Largest first", ["mid", "old", "new"]),
+        ):
+            with self.subTest(sort=sort):
+                result = module._filter_history(entries, None, None, "", "", sort)
+                self.assertEqual([entry.id for entry in result], ids)
+        self.assertEqual([entry.id for entry in entries], ["new", "mid", "old"])
+
+    def test_history_filters_use_cached_entries_and_clear_stale_details(self):
+        from src.core.download_history import HistoryEntry
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._all_history_entries = [
+            HistoryEntry("1", "2026-10-17T12:30:00", "Pack", "texture_pack", serial="SLUS-20228"),
+        ]
+        panel._status_combo = MagicMock()
+        panel._status_combo.currentText.return_value = "All"
+        panel._type_combo = MagicMock()
+        panel._type_combo.currentText.return_value = "All"
+        panel._serial_edit = MagicMock()
+        panel._serial_edit.text.return_value = ""
+        panel._list_widget = MagicMock()
+        panel._detail_label = MagicMock()
+        panel._delete_btn = MagicMock()
+        panel._history_summary_lbl = MagicMock()
+        panel._restore_history_selection = MagicMock()
+        with patch("src.core.download_history.list_history") as load:
+            panel._apply_history_filters()
+            self.assertEqual(len(panel._history_entries), 1)
+            label = panel._list_widget.addItem.call_args.args[0]
+            self.assertIn("\n2026-10-17 12:30", label)
+            self.assertIn("SLUS-20228", label)
+            panel._search_edit.text.return_value = "not found"
+            panel._apply_history_filters()
+        load.assert_not_called()
+        self.assertEqual(panel._history_entries, [])
+        panel._empty_filters_btn.setVisible.assert_called_with(True)
+        panel._delete_btn.setEnabled.assert_called_with(False)
+        self.assertIn("No history entries match", panel._detail_label.setText.call_args.args[0])
+
+    def test_history_text_changes_debounce_saving_and_local_filtering(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._save_history_filters = MagicMock()
+        panel._apply_history_filters = MagicMock()
+        panel._on_history_text_changed("s")
+        panel._on_history_text_changed("sh")
+        self.assertEqual(panel._filter_timer.start.call_count, 2)
+        panel._save_history_filters.assert_not_called()
+        panel._apply_history_filters.assert_not_called()
+        panel._on_history_filter_changed()
+        panel._filter_timer.stop.assert_called_once()
+        panel._save_history_filters.assert_called_once()
+        panel._apply_history_filters.assert_called_once()
+
+    def test_history_query_and_sort_restore_and_save(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"query": "Silent Hill", "sort": "Largest first"}}
+        panel._restore_history_view()
+        panel._search_edit.setText.assert_called_once_with("Silent Hill")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(3)
+        panel._search_edit.blockSignals.assert_called_with(False)
+        panel._sort_combo.blockSignals.assert_called_with(False)
+        panel._history_filter_state = lambda: ("All", "All", "")
+        panel._search_edit.text.return_value = "  new query  "
+        panel._sort_combo.currentText.return_value = "Oldest first"
+        with patch.object(module, "save_config") as save:
+            panel._save_history_filters()
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["query"], "new query")
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["sort"], "Oldest first")
+        save.assert_called_once_with(panel.config)
+
+    def test_history_view_ignores_malformed_saved_preferences(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"query": ["bad"], "sort": {"bad": True}}}
+        panel._restore_history_view()
+        panel._search_edit.setText.assert_called_once_with("")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(0)
+
+    def test_history_selection_is_retained_when_temporarily_filtered_out(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"downloads_panel": {"history_selected_entry_id": "hidden"}}
+        panel._all_history_entries = [SimpleNamespace(id="hidden")]
+        panel._clear_history_selection_state = MagicMock()
+        panel._restore_history_selection()
+        panel._clear_history_selection_state.assert_not_called()
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"], "hidden",
+        )
+
+    def test_history_poll_reloads_only_when_disk_log_changes(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._history_stamp = (123, 400)
+        panel._history_file_stamp = MagicMock(return_value=(123, 400))
+        panel._refresh_history = MagicMock()
+        panel._refresh_active = MagicMock()
+        panel._poll_downloads()
+        panel._refresh_history.assert_not_called()
+        panel._history_file_stamp.return_value = (124, 500)
+        panel._poll_downloads()
+        panel._refresh_history.assert_called_once()
+        self.assertEqual(panel._refresh_active.call_count, 2)
+
+    def test_history_file_stamp_handles_creation_changes_and_removal(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "history.json"
+            with patch("src.core.download_history.get_history_file", return_value=path):
+                self.assertIsNone(panel._history_file_stamp())
+                path.write_text("[]")
+                first = panel._history_file_stamp()
+                self.assertEqual(first[1], 2)
+                path.write_text("[{}]")
+                self.assertNotEqual(panel._history_file_stamp(), first)
+                path.unlink()
+                self.assertIsNone(panel._history_file_stamp())
+
+    def test_history_refresh_flushes_pending_search_before_reloading(self):
+        module = self._import_downloads_panel()
+        panel = self._make_panel(module)
+        panel._filter_timer.isActive.return_value = True
+        panel._save_history_filters = MagicMock()
+        panel._apply_history_filters = MagicMock()
+        with patch("src.core.download_history.list_history", return_value=[]) as load:
+            panel._refresh_history()
+        panel._filter_timer.stop.assert_called_once()
+        panel._save_history_filters.assert_called_once()
+        load.assert_called_once_with(panel.config)
+        panel._apply_history_filters.assert_called_once()
+
+    def test_history_filters_restore_and_save(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            download_history_status_filter="❌ Failed",
+            download_history_type_filter="🖼 Cover Art",
+            download_history_serial_filter="SLUS-20228",
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=0)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ])
+        panel._serial_edit = FakeLineEdit()
+        panel._history_entries = []
+        panel._list_widget = types.SimpleNamespace(clear=lambda: None, addItem=lambda value: None)
+        panel._detail_label = types.SimpleNamespace(setText=lambda value: None)
+        panel._delete_btn = types.SimpleNamespace(setEnabled=lambda value: None)
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._restore_history_filters()
+            self.assertEqual(panel._status_combo.currentText(), "❌ Failed")
+            self.assertEqual(panel._type_combo.currentText(), "🖼 Cover Art")
+            self.assertEqual(panel._serial_edit.value, "SLUS-20228")
+
+            panel._status_combo.index = 1
+            panel._type_combo.index = 4
+            panel._serial_edit.value = "SCUS-97399"
+            panel._save_history_filters()
+
+        self.assertEqual(panel.config.download_history_status_filter, "✅ Success")
+        self.assertEqual(panel.config.download_history_type_filter, "💾 Game Save")
+        self.assertEqual(panel.config.download_history_serial_filter, "SCUS-97399")
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_save_panel_config_failure_logs_and_notifies_status(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel, "save_config", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._save_panel_config("saving test state")
+
+        self.assertTrue(any("Could not save downloads panel config" in msg for msg in logs.output))
+        panel._notify_status.assert_called_once_with("Could not save downloads panel settings right now.")
+
+    def test_history_filters_restore_invalid_values_are_logged(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value=""):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            download_history_status_filter="Archived",
+            download_history_type_filter=object(),
+            download_history_serial_filter=12345,
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=2)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ], index=4)
+        panel._serial_edit = FakeLineEdit("SLUS-20228")
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._restore_history_filters()
+
+        self.assertEqual(panel._status_combo.currentText(), "All")
+        self.assertEqual(panel._type_combo.currentText(), "All")
+        self.assertEqual(panel._serial_edit.value, "12345")
+        self.assertEqual(panel.config.download_history_status_filter, "All")
+        self.assertEqual(panel.config.download_history_type_filter, "All")
+        self.assertEqual(panel.config.download_history_serial_filter, "12345")
+        self.assertTrue(
+            any("status filter" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("type filter" in msg for msg in logs.output),
+            logs.output,
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_clear_history_filters_resets_widgets_and_refreshes(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, items, index=0):
+                self.items = list(items)
+                self.index = index
+                self.blocked = False
+
+            def currentText(self):
+                return self.items[self.index]
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def findText(self, value):
+                try:
+                    return self.items.index(value)
+                except ValueError:
+                    return -1
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        class FakeLineEdit:
+            def __init__(self, value="SLUS-20228"):
+                self.value = value
+                self.blocked = False
+
+            def text(self):
+                return self.value
+
+            def setText(self, value):
+                self.value = value
+
+            def blockSignals(self, value):
+                self.blocked = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            download_history_status_filter="❌ Failed",
+            download_history_type_filter="🖼 Cover Art",
+            download_history_serial_filter="SLUS-20228",
+        )
+        panel._status_combo = FakeComboBox(["All", "✅ Success", "❌ Failed", "⏭ Skipped"], index=2)
+        panel._type_combo = FakeComboBox([
+            "All", "🎨 Texture Pack", "🔧 PNACH Patch",
+            "🖼 Cover Art", "💾 Game Save", "🕹 Cheat", "📦 Other",
+        ], index=3)
+        panel._serial_edit = FakeLineEdit()
+        panel._apply_history_filters = MagicMock()
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._clear_history_filters()
+
+        self.assertEqual(panel._status_combo.index, 0)
+        self.assertEqual(panel._type_combo.index, 0)
+        self.assertEqual(panel._serial_edit.value, "")
+        self.assertEqual(panel.config.download_history_status_filter, "All")
+        self.assertEqual(panel.config.download_history_type_filter, "All")
+        self.assertEqual(panel.config.download_history_serial_filter, "")
+        panel._apply_history_filters.assert_called_once()
+        panel._search_edit.setText.assert_called_once_with("")
+        panel._filter_timer.stop.assert_called_once()
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_history_splitter_state_restores_and_saves(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": [280, 520]}})
+        panel._history_splitter = FakeSplitter([120, 680])
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._restore_history_splitter()
+            self.assertEqual(panel._history_splitter._sizes, [280, 520])
+            panel._history_splitter._sizes = [360, 440]
+            panel._save_history_splitter()
+
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["history_splitter_sizes"], [360, 440])
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_history_splitter_state_invalid_values_are_logged(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+                self.set_calls = 0
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+                self.set_calls += 1
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(ui_state={"downloads_panel": {"history_splitter_sizes": "broken"}})
+        panel._history_splitter = FakeSplitter([120, 680])
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                panel._restore_history_splitter()
+                panel._history_splitter._sizes = [360, "oops"]
+                panel._save_history_splitter()
+
+        self.assertEqual(panel._history_splitter.set_calls, 0)
+        self.assertFalse(save_mock.called)
+        self.assertEqual(panel.config.ui_state["downloads_panel"]["history_splitter_sizes"], "broken")
+        self.assertTrue(
+            any("history splitter" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_history_selection_state_restores_and_persists(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeComboBox:
+            def __init__(self, value="All"):
+                self.value = value
+
+            def currentText(self):
+                return self.value
+
+        class FakeLineEdit:
+            def text(self):
+                return ""
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+                self.on_set_current_row = None
+
+            def clear(self):
+                self.items = []
+
+            def addItem(self, value):
+                self.items.append(value)
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                if callable(self.on_set_current_row):
+                    self.on_set_current_row(row)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        entries = [
+            types.SimpleNamespace(
+                id="entry-1",
+                mod_name="First Mod",
+                mod_type="texture_pack",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 09:00",
+                serial="SLUS-10001",
+                source_url="https://example.com/1",
+                size_bytes=10,
+                size_label="10 B",
+                note="",
+            ),
+            types.SimpleNamespace(
+                id="entry-2",
+                mod_name="Second Mod",
+                mod_type="pnach",
+                type_label="PNACH Patch",
+                status="failed",
+                status_label="Failed",
+                timestamp="2026-10-15 10:00",
+                serial="SLUS-10002",
+                source_url="https://example.com/2",
+                size_bytes=20,
+                size_label="20 B",
+                note="",
+            ),
+        ]
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": "entry-2"}}
+        )
+        panel._status_combo = FakeComboBox()
+        panel._type_combo = FakeComboBox()
+        panel._serial_edit = FakeLineEdit()
+        panel._list_widget = FakeListWidget()
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._list_widget.on_set_current_row = panel._on_selection_changed
+
+        with patch("src.core.download_history.list_history", return_value=entries):
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._refresh_history()
+
+        self.assertEqual(panel._list_widget.current_row, 1)
+        self.assertEqual(panel._selected_source_url, "https://example.com/2")
+        self.assertTrue(panel._delete_btn.enabled)
+        self.assertIn("Second Mod", panel._detail_label.value)
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"],
+            "entry-2",
+        )
+        save_mock.assert_not_called()
+
+    def test_history_selection_restore_warns_when_entry_missing(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeListWidget:
+            def __init__(self):
+                self.current_row = -1
+                self.set_calls = 0
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                self.set_calls += 1
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": "missing-entry"}}
+        )
+        panel._history_entries = [
+            types.SimpleNamespace(id="entry-1"),
+            types.SimpleNamespace(id="entry-2"),
+        ]
+        panel._list_widget = FakeListWidget()
+
+        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._restore_history_selection()
+
+        self.assertEqual(panel._list_widget.set_calls, 0)
+        self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertNotIn(
+            "history_selected_entry_id",
+            panel.config.ui_state["downloads_panel"],
+        )
+        save_mock.assert_called_once()
+        self.assertTrue(
+            any("no longer available" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_history_selection_restore_warns_on_invalid_entry_id(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeListWidget:
+            def __init__(self):
+                self.current_row = -1
+                self.set_calls = 0
+
+            def setCurrentRow(self, row):
+                self.current_row = row
+                self.set_calls += 1
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig(
+            ui_state={"downloads_panel": {"history_selected_entry_id": 12345}}
+        )
+        panel._history_entries = [
+            types.SimpleNamespace(id="entry-1"),
+            types.SimpleNamespace(id="entry-2"),
+        ]
+        panel._list_widget = FakeListWidget()
+
+        with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+            with patch.object(downloads_panel, "save_config") as save_mock:
+                panel._restore_history_selection()
+
+        self.assertEqual(panel._list_widget.set_calls, 0)
+        self.assertEqual(panel._list_widget.current_row, -1)
+        self.assertNotIn(
+            "history_selected_entry_id",
+            panel.config.ui_state["downloads_panel"],
+        )
+        save_mock.assert_called_once()
+        self.assertTrue(
+            any("invalid" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_history_selection_change_saves_entry_id(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._history_entries = [
+            types.SimpleNamespace(
+                id="entry-1",
+                mod_name="First Mod",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 09:00",
+                serial="SLUS-10001",
+                source_url="https://example.com/1",
+                size_bytes=10,
+                size_label="10 B",
+                note="",
+            ),
+            types.SimpleNamespace(
+                id="entry-2",
+                mod_name="Second Mod",
+                type_label="PNACH Patch",
+                status="failed",
+                status_label="Failed",
+                timestamp="2026-10-15 10:00",
+                serial="SLUS-10002",
+                source_url="https://example.com/2",
+                size_bytes=20,
+                size_label="20 B",
+                note="",
+            ),
+        ]
+        panel._detail_label = FakeLabel()
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._selected_source_url = ""
+
+        with patch.object(downloads_panel, "save_config") as save_mock:
+            panel._on_selection_changed(1)
+
+        self.assertEqual(panel._selected_source_url, "https://example.com/2")
+        self.assertEqual(
+            panel.config.ui_state["downloads_panel"]["history_selected_entry_id"],
+            "entry-2",
+        )
+        self.assertTrue(panel._delete_btn.enabled)
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_history_details_escape_html(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = self._make_panel(downloads_panel)
+        panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
+        panel._delete_btn = types.SimpleNamespace(enabled=False, setEnabled=lambda value: setattr(panel._delete_btn, "enabled", bool(value)))
+        panel._history_entries = [
+            types.SimpleNamespace(
+                mod_name="<b>Danger & Mod</b>",
+                type_label="Game <Save>",
+                status="success",
+                status_label="<Ready>",
+                timestamp="2026-10-15 <noon>",
+                serial="SCUS-12345",
+                source_url="https://example.com/?q=<x>",
+                size_bytes=12,
+                size_label="12 <KB>",
+                note="5 < 6",
+                id="<id>",
+            )
+        ]
+
+        with patch.object(downloads_panel, "save_config"):
+            panel._on_selection_changed(0)
+
+        self.assertIn("&lt;b&gt;Danger &amp; Mod&lt;/b&gt;", panel._detail_label.value)
+        self.assertIn("&lt;Ready&gt;", panel._detail_label.value)
+        self.assertNotIn("<b>Danger & Mod</b>", panel._detail_label.value)
+
+    def test_history_selection_enables_source_actions(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeButton:
+            def __init__(self):
+                self.enabled = False
+
+            def setEnabled(self, value):
+                self.enabled = bool(value)
+
+        panel = self._make_panel(downloads_panel)
+        panel._detail_label = types.SimpleNamespace(value="", setText=lambda value: setattr(panel._detail_label, "value", value))
+        panel._delete_btn = FakeButton()
+        panel._open_source_btn = FakeButton()
+        panel._copy_source_btn = FakeButton()
+        panel._history_entries = [
+            types.SimpleNamespace(
+                mod_name="Source Mod",
+                type_label="Texture Pack",
+                status="success",
+                status_label="Success",
+                timestamp="2026-10-15 12:00",
+                serial="SLUS-12345",
+                source_url="https://example.com/source",
+                size_bytes=12,
+                size_label="12 B",
+                note="",
+                id="entry-1",
+            )
+        ]
+
+        with patch.object(downloads_panel, "save_config"):
+            panel._on_selection_changed(0)
+
+        self.assertEqual(panel._selected_source_url, "https://example.com/source")
+        self.assertTrue(panel._open_source_btn.enabled)
+        self.assertTrue(panel._copy_source_btn.enabled)
+
+    def test_history_source_actions_open_and_copy(self):
+        import sys
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeClipboard:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        panel = self._make_panel(downloads_panel)
+        panel._selected_source_url = "https://example.com/source"
+        panel._notify_status = MagicMock()
+
+        clipboard = FakeClipboard()
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+        class _QApplication:
+            @staticmethod
+            def clipboard():
+                return clipboard
+
+        qtwidgets.QApplication = _QApplication
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            },
+        ):
+            with patch.object(downloads_panel.webbrowser, "open", return_value=True) as open_mock:
+                panel._open_selected_source()
+                panel._copy_selected_source()
+
+        open_mock.assert_called_once_with("https://example.com/source", new=2)
+        self.assertEqual(clipboard.text, "https://example.com/source")
+        self.assertTrue(any("Opened the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
+        self.assertTrue(any("Copied the selected source URL" in call.args[0] for call in panel._notify_status.call_args_list))
+
+    def test_history_source_actions_missing_source_url_notify(self):
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        panel = self._make_panel(downloads_panel)
+        panel._selected_source_url = ""
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel.webbrowser, "open") as open_mock:
+            panel._open_selected_source()
+            panel._copy_selected_source()
+
+        open_mock.assert_not_called()
+        self.assertEqual(
+            [call.args[0] for call in panel._notify_status.call_args_list],
+            [
+                "No source URL is available for this history entry.",
+                "No source URL is available to copy.",
+            ],
+        )
+
+    def test_history_source_actions_backend_failures_log_and_notify(self):
+        import sys
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+
+        class FakeClipboard:
+            def setText(self, _text):
+                raise RuntimeError("clipboard boom")
+
+        panel = self._make_panel(downloads_panel)
+        panel._selected_source_url = "https://example.com/source"
+        panel._notify_status = MagicMock()
+
+        with patch.object(downloads_panel.webbrowser, "open", return_value=False) as open_mock:
+            pyqt_pkg = types.ModuleType("PyQt6")
+            pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+            qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+
+            class _QApplication:
+                @staticmethod
+                def clipboard():
+                    return FakeClipboard()
+
+            qtwidgets.QApplication = _QApplication
+
+            with patch.dict(sys.modules, {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtWidgets": qtwidgets,
+            }):
+                with self.assertLogs("src.ui.downloads_panel", level="WARNING") as logs:
+                    panel._open_selected_source()
+                    panel._copy_selected_source()
+
+        open_mock.assert_called_once_with("https://example.com/source", new=2)
+        self.assertEqual(
+            [call.args[0] for call in panel._notify_status.call_args_list],
+            [
+                "Could not open the selected source URL.",
+                "Could not copy the selected source URL.",
+            ],
+        )
+        self.assertTrue(any("browser refused" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("Failed to copy download history source URL" in msg for msg in logs.output), logs.output)
+
+    def test_delete_history_failure_shows_error_dialog(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+        downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
+        panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]
+        panel._refresh_history = MagicMock()
+
+        with patch.object(downloads_panel.QMessageBox, "question", return_value=1, create=True):
+            with patch.object(downloads_panel.QMessageBox, "critical", create=True) as critical:
+                with patch("src.core.download_history.delete_entry", side_effect=RuntimeError("locked")):
+                    panel._on_delete_entry()
+
+        critical.assert_called_once()
+        panel._refresh_history.assert_not_called()
+
+    def test_clear_history_failure_shows_error_dialog(self):
+        import types
+
+        downloads_panel = self._import_downloads_panel()
+        DownloadsPanel = downloads_panel.DownloadsPanel
+        downloads_panel.QMessageBox.StandardButton = types.SimpleNamespace(Yes=1, No=0)
+
+        panel = self._make_panel(downloads_panel)
+        panel.config = AppConfig()
+        panel._list_widget = types.SimpleNamespace(currentRow=lambda: 0)
+        panel._history_entries = [types.SimpleNamespace(mod_name="Broken Mod")]
+        panel._refresh_history = MagicMock()
+
+        with patch.object(downloads_panel.QMessageBox, "question", return_value=1, create=True):
+            with patch.object(downloads_panel.QMessageBox, "critical", create=True) as critical:
+                with patch("src.core.download_history.clear_history", side_effect=RuntimeError("locked")):
+                    panel._on_clear()
+
+        critical.assert_called_once()
+        panel._refresh_history.assert_not_called()
+
+
+class TestDashboardWorkflows(unittest.TestCase):
+    def _import_dashboard(self):
+        import importlib
+        import types
+
+        pyqt = types.ModuleType("PyQt6")
+        pyqt.__path__ = []
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = SimpleNamespace(
+            AlignmentFlag=SimpleNamespace(AlignCenter=0),
+            CursorShape=SimpleNamespace(PointingHandCursor=1),
+        )
+        qtcore.pyqtSignal = lambda *args: MagicMock()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QFrame", "QGridLayout", "QHBoxLayout", "QLabel", "QPushButton",
+            "QScrollArea", "QVBoxLayout", "QWidget", "QLineEdit",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        with patch.dict(sys.modules, {
+            "PyQt6": pyqt, "PyQt6.QtCore": qtcore, "PyQt6.QtWidgets": qtwidgets,
+        }):
+            return importlib.import_module("src.ui.dashboard")
+
+    def test_dashboard_actions_emit_distinct_routes_and_stats_include_cheats(self):
+        dashboard = self._import_dashboard()
+        panel = MagicMock(config=AppConfig())
+        mods = [
+            ModInfo(id=str(i), name=str(i), mod_type=kind, path=f"/mods/{i}")
+            for i, kind in enumerate((ModType.PNACH, ModType.CHEAT))
+        ]
+        panel.db.all.return_value = mods
+        panel.db.by_type.return_value = []
+        buttons = {}
+
+        def make_button(text):
+            buttons[text] = MagicMock()
+            return buttons[text]
+
+        grid = MagicMock()
+        stat = MagicMock()
+        with patch.multiple(
+            dashboard, QScrollArea=MagicMock(), QWidget=MagicMock(), QFrame=MagicMock(),
+            QVBoxLayout=MagicMock(), QHBoxLayout=MagicMock(), QGridLayout=grid,
+            QLabel=MagicMock(), QPushButton=MagicMock(side_effect=make_button),
+            StatCard=stat, ModManager=MagicMock(),
+        ):
+            dashboard.ModManager.return_value.detect_conflicts.return_value = []
+            dashboard.DashboardPanel._build(panel)
+        routes = {
+            "🌐 Discover Mods": "discover", "➕ Import Textures": "import_textures",
+            "⬇ Download from URL": "download_url", "📥 Downloads / History": "downloads",
+            "⚙ Open Settings": "settings",
+        }
+        for text, action in routes.items():
+            buttons[text].clicked.connect.call_args.args[0]()
+            panel.action_requested.emit.assert_called_with(action)
+        self.assertTrue(any(call.args[1:3] == ("PNACH / Cheats", "2") for call in stat.call_args_list))
+        panel._content_layout.addWidget.assert_called_once()
+        grid.return_value.addWidget.assert_any_call(stat.return_value, 1, 2)
+
+    def test_dashboard_refresh_disposes_old_scroll_container_before_rebuild(self):
+        dashboard = self._import_dashboard()
+        old_scroll = MagicMock()
+        panel = MagicMock()
+        panel._content_layout.count.side_effect = [1, 0]
+        panel._content_layout.takeAt.return_value.widget.return_value = old_scroll
+        dashboard.DashboardPanel.refresh(panel)
+        old_scroll.deleteLater.assert_called_once()
+        panel._build.assert_called_once()
+
+
+class TestMainWindowNavigationState(unittest.TestCase):
+    """Tests for main-window panel selection persistence."""
+
+    def _import_main_window(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            CursorShape=types.SimpleNamespace(PointingHandCursor=1),
+            AlignmentFlag=types.SimpleNamespace(),
+        )
+        qtcore.QSize = type("QSize", (), {})
+
+        class _Signal:
+            def connect(self, *args, **kwargs):
+                return None
+
+            def emit(self, *args, **kwargs):
+                return None
+
+        qtcore.pyqtSignal = lambda *args, **kwargs: _Signal()
+        qtcore.QObject = type("QObject", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QFrame", "QHBoxLayout", "QLabel", "QMainWindow", "QPushButton",
+            "QScrollArea", "QSizePolicy", "QSpacerItem", "QStackedWidget",
+            "QStatusBar", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QFont = type("QFont", (), {})
+        qtgui.QIcon = type("QIcon", (), {})
+        stub_panel = type("StubPanel", (), {})
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.dashboard": types.SimpleNamespace(DashboardPanel=stub_panel),
+                "src.ui.browse_panel": types.SimpleNamespace(BrowsePanel=stub_panel),
+                "src.ui.downloads_panel": types.SimpleNamespace(DownloadsPanel=stub_panel),
+                "src.ui.library_panel": types.SimpleNamespace(LibraryPanel=stub_panel),
+                "src.ui.memcard_panel": types.SimpleNamespace(MemoryCardPanel=stub_panel),
+                "src.ui.mod_panel": types.SimpleNamespace(ModPanel=stub_panel),
+                "src.ui.settings_panel": types.SimpleNamespace(SettingsPanel=stub_panel),
+                "src.ui.setup_wizard": types.SimpleNamespace(SetupWizard=stub_panel),
+            },
+        ):
+            return importlib.import_module("src.ui.main_window")
+
+    def test_activate_nav_persists_selected_panel(self):
+        main_window = self._import_main_window()
+        MainWindow = main_window.MainWindow
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = None
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakePanel:
+            def __init__(self):
+                self.refresh_count = 0
+
+            def refresh(self):
+                self.refresh_count += 1
+
+        class FakeStack:
+            def __init__(self, panel):
+                self.index = None
+                self.panel = panel
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentWidget(self):
+                return self.panel
+
+        panel = MainWindow.__new__(MainWindow)
+        panel.config = AppConfig()
+        panel._nav_buttons = [FakeButton(), FakeButton(), FakeButton()]
+        panel._stack = FakeStack(FakePanel())
+
+        with patch.object(main_window, "save_config") as save_mock:
+            panel._activate_nav(1)
+
+        self.assertEqual(panel._stack.index, 1)
+        self.assertEqual([btn.checked for btn in panel._nav_buttons], [False, True, False])
+        self.assertEqual(panel._stack.panel.refresh_count, 1)
+        self.assertEqual(panel.config.ui_state["main_window"]["selected_nav_index"], 1)
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_dashboard_actions_navigate_then_open_the_matching_workflow(self):
+        main_window = self._import_main_window()
+        window = main_window.MainWindow.__new__(main_window.MainWindow)
+        window._activate_nav = MagicMock()
+        window._texture_panel = MagicMock()
+        window._browse_panel = MagicMock()
+        for action, index in (
+            ("discover", 1), ("import_textures", 4), ("download_url", 1),
+            ("downloads", 3), ("settings", 8),
+        ):
+            with self.subTest(action=action):
+                window._on_dashboard_action(action)
+                window._activate_nav.assert_called_with(index)
+        window._texture_panel._import_mod.assert_called_once()
+        window._browse_panel._open_download_dialog.assert_called_once()
+        calls = window._activate_nav.call_count
+        window._on_dashboard_action("unknown")
+        self.assertEqual(window._activate_nav.call_count, calls)
+
+    def test_discover_install_refreshes_panels_to_invalidate_issue_caches(self):
+        main_window = self._import_main_window()
+        window = main_window.MainWindow.__new__(main_window.MainWindow)
+        panels = [MagicMock(), MagicMock(), MagicMock()]
+        window._texture_panel, window._pnach_panel, window._cover_panel = panels
+        window._library_panel = MagicMock()
+        window._dashboard = MagicMock()
+        window._on_mod_installed()
+        for panel in panels:
+            panel.refresh.assert_called_once()
+            panel._apply_filter.assert_not_called()
+
+    def test_selected_nav_index_from_state_logs_and_clamps_invalid_values(self):
+        main_window = self._import_main_window()
+
+        with self.assertLogs("src.ui.main_window", level="WARNING") as logs:
+            self.assertEqual(
+                main_window._selected_nav_index_from_state(
+                    {"selected_nav_index": "oops"},
+                    3,
+                ),
+                0,
+            )
+            self.assertEqual(
+                main_window._selected_nav_index_from_state(
+                    {"selected_nav_index": 99},
+                    3,
+                ),
+                2,
+            )
+
+        self.assertTrue(any("invalid" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("no longer available" in msg for msg in logs.output), logs.output)
+
+
+class TestMemoryCardPanelStatePersistence(unittest.TestCase):
+    """Tests for memory-card panel last-path persistence."""
+
+    def _make_panel(self, module):
+        panel = module.MemoryCardPanel.__new__(module.MemoryCardPanel)
+        panel.config = AppConfig()
+        panel._current_card = ""
+        panel._all_saves = []
+        panel._shown_saves = []
+        panel._export_busy = False
+        panel._write_busy = False
+        panel._card_exists = False
+        panel._card_valid = False
+        panel._filter_timer = MagicMock()
+        panel._filter_timer.isActive.return_value = False
+        panel._search_edit = MagicMock()
+        panel._search_edit.text.return_value = ""
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentText.return_value = "Card order"
+        for name in ("_export_btn", "_copy_btn", "_import_btn", "_export_all_btn",
+                     "_backup_btn", "_saves_summary", "_saves_empty_message",
+                     "_saves_empty_action", "_saves_empty_state", "_info_lbl",
+                     "_export_shown_btn", "_selected_save_info", "_copy_id_btn"):
+            setattr(panel, name, MagicMock())
+        panel._saves_list = MagicMock()
+        panel._saves_list.currentItem.return_value = None
+        return panel
+
+    def _make_save_list(self, panel):
+        class SaveList:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+                self.visible = True
+
+            def clear(self):
+                self.items = []
+                self.current_row = -1
+                panel._on_save_selected(-1)
+
+            def addItem(self, item):
+                self.items.append(item)
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def currentItem(self):
+                return self.items[self.current_row] if 0 <= self.current_row < len(self.items) else None
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+                panel._on_save_selected(idx)
+
+            def setVisible(self, visible):
+                self.visible = visible
+
+        return SaveList()
+
+    def _import_memcard_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            ItemDataRole=types.SimpleNamespace(UserRole=object()),
+            GlobalColor=types.SimpleNamespace(gray=object()),
+            TextFormat=types.SimpleNamespace(PlainText=object()),
+        )
+        qtcore.QTimer = type("QTimer", (), {})
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        class FakeQListWidgetItem:
+            def __init__(self, text=""):
+                self.text = text
+                self._data = {}
+                self.tooltip = ""
+                self.foreground = None
+
+            def setData(self, role, value):
+                self._data[role] = value
+
+            def data(self, role):
+                return self._data.get(role)
+
+            def setToolTip(self, text):
+                self.tooltip = text
+
+            def setForeground(self, color):
+                self.foreground = color
+
+        for name in (
+            "QComboBox", "QFileDialog", "QFrame", "QHBoxLayout", "QInputDialog",
+            "QLabel", "QLineEdit", "QListWidget", "QListWidgetItem", "QMessageBox", "QPushButton",
+            "QScrollArea", "QSplitter", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtwidgets.QListWidgetItem = FakeQListWidgetItem
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+        widgets_stub = types.ModuleType("src.ui.widgets")
+        widgets_stub.EmptyStateWidget = type("EmptyStateWidget", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "src.ui.base_panel": base_panel_stub,
+                "src.ui.widgets": widgets_stub,
+            },
+        ):
+            return importlib.import_module("src.ui.memcard_panel")
+
+    def test_remember_last_path_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._remember_last_path(panel, "memcard_export_dir", "/tmp/export")
+
+        self.assertEqual(panel.config.ui_state["last_paths"]["memcard_export_dir"], "/tmp/export")
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_card_selection_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = [
+                    ("— Select a memory card —", ""),
+                    ("Card A", "/cards/a.ps2"),
+                ]
+
+            def itemData(self, idx):
+                return self.items[idx][1]
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig()
+        panel._card_combo = FakeComboBox()
+        panel._current_card = ""
+        panel._load_saves = MagicMock()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._on_card_selected(panel, 1)
+
+        self.assertEqual(panel._current_card, "/cards/a.ps2")
+        self.assertEqual(panel.config.ui_state["memcard_panel"]["selected_card"], "/cards/a.ps2")
+        panel._load_saves.assert_called_once()
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_save_selection_updates_ui_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeItem:
+            def __init__(self, save_name):
+                self._save_name = save_name
+
+            def data(self, role):
+                return self._save_name
+
+        class FakeListWidget:
+            def __init__(self):
+                self._current = FakeItem("BASLUS-12345")
+
+            def currentItem(self):
+                return self._current
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig()
+        panel._current_card = "/cards/a.ps2"
+        panel._saves_loading = False
+        panel._save_selection_syncing = False
+        panel._saves_list = FakeListWidget()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._on_save_selected(panel, 0)
+
+        self.assertEqual(
+            panel.config.ui_state["memcard_panel"]["selected_save_dir_by_card"]["/cards/a.ps2"],
+            "BASLUS-12345",
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_refresh_restores_last_selected_card(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = []
+                self.current_index = -1
+                self.blocked = False
+
+            def blockSignals(self, blocked):
+                self.blocked = blocked
+
+            def clear(self):
+                self.items = []
+                self.current_index = -1
+
+            def addItem(self, label, data=""):
+                self.items.append((label, data))
+                if self.current_index < 0:
+                    self.current_index = 0
+
+            def findData(self, value):
+                for idx, (_label, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.current_index = index
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(
+            memcards_path="/cards",
+            ui_state={"memcard_panel": {"selected_card": "/cards/beta.ps2"}},
+        )
+        panel._card_combo = FakeComboBox()
+        panel._current_card = ""
+        panel._load_saves = MagicMock()
+
+        with patch.object(memcard_panel, "list_memcard_files", return_value=["/cards/alpha.ps2", "/cards/beta.ps2"]):
+            MemoryCardPanel.refresh(panel)
+
+        self.assertEqual(panel._current_card, "/cards/beta.ps2")
+        self.assertEqual(panel._card_combo.current_index, 2)
+        panel._load_saves.assert_called_once()
+
+    def test_refresh_restores_selected_save(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = []
+                self.current_row = -1
+
+            def clear(self):
+                self.items = []
+                self.current_row = -1
+
+            def addItem(self, item):
+                self.items.append(item)
+                if self.current_row < 0:
+                    self.current_row = 0
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+
+            def currentItem(self):
+                if 0 <= self.current_row < len(self.items):
+                    return self.items[self.current_row]
+                return None
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(
+            memcards_path="/cards",
+            ui_state={
+                "memcard_panel": {
+                    "selected_card": "/cards/beta.ps2",
+                    "selected_save_dir_by_card": {"/cards/beta.ps2": "BASLUS-12345"},
+                }
+            },
+        )
+        panel._current_card = "/cards/beta.ps2"
+        panel._card_combo = SimpleNamespace()
+        panel._saves_list = FakeListWidget()
+        panel._info_lbl = FakeLabel()
+
+        fake_saves = [
+            SimpleNamespace(name="Save A", dir_name="BASLUS-11111", size_bytes=128),
+            SimpleNamespace(name="Save B", dir_name="BASLUS-12345", size_bytes=256),
+        ]
+
+        with patch.object(memcard_panel.Path, "is_file", return_value=True):
+            with patch.object(
+                memcard_panel.Path,
+                "stat",
+                return_value=SimpleNamespace(st_size=4 * 1024 * 1024),
+            ):
+                with patch.object(memcard_panel, "is_valid_memcard", return_value=True):
+                    with patch.object(memcard_panel, "list_saves", return_value=fake_saves):
+                        MemoryCardPanel._load_saves(panel)
+
+        self.assertEqual(panel._saves_list.current_row, 1)
+        self.assertEqual(panel._info_lbl.text.splitlines()[0], "File: beta.ps2")
+
+    def test_load_saves_without_selected_card_shows_placeholder(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeLabel:
+            def __init__(self):
+                self.text = ""
+
+            def setText(self, text):
+                self.text = text
+
+        class FakeListWidget:
+            def __init__(self):
+                self.cleared = False
+                self.visible = True
+
+            def clear(self):
+                self.cleared = True
+
+            def currentItem(self):
+                return None
+
+            def setVisible(self, value):
+                self.visible = bool(value)
+
+        class FakePlaceholder:
+            def __init__(self):
+                self.visible = False
+
+            def setVisible(self, value):
+                self.visible = bool(value)
+
+        panel = self._make_panel(memcard_panel)
+        panel._current_card = ""
+        panel._info_lbl = FakeLabel()
+        panel._saves_list = FakeListWidget()
+        panel._saves_empty_state = FakePlaceholder()
+
+        MemoryCardPanel._load_saves(panel)
+
+        self.assertTrue(panel._saves_list.cleared)
+        self.assertTrue(panel._saves_empty_state.visible)
+        self.assertFalse(panel._saves_list.visible)
+        self.assertTrue(panel._info_lbl.text.startswith("No memory card selected"))
+
+    def test_save_search_matches_all_terms_across_name_and_directory(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        saves = [
+            SaveEntry("Kingdom Hearts", "BASLUS-20370", 1024),
+            SaveEntry("Kingdom Hearts II", "BASLUS-21005", 2048),
+            SaveEntry("Silent Hill", "BASLES-50382", 2048),
+        ]
+        self.assertEqual(module._filter_saves(saves, "HEARTS slus-210", "Card order"), [saves[1]])
+        self.assertEqual(module._filter_saves(saves, "kingdom missing", "Card order"), [])
+        self.assertEqual(module._filter_saves(saves, " \t", "Card order"), saves)
+
+    def test_save_sorting_is_stable_and_keeps_cached_card_order(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        saves = [SaveEntry("Zulu", "1", 1), SaveEntry("alpha", "2", 10), SaveEntry("Alpha", "3", 10)]
+        for sort, expected in (
+            ("Card order", saves),
+            ("Name (A–Z)", [saves[1], saves[2], saves[0]]),
+            ("Largest first", [saves[1], saves[2], saves[0]]),
+        ):
+            with self.subTest(sort=sort):
+                self.assertEqual(module._filter_saves(saves, "", sort), expected)
+        self.assertEqual([save.dir_name for save in saves], ["1", "2", "3"])
+
+    def test_filtering_preserves_selection_without_reparsing_card(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._card_valid = panel._card_exists = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 1024)]
+        panel._saves_list = self._make_save_list(panel)
+        with patch.object(module, "list_saves") as read, patch.object(module, "save_config"):
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.items[0].data(module.Qt.ItemDataRole.UserRole), "A")
+            self.assertIn("512 bytes", panel._saves_list.items[0].text)
+            panel._saves_list.setCurrentRow(1)
+            panel._search_edit.text.return_value = "Alpha"
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.count(), 1)
+            panel._export_btn.setEnabled.assert_called_with(False)
+            self.assertEqual(panel._selected_save_bucket()[panel._current_card], "B")
+            panel._search_edit.text.return_value = "no match"
+            panel._apply_save_filters()
+            self.assertEqual(panel._empty_action, "clear")
+            self.assertFalse(panel._saves_list.visible)
+            panel._export_all_btn.setEnabled.assert_called_with(True)
+            panel._search_edit.text.return_value = ""
+            panel._sort_combo.currentText.return_value = "Largest first"
+            panel._apply_save_filters()
+            self.assertEqual(panel._saves_list.current_row, 0)
+            self.assertEqual(panel._saves_list.currentItem().data(module.Qt.ItemDataRole.UserRole), "B")
+            panel._export_btn.setEnabled.assert_called_with(True)
+        read.assert_not_called()
+
+    def test_save_filter_settings_restore_validate_and_persist(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel.config.ui_state = {"memcard_panel": {"query": "SLUS", "sort": "Largest first"}}
+        panel._restore_save_filters()
+        panel._search_edit.setText.assert_called_once_with("SLUS")
+        panel._sort_combo.setCurrentIndex.assert_called_once_with(2)
+        panel._search_edit.text.return_value = "  Hearts  "
+        panel._sort_combo.currentText.return_value = "Name (A–Z)"
+        panel._card_valid = True
+        panel._apply_save_filters = MagicMock()
+        with patch.object(module, "save_config") as save:
+            panel._on_save_filter_changed()
+        self.assertEqual(panel._panel_state_bucket()["query"], "Hearts")
+        self.assertEqual(panel._panel_state_bucket()["sort"], "Name (A–Z)")
+        panel._filter_timer.stop.assert_called_once()
+        save.assert_called_once_with(panel.config)
+        panel._apply_save_filters.assert_called_once()
+        panel.config.ui_state = {"memcard_panel": {"query": {}, "sort": []}}
+        panel._restore_save_filters()
+        panel._search_edit.setText.assert_called_with("")
+        panel._sort_combo.setCurrentIndex.assert_called_with(0)
+
+    def test_save_filter_save_failure_still_updates_results(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._apply_save_filters = MagicMock()
+        with patch.object(module, "save_config", side_effect=OSError("locked")):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+                panel._on_save_filter_changed()
+        self.assertTrue(any("search settings" in msg for msg in logs.output))
+        panel._apply_save_filters.assert_called_once()
+
+    def test_save_actions_follow_card_readiness_and_selection(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        for exists, valid, selected, has_saves in (
+            (False, False, False, False), (True, False, False, False),
+            (True, True, False, False), (True, True, False, True),
+            (True, True, True, True),
+        ):
+            with self.subTest(exists=exists, valid=valid, selected=selected, has_saves=has_saves):
+                panel._card_exists, panel._card_valid = exists, valid
+                panel._all_saves = [SaveEntry("Save", "SAVE", 512)] if has_saves else []
+                panel._shown_saves = panel._all_saves[:]
+                panel._saves_list.currentItem.return_value = (
+                    SimpleNamespace(data=lambda role: "SAVE") if selected else None
+                )
+                panel._update_save_actions()
+                panel._backup_btn.setEnabled.assert_called_with(exists)
+                panel._import_btn.setEnabled.assert_called_with(valid)
+                panel._export_all_btn.setEnabled.assert_called_with(valid and has_saves)
+                panel._export_btn.setEnabled.assert_called_with(valid and selected)
+                panel._copy_btn.setEnabled.assert_called_with(valid and selected)
+                panel._copy_id_btn.setEnabled.assert_called_with(valid and selected)
+                panel._export_shown_btn.setEnabled.assert_called_with(valid and has_saves)
+
+    def test_selected_save_details_clear_when_selection_is_filtered_out(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._current_card = "/cards/card.ps2"
+        panel._all_saves = [SaveEntry("<b>Alpha</b>", "ALPHA", 512)]
+        panel._saves_list = self._make_save_list(panel)
+        with patch.object(module, "save_config"):
+            panel._apply_save_filters()
+            panel._saves_list.setCurrentRow(0)
+            panel._selected_save_info.setText.assert_called_with(
+                "<b>Alpha</b>\nDirectory ID: ALPHA\nListed size: 512 bytes"
+            )
+            panel._search_edit.text.return_value = "missing"
+            panel._apply_save_filters()
+        self.assertEqual(panel._shown_saves, [])
+        panel._export_shown_btn.setEnabled.assert_called_with(False)
+        panel._copy_id_btn.setEnabled.assert_called_with(False)
+        self.assertNotIn("ALPHA", panel._selected_save_info.setText.call_args.args[0])
+        self.assertEqual(panel._selected_save_bucket()[panel._current_card], "ALPHA")
+
+    def test_busy_card_operations_disable_writes_and_exports_but_keep_details(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_exists = panel._card_valid = True
+        panel._all_saves = panel._shown_saves = [SaveEntry("Alpha", "A", 512)]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        for exporting, writing in ((True, False), (False, True)):
+            with self.subTest(exporting=exporting, writing=writing):
+                panel._export_busy, panel._write_busy = exporting, writing
+                panel._update_save_actions()
+                for name in ("_backup_btn", "_import_btn", "_copy_btn", "_export_btn",
+                             "_export_all_btn", "_export_shown_btn"):
+                    getattr(panel, name).setEnabled.assert_called_with(False)
+                panel._copy_id_btn.setEnabled.assert_called_with(True)
+
+    def test_write_dialogs_freeze_original_card_and_selected_save(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying):
+                panel = self._make_panel(module)
+                panel._current_card = "/cards/original.ps2"
+                panel._card_valid = True
+                panel._all_saves = [SaveEntry("Alpha", "ALPHA", 512)]
+                panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "ALPHA")
+                panel._write_save_with_backup = MagicMock()
+
+                def choose(*args):
+                    self.assertTrue(panel._write_busy)
+                    panel._current_card = "/cards/changed.ps2"
+                    panel._all_saves = []
+                    # Reentrant actions must not launch another chooser.
+                    panel._import_save()
+                    panel._copy_save_to_other_card()
+                    panel._backup_card()
+                    return "/chosen.bin", ""
+
+                with patch.object(module, "QFileDialog") as picker, \
+                     patch.object(module, "QInputDialog") as names, \
+                     patch.object(module, "save_config"):
+                    picker.getOpenFileName.side_effect = choose
+                    names.getText.return_value = ("ALPHA", True)
+                    if copying:
+                        panel._copy_save_to_other_card()
+                        expected = ("/cards/original.ps2", "/chosen.bin", "ALPHA")
+                    else:
+                        panel._import_save()
+                        expected = ("/chosen.bin", "/cards/original.ps2", "ALPHA")
+                panel._write_save_with_backup.assert_called_once_with(*expected, copying=copying)
+                picker.getOpenFileName.assert_called_once()
+                self.assertFalse(panel._write_busy)
+
+    def test_manual_backup_freezes_card_before_chooser_and_releases_busy(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/original.ps2"
+        panel._show_card_result = MagicMock()
+        panel.emit_status = MagicMock()
+
+        def choose(*args):
+            self.assertTrue(panel._write_busy)
+            panel._current_card = "/cards/changed.ps2"
+            panel._backup_card()
+            return "/backups"
+
+        with patch.object(module, "QFileDialog") as picker, \
+             patch.object(module, "backup_memcard", return_value="/backups/original.ps2") as backup, \
+             patch.object(module, "save_config"):
+            picker.getExistingDirectory.side_effect = choose
+            panel._backup_card()
+        backup.assert_called_once_with("/cards/original.ps2", "/backups")
+        self.assertIn("/cards/original.ps2", panel._show_card_result.call_args.args[1])
+        self.assertFalse(panel._write_busy)
+
+    def test_import_cancel_and_invalid_ids_never_start_backup_or_write(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/card.ps2"
+        panel._card_valid = True
+        panel._show_card_result = MagicMock()
+        panel._write_save_with_backup = MagicMock()
+        with patch.object(module, "QFileDialog") as picker, \
+             patch.object(module, "QInputDialog") as names, \
+             patch.object(module, "save_config"):
+            picker.getOpenFileName.return_value = ("", "")
+            panel._import_save()
+            names.getText.assert_not_called()
+            picker.getOpenFileName.return_value = ("/saves/raw.bin", "")
+            for name, ok in (("A", False), (" ", True), ("A" * 33, True),
+                             ("../bad", True), ("A\\B", True), ("é", True),
+                             ("A\x00B", True), ("..", True)):
+                with self.subTest(name=name, ok=ok):
+                    names.getText.return_value = (name, ok)
+                    panel._import_save()
+                    self.assertFalse(panel._write_busy)
+        panel._write_save_with_backup.assert_not_called()
+
+    def _card_write_fixture(self, module, tmp):
+        from src.core.memory_card import create_memcard
+        source, destination = str(Path(tmp) / "source.bin"), str(Path(tmp) / "card.ps2")
+        Path(source).write_bytes(b"ALPHA" + b"\x00" * 507)
+        create_memcard(destination, size_mb=1)
+        panel = self._make_panel(module)
+        panel._show_card_result = MagicMock()
+        panel._load_saves = MagicMock()
+        panel.emit_status = MagicMock()
+        message = MagicMock()
+        message.StandardButton = SimpleNamespace(Yes=1, No=2)
+        message.return_value.exec.return_value = 1
+        return panel, source, destination, message
+
+    def test_confirmed_import_and_copy_back_up_destination_before_write(self):
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                events = []
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard", side_effect=lambda *a: events.append("backup") or "/backup.ps2") as backup, \
+                     patch.object(module, "import_raw_save", side_effect=lambda *a: events.append("import") or False) as write, \
+                     patch.object(module, "copy_save_between_cards", side_effect=lambda *a: events.append("copy") or True) as copy:
+                    panel._write_save_with_backup(source, destination, "<ALPHA>", copying=copying)
+                self.assertEqual(events, ["backup", "copy" if copying else "import"])
+                backup.assert_called_once_with(destination, str(Path(tmp) / "backups"))
+                if copying:
+                    self.assertEqual(copy.call_args.args[:3], (source, "<ALPHA>", destination))
+                    write.assert_not_called()
+                else:
+                    write.assert_called_once_with(source, destination, "<ALPHA>")
+                    copy.assert_not_called()
+                question = message.return_value
+                question.setDefaultButton.assert_called_once_with(2)
+                question.setTextFormat.assert_called_once_with(module.Qt.TextFormat.PlainText)
+                text = question.setText.call_args.args[0]
+                for value in (source, destination, "<ALPHA>", "best-effort", "Close PCSX2", "backups"):
+                    self.assertIn(value, text)
+                self.assertIn("/backup.ps2", panel._show_card_result.call_args.args[1])
+                panel._load_saves.assert_called_once()
+
+    def test_declined_card_write_never_creates_backup_or_writes(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            message.return_value.exec.return_value = 2
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard") as backup, \
+                 patch.object(module, "import_raw_save") as write, \
+                 patch.object(module, "copy_save_between_cards") as copy:
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backup.assert_not_called()
+            write.assert_not_called()
+            copy.assert_not_called()
+            panel._show_card_result.assert_not_called()
+            panel.emit_status.assert_not_called()
+
+    def test_backup_failure_aborts_write_and_does_not_claim_success(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard", side_effect=module.MemoryCardError("disk full")), \
+                 patch.object(module, "import_raw_save") as write, \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            write.assert_not_called()
+            self.assertIn("No save write was attempted", panel._show_card_result.call_args.args[1])
+            panel.emit_status.assert_not_called()
+
+    def test_failed_write_retains_backup_location_and_recovery_guidance(self):
+        module = self._import_memcard_panel()
+        for copying in (False, True):
+            with self.subTest(copying=copying), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                target = "copy_save_between_cards" if copying else "import_raw_save"
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard", return_value="/backups/prewrite.ps2"), \
+                     patch.object(module, target, side_effect=module.MemoryCardError("write failed")), \
+                     self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                    panel._write_save_with_backup(source, destination, "ALPHA", copying=copying)
+                result = panel._show_card_result.call_args
+                self.assertTrue(result.kwargs["failed"])
+                self.assertIn("/backups/prewrite.ps2", result.args[1])
+                self.assertIn("restore", result.args[1])
+                panel.emit_status.assert_not_called()
+
+    def test_invalid_destination_and_same_file_aliases_are_rejected_before_backup(self):
+        module = self._import_memcard_panel()
+        for kind in ("same", "symlink", "hardlink", "invalid", "missing"):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                panel, source, destination, message = self._card_write_fixture(module, tmp)
+                if kind == "same":
+                    source = destination
+                elif kind in ("symlink", "hardlink"):
+                    alias = Path(tmp) / "alias.ps2"
+                    if kind == "symlink":
+                        alias.symlink_to(destination)
+                    else:
+                        alias.hardlink_to(destination)
+                    source = str(alias)
+                elif kind == "invalid":
+                    Path(destination).write_bytes(b"invalid card")
+                else:
+                    Path(destination).unlink()
+                with patch.object(module, "QMessageBox", message), \
+                     patch.object(module, "backup_memcard") as backup, \
+                     patch.object(module, "copy_save_between_cards") as copy, \
+                     self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                    panel._write_save_with_backup(source, destination, "ALPHA", copying=True)
+                backup.assert_not_called()
+                copy.assert_not_called()
+                message.assert_not_called()
+                self.assertTrue(panel._show_card_result.call_args.kwargs["failed"])
+
+    def test_card_removed_during_confirmation_never_starts_backup(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+
+            def confirm():
+                Path(destination).unlink()
+                return 1
+
+            message.return_value.exec.side_effect = confirm
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "backup_memcard") as backup, \
+                 patch.object(module, "import_raw_save") as write, \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backup.assert_not_called()
+            write.assert_not_called()
+
+    def test_import_rejects_corrupted_post_write_header_and_keeps_real_backup(self):
+        module = self._import_memcard_panel()
+        with tempfile.TemporaryDirectory() as tmp:
+            panel, source, destination, message = self._card_write_fixture(module, tmp)
+            before = Path(destination).read_bytes()
+
+            def corrupt(*args):
+                Path(destination).write_bytes(b"bad header")
+                return True
+
+            with patch.object(module, "QMessageBox", message), \
+                 patch.object(module, "import_raw_save", side_effect=corrupt), \
+                 self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._write_save_with_backup(source, destination, "ALPHA", copying=False)
+            backups = list((Path(tmp) / "backups").glob("*.ps2"))
+            self.assertEqual(len(backups), 1)
+            self.assertEqual(backups[0].read_bytes(), before)
+            self.assertIn(str(backups[0]), panel._show_card_result.call_args.args[1])
+            self.assertIn("header", panel._show_card_result.call_args.args[1])
+            panel.emit_status.assert_not_called()
+
+    def test_card_results_render_untrusted_names_and_paths_as_plain_text(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        with patch.object(module, "QMessageBox") as message:
+            panel._show_card_result("Finished", "<b>raw path</b>")
+        message.return_value.setTextFormat.assert_called_once_with(module.Qt.TextFormat.PlainText)
+        message.return_value.setText.assert_called_once_with("<b>raw path</b>")
+
+    def test_export_scopes_use_selected_shown_or_entire_cached_card(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 1024)]
+        panel._all_saves = saves
+        panel._shown_saves = [saves[0]]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        panel._export_saves = MagicMock()
+        panel._export_selected()
+        panel._export_saves.assert_called_with("Selected Save", [saves[0]])
+        panel._export_shown()
+        panel._export_saves.assert_called_with("Shown Saves", [saves[0]])
+        panel._export_all()
+        panel._export_saves.assert_called_with("All Saves (including hidden)", saves)
+
+    def test_export_shown_flushes_pending_search_before_taking_snapshot(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._filter_timer.isActive.return_value = True
+        shown = [SaveEntry("Alpha", "A", 512)]
+        panel._on_save_filter_changed = MagicMock(
+            side_effect=lambda: setattr(panel, "_shown_saves", shown)
+        )
+        panel._export_saves = MagicMock()
+        panel._export_shown()
+        panel._on_save_filter_changed.assert_called_once()
+        panel._export_saves.assert_called_once_with("Shown Saves", shown)
+
+    def test_export_batch_freezes_source_scope_and_deduplicates_ids(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/original.ps2"
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512), SaveEntry("Other label", "A", 512)]
+        panel.emit_status = MagicMock()
+
+        def choose(*args):
+            panel._current_card = "/cards/changed.ps2"
+            panel._all_saves.append(SaveEntry("New save", "B", 1024))
+            return "/exports"
+
+        dialog = MagicMock()
+        message = MagicMock()
+        dialog.getExistingDirectory.side_effect = choose
+        with patch.object(module, "QFileDialog", dialog), \
+             patch.object(module, "QMessageBox", message), \
+             patch.object(module, "export_save", return_value="/exports/A.bin") as export, \
+             patch.object(module, "save_config"):
+            panel._export_all()
+        export.assert_called_once_with("/cards/original.ps2", "A", "/exports", overwrite=False)
+        self.assertIn("1 save(s)", dialog.getExistingDirectory.call_args.args[1])
+        self.assertIn("exported 1 of 1", message.return_value.setText.call_args.args[0])
+        self.assertIn("/cards/original.ps2", message.return_value.setText.call_args.args[0])
+        self.assertFalse(panel._export_busy)
+
+    def test_export_batch_reports_partial_failure_and_keeps_processing(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._card_valid = True
+        panel.emit_status = MagicMock()
+        panel._all_saves = [
+            SaveEntry("Alpha", "A", 512), SaveEntry("Beta", "B", 512),
+            SaveEntry("Gamma", "C", 512),
+        ]
+        message = MagicMock()
+        with patch.object(module, "QFileDialog") as dialog, \
+             patch.object(module, "QMessageBox", message), \
+             patch.object(module, "save_config"), \
+             patch.object(module, "export_save", side_effect=[
+                 "/exports/A.bin", module.MemoryCardError("File exists"), "/exports/C.bin",
+             ]) as export:
+            dialog.getExistingDirectory.return_value = "/exports"
+            panel._export_all()
+        self.assertEqual(export.call_count, 3)
+        result = message.return_value
+        self.assertIn("exported 2 of 3", result.setText.call_args.args[0])
+        self.assertIn("Beta [B]: File exists", result.setDetailedText.call_args.args[0])
+        result.setIcon.assert_called_once_with(message.Icon.Warning)
+        self.assertFalse(panel._export_busy)
+
+    def test_export_cancel_empty_invalid_and_busy_do_not_write(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        with patch.object(module, "QFileDialog") as dialog, \
+             patch.object(module, "export_save") as export, \
+             patch.object(module, "save_config") as save:
+            panel._export_all()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._card_valid = True
+            panel._export_shown()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._export_busy = True
+            panel._export_all()
+            dialog.getExistingDirectory.assert_not_called()
+            panel._export_busy = False
+            dialog.getExistingDirectory.return_value = ""
+            panel._export_all()
+            dialog.getExistingDirectory.assert_called_once()
+            save.assert_not_called()
+            export.assert_not_called()
+        self.assertFalse(panel._export_busy)
+
+    def test_copy_directory_id_uses_current_visible_selection(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        panel.emit_status = MagicMock()
+        application = MagicMock()
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": SimpleNamespace(QApplication=application)}):
+            panel._copy_save_id()
+            application.clipboard.assert_not_called()
+            panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+            panel._copy_save_id()
+        application.clipboard.return_value.setText.assert_called_once_with("A")
+        panel.emit_status.assert_called_once_with("Copied save directory ID.")
+
+    def test_copy_directory_id_failure_is_logged_without_success_feedback(self):
+        from src.core.memory_card import SaveEntry
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_valid = True
+        panel._all_saves = [SaveEntry("Alpha", "A", 512)]
+        panel._saves_list.currentItem.return_value = SimpleNamespace(data=lambda role: "A")
+        panel.emit_status = MagicMock()
+        application = MagicMock()
+        application.clipboard.return_value = None
+        with patch.dict(sys.modules, {"PyQt6.QtWidgets": SimpleNamespace(QApplication=application)}):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._copy_save_id()
+        panel.emit_status.assert_called_once_with("Could not copy the save directory ID.")
+
+    def test_card_load_states_offer_matching_recovery_actions(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._saves_list = self._make_save_list(panel)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "card.ps2"
+            panel._current_card = str(path)
+            panel._load_saves()
+            self.assertEqual(panel._empty_action, "browse")
+            panel._backup_btn.setEnabled.assert_called_with(False)
+            path.touch()
+            with patch.object(module, "is_valid_memcard", return_value=False):
+                panel._load_saves()
+            self.assertEqual(panel._empty_action, "browse")
+            panel._backup_btn.setEnabled.assert_called_with(True)
+            panel._import_btn.setEnabled.assert_called_with(False)
+            with patch.object(module, "is_valid_memcard", return_value=True):
+                with patch.object(module, "list_saves", return_value=[]):
+                    panel._load_saves()
+                self.assertEqual(panel._empty_action, "import")
+                self.assertFalse(panel._saves_list.visible)
+                panel._export_all_btn.setEnabled.assert_called_with(False)
+                panel._import_btn.setEnabled.assert_called_with(True)
+                self.assertIn("0 of 0", panel._saves_summary.setText.call_args.args[0])
+                with patch.object(module, "list_saves", side_effect=module.MemoryCardError("bad data")):
+                    with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                        panel._load_saves()
+                self.assertEqual(panel._empty_action, "refresh")
+                self.assertIn("bad data", panel._saves_empty_message.setText.call_args.args[0])
+                panel._import_btn.setEnabled.assert_called_with(False)
+        self.assertFalse(panel._saves_loading)
+
+    def test_card_inspection_failure_is_recoverable_and_clears_old_saves(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._current_card = "/cards/a.ps2"
+        panel._all_saves = [object()]
+        with patch.object(module.Path, "is_file", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING"):
+                panel._load_saves()
+        self.assertEqual(panel._all_saves, [])
+        self.assertEqual(panel._empty_action, "refresh")
+        self.assertIn("denied", panel._info_lbl.setText.call_args.args[0])
+        panel._export_btn.setEnabled.assert_called_with(False)
+        self.assertFalse(panel._saves_loading)
+
+    def test_empty_state_actions_use_the_expected_workflows(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        for action, method in (
+            ("browse", "_browse_card"), ("import", "_import_save"),
+            ("refresh", "_load_saves"), ("clear", "_clear_save_search"),
+        ):
+            with self.subTest(action=action), patch.object(panel, method) as callback:
+                panel._empty_action = action
+                panel._on_empty_action()
+                callback.assert_called_once()
+
+    def test_clear_save_search_filters_once_and_retains_sorting(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._on_save_filter_changed = MagicMock()
+        panel._clear_save_search()
+        panel._search_edit.clear.assert_called_once()
+        panel._search_edit.blockSignals.assert_any_call(True)
+        panel._search_edit.blockSignals.assert_called_with(False)
+        panel._on_save_filter_changed.assert_called_once()
+        panel._sort_combo.setCurrentIndex.assert_not_called()
+
+    def test_restore_card_retains_browsed_file_outside_configured_directory(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_combo = MagicMock()
+        panel._card_combo.findData.side_effect = [-1, 1]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "external.ps2"
+            path.touch()
+            panel.config.ui_state = {"memcard_panel": {"selected_card": str(path)}}
+            panel._restore_selected_card()
+            self.assertEqual(panel._current_card, str(path))
+            panel._card_combo.addItem.assert_called_once_with(path.name, str(path))
+            panel._card_combo.setCurrentIndex.assert_called_once_with(1)
+
+    def test_select_card_path_reuses_existing_combo_entry(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel._card_combo = MagicMock()
+        panel._card_combo.findData.return_value = 2
+        panel._select_card_path("/cards/a.ps2")
+        panel._card_combo.addItem.assert_not_called()
+        panel._card_combo.setCurrentIndex.assert_called_with(2)
+        panel._card_combo.findData.return_value = -1
+        panel._card_combo.count.return_value = 4
+        panel._select_card_path("/cards/b.ps2")
+        panel._card_combo.addItem.assert_called_once_with("b.ps2", "/cards/b.ps2")
+        panel._card_combo.setCurrentIndex.assert_called_with(3)
+
+    def test_new_card_opens_created_file_without_refreshing_away_external_path(self):
+        module = self._import_memcard_panel()
+        panel = self._make_panel(module)
+        panel.config.memcards_path = "/cards"
+        panel._select_card_path = MagicMock()
+        panel.emit_status = MagicMock()
+        with patch.object(module.QInputDialog, "getText", return_value=("NewCard", True), create=True):
+            with patch.object(module, "create_memcard", return_value="/cards/NewCard.ps2") as create:
+                with patch.object(module.QMessageBox, "information", create=True):
+                    panel._create_card()
+        create.assert_called_once_with("/cards/NewCard.ps2")
+        panel._select_card_path.assert_called_once_with("/cards/NewCard.ps2")
+
+    def test_restore_selected_card_warns_when_missing(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeComboBox:
+            def __init__(self):
+                self.items = [
+                    ("— Select a memory card —", ""),
+                    ("Card A", "/cards/a.ps2"),
+                ]
+                self.current_index = -1
+
+            def findData(self, value):
+                for idx, (_label, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.current_index = index
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"selected_card": "/cards/missing.ps2"}})
+        panel._current_card = ""
+        panel._card_combo = FakeComboBox()
+
+        with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+            MemoryCardPanel._restore_selected_card(panel)
+
+        self.assertEqual(panel._current_card, "")
+        self.assertEqual(panel._card_combo.current_index, 0)
+        self.assertTrue(any("memory card selection" in msg for msg in logs.output))
+
+    def test_restore_selected_save_warns_when_missing(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeItem:
+            def __init__(self, save_name):
+                self._save_name = save_name
+
+            def data(self, role):
+                return self._save_name
+
+        class FakeListWidget:
+            def __init__(self):
+                self.items = [FakeItem("BASLUS-11111")]
+                self.current_row = -1
+
+            def count(self):
+                return len(self.items)
+
+            def item(self, idx):
+                return self.items[idx]
+
+            def setCurrentRow(self, idx):
+                self.current_row = idx
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(
+            ui_state={
+                "memcard_panel": {
+                    "selected_save_dir_by_card": {"/cards/beta.ps2": "BASLUS-12345"},
+                }
+            },
+        )
+        panel._current_card = "/cards/beta.ps2"
+        panel._saves_list = FakeListWidget()
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+                MemoryCardPanel._restore_selected_save(panel)
+
+        self.assertNotIn(
+            "selected_save_dir_by_card",
+            panel.config.ui_state["memcard_panel"],
+        )
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(any("no longer available" in msg for msg in logs.output))
+
+    def test_splitter_state_restores_and_saves(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeSplitter:
+            def __init__(self, sizes=None):
+                self._sizes = list(sizes or [])
+
+            def sizes(self):
+                return list(self._sizes)
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": [260, 420]}})
+        panel._splitter = FakeSplitter([180, 500])
+
+        with patch.object(memcard_panel, "save_config") as save_mock:
+            MemoryCardPanel._restore_splitter_sizes(panel)
+            self.assertEqual(panel._splitter._sizes, [260, 420])
+            panel._splitter._sizes = [300, 380]
+            MemoryCardPanel._save_splitter_sizes(panel)
+
+        self.assertEqual(panel.config.ui_state["memcard_panel"]["splitter_sizes"], [300, 380])
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_restore_splitter_sizes_warns_on_invalid_state(self):
+        memcard_panel = self._import_memcard_panel()
+        MemoryCardPanel = memcard_panel.MemoryCardPanel
+
+        class FakeSplitter:
+            def __init__(self):
+                self._sizes = [180, 500]
+
+            def setSizes(self, sizes):
+                self._sizes = list(sizes)
+
+        panel = self._make_panel(memcard_panel)
+        panel.config = AppConfig(ui_state={"memcard_panel": {"splitter_sizes": "broken"}})
+        panel._splitter = FakeSplitter()
+
+        with self.assertLogs("src.ui.memcard_panel", level="WARNING") as logs:
+            MemoryCardPanel._restore_splitter_sizes(panel)
+
+        self.assertEqual(panel._splitter._sizes, [180, 500])
+        self.assertTrue(any("splitter state" in msg for msg in logs.output))
+
+
+class TestModPanelEmptyState(unittest.TestCase):
+    """Tests for mod-panel empty-state copy."""
+
+    def _import_mod_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            CursorShape=types.SimpleNamespace(ArrowCursor=0, PointingHandCursor=1),
+            AlignmentFlag=types.SimpleNamespace(AlignCenter=0),
+        )
+        qtcore.QSize = type("QSize", (), {})
+        qtcore.QThread = type("QThread", (), {})
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.pyqtSlot = lambda *args: lambda method: method
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit", "QMessageBox",
+            "QPushButton", "QScrollArea", "QVBoxLayout", "QWidget", "QComboBox",
+            "QSizePolicy", "QSpacerItem", "QProgressBar", "QFileDialog", "QDialog",
+            "QDialogButtonBox", "QGridLayout", "QTextEdit", "QListWidget", "QListWidgetItem",
+            "QSplitter", "QTabWidget", "QFormLayout", "QApplication",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        for name in ("QPixmap", "QFont", "QIcon"):
+            setattr(qtgui, name, type(name, (), {}))
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+            },
+        ):
+            return importlib.import_module("src.ui.mod_panel")
+
+    def test_empty_state_message_mentions_active_filters(self):
+        mod_panel = self._import_mod_panel()
+        message = mod_panel._mod_panel_empty_message("Texture Packs", "gta", "TexMaster", True)
+        self.assertIn("search 'gta'", message)
+        self.assertIn("author 'TexMaster'", message)
+        self.assertIn("library-only filter", message)
+
+    def test_restore_filter_state_applies_saved_values(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+                self.blocked = False
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+                self.blocked = False
+
+            def count(self):
+                return len(self.items)
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+                self.blocked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.config = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 3,
+                        "author": "TexMaster",
+                        "library_only": True,
+                        "status": "conflicts",
+                    }
+                }
+            }
+        )
+        panel._search = FakeLineEdit()
+        panel._sort_combo = FakeComboBox([
+            ("Name ↑", 0),
+            ("Name ↓", 1),
+            ("Priority ↑", 2),
+            ("Priority ↓", 3),
+            ("Size", 4),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+            ("Panda_Venom", "Panda_Venom"),
+        ])
+        panel._library_filter_check = FakeCheckBox()
+        panel._status_filter = FakeComboBox([
+            ("All statuses", "all"),
+            ("Conflicts", "conflicts"),
+        ])
+
+        ModPanel._restore_filter_state(panel)
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._sort_combo.currentIndex(), 3)
+        self.assertEqual(panel._author_filter.currentData(), "TexMaster")
+        self.assertTrue(panel._library_filter_check.isChecked())
+        self.assertEqual(panel._status_filter.currentData(), "conflicts")
+        self.assertFalse(panel._status_filter.blocked)
+
+    def test_restore_filter_state_warns_on_stale_values(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+                self.blocked = False
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+                self.blocked = False
+
+            def count(self):
+                return len(self.items)
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        class FakeCheckBox:
+            def __init__(self):
+                self.checked = False
+                self.blocked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+            def isChecked(self):
+                return self.checked
+
+            def blockSignals(self, blocked):
+                self.blocked = bool(blocked)
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.config = AppConfig(
+            ui_state={
+                "mod_panels": {
+                    "texture_pack": {
+                        "query": "gta",
+                        "sort_index": 99,
+                        "author": "Missing Author",
+                        "library_only": False,
+                        "status": "obsolete",
+                    }
+                }
+            }
+        )
+        panel._search = FakeLineEdit()
+        panel._sort_combo = FakeComboBox([
+            ("Name ↑", 0),
+            ("Name ↓", 1),
+            ("Priority ↑", 2),
+            ("Priority ↓", 3),
+            ("Size", 4),
+        ])
+        panel._author_filter = FakeComboBox([
+            ("All Authors", ""),
+            ("TexMaster", "TexMaster"),
+        ])
+        panel._library_filter_check = FakeCheckBox()
+        panel._status_filter = FakeComboBox([("All statuses", "all")])
+
+        with patch.object(mod_panel, "_save_mod_panel_config") as save_mock:
+            with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
+                ModPanel._restore_filter_state(panel)
+
+        self.assertEqual(panel._search.value, "gta")
+        self.assertEqual(panel._sort_combo.currentIndex(), 0)
+        self.assertEqual(panel._author_filter.currentData(), "")
+        self.assertFalse(panel._library_filter_check.isChecked())
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["texture_pack"]["sort_index"],
+            0,
+        )
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["texture_pack"]["author"],
+            "",
+        )
+        self.assertTrue(any("sort index" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("author filter" in msg for msg in logs.output), logs.output)
+        self.assertTrue(any("status filter" in msg for msg in logs.output), logs.output)
+        self.assertEqual(panel._status_filter.currentData(), "all")
+        self.assertEqual(panel.config.ui_state["mod_panels"]["texture_pack"]["status"], "all")
+        save_mock.assert_called_once_with(panel.config, "sanitizing mod panel filter state")
+
+    def test_search_helper_matches_tags_source_url_files_and_type(self):
+        mod_panel = self._import_mod_panel()
+        mod = ModInfo(
+            id="mod-123",
+            name="High Res Pack",
+            mod_type=ModType.TEXTURE_PACK,
+            path="/mods/high-res-pack",
+            author="TexMaster",
+            description="Improves textures",
+            game_id="SLUS-20062",
+            version="1.2.3",
+            source_url="https://github.com/example/high-res-pack",
+            tags=["HD", "4k"],
+            files=["textures/intro.dds", "pnach/SLUS-20062.pnach"],
+        )
+
+        self.assertTrue(mod_panel._mod_matches_query(mod, "hd"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "github"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "slus20062"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "intro.dds"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "1.2"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "gta iii"))
+        self.assertTrue(mod_panel._mod_matches_query(mod, "texture"))
+        self.assertFalse(mod_panel._mod_matches_query(mod, "yakuza"))
+
+    def test_save_filter_state_updates_config(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        class FakeLineEdit:
+            def __init__(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+        class FakeComboBox:
+            def __init__(self, index, current_data):
+                self.index = index
+                self.data = current_data
+
+            def currentIndex(self):
+                return self.index
+
+            def currentData(self):
+                return self.data
+
+        class FakeCheckBox:
+            def __init__(self, checked):
+                self.checked = checked
+
+            def isChecked(self):
+                return self.checked
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._search = FakeLineEdit("gta")
+        panel._sort_combo = FakeComboBox(2, None)
+        panel._author_filter = FakeComboBox(0, "Curse_Arms")
+        panel._library_filter_check = FakeCheckBox(False)
+        panel._status_filter = FakeComboBox(1, "disabled")
+
+        with patch.object(mod_panel, "save_config") as save_mock:
+            ModPanel._save_filter_state(panel, "updating mod panel filters")
+
+        self.assertEqual(
+            panel.config.ui_state["mod_panels"]["pnach"],
+            {
+                "query": "gta",
+                "sort_index": 2,
+                "author": "Curse_Arms",
+                "library_only": False,
+                "status": "disabled",
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_enable_all_confirms_before_bulk_deploy(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        mods = [
+            ModInfo("one", "One", ModType.TEXTURE_PACK, "/one", enabled=False),
+            ModInfo("two", "Two", ModType.TEXTURE_PACK, "/two", enabled=True),
+        ]
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.extra_types = []
+        panel.config = AppConfig(textures_path="/pcsx2/textures")
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel.manager.set_enabled_many.return_value = (2, [])
+        panel.db.get.side_effect = lambda mid: next(mod for mod in mods if mod.id == mid)
+        panel._all_mods = MagicMock(return_value=mods)
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        self._prepare_batch_panel(panel)
+
+        def confirm(states, scope, skipped):
+            panel.manager.set_enabled_many.assert_not_called()
+            self.assertEqual(states, {"one": True})
+            self.assertIn("including hidden", scope)
+            return True
+
+        with patch.object(panel, "_confirm_batch", side_effect=confirm) as confirmation:
+            ModPanel._enable_all(panel)
+
+        confirmation.assert_called_once()
+        self.assertTrue(mods[1].enabled)
+        panel.db.update.assert_not_called()
+        panel.manager.set_enabled_many.assert_called_once_with({"one": True}, panel.config)
+        panel.manager.deploy.assert_not_called()
+        self.assertTrue(
+            any("saved enabled flags for 1" in call.args[0] for call in panel.emit_status.call_args_list),
+            panel.emit_status.call_args_list,
+        )
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_metadata_editor_cancel_does_not_persist_or_refresh(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel._apply_filter = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.exec.return_value = 0
+            edit.return_value.DialogCode.Accepted = 1
+            panel._on_edit("a")
+        panel.manager.update_metadata.assert_not_called()
+        panel._apply_filter.assert_not_called()
+
+    def test_metadata_callback_rejects_removed_mod(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.db.get.side_effect = [ModInfo("a", "A", ModType.PNACH, "/a"), None]
+        panel.manager = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.exec.return_value = 0
+            edit.return_value.DialogCode.Accepted = 1
+            panel._on_edit("a")
+            with self.assertRaisesRegex(ValueError, "no longer installed"):
+                edit.call_args.kwargs["save_callback"]({"name": "Edited"})
+        panel.manager.update_metadata.assert_not_called()
+
+    def test_details_connects_edit_shortcut(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel._on_edit = MagicMock()
+        panel._on_see_more_by_author = MagicMock()
+        with patch.object(mod_panel, "ModDetailsDialog") as details:
+            panel._on_details("a")
+        details.return_value.edit_requested.connect.assert_called_once_with(panel._on_edit)
+
+    def test_disable_all_cancelled_leaves_mods_unchanged(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        mods = [
+            types.SimpleNamespace(id="one", enabled=True),
+            types.SimpleNamespace(id="two", enabled=True),
+        ]
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.TEXTURE_PACK
+        panel.extra_types = []
+        panel.config = AppConfig(textures_path="/pcsx2/textures")
+        panel.db = MagicMock()
+        panel.manager = MagicMock()
+        panel._all_mods = MagicMock(return_value=mods)
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        self._prepare_batch_panel(panel)
+
+        with patch.object(panel, "_confirm_batch", return_value=False):
+            ModPanel._disable_all(panel)
+
+        self.assertTrue(all(mod.enabled for mod in mods))
+        panel.db.update.assert_not_called()
+        panel.manager.deploy.assert_not_called()
+        panel.manager.set_enabled_many.assert_not_called()
+        self.assertTrue(
+            any("cancelled" in call.args[0] for call in panel.emit_status.call_args_list),
+            panel.emit_status.call_args_list,
+        )
+        panel._invalidate_issue_state_cache.assert_not_called()
+        panel._apply_filter.assert_not_called()
+
+    def test_issue_state_cache_reuses_expensive_checks_until_invalidated(self):
+        import types
+
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.extra_types = [ModType.CHEAT]
+        panel.manager = MagicMock()
+        panel.manager.detect_conflicts.return_value = [
+            ConflictInfo(mod_a_id="mod-a", mod_b_id="mod-b", conflicting_files=["code.pnach"])
+        ]
+        panel.manager.detect_pnach_conflicts.side_effect = lambda mt: (
+            [{"mod_a_id": "mod-c", "mod_b_id": "mod-d", "address": "00200000"}]
+            if mt == ModType.CHEAT else []
+        )
+        panel.manager.validate_all_pnach.return_value = {
+            "mod-a": [
+                types.SimpleNamespace(severity="error"),
+                types.SimpleNamespace(severity="warning"),
+            ]
+        }
+        panel._issue_state_cache = None
+
+        first = ModPanel._issue_state(panel)
+        second = ModPanel._issue_state(panel)
+        panel._invalidate_issue_state_cache()
+        third = ModPanel._issue_state(panel)
+
+        self.assertIs(first, second)
+        self.assertIsNot(first, third)
+        self.assertEqual(panel.manager.detect_conflicts.call_count, 4)
+        self.assertEqual(panel.manager.validate_all_pnach.call_count, 2)
+        self.assertEqual(first["conflicting_ids"], {"mod-a", "mod-b", "mod-c", "mod-d"})
+        self.assertEqual(len(first["pnach_conflicts"]), 1)
+        self.assertEqual(panel.manager.detect_pnach_conflicts.call_count, 4)
+        self.assertEqual(first["pnach_validation"]["mod-a"], {"errors": 1, "warnings": 1})
+
+    def test_refresh_invalidates_issue_state_cache(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel._invalidate_library_serial_cache = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._refresh_author_filter = MagicMock()
+        panel._apply_filter = MagicMock()
+
+        ModPanel.refresh(panel)
+
+        panel._invalidate_library_serial_cache.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._refresh_author_filter.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_get_library_serials_caches_until_path_changes(self):
+        mod_panel = self._import_mod_panel()
+        ModPanel = mod_panel.ModPanel
+
+        panel = ModPanel.__new__(ModPanel)
+        panel.config = AppConfig(game_library_path="/games/a")
+        panel._library_serials_cache_path = ""
+        panel._library_serials_cache = frozenset()
+
+        with patch("src.core.game_library.get_library_serials", return_value=frozenset({"SLUS-20062"})) as get_serials:
+            first = ModPanel._get_library_serials(panel)
+            second = ModPanel._get_library_serials(panel)
+            panel.config.game_library_path = "/games/b"
+            get_serials.return_value = frozenset({"SLUS-21075"})
+            third = ModPanel._get_library_serials(panel)
+
+        self.assertEqual(first, frozenset({"SLUS-20062"}))
+        self.assertEqual(second, frozenset({"SLUS-20062"}))
+        self.assertEqual(third, frozenset({"SLUS-21075"}))
+        self.assertEqual(get_serials.call_count, 2)
+
+    def _prepare_batch_panel(self, panel):
+        panel._shown_mod_ids = ()
+        panel._batch_busy = False
+        panel._batch_retry_states = {}
+        for name in (
+            "_enable_all_btn", "_disable_all_btn", "_enable_shown_btn", "_disable_shown_btn",
+            "_batch_feedback", "_batch_retry_btn", "_batch_dismiss_btn",
+        ):
+            setattr(panel, name, MagicMock())
+
+    def _make_filter_panel(self, mod_panel, mods, issues=None):
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.config = AppConfig()
+        panel._all_mods = MagicMock(return_value=mods)
+        panel._search = MagicMock()
+        panel._search.text.return_value = ""
+        panel._author_filter = MagicMock()
+        panel._author_filter.currentData.return_value = ""
+        panel._library_filter_check = MagicMock()
+        panel._library_filter_check.isChecked.return_value = False
+        panel._status_filter = MagicMock()
+        panel._status_filter.currentData.return_value = "all"
+        panel._sort_combo = MagicMock()
+        panel._sort_combo.currentIndex.return_value = 0
+        panel._issue_state = MagicMock(return_value=issues or {
+            "conflicts": [], "pnach_conflicts": [],
+            "conflicting_ids": set(), "shadowed_ids": set(), "pnach_validation": {},
+        })
+        panel._list_layout = MagicMock()
+        panel._list_layout.count.return_value = 1
+        panel._count_lbl = MagicMock()
+        panel._save_filter_state = MagicMock()
+        panel._get_library_serials = MagicMock(return_value={"SLUS-20062"})
+        self._prepare_batch_panel(panel)
+        for handler in (
+            "_on_toggle", "_on_remove", "_on_priority_up", "_on_priority_down",
+            "_on_details", "_on_edit", "_filter_by_author", "_show_conflicts",
+            "_clear_filters", "_import_mod",
+        ):
+            setattr(panel, handler, MagicMock())
+        return panel
+
+    def test_status_filters_cover_enabled_disabled_and_each_issue_kind(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(id="enabled", name="Enabled", mod_type=ModType.PNACH, path="/mods/a", enabled=True),
+            ModInfo(id="disabled", name="Disabled", mod_type=ModType.PNACH, path="/mods/b", enabled=False),
+            ModInfo(id="warning", name="Warning", mod_type=ModType.PNACH, path="/mods/c", enabled=True),
+            ModInfo(id="clean", name="Clean", mod_type=ModType.PNACH, path="/mods/d", enabled=True),
+        ]
+        issues = {
+            "conflicting_ids": {"enabled"},
+            "shadowed_ids": {"enabled"},
+            "pnach_validation": {"enabled": {"errors": 1}, "warning": {"warnings": 2}},
+        }
+        expected = {
+            "all": {"enabled", "disabled", "warning", "clean"},
+            "enabled": {"enabled", "warning", "clean"},
+            "disabled": {"disabled"},
+            "conflicts": {"enabled"},
+            "shadowed": {"enabled"},
+            "code_issues": {"enabled", "warning"},
+        }
+        for status, ids in expected.items():
+            with self.subTest(status=status):
+                self.assertEqual(
+                    {m.id for m in mods if mod_panel._mod_matches_status(m, status, issues)}, ids,
+                )
+        message = mod_panel._mod_panel_empty_message("PNACH", "", "", False, "code_issues")
+        self.assertIn("Code issues (enabled)", message)
+
+    def test_status_filter_combines_search_author_library_and_sort(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(
+                id=str(i), name=name, mod_type=ModType.PNACH, path=f"/mods/{i}",
+                author=author, game_id=serial, enabled=enabled,
+            )
+            for i, (name, author, serial, enabled) in enumerate([
+                ("Pack Alpha", "Alice", "SLUS-20062", True),
+                ("Pack Zulu", "Alice", "SLUS-20062", True),
+                ("Pack Disabled", "Alice", "SLUS-20062", False),
+                ("Pack Other Game", "Alice", "SLUS-21075", True),
+                ("Pack Other Author", "Bob", "SLUS-20062", True),
+                ("Unrelated", "Alice", "SLUS-20062", True),
+            ])
+        ]
+        panel = self._make_filter_panel(mod_panel, mods)
+        panel._search.text.return_value = "pack"
+        panel._author_filter.currentData.return_value = "Alice"
+        panel._library_filter_check.isChecked.return_value = True
+        panel._sort_combo.currentIndex.return_value = 1
+        panel._status_filter.currentData.return_value = "enabled"
+        with patch.object(mod_panel, "ModItemWidget") as widget:
+            panel._apply_filter()
+        self.assertEqual([call.args[0].name for call in widget.call_args_list], ["Pack Zulu", "Pack Alpha"])
+        self.assertIn("Showing 2 of 6", panel._count_lbl.setText.call_args.args[0])
+        widget.return_value.conflicts_requested.connect.assert_called_with(panel._show_conflicts)
+        panel._all_mods.assert_called_once()
+
+    def test_pnach_only_conflicts_are_visible_and_counts_exclude_other_panels(self):
+        mod_panel = self._import_mod_panel()
+        mods = [
+            ModInfo(id="overlap", name="Overlap", mod_type=ModType.PNACH, path="/mods/a", enabled=True),
+            ModInfo(id="warning", name="Warning", mod_type=ModType.PNACH, path="/mods/b", enabled=True),
+        ]
+        issues = {
+            "conflicts": [],
+            "pnach_conflicts": [{"mod_a_id": "overlap", "mod_b_id": "other", "address": "00200000"}],
+            "conflicting_ids": {"overlap", "other"},
+            "shadowed_ids": set(),
+            "pnach_validation": {
+                "warning": {"errors": 0, "warnings": 1},
+                "unrelated-mod": {"errors": 1, "warnings": 0},
+            },
+        }
+        panel = self._make_filter_panel(mod_panel, mods, issues)
+        panel._status_filter.currentData.return_value = "conflicts"
+        with patch.object(mod_panel, "ModItemWidget") as widget:
+            panel._apply_filter()
+        self.assertEqual(widget.call_count, 1)
+        self.assertTrue(widget.call_args.kwargs["has_conflict"])
+        text = panel._count_lbl.setText.call_args.args[0]
+        self.assertIn("Showing 1 of 2", text)
+        self.assertIn("1 PNACH address overlap(s)", text)
+        self.assertIn("1 with code warnings", text)
+        self.assertNotIn("invalid", text)
+        self.assertNotIn("file conflict", text)
+        panel._count_lbl.setCursor.assert_called_with(mod_panel.Qt.CursorShape.PointingHandCursor)
+
+    def test_empty_state_offers_clear_filters_or_import(self):
+        mod_panel = self._import_mod_panel()
+        for installed in (False, True):
+            with self.subTest(installed=installed):
+                mods = [ModInfo(id="disabled", name="Disabled", mod_type=ModType.PNACH, path="/mods/a", enabled=False)] if installed else []
+                panel = self._make_filter_panel(mod_panel, mods)
+                panel._status_filter.currentData.return_value = "enabled"
+                with patch.object(mod_panel, "EmptyStateWidget") as empty, \
+                        patch.object(mod_panel, "QPushButton") as button:
+                    panel._apply_filter()
+                button.assert_called_once_with("✖ Clear Filters" if installed else "➕ Import")
+                button.return_value.clicked.connect.assert_called_once_with(
+                    panel._clear_filters if installed else panel._import_mod,
+                )
+                empty.return_value.layout.return_value.addWidget.assert_called_once_with(button.return_value)
+                message = empty.call_args.args[1]
+                self.assertIn("match the current filters" if installed else "yet", message)
+
+    def test_clear_filters_resets_status_and_saves_once_before_refresh(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        for name in ("_search", "_sort_combo", "_author_filter", "_library_filter_check", "_status_filter"):
+            setattr(panel, name, MagicMock())
+        panel._save_filter_state = MagicMock()
+        panel._apply_filter = MagicMock()
+        panel._clear_filters()
+        panel._search.clear.assert_called_once()
+        panel._status_filter.setCurrentIndex.assert_called_once_with(0)
+        panel._status_filter.blockSignals.assert_any_call(True)
+        panel._status_filter.blockSignals.assert_called_with(False)
+        panel._library_filter_check.setChecked.assert_called_once_with(False)
+        panel._save_filter_state.assert_called_once_with("clearing mod panel filters")
+        panel._apply_filter.assert_called_once()
+
+    def test_conflict_dialog_uses_cached_pnach_results_and_invalidates_after_close(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        overlaps = [{"mod_a_id": "a", "mod_b_id": "b", "address": "00200000"}]
+        panel._issue_state = MagicMock(return_value={"conflicts": [], "pnach_conflicts": overlaps})
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        panel.manager = MagicMock()
+        panel.config = AppConfig()
+        with patch.object(mod_panel, "ConflictDialog") as dialog:
+            panel._show_conflicts()
+            dialog.assert_called_once_with(
+                [], panel.db, panel, pnach_conflicts=overlaps,
+                manager=panel.manager, config=panel.config,
+            )
+            dialog.return_value.exec.assert_called_once()
+        panel.manager.detect_pnach_conflicts.assert_not_called()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_issue_summary_only_opens_review_for_actual_conflicts(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel._show_conflicts = MagicMock()
+        panel._issue_state = MagicMock(return_value={"conflicts": [], "pnach_conflicts": []})
+        panel._on_count_lbl_clicked()
+        panel._show_conflicts.assert_not_called()
+        panel._issue_state.return_value["pnach_conflicts"] = [{"address": "00200000"}]
+        panel._on_count_lbl_clicked()
+        panel._show_conflicts.assert_called_once()
+
+    def test_old_filter_state_defaults_to_all_statuses(self):
+        mod_panel = self._import_mod_panel()
+        panel = self._make_filter_panel(mod_panel, [])
+        panel.config.ui_state = {"mod_panels": {"pnach": {"query": "gta"}}}
+        panel._sort_combo.count.return_value = 5
+        panel._status_filter.findData.return_value = 0
+        with patch.object(mod_panel, "_save_mod_panel_config") as save:
+            panel._restore_filter_state()
+        panel._status_filter.findData.assert_called_once_with("all")
+        panel._status_filter.setCurrentIndex.assert_called_once_with(0)
+        self.assertEqual(panel.config.ui_state["mod_panels"]["pnach"]["status"], "all")
+        save.assert_not_called()
+
+    def test_metadata_edit_invalidates_cached_issue_state(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.db = MagicMock()
+        panel.db.get.return_value = ModInfo(id="a", name="A", mod_type=ModType.PNACH, path="/mods/a")
+        panel.manager = MagicMock()
+        panel.emit_status = MagicMock()
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        panel._refresh_author_filter = MagicMock()
+        with patch.object(mod_panel, "EditModDialog") as edit:
+            edit.return_value.updated_meta = {"name": "Edited"}
+            edit.return_value.exec.return_value = edit.return_value.DialogCode.Accepted
+            edit.return_value.exec.side_effect = lambda: (
+                edit.call_args.kwargs["save_callback"]({"name": "Edited"}),
+                edit.return_value.DialogCode.Accepted,
+            )[1]
+            panel._on_edit("a")
+        panel.manager.update_metadata.assert_called_once_with("a", name="Edited", fetch_thumbnail=False)
+        panel._refresh_author_filter.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_code_builder_close_invalidates_cached_pnach_overlaps(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.config = AppConfig()
+        panel._library_filter_check = MagicMock()
+        panel._library_filter_check.isChecked.return_value = False
+        panel._invalidate_issue_state_cache = MagicMock()
+        panel._apply_filter = MagicMock()
+        with patch("src.ui.widgets.PnachCodeBuilderDialog") as builder, \
+                patch.object(AppConfig, "load", return_value=panel.config, create=True):
+            panel._open_code_builder()
+        builder.return_value.exec.assert_called_once()
+        panel._invalidate_issue_state_cache.assert_called_once()
+        panel._apply_filter.assert_called_once()
+
+    def test_pnach_detection_failure_logs_and_preserves_file_conflicts(self):
+        mod_panel = self._import_mod_panel()
+        panel = mod_panel.ModPanel.__new__(mod_panel.ModPanel)
+        panel.mod_type = ModType.PNACH
+        panel.extra_types = []
+        panel._issue_state_cache = None
+        panel.manager = MagicMock()
+        panel.manager.detect_conflicts.return_value = [
+            ConflictInfo(mod_a_id="a", mod_b_id="b", conflicting_files=["ABCD1234.pnach"]),
+        ]
+        panel.manager.detect_pnach_conflicts.side_effect = OSError("unreadable")
+        panel.manager.validate_all_pnach.return_value = {}
+        with self.assertLogs("src.ui.mod_panel", level="WARNING") as logs:
+            state = panel._issue_state()
+        self.assertEqual(state["pnach_conflicts"], [])
+        self.assertEqual(state["conflicting_ids"], {"a", "b"})
+        self.assertTrue(any("Could not detect PNACH conflicts" in msg for msg in logs.output))
+
+    def test_mod_row_conflict_button_is_actionable_even_when_shadowed(self):
+        self._import_mod_panel()
+        from src.ui import widgets
+        for shadowed in (False, True):
+            with self.subTest(shadowed=shadowed):
+                mod = ModInfo(id="a", name="A pack", mod_type=ModType.TEXTURE_PACK, path="/mods/a", enabled=False)
+                row = MagicMock(
+                    mod=mod, has_conflict=True, is_shadowed=shadowed,
+                    validation_errors=0, validation_warnings=0, tooltip_mode="normal",
+                )
+                qt = SimpleNamespace(AlignmentFlag=SimpleNamespace(AlignCenter=0))
+                buttons = MagicMock()
+                checkbox = MagicMock()
+                with patch.multiple(
+                    widgets, QLabel=MagicMock(), QHBoxLayout=MagicMock(),
+                    QVBoxLayout=MagicMock(), QPushButton=buttons,
+                    QCheckBox=checkbox, QFrame=MagicMock(), QSizePolicy=MagicMock(), Qt=qt,
+                ):
+                    widgets.ModItemWidget._build_ui(row)
+                calls = buttons.call_args_list
+                self.assertIn(unittest.mock.call("⚠ Review conflicts"), calls)
+                button = buttons.return_value
+                review_callback = button.clicked.connect.call_args_list[0].args[0]
+                review_callback()
+                row.conflicts_requested.emit.assert_called_once_with()
+                checkbox.assert_called_once_with("Disabled")
+                row.toggle.setAccessibleName.assert_called_once_with("Enable or disable A pack")
+                toggle_callback = row.toggle.toggled.connect.call_args_list[0].args[0]
+                toggle_callback(True)
+                row.toggle.setText.assert_called_with("Enabled")
+
+
+class TestLibraryPanelStatePersistence(unittest.TestCase):
+    """Tests for library-panel mode/filter state persistence helpers."""
+
+    def _import_library_panel(self):
+        import importlib
+        import sys
+        import types
+
+        pyqt_pkg = types.ModuleType("PyQt6")
+        pyqt_pkg.__path__ = []  # type: ignore[attr-defined]
+        qtcore = types.ModuleType("PyQt6.QtCore")
+        qtcore.Qt = types.SimpleNamespace(
+            Orientation=types.SimpleNamespace(Horizontal=0),
+            AlignmentFlag=types.SimpleNamespace(AlignCenter=0),
+            TextFormat=types.SimpleNamespace(PlainText=0),
+        )
+        qtcore.QObject = type("QObject", (), {})
+        qtcore.QTimer = type("QTimer", (), {})
+        qtcore.pyqtSignal = lambda *args, **kwargs: type("Signal", (), {})()
+        qtcore.pyqtSlot = lambda *args, **kwargs: lambda fn: fn
+        qtwidgets = types.ModuleType("PyQt6.QtWidgets")
+        for name in (
+            "QCheckBox", "QComboBox", "QFrame", "QHBoxLayout", "QLabel", "QLineEdit",
+            "QMessageBox", "QPushButton", "QScrollArea", "QSizePolicy", "QSplitter",
+            "QStackedWidget", "QTextEdit", "QToolButton", "QVBoxLayout", "QWidget",
+        ):
+            setattr(qtwidgets, name, type(name, (), {}))
+        qtgui = types.ModuleType("PyQt6.QtGui")
+        qtgui.QPixmap = type("QPixmap", (), {})
+
+        base_panel_stub = types.ModuleType("src.ui.base_panel")
+        base_panel_stub.BasePanel = type("BasePanel", (), {})
+
+        with patch.dict(
+            sys.modules,
+            {
+                "PyQt6": pyqt_pkg,
+                "PyQt6.QtCore": qtcore,
+                "PyQt6.QtWidgets": qtwidgets,
+                "PyQt6.QtGui": qtgui,
+                "src.ui.base_panel": base_panel_stub,
+            },
+        ):
+            return importlib.import_module("src.ui.library_panel")
+
+    def _new_scan_panel(self, path="/games", *, module=None):
+        module = module or self._import_library_panel()
+        panel = module.LibraryPanel.__new__(module.LibraryPanel)
+        panel.config = AppConfig(game_library_path=path)
+        panel.db = MagicMock()
+        panel.db.all.return_value = []
+        panel._library_scan_cache_path = None
+        panel._library_scan_cache = []
+        panel._library_scan_error_path = None
+        panel._library_scan_error = ""
+        panel._scan_generation = 0
+        panel._scan_requested_path = None
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._rendered_library_path = None
+        panel._last_library_status = ""
+        panel._cards = []
+        panel._shown_cards = []
+        panel._selected_card = None
+        panel._detail = MagicMock()
+        panel._count_lbl = MagicMock()
+        panel._scan_status = MagicMock()
+        panel._mode_stack = MagicMock()
+        panel._mode_stack.currentIndex.return_value = 0
+        panel._list_layout = MagicMock()
+        panel._list_layout.count.return_value = 0
+        panel.emit_status = MagicMock()
+        self._add_game_filter_controls(panel)
+        return panel
+
+    def _add_game_filter_controls(self, panel):
+        panel._game_search = MagicMock()
+        panel._game_search.text.return_value = ""
+        panel._game_search.setText.side_effect = lambda text: setattr(
+            panel._game_search.text, "return_value", text,
+        )
+        panel._game_search.clear.side_effect = lambda: panel._game_search.setText("")
+
+        def combo(values):
+            widget = MagicMock()
+            widget.currentData.return_value = values[0]
+            widget.findData.side_effect = lambda value: values.index(value) if value in values else -1
+            widget.setCurrentIndex.side_effect = lambda index: setattr(
+                widget.currentData, "return_value", values[index],
+            )
+            return widget
+
+        panel._game_filter = combo(["all", "with_mods", "without_mods", "disc", "tracked"])
+        panel._game_sort = combo(["title", "title_desc", "mods", "size", "serial"])
+        panel._game_search_timer = MagicMock()
+        panel._clear_game_filters_btn = MagicMock()
+        panel._game_empty = MagicMock()
+
+    def _add_sample_game_cards(self, panel, module):
+        entries = [
+            module.GameEntry(
+                path="/games/God of War.iso", filename="God of War.iso",
+                serial="SCUS-97399", title="God of War", size_bytes=400, crcs=["77E61C8A"],
+            ),
+            module.GameEntry(
+                path="/games/Kingdom Hearts.iso", filename="Kingdom Hearts.iso",
+                serial="SLUS-20370", title="Kingdom Hearts", size_bytes=100,
+            ),
+            module.GameEntry(path="", filename="", serial="SLES-55432", title="Persona 4"),
+            module.GameEntry(
+                path="/games/mystery.chd", filename="mystery.chd",
+                serial="", title="", size_bytes=800,
+            ),
+        ]
+        panel._cards = [
+            MagicMock(game=game, mod_count=count)
+            for game, count in zip(entries, (0, 3, 1, 0))
+        ]
+        return list(panel._cards)
+
+    def test_game_search_all_words_can_match_different_fields(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("gOd war scus97399 ntscu ISO 77E6")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [cards[0]])
+        for card, expected in zip(cards, (True, False, False, False)):
+            card.setVisible.assert_called_once_with(expected)
+
+    def test_game_search_matches_filenames_paths_regions_and_crc(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for query, matches in (
+            ("MYSTERYCHD", [3]), ("/games/Kingdom", [1]),
+            ("pal", [2]), ("77e61c8a", [0]), ("CHD", [3]),
+            ("god kingdom", []), ("does not exist", []),
+        ):
+            with self.subTest(query=query):
+                panel._game_search.setText(query)
+                panel._apply_game_filters()
+                self.assertEqual(panel._shown_cards, [cards[i] for i in matches])
+
+    def test_game_search_unicode_casefold_and_whitespace(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        game = module.GameEntry(
+            path="/games/Ōkami.iso", filename="Ōkami.iso", serial="SLUS-21115", title="Ōkami",
+        )
+        card = MagicMock(game=game, mod_count=0)
+        panel._cards = [card]
+        panel._game_search.setText("  ŌKAMI \t slus21115 \n")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [card])
+        self.assertEqual(panel._current_game_filter_state()["search"], "  ŌKAMI \t slus21115 \n")
+
+    def test_game_filters_distinguish_mod_counts_and_disc_presence(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for mode, indices in (
+            ("all", [0, 1, 3, 2]), ("with_mods", [1, 2]),
+            ("without_mods", [0, 3]), ("disc", [0, 1, 3]), ("tracked", [2]),
+        ):
+            with self.subTest(mode=mode):
+                panel._game_filter.currentData.return_value = mode
+                panel._apply_game_filters()
+                self.assertEqual(panel._shown_cards, [cards[i] for i in indices])
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0],
+                         "Library games: 1/4 shown • 1 with installed mods\n0 disc images • 1 tracked only")
+
+    def test_search_composes_with_game_filter_and_sort(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("iso")
+        panel._game_filter.currentData.return_value = "with_mods"
+        panel._game_sort.currentData.return_value = "size"
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [cards[1]])
+        self.assertIn("1/4 shown", panel._count_lbl.setText.call_args.args[0])
+
+    def test_game_sort_orders_and_deterministic_ties(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        for sort, indices in (
+            ("title", [0, 1, 3, 2]), ("title_desc", [2, 3, 1, 0]),
+            ("mods", [1, 2, 0, 3]), ("size", [3, 0, 1, 2]),
+            ("serial", [0, 2, 1, 3]),
+        ):
+            with self.subTest(sort=sort):
+                panel._game_sort.currentData.return_value = sort
+                panel._list_layout.insertWidget.reset_mock()
+                panel._apply_game_filters()
+                expected = [cards[i] for i in indices]
+                self.assertEqual(panel._shown_cards, expected)
+                self.assertEqual(
+                    [call.args[1] for call in panel._list_layout.insertWidget.call_args_list], expected,
+                )
+        self.assertEqual(panel._cards, cards)  # Full snapshot is not narrowed or reordered.
+
+    def test_empty_filters_do_not_construct_cards_scan_or_touch_database(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        with patch.object(module, "scan_library") as scan, patch.object(module, "_GameCard") as constructor:
+            for text in ("", "g", "god", "no match", ""):
+                panel._game_search.setText(text)
+                panel._apply_game_filters()
+        scan.assert_not_called()
+        constructor.assert_not_called()
+        panel.db.all.assert_not_called()
+        self.assertEqual(panel._cards, cards)
+
+    def test_hiding_selection_clears_detail_not_saved_identity(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._apply_game_filters()
+        panel._on_game_clicked(cards[0].game)
+        # Persist explicitly: fixture disables automatic persistence by default.
+        panel.config.ui_state["library_panel"]["selected_game"] = panel._selected_game_state()
+        selected = dict(panel.config.ui_state["library_panel"]["selected_game"])
+        panel._game_search.setText("kingdom")
+        panel._detail.clear_game.reset_mock()
+        with patch.object(module, "save_config") as save:
+            panel._apply_game_filters()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        panel._detail.clear_game.assert_called_once()
+        cards[0].set_selected.assert_called_with(False)
+        save.assert_not_called()
+        panel._game_search.setText("")
+        panel._apply_game_filters()
+        self.assertIs(panel._selected_card, cards[0])
+
+    def test_hidden_exact_disc_does_not_fall_back_to_visible_sibling(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        other = MagicMock(
+            game=module.GameEntry(path="/games/variant.chd", filename="variant.chd",
+                                  serial=cards[0].game.serial, title="Variant"),
+            mod_count=0,
+        )
+        panel._cards.append(other)
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": cards[0].game.path, "serial": cards[0].game.serial,
+        }}}
+        panel._game_search.setText("variant")
+        panel._apply_game_filters()
+        self.assertEqual(panel._shown_cards, [other])
+        self.assertIsNone(panel._selected_card)
+        panel._detail.show_game.assert_not_called()
+
+    def test_serial_fallback_skips_hidden_matches_when_exact_disc_is_absent(self):
+        module = self._import_library_panel()
+        for saved_path in ("", "/removed/disc.iso"):
+            with self.subTest(saved_path=saved_path):
+                panel = self._new_scan_panel(module=module)
+                cards = self._add_sample_game_cards(panel, module)
+                other = MagicMock(
+                    game=module.GameEntry(path="/games/variant.chd", filename="variant.chd",
+                                          serial=cards[0].game.serial, title="Variant"),
+                    mod_count=0,
+                )
+                panel._cards.append(other)
+                panel.config.ui_state = {"library_panel": {"selected_game": {
+                    "path": saved_path, "serial": cards[0].game.serial,
+                }}}
+                panel._game_search.setText("variant")
+                panel._apply_game_filters()
+                self.assertIs(panel._selected_card, other)
+                panel._detail.show_game.assert_called_once_with(other.game)
+
+    def test_hidden_serial_fallback_preserves_saved_selection_when_none_visible(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        selected = {"path": "/removed/disc.iso", "serial": cards[0].game.serial}
+        panel.config.ui_state = {"library_panel": {"selected_game": dict(selected)}}
+        panel._game_search.setText("no match")
+        with patch.object(module, "save_config") as save:
+            panel._apply_game_filters()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        save.assert_not_called()
+
+    def test_selecting_another_game_replaces_hidden_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._state_persistence_enabled = True
+        panel._all_mods_pane = MagicMock()
+        panel._all_mods_pane.current_filter_state.return_value = {}
+        with patch.object(module, "save_config"):
+            panel._apply_game_filters()
+            panel._on_game_clicked(cards[0].game)
+            panel._game_search.setText("kingdom")
+            panel._on_game_filters_changed()
+            panel._on_game_clicked(cards[1].game)
+            panel._clear_game_filters()
+        self.assertIs(panel._selected_card, cards[1])
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"]["path"], cards[1].game.path)
+        cards[0].set_selected.assert_called_with(False)
+
+    def test_hidden_game_click_is_ignored(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        cards = self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("kingdom")
+        panel._apply_game_filters()
+        panel._on_game_clicked(cards[1].game)
+        panel._detail.show_game.reset_mock()
+        panel._on_game_clicked(cards[0].game)
+        self.assertIs(panel._selected_card, cards[1])
+        panel._detail.show_game.assert_not_called()
+
+    def test_no_match_recovery_resets_search_filter_sort_once(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._game_search.setText("no match")
+        panel._game_filter.currentData.return_value = "disc"
+        panel._game_sort.currentData.return_value = "mods"
+        panel._apply_game_filters()
+        panel._game_empty.setVisible.assert_called_with(True)
+        self.assertIn("Clear Filters", panel._game_empty.setText.call_args.args[0])
+        self.assertIn("0/4 shown", panel._count_lbl.setText.call_args.args[0])
+        with patch.object(panel, "_save_view_state") as save, patch.object(panel, "_apply_game_filters", wraps=panel._apply_game_filters) as apply:
+            panel._clear_game_filters()
+        self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+        self.assertEqual(len(panel._shown_cards), 4)
+        panel._game_empty.setVisible.assert_called_with(False)
+        panel._clear_game_filters_btn.setEnabled.assert_called_with(False)
+        apply.assert_called_once()
+        save.assert_called_once()
+        for widget in (panel._game_search, panel._game_filter, panel._game_sort):
+            self.assertEqual([call.args[0] for call in widget.blockSignals.call_args_list[-2:]], [True, False])
+
+    def test_game_filter_state_round_trip_preserves_raw_search(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        state = {"search": "  Kingdom  SLUS20370 ", "filter": "disc", "sort": "mods"}
+        with patch.object(module, "save_config") as save:
+            panel._restore_game_filter_state(state)
+        self.assertEqual(panel._current_game_filter_state(), state)
+        save.assert_not_called()
+        for widget in (panel._game_search, panel._game_filter, panel._game_sort):
+            self.assertEqual([call.args[0] for call in widget.blockSignals.call_args_list], [True, False])
+        panel._game_search_timer.start.assert_not_called()
+
+    def test_game_filter_state_repairs_stale_and_malformed_values(self):
+        module = self._import_library_panel()
+        for state in (
+            None, [], {"search": 12, "filter": ["disc"], "sort": False},
+            {"filter": "archived", "sort": "recent"},
+        ):
+            with self.subTest(state=state):
+                panel = self._new_scan_panel(module=module)
+                with patch.object(module, "save_config") as save:
+                    with self.assertLogs("src.ui.library_panel", level="WARNING"):
+                        panel._restore_game_filter_state(state)
+                self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+                self.assertEqual(panel.config.ui_state["library_panel"]["by_game"], panel._current_game_filter_state())
+                save.assert_called_once_with(panel.config)
+
+    def test_game_filter_state_defaults_without_writing_config(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        with patch.object(module, "save_config") as save:
+            panel._restore_game_filter_state({})
+        self.assertEqual(panel._current_game_filter_state(), {"search": "", "filter": "all", "sort": "title"})
+        save.assert_not_called()
+
+    def test_game_and_all_mods_filter_states_remain_independent(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._all_mods_pane = MagicMock()
+        all_mods = {"search": "author:Alice", "status": "enabled", "type": "pnach"}
+        panel._all_mods_pane.current_filter_state.return_value = all_mods
+        panel._state_persistence_enabled = True
+        state = {"search": "god", "filter": "disc", "sort": "size"}
+        panel._restore_game_filter_state(state)
+        with patch.object(module, "save_config"):
+            panel._save_view_state("testing independent filters")
+        saved = panel.config.ui_state["library_panel"]
+        self.assertEqual(saved["all_mods"], all_mods)
+        self.assertEqual(saved["by_game"], state)
+
+    def test_late_game_search_timer_does_not_overwrite_all_mods_count(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._game_search.setText("god")
+        with patch.object(panel, "_apply_game_filters") as apply, patch.object(panel, "_save_view_state") as save:
+            panel._on_game_filters_changed()
+        panel._game_search_timer.stop.assert_called_once()
+        apply.assert_not_called()
+        save.assert_called_once()
+        panel._count_lbl.setText.assert_not_called()
+
+    def test_no_matches_during_scan_are_not_reported_as_finished_empty(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._scan_active = (1, "/games")
+        panel._game_search.setText("no match")
+        panel._apply_game_filters()
+        self.assertIn("still loading", panel._game_empty.setText.call_args.args[0])
+        self.assertIn("Scanning disc images: 0/4", panel._count_lbl.setText.call_args.args[0])
+
+    def test_filtered_error_state_reports_failure_and_allows_reset(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        self._add_sample_game_cards(panel, module)
+        panel._library_scan_error = "disk offline"
+        panel._game_filter.currentData.return_value = "tracked"
+        panel._apply_game_filters()
+        self.assertIn("Scan failed: 1/4", panel._count_lbl.setText.call_args.args[0])
+        panel._clear_game_filters()
+        self.assertEqual(len(panel._shown_cards), 4)
+
+    def test_filters_apply_to_async_completion_without_dropping_full_snapshot(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        entries = [card.game for card in originals[:2]]
+        panel._cards = []
+        panel._game_search.setText("kingdom")
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+                panel._on_library_scan_finished(*panel._scan_active, entries, "")
+        self.assertEqual([card.game for card in panel._shown_cards], [entries[1]])
+        self.assertEqual([card.game for card in panel._cards], entries)
+        self.assertEqual(panel._library_scan_cache, entries)
+
+    def test_same_folder_refresh_retains_hidden_disc_results(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        panel._rendered_library_path = "/games"
+        panel._game_search.setText("kingdom")
+        panel._apply_game_filters()
+        panel._sync_installed_content = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+                panel.refresh()
+        self.assertEqual([card.game for card in panel._cards], [originals[i].game for i in (0, 1, 3)])
+        self.assertEqual([card.game for card in panel._shown_cards], [originals[1].game])
+
+    def test_game_mod_filter_updates_after_database_refresh(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        originals = self._add_sample_game_cards(panel, module)
+        panel._scan_requested_path = "/games"
+        panel._library_scan_cache_path = "/games"
+        panel._library_scan_cache = [card.game for card in originals[:2]]
+        panel._game_filter.currentData.return_value = "with_mods"
+        panel.db.all.return_value = [MagicMock(game_id=originals[0].game.serial)]
+        with patch.object(module, "_GameCard", side_effect=lambda game, count, **kwargs: MagicMock(game=game, mod_count=count)):
+            panel._populate()
+        self.assertEqual([card.game for card in panel._shown_cards], [originals[0].game])
+        self.assertEqual([card.mod_count for card in panel._cards], [1, 0])
+
+    def test_all_mods_filter_state_round_trip(self):
+        library_panel = self._import_library_panel()
+        AllModsPane = library_panel._AllModsPane
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, _blocked):
+                pass
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, _blocked):
+                pass
+
+        pane = AllModsPane.__new__(AllModsPane)
+        pane._search_edit = FakeLineEdit()
+        pane._type_combo = FakeComboBox([
+            ("All types", ""),
+            ("pnach", "pnach"),
+            ("texture_pack", "texture_pack"),
+        ])
+        pane._status_combo = FakeComboBox([
+            ("All", "all"),
+            ("Enabled", "enabled"),
+            ("Disabled", "disabled"),
+        ])
+
+        pane.restore_filter_state({
+            "search": "gta",
+            "type": "texture_pack",
+            "status": "enabled",
+        })
+
+        self.assertEqual(pane._search_edit.text(), "gta")
+        self.assertEqual(pane._type_combo.currentData(), "texture_pack")
+        self.assertEqual(pane._status_combo.currentData(), "enabled")
+        self.assertEqual(
+            pane.current_filter_state(),
+            {"search": "gta", "type": "texture_pack", "status": "enabled"},
+        )
+
+    def test_all_mods_filter_state_sanitizes_stale_values(self):
+        library_panel = self._import_library_panel()
+        AllModsPane = library_panel._AllModsPane
+
+        class FakeLineEdit:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+            def text(self):
+                return self.value
+
+            def blockSignals(self, _blocked):
+                pass
+
+        class FakeComboBox:
+            def __init__(self, items):
+                self.items = list(items)
+                self.index = 0
+
+            def findData(self, value):
+                for idx, (_, data) in enumerate(self.items):
+                    if data == value:
+                        return idx
+                return -1
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+            def currentData(self):
+                if not self.items:
+                    return ""
+                return self.items[self.index][1]
+
+            def blockSignals(self, _blocked):
+                pass
+
+        state = {
+            "search": "gta",
+            "type": "obsolete_type",
+            "status": "archived",
+        }
+
+        pane = AllModsPane.__new__(AllModsPane)
+        pane.config = AppConfig(ui_state={"library_panel": {"all_mods": state}})
+        pane._search_edit = FakeLineEdit()
+        pane._type_combo = FakeComboBox([
+            ("All types", ""),
+            ("pnach", "pnach"),
+            ("texture_pack", "texture_pack"),
+        ])
+        pane._status_combo = FakeComboBox([
+            ("All", "all"),
+            ("Enabled", "enabled"),
+            ("Disabled", "disabled"),
+        ])
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                AllModsPane.restore_filter_state(pane, state)
+
+        self.assertEqual(pane._search_edit.text(), "gta")
+        self.assertEqual(pane._type_combo.currentData(), "")
+        self.assertEqual(pane._status_combo.currentData(), "all")
+        self.assertEqual(state, {"search": "gta", "type": "", "status": "all"})
+        save_mock.assert_called_once_with(pane.config)
+        self.assertTrue(
+            any("library-panel type filter" in msg for msg in logs.output),
+            logs.output,
+        )
+        self.assertTrue(
+            any("library-panel status filter" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_restore_view_state_defaults_to_by_game(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakePane:
+            def __init__(self):
+                self.restored = None
+                self._state_persistence_enabled = False
+
+            def restore_filter_state(self, state):
+                self.restored = dict(state)
+
+        class FakeStack:
+            def __init__(self):
+                self.index = 0
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = False
+        panel._all_mods_pane = FakePane()
+        panel._mode_stack = FakeStack()
+        panel._by_game_btn = FakeButton()
+        panel._all_mods_btn = FakeButton()
+        panel._count_lbl = FakeLabel()
+        self._add_game_filter_controls(panel)
+        panel._populate = lambda: setattr(panel, "populate_called", True)
+        panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
+        panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
+
+        LibraryPanel._restore_view_state(panel)
+
+        self.assertTrue(getattr(panel, "populate_called", False))
+        self.assertEqual(panel._mode_stack.currentIndex(), 0)
+        self.assertTrue(panel._by_game_btn.checked)
+        self.assertFalse(panel._all_mods_btn.checked)
+        self.assertEqual(panel._all_mods_pane.restored, {})
+
+    def test_restore_view_state_switches_to_all_mods(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakePane:
+            def __init__(self):
+                self.restored = None
+                self.refreshed = False
+                self._state_persistence_enabled = False
+
+            def restore_filter_state(self, state):
+                self.restored = dict(state)
+
+            def refresh(self):
+                self.refreshed = True
+
+        class FakeStack:
+            def __init__(self):
+                self.index = 0
+
+            def currentIndex(self):
+                return self.index
+
+            def setCurrentIndex(self, index):
+                self.index = index
+
+        class FakeButton:
+            def __init__(self):
+                self.checked = False
+
+            def setChecked(self, value):
+                self.checked = bool(value)
+
+        class FakeLabel:
+            def __init__(self):
+                self.value = ""
+
+            def setText(self, value):
+                self.value = value
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "mode": "all_mods",
+                    "all_mods": {"search": "gta", "type": "pnach", "status": "enabled"},
+                }
+            }
+        )
+        panel.db = types.SimpleNamespace(all=lambda: [
+            types.SimpleNamespace(enabled=True),
+            types.SimpleNamespace(enabled=False),
+        ])
+        panel._state_persistence_enabled = False
+        panel._all_mods_pane = FakePane()
+        panel._mode_stack = FakeStack()
+        panel._by_game_btn = FakeButton()
+        panel._all_mods_btn = FakeButton()
+        panel._count_lbl = FakeLabel()
+        self._add_game_filter_controls(panel)
+        panel._populate = lambda: setattr(panel, "populate_called", True)
+        panel._switch_to_by_game = types.MethodType(LibraryPanel._switch_to_by_game, panel)
+        panel._switch_to_all_mods = types.MethodType(LibraryPanel._switch_to_all_mods, panel)
+
+        LibraryPanel._restore_view_state(panel)
+
+        self.assertTrue(panel._all_mods_pane.refreshed)
+        self.assertEqual(panel._mode_stack.currentIndex(), 1)
+        self.assertFalse(panel._by_game_btn.checked)
+        self.assertTrue(panel._all_mods_btn.checked)
+        self.assertEqual(
+            panel._all_mods_pane.restored,
+            {"search": "gta", "type": "pnach", "status": "enabled"},
+        )
+
+    def test_save_view_state_updates_config(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeStack:
+            def __init__(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+        class FakePane:
+            def current_filter_state(self):
+                return {"search": "gta", "type": "pnach", "status": "enabled"}
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._mode_stack = FakeStack(1)
+        panel._all_mods_pane = FakePane()
+        self._add_game_filter_controls(panel)
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            LibraryPanel._save_view_state(panel, "switching library view to all-mods")
+
+        self.assertEqual(
+            panel.config.ui_state["library_panel"],
+            {
+                "mode": "all_mods",
+                "all_mods": {"search": "gta", "type": "pnach", "status": "enabled"},
+                "by_game": {"search": "", "filter": "all", "sort": "title"},
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_save_view_state_persists_selected_game(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeStack:
+            def __init__(self, index):
+                self.index = index
+
+            def currentIndex(self):
+                return self.index
+
+        class FakePane:
+            def current_filter_state(self):
+                return {"search": "gta", "type": "pnach", "status": "enabled"}
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig()
+        panel._state_persistence_enabled = True
+        panel._mode_stack = FakeStack(0)
+        panel._all_mods_pane = FakePane()
+        panel._selected_card = types.SimpleNamespace(
+            game=types.SimpleNamespace(
+                path="/games/kh.iso",
+                serial="slus-20370",
+                title="Kingdom Hearts",
+            )
+        )
+        self._add_game_filter_controls(panel)
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            LibraryPanel._save_view_state(panel, "selecting game in library")
+
+        self.assertEqual(
+            panel.config.ui_state["library_panel"]["selected_game"],
+            {
+                "path": "/games/kh.iso",
+                "serial": "SLUS-20370",
+                "title": "Kingdom Hearts",
+            },
+        )
+        save_mock.assert_called_once_with(panel.config)
+
+    def test_restore_selected_game_reselects_matching_card(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeGame:
+            def __init__(self, path, serial, title):
+                self.path = path
+                self.serial = serial
+                self.title = title
+
+        class FakeCard:
+            def __init__(self, game):
+                self.game = game
+                self.selected = False
+
+            def set_selected(self, value):
+                self.selected = bool(value)
+
+        class FakeDetail:
+            def __init__(self):
+                self.shown = None
+
+            def show_game(self, game):
+                self.shown = game
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "selected_game": {
+                        "path": "/games/kh.iso",
+                        "serial": "SLUS-20370",
+                        "title": "Kingdom Hearts",
+                    }
+                }
+            }
+        )
+        panel._cards = [
+            FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War")),
+            FakeCard(FakeGame("/games/kh.iso", "SLUS-20370", "Kingdom Hearts")),
+        ]
+        panel._shown_cards = list(panel._cards)
+        panel._selected_card = None
+        panel._detail = FakeDetail()
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._library_scan_error = ""
+
+        LibraryPanel._restore_selected_game(panel)
+
+        self.assertFalse(panel._cards[0].selected)
+        self.assertTrue(panel._cards[1].selected)
+        self.assertIs(panel._selected_card, panel._cards[1])
+        self.assertEqual(panel._detail.shown.title, "Kingdom Hearts")
+
+    def test_restore_selected_game_clears_stale_selection(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        class FakeGame:
+            def __init__(self, path, serial, title):
+                self.path = path
+                self.serial = serial
+                self.title = title
+
+        class FakeCard:
+            def __init__(self, game):
+                self.game = game
+                self.selected = False
+
+            def set_selected(self, value):
+                self.selected = bool(value)
+
+        class FakeDetail:
+            def __init__(self):
+                self.shown = None
+
+            def show_game(self, game):
+                self.shown = game
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={
+                "library_panel": {
+                    "selected_game": {
+                        "path": "/games/missing.iso",
+                        "serial": "SLUS-99999",
+                        "title": "Missing Game",
+                    }
+                }
+            }
+        )
+        panel._cards = [FakeCard(FakeGame("/games/gow.iso", "SCUS-97399", "God of War"))]
+        panel._selected_card = None
+        panel._detail = FakeDetail()
+        panel._scan_active = None
+        panel._scan_pending = None
+        panel._library_scan_error = ""
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                LibraryPanel._restore_selected_game(panel)
+
+        self.assertEqual(panel.config.ui_state["library_panel"], {})
+        self.assertFalse(panel._cards[0].selected)
+        self.assertIsNone(panel._selected_card)
+        self.assertIsNone(panel._detail.shown)
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(
+            any("clearing stale selection" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_restore_selected_game_clears_invalid_state(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.config = AppConfig(
+            ui_state={"library_panel": {"selected_game": ["not", "a", "dict"]}}
+        )
+        panel._cards = []
+        panel._selected_card = None
+
+        with patch.object(library_panel, "save_config") as save_mock:
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                LibraryPanel._restore_selected_game(panel)
+
+        self.assertEqual(panel.config.ui_state["library_panel"], {})
+        save_mock.assert_called_once_with(panel.config)
+        self.assertTrue(any("invalid" in msg for msg in logs.output), logs.output)
+
+    def test_scan_library_reuses_cache_until_invalidated(self):
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = self._new_scan_panel(module=library_panel)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult"):
+            first = LibraryPanel._scan_library(panel, "/games")
+            self.assertIsNone(first)
+            generation = panel._scan_generation
+            panel._on_library_scan_finished(generation, "/games", ["first"], "")
+            second = LibraryPanel._scan_library(panel, "/games")
+            second.append("not cached")
+            self.assertEqual(panel._scan_library("/games"), ["first"])
+            LibraryPanel._invalidate_library_scan_cache(panel)
+            third = LibraryPanel._scan_library(panel, "/games")
+
+        self.assertEqual(second, ["first", "not cached"])
+        self.assertIsNone(third)
+        self.assertEqual(thread.call_count, 2)
+
+    def test_scan_library_logs_failure_and_keeps_retryable_error(self):
+        library_panel = self._import_library_panel()
+        panel = self._new_scan_panel(module=library_panel)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult") as relay:
+            with patch.object(library_panel, "scan_library", side_effect=RuntimeError("boom")) as scan:
+                panel._scan_library("/games")
+                worker = thread.call_args.kwargs["target"]
+                with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                    worker()
+            scan.assert_called_once_with("/games", strict=True)
+            args = relay.return_value.finished.emit.call_args.args
+            self.assertEqual(args[1:], ("/games", [], "boom"))
+            panel._on_library_scan_finished(*args)
+            self.assertEqual(panel._scan_library("/games"), [])
+            self.assertEqual(thread.call_count, 1)
+            panel._invalidate_library_scan_cache()
+            self.assertIsNone(panel._scan_library("/games"))
+            self.assertEqual(thread.call_count, 2)
+
+        relay.return_value.deleteLater.assert_called_once()
+        self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+
+    def test_get_db_only_games_uses_provided_serial_counts(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel.db = types.SimpleNamespace(all=MagicMock(side_effect=AssertionError("unexpected db scan")))
+
+        with patch(
+            "src.core.game_registry.lookup_game_title",
+            side_effect=lambda serial: f"Title {serial}",
+        ) as lookup_mock:
+            db_only = LibraryPanel._get_db_only_games(
+                panel,
+                {"SLUS-20062"},
+                {"SLUS-20062": 2, "SLUS-21075": 1},
+            )
+
+        self.assertEqual(len(db_only), 1)
+        game, mod_count = db_only[0]
+        self.assertEqual(game.serial, "SLUS-21075")
+        self.assertEqual(game.title, "Title SLUS-21075")
+        self.assertEqual(mod_count, 1)
+        panel.db.all.assert_not_called()
+        lookup_mock.assert_called_once_with("SLUS-21075")
+
+    def test_populate_missing_game_library_path_is_checked_in_worker(self):
+        library_panel = self._import_library_panel()
+        path = "/definitely/not/a/real/folder"
+        panel = self._new_scan_panel(path, module=library_panel)
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(library_panel, "_LibraryScanResult") as relay:
+            with patch.object(library_panel.Path, "is_dir", side_effect=AssertionError("UI filesystem access")):
+                panel._populate()
+            self.assertIn("Scanning", panel._count_lbl.setText.call_args.args[0])
+            panel._populate_db_games.assert_called_once()
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                thread.call_args.kwargs["target"]()
+            with patch.object(library_panel, "QLabel", MagicMock()):
+                panel._on_library_scan_finished(*relay.return_value.finished.emit.call_args.args)
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        self.assertIn("folder not found", panel._library_scan_error)
+        self.assertTrue(any("Game library folder not found" in msg for msg in logs.output))
+
+    def test_populate_scan_failure_shows_error_placeholder_and_status(self):
+        library_panel = self._import_library_panel()
+        panel = self._new_scan_panel(module=library_panel)
+        panel._scan_requested_path = "/games"
+        panel._library_scan_error_path = "/games"
+        panel._library_scan_error = "permission <denied>"
+        panel._populate_db_games = MagicMock()
+        panel._restore_selected_game = MagicMock()
+        with patch.object(library_panel, "QLabel") as label:
+            panel._populate()
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        text = label.call_args.args[0]
+        self.assertTrue(text.startswith("Could not scan your game library folder."))
+        self.assertIn("permission <denied>", text)
+        label.return_value.setTextFormat.assert_called_once_with(library_panel.Qt.TextFormat.PlainText)
+        panel._populate_db_games.assert_called_once()
+        panel._restore_selected_game.assert_called_once()
+        panel.emit_status.assert_called_once_with("Could not scan game library folder: /games")
+
+    def test_scan_requests_coalesce_to_latest_folder(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            for path in ("/second", "/third", "/latest"):
+                panel.config.game_library_path = path
+                panel._invalidate_library_scan_cache()
+                panel._scan_library(path)
+            self.assertEqual(thread.call_count, 1)
+            latest = panel._scan_pending
+            self.assertEqual(latest[1], "/latest")
+            panel._on_library_scan_finished(*first, ["stale"], "")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._scan_active, latest)
+            self.assertIsNone(panel._scan_pending)
+            self.assertIsNone(panel._library_scan_cache_path)
+            panel._on_library_scan_finished(*latest, ["current"], "")
+            self.assertEqual(panel._scan_library("/latest"), ["current"])
+            self.assertEqual(thread.call_count, 2)
+
+    def test_repeated_populate_uses_one_pending_scan(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            for _ in range(5):
+                panel._populate()
+        self.assertEqual(thread.call_count, 1)
+        self.assertIsNone(panel._scan_pending)
+        self.assertIn("background", panel._scan_status.setText.call_args.args[0])
+
+    def test_refresh_during_scan_only_queues_one_followup(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._sync_installed_content = MagicMock()
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._populate()
+            first = panel._scan_active
+            for _ in range(5):
+                panel.refresh()
+            latest = panel._scan_pending
+            self.assertEqual(thread.call_count, 1)
+            panel._on_library_scan_finished(*first, [], "")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._scan_active, latest)
+            self.assertIsNone(panel._scan_pending)
+        panel.emit_status.assert_not_called()
+
+    def test_completion_detects_settings_change_without_populate(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel.config.game_library_path = "/new"
+            panel._on_library_scan_finished(*first, ["old"], "stale failure")
+            self.assertEqual(panel._scan_active[1], "/new")
+            self.assertEqual(thread.call_count, 2)
+            self.assertEqual(panel._library_scan_cache, [])
+            self.assertEqual(panel._library_scan_error, "")
+        panel.emit_status.assert_not_called()
+
+    def test_cleared_folder_discards_result_and_queued_request(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel._invalidate_library_scan_cache()
+            panel._scan_library("/queued")
+            panel.config.game_library_path = ""
+            panel._on_library_scan_finished(*first, ["old"], "")
+            self.assertIsNone(panel._scan_active)
+            self.assertIsNone(panel._scan_pending)
+            self.assertIsNone(panel._library_scan_cache_path)
+            self.assertEqual(thread.call_count, 1)
+
+    def test_duplicate_completion_cannot_release_new_worker(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            first = panel._scan_active
+            panel._invalidate_library_scan_cache()
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*first, ["old"], "")
+            current = panel._scan_active
+            panel._on_library_scan_finished(*first, ["duplicate"], "duplicate error")
+        self.assertEqual(panel._scan_active, current)
+        self.assertEqual(panel._library_scan_error, "")
+        self.assertIsNone(panel._library_scan_cache_path)
+
+    def test_all_mods_completion_caches_without_rebuilding_game_view(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate = MagicMock()
+        panel._mode_stack.currentIndex.return_value = 1
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*panel._scan_active, ["ready"], "")
+        panel._populate.assert_not_called()
+        panel._count_lbl.setText.assert_not_called()
+        panel._detail.clear_game.assert_not_called()
+        self.assertEqual(panel._scan_library("/games"), ["ready"])
+        panel._scan_status.setVisible.assert_called_with(False)
+
+    def test_all_mods_scan_failure_keeps_count_and_reports_retry(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._populate = MagicMock()
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._scan_library("/games")
+            panel._on_library_scan_finished(*panel._scan_active, [], "denied")
+        panel._populate.assert_not_called()
+        panel._count_lbl.setText.assert_not_called()
+        self.assertIn("denied", panel._scan_status.setText.call_args.args[0])
+        panel.emit_status.assert_called_once_with("Game library scan failed; use Scan Library to retry.")
+
+    def test_all_mods_refresh_still_requests_disc_scan(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._mode_stack.currentIndex.return_value = 1
+        panel._sync_installed_content = MagicMock()
+        panel._switch_to_all_mods = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult"):
+            panel.refresh()
+        self.assertEqual(thread.call_count, 1)
+        panel._switch_to_all_mods.assert_called_once()
+        panel._sync_installed_content.assert_called_once()
+
+    def test_worker_owns_only_relay_and_immutable_request(self):
+        import inspect
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult") as relay:
+            with patch.object(module, "scan_library", return_value=["disc"]) as scan:
+                panel._scan_library("/games")
+                worker = thread.call_args.kwargs["target"]
+                closure = inspect.getclosurevars(worker).nonlocals
+                self.assertEqual(set(closure), {"result", "generation", "path"})
+                self.assertNotIn(panel, closure.values())
+                worker()
+        scan.assert_called_once_with("/games", strict=True)
+        relay.return_value.finished.connect.assert_called_once_with(panel._on_library_scan_finished)
+        relay.return_value.finished.emit.assert_called_once_with(panel._scan_generation, "/games", ["disc"], "")
+        relay.return_value.deleteLater.assert_called_once()
+        self.assertEqual(panel._library_scan_cache, [])  # Only the UI receiver writes state.
+
+    def test_thread_start_failure_is_rendered_without_recursive_populate(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._populate_db_games = MagicMock()
+        with patch("threading.Thread") as thread, patch.object(module, "_LibraryScanResult") as relay:
+            thread.return_value.start.side_effect = RuntimeError("no threads")
+            with patch.object(module, "QLabel"), self.assertLogs("src.ui.library_panel", level="WARNING"):
+                panel._populate()
+        self.assertIsNone(panel._scan_active)
+        self.assertIn("no threads", panel._library_scan_error)
+        self.assertEqual(panel._count_lbl.setText.call_args.args[0], "Scan failed — showing installed mods only")
+        relay.return_value.deleteLater.assert_called_once()
+
+    def test_pending_and_failed_scans_do_not_clear_saved_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        selected = {"path": "/games/disc.iso", "serial": "SLUS-20062"}
+        panel.config.ui_state = {"library_panel": {"selected_game": selected}}
+        with patch.object(module, "save_config") as save:
+            panel._scan_active = (1, "/games")
+            panel._restore_selected_game()
+            panel._scan_active = None
+            panel._library_scan_error = "denied"
+            panel._restore_selected_game()
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        save.assert_not_called()
+
+    def test_restore_prefers_exact_disc_over_another_with_same_serial(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": "/games/second.iso", "serial": "SLUS-20062",
+        }}}
+        panel._cards = [MagicMock(), MagicMock()]
+        for card, path in zip(panel._cards, ("/games/first.iso", "/games/second.iso")):
+            card.game = module.GameEntry(path=path, filename=Path(path).name, serial="SLUS-20062", title="")
+        panel._shown_cards = list(panel._cards)
+        panel._restore_selected_game()
+        self.assertIs(panel._selected_card, panel._cards[1])
+        panel._cards[0].set_selected.assert_not_called()
+
+    def test_error_fallback_does_not_replace_saved_disc_with_db_only_game(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        selected = {"path": "/games/disc.iso", "serial": "SLUS-20062"}
+        panel.config.ui_state = {"library_panel": {"selected_game": selected}}
+        panel._library_scan_error = "denied"
+        card = MagicMock()
+        card.game = module.GameEntry(path="", filename="", serial="SLUS-20062", title="")
+        panel._cards = [card]
+        panel._restore_selected_game()
+        self.assertIsNone(panel._selected_card)
+        self.assertEqual(panel.config.ui_state["library_panel"]["selected_game"], selected)
+        panel._detail.show_game.assert_not_called()
+
+    def test_refresh_reuses_same_folder_games_but_rebuilds_mod_counts(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._rendered_library_path = "/games"
+        disc = module.GameEntry(path="/games/disc.iso", filename="disc.iso", serial="SLUS-20062", title="")
+        panel._cards = [MagicMock(game=disc)]
+        panel.config.ui_state = {"library_panel": {"selected_game": {
+            "path": disc.path, "serial": disc.serial,
+        }}}
+        panel.db.all.return_value = [MagicMock(game_id=disc.serial)]
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            with patch.object(module, "_GameCard") as card:
+                card.return_value.game = disc
+                card.return_value.mod_count = 1
+                panel._populate()
+        card.assert_called_once_with(disc, 1, config=panel.config)
+        self.assertIs(panel._selected_card, card.return_value)
+        panel._detail.show_game.assert_called_once_with(disc)
+        self.assertEqual(panel._rendered_library_path, "/games")
+        self.assertIn("Scanning", panel._last_library_status)
+
+    def test_new_folder_scan_clears_old_cards_and_details_not_saved_selection(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(path="/new", module=module)
+        panel._rendered_library_path = "/old"
+        panel._cards = [MagicMock()]
+        panel._selected_card = panel._cards[0]
+        panel._populate_db_games = MagicMock()
+        panel.config.ui_state = {"library_panel": {"selected_game": {"path": "/old/disc.iso"}}}
+        with patch("threading.Thread"), patch.object(module, "_LibraryScanResult"):
+            panel._populate()
+        self.assertEqual(panel._cards, [])
+        self.assertIsNone(panel._selected_card)
+        panel._detail.clear_game.assert_called_once()
+        self.assertIn("selected_game", panel.config.ui_state["library_panel"])
+
+    def test_scan_failure_keeps_previous_disc_results_usable(self):
+        module = self._import_library_panel()
+        panel = self._new_scan_panel(module=module)
+        panel._scan_requested_path = "/games"
+        panel._rendered_library_path = "/games"
+        panel._library_scan_error_path = "/games"
+        panel._library_scan_error = "disk disconnected"
+        disc = module.GameEntry(path="/games/disc.iso", filename="disc.iso", serial="", title="")
+        panel._cards = [MagicMock(game=disc)]
+        with patch.object(module, "_GameCard") as card:
+            card.return_value.game = disc
+            card.return_value.mod_count = 0
+            panel._populate()
+        card.assert_called_once_with(disc, 0, config=panel.config)
+        self.assertIn("disk disconnected", panel._scan_status.setText.call_args.args[0])
+        panel.emit_status.assert_called_once()
+
+    def test_clear_game_hides_stale_detail_and_restores_placeholder(self):
+        module = self._import_library_panel()
+        detail = module._GameDetailPane.__new__(module._GameDetailPane)
+        detail._game = MagicMock()
+        detail._scroll = MagicMock()
+        detail._placeholder = MagicMock()
+        detail.clear_game()
+        self.assertIsNone(detail._game)
+        detail._scroll.setVisible.assert_called_once_with(False)
+        detail._placeholder.setVisible.assert_called_once_with(True)
+
+    def test_refresh_keeps_scan_failure_status_message(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        LibraryPanel = library_panel.LibraryPanel
+
+        panel = LibraryPanel.__new__(LibraryPanel)
+        panel._mode_stack = types.SimpleNamespace(currentIndex=lambda: 0)
+        panel._invalidate_library_scan_cache = MagicMock()
+        panel._sync_installed_content = MagicMock()
+        def _populate():
+            panel._last_library_status = "Could not scan game library folder: boom"
+            panel.emit_status(panel._last_library_status)
+
+        panel._populate = _populate
+        panel.emit_status = MagicMock()
+        panel._last_library_status = ""
+
+        LibraryPanel.refresh(panel)
+
+        panel.emit_status.assert_called_once_with("Could not scan game library folder: boom")
+        panel._invalidate_library_scan_cache.assert_called_once()
+        panel._sync_installed_content.assert_called_once()
+
+    def test_save_library_config_logs_warning_on_failure(self):
+        library_panel = self._import_library_panel()
+        with patch.object(library_panel, "save_config", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.ui.library_panel", level="WARNING") as logs:
+                library_panel._save_library_config(AppConfig(), "saving library view state")
+
+        self.assertTrue(
+            any(
+                "Could not save library panel config after saving library view state: boom" in msg
+                for msg in logs.output
+            )
+        )
+
+    def test_mod_matches_query_includes_extended_metadata(self):
+        library_panel = self._import_library_panel()
+
+        mod = ModInfo(
+        id="meta-1",
+        name="Texture Overhaul",
+        mod_type=ModType.TEXTURE_PACK,
+        path="/mods/texture-overhaul",
+        author="Alice",
+        description="HD overhaul for God of War",
+        game_id="SLUS-20062",
+        version="1.2",
+        thumbnail_path="/covers/texture-overhaul.png",
+        source_url="https://example.com/posts/texture-overhaul",
+        files=["textures/hero.dds", "readme.txt"],
+        tags=["hd", "4k"],
+        )
+
+        self.assertTrue(library_panel._mod_matches_query(mod, "grand theft auto iii"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "slus20062"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "hero.dds"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "example.com"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "4k"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "1.2"))
+        self.assertTrue(library_panel._mod_matches_query(mod, "gta iii"))
+        self.assertFalse(library_panel._mod_matches_query(mod, "yakuza"))
+
+    def test_game_card_key_press_activates_selected_card(self):
+        import types
+
+        library_panel = self._import_library_panel()
+        GameCard = library_panel._GameCard
+        library_panel.Qt.Key = types.SimpleNamespace(
+            Key_Return=1,
+            Key_Enter=2,
+            Key_Space=3,
+        )
+
+        class FakeSignal:
+            def __init__(self):
+                self.emitted = []
+
+            def emit(self, *args):
+                self.emitted.append(args)
+
+        class FakeEvent:
+            def __init__(self, key):
+                self._key = key
+                self.accepted = False
+
+            def key(self):
+                return self._key
+
+            def accept(self):
+                self.accepted = True
+
+        card = GameCard.__new__(GameCard)
+        card.clicked = FakeSignal()
+        card.game = types.SimpleNamespace(display_name="Kingdom Hearts")
+
+        event = FakeEvent(library_panel.Qt.Key.Key_Return)
+        GameCard.keyPressEvent(card, event)
+
+        self.assertTrue(event.accepted)
+        self.assertEqual(card.clicked.emitted, [(card.game,)])
+
+
+class TestLibraryModActions(unittest.TestCase):
+    def setUp(self):
+        helper = TestLibraryPanelStatePersistence()
+        self.module = helper._import_library_panel()
+        self.panel = helper._new_scan_panel(module=self.module)
+        self.mods = [
+            ModInfo("a", "Alpha <literal>", ModType.TEXTURE_PACK, "/mods/a",
+                    game_id="SLUS-20370", enabled=False),
+            ModInfo("b", "Beta", ModType.PNACH, "/mods/b",
+                    game_id="slus-20370", enabled=True),
+            ModInfo("c", "Other game", ModType.CHEAT, "/mods/c",
+                    game_id="SLUS-20062", enabled=False),
+        ]
+        p = self.panel
+        p.db.all.side_effect = lambda: list(self.mods)
+        p.db.get.side_effect = lambda mid: next((mod for mod in self.mods if mod.id == mid), None)
+        p.config = AppConfig(textures_path="/pcsx2/textures", pnach_path="/pcsx2/cheats")
+        p._mod_action_busy = False
+        p._mod_retry_states = {}
+        p._mod_retry_scope = ""
+        for name in ("_mod_feedback", "_mod_retry_btn", "_mod_dismiss_btn"):
+            setattr(p, name, MagicMock())
+        p._confirm_mod_action = MagicMock(return_value=True)
+        p._on_mod_toggled = MagicMock()
+        p.manager = MagicMock()
+        p.manager.set_enabled_many.side_effect = self._persist
+
+    def _persist(self, states, config):
+        for mid, enabled in states.items():
+            self.panel.db.get(mid).enabled = enabled
+        return len(states), []
+
+    def _new_detail(self):
+        pane = self.module._GameDetailPane.__new__(self.module._GameDetailPane)
+        pane.db = self.panel.db
+        pane.enabled_requested = MagicMock()
+        pane._game = self.module.GameEntry("", "", "SLUS-20370", "Kingdom Hearts")
+        return pane
+
+    def test_row_requests_opposite_state_without_mutating_or_saving(self):
+        row = self.module._ModRow.__new__(self.module._ModRow)
+        row.mod = self.mods[0]
+        row.db = self.panel.db
+        row.toggle_requested = MagicMock()
+        row._on_toggle()
+        row.toggle_requested.emit.assert_called_once_with("a", True)
+        self.assertFalse(self.mods[0].enabled)
+        row.db.update.assert_not_called()
+        row.db.save.assert_not_called()
+
+    def test_row_toggle_labels_explain_deployment_and_card_safety(self):
+        row = self.module._ModRow.__new__(self.module._ModRow)
+        row.mod = self.mods[0]
+        row._toggle_btn = MagicMock()
+        row._refresh_toggle()
+        row._toggle_btn.setAccessibleName.assert_called_with("Enable Alpha <literal>")
+        self.assertIn("reconcile", row._toggle_btn.setToolTip.call_args.args[0])
+        row.mod = ModInfo("card", "Card", ModType.SAVE_FILE, "/cards", enabled=True)
+        row._refresh_toggle()
+        row._toggle_btn.setAccessibleName.assert_called_with("Disable Card")
+        self.assertIn("never copied or removed", row._toggle_btn.setToolTip.call_args.args[0])
+
+    def test_game_batch_requests_only_changed_flags_for_current_serial(self):
+        pane = self._new_detail()
+        self.mods.append(ModInfo("unidentified", "Unidentified", ModType.PNACH, "/unknown",
+                                 game_id=None, enabled=False))
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_called_once_with(
+            {"a": True}, "Game SLUS-20370 — all installed content types", True,
+        )
+        self.assertFalse(self.mods[0].enabled)
+        self.panel.db.update.assert_not_called()
+        pane.enabled_requested.reset_mock()
+        pane._request_game_enabled(False)
+        pane.enabled_requested.emit.assert_called_once_with(
+            {"b": False}, "Game SLUS-20370 — all installed content types", True,
+        )
+
+    def test_game_batch_uses_current_database_not_stale_rendered_rows(self):
+        pane = self._new_detail()
+        self.mods.append(ModInfo("later", "Later", ModType.SAVE_FILE, "/cards",
+                                 game_id="SLUS-20370", enabled=False))
+        pane._request_game_enabled(True)
+        self.assertEqual(pane.enabled_requested.emit.call_args.args[0], {"a": True, "later": True})
+        pane._game = None
+        pane.enabled_requested.reset_mock()
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_unidentified_game_never_requests_all_mods(self):
+        pane = self._new_detail()
+        pane._game.serial = ""
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_already_matching_game_flags_produce_no_new_batch(self):
+        pane = self._new_detail()
+        self.mods[0].enabled = True
+        pane._request_game_enabled(True)
+        pane.enabled_requested.emit.assert_not_called()
+
+    def test_both_views_forward_single_requests_to_parent(self):
+        detail = self._new_detail()
+        detail._request_mod_enabled("a", True)
+        detail.enabled_requested.emit.assert_called_once_with(
+            {"a": True}, "Single mod in By Game", False,
+        )
+        all_mods = self.module._AllModsPane.__new__(self.module._AllModsPane)
+        all_mods.enabled_requested = MagicMock()
+        all_mods._request_mod_enabled("b", False)
+        all_mods.enabled_requested.emit.assert_called_once_with(
+            {"b": False}, "Single mod in All Mods", False,
+        )
+
+    def test_single_action_uses_shared_reconciliation_not_direct_updates(self):
+        p = self.panel
+        p._run_mod_action({"a": True}, "Single mod", False)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        p._confirm_mod_action.assert_not_called()
+        p.db.update.assert_not_called()
+        p._on_mod_toggled.assert_called_once()
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertIn("Alpha <literal> [a] → Enabled", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_feedback.setHtml.assert_not_called()
+        p._mod_retry_btn.setVisible.assert_called_with(False)
+
+    def test_game_batch_confirms_before_one_shared_call(self):
+        p = self.panel
+        p._run_mod_action({"a": True, "b": False}, "Game SLUS-20370", True)
+        p._confirm_mod_action.assert_called_once_with({"a": True, "b": False}, "Game SLUS-20370", 0)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "b": False}, p.config)
+        self.assertEqual([mod.enabled for mod in self.mods], [True, False, False])
+
+    def test_cancel_preserves_flags_result_and_earlier_retry(self):
+        p = self.panel
+        p._mod_retry_states = {"c": True}
+        p._mod_retry_scope = "Earlier"
+        p._confirm_mod_action.return_value = False
+        p._run_mod_action({"a": True}, "Game", True)
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._mod_retry_states, {"c": True})
+        self.assertEqual(p._mod_retry_scope, "Earlier")
+        self.assertFalse(self.mods[0].enabled)
+        p._mod_feedback.setPlainText.assert_not_called()
+        p._on_mod_toggled.assert_not_called()
+        self.assertFalse(p._mod_action_busy)
+        p._mod_retry_btn.setEnabled.assert_called_with(True)
+
+    def test_warnings_keep_frozen_states_after_flags_save_and_row_refresh(self):
+        p = self.panel
+        states = {"a": True}
+        def warn(requested, config):
+            self._persist(requested, config)
+            return 0, ["Destination <locked>"]
+        p.manager.set_enabled_many.side_effect = warn
+        p._run_mod_action(states, "Single mod", False)
+        states["c"] = True
+        self.assertEqual(p._mod_retry_states, {"a": True})
+        self.assertTrue(self.mods[0].enabled)
+        self.assertIn("Destination <locked>", p._mod_feedback.setPlainText.call_args.args[0])
+        self.assertNotIn("Deployment reconciled", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_retry_btn.setVisible.assert_called_with(True)
+
+    def test_exception_after_save_retains_requested_state_not_inverse(self):
+        p = self.panel
+        def fail(states, config):
+            self._persist(states, config)
+            raise OSError("disk <full>")
+        p.manager.set_enabled_many.side_effect = fail
+        with self.assertLogs("src.ui.library_panel", level="WARNING"):
+            p._run_mod_action({"a": True}, "Single mod", False)
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(p._mod_retry_states, {"a": True})
+        self.assertIn("Flags may already be saved", p._mod_feedback.setPlainText.call_args.args[0])
+        p._mod_feedback.setHtml.assert_not_called()
+        p.manager.set_enabled_many.side_effect = self._persist
+        p._retry_mod_action()
+        self.assertEqual(p.manager.set_enabled_many.call_args.args[0], {"a": True})
+        self.assertTrue(self.mods[0].enabled)
+        p._confirm_mod_action.assert_called_once()
+
+    def test_retry_skips_removed_mods_excludes_later_imports_and_keeps_mixed_states(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True, "b": False, "removed": True}
+        p._mod_retry_scope = "Original game"
+        self.mods.append(ModInfo("later", "Later", ModType.TEXTURE_PACK, "/later",
+                                 game_id="SLUS-20370", enabled=False))
+        p._retry_mod_action()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True, "b": False}, p.config)
+        p._confirm_mod_action.assert_called_once_with(
+            {"a": True, "b": False}, "Retry original action — Original game", 1,
+        )
+        self.assertFalse(self.mods[-1].enabled)
+        self.assertIn("Skipped 1 original", p._mod_feedback.setPlainText.call_args.args[0])
+
+    def test_retry_uses_latest_settings_not_row_or_confirmation_snapshot(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Original"
+        p.config = AppConfig(textures_path="/new/pcsx2/textures")
+        p._retry_mod_action()
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+
+    def test_repeated_retry_keeps_original_scope_without_growing_prefix(self):
+        p = self.panel
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Original game"
+        p.manager.set_enabled_many.return_value = (0, ["offline"])
+        p.manager.set_enabled_many.side_effect = None
+        for _ in range(3):
+            p._retry_mod_action()
+            self.assertEqual(p._mod_retry_scope, "Original game")
+            self.assertEqual(p._confirm_mod_action.call_args.args[1], "Retry original action — Original game")
+
+    def test_retry_when_all_original_mods_removed_never_widens_scope(self):
+        p = self.panel
+        p._mod_retry_states = {"removed": True}
+        p._retry_mod_action()
+        self.assertEqual(p._mod_retry_states, {})
+        p.manager.set_enabled_many.assert_not_called()
+        p._confirm_mod_action.assert_not_called()
+        self.assertIn("None of the original", p._mod_feedback.setPlainText.call_args.args[0])
+
+    def test_cancelled_retry_preserves_complete_original_snapshot(self):
+        p = self.panel
+        original = {"a": True, "removed": False}
+        p._mod_retry_states = dict(original)
+        p._confirm_mod_action.return_value = False
+        p._retry_mod_action()
+        self.assertEqual(p._mod_retry_states, original)
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_new_single_action_cannot_silently_replace_earlier_retry(self):
+        p = self.panel
+        p._mod_retry_states = {"b": False}
+        p._confirm_mod_action.return_value = False
+        p._run_mod_action({"a": True}, "Single mod", False)
+        p._confirm_mod_action.assert_called_once()
+        p.manager.set_enabled_many.assert_not_called()
+        self.assertEqual(p._mod_retry_states, {"b": False})
+
+    def test_busy_guard_covers_nested_confirmation_and_dismiss_retry(self):
+        p = self.panel
+        def confirm(*args):
+            self.assertTrue(p._mod_action_busy)
+            p._run_mod_action({"c": True}, "Nested", False)
+            p._retry_mod_action()
+            p._dismiss_mod_result()
+            return True
+        p._confirm_mod_action.side_effect = confirm
+        p._run_mod_action({"a": True}, "Game", True)
+        p.manager.set_enabled_many.assert_called_once_with({"a": True}, p.config)
+        self.assertFalse(self.mods[2].enabled)
+        self.assertFalse(p._mod_action_busy)
+
+    def test_dismiss_forgets_retry_without_undoing_flags(self):
+        p = self.panel
+        self.mods[0].enabled = True
+        p._mod_retry_states = {"a": True}
+        p._mod_retry_scope = "Earlier"
+        p._dismiss_mod_result()
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertEqual(p._mod_retry_scope, "")
+        self.assertTrue(self.mods[0].enabled)
+        p._mod_feedback.hide.assert_called_once()
+        p.manager.set_enabled_many.assert_not_called()
+
+    def test_removed_single_mod_is_a_safe_noop(self):
+        p = self.panel
+        p._run_mod_action({"removed": True}, "Single mod", False)
+        p.manager.set_enabled_many.assert_not_called()
+        p._on_mod_toggled.assert_not_called()
+
+    def test_confirmation_is_plain_text_default_no_and_describes_destinations(self):
+        p = self.panel
+        del p._confirm_mod_action
+        p._mod_retry_states = {"c": True}
+        self.mods.append(ModInfo("card", "Card", ModType.SAVE_FILE, "/cards"))
+        with patch.object(self.module, "QMessageBox") as box:
+            box.StandardButton.Yes = 1
+            box.StandardButton.No = 2
+            box.return_value.exec.return_value = 2
+            result = p._confirm_mod_action({"a": True, "b": True, "card": False}, "Game <literal>", 1)
+        self.assertFalse(result)
+        dialog = box.return_value
+        dialog.setTextFormat.assert_called_once_with(self.module.Qt.TextFormat.PlainText)
+        dialog.setDefaultButton.assert_called_once_with(2)
+        text = dialog.setText.call_args.args[0]
+        self.assertIn("1 already match", text)
+        self.assertIn("Game <literal>", text)
+        info = dialog.setInformativeText.call_args.args[0]
+        for phrase in ("/pcsx2/textures", "/pcsx2/cheats", "live memory cards",
+                       "other games and hidden results", "replaces the earlier retry snapshot",
+                       "1 original mod(s)"):
+            self.assertIn(phrase, info)
+        details = dialog.setDetailedText.call_args.args[0]
+        self.assertIn("Alpha <literal> [a]", details)
+        self.assertIn("Card [card]", details)
+
+    def test_view_refresh_after_action_never_starts_disc_scan(self):
+        p = self.panel
+        del p._on_mod_toggled
+        p._populate = MagicMock()
+        p._save_view_state = MagicMock()
+        p._switch_to_all_mods = MagicMock()
+        with patch.object(self.module, "scan_library") as scan:
+            p._on_mod_toggled()
+            p._populate.assert_called_once()
+            p._mode_stack.currentIndex.return_value = 1
+            p._on_mod_toggled()
+        p._switch_to_all_mods.assert_called_once()
+        scan.assert_not_called()
+
+    def test_all_mods_refresh_uses_current_settings_for_filter_persistence(self):
+        p = self.panel
+        p._by_game_btn = MagicMock()
+        p._all_mods_btn = MagicMock()
+        p._all_mods_pane = MagicMock()
+        p._all_mods_pane.config = AppConfig(textures_path="/old/textures")
+        p._save_view_state = MagicMock()
+        self.module.LibraryPanel._switch_to_all_mods(p)
+        self.assertIs(p._all_mods_pane.config, p.config)
+        p._all_mods_pane.refresh.assert_called_once()
+
+    def test_real_manager_rolls_back_flags_on_save_failure_then_retries(self):
+        p = self.panel
+        p.manager = self.module.ModManager(p.db)
+        p.db.save.side_effect = OSError("database locked")
+        with patch.object(p.manager, "_reconcile_deployment") as deploy:
+            with self.assertLogs("src.ui.library_panel", level="WARNING"):
+                p._run_mod_action({"a": True, "b": False}, "Game", True)
+            self.assertEqual([mod.enabled for mod in self.mods[:2]], [False, True])
+            self.assertEqual(p._mod_retry_states, {"a": True, "b": False})
+            deploy.assert_not_called()
+            p.db.save.side_effect = None
+            deploy.return_value = (2, [])
+            p._retry_mod_action()
+        self.assertEqual([mod.enabled for mod in self.mods[:2]], [True, False])
+        self.assertEqual(p._mod_retry_states, {})
+        self.assertEqual(p.db.save.call_count, 2)
+        deploy.assert_called_once()
+
+    def test_real_texture_disable_restores_lower_priority_mod_and_persists(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                p.db = self.module.ModDatabase()
+                self.mods = []
+                for mid, priority, content in (("low", 1, b"base"), ("high", 10, b"override")):
+                    source = root / mid / "SLUS-20370" / "replacements"
+                    source.mkdir(parents=True)
+                    (source / "texture.png").write_bytes(content)
+                    mod = ModInfo(mid, mid, ModType.TEXTURE_PACK, str(root / mid),
+                                  enabled=True, game_id="SLUS-20370", priority=priority,
+                                  files=["SLUS-20370/replacements/texture.png"])
+                    p.db.add(mod)
+                p.config = AppConfig(textures_path=str(root / "textures"))
+                p.manager = self.module.ModManager(p.db)
+                p.manager.deploy(ModType.TEXTURE_PACK, p.config.textures_path)
+                deployed = root / "textures" / "SLUS-20370" / "replacements" / "texture.png"
+                self.assertEqual(deployed.read_bytes(), b"override")
+                p._run_mod_action({"high": False}, "Single mod", False)
+                self.assertEqual(deployed.read_bytes(), b"base")
+                self.assertFalse(self.module.ModDatabase().get("high").enabled)
+                p._run_mod_action({"high": True}, "Single mod", False)
+                self.assertEqual(deployed.read_bytes(), b"override")
+                self.assertTrue(self.module.ModDatabase().get("high").enabled)
+                self.assertEqual(p._mod_retry_states, {})
+
+    def test_real_shared_pnach_cheat_destination_reconciles_other_game_mods(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                p.db = self.module.ModDatabase()
+                for mid, kind, address in (("patch", ModType.PNACH, "20000000"),
+                                           ("cheat", ModType.CHEAT, "20000004")):
+                    source = root / mid
+                    source.mkdir()
+                    (source / "12345678.pnach").write_text(
+                        f"patch=1,EE,{address},extended,00000001\n", encoding="utf-8",
+                    )
+                    p.db.add(ModInfo(mid, mid, kind, str(source), enabled=True,
+                                     game_id="SLUS-20370" if mid == "patch" else "SLUS-20062",
+                                     files=["12345678.pnach"]))
+                destination = root / "cheats"
+                p.config = AppConfig(pnach_path=str(destination), cheats_path=str(destination))
+                p.manager = self.module.ModManager(p.db)
+                p._run_mod_action({"patch": True}, "Single mod", False)
+                text = (destination / "12345678.pnach").read_text()
+                self.assertIn("20000000", text)
+                self.assertIn("20000004", text)
+                p._run_mod_action({"patch": False}, "Single mod", False)
+                text = (destination / "12345678.pnach").read_text()
+                self.assertNotIn("20000000", text)
+                self.assertIn("20000004", text)
+                self.assertTrue(p.db.get("cheat").enabled)
+
+    def test_real_save_file_actions_never_copy_or_remove_live_cards(self):
+        p = self.panel
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"):
+                source = root / "source"
+                live = root / "memcards"
+                source.mkdir()
+                live.mkdir()
+                (source / "card.ps2").write_bytes(b"imported")
+                (live / "card.ps2").write_bytes(b"live-progress")
+                p.db = self.module.ModDatabase()
+                p.db.add(ModInfo("card", "Card", ModType.SAVE_FILE, str(source), enabled=False,
+                                 files=["card.ps2"], game_id="SLUS-20370"))
+                p.config = AppConfig(memcards_path=str(live))
+                p.manager = self.module.ModManager(p.db)
+                for state in (True, False):
+                    p._run_mod_action({"card": state}, "Single card", False)
+                    self.assertEqual((live / "card.ps2").read_bytes(), b"live-progress")
+                    self.assertEqual(p.db.get("card").enabled, state)
+                self.assertIn("Save-file flags only", p._mod_feedback.setPlainText.call_args.args[0])
+
 
 class TestCatalogueIntegrity(unittest.TestCase):
     """Structural integrity checks for the JSON catalogue files.
@@ -3484,6 +16352,16 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     f"Entry {entry['id']} has non-empty but invalid direct_download_url: {val!r}"
                 )
 
+    def test_thumbnail_urls_do_not_use_generic_favicon_placeholders(self):
+        """Catalogue entries should not keep the generic GitHub favicon as a thumbnail."""
+        placeholder = "https://github.githubassets.com/favicons/favicon.png"
+        for entry in self.catalogue:
+            self.assertNotEqual(
+                entry.get("thumbnail_url", ""),
+                placeholder,
+                f"Entry {entry['id']} should not use a generic favicon as thumbnail_url",
+            )
+
     def test_no_duplicate_names(self):
         names = [e["name"] for e in self.catalogue]
         seen: dict = {}
@@ -3569,6 +16447,25 @@ class TestCatalogueIntegrity(unittest.TestCase):
                 f"Entry {entry['id']} author_url is a member-search page (not a profile): {aurl!r}"
             )
 
+    def test_no_author_url_fragments_in_shipped_catalogue(self):
+        """Raw catalogue author_url values should already be canonical profile URLs."""
+        import json
+        from pathlib import Path
+
+        cat_dir = Path(__file__).parent.parent / "data" / "catalogue"
+        for path in cat_dir.glob("*.json"):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                aurl = entry.get("author_url", "")
+                if isinstance(aurl, str) and aurl:
+                    self.assertNotIn(
+                        "#",
+                        aurl,
+                        f"{path.name}:{entry.get('id')} author_url should not include fragments: {aurl!r}",
+                    )
+
     def test_no_gbatem_org_typo_in_author_url(self):
         """author_url must not contain the typo domain 'gbatem.org' (should be gbatemp.net)."""
         for entry in self.catalogue:
@@ -3628,15 +16525,21 @@ class TestCatalogueIntegrity(unittest.TestCase):
                     f"LoversLab entry {entry['id']} must have nsfw=True"
                 )
 
-    def test_hub_entries_have_empty_author(self):
-        """Hub entries (is_hub=True) must have an empty author string.
-        Individual posters on community search pages are not known ahead of time,
-        so we never pre-fill a fake community name as the 'author'."""
+    def test_hub_entries_do_not_use_generic_author_placeholders(self):
+        """Hub entries may infer a specific author, but never a generic placeholder."""
+        generic_authors = {
+            "GBAtemp Community",
+            "PS2Wide Community",
+            "GitHub Community",
+            "PS2-Home Community",
+            "Unknown (GBAtemp member)",
+        }
         for entry in self.catalogue:
             if entry.get("is_hub", False):
-                self.assertEqual(
-                    entry.get("author", ""), "",
-                    f"Hub entry {entry['id']} should have author='' (got {entry.get('author')!r})"
+                self.assertNotIn(
+                    entry.get("author", ""),
+                    generic_authors,
+                    f"Hub entry {entry['id']} should not use a generic placeholder author",
                 )
 
     def test_named_author_entries_have_non_empty_author(self):
@@ -3739,6 +16642,7 @@ class TestCatalogueIntegrity(unittest.TestCase):
 
         An entry is in-app downloadable when:
         - download_action is 'cover_by_id' or 'cover_by_url', OR
+        - download_action is 'pnach_crc', 'gdrive', or 'yandex' AND direct_download_url is non-empty, OR
         - download_action is '' AND direct_download_url is non-empty.
         All other entries (manual, download_save, manual_mega without direct
         URL, or empty action without direct URL) must be hidden.
@@ -3747,11 +16651,19 @@ class TestCatalogueIntegrity(unittest.TestCase):
             action = entry.get("download_action", "")
             if action in ("cover_by_id", "cover_by_url"):
                 return True
+            if action in ("pnach_crc", "gdrive", "yandex"):
+                return bool(entry.get("direct_download_url", ""))
             return action == "" and bool(entry.get("direct_download_url", ""))
 
         must_be_true = [
             {"download_action": "cover_by_id", "direct_download_url": ""},
             {"download_action": "cover_by_url", "direct_download_url": ""},
+            {
+                "download_action": "pnach_crc",
+                "direct_download_url": "https://raw.githubusercontent.com/PCSX2/cheatdb/master/cheats/0F6B6315.pnach",
+            },
+            {"download_action": "gdrive", "direct_download_url": "https://drive.google.com/uc?id=ABCDEF"},
+            {"download_action": "yandex", "direct_download_url": "https://downloader.disk.yandex.ru/disk/abc123"},
             {
                 "download_action": "",
                 "direct_download_url": "https://www.mediafire.com/file/abc/mod.zip/file",
@@ -3768,6 +16680,9 @@ class TestCatalogueIntegrity(unittest.TestCase):
             {"download_action": "manual", "direct_download_url": ""},
             {"download_action": "download_save", "direct_download_url": ""},
             {"download_action": "manual_mega", "direct_download_url": ""},
+            {"download_action": "pnach_crc", "direct_download_url": ""},
+            {"download_action": "gdrive", "direct_download_url": ""},
+            {"download_action": "yandex", "direct_download_url": ""},
             {"download_action": "manual_mega",
              "direct_download_url": "https://mega.nz/file/ABCDEF"},
             {"download_action": "", "direct_download_url": ""},
@@ -3782,6 +16697,8 @@ class TestCatalogueIntegrity(unittest.TestCase):
             action = entry.get("download_action", "")
             if action in ("cover_by_id", "cover_by_url"):
                 return True
+            if action in ("pnach_crc", "gdrive", "yandex"):
+                return bool(entry.get("direct_download_url", ""))
             return action == "" and bool(entry.get("direct_download_url", ""))
 
         in_app = [e for e in self.catalogue if is_in_app(e)]
@@ -3792,7 +16709,11 @@ class TestCatalogueIntegrity(unittest.TestCase):
         for e in in_app:
             action = e.get("download_action", "")
             direct = e.get("direct_download_url", "")
-            ok = action in ("cover_by_id", "cover_by_url") or (action == "" and bool(direct))
+            ok = (
+                action in ("cover_by_id", "cover_by_url")
+                or (action in ("pnach_crc", "gdrive", "yandex") and bool(direct))
+                or (action == "" and bool(direct))
+            )
             self.assertTrue(ok, f"Entry {e['id']} wrongly classified as in-app")
 
     def test_no_serial_shared_across_unrelated_games(self):
@@ -3876,6 +16797,24 @@ class TestCatalogueIntegrity(unittest.TestCase):
         self.assertTrue(expected.exists())
         self.assertEqual(len(list(expected.iterdir())), 2)
 
+    def test_texture_structure_inspection_failure_logs_and_keeps_layout(self):
+        from src.core.mod_manager import ModManager
+        dest = self._make_dest()
+        (dest / "replacement").mkdir()
+        (dest / "replacement" / "hash.png").write_bytes(b"A")
+
+        with patch("pathlib.Path.iterdir", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.mod_manager", level="WARNING") as logs:
+                ModManager._normalize_texture_structure(dest, "SLUS-21228")
+
+        self.assertTrue((dest / "replacement").exists())
+        self.assertTrue((dest / "replacement" / "hash.png").exists())
+        self.assertFalse((dest / "SLUS-21228").exists())
+        self.assertTrue(
+            any("Could not inspect" in msg for msg in logs.output),
+            logs.output,
+        )
+
     def test_already_correct_structure_unchanged(self):
         from src.core.mod_manager import ModManager
         dest = self._make_dest()
@@ -3938,10 +16877,22 @@ class TestGametdbCoverUrl(unittest.TestCase):
         url = self.gcu("SCES-52400")
         self.assertIn("/EN/", url)
 
+    def test_pal_demo_sced_gives_en_region(self):
+        url = self.gcu("SCED-52246")
+        self.assertIn("/EN/", url)
+
     def test_japan_slps_gives_ja_region(self):
         url = self.gcu("SLPS-25302")
         self.assertIn("/JA/", url)
         self.assertIn("SLPS25302", url)
+
+    def test_japan_demo_scpd_gives_ja_region(self):
+        url = self.gcu("SCPD-10002")
+        self.assertIn("/JA/", url)
+
+    def test_north_america_demo_sccd_gives_us_region(self):
+        url = self.gcu("SCCD-10001")
+        self.assertIn("/US/", url)
 
     def test_hyphen_stripped_from_serial(self):
         url = self.gcu("SLUS-20312")
@@ -4292,6 +17243,13 @@ class TestCatalogueLoader(unittest.TestCase):
             self.assertTrue(e.get("direct_download_url"),
                             f"Save entry {e['id']} has no direct_download_url")
 
+    def test_placeholder_author_helper_recognises_common_values(self):
+        from src.core.catalogue_loader import is_placeholder_author
+
+        self.assertTrue(is_placeholder_author("Unknown"))
+        self.assertTrue(is_placeholder_author(" Anonymous "))
+        self.assertFalse(is_placeholder_author("TexMaster"))
+
     def test_no_generic_placeholder_authors(self):
         """Every catalogue entry must credit a real person or project.
 
@@ -4311,6 +17269,120 @@ class TestCatalogueLoader(unittest.TestCase):
         bad = [e["id"] for e in self.catalogue if e.get("author") in generic_authors]
         self.assertEqual(bad, [],
                          f"Entries still using generic placeholder author: {bad}")
+
+    def test_blank_authors_are_inferred_from_titles_and_profiles(self):
+        """Common hub/list entries should load with usable author metadata."""
+        by_id = {e["id"]: e for e in self.catalogue}
+
+        expected_authors = {
+            "bl4ckh4nd_ps2_packs": "Bl4ckH4nd",
+            "cckrizalid_mega_library": "CCKrizalid",
+            "curse_arms_hd_remaster_pack": "Curse_Arms",
+            "pandavenom_packs_list": "Panda_Venom",
+            "retrogenerica_packs_list": "RetroGenerica",
+            "teodormax_packs_list": "TEODOR_MAX",
+            "josephsdeadish_hd_ps2_hub": "JosephsDeadish",
+        }
+        for entry_id, author in expected_authors.items():
+            with self.subTest(entry_id=entry_id):
+                self.assertEqual(by_id[entry_id]["author"], author)
+
+        self.assertNotIn("#", by_id["cckrizalid_mega_library"]["author_url"])
+        self.assertNotIn("#", by_id["crash_twinsanity_hd_durindragon"]["author_url"])
+
+    def test_placeholder_authors_are_normalized_before_inference(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "title_inferred",
+                    "name": "Example Pack by ExampleName",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "url": "https://example.com/title",
+                    "source": "gbatemp.net",
+                    "game": "Example Game",
+                    "game_serial": "SLUS-12345",
+                },
+                {
+                    "id": "profile_inferred",
+                    "name": "Profile Pack",
+                    "description": "Test entry",
+                    "author": "Anonymous",
+                    "author_url": "https://gbatemp.net/members/profile_user.12345/#latest-activity",
+                    "url": "https://example.com/profile",
+                    "source": "GitHub.com",
+                    "game": "Example Game 2",
+                    "game_serial": "SCUS-54321",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        by_id = {e["id"]: e for e in result}
+        self.assertEqual(by_id["title_inferred"]["author"], "ExampleName")
+        self.assertEqual(by_id["title_inferred"]["source"], "GBAtemp")
+        self.assertEqual(by_id["profile_inferred"]["author"], "profile_user")
+        self.assertEqual(by_id["profile_inferred"]["source"], "GitHub")
+
+    def test_dash_variant_titles_keep_placeholder_authors(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "dash_variant",
+                    "name": "Curse: The Eye of Isis HD Texture Pack — Lights On",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "author_url": "https://gbatemp.net/threads/curse-the-eye-of-isis-hd-texture-pack.665990/",
+                    "url": "https://example.com/variant",
+                    "source": "gbatemp.net",
+                    "game": "Curse: The Eye of Isis",
+                    "game_serial": "SLES-51934",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        entry = result[0]
+        self.assertEqual(entry["author"], "Unknown")
+        self.assertEqual(entry["source"], "GBAtemp")
+
+    def test_hub_placeholder_authors_are_cleared(self):
+        import json
+        import tempfile
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "texture_packs.json"
+            path.write_text(json.dumps([
+                {
+                    "id": "hub_placeholder",
+                    "name": "Texture Hub",
+                    "description": "Test entry",
+                    "author": "Unknown",
+                    "author_url": "https://gbatemp.net/threads/example.123/",
+                    "is_hub": True,
+                    "url": "https://example.com/hub",
+                    "source": "gbatemp.net",
+                    "game": "Example Game",
+                    "game_serial": "SLUS-12345",
+                },
+            ]), encoding="utf-8")
+
+            result = load_catalogue(catalogue_dir=Path(tmpdir), user_catalogue_dir=False)
+
+        entry = result[0]
+        self.assertEqual(entry["author"], "")
+        self.assertTrue(entry["is_hub"])
 
     # ── Strict mode ─────────────────────────────────────────────────────────
 
@@ -4351,6 +17423,26 @@ class TestCatalogueLoader(unittest.TestCase):
             result = load_catalogue(catalogue_dir=d, strict=False)
             self.assertEqual(result, [])
 
+    def test_lenient_mode_skips_unreadable_files(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        original_read_text = Path.read_text
+
+        def _read_text(path_obj, *args, **kwargs):
+            if path_obj.name == "texture_packs.json":
+                raise OSError("denied")
+            return original_read_text(path_obj, *args, **kwargs)
+
+        with patch.object(Path, "read_text", autospec=True, side_effect=_read_text):
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(
+                    catalogue_dir=CATALOGUE_DIR,
+                    strict=False,
+                    user_catalogue_dir=False,
+                )
+
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Failed to read catalogue file" in msg for msg in logs.output))
+
     def test_empty_dir_returns_empty_list(self):
         import tempfile
         from src.core.catalogue_loader import load_catalogue
@@ -4385,6 +17477,31 @@ class TestCatalogueLoader(unittest.TestCase):
             p.write_text(json.dumps([entry, entry]))
             with self.assertRaises(ValueError):
                 load_catalogue(catalogue_dir=d, strict=True)
+
+    def test_lenient_mode_skips_invalid_download_action(self):
+        import tempfile, json
+        from src.core.catalogue_loader import load_catalogue
+
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "texture_packs.json"
+            entry = {
+                "id": "bad-action",
+                "name": "Bad Action",
+                "description": "D",
+                "author": "A",
+                "url": "https://example.com",
+                "source": "S",
+                "game": "G",
+                "game_serial": "SLUS-00001",
+                "download_action": "manual_meg",
+            }
+            p.write_text(json.dumps([entry]))
+
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(catalogue_dir=d, strict=False, user_catalogue_dir=False)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("unknown download_action" in msg for msg in logs.output))
 
     # ── ALL_SOURCES ──────────────────────────────────────────────────────────
 
@@ -4458,13 +17575,33 @@ class TestGameLibrary(unittest.TestCase):
     # ── Non-existent directory ───────────────────────────────────────────────
 
     def test_nonexistent_dir_returns_empty(self):
-        result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
+        with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+            result = self.scan_library("/nonexistent/path/xyz_ps2_lib")
         self.assertEqual(result, [])
+        self.assertTrue(any("directory not found" in msg for msg in logs.output))
 
     def test_empty_dir_returns_empty(self):
         with tempfile.TemporaryDirectory() as d:
             result = self.scan_library(d)
             self.assertEqual(result, [])
+
+    def test_strict_missing_dir_raises(self):
+        with self.assertLogs("src.core.game_library", level="WARNING"):
+            with self.assertRaises(FileNotFoundError):
+                self.scan_library("/nonexistent/path/xyz_ps2_lib", strict=True)
+
+    def test_strict_empty_dir_is_successful(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(self.scan_library(directory, strict=True), [])
+
+    def test_strict_permission_error_raises_for_flat_and_recursive_scans(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for recursive in (False, True):
+                with self.subTest(recursive=recursive):
+                    with patch("src.core.game_library.os.scandir", side_effect=PermissionError("denied")):
+                        with self.assertLogs("src.core.game_library", level="WARNING"):
+                            with self.assertRaises(PermissionError):
+                                self.scan_library(directory, strict=True, recursive=recursive)
 
     # ── Extension filtering ──────────────────────────────────────────────────
 
@@ -4571,6 +17708,51 @@ class TestGameLibrary(unittest.TestCase):
             p.write_bytes(b"\x00" * 256)
             games = self.scan_library(d)
             self.assertEqual(games[0].size_bytes, 256)
+
+    def test_scan_library_logs_crc_lookup_failure_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+
+            with patch("src.core.game_library._get_sdb", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(len(games), 1)
+        self.assertEqual(games[0].serial, "SLUS-20891")
+        self.assertIn("God of War", games[0].title)
+        self.assertEqual(games[0].crcs, [])
+        self.assertTrue(any("Failed to resolve CRCs" in msg for msg in logs.output))
+
+    def test_scan_library_logs_permission_error_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "SLUS-20891.iso").write_bytes(b"\x00")
+
+            with patch("src.core.game_library.os.scandir", side_effect=PermissionError("denied")):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(games, [])
+        self.assertTrue(any("Could not scan game library folder" in msg for msg in logs.output))
+
+    def test_scan_library_logs_size_lookup_failure_and_continues(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d, "SLUS-20891.iso")
+            path.write_bytes(b"\x00")
+
+            real_stat = Path.stat
+
+            def fake_stat(self):
+                if self.name == "SLUS-20891.iso":
+                    raise OSError("stale handle")
+                return real_stat(self)
+
+            with patch.object(Path, "stat", fake_stat):
+                with self.assertLogs("src.core.game_library", level="WARNING") as logs:
+                    games = self.scan_library(d)
+
+        self.assertEqual(len(games), 1)
+        self.assertEqual(games[0].size_bytes, 0)
+        self.assertTrue(any("Could not determine file size" in msg for msg in logs.output))
 
 
 # =============================================================================
@@ -4779,6 +17961,26 @@ class TestPnachAnalyzer(unittest.TestCase):
         self.assertTrue(ann["inferred"])
         self.assertIn("category", ann)
 
+    def test_infer_category_logs_float_parse_failure(self):
+        from src.core import pnach_analyzer as pa
+
+        with patch.object(pa.struct, "pack", side_effect=pa.struct.error("boom")):
+            with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                cat = pa.infer_category("003B2340", "3FAB851F", "word")
+
+        self.assertEqual(cat, "physics")
+        self.assertTrue(any("Could not interpret PNACH value" in msg for msg in cm.output))
+
+    def test_interpret_value_logs_float_parse_failure(self):
+        from src.core import pnach_analyzer as pa
+
+        with patch.object(pa.struct, "unpack", side_effect=pa.struct.error("boom")):
+            with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                note = pa._interpret_value("3FAB851F", "word")
+
+        self.assertTrue(note.startswith("hex: 0x3FAB851F"))
+        self.assertTrue(any("Could not interpret PNACH value" in msg for msg in cm.output))
+
     def test_group_conflicts_by_function(self):
         from src.core.pnach_analyzer import group_conflicts_by_function
         conflicts = [
@@ -4813,6 +18015,32 @@ class TestPnachAnalyzer(unittest.TestCase):
         from src.core.pnach_analyzer import reload_db
         n = reload_db()
         self.assertGreater(n, 0)
+
+    def test_reload_db_logs_when_database_is_invalid(self):
+        from src.core import pnach_analyzer as pa
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "known_addresses.json"
+            bad_db.write_text("{not-json", encoding="utf-8")
+            with patch.object(pa, "_DB_FILE", bad_db):
+                with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                    count = pa.reload_db()
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("Failed to load PNACH analyzer DB" in msg for msg in cm.output))
+
+    def test_reload_db_logs_when_database_root_is_invalid(self):
+        from src.core import pnach_analyzer as pa
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "known_addresses.json"
+            bad_db.write_text("[]", encoding="utf-8")
+            with patch.object(pa, "_DB_FILE", bad_db):
+                with self.assertLogs("src.core.pnach_analyzer", level="WARNING") as cm:
+                    count = pa.reload_db()
+
+        self.assertEqual(count, 0)
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
 
     def test_db_file_exists(self):
         db_path = Path(__file__).parent.parent / "data" / "pnach_db" / "known_addresses.json"
@@ -6062,6 +19290,179 @@ class TestUserCatalogueLoader(unittest.TestCase):
         self.assertEqual(result[0]["id"], "user-tp-001")
         self.assertEqual(result[0]["type"], ModType.TEXTURE_PACK)
 
+    def test_load_user_catalogue_normalizes_common_fields(self):
+        from src.core.catalogue_loader import load_user_catalogue
+        from src.models.mod import ModType
+
+        entry = self._make_user_entry()
+        entry.update({
+            "name": "  My Custom Pack  ",
+            "description": "  A personal texture pack  ",
+            "author": "  Tester  ",
+            "source": " gbatemp ",
+            "type": " texture pack ",
+            "game": "  Ratchet & Clank  ",
+            "game_serial": " scus-97199 ",
+            "url": " https://example.com/my-pack ",
+            "author_url": " https://example.com/author ",
+            "thumbnail_url": " https://example.com/thumb.png ",
+            "direct_download_url": " https://example.com/direct.zip ",
+            "download_action": " MANUAL ",
+            "tags": [" one ", "", "Two "],
+        })
+        (Path(self.tmpdir) / "normalised.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        loaded = result[0]
+        self.assertEqual(loaded["type"], ModType.TEXTURE_PACK)
+        self.assertEqual(loaded["source"], "GBAtemp")
+        self.assertEqual(loaded["name"], "My Custom Pack")
+        self.assertEqual(loaded["description"], "A personal texture pack")
+        self.assertEqual(loaded["author"], "Tester")
+        self.assertEqual(loaded["game"], "Ratchet & Clank")
+        self.assertEqual(loaded["game_serial"], "SCUS-97199")
+        self.assertEqual(loaded["url"], "https://example.com/my-pack")
+        self.assertEqual(loaded["author_url"], "https://example.com/author")
+        self.assertEqual(loaded["thumbnail_url"], "https://example.com/thumb.png")
+        self.assertEqual(loaded["direct_download_url"], "https://example.com/direct.zip")
+        self.assertEqual(loaded["download_action"], "manual")
+        self.assertEqual(loaded["tags"], ["one", "Two"])
+        self.assertTrue(
+            any("source" in msg and "GBAtemp" in msg for msg in logs.output),
+            logs.output,
+        )
+
+    def test_load_user_catalogue_uses_source_url_as_url_fallback(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["url"] = ""
+        entry["source_url"] = " https://example.com/source-page "
+        (Path(self.tmpdir) / "source_url_only.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        loaded = result[0]
+        self.assertEqual(loaded["url"], "https://example.com/source-page")
+        self.assertEqual(loaded["source_url"], "https://example.com/source-page")
+        self.assertTrue(any("using source_url as a fallback" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_strips_placeholder_thumbnail_url(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["thumbnail_url"] = "https://github.githubassets.com/favicons/favicon.png"
+        (Path(self.tmpdir) / "placeholder_thumb.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["thumbnail_url"], "")
+        self.assertTrue(any("generic favicon placeholder" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_strips_placeholder_thumbnail_host(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["thumbnail_url"] = "https://placehold.co/60x88.png"
+        (Path(self.tmpdir) / "placeholder_host.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["thumbnail_url"], "")
+        self.assertTrue(any("generic placeholder image host" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_rejects_non_string_url(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["url"] = 123
+        (Path(self.tmpdir) / "bad_url.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("must be a string" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_rejects_non_string_type(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["type"] = 5
+        (Path(self.tmpdir) / "bad_type.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("mod type must be a string" in msg for msg in logs.output))
+
+    def test_load_user_catalogue_copies_default_tags_lists(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entries = [self._make_user_entry("one"), self._make_user_entry("two")]
+        (Path(self.tmpdir) / "tags.json").write_text(
+            json.dumps(entries), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+        result[0]["tags"].append("new-tag")
+
+        self.assertEqual(result[1]["tags"], [])
+        self.assertIsNot(result[0]["tags"], result[1]["tags"])
+
+    def test_load_user_catalogue_preserves_mega_direct_download_fragment(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["direct_download_url"] = (
+            " https://mega.nz/file/Qds2kQAR#H0axHO4bIWOciSqh0jNkkzwpfHMiZ8AukDQfFClLMuI "
+        )
+        (Path(self.tmpdir) / "mega.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(
+            result[0]["direct_download_url"],
+            "https://mega.nz/file/Qds2kQAR#H0axHO4bIWOciSqh0jNkkzwpfHMiZ8AukDQfFClLMuI",
+        )
+
+    def test_load_user_catalogue_invalid_game_serial_logs_warning(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry = self._make_user_entry()
+        entry["game_serial"] = "SLUS-20A62"
+        (Path(self.tmpdir) / "bad_serial.json").write_text(
+            json.dumps([entry]), encoding="utf-8"
+        )
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("invalid game_serial" in msg for msg in logs.output))
+
     def test_load_user_catalogue_multiple_types(self):
         from src.core.catalogue_loader import load_user_catalogue
         from src.models.mod import ModType
@@ -6086,6 +19487,22 @@ class TestUserCatalogueLoader(unittest.TestCase):
         )
         result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
         self.assertEqual(len(result), 1)
+
+    def test_load_user_catalogue_skips_helper_json_files(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        helper_entry = self._make_user_entry("helper-index")
+        custom_entry = self._make_user_entry("custom-entry")
+        (Path(self.tmpdir) / "_index.json").write_text(
+            json.dumps([helper_entry]), encoding="utf-8"
+        )
+        (Path(self.tmpdir) / "custom.json").write_text(
+            json.dumps([custom_entry]), encoding="utf-8"
+        )
+
+        result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual([entry["id"] for entry in result], ["custom-entry"])
 
     def test_load_user_catalogue_missing_type_skipped(self):
         from src.core.catalogue_loader import load_user_catalogue
@@ -6131,6 +19548,38 @@ class TestUserCatalogueLoader(unittest.TestCase):
         count = sum(1 for e in result if e["id"] == existing_id)
         self.assertEqual(count, 1)
 
+    def test_load_user_catalogue_duplicate_id_logs_differing_fields(self):
+        from src.core.catalogue_loader import load_user_catalogue
+
+        entry_a = self._make_user_entry("dup-id")
+        entry_b = self._make_user_entry("dup-id")
+        entry_b["author"] = "Different Author"
+        (Path(self.tmpdir) / "a.json").write_text(json.dumps([entry_a]), encoding="utf-8")
+        (Path(self.tmpdir) / "b.json").write_text(json.dumps([entry_b]), encoding="utf-8")
+
+        with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+            result = load_user_catalogue(user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(sum(1 for e in result if e["id"] == "dup-id"), 1)
+        self.assertTrue(any("fields differ" in msg for msg in logs.output))
+
+    def test_load_catalogue_logs_when_user_glob_fails(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with patch("src.core.catalogue_loader.Path.glob", side_effect=OSError("denied")):
+                with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                    result = load_catalogue(catalogue_dir=CATALOGUE_DIR, user_catalogue_dir=Path(tmpdir))
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Could not list catalogue files under" in msg for msg in logs.output))
+
+    def test_load_catalogue_logs_when_user_dir_lookup_fails(self):
+        from src.core.catalogue_loader import load_catalogue, CATALOGUE_DIR
+        with patch("src.core.config_manager.get_user_catalogue_dir", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.catalogue_loader", level="WARNING") as logs:
+                result = load_catalogue(catalogue_dir=CATALOGUE_DIR)
+        self.assertGreater(len(result), 0)
+        self.assertTrue(any("Could not resolve user catalogue directory" in msg for msg in logs.output))
+
 
 # ---------------------------------------------------------------------------
 # Tests for texture_scanner
@@ -6160,8 +19609,10 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
 
     def test_nonexistent_root_returns_empty(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
-        result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
+        with self.assertLogs("src.core.texture_scanner", level="WARNING") as logs:
+            result = scan_unmanaged_texture_packs("/nonexistent/path/12345")
         self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
 
     def test_finds_texture_pack_with_replacements_subdir(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
@@ -6218,6 +19669,26 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         label = result[0].size_label
         self.assertTrue(label, "size_label should not be empty")
 
+    def test_dir_size_and_count_logs_warning_on_stat_failure(self):
+        from src.core.texture_scanner import _dir_size_and_count
+
+        rep = self._create_texture_pack("SLUS-20062", ["tex.png"])
+        file_path = rep / "tex.png"
+        orig_stat = Path.stat
+
+        def stat_side_effect(self):
+            if self == file_path:
+                raise OSError("denied")
+            return orig_stat(self)
+
+        with patch("os.walk", return_value=[(str(rep), [], ["tex.png"])]):
+            with patch("pathlib.Path.stat", autospec=True, side_effect=stat_side_effect):
+                with self.assertLogs("src.core.texture_scanner", level="WARNING") as logs:
+                    total, count = _dir_size_and_count(rep)
+
+        self.assertEqual((total, count), (0, 0))
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
     def test_results_sorted_by_serial(self):
         from src.core.texture_scanner import scan_unmanaged_texture_packs
         self._create_texture_pack("SLUS-20999", ["a.png"])
@@ -6225,6 +19696,42 @@ class TestTextureScannerUnmanaged(unittest.TestCase):
         result = scan_unmanaged_texture_packs(self.tmpdir)
         serials = [p.serial for p in result]
         self.assertEqual(serials, sorted(serials))
+
+    def test_permission_error_logs_warning(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+
+        with patch("src.core.texture_scanner.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.texture_scanner", level="WARNING") as cm:
+                result = scan_unmanaged_texture_packs(self.tmpdir)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("Could not scan texture pack root" in msg for msg in cm.output))
+
+    def test_path_resolution_failures_are_skipped(self):
+        from src.core.texture_scanner import scan_unmanaged_texture_packs
+
+        good = self._create_texture_pack("SLUS-20062", ["good.png"])
+        bad_root = Path(self.tmpdir) / "SLES-50000" / "replacements"
+        bad_root.mkdir(parents=True, exist_ok=True)
+        managed_path = Path(self.tmpdir) / "BROKEN-MANAGED"
+
+        orig_resolve = Path.resolve
+
+        def resolve_side_effect(self):
+            if self == bad_root or self == managed_path:
+                raise OSError("resolve failed")
+            return orig_resolve(self)
+
+        with patch("pathlib.Path.resolve", autospec=True, side_effect=resolve_side_effect):
+            with self.assertLogs("src.core.texture_scanner", level="WARNING") as cm:
+                result = scan_unmanaged_texture_packs(
+                    self.tmpdir,
+                    managed_paths={str(managed_path)},
+                )
+
+        self.assertEqual([p.serial for p in result], ["SLUS-20062"])
+        self.assertTrue(any("Could not resolve managed texture path" in msg for msg in cm.output))
+        self.assertTrue(any("Could not resolve texture pack path" in msg for msg in cm.output))
 
 
 # ---------------------------------------------------------------------------
@@ -6267,6 +19774,13 @@ class TestInstalledScanner(unittest.TestCase):
         from src.core.installed_scanner import scan_pnach
         self.assertEqual(scan_pnach(""), [])
 
+    def test_scan_pnach_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_pnach
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_pnach("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
+
     def test_scan_pnach_finds_crc_file(self):
         from src.core.installed_scanner import scan_pnach
         self._make_pnach(self.tmpdir, "AABBCCDD")
@@ -6287,11 +19801,28 @@ class TestInstalledScanner(unittest.TestCase):
         result = scan_pnach(self.tmpdir, managed_paths={str(fp.resolve())})
         self.assertEqual(result, [])
 
+    def test_scan_pnach_permission_error_logs_warning(self):
+        from src.core.installed_scanner import scan_pnach
+
+        with patch("src.core.installed_scanner.Path.iterdir", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as cm:
+                result = scan_pnach(self.tmpdir)
+
+        self.assertEqual(result, [])
+        self.assertTrue(any("Could not scan installed PNACH directory" in msg for msg in cm.output))
+
     # scan_cheats ---------------------------------------------------------
 
     def test_scan_cheats_empty_path(self):
         from src.core.installed_scanner import scan_cheats
         self.assertEqual(scan_cheats(""), [])
+
+    def test_scan_cheats_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_cheats
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_cheats("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
 
     def test_scan_cheats_finds_widescreen_pnach(self):
         from src.core.installed_scanner import scan_cheats
@@ -6307,6 +19838,13 @@ class TestInstalledScanner(unittest.TestCase):
     def test_scan_cover_art_empty_path(self):
         from src.core.installed_scanner import scan_cover_art
         self.assertEqual(scan_cover_art(""), [])
+
+    def test_scan_cover_art_invalid_root_logs_warning(self):
+        from src.core.installed_scanner import scan_cover_art
+        with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+            result = scan_cover_art("/nonexistent/path/12345")
+        self.assertEqual(result, [])
+        self.assertTrue(any("not a directory" in msg for msg in logs.output))
 
     def test_scan_cover_art_finds_png(self):
         from src.core.installed_scanner import scan_cover_art
@@ -6329,6 +19867,18 @@ class TestInstalledScanner(unittest.TestCase):
         fp = self._make_cover(self.tmpdir, "SCUS-97199")
         result = scan_cover_art(self.tmpdir, managed_paths={str(fp.resolve())})
         self.assertEqual(result, [])
+
+    def test_file_size_logs_warning_on_stat_failure(self):
+        from src.core.installed_scanner import _file_size
+
+        fp = self._make_cover(self.tmpdir, "SCUS-97199")
+
+        with patch("pathlib.Path.stat", autospec=True, side_effect=OSError("denied")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+                size = _file_size(fp)
+
+        self.assertEqual(size, 0)
+        self.assertTrue(any("Could not stat installed file" in msg for msg in logs.output))
 
     # scan_textures -------------------------------------------------------
 
@@ -6368,6 +19918,26 @@ class TestInstalledScanner(unittest.TestCase):
         self.assertIn("pnach", types)
         self.assertIn("cheat", types)
         self.assertIn("cover_art", types)
+
+    def test_scan_all_logs_and_continues_when_one_scanner_fails(self):
+        from src.core.installed_scanner import scan_all
+        from src.models.mod import ModType
+
+        pnach_root = Path(self.tmpdir) / "cheats"
+        self._make_pnach(str(pnach_root), "F0A235B4")
+
+        class FakeConfig:
+            textures_path = str(Path(self.tmpdir) / "textures")
+            pnach_path = str(pnach_root)
+            cheats_path = ""
+            cover_art_path = ""
+
+        with patch("src.core.installed_scanner.scan_textures", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.installed_scanner", level="WARNING") as logs:
+                result = scan_all(FakeConfig())
+
+        self.assertTrue(any("Could not scan unmanaged texture packs" in msg for msg in logs.output))
+        self.assertTrue(any(item.item_type == ModType.PNACH for item in result))
 
     def test_scan_all_empty_config(self):
         from src.core.installed_scanner import scan_all
@@ -6513,6 +20083,26 @@ class TestModManagerAutoImportUnmanagedContent(unittest.TestCase):
         self.assertEqual(second, 0)
         self.assertEqual(len(self.db.all()), 4)
 
+    def test_auto_import_logs_failed_item(self):
+        from types import SimpleNamespace
+        from src.models.mod import ModType
+
+        config = self._make_pcsx2_layout()
+        fake_item = SimpleNamespace(
+            item_type=ModType.TEXTURE_PACK,
+            serial="SLUS-20062",
+            path=Path(self.tmpdir) / "source",
+            name="Fake Pack",
+        )
+
+        with patch("src.core.installed_scanner.scan_all", return_value=[fake_item]):
+            with patch.object(self.mgr, "install_from_folder", side_effect=RuntimeError("boom")):
+                with self.assertLogs("src.core.mod_manager", level="WARNING") as cm:
+                    imported = self.mgr.auto_import_unmanaged_content(config)
+
+        self.assertEqual(imported, 0)
+        self.assertTrue(any("Auto-import failed" in msg for msg in cm.output))
+
 
 # ---------------------------------------------------------------------------
 # Tests for custom_card_builder
@@ -6617,6 +20207,24 @@ class TestCustomCardBuilder(unittest.TestCase):
         import json
         data = json.loads((Path(self.tmpdir) / "my_cards.json").read_text())
         self.assertEqual(len(data), 2)
+
+    def test_save_entry_logs_and_recovers_from_corrupt_catalogue(self):
+        from src.core.custom_card_builder import build_entry, save_entry
+
+        bad_catalogue = Path(self.tmpdir) / "my_cards.json"
+        bad_catalogue.write_text("{not valid json", encoding="utf-8")
+        entry = build_entry(
+            mod_type="texture_pack", name="Recovering Pack", game="Game",
+            game_serial="SLUS-20062", author="", url="", description="",
+        )
+
+        with self.assertLogs("src.core.custom_card_builder", level="WARNING") as logs:
+            path = save_entry(entry, user_catalogue_dir=Path(self.tmpdir))
+
+        self.assertEqual(path, bad_catalogue)
+        data = json.loads(bad_catalogue.read_text())
+        self.assertEqual(len(data), 1)
+        self.assertTrue(any("Failed to load custom card catalogue" in msg for msg in logs.output))
 
     def test_save_entry_duplicate_id_gets_new_id(self):
         from src.core.custom_card_builder import build_entry, save_entry
@@ -6993,6 +20601,16 @@ class TestConflictResolver(unittest.TestCase):
         self.assertEqual(conflicts[0].conflict_type, "texture_duplicate_hash")
         self.assertIn("SLUS-20062", conflicts[0].title)
 
+    def test_texture_hash_logs_read_failure(self):
+        from src.core.conflict_resolver import _hash_file
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                digest = _hash_file(Path("/tmp/missing-file"))
+
+        self.assertEqual(digest, "")
+        self.assertTrue(any("Could not hash file" in msg for msg in logs.output))
+
     def test_texture_missing_dir(self):
         from src.core.conflict_resolver import resolve_texture_conflicts
         conflicts = resolve_texture_conflicts("")
@@ -7089,6 +20707,247 @@ class TestConflictResolver(unittest.TestCase):
 
 
 # ===========================================================================
+
+class TestBackupBrowser(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        from src.core.backup_manager import BackupEntry
+
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        from src.ui import widgets
+        self.module = widgets
+        self.first = BackupEntry("/backups/a.zip", "backup_HD_pack.zip", "2026-01-01", 10,
+                                 "Kingdom Hearts", file_count=2)
+        self.second = BackupEntry("/backups/b.zip", "backup_codes.zip", "2026-02-01", 20,
+                                  file_count=1)
+        self.d = SimpleNamespace(
+            _config=AppConfig(textures_path="/pcsx2/textures"),
+            _entries=[self.first, self.second], _shown_entries=[], _selected_path="",
+            _row=-1, _loaded=True, _load_error="", _busy="", _confirming=False,
+            _result_text="", _operation_details="",
+        )
+        for name in (
+            "_search_timer", "_search_edit", "_sort_combo", "_list_widget",
+            "_count_label", "_clear_btn", "_detail_label", "_status_label",
+            "_restore_btn", "_delete_btn", "_copy_path_btn", "_create_btn",
+            "_note_edit", "_reload_btn", "_result_label", "_copy_result_btn",
+        ):
+            setattr(self.d, name, MagicMock())
+        self.d._search_edit.text.return_value = ""
+        self.d._sort_combo.currentData.return_value = "newest"
+        self.d._note_edit.text.return_value = "draft note"
+        self.d._list_widget.currentRow.side_effect = lambda: self.d._row
+        self.d._list_widget.setCurrentRow.side_effect = lambda row: setattr(self.d, "_row", row)
+        for name in (
+            "_apply_filters", "_selected_entry", "_on_selection_changed", "_update_actions",
+            "_set_result", "_operation_finished", "_refresh_list", "_on_create",
+            "_on_restore", "_on_delete", "_copy_path", "_copy_result",
+        ):
+            setattr(self.d, name, MethodType(getattr(widgets.BackupManagerDialog, name), self.d))
+        self.d._start_operation = MagicMock()
+        self.d._confirm_action = MagicMock(return_value=True)
+
+    def select_first(self):
+        self.d._selected_path = self.first.path
+        self.d._apply_filters()
+
+    def test_search_matches_across_fields_without_rereading_archives(self):
+        matches = self.module._backup_matches
+        self.assertTrue(matches(self.first, "kingdom HDpack 20260101"))
+        self.assertTrue(matches(self.first, "/backups a.zip"))
+        self.assertFalse(matches(self.first, "kingdom missing"))
+        self.assertFalse(matches(self.first, "!!!"))
+        with patch("src.core.backup_manager.list_backups") as load:
+            self.d._search_edit.text.return_value = "kingdom"
+            self.d._apply_filters()
+        load.assert_not_called()
+        self.assertEqual(self.d._shown_entries, [self.first])
+        self.assertEqual(self.d._entries, [self.first, self.second])
+        self.d._count_label.setText.assert_called_with("Showing 1 of 2 backups")
+
+    def test_sort_modes(self):
+        for sort, expected in (
+            ("newest", [self.second, self.first]), ("oldest", [self.first, self.second]),
+            ("name", [self.second, self.first]), ("size", [self.second, self.first]),
+        ):
+            with self.subTest(sort=sort):
+                self.d._sort_combo.currentData.return_value = sort
+                self.d._apply_filters()
+                self.assertEqual(self.d._shown_entries, expected)
+
+    def test_exact_selection_survives_filter_hiding_and_reappears(self):
+        self.select_first()
+        self.assertIs(self.d._selected_entry(), self.first)
+        self.d._search_edit.text.return_value = "codes"
+        self.d._apply_filters()
+        self.assertIsNone(self.d._selected_entry())
+        self.assertEqual(self.d._selected_path, self.first.path)
+        self.d._delete_btn.setEnabled.assert_called_with(False)
+        self.d._search_edit.text.return_value = ""
+        self.d._apply_filters()
+        self.assertIs(self.d._selected_entry(), self.first)
+
+    def test_no_match_and_empty_states_offer_recovery(self):
+        self.d._search_edit.text.return_value = "missing"
+        self.d._apply_filters()
+        self.assertIn("Clear Filters", self.d._detail_label.setPlainText.call_args.args[0])
+        self.d._entries = []
+        self.d._apply_filters()
+        self.assertIn("Create Backup", self.d._detail_label.setPlainText.call_args.args[0])
+
+    def test_details_are_plain_text_and_unreadable_archives_cannot_restore(self):
+        self.first.note = "<img src='file:///private'>"
+        self.first.inspection_error = "<bad ZIP>"
+        self.select_first()
+        text = self.d._detail_label.setPlainText.call_args.args[0]
+        self.assertIn(self.first.note, text)
+        self.assertIn("Archive on disk", text)
+        self.d._restore_btn.setEnabled.assert_called_with(False)
+        self.d._delete_btn.setEnabled.assert_called_with(True)
+        self.d._on_restore()
+        self.d._start_operation.assert_not_called()
+
+    def test_reload_failure_keeps_snapshot_selection_and_requires_success_before_delete(self):
+        self.select_first()
+        self.d._busy = "list"
+        self.d._operation_finished("list", None, "permission denied")
+        self.assertEqual(self.d._entries, [self.first, self.second])
+        self.assertIs(self.d._selected_entry(), self.first)
+        self.d._delete_btn.setEnabled.assert_called_with(False)
+        self.d._on_delete()
+        self.d._start_operation.assert_not_called()
+        self.d._operation_finished("list", [self.first], "")
+        self.d._delete_btn.setEnabled.assert_called_with(True)
+        self.assertIs(self.d._selected_entry(), self.first)
+
+    def test_reload_removes_missing_selection_without_selecting_another_archive(self):
+        self.select_first()
+        self.d._operation_finished("list", [self.second], "")
+        self.assertEqual(self.d._selected_path, "")
+        self.assertIsNone(self.d._selected_entry())
+
+    def test_create_captures_config_and_note_before_worker_runs(self):
+        with patch("src.core.backup_manager.create_backup") as create:
+            self.d._on_create()
+            kind, work = self.d._start_operation.call_args.args
+            self.assertEqual(kind, "create")
+            self.d._config.textures_path = "/changed"
+            work()
+        self.assertEqual(create.call_args.args[0].textures_path, "/pcsx2/textures")
+        self.assertEqual(create.call_args.kwargs["note"], "draft note")
+
+    def test_create_failure_preserves_note_and_success_selects_new_archive(self):
+        self.d._refresh_list = MagicMock()
+        self.d._operation_finished("create", None, "disk full")
+        self.d._note_edit.clear.assert_not_called()
+        self.assertIn("disk full", self.d._result_text)
+        self.first.failure_count = 1
+        self.d._operation_finished("create", self.first, "")
+        self.d._note_edit.clear.assert_called_once()
+        self.assertEqual(self.d._selected_path, self.first.path)
+        self.assertIn("may be incomplete", self.d._result_text)
+        self.assertIn("1 recoverable", self.d._result_text)
+
+    def test_restore_declined_never_runs_and_confirmed_uses_frozen_archive_and_destinations(self):
+        self.select_first()
+        self.d._confirm_action.return_value = False
+        self.d._on_restore()
+        self.d._start_operation.assert_not_called()
+        self.d._confirm_action.return_value = True
+        with patch("src.core.backup_manager.restore_backup") as restore:
+            self.d._on_restore()
+            kind, work, details = self.d._start_operation.call_args.args
+            self.d._config.textures_path = "/changed"
+            self.d._row = -1
+            work()
+        self.assertEqual(kind, "restore")
+        self.assertIs(restore.call_args.args[0], self.first)
+        self.assertEqual(restore.call_args.args[1].textures_path, "/pcsx2/textures")
+        self.assertEqual(restore.call_args.kwargs, {"detailed": True})
+        self.assertIn(self.first.path, details)
+        self.assertIn("no automatic undo", self.d._confirm_action.call_args.args[1])
+
+    def test_restore_result_reports_partial_outcomes_and_preserves_copyable_context(self):
+        from src.core.backup_manager import RestoreReport
+        self.d._refresh_list = MagicMock()
+        self.d._operation_details = "Archive: /backups/a.zip\nDestination: /pcsx2/textures"
+        self.d._operation_finished("restore", RestoreReport(2, 1, 3), "")
+        self.assertIn("2 restored, 1 failed, 3 skipped", self.d._result_text)
+        self.assertIn(self.d._operation_details, self.d._result_text)
+        self.d._copy_result_btn.setEnabled.assert_called_with(True)
+
+    def test_delete_is_confirmed_and_never_targets_a_new_selection(self):
+        self.select_first()
+        with patch("src.core.backup_manager.delete_backup") as delete:
+            self.d._on_delete()
+            kind, work, _ = self.d._start_operation.call_args.args
+            self.d._row = -1
+            work()
+        self.assertEqual(kind, "delete")
+        delete.assert_called_once_with(self.first)
+        self.d._confirm_action.return_value = False
+        self.select_first()
+        self.d._start_operation.reset_mock()
+        self.d._on_delete()
+        self.d._start_operation.assert_not_called()
+
+    def test_worker_blocks_overlapping_operations_and_recovers_launch_failure(self):
+        relay = MagicMock()
+        work = MagicMock(return_value=123)
+        start = self.module.BackupManagerDialog._start_operation
+        with patch.object(self.module, "_BackupOperationResult", return_value=relay):
+            with patch("threading.Thread") as thread:
+                start(self.d, "create", work)
+                start(self.d, "delete", work)
+                thread.assert_called_once()
+                thread.call_args.kwargs["target"]()
+        work.assert_called_once()
+        relay.finished.emit.assert_called_once_with("create", 123, "")
+        relay.deleteLater.assert_called_once()
+        self.d._busy = ""
+        self.d._refresh_list = MagicMock()
+        with patch.object(self.module, "_BackupOperationResult", return_value=MagicMock()):
+            with patch("threading.Thread", side_effect=RuntimeError("no thread")):
+                start(self.d, "create", work)
+        self.assertEqual(self.d._busy, "")
+        self.assertIn("no thread", self.d._result_text)
+
+    def test_confirmation_is_plain_text_and_defaults_to_no(self):
+        box = MagicMock()
+        box.exec.return_value = 2
+        self.module.QMessageBox.StandardButton = SimpleNamespace(Yes=1, No=2)
+        self.module.Qt.TextFormat.PlainText = 1
+        box_type = MagicMock(return_value=box)
+        box_type.Icon.Warning = 1
+        box_type.StandardButton = SimpleNamespace(Yes=1, No=2)
+        with patch.object(self.module, "QMessageBox", box_type):
+            confirmed = self.module.BackupManagerDialog._confirm_action(
+                self.d, "Delete", "<b>archive</b>", "/backups/a.zip"
+            )
+        self.assertFalse(confirmed)
+        box.setDefaultButton.assert_called_once_with(2)
+        box.setTextFormat.assert_called_once_with(1)
+        box.setDetailedText.assert_called_once_with("/backups/a.zip")
+        self.assertFalse(self.d._confirming)
+
+    def test_mutating_operations_block_close_and_busy_reentry(self):
+        for kind in ("create", "restore", "delete"):
+            with self.subTest(kind=kind):
+                self.d._busy = kind
+                self.select_first()
+                self.d._on_create()
+                self.d._on_restore()
+                self.d._on_delete()
+                self.d._start_operation.assert_not_called()
+                event = MagicMock()
+                self.module.BackupManagerDialog.closeEvent(self.d, event)
+                event.ignore.assert_called_once()
+                self.module.BackupManagerDialog.reject(self.d)
+
 
 class TestBackupManager(unittest.TestCase):
     """Tests for src.core.backup_manager — create / list / restore / delete."""
@@ -7226,6 +21085,77 @@ class TestBackupManager(unittest.TestCase):
         entry = create_backup(self.cfg)
         self.assertTrue(os.path.isfile(entry.path))
 
+    def test_create_backup_logs_and_cleans_up_on_failure(self):
+        from src.core.backup_manager import create_backup, get_backup_dir
+
+        Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach")).write_text("patch=1,EE,0,word,0")
+
+        with patch("zipfile.ZipFile.write", side_effect=OSError("disk full")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    create_backup(self.cfg)
+
+        backup_dir = get_backup_dir(self.cfg)
+        self.assertEqual(list(backup_dir.iterdir()), [])
+        self.assertTrue(any("Failed to create backup archive" in msg for msg in logs.output))
+
+    def test_create_backup_skips_recoverable_write_failure(self):
+        import zipfile
+        from src.core.backup_manager import create_backup
+
+        good_path = Path(os.path.join(self.covers_dir, "SLUS-20062.png"))
+        bad_path = Path(os.path.join(self.cheats_dir, "AABBCCDD.pnach"))
+        good_path.write_bytes(b"PNG")
+        bad_path.write_text("patch=1,EE,0,word,0")
+        orig_write = zipfile.ZipFile.write
+
+        def _write(zf, filename, arcname=None, *args, **kwargs):
+            if Path(filename).name == bad_path.name:
+                raise OSError("disk full")
+            return orig_write(zf, filename, arcname, *args, **kwargs)
+
+        with patch("zipfile.ZipFile.write", autospec=True, side_effect=_write):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                entry = create_backup(self.cfg)
+
+        self.assertTrue(os.path.isfile(entry.path))
+        with zipfile.ZipFile(entry.path) as zf:
+            names = zf.namelist()
+        self.assertTrue(any("SLUS-20062.png" in n for n in names))
+        self.assertFalse(any("AABBCCDD.pnach" in n for n in names))
+        self.assertTrue(any("recoverable failure" in msg for msg in logs.output))
+        self.assertEqual(entry.file_count, 1)
+        self.assertEqual(entry.failure_count, 1)
+
+    def test_same_timestamp_never_overwrites_archives_or_existing_links(self):
+        from src.core.backup_manager import create_backup
+        with patch("src.core.backup_manager.datetime") as clock:
+            clock.datetime.now.return_value.strftime.return_value = "20260101_010101"
+            clock.datetime.now.return_value.isoformat.return_value = "2026-01-01T01:01:01"
+            first = create_backup(self.cfg, note="HD")
+            original = Path(first.path).read_bytes()
+            second_path = Path(first.path).with_stem(Path(first.path).stem + "_1")
+            victim = Path(self.tmpdir) / "keep.txt"
+            victim.write_text("keep")
+            second_path.symlink_to(victim)
+            second = create_backup(self.cfg, note="HD")
+        self.assertNotEqual(first.path, second.path)
+        self.assertTrue(second.path.endswith("_2.zip"))
+        self.assertEqual(Path(first.path).read_bytes(), original)
+        self.assertTrue(second_path.is_symlink())
+        self.assertEqual(victim.read_text(), "keep")
+
+    def test_failed_archive_publication_removes_only_new_reservation_and_temp_file(self):
+        from src.core.backup_manager import create_backup, get_backup_dir
+        first = create_backup(self.cfg)
+        original = Path(first.path).read_bytes()
+        with patch("src.core.backup_manager.os.replace", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING"):
+                with self.assertRaises(OSError):
+                    create_backup(self.cfg)
+        self.assertEqual(list(get_backup_dir(self.cfg).iterdir()), [Path(first.path)])
+        self.assertEqual(Path(first.path).read_bytes(), original)
+
     # -----------------------------------------------------------------------
     # list_backups
     # -----------------------------------------------------------------------
@@ -7241,6 +21171,60 @@ class TestBackupManager(unittest.TestCase):
         create_backup(self.cfg, note="second")
         entries = list_backups(self.cfg)
         self.assertEqual(len(entries), 2)
+
+    def test_list_backups_logs_when_archive_is_corrupt(self):
+        from src.core.backup_manager import get_backup_dir, list_backups
+
+        backup_dir = get_backup_dir(self.cfg)
+        archive = backup_dir / "backup_20250101_000000.zip"
+        archive.write_bytes(b"not-a-zip")
+
+        with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+            entries = list_backups(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        self.assertTrue(entries[0].inspection_error)
+        self.assertTrue(any("Failed to inspect backup archive" in msg for msg in cm.output))
+
+    def test_list_backups_skips_when_stat_fails(self):
+        from src.core.backup_manager import create_backup, list_backups
+
+        first = create_backup(self.cfg, note="first")
+        second = create_backup(self.cfg, note="second")
+        target = Path(second.path)
+        orig_stat = Path.stat
+
+        def stat_side_effect(self):
+            if self == target:
+                raise OSError("vanished")
+            return orig_stat(self)
+
+        with patch("pathlib.Path.stat", autospec=True, side_effect=stat_side_effect):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+                entries = list_backups(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        labels = [e.label for e in entries]
+        self.assertIn(first.label, labels)
+        self.assertNotIn(target.name, labels)
+        self.assertTrue(any("Failed to inspect backup archive metadata" in msg for msg in cm.output))
+
+    def test_delete_backup_logs_when_unlink_fails(self):
+        from src.core.backup_manager import BackupEntry, delete_backup
+
+        entry = BackupEntry(
+            path="/tmp/missing.zip",
+            label="missing.zip",
+            created_at="2025-01-01T00:00:00",
+            size_bytes=0,
+        )
+
+        with patch("pathlib.Path.unlink", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as cm:
+                ok = delete_backup(entry)
+
+        self.assertFalse(ok)
+        self.assertTrue(any("Failed to delete backup" in msg for msg in cm.output))
 
     def test_list_backups_newest_first(self):
         """list_backups must return entries newest-first."""
@@ -7282,6 +21266,77 @@ class TestBackupManager(unittest.TestCase):
         entry = create_backup(self.cfg)
         count = restore_backup(entry, self.cfg)
         self.assertEqual(count, 2)
+
+    def test_restore_backup_continues_after_file_write_error(self):
+        from src.core.backup_manager import restore_backup, BackupEntry, get_backup_dir
+        import builtins
+        import zipfile
+
+        backup_dir = get_backup_dir(self.cfg)
+        archive = backup_dir / "backup_20250101_000001.zip"
+        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("cheats_ws/DEADBEEF.pnach", "patch=1,EE,0,word,1")
+            zf.writestr("covers/SLUS-20062.png", b"PNG")
+
+        entry = BackupEntry(
+            path=str(archive),
+            label=archive.name,
+            created_at="2025-01-01T00:00:01",
+            size_bytes=0,
+        )
+        failing_dest = os.path.join(self.covers_dir, "SLUS-20062.png")
+        original_open = builtins.open
+
+        def flaky_open(file, mode="r", *args, **kwargs):
+            if os.fspath(file) == failing_dest and "w" in mode:
+                raise OSError("disk full")
+            return original_open(file, mode, *args, **kwargs)
+
+        with patch("builtins.open", side_effect=flaky_open):
+            with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+                count = restore_backup(entry, self.cfg)
+
+        self.assertEqual(count, 1)
+        self.assertTrue(os.path.exists(os.path.join(self.cheats_ws_dir, "DEADBEEF.pnach")))
+        self.assertFalse(os.path.exists(failing_dest))
+        self.assertTrue(any("Failed to restore backup entry" in msg for msg in logs.output))
+        self.assertTrue(any("with 1 failure(s)" in msg for msg in logs.output))
+
+    def test_detailed_restore_reports_unmatched_unsafe_and_failed_files(self):
+        import zipfile
+        from src.core.backup_manager import BackupEntry, restore_backup, get_backup_dir
+        archive = get_backup_dir(self.cfg) / "backup_report.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("cheats/ok.pnach", "good")
+            zf.writestr("cheats/fail.pnach", "bad")
+            zf.writestr("unknown/file.txt", "skip")
+            zf.writestr("root.txt", "skip")
+            zf.writestr("cheats/../escape.txt", "skip")
+        entry = BackupEntry(str(archive), archive.name, "", 0)
+        original_open = open
+
+        def failing_open(path, *args, **kwargs):
+            if str(path).endswith("fail.pnach"):
+                raise OSError("disk full")
+            return original_open(path, *args, **kwargs)
+
+        with patch("builtins.open", side_effect=failing_open):
+            with self.assertLogs("src.core.backup_manager", level="WARNING"):
+                report = restore_backup(entry, self.cfg, detailed=True)
+        self.assertEqual((report.restored, report.failed, report.skipped), (1, 1, 3))
+        self.assertFalse((Path(self.tmpdir) / "escape.txt").exists())
+        self.assertEqual(Path(self.cheats_dir, "ok.pnach").read_text(), "good")
+
+    def test_list_backups_reports_file_counts_and_propagates_directory_errors(self):
+        from src.core.backup_manager import create_backup, list_backups
+        Path(self.cheats_dir, "ok.pnach").write_text("good")
+        create_backup(self.cfg)
+        entries = list_backups(self.cfg)
+        self.assertEqual(entries[0].file_count, 1)
+        self.assertEqual(entries[0].inspection_error, "")
+        with patch.object(Path, "iterdir", side_effect=PermissionError("denied")):
+            with self.assertRaises(PermissionError):
+                list_backups(self.cfg)
 
     def test_restore_missing_archive_raises(self):
         from src.core.backup_manager import BackupEntry, restore_backup
@@ -7345,12 +21400,14 @@ class TestBackupManager(unittest.TestCase):
             created_at="1999-01-01T00:00:00",
             size_bytes=0,
         )
-        count = restore_backup(entry, self.cfg)
+        with self.assertLogs("src.core.backup_manager", level="WARNING") as logs:
+            count = restore_backup(entry, self.cfg)
         # The evil file must NOT have been written outside cheats_dir
         evil_file = os.path.join(self.tmpdir, "evil.txt")
         self.assertFalse(os.path.exists(evil_file), "Zip-slip path traversal was not blocked")
         # And nothing should have been restored (the entry was skipped)
         self.assertEqual(count, 0)
+        self.assertTrue(any("Skipping backup archive entry outside destination" in msg for msg in logs.output))
 
 
 # ===========================================================================
@@ -7544,6 +21601,61 @@ class TestDownloadHistory(unittest.TestCase):
         entries = list_history(self.cfg)
         self.assertEqual(entries, [])
 
+    def test_list_history_corrupt_file_returns_empty(self):
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text("not valid json", encoding="utf-8")
+
+        entries = list_history(self.cfg)
+
+        self.assertEqual(entries, [])
+
+    def test_list_history_non_array_root_returns_empty(self):
+        import json
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+        with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+            entries = list_history(self.cfg)
+
+        self.assertEqual(entries, [])
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
+    def test_list_history_skips_malformed_entries(self):
+        import json
+        from src.core.download_history import get_history_file, list_history
+
+        history_path = get_history_file(self.cfg)
+        history_path.write_text(
+            json.dumps([
+                {
+                    "id": "good",
+                    "timestamp": "2025-01-01T00:00:00+00:00",
+                    "mod_name": "Valid Entry",
+                    "mod_type": "pnach",
+                    "size_bytes": 10,
+                },
+                {
+                    "id": "bad",
+                    "timestamp": "2025-01-01T00:00:00+00:00",
+                    "mod_name": "Broken Entry",
+                    "mod_type": "pnach",
+                    "size_bytes": "oops",
+                },
+            ]),
+            encoding="utf-8",
+        )
+
+        with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+            entries = list_history(self.cfg)
+
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].mod_name, "Valid Entry")
+        self.assertTrue(any("Skipping malformed download history entry" in msg for msg in logs.output))
+
     # --- clear_history -----------------------------------------------------
 
     def test_clear_history_returns_count(self):
@@ -7657,6 +21769,24 @@ class TestDownloadHistory(unittest.TestCase):
         # Original file must still be valid
         data = json.loads(history_path.read_text(encoding="utf-8"))
         self.assertEqual(data, original_json)
+
+    def test_save_logs_cleanup_warning(self):
+        from src.core.download_history import HistoryEntry, _save
+
+        entries = [
+            HistoryEntry(id="1", timestamp="t", mod_name="A", mod_type="pnach"),
+        ]
+
+        with patch("src.core.download_history.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.download_history.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.download_history", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    _save(entries, self.cfg)
+
+        self.assertTrue(
+            any("Could not remove temporary download history file" in msg for msg in logs.output)
+        )
 
 
 
@@ -7825,6 +21955,31 @@ class TestModNotes(unittest.TestCase):
         from src.core.mod_notes import list_notes
         self.assertEqual(list_notes(self.cfg), [])
 
+    def test_list_notes_invalid_json_logs_warning(self):
+        from src.core.mod_notes import list_notes
+
+        notes_path = Path(self.tmpdir) / "mod_notes.json"
+        notes_path.write_text("{not valid json", encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+            notes = list_notes(self.cfg)
+
+        self.assertEqual(notes, [])
+        self.assertTrue(any("Could not load mod notes" in msg for msg in logs.output))
+
+    def test_list_notes_non_array_root_returns_empty(self):
+        import json
+        from src.core.mod_notes import get_notes_file, list_notes
+
+        notes_path = get_notes_file(self.cfg)
+        notes_path.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+        with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+            notes = list_notes(self.cfg)
+
+        self.assertEqual(notes, [])
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
     def test_list_notes_filter_mod_type(self):
         from src.core.mod_notes import upsert_note, list_notes
         upsert_note(self.cfg, entry_id="a", entry_title="A",
@@ -7910,6 +22065,22 @@ class TestModNotes(unittest.TestCase):
                     mod_type="pnach", text="x")
         clear_notes(self.cfg)
         self.assertEqual(list_notes(self.cfg), [])
+
+    def test_save_logs_cleanup_warning(self):
+        from src.core.mod_notes import NoteEntry, _save
+
+        notes = [
+            NoteEntry(id="1", entry_id="e1", entry_title="Entry", mod_type="pnach", text="note"),
+        ]
+
+        with patch("src.core.mod_notes.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.mod_notes.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_notes", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    _save(notes, self.cfg)
+
+        self.assertTrue(any("Could not remove temporary notes file" in msg for msg in logs.output))
 
     # --- export_notes_csv --------------------------------------------------
 
@@ -8077,6 +22248,47 @@ class TestSerialDatabase(unittest.TestCase):
             self.sdb.get_serial("Silent Hill 4: The Room"), "SLUS-20873"
         )
 
+    def test_catalogue_title_variants_resolve_through_aliases(self):
+        from src.core.game_registry import title_to_serials
+
+        cases = [
+            ("Fahrenheit / Indigo Prophecy", ("SLUS-21196", "Indigo Prophecy")),
+            ("Ar tonelico 2: Melody of Metafalica", ("SLUS-21788", "Ar tonelico II: Melody of Metafalica")),
+            ("La Pucelle: Ragnarok", ("SLUS-20847", "La Pucelle: Tactics")),
+            ("Rayman 2: The Great Escape", ("SLUS-20138", "Rayman 2: Revolution")),
+            ("Sims, The", ("SLUS-20573", "The Sims")),
+            ("Devil May Cry 2 (alt serial)", ("SLUS-20627", "Devil May Cry 2 (Disc 2)")),
+            ("Incredibles, The", ("SLES-52812", "The Incredibles (PAL)")),
+        ]
+        for query, expected in cases:
+            with self.subTest(query=query):
+                self.assertIn(expected, title_to_serials(query))
+
+        series_cases = [
+            (
+                "Prince of Persia Trilogy",
+                {
+                    "Prince of Persia: The Sands of Time",
+                    "Prince of Persia: Warrior Within",
+                    "Prince of Persia: The Two Thrones",
+                },
+            ),
+            (
+                "Silent Hill series",
+                {
+                    "Silent Hill 2",
+                    "Silent Hill 3",
+                    "Silent Hill 4: The Room",
+                    "Silent Hill: Origins",
+                    "Silent Hill: Shattered Memories",
+                },
+            ),
+        ]
+        for query, expected_titles in series_cases:
+            with self.subTest(query=query):
+                titles = {title for _, title in title_to_serials(query)}
+                self.assertTrue(expected_titles.issubset(titles))
+
     def test_hack_infection_serial(self):
         # CRC D3C7A0A3 confirms SLUS-20267
         self.assertEqual(self.sdb.get_serial(".hack//Infection"), "SLUS-20267")
@@ -8091,6 +22303,53 @@ class TestSerialDatabase(unittest.TestCase):
         self.assertEqual(
             self.sdb.get_serial("Crash Twinsanity"), "SLUS-20909"
         )
+
+    def test_catalogue_title_variants_resolve_through_normalized_aliases(self):
+        cases = [
+            ("Killer 7", "Killer7"),
+            ("Wild Arms 3", "Wild ARMs 3"),
+            ("Star Wars Battlefront II", "Star Wars: Battlefront II"),
+            ("Dark Chronicle (Dark Cloud 2)", "Dark Cloud 2"),
+            ("Fahrenheit / Indigo Prophecy", "Indigo Prophecy"),
+        ]
+
+        for query, canonical in cases:
+            with self.subTest(query=query):
+                info = self.sdb.get_info(query)
+                self.assertIsNotNone(info)
+                self.assertEqual(info.title, canonical)
+                self.assertEqual(self.sdb.get_serial(query), self.sdb.get_serial(canonical))
+
+        for ambiguous in ("Prince of Persia Trilogy", "Silent Hill series"):
+            with self.subTest(query=ambiguous):
+                self.assertIsNone(self.sdb.get_info(ambiguous))
+
+    def test_demo_collisions_keep_retail_canonical(self):
+        """Exact-title demo collisions should resolve to the intended canonical entry."""
+        cases = [
+            ("Ace Combat: Squadron Leader (PAL)", "SCED-53081", "demo"),
+            ("Burnout 3: Takedown", "SLUS-21050", "retail"),
+            ("Fight Night Round 2", "SLUS-21161", "retail"),
+            ("Final Fantasy XII", "SLUS-20963", "retail"),
+            ("NBA Street Vol. 2", "SLUS-20651", "retail"),
+            ("NCAA Final Four 2003", "SCUS-97204", "retail"),
+            ("Need for Speed: Underground", "SLUS-20811", "retail"),
+            ("Need for Speed: Underground 2", "SLUS-21065", "retail"),
+            ("Prince of Persia: Warrior Within", "SLUS-21022", "retail"),
+            ("Ratchet & Clank 3 (PAL)", "SCES-52456", "retail"),
+            ("SOCOM: U.S. Navy SEALs", "SCUS-97134", "retail"),
+            ("Smash Court Tennis: Pro Tournament 2 (PAL)", "SCES-52423", "retail"),
+            ("Tekken 5", "SLUS-21059", "retail"),
+            ("Tony Hawk's Underground", "SLUS-20731", "retail"),
+            ("Tony Hawk's Underground 2", "SLUS-20965", "retail"),
+            ("WWF SmackDown! Just Bring It (PAL)", "SLES-50477", "retail"),
+        ]
+        for title, serial, disc_type in cases:
+            with self.subTest(title=title):
+                info = self.sdb.get_info(title)
+                self.assertIsNotNone(info)
+                self.assertEqual(info.serial, serial)
+                self.assertEqual(info.disc_type, disc_type)
 
     # ------------------------------------------------------------------
     # is_valid / is_known helpers
@@ -8125,6 +22384,27 @@ class TestSerialDatabase(unittest.TestCase):
             self.fail(
                 f"Found {len(issues)} remaining serial mismatches:\n{sample}"
             )
+
+    def test_validate_all_catalogues_skips_corrupt_files(self):
+        from pathlib import Path
+        from src.core.serial_validator import SerialDatabase
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cat_dir = Path(tmpdir)
+            (cat_dir / "texture_packs.json").write_text("{not valid json", encoding="utf-8")
+            with patch("src.core.serial_validator._CAT_DIR", cat_dir):
+                sdb = SerialDatabase()
+                self.assertEqual(sdb.validate_all_catalogues(), [])
+
+    def test_serial_database_skips_corrupt_primary_db(self):
+        from pathlib import Path
+        from src.core.serial_validator import SerialDatabase
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "ps2_ntsc_u.json"
+            bad_db.write_text("{not valid json", encoding="utf-8")
+            sdb = SerialDatabase(db_path=bad_db)
+            self.assertGreater(sdb.game_count(), 0)
 
     def test_validate_catalogue_detects_wrong_serial(self):
         """validate_catalogue() detects a manually-injected wrong serial."""
@@ -8188,7 +22468,8 @@ class TestSerialDatabase(unittest.TestCase):
             path = os.path.join(cat_dir, fname)
             if not os.path.isfile(path):
                 continue
-            data = json.load(open(path, encoding="utf-8"))
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
             for entry in data:
                 if entry.get("game") == "Kingdom Hearts":
                     self.assertEqual(
@@ -8204,7 +22485,8 @@ class TestSerialDatabase(unittest.TestCase):
             path = os.path.join(cat_dir, fname)
             if not os.path.isfile(path):
                 continue
-            data = json.load(open(path, encoding="utf-8"))
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
             for entry in data:
                 if entry.get("game") == "God of War":
                     self.assertEqual(
@@ -8399,6 +22681,15 @@ class TestCrcSerialConsistency(unittest.TestCase):
             self.assertIn("serial", item)
             self.assertIn("issue",  item)
 
+    def test_crc_serial_consistency_skips_corrupt_db(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_path = Path(tmpdir) / "known_addresses.json"
+            bad_path.write_text("{not valid json", encoding="utf-8")
+            self.assertEqual(
+                self.sdb.validate_crc_serial_consistency(pnach_db_path=bad_path),
+                [],
+            )
+
 
 class TestCheatsCatalogue(unittest.TestCase):
     """Expanded cheats catalogue should have game-specific entries."""
@@ -8484,6 +22775,13 @@ class TestLinkChecker(unittest.TestCase):
         from src.core.link_checker import LinkChecker
         self.lc = LinkChecker()
 
+    def test_url_fields_match_catalogue_schema(self):
+        from src.core import link_checker
+        self.assertEqual(
+            link_checker._URL_FIELDS,
+            ("url", "source_url", "author_url", "direct_download_url", "thumbnail_url"),
+        )
+
     # -- Unit tests for URL validators --
 
     def test_valid_https_url_passes(self):
@@ -8491,6 +22789,15 @@ class TestLinkChecker(unittest.TestCase):
         lc = LinkChecker()
         issues = lc.check_entries(
             [{"url": "https://github.com/PCSX2/pcsx2"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_source_url_only_entry_passes(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"source_url": "https://github.com/PCSX2/pcsx2"}],
             source_file="test",
         )
         self.assertEqual(issues, [])
@@ -8505,6 +22812,48 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "malformed")
 
+    def test_check_file_logs_parse_error(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text("{not valid json", encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "parse_error")
+        self.assertTrue(any("Could not parse catalogue link file" in msg for msg in logs.output))
+
+    def test_check_file_logs_non_array_root(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text(json.dumps({"not": "a list"}), encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "parse_error")
+        self.assertTrue(any("expected a JSON array at the top level" in msg for msg in logs.output))
+
+    def test_check_file_logs_malformed_entry(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad = Path(tmpdir) / "broken.json"
+            bad.write_text(json.dumps(["oops", {"url": "https://github.com/PCSX2/pcsx2"}]), encoding="utf-8")
+
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                issues = LinkChecker().check_file(bad, source_file="broken.json")
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed_entry")
+        self.assertTrue(any("Skipping malformed catalogue entry" in msg for msg in logs.output))
+
     def test_bad_domain_flagged(self):
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
@@ -8515,22 +22864,385 @@ class TestLinkChecker(unittest.TestCase):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].issue_type, "bad_domain")
 
+    def test_bad_domain_with_path_segment_is_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamefaqs.gamespot.com/ps2/invalid/old-page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_gamefaqs_other_paths_not_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://gamefaqs.gamespot.com/ps2/564423-game/faqs"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_bad_domain_normalization_only_strips_literal_www_prefix(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        with patch("src.core.link_checker._BAD_DOMAINS", frozenset({"wtest.com"})):
+            issues = lc.check_entries(
+                [{"url": "https://www.wtest.com/some/page"}],
+                source_file="test",
+            )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "bad_domain")
+
+    def test_trusted_domain_not_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://mega.nz/file/ABCDEF#frag"}],
+            source_file="test",
+        )
+        self.assertEqual(issues, [])
+
+    def test_suspicious_domain_flagged(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": "https://example.com/some/page"}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "suspicious_domain")
+
     def test_empty_url_not_flagged(self):
         """Empty URL fields should not produce issues."""
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
         issues = lc.check_entries(
-            [{"url": "", "author_url": ""}],
+            [{"url": "", "author_url": "", "author": "Test Author"}],
             source_file="test",
         )
         self.assertEqual(issues, [])
+
+    def test_non_string_url_value_is_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"url": 123}],
+            source_file="test",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "malformed")
+        self.assertIn("expected a string URL", issues[0].detail)
 
     def test_no_url_field_not_flagged(self):
         """Entries without URL fields should not produce issues."""
         from src.core.link_checker import LinkChecker
         lc = LinkChecker()
-        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000"}])
+        issues = lc.check_entries([{"game": "Test", "serial": "SLUS-20000", "author": "Test Author"}])
         self.assertEqual(issues, [])
+
+    def test_empty_author_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"name": "Test Pack", "url": "https://github.com/PCSX2/pcsx2", "author": ""}],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_author")
+        self.assertEqual(issues[0].field_name, "author")
+
+    def test_placeholder_author_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Unknown",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "placeholder_author")
+        self.assertEqual(issues[0].field_name, "author")
+
+    def test_placeholder_author_inference_matches_loader_fallbacks(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack by ExampleName",
+                "author": "",
+                "url": "https://gbatemp.net/threads/example.123/",
+                "source": "GBAtemp",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            },
+            {
+                "name": "Profile Pack",
+                "author": "Anonymous",
+                "author_url": "https://gbatemp.net/members/profile_user.12345/#latest-activity",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game 2",
+                "game_serial": "SCUS-54321",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(issues, [])
+
+    def test_noncanonical_source_label_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "gbatemp.net",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "noncanonical_source")
+        self.assertEqual(issues[0].field_name, "source")
+        self.assertIn("GBAtemp", issues[0].detail)
+
+    def test_generic_author_url_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "author_url": "https://gbatemp.net/",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_author_url")
+        self.assertEqual(issues[0].field_name, "author_url")
+
+    def test_generic_thumbnail_url_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "thumbnail_url": "https://github.githubassets.com/favicons/favicon.png",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_thumbnail_url")
+        self.assertEqual(issues[0].field_name, "thumbnail_url")
+
+    def test_generic_thumbnail_host_flagged(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Example Pack",
+                "author": "Test Author",
+                "thumbnail_url": "https://placehold.co/60x88.png",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Example Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "generic_thumbnail_url")
+        self.assertEqual(issues[0].field_name, "thumbnail_url")
+        self.assertIn("placeholder image host", issues[0].detail)
+
+    def test_invalid_download_action_flagged_for_catalogue_entries(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+                "download_action": "manual_meg",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "invalid_download_action")
+        self.assertEqual(issues[0].field_name, "download_action")
+
+    def test_automatic_download_actions_require_direct_download_url(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Pack",
+                "author": "Test Author",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+                "download_action": "gdrive",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
+        self.assertEqual(issues[0].field_name, "direct_download_url")
+        self.assertIn("download_action", issues[0].detail)
+
+    def test_save_entries_require_direct_download_url(self):
+        from src.core.link_checker import LinkChecker
+
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Test Save",
+                "author": "Test Author",
+                "url": "https://example.com/save",
+                "source": "GitHub",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="saves.json",
+            required_url_fields=["direct_download_url"],
+        )
+        self.assertEqual(len(issues), 2)
+        self.assertEqual({issue.issue_type for issue in issues}, {"empty_required", "suspicious_domain"})
+        self.assertTrue(any(issue.field_name == "direct_download_url" for issue in issues))
+
+    def test_hub_entries_may_skip_author_credit(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Texture Hub",
+                "url": "https://gbatemp.net/threads/example.123",
+                "author": "",
+                "is_hub": True,
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(issues, [])
+
+    def test_hub_entries_may_skip_placeholder_author(self):
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{
+                "name": "Texture Hub",
+                "url": "https://gbatemp.net/threads/example.123",
+                "author": "Unknown",
+                "is_hub": True,
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }],
+            source_file="texture_packs.json",
+        )
+        self.assertEqual(issues, [])
+
+    def test_check_all_catalogues_includes_user_catalogue_files(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            user_dir = Path(tmpdir) / "user_catalogue"
+            user_dir.mkdir()
+            custom = user_dir / "custom.json"
+            custom.write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "user-pack",
+                "name": "User Pack",
+                "description": "User-added catalogue entry",
+                "author": "Unknown",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+
+            with patch("src.core.link_checker._user_catalogue_dir", return_value=user_dir):
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertIn("user_catalogue/custom.json", report["catalogues_checked"])
+        user_issues = report["issues_by_file"].get("user_catalogue/custom.json", [])
+        self.assertTrue(any(issue["issue_type"] == "placeholder_author" for issue in user_issues))
+
+    def test_check_all_catalogues_skips_helper_user_files(self):
+        from src.core.link_checker import LinkChecker
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            user_dir = Path(tmpdir) / "user_catalogue"
+            user_dir.mkdir()
+            (user_dir / "_index.json").write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "helper-index",
+                "name": "Helper Index",
+                "description": "Helper metadata file",
+                "author": "Tester",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+            (user_dir / "custom.json").write_text(json.dumps([{
+                "type": "texture_pack",
+                "id": "user-pack",
+                "name": "User Pack",
+                "description": "User-added catalogue entry",
+                "author": "Tester",
+                "url": "https://github.com/PCSX2/pcsx2",
+                "source": "Personal",
+                "game": "Test Game",
+                "game_serial": "SLUS-12345",
+            }]), encoding="utf-8")
+
+            with patch("src.core.link_checker._user_catalogue_dir", return_value=user_dir):
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertIn("user_catalogue/custom.json", report["catalogues_checked"])
+        self.assertNotIn("user_catalogue/_index.json", report["catalogues_checked"])
+
+    def test_check_all_catalogues_logs_user_catalogue_resolution_failure(self):
+        from src.core.link_checker import LinkChecker
+
+        with patch("src.core.link_checker._user_catalogue_dir", side_effect=RuntimeError("boom")):
+            with self.assertLogs("src.core.link_checker", level="WARNING") as logs:
+                report = LinkChecker().check_all_catalogues()
+
+        self.assertEqual(report["total_issues"], 0)
+        self.assertTrue(
+            any("Could not resolve user catalogue directory" in msg for msg in logs.output),
+            logs.output,
+        )
 
     def test_multiple_url_fields_checked(self):
         """Both 'url' and 'author_url' fields are checked independently."""
@@ -8542,20 +23254,49 @@ class TestLinkChecker(unittest.TestCase):
         )
         self.assertEqual(len(issues), 2)
 
+    def test_required_download_url_fields_flagged_for_cheats(self):
+        """Cheat and PNACH entries should report missing required download URLs."""
+        from src.core.link_checker import LinkChecker
+        lc = LinkChecker()
+        issues = lc.check_entries(
+            [{"type": "cheat", "name": "Test", "game": "Game", "author": "Test Author"}],
+            source_file="cheats.json",
+            required_url_fields=["direct_download_url"],
+        )
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
+        self.assertEqual(issues[0].field_name, "direct_download_url")
+
+    def test_check_file_flags_missing_required_download_url(self):
+        """check_file should apply required field validation for cheats.json."""
+        from src.core.link_checker import LinkChecker
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p = Path(tmpdir) / "cheats.json"
+            p.write_text(json.dumps([{"author": "Test Author"}]), encoding="utf-8")
+
+            issues = LinkChecker(cat_dir=tmpdir).check_file(
+                p,
+                source_file="cheats.json",
+                required_url_fields=["direct_download_url"],
+            )
+
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].issue_type, "empty_required")
+
     # -- Integration test: all catalogues pass link checks --
 
-    def test_all_catalogues_pass_link_check(self):
-        """All 5 catalogue files should have 0 link issues after Wave 38."""
+    def test_all_catalogues_have_no_broken_urls(self):
+        """Built-in catalogues should remain free of broken URLs and placeholder authors."""
         report = self.lc.check_all_catalogues()
-        self.assertEqual(
-            report["total_issues"], 0,
-            f"Link issues found:\n"
-            + "\n".join(
-                f"  [{f}] {i}"
-                for f, issues in report["issues_by_file"].items()
-                for i in issues
-            )
-        )
+        self.assertEqual(report["issue_count_by_type"].get("parse_error", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("malformed", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("bad_domain", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("suspicious_domain", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("invalid_download_action", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("noncanonical_source", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("generic_author_url", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("generic_thumbnail_url", 0), 0)
+        self.assertEqual(report["issue_count_by_type"].get("placeholder_author", 0), 0)
 
     def test_check_all_catalogues_returns_dict(self):
         report = self.lc.check_all_catalogues()
@@ -10168,6 +24909,17 @@ class TestWave53TextureHashDB(unittest.TestCase):
         self.assertEqual(s["duplicate_groups"], 0)
         self.assertEqual(s["overwrite_conflicts"], 0)
 
+    def test_corrupt_db_logs_warning_and_starts_fresh(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        Path(self.db_path).write_text("{not valid json", encoding="utf-8")
+
+        with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+            db = TextureHashDB(self.db_path)
+
+        self.assertEqual(db.stats()["total_entries"], 0)
+        self.assertTrue(any("Failed to load texture hash DB" in msg for msg in logs.output))
+
     def test_all_entries_empty(self):
         from src.core.texture_hash_db import TextureHashDB
         db = TextureHashDB(self.db_path)
@@ -10196,8 +24948,24 @@ class TestWave53TextureHashDB(unittest.TestCase):
     def test_register_missing_file_marked_broken(self):
         from src.core.texture_hash_db import TextureHashDB
         db = TextureHashDB(self.db_path)
-        entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
+        with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+            entry = db.register_file("nope.png", "pack-1", "/nonexistent/nope.png")
         self.assertTrue(entry.broken)
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
+    def test_register_file_logs_hash_failure(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        db = TextureHashDB(self.db_path)
+        tex = Path(self.tmpdir) / "hashfail.png"
+        tex.write_bytes(b"\x89PNG" + b"\x00" * 200)
+
+        with patch.object(TextureHashDB, "_hash_file", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                entry = db.register_file("hashfail.png", "pack-1", str(tex))
+
+        self.assertTrue(entry.broken)
+        self.assertTrue(any("Could not hash texture file" in msg for msg in logs.output))
 
     def test_register_pack_scans_directory(self):
         from src.core.texture_hash_db import TextureHashDB
@@ -10224,6 +24992,20 @@ class TestWave53TextureHashDB(unittest.TestCase):
         db = TextureHashDB(self.db_path)
         result = db.register_pack("pack-x", "/nonexistent/path")
         self.assertEqual(result, [])
+
+    def test_register_pack_permission_error_logs_warning(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        pack_dir = os.path.join(self.tmpdir, "PackDenied")
+        os.makedirs(pack_dir)
+        db = TextureHashDB(self.db_path)
+
+        with patch("src.core.texture_hash_db.os.walk", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                entries = db.register_pack("pack-denied", pack_dir)
+
+        self.assertEqual(entries, [])
+        self.assertTrue(any("Could not scan texture pack directory" in msg for msg in logs.output))
 
     def test_no_conflict_different_texture_ids(self):
         from src.core.texture_hash_db import TextureHashDB
@@ -10341,6 +25123,23 @@ class TestWave53TextureHashDB(unittest.TestCase):
         tmp_files = [f for f in parent.iterdir() if "texhash_tmp" in f.name]
         self.assertEqual(tmp_files, [])
 
+    def test_save_logs_cleanup_warning(self):
+        from src.core.texture_hash_db import TextureHashDB
+
+        db = TextureHashDB(self.db_path)
+
+        with patch("src.core.texture_hash_db.os.replace", side_effect=OSError("disk full")), patch(
+            "src.core.texture_hash_db.os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.texture_hash_db", level="WARNING") as logs:
+                with self.assertRaises(OSError):
+                    db.save()
+
+        self.assertTrue(any("Failed to save texture hash DB" in msg for msg in logs.output))
+        self.assertTrue(
+            any("Could not remove temporary texture hash file" in msg for msg in logs.output)
+        )
+
     def test_stats_reflect_registered_entries(self):
         from src.core.texture_hash_db import TextureHashDB
         db = TextureHashDB(self.db_path)
@@ -10406,6 +25205,16 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         lom = LoadOrderManager(self.order_file)
         lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
         self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+
+    def test_set_order_logs_duplicates(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        lom = LoadOrderManager(self.order_file)
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as logs:
+            lom.set_order("SLUS-20062", ["pack-A", "pack-B", "pack-A"])
+
+        self.assertEqual(lom.get_order("SLUS-20062"), ["pack-A", "pack-B"])
+        self.assertTrue(any("duplicate pack id" in msg.lower() for msg in logs.output))
 
     def test_get_order_returns_copy(self):
         from src.core.load_order_manager import LoadOrderManager
@@ -10571,6 +25380,41 @@ class TestWave53LoadOrderManager(unittest.TestCase):
         parent = Path(self.order_file).parent
         tmp_files = [f for f in parent.iterdir() if "loadorder_tmp" in f.name]
         self.assertEqual(tmp_files, [])
+
+    def test_save_failure_logs_cleanup_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+        lom = LoadOrderManager(self.order_file)
+        lom.add_pack("SLUS-20062", "pack-1")
+
+        with patch("os.replace", side_effect=RuntimeError("boom")), patch(
+            "os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.load_order_manager", level="WARNING") as logs:
+                with self.assertRaises(RuntimeError):
+                    lom.save()
+
+        self.assertTrue(any("Failed to save load-order file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove temporary load-order file" in msg for msg in logs.output))
+
+    def test_load_invalid_json_logs_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        Path(self.order_file).write_text("{not-json", encoding="utf-8")
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as cm:
+            lom = LoadOrderManager(self.order_file)
+
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+        self.assertTrue(any("Failed to load load-order file" in msg for msg in cm.output))
+
+    def test_load_non_object_json_logs_warning(self):
+        from src.core.load_order_manager import LoadOrderManager
+
+        Path(self.order_file).write_text("[]", encoding="utf-8")
+        with self.assertLogs("src.core.load_order_manager", level="WARNING") as cm:
+            lom = LoadOrderManager(self.order_file)
+
+        self.assertEqual(lom.get_order("SLUS-20062"), [])
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
 
     def test_clear_removes_all(self):
         from src.core.load_order_manager import LoadOrderManager
@@ -10812,6 +25656,41 @@ class TestWave53ModProfiles(unittest.TestCase):
         tmp_files = [f for f in parent.iterdir() if "profiles_tmp" in f.name]
         self.assertEqual(tmp_files, [])
 
+    def test_save_failure_logs_cleanup_warning(self):
+        from src.core.mod_profile import ModProfileManager
+        pm = ModProfileManager(self.profiles_file)
+        pm.create_profile("P")
+
+        with patch("os.replace", side_effect=RuntimeError("boom")), patch(
+            "os.unlink", side_effect=OSError("cleanup denied")
+        ):
+            with self.assertLogs("src.core.mod_profile", level="WARNING") as logs:
+                with self.assertRaises(RuntimeError):
+                    pm.save()
+
+        self.assertTrue(any("Failed to save mod profiles file" in msg for msg in logs.output))
+        self.assertTrue(any("Could not remove temporary profiles file" in msg for msg in logs.output))
+
+    def test_load_invalid_json_logs_warning(self):
+        from src.core.mod_profile import ModProfileManager
+
+        Path(self.profiles_file).write_text("{not-json", encoding="utf-8")
+        with self.assertLogs("src.core.mod_profile", level="WARNING") as cm:
+            pm = ModProfileManager(self.profiles_file)
+
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertTrue(any("Failed to load mod profiles file" in msg for msg in cm.output))
+
+    def test_load_non_object_json_logs_warning(self):
+        from src.core.mod_profile import ModProfileManager
+
+        Path(self.profiles_file).write_text("[]", encoding="utf-8")
+        with self.assertLogs("src.core.mod_profile", level="WARNING") as cm:
+            pm = ModProfileManager(self.profiles_file)
+
+        self.assertEqual(pm.list_profiles(), [])
+        self.assertTrue(any("expected JSON object" in msg for msg in cm.output))
+
     def test_reload_preserves_load_order(self):
         from src.core.mod_profile import ModProfileManager
         pm = ModProfileManager(self.profiles_file)
@@ -10836,6 +25715,406 @@ class TestWave53ModProfiles(unittest.TestCase):
         self.assertEqual(p2.description, "test")
         self.assertEqual(p2.enabled_mods, ["m1", "m2"])
         self.assertEqual(p2.get_load_order("SLUS-20062"), ["m1", "m2"])
+
+
+class TestModProfilesDialogWorkflows(unittest.TestCase):
+    """Profile previews, persistence failures, and deployment use the same state."""
+
+    def setUp(self):
+        import sys
+        from types import MethodType, SimpleNamespace
+        from src.core.mod_profile import ModProfileManager
+
+        self.enterContext(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        from src.ui import widgets
+        self.widgets = widgets
+        self.dialog_type = widgets.ModProfilesDialog
+        self.tmp = self.enterContext(tempfile.TemporaryDirectory())
+        self.pm = ModProfileManager(str(Path(self.tmp) / "profiles.json"))
+        self.pm.create_profile("HD", "Graphics", ["on", "missing", "on"])
+        self.pm.create_profile("Vanilla")
+        self.mods = [
+            SimpleNamespace(id="on", name="<b>HD pack</b>", enabled=False),
+            SimpleNamespace(id="off", name="Other", enabled=True),
+        ]
+        self.dialog = SimpleNamespace(
+            _pm=self.pm, _db=MagicMock(), _config=object(), _selection="HD",
+            _selected_profile=MagicMock(return_value="HD"), _refresh=MagicMock(),
+            _status_lbl=MagicMock(), _detail_text=MagicMock(),
+            _apply_btn=MagicMock(), _rename_btn=MagicMock(), _dup_btn=MagicMock(),
+            _del_btn=MagicMock(), profile_applied=MagicMock(),
+        )
+        self.dialog._db.all.return_value = self.mods
+        for name in ("_profile_preview", "_persist_profiles"):
+            setattr(self.dialog, name, MethodType(getattr(self.dialog_type, name), self.dialog))
+        self.input = SimpleNamespace(getText=MagicMock())
+        self.enterContext(patch.object(sys.modules["PyQt6.QtWidgets"], "QInputDialog", self.input, create=True))
+        self.enterContext(patch.object(
+            widgets.QMessageBox, "StandardButton", SimpleNamespace(Yes=1, No=2), create=True,
+        ))
+        self.question = self.enterContext(patch.object(widgets.QMessageBox, "question", return_value=1))
+        self.critical = self.enterContext(patch.object(widgets.QMessageBox, "critical"))
+        self.warning = self.enterContext(patch.object(widgets.QMessageBox, "warning"))
+
+    def test_preview_deduplicates_missing_ids_and_reports_changes(self):
+        _mods, installed, missing, enable, disable = self.dialog._profile_preview(self.pm.get_profile("HD"))
+        self.assertEqual(installed, {"on"})
+        self.assertEqual(missing, {"missing"})
+        self.assertEqual([m.id for m in enable], ["on"])
+        self.assertEqual([m.id for m in disable], ["off"])
+
+    def test_details_are_plain_text_and_show_scope(self):
+        self.pm.get_profile("HD").description = "<img src='file:///private'>"
+        self.dialog_type._on_selection_changed(self.dialog, 0)
+        text = self.dialog._detail_text.setPlainText.call_args.args[0]
+        self.assertIn("<b>HD pack</b>", text)
+        self.assertIn("<img", text)
+        self.assertIn("1 installed, 1 missing", text)
+        self.assertIn("enable 1, disable 1", text)
+        self.assertIn("Priorities are unchanged", text)
+        self.dialog._detail_text.setHtml.assert_not_called()
+
+    def test_no_selection_disables_actions_and_explains_empty_search(self):
+        self.dialog._selected_profile.return_value = ""
+        self.dialog_type._on_selection_changed(self.dialog, -1)
+        self.dialog._apply_btn.setEnabled.assert_called_with(False)
+        self.assertIn("Clear the search", self.dialog._detail_text.setPlainText.call_args.args[0])
+
+    def test_empty_store_explains_save_action(self):
+        self.dialog._selected_profile.return_value = ""
+        self.pm.delete_profile("HD")
+        self.pm.delete_profile("Vanilla")
+        self.dialog_type._on_selection_changed(self.dialog, -1)
+        self.assertIn("Save Current State", self.dialog._detail_text.setPlainText.call_args.args[0])
+
+    def test_save_failure_keeps_manager_and_disk_unchanged(self):
+        self.pm.save()
+        original = self.pm._path.read_text()
+        with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                saved = self.dialog._persist_profiles(lambda pm: pm.delete_profile("HD"), "", "Deleted")
+        self.assertFalse(saved)
+        self.assertIs(self.dialog._pm, self.pm)
+        self.assertIsNotNone(self.pm.get_profile("HD"))
+        self.assertEqual(self.pm._path.read_text(), original)
+        self.dialog._refresh.assert_not_called()
+        self.critical.assert_called_once()
+
+    def test_successful_mutation_round_trips_and_selects_result(self):
+        self.assertTrue(self.dialog._persist_profiles(
+            lambda pm: pm.rename_profile("HD", "New"), "New", "Renamed",
+        ))
+        from src.core.mod_profile import ModProfileManager
+        loaded = ModProfileManager(str(self.pm._path))
+        self.assertIsNotNone(loaded.get_profile("New"))
+        self.assertIsNotNone(self.pm.get_profile("HD"))
+        self.dialog._refresh.assert_called_once_with("New")
+
+    def test_overwrite_decline_does_not_change_snapshot(self):
+        self.input.getText.return_value = ("HD", True)
+        self.question.return_value = 2
+        self.dialog_type._on_save_as(self.dialog)
+        self.assertEqual(self.pm.get_profile("HD").enabled_mods, ["on", "missing", "on"])
+        self.input.getText.assert_called_once()
+        self.assertFalse(self.pm._path.exists())
+
+    def test_confirmed_overwrite_replaces_states_but_preserves_load_order(self):
+        self.pm.get_profile("HD").set_load_order("SLUS-20062", ["on", "off"])
+        self.input.getText.side_effect = [("HD", True), ("", True)]
+        self.dialog_type._on_save_as(self.dialog)
+        saved = self.dialog._pm.get_profile("HD")
+        self.assertEqual(saved.enabled_mods, ["off"])
+        self.assertEqual(saved.description, "")
+        self.assertEqual(saved.get_load_order("SLUS-20062"), ["on", "off"])
+
+    def test_cancelled_description_does_not_create_profile(self):
+        self.input.getText.side_effect = [("New", True), ("", False)]
+        self.dialog_type._on_save_as(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_profile("New"))
+
+    def test_rename_and_duplicate_reject_collisions(self):
+        for action in ("_on_rename", "_on_duplicate"):
+            with self.subTest(action=action):
+                self.input.getText.return_value = ("Vanilla", True)
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    getattr(self.dialog_type, action)(self.dialog)
+                self.assertEqual(self.dialog._pm.list_profiles(), ["HD", "Vanilla"])
+                self.assertFalse(self.pm._path.exists())
+        self.assertEqual(self.critical.call_count, 2)
+
+    def test_delete_failure_is_recoverable(self):
+        with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                self.dialog_type._on_delete(self.dialog)
+        self.assertIsNotNone(self.dialog._pm.get_profile("HD"))
+        self.critical.assert_called_once()
+
+    def test_confirmation_does_not_render_profile_name_as_html(self):
+        self.dialog._selected_profile.return_value = "<img src='https://example.invalid/test'>"
+        self.question.return_value = 2
+        self.dialog_type._on_delete(self.dialog)
+        text = self.question.call_args.args[2]
+        self.assertNotIn("<img", text)
+        self.assertIn("&lt;img", text)
+
+    def test_apply_reconciles_all_installed_states_in_one_batch(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled_many.return_value = (1, [])
+            self.dialog_type._on_apply(self.dialog)
+        manager.return_value.set_enabled_many.assert_called_once_with(
+            {"on": True, "off": False}, self.dialog._config,
+        )
+        self.assertEqual(self.dialog._pm.get_active_name(), "HD")
+        self.dialog.profile_applied.emit.assert_called_once_with("HD")
+        self.assertIn("1 installed mods enabled; 1 missing", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_apply_cancel_does_not_deploy_or_persist(self):
+        self.question.return_value = 2
+        with patch("src.core.mod_manager.ModManager") as manager:
+            self.dialog_type._on_apply(self.dialog)
+        manager.assert_not_called()
+        self.assertIsNone(self.pm.get_active_name())
+        self.assertFalse(self.pm._path.exists())
+
+    def test_apply_updates_real_texture_files_and_persisted_flags(self):
+        from src.core.mod_manager import ModDatabase
+        from src.models.mod import AppConfig, ModInfo, ModType
+
+        root = Path(self.tmp)
+        source = root / "new"
+        source.mkdir()
+        (source / "new.png").write_bytes(b"new")
+        old = root / "old"
+        old.mkdir()
+        (old / "old.png").write_bytes(b"old")
+        target = root / "textures"
+        target.mkdir()
+        (target / "old.png").write_bytes(b"old")
+        with patch("src.core.config_manager.MODS_DB_FILE", root / "mods.json"), patch(
+            "src.core.config_manager.ensure_dirs",
+        ):
+            db = ModDatabase()
+            db.add(ModInfo("on", "New", ModType.TEXTURE_PACK, str(source), enabled=False))
+            db.add(ModInfo("off", "Old", ModType.TEXTURE_PACK, str(old), enabled=True))
+            self.dialog._db = db
+            self.dialog._config = AppConfig(textures_path=str(target))
+            self.dialog_type._on_apply(self.dialog)
+            self.assertEqual((target / "new.png").read_bytes(), b"new")
+            self.assertFalse((target / "old.png").exists())
+            reloaded = ModDatabase()
+            self.assertTrue(reloaded.get("on").enabled)
+            self.assertFalse(reloaded.get("off").enabled)
+        self.warning.assert_not_called()
+
+    def test_apply_without_config_explicitly_uses_database_only(self):
+        self.dialog._config = None
+        self.dialog_type._on_selection_changed(self.dialog, 0)
+        self.assertIn("database flags only", self.dialog._detail_text.setPlainText.call_args.args[0])
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled_many.return_value = (0, [])
+            self.dialog_type._on_apply(self.dialog)
+        manager.return_value.set_enabled_many.assert_called_once_with({"on": True, "off": False}, None)
+        self.assertIn("Database flags only", self.question.call_args.args[2])
+
+    def test_apply_reports_deployment_warnings(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled_many.return_value = (0, ["No target configured"])
+            self.dialog_type._on_apply(self.dialog)
+        self.warning.assert_called_once()
+        self.assertEqual(self.warning.call_args.args[-1], "<p>No target configured</p>")
+        self.assertIn("deployment warnings", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_partial_apply_refreshes_without_marking_active(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled_many.side_effect = OSError("denied")
+            with self.assertLogs("src.ui.widgets", level="WARNING"):
+                self.dialog_type._on_apply(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_active_name())
+        self.dialog._refresh.assert_called_once_with("HD")
+        self.dialog.profile_applied.emit.assert_called_once()
+        self.assertIn("Some mods may have changed", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_apply_metadata_failure_still_refreshes_mod_state(self):
+        with patch("src.core.mod_manager.ModManager") as manager:
+            manager.return_value.set_enabled_many.return_value = (1, [])
+            with patch("src.core.mod_profile.ModProfileManager.save", side_effect=OSError("denied")):
+                with self.assertLogs("src.ui.widgets", level="WARNING"):
+                    self.dialog_type._on_apply(self.dialog)
+        self.assertIsNone(self.dialog._pm.get_active_name())
+        self.dialog.profile_applied.emit.assert_called_once()
+        self.dialog._refresh.assert_called_once_with("HD")
+        self.assertIn("last-used profile could not be saved", self.dialog._status_lbl.setText.call_args.args[0])
+
+    def test_search_matches_description_and_restores_hidden_selection(self):
+        self.dialog._selection = "Vanilla"
+        self.dialog._search_edit = MagicMock()
+        self.dialog._count_lbl = MagicMock()
+        self.dialog._profile_list = MagicMock()
+        self.dialog._on_selection_changed = MagicMock()
+        self.dialog._search_edit.text.return_value = "graphics"
+        self.enterContext(patch.object(self.widgets, "QListWidgetItem", side_effect=lambda text: MagicMock()))
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._profile_list.setCurrentRow.assert_called_with(0)
+        self.dialog._count_lbl.setText.assert_called_with("Showing 1 of 2 profiles")
+        self.dialog._search_edit.text.return_value = "nothing"
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._count_lbl.setText.assert_called_with("Showing 0 of 2 profiles")
+        self.assertEqual(self.dialog._selection, "Vanilla")
+        self.dialog._search_edit.text.return_value = ""
+        self.dialog_type._refresh(self.dialog)
+        self.dialog._profile_list.setCurrentRow.assert_called_with(1)
+
+
+class TestModProfileBatchDeployment(unittest.TestCase):
+    """Batch profile application reconciles files once per type, including retries."""
+
+    def setUp(self):
+        from src.core.mod_manager import ModManager
+        from src.models.mod import AppConfig, ModInfo, ModType
+
+        self.tmp = self.enterContext(tempfile.TemporaryDirectory())
+        self.root = Path(self.tmp)
+        self.target = self.root / "target"
+        self.target.mkdir()
+        self.mods = []
+        for index in range(3):
+            source = self.root / f"source{index}"
+            source.mkdir()
+            (source / f"{index}.png").write_bytes(b"texture")
+            (self.target / f"{index}.png").write_bytes(b"texture")
+            self.mods.append(ModInfo(str(index), str(index), ModType.TEXTURE_PACK, str(source)))
+        self.db = MagicMock()
+        self.db.all.return_value = self.mods
+        self.db.get.side_effect = lambda mid: next((m for m in self.mods if m.id == mid), None)
+        self.db.by_type.side_effect = lambda kind: [m for m in self.mods if m.mod_type == kind]
+        self.manager = ModManager(self.db)
+        self.config = AppConfig(textures_path=str(self.target))
+
+    def test_disable_all_never_recopies_packs_and_deploys_once(self):
+        from src.models.mod import ModType
+        with patch.object(self.manager, "deploy", wraps=self.manager.deploy) as deploy, patch(
+            "src.core.mod_manager.shutil.copytree",
+        ) as copy:
+            count, warnings = self.manager.set_enabled_many({m.id: False for m in self.mods}, self.config)
+        self.assertEqual((count, warnings), (0, []))
+        deploy.assert_called_once_with(ModType.TEXTURE_PACK, str(self.target))
+        copy.assert_not_called()
+        self.assertEqual(list(self.target.iterdir()), [])
+        self.db.save.assert_called_once()
+
+    def test_unchanged_enabled_flag_retries_missing_source(self):
+        import shutil
+        source = Path(self.mods[0].path)
+        shutil.rmtree(source)
+        self.mods[0].enabled = False
+        count, warnings = self.manager.set_enabled_many({"0": True, "1": False, "2": False}, self.config)
+        self.assertTrue(self.mods[0].enabled)
+        self.assertEqual(count, 0)
+        self.assertTrue(warnings)
+        source.mkdir()
+        (source / "0.png").write_bytes(b"restored")
+        count, warnings = self.manager.set_enabled_many({"0": True, "1": False, "2": False}, self.config)
+        self.assertEqual((count, warnings), (1, []))
+        self.assertEqual((self.target / "0.png").read_bytes(), b"restored")
+
+    def test_retry_after_cleanup_exception_reconciles_disabled_flags(self):
+        states = {m.id: False for m in self.mods}
+        with patch.object(self.manager, "undeploy_mod", side_effect=OSError("denied")):
+            with self.assertRaises(OSError):
+                self.manager.set_enabled_many(states, self.config)
+        self.assertTrue(all(not m.enabled for m in self.mods))
+        self.manager.set_enabled_many(states, self.config)
+        self.assertEqual(list(self.target.iterdir()), [])
+
+    def test_database_save_failure_restores_in_memory_flags_and_skips_deploy(self):
+        self.db.save.side_effect = OSError("denied")
+        with patch.object(self.manager, "deploy") as deploy:
+            with self.assertRaises(OSError):
+                self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertTrue(self.mods[0].enabled)
+        deploy.assert_not_called()
+        self.assertTrue((self.target / "0.png").exists())
+
+    def test_no_config_persists_flags_without_touching_files(self):
+        with patch.object(self.manager, "deploy") as deploy:
+            result = self.manager.set_enabled_many({"0": False, "unknown": True})
+        self.assertEqual(result, (0, []))
+        self.assertFalse(self.mods[0].enabled)
+        self.assertTrue((self.target / "0.png").exists())
+        deploy.assert_not_called()
+
+    def test_missing_target_warns_once_per_type(self):
+        self.config.textures_path = ""
+        count, warnings = self.manager.set_enabled_many({m.id: False for m in self.mods}, self.config)
+        self.assertEqual(count, 0)
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("No target path", warnings[0])
+        self.assertEqual(len(list(self.target.iterdir())), 3)
+
+    def test_multiple_types_deploy_once_each_and_unrequested_flags_stay_unchanged(self):
+        from src.models.mod import ModType
+        self.mods[1].mod_type = ModType.PNACH
+        self.config.pnach_path = str(self.root / "patches")
+        with patch.object(self.manager, "deploy", return_value=(1, [])) as deploy, patch.object(
+            self.manager, "_deploy_pnach", return_value=(1, []),
+        ) as pnach_deploy:
+            count, warnings = self.manager.set_enabled_many({"0": False, "1": True}, self.config)
+        self.assertEqual((count, warnings), (2, []))
+        deploy.assert_called_once()
+        pnach_deploy.assert_called_once()
+        self.assertTrue(self.mods[2].enabled)
+
+    def test_disable_removes_renamed_cover_output(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.COVER_ART
+        self.mods[0].game_id = "SLUS-20062"
+        self.config.cover_art_path = str(self.target)
+        self.manager.deploy(ModType.COVER_ART, str(self.target))
+        canonical = self.target / "SLUS-20062.png"
+        self.assertTrue(canonical.exists())
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse(canonical.exists())
+
+    def test_disable_removes_flattened_and_crc_normalized_patches(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.PNACH
+        source = Path(self.mods[0].path) / "nested"
+        source.mkdir()
+        (source / "1234abcd.pnach").write_text("patch=1,EE,00100000,word,00000001")
+        (source / "custom.pnach").write_text("patch=1,EE,00100004,word,00000002")
+        self.config.pnach_path = str(self.target)
+        self.manager.deploy(ModType.PNACH, str(self.target))
+        self.assertTrue((self.target / "1234ABCD.pnach").exists())
+        self.assertTrue((self.target / "custom.pnach").exists())
+        self.manager.set_enabled_many({"0": False}, self.config)
+        self.assertFalse((self.target / "1234ABCD.pnach").exists())
+        self.assertFalse((self.target / "custom.pnach").exists())
+
+    def test_unchanged_or_changed_save_flags_never_overwrite_or_delete_live_cards(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.SAVE_FILE
+        self.config.memcards_path = str(self.target)
+        live = self.target / "0.png"
+        live.write_bytes(b"newer game progress")
+        for enabled in (True, False, True):
+            self.manager.set_enabled_many({"0": enabled}, self.config)
+            self.assertEqual(live.read_bytes(), b"newer game progress")
+        self.assertTrue(self.mods[0].enabled)
+
+    def test_shared_pnach_cheat_target_cleans_before_combined_deploy(self):
+        from src.models.mod import ModType
+        self.mods[0].mod_type = ModType.PNACH
+        self.mods[1].mod_type = ModType.CHEAT
+        for mod, address in ((self.mods[0], "00100000"), (self.mods[1], "00100004")):
+            (Path(mod.path) / "1234ABCD.pnach").write_text(f"patch=1,EE,{address},word,00000001")
+        self.config.pnach_path = self.config.cheats_path = str(self.target)
+        self.manager.set_enabled_many({"0": True, "1": False}, self.config)
+        output = self.target / "1234ABCD.pnach"
+        self.assertIn("00100000", output.read_text())
+        self.manager.set_enabled_many({"0": True, "1": True}, self.config)
+        self.assertIn("00100000", output.read_text())
+        self.assertIn("00100004", output.read_text())
 
 
 class TestWave53TextureOverwriteConflicts(unittest.TestCase):
@@ -10895,6 +26174,23 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         self.assertEqual(result[0].serial, "SLUS-20062")
         self.assertFalse(result[0].same_content)
 
+    def test_conflict_detected_case_insensitive_shared_filename(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+        Path(pa, "abc.png").write_bytes(b"\x89PNG" + b"\x03" * 200)
+        Path(pb, "ABC.PNG").write_bytes(b"\x89PNG" + b"\x04" * 200)
+
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].texture_id, "abc.png")
+        self.assertEqual(result[0].serial, "SLUS-20062")
+        self.assertFalse(result[0].same_content)
+
     def test_conflict_same_content_detected(self):
         from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
         tex = os.path.join(self.tmpdir, "textures")
@@ -10908,6 +26204,23 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         result = resolve_texture_overwrite_conflicts(tex)
         self.assertEqual(len(result), 1)
         self.assertTrue(result[0].same_content)
+
+    def test_conflict_same_content_requires_full_file_match(self):
+        from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
+
+        tex = os.path.join(self.tmpdir, "textures")
+        pa = os.path.join(tex, "SLUS-20062", "replacements", "PackA")
+        pb = os.path.join(tex, "SLUS-20062", "replacements", "PackB")
+        os.makedirs(pa)
+        os.makedirs(pb)
+
+        prefix = b"\x89PNG" + (b"A" * (8192 - 4))
+        Path(pa, "same.png").write_bytes(prefix + b"pack-a-tail")
+        Path(pb, "same.png").write_bytes(prefix + b"pack-b-tail")
+
+        result = resolve_texture_overwrite_conflicts(tex)
+        self.assertEqual(len(result), 1)
+        self.assertFalse(result[0].same_content)
 
     def test_multiple_conflicts_sorted_by_texture_id(self):
         from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
@@ -10927,6 +26240,33 @@ class TestWave53TextureOverwriteConflicts(unittest.TestCase):
         from src.core.conflict_resolver import resolve_texture_overwrite_conflicts
         result = resolve_texture_overwrite_conflicts("/nonexistent/path")
         self.assertEqual(result, [])
+
+    def test_permission_error_logs_warning(self):
+        from src.core.conflict_resolver import _scan_replacements_dir
+        repl = Path(self.tmpdir) / "textures" / "SLUS-20062" / "replacements"
+        repl.mkdir(parents=True, exist_ok=True)
+        with patch("src.core.conflict_resolver.os.walk", side_effect=PermissionError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                result = _scan_replacements_dir(repl)
+        self.assertEqual(result, {})
+        self.assertTrue(any("Could not scan replacements directory" in msg for msg in logs.output))
+
+    def test_scan_replacements_dir_prefers_lexicographic_subdir(self):
+        from src.core.conflict_resolver import _scan_replacements_dir
+
+        repl = Path(self.tmpdir) / "textures" / "SLUS-20062" / "replacements" / "PackRoot"
+        repl.mkdir(parents=True, exist_ok=True)
+
+        def fake_walk(root):
+            dirnames = ["PackB", "PackA"]
+            yield str(root), dirnames, []
+            for dirname in dirnames:
+                yield str(Path(root) / dirname), [], ["shared.png"]
+
+        with patch("src.core.conflict_resolver.os.walk", side_effect=fake_walk):
+            result = _scan_replacements_dir(repl)
+
+        self.assertEqual(result["shared.png"], repl / "PackA" / "shared.png")
 
     def test_conflict_summary_readable(self):
         from src.core.conflict_resolver import TextureOverwriteConflict
@@ -11069,12 +26409,50 @@ class TestWave54ConflictVisualizer(unittest.TestCase):
         p = Path(self.tmpdir, "nonexistent.png")
         self.assertEqual(_detect_alpha_type(p), "unknown")
 
+    def test_detect_alpha_type_unreadable_file_logs_warning(self):
+        from src.core.conflict_resolver import _detect_alpha_type
+
+        p = Path(self.tmpdir, "broken.png")
+        p.write_bytes(b"not used")
+
+        with patch("pathlib.Path.read_bytes", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                result = _detect_alpha_type(p)
+
+        self.assertEqual(result, "unknown")
+        self.assertTrue(any("Could not read texture file" in msg for msg in logs.output))
+
     def test_detect_alpha_type_truncated_png_returns_unknown(self):
         from src.core.conflict_resolver import _detect_alpha_type
         p = Path(self.tmpdir, "short.png")
         # Valid magic but not enough bytes for IHDR
         p.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 10)
         self.assertEqual(_detect_alpha_type(p), "unknown")
+
+    def test_file_size_bytes_missing_file_logs_warning(self):
+        from src.core.conflict_resolver import _file_size_bytes
+
+        p = Path(self.tmpdir, "missing.png")
+        with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+            size = _file_size_bytes(p)
+
+        self.assertEqual(size, 0)
+        self.assertTrue(any("Could not stat texture file" in msg for msg in logs.output))
+
+    def test_files_have_same_content_unreadable_logs_warning(self):
+        from src.core.conflict_resolver import _files_have_same_content
+
+        a = Path(self.tmpdir, "a.png")
+        b = Path(self.tmpdir, "b.png")
+        a.write_bytes(b"abc")
+        b.write_bytes(b"xyz")
+
+        with patch("builtins.open", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.conflict_resolver", level="WARNING") as logs:
+                same = _files_have_same_content(a, b)
+
+        self.assertFalse(same)
+        self.assertTrue(any("Could not compare texture file contents" in msg for msg in logs.output))
 
     # ------------------------------------------------------------------
     # TextureOverwriteConflict new fields
@@ -18461,11 +33839,11 @@ class TestWave89DbDeduplicationAndConnectivity(unittest.TestCase):
                       "browse_panel must call record_event for download history")
 
     def test_pnach_install_references_record_event(self):
-        """PnachGitHubDialog._install_patch must call record_event."""
+        """The PNACH installation completion receiver must record history."""
         bp_path = Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py"
         src_text = bp_path.read_text(encoding="utf-8")
-        # Verify record_event appears after _install_patch definition
-        install_patch_pos = src_text.find("def _install_patch")
+        # Verify record_event appears after the installation completion definition
+        install_patch_pos = src_text.find("def _complete_install")
         record_event_pos = src_text.find("record_event", install_patch_pos)
         self.assertGreater(record_event_pos, install_patch_pos,
                            "_install_patch must call record_event")
@@ -18565,6 +33943,22 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         results = self.sdb.search_titles("SotC")
         self.assertTrue(any("shadow of the colossus" in r.lower() for r in results))
 
+    def test_search_titles_punctuation_insensitive(self):
+        results = self.sdb.search_titles("Baldurs Gate")
+        self.assertTrue(
+            any("baldur's gate: dark alliance" in r.lower() for r in results),
+            f"Expected Baldur's Gate results, got: {results}",
+        )
+
+    def test_title_to_serials_punctuation_insensitive(self):
+        from src.core.game_registry import title_to_serials
+
+        results = title_to_serials("Baldurs Gate")
+        self.assertTrue(
+            any(title.lower().startswith("baldur's gate") for _, title in results),
+            f"Expected Baldur's Gate serial results, got: {results}",
+        )
+
     def test_search_titles_dq8(self):
         results = self.sdb.search_titles("DQ8")
         self.assertTrue(any("dragon quest viii" in r.lower() for r in results))
@@ -18637,6 +34031,11 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
     def test_title_matches_query_regional_bully(self):
         self.assertTrue(self.sdb.title_matches_query("Bully", "canis canem"))
 
+    def test_title_matches_query_punctuation_insensitive(self):
+        self.assertTrue(
+            self.sdb.title_matches_query("Baldur's Gate: Dark Alliance", "Baldurs Gate")
+        )
+
     def test_title_matches_query_false_when_no_match(self):
         self.assertFalse(self.sdb.title_matches_query("Kingdom Hearts", "DMC3"))
 
@@ -18647,6 +34046,19 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         """Unknown title (not in DB) falls back to substring check only."""
         self.assertTrue(self.sdb.title_matches_query("Some Unknown Game", "unknown"))
         self.assertFalse(self.sdb.title_matches_query("Some Unknown Game", "DMC3"))
+
+    def test_load_pal_serials_logs_invalid_root(self):
+        from src.core import game_registry as gr
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_db = Path(tmpdir) / "ps2_pal.json"
+            bad_db.write_text("[]", encoding="utf-8")
+            with patch.object(gr, "_PAL_DB_FILE", bad_db):
+                with self.assertLogs("src.core.game_registry", level="WARNING") as logs:
+                    result = gr._load_pal_serials()
+
+        self.assertEqual(result, {})
+        self.assertTrue(any("Expected JSON object" in msg for msg in logs.output))
 
     # ------------------------------------------------------------------
     # Alias data correctness in NTSC-U JSON
@@ -18737,11 +34149,59 @@ class TestWave90AliasSearchAndRegionalVariants(unittest.TestCase):
         self.assertTrue(hasattr(SerialDatabase, "title_matches_query"))
 
     def test_browse_panel_uses_title_matches_query(self):
-        """browse_panel.apply_filters must use title_matches_query for alias expansion."""
+        """browse_panel.apply_filters must use the shared search helper."""
         from pathlib import Path
         src = (Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py").read_text(encoding="utf-8")
-        self.assertIn("title_matches_query", src,
-                      "apply_filters must call title_matches_query for alias-aware search")
+        self.assertIn("_entry_matches_query", src,
+                      "apply_filters must call the shared browse search helper")
+        for snippet in ("title_matches_query", "game_serial", "source"):
+            self.assertIn(snippet, src)
+
+    def test_browse_panel_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "browse_panel.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Could not save browse panel config after %s: %s",
+            "updating favorites",
+            "updating NSFW preference",
+            "updating paid-content preference",
+            "updating account-required preference",
+            "updating incomplete-content preference",
+            "updating in-app-only preference",
+            "Direct download %s failed: %s",
+            "Could not start direct download worker",
+            "Could not record browse download history for",
+            "Could not record failed browse download history for",
+            "Could not load serial database for alias-aware browse filters",
+            "Cover %s failed: %s",
+            "Could not fetch browse cover art from",
+            "Could not download browse cover art from",
+            "Could not remove temporary browse cover art file",
+            "Could not inspect browse download URL",
+            "Could not determine downloaded size for",
+            "Could not record PNACH download history for",
+            "Could not record failed PNACH download history for",
+            "PNACH DB registration warning for",
+        ):
+            self.assertIn(snippet, src)
+
+    def test_widgets_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "widgets.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Skipping unreadable PNACH file",
+            "Could not load library serials for PNACH picker",
+            "Could not load serial database for PNACH picker",
+            "Could not parse existing PNACH file",
+            "Could not determine backup directory",
+        ):
+            self.assertIn(snippet, src)
+
+    def test_splash_logs_icon_fallback(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "splash.py").read_text(encoding="utf-8")
+        self.assertIn("Splash screen controller icon not found", src)
+        self.assertIn("Splash screen controller icon could not be loaded", src)
 
     # ------------------------------------------------------------------
     # Games with aliases count
@@ -19056,6 +34516,24 @@ class TestWave91And92And93(unittest.TestCase):
                       "mod_panel must use QPushButton for count label (clickable)")
         self.assertIn("_on_count_lbl_clicked", src,
                       "mod_panel must have _on_count_lbl_clicked handler")
+
+    def test_mod_panel_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "mod_panel.py").read_text(encoding="utf-8")
+        for snippet in (
+            "Could not validate PNACH status for",
+            "Could not detect PNACH conflicts for",
+            "Could not load library serials for mod panel",
+            "Could not determine cheats folder for PNACH code builder",
+            "Could not infer current game serial for PNACH code builder",
+            "Could not import mod in mod panel",
+        ):
+            self.assertIn(snippet, src)
+
+    def test_setup_wizard_logs_best_effort_failures(self):
+        from pathlib import Path
+        src = (Path(__file__).parent.parent / "src" / "ui" / "setup_wizard.py").read_text(encoding="utf-8")
+        self.assertIn("Could not create PCSX2 folders during setup", src)
 
     # ------------------------------------------------------------------
     # ValidationIssue dataclass structure (Wave 92)
@@ -20695,6 +36173,10 @@ class TestWave110DemoDatabase(unittest.TestCase):
     def test_is_demo_serial_kiosk(self):
         """Wave 110: Kiosk disc PBPX-95500 recognised as demo (kiosk is non-retail)."""
         self.assertTrue(self.sdb.is_demo_serial("PBPX-95500"))
+
+    def test_is_demo_serial_pcpx_trial_disc(self):
+        """Wave 110: PCPX trial discs should rank with other non-retail demo media."""
+        self.assertTrue(self.sdb.is_demo_serial("PCPX-96322"))
 
     def test_is_demo_serial_retail_gow(self):
         """Wave 110: God of War retail serial SCUS-97399 NOT a demo serial."""

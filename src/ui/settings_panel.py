@@ -1,6 +1,9 @@
 """Settings panel for PS2 Mod Manager."""
 
-from PyQt6.QtCore import pyqtSignal, Qt
+import logging
+from dataclasses import replace
+from pathlib import Path
+from PyQt6.QtCore import pyqtSignal, Qt, QTimer
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -14,14 +17,41 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.core.app_info import APP_NAME, APP_VERSION, PATREON_URL
 from src.core.config_manager import save_config
+from src.core.link_checker import LinkChecker
 from src.models.mod import AppConfig
 from src.ui.base_panel import BasePanel
 from src.ui.widgets import PathChooser
+from src.ui.url_helpers import open_external_url
 from src.ui.theme import THEME_KEYS, apply_theme
 
-PATREON_URL = "https://www.patreon.com/c/DeadOnTheInside"
-APP_VERSION = "1.0.0"
+logger = logging.getLogger(__name__)
+
+_PATH_FIELDS = (
+    ("_pcsx2_chooser", "pcsx2_path", "PCSX2 Config Dir"),
+    ("_tex_chooser", "textures_path", "Textures Folder"),
+    ("_pnach_chooser", "pnach_path", "PNACH / Cheats Folder"),
+    ("_covers_chooser", "cover_art_path", "Cover Art Folder"),
+    ("_memcards_chooser", "memcards_path", "Memory Cards Folder"),
+    ("_partial_tex_chooser", "partial_textures_path", "Partial Textures Folder"),
+    ("_storage_chooser", "mods_storage_path", "Mod Storage Folder"),
+    ("_game_lib_chooser", "game_library_path", "Game Library Folder"),
+)
+
+
+def _folder_status(path: str) -> tuple[bool, str]:
+    if not path:
+        return True, "Not configured — leave blank if you do not use this feature."
+    try:
+        if Path(path).is_dir():
+            return True, "Folder found."
+        if Path(path).exists():
+            return False, "This is a file, not a folder."
+    except (OSError, ValueError) as exc:
+        logger.warning("Could not inspect settings folder %r: %s", path, exc)
+        return False, "Cannot inspect this folder. Check its path and permissions."
+    return False, "Folder not found. Choose an existing folder or leave this field blank."
 
 
 class SettingsPanel(BasePanel):
@@ -32,8 +62,13 @@ class SettingsPanel(BasePanel):
     theme_changed = pyqtSignal(str)  # emits the new theme key when changed
 
     def __init__(self, config: AppConfig, parent=None):
-        super().__init__("⚙️  Settings", "Configure PS2 Mod Manager", parent=parent)
+        super().__init__("⚙️  Settings", f"Configure {APP_NAME}", parent=parent)
         self.config = config
+        self._syncing = False
+        self._validation_timer = QTimer(self)
+        self._validation_timer.setSingleShot(True)
+        self._validation_timer.setInterval(200)
+        self._validation_timer.timeout.connect(self._update_form_state)
         self._build()
 
     def _build(self):
@@ -89,7 +124,7 @@ class SettingsPanel(BasePanel):
 
         game_lib_note = QLabel(
             "Select the folder where your PS2 disc images are stored\n"
-            "(ISO, CHD, BIN, IMG, MDF …).  PS2 Mod Manager will scan for game\n"
+            f"(ISO, CHD, BIN, IMG, MDF …).  {APP_NAME} will scan for game\n"
             "serials so you can filter mods to only show what you own."
         )
         game_lib_note.setStyleSheet("color: #7070a0; font-size: 12px;")
@@ -112,9 +147,27 @@ class SettingsPanel(BasePanel):
         scan_row.addStretch()
         layout.addLayout(scan_row)
 
-        # Update label if library is already set
-        if self.config.game_library_path:
-            self._update_game_lib_label(self.config.game_library_path)
+        self._game_lib_count_lbl.setWordWrap(True)
+        self._on_game_lib_changed(self.config.game_library_path)
+
+        layout.addWidget(_sep())
+
+        # ---- Catalogue Quality ----
+        layout.addWidget(_section("Catalogue Quality"))
+
+        catalogue_note = QLabel(
+            "Validate catalogue URLs, placeholder authors, and user-imported JSON entries."
+        )
+        catalogue_note.setStyleSheet("color: #7070a0; font-size: 12px;")
+        catalogue_note.setWordWrap(True)
+        layout.addWidget(catalogue_note)
+
+        catalogue_btn = QPushButton("🔗 Check Catalogue Links")
+        catalogue_btn.setToolTip(
+            "Run the static catalogue metadata checker and report malformed, deprecated, suspicious, or placeholder metadata."
+        )
+        catalogue_btn.clicked.connect(self._check_catalogue_links)
+        layout.addWidget(catalogue_btn)
 
         layout.addWidget(_sep())
 
@@ -223,7 +276,7 @@ class SettingsPanel(BasePanel):
         layout.addWidget(_section("About"))
 
         about_lbl = QLabel(
-            f"<b>PS2 Mod Manager</b>  v{APP_VERSION}<br>"
+            f"<b>{APP_NAME}</b>  v{APP_VERSION}<br>"
             "A free mod manager for PCSX2.<br><br>"
             "Manage texture packs, PNACH patches, cover art, memory cards, and cheats "
             "all in one place.<br><br>"
@@ -242,39 +295,135 @@ class SettingsPanel(BasePanel):
         layout.addWidget(patreon_btn)
 
         layout.addStretch()
+        self._path_status_labels = {}
+        for chooser_attr, key, _label in _PATH_FIELDS:
+            chooser = getattr(self, chooser_attr)
+            status = QLabel()
+            status.setWordWrap(True)
+            status.setTextFormat(Qt.TextFormat.PlainText)
+            status.setStyleSheet("font-size: 11px;")
+            layout.insertWidget(layout.indexOf(chooser) + 1, status)
+            self._path_status_labels[key] = status
+            chooser.path_changed.connect(self._on_form_changed)
+        for signal in (
+            self._conflicts_check.toggled, self._updates_check.toggled,
+            self._theme_combo.currentIndexChanged, self._tooltip_combo.currentIndexChanged,
+            self._fav_authors_edit.textChanged,
+        ):
+            signal.connect(self._on_form_changed)
         scroll.setWidget(container)
         content.addWidget(scroll, 1)
 
-        # ---- Save button ----
-        save_btn = QPushButton("💾 Save Settings")
-        save_btn.setObjectName("primary_btn")
-        save_btn.clicked.connect(self._save)
-        content.addWidget(save_btn)
+        self._feedback_lbl = QLabel()
+        self._feedback_lbl.setWordWrap(True)
+        self._feedback_lbl.setTextFormat(Qt.TextFormat.PlainText)
+        content.addWidget(self._feedback_lbl)
+        actions = QHBoxLayout()
+        self._revert_btn = QPushButton("Revert Changes")
+        self._revert_btn.setToolTip("Restore saved settings, including the previewed theme")
+        self._revert_btn.clicked.connect(self._revert_changes)
+        actions.addWidget(self._revert_btn)
+        self._save_btn = QPushButton("💾 Save Settings")
+        self._save_btn.setObjectName("primary_btn")
+        self._save_btn.clicked.connect(self._save)
+        actions.addWidget(self._save_btn)
+        content.addLayout(actions)
+        self._saved_values = self._draft_values()
+        self._update_form_state()
+
+    def _draft_values(self):
+        values = {
+            key: getattr(self, chooser).get_path().strip()
+            for chooser, key, _label in _PATH_FIELDS
+        }
+        values.update(
+            cheats_path=values["pnach_path"],
+            show_conflict_warnings=self._conflicts_check.isChecked(),
+            check_updates_on_start=self._updates_check.isChecked(),
+            theme=self._theme_combo.currentData() or "dark",
+            tooltip_mode=self._tooltip_combo.currentData() or "normal",
+            favorite_authors=[
+                line.strip() for line in self._fav_authors_edit.toPlainText().splitlines()
+                if line.strip()
+            ],
+        )
+        return values
+
+    def _on_form_changed(self, *_args):
+        if self._syncing:
+            return
+        dirty = self._draft_values() != self._saved_values
+        self._revert_btn.setEnabled(dirty)
+        self._save_btn.setEnabled(False)
+        self._feedback_lbl.setText(
+            "Unsaved changes — checking folders…" if dirty else "No unsaved changes."
+        )
+        self._validation_timer.start()
+
+    def _update_form_state(self):
+        self._validation_timer.stop()
+        values = self._draft_values()
+        invalid = []
+        for _chooser, key, label in _PATH_FIELDS:
+            valid, message = _folder_status(values[key])
+            status = self._path_status_labels[key]
+            status.setText(message)
+            status.setStyleSheet(
+                f"font-size: 11px; color: {'#7070a0' if valid else '#e0a040'};"
+            )
+            if not valid:
+                invalid.append(label)
+        dirty = values != self._saved_values
+        self._save_btn.setEnabled(dirty and not invalid)
+        self._revert_btn.setEnabled(dirty)
+        if invalid:
+            message = "Check these folders before saving: " + ", ".join(invalid) + "."
+        else:
+            message = "Unsaved changes — ready to save." if dirty else "No unsaved changes."
+        self._feedback_lbl.setText(message)
+
+    def _revert_changes(self):
+        self.reload_config(self.config)
+        self._on_theme_changed(0)
+        self._feedback_lbl.setText("Changes reverted.")
 
     def _save(self):
-        self.config.pcsx2_path = self._pcsx2_chooser.get_path()
-        self.config.textures_path = self._tex_chooser.get_path()
-        self.config.pnach_path = self._pnach_chooser.get_path()
-        self.config.cheats_path = self.config.pnach_path  # same folder in PCSX2
-        self.config.cover_art_path = self._covers_chooser.get_path()
-        self.config.memcards_path = self._memcards_chooser.get_path()
-        self.config.partial_textures_path = self._partial_tex_chooser.get_path()
-        self.config.mods_storage_path = self._storage_chooser.get_path()
-        self.config.game_library_path = self._game_lib_chooser.get_path()
-        self.config.show_conflict_warnings = self._conflicts_check.isChecked()
-        self.config.check_updates_on_start = self._updates_check.isChecked()
-        self.config.theme = self._theme_combo.currentData() or "dark"
-        self.config.tooltip_mode = self._tooltip_combo.currentData() or "normal"
-        # Favourite authors — split by newlines, strip blanks
-        raw = self._fav_authors_edit.toPlainText()
-        self.config.favorite_authors = [
-            line.strip() for line in raw.splitlines() if line.strip()
+        self._validation_timer.stop()
+        values = self._draft_values()
+        invalid_paths = [
+            (label, values[key]) for _chooser, key, label in _PATH_FIELDS
+            if not _folder_status(values[key])[0]
         ]
 
-        save_config(self.config)
+        if invalid_paths:
+            logger.warning(
+                "Not saving settings because these paths are invalid: %s",
+                "; ".join(f"{label}={path}" for label, path in invalid_paths),
+            )
+            QMessageBox.warning(
+                self,
+                "Invalid Settings Paths",
+                "Please choose existing folders before saving:\n\n"
+                + "\n".join(f"• {label}: {path}" for label, path in invalid_paths),
+            )
+            self._update_form_state()
+            return
+
+        try:
+            save_config(replace(self.config, **values))
+        except Exception as exc:
+            logger.warning("Could not save settings: %s", exc)
+            self._update_form_state()
+            self._feedback_lbl.setText("Could not save settings. Your changes are still available to retry.")
+            QMessageBox.critical(self, "Error", f"Could not save settings: {exc}")
+            return
+        for key, value in values.items():
+            setattr(self.config, key, value)
+        self._saved_values = values
+        self._update_form_state()
+        self._feedback_lbl.setText("Settings saved ✅")
         self.settings_saved.emit(self.config)
         self.emit_status("Settings saved ✅")
-        QMessageBox.information(self, "Saved", "Settings have been saved.")
 
     def _on_theme_changed(self, _index: int):
         """Apply the newly selected theme immediately as a live preview.
@@ -290,8 +439,10 @@ class SettingsPanel(BasePanel):
         self.theme_changed.emit(theme_key)
 
     def _on_game_lib_changed(self, path: str):
-        if path:
-            self._update_game_lib_label(path)
+        self._game_lib_count_lbl.setText(
+            "  Folder selected — click Scan Library to count disc images."
+            if path else "  No folder selected"
+        )
 
     def _scan_game_library(self):
         path = self._game_lib_chooser.get_path()
@@ -302,7 +453,16 @@ class SettingsPanel(BasePanel):
 
     def _update_game_lib_label(self, path: str):
         from src.core.game_library import scan_library
-        games = scan_library(path)
+        if path and not Path(path).is_dir():
+            logger.warning("Game library folder not found: %s", path)
+            self._game_lib_count_lbl.setText("  Folder not found")
+            return
+        try:
+            games = scan_library(path)
+        except Exception as exc:
+            logger.warning("Could not scan game library %s: %s", path, exc)
+            self._game_lib_count_lbl.setText("  Could not scan that folder")
+            return
         identified = sum(1 for g in games if g.serial)
         if games:
             self._game_lib_count_lbl.setText(
@@ -311,13 +471,104 @@ class SettingsPanel(BasePanel):
         else:
             self._game_lib_count_lbl.setText("  No disc images found in that folder")
 
+    def _check_catalogue_links(self):
+        try:
+            report = LinkChecker().check_all_catalogues()
+        except Exception as exc:
+            logger.warning("Could not check catalogue links: %s", exc)
+            QMessageBox.critical(
+                self,
+                "Catalogue Link Check Failed",
+                f"Could not check catalogue links:\n{exc}",
+            )
+            return
+
+        total = int(report.get("total_issues", 0) or 0)
+        summary = report.get("summary", "Catalogue link check completed.")
+        if total == 0:
+            QMessageBox.information(self, "Catalogue Link Check", summary)
+            return
+
+        lines = [summary, ""]
+        issue_counts = report.get("issue_count_by_type", {}) or {}
+        if issue_counts:
+            breakdown = ", ".join(
+                f"{issue_type}×{count}"
+                for issue_type, count in sorted(issue_counts.items())
+            )
+            lines.append(f"Breakdown: {breakdown}")
+            lines.append("")
+        shown = 0
+        for source_file, issues in report.get("issues_by_file", {}).items():
+            if not issues:
+                continue
+            lines.append(f"{source_file}:")
+            for issue in issues:
+                idx = issue.get("entry_index", -1)
+                field = issue.get("field", "(field)")
+                issue_type = issue.get("issue_type", "issue")
+                url = issue.get("url", "")
+                detail = issue.get("detail", "")
+                line = f"  • [{idx}] {field}: {issue_type}"
+                if url:
+                    line += f" — {url}"
+                if detail:
+                    line += f" ({detail})"
+                lines.append(line)
+                shown += 1
+                if shown >= 10:
+                    break
+            if shown >= 10:
+                break
+        if total > shown:
+            lines.append(f"... and {total - shown} more issue(s).")
+
+        QMessageBox.warning(self, "Catalogue Link Check", "\n".join(lines))
+
     def _auto_detect(self):
         from src.core.config_manager import detect_pcsx2_paths
         path = self._pcsx2_chooser.get_path()
         if not path:
             QMessageBox.warning(self, "No Path", "Please set the PCSX2 config directory first.")
             return
-        paths = detect_pcsx2_paths(path)
+        if not Path(path).is_dir():
+            logger.warning("PCSX2 config directory not found: %s", path)
+            QMessageBox.warning(
+                self,
+                "PCSX2 Path Not Found",
+                "Could not auto-detect PCSX2 subfolders because the selected "
+                f"folder does not exist:\n{path}",
+            )
+            return
+        try:
+            paths = detect_pcsx2_paths(path)
+        except Exception as exc:
+            logger.warning("Could not auto-detect PCSX2 paths for %s: %s", path, exc)
+            QMessageBox.warning(
+                self,
+                "Auto-detect Failed",
+                "Could not auto-detect PCSX2 subfolders from:\n"
+                f"{path}\n\n{exc}",
+            )
+            return
+        if not any(
+            isinstance(paths.get(key), str)
+            and paths[key]
+            and Path(paths[key]).exists()
+            for key in ("textures_path", "pnach_path", "cover_art_path", "memcards_path")
+        ):
+            logger.warning(
+                "Could not recognize any PCSX2 subfolders under %s; using canonical defaults",
+                path,
+            )
+            QMessageBox.warning(
+                self,
+                "PCSX2 Folders Not Found",
+                "I couldn't find any PCSX2 subfolders in the selected directory.\n\n"
+                "The fields were filled with the expected locations, but you may "
+                "need to choose the actual PCSX2 config folder or create the "
+                "folders first.",
+            )
         self._tex_chooser.set_path(paths.get("textures_path", ""))
         self._pnach_chooser.set_path(paths.get("pnach_path", ""))
         self._covers_chooser.set_path(paths.get("cover_art_path", ""))
@@ -325,35 +576,39 @@ class SettingsPanel(BasePanel):
         self._partial_tex_chooser.set_path(paths.get("partial_textures_path", ""))
 
     def _open_patreon(self):
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
-        QDesktopServices.openUrl(QUrl(PATREON_URL))
+        open_external_url(
+            PATREON_URL,
+            parent=self,
+            context="Patreon page",
+            title="Patreon Link Unavailable",
+            failure_message=(
+                "Could not open the Patreon page. Please copy the URL into your browser."
+            ),
+        )
 
     def reload_config(self, config: AppConfig):
         """Update displayed values when config changes."""
-        self.config = config
-        self._pcsx2_chooser.set_path(config.pcsx2_path)
-        self._tex_chooser.set_path(config.textures_path)
-        self._pnach_chooser.set_path(config.pnach_path)
-        self._covers_chooser.set_path(config.cover_art_path)
-        self._memcards_chooser.set_path(config.memcards_path)
-        self._partial_tex_chooser.set_path(config.partial_textures_path)
-        self._storage_chooser.set_path(config.mods_storage_path)
-        self._game_lib_chooser.set_path(config.game_library_path)
-        if config.game_library_path:
-            self._update_game_lib_label(config.game_library_path)
-        self._conflicts_check.setChecked(config.show_conflict_warnings)
-        self._updates_check.setChecked(config.check_updates_on_start)
-        idx = self._theme_combo.findData(getattr(config, "theme", "dark"))
-        if idx >= 0:
-            self._theme_combo.blockSignals(True)
-            self._theme_combo.setCurrentIndex(idx)
-            self._theme_combo.blockSignals(False)
-        tip_idx = self._tooltip_combo.findData(getattr(config, "tooltip_mode", "normal"))
-        if tip_idx >= 0:
-            self._tooltip_combo.setCurrentIndex(tip_idx)
-        fav_list = getattr(config, "favorite_authors", [])
-        self._fav_authors_edit.setPlainText("\n".join(fav_list))
+        self._syncing = True
+        try:
+            self.config = config
+            for chooser, key, _label in _PATH_FIELDS:
+                getattr(self, chooser).set_path(getattr(config, key))
+            self._on_game_lib_changed(config.game_library_path)
+            self._conflicts_check.setChecked(config.show_conflict_warnings)
+            self._updates_check.setChecked(config.check_updates_on_start)
+            idx = self._theme_combo.findData(getattr(config, "theme", "dark"))
+            if idx >= 0:
+                self._theme_combo.blockSignals(True)
+                self._theme_combo.setCurrentIndex(idx)
+                self._theme_combo.blockSignals(False)
+            tip_idx = self._tooltip_combo.findData(getattr(config, "tooltip_mode", "normal"))
+            if tip_idx >= 0:
+                self._tooltip_combo.setCurrentIndex(tip_idx)
+            self._fav_authors_edit.setPlainText("\n".join(config.favorite_authors))
+            self._saved_values = self._draft_values()
+        finally:
+            self._syncing = False
+        self._update_form_state()
 
 
 def _section(title: str) -> QLabel:

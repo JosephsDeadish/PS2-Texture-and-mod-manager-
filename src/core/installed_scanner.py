@@ -35,6 +35,7 @@ Public API::
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -42,6 +43,8 @@ from pathlib import Path
 from typing import List, Optional, Set
 
 from src.models.mod import ModType
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -68,17 +71,22 @@ def _dir_size_and_count(path: Path):
                 try:
                     total += (Path(root) / fname).stat().st_size
                     count += 1
-                except OSError:
-                    pass
-    except PermissionError:
-        pass
+                except OSError as exc:
+                    logger.warning(
+                        "Could not stat installed file %s: %s",
+                        Path(root) / fname,
+                        exc,
+                    )
+    except PermissionError as exc:
+        logger.warning("Could not read files under %s: %s", path, exc)
     return total, count
 
 
 def _file_size(path: Path) -> int:
     try:
         return path.stat().st_size
-    except OSError:
+    except OSError as exc:
+        logger.warning("Could not stat installed file %s: %s", path, exc)
         return 0
 
 
@@ -98,7 +106,8 @@ def _game_title(serial: str) -> str:
     try:
         from src.core.game_registry import lookup_game_title
         return lookup_game_title(serial.upper()) or ""
-    except Exception:
+    except Exception as exc:
+        logger.warning("Failed to look up game title for serial %s: %s", serial, exc)
         return ""
 
 
@@ -189,6 +198,7 @@ def scan_pnach(
         return []
     root = Path(pnach_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed PNACH directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
@@ -196,7 +206,8 @@ def scan_pnach(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed PNACH directory %s: %s", root, exc)
         return []
 
     for f in files:
@@ -246,6 +257,7 @@ def scan_cheats(
         return []
     root = Path(cheats_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed cheats directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
@@ -253,7 +265,8 @@ def scan_cheats(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed cheats directory %s: %s", root, exc)
         return []
 
     for f in files:
@@ -303,6 +316,7 @@ def scan_cover_art(
         return []
     root = Path(cover_art_path)
     if not root.is_dir():
+        logger.warning("Could not scan installed cover art directory %s: not a directory", root)
         return []
 
     managed = {str(Path(p).resolve()) for p in (managed_paths or set())}
@@ -310,7 +324,8 @@ def scan_cover_art(
 
     try:
         files = sorted(root.iterdir())
-    except PermissionError:
+    except PermissionError as exc:
+        logger.warning("Could not scan installed cover art directory %s: %s", root, exc)
         return []
 
     for f in files:
@@ -405,10 +420,16 @@ def scan_all(config, managed_paths: Optional[Set[str]] = None) -> List[Unmanaged
     cheats_path   = getattr(config, "cheats_path", "")   or ""
     cover_art_path = getattr(config, "cover_art_path", "") or ""
 
-    results.extend(scan_textures(textures_path, managed_paths))
-    results.extend(scan_pnach(pnach_path, managed_paths))
-    results.extend(scan_cheats(cheats_path, managed_paths))
-    results.extend(scan_cover_art(cover_art_path, managed_paths))
+    def _extend_scan(label: str, scanner, *args) -> None:
+        try:
+            results.extend(scanner(*args))
+        except Exception as exc:
+            logger.warning("Could not scan unmanaged %s: %s", label, exc)
+
+    _extend_scan("texture packs", scan_textures, textures_path, managed_paths)
+    _extend_scan("PNACH files", scan_pnach, pnach_path, managed_paths)
+    _extend_scan("cheats", scan_cheats, cheats_path, managed_paths)
+    _extend_scan("cover art", scan_cover_art, cover_art_path, managed_paths)
 
     return results
 
