@@ -69,6 +69,15 @@
 - Metadata and explicitly fetched thumbnails save together; failures keep the draft open for retry, and Save never waits for a network request
 - GameTDB thumbnail fetching runs in the background and discards results after a Game ID change, Revert, or dialog close
 
+### 📝 Personal Mod Notes
+- Search saved titles, text, serials, and entry IDs across fields; sort by title or update date, with counts and **Clear Filters** recovery
+- Debounced search/filter/sort reuse a local snapshot without rereading the notes file; **Reload Notes** explicitly refreshes it
+- Filtering can hide a selected note without losing its editor or draft; switching notes, reloading, creating a note, and closing offer **Save / Discard / Cancel**
+- Unsaved-change feedback and **Revert** help protect edits; failed saves or deletions keep the draft for retry
+- **New Note** creates an independent personal note, even when its title matches another note; existing catalogue-linked notes are never overwritten by title
+- Delete and Clear All require default-No confirmation; **Export CSV** includes all saved notes, not unsaved drafts or just filtered results
+- Unreadable or malformed note stores are reported and never overwritten by save/delete/clear; reload failures preserve previous results
+
 ### 🔎 Installed-Mod Search
 - Mod panels and **Library → View All Mods** share search across names, game titles/aliases, authors, descriptions, tags, files, paths, versions, and source links
 - All words must match, even across different fields; use double quotes for a phrase, or `-demo` to exclude a term

@@ -4003,9 +4003,18 @@ class ModNotesDialog(QDialog):
     def __init__(self, config, parent=None):
         super().__init__(parent)
         self._config = config
-        self._notes  = []   # list[NoteEntry] — currently displayed
+        self._all_notes = []
+        self._notes = []
+        self._current_note = None
+        self._changing_note = False
+        from PyQt6.QtCore import QTimer
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(200)
+        self._search_timer.timeout.connect(self._apply_filters)
         self.setWindowTitle("📝  Mod Notes")
-        self.setMinimumSize(900, 560)
+        self.setMinimumSize(620, 420)
+        self.resize(900, 600)
         self._build_ui()
         self._refresh()
 
@@ -4036,17 +4045,35 @@ class ModNotesDialog(QDialog):
             "🕹 Cheat",
             "📦 Other",
         ])
-        self._type_combo.currentIndexChanged.connect(self._refresh)
+        self._type_combo.currentIndexChanged.connect(self._apply_filters)
         filter_row.addWidget(self._type_combo)
 
         filter_row.addWidget(QLabel("Search:"))
         self._search_edit = QLineEdit()
-        self._search_edit.setPlaceholderText("Filter by title or note text…")
-        self._search_edit.textChanged.connect(self._refresh)
+        self._search_edit.setPlaceholderText("Search titles, notes, serials, or IDs…")
+        self._search_edit.setAccessibleName("Search mod notes")
+        self._search_edit.setClearButtonEnabled(True)
+        self._search_edit.textChanged.connect(lambda *_: self._search_timer.start())
         filter_row.addWidget(self._search_edit, 1)
-
-        filter_row.addStretch()
         layout.addLayout(filter_row)
+        tools = QHBoxLayout()
+        self._sort_combo = QComboBox()
+        self._sort_combo.addItems(["Recently updated", "Oldest updated", "Title (A–Z)"])
+        self._sort_combo.setAccessibleName("Sort mod notes")
+        self._sort_combo.currentIndexChanged.connect(self._apply_filters)
+        tools.addWidget(self._sort_combo)
+        clear_filters = QPushButton("Clear Filters")
+        clear_filters.clicked.connect(self._clear_filters)
+        tools.addWidget(clear_filters)
+        refresh_btn = QPushButton("Reload Notes")
+        refresh_btn.clicked.connect(self._refresh)
+        tools.addWidget(refresh_btn)
+        tools.addStretch()
+        layout.addLayout(tools)
+        self._summary_label = QLabel()
+        self._summary_label.setWordWrap(True)
+        self._summary_label.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addWidget(self._summary_label)
 
         # Splitter: list (left) + editor (right)
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -4058,6 +4085,8 @@ class ModNotesDialog(QDialog):
 
         self._list_widget = QListWidget()
         self._list_widget.setAlternatingRowColors(True)
+        self._list_widget.setWordWrap(True)
+        self._list_widget.setAccessibleName("Saved mod notes")
         self._list_widget.currentRowChanged.connect(self._on_selection_changed)
         ll.addWidget(self._list_widget)
         splitter.addWidget(left)
@@ -4068,6 +4097,7 @@ class ModNotesDialog(QDialog):
         rl.setContentsMargins(4, 0, 0, 0)
 
         self._title_label = QLabel("← Select a note or create a new one")
+        self._title_label.setTextFormat(Qt.TextFormat.PlainText)
         self._title_label.setWordWrap(True)
         font = self._title_label.font()
         font.setBold(True)
@@ -4076,13 +4106,19 @@ class ModNotesDialog(QDialog):
 
         self._meta_label = QLabel("")
         self._meta_label.setWordWrap(True)
-        self._meta_label.setTextFormat(Qt.TextFormat.RichText)
+        self._meta_label.setTextFormat(Qt.TextFormat.PlainText)
         rl.addWidget(self._meta_label)
+        self._draft_label = QLabel()
+        self._draft_label.setWordWrap(True)
+        rl.addWidget(self._draft_label)
 
         rl.addWidget(QLabel("Note:"))
         self._text_edit = QTextEdit()
         self._text_edit.setPlaceholderText("Write your note here…")
+        self._text_edit.setAcceptRichText(False)
+        self._text_edit.setAccessibleName("Note text")
         self._text_edit.setEnabled(False)
+        self._text_edit.textChanged.connect(self._sync_editor_state)
         rl.addWidget(self._text_edit, 1)
 
         edit_row = QHBoxLayout()
@@ -4092,6 +4128,10 @@ class ModNotesDialog(QDialog):
         self._save_btn.setEnabled(False)
         self._save_btn.clicked.connect(self._on_save_note)
         edit_row.addWidget(self._save_btn)
+        self._revert_btn = QPushButton("Revert")
+        self._revert_btn.clicked.connect(self._on_revert)
+        self._revert_btn.setEnabled(False)
+        edit_row.addWidget(self._revert_btn)
 
         self._delete_btn = QPushButton("🗑  Delete Note")
         self._delete_btn.setToolTip("Permanently remove this note")
@@ -4121,7 +4161,7 @@ class ModNotesDialog(QDialog):
         bottom_row.addWidget(clear_btn)
 
         export_btn = QPushButton("📤 Export CSV")
-        export_btn.setToolTip("Save all notes to a CSV file")
+        export_btn.setToolTip("Export every saved note, including hidden notes; unsaved drafts are not included")
         export_btn.clicked.connect(self._on_export_csv)
         bottom_row.addWidget(export_btn)
 
@@ -4132,6 +4172,10 @@ class ModNotesDialog(QDialog):
         bottom_row.addWidget(close_btn)
 
         layout.addLayout(bottom_row)
+        self._status_label = QLabel()
+        self._status_label.setWordWrap(True)
+        self._status_label.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addWidget(self._status_label)
 
     # ------------------------------------------------------------------
     # Helpers
@@ -4148,73 +4192,154 @@ class ModNotesDialog(QDialog):
     }
 
     def _refresh(self):
-        type_text   = self._type_combo.currentText()
-        query_text  = self._search_edit.text().strip()
-        type_filter = self._TYPE_MAP.get(type_text)
-
+        if not self._confirm_leave():
+            return
         try:
             from src.core.mod_notes import list_notes
-            self._notes = list_notes(
-                self._config,
-                mod_type=type_filter,
-                query=query_text if query_text else None,
-            )
+            notes = list_notes(self._config, strict=True)
         except Exception as exc:
             logger.warning("Could not refresh mod notes list: %s", exc)
-            self._notes = []
-            self._meta_label.setText(f"<i>Could not read notes: {exc}</i>")
+            self._status_label.setText(f"Could not read notes: {exc}\nPrevious results are kept. Use Reload Notes to retry.")
+            return
+        selected_id = self._current_note.entry_id if self._current_note else None
+        self._all_notes = notes
+        self._show_note(next((note for note in notes if note.entry_id == selected_id), None))
+        self._status_label.setText("")
+        self._apply_filters()
 
+    def _apply_filters(self, *_):
+        self._search_timer.stop()
+        terms = self._search_edit.text().casefold().split()
+        mod_type = self._TYPE_MAP.get(self._type_combo.currentText())
+        self._notes = [
+            note for note in self._all_notes
+            if (not mod_type or note.mod_type == mod_type or
+                (mod_type == "save" and note.mod_type == "save_file"))
+            and all(term in " ".join((
+                note.entry_title, note.text, note.serial, note.entry_id, note.type_label,
+            )).casefold() for term in terms)
+        ]
+        sort = self._sort_combo.currentText()
+        if sort == "Title (A–Z)":
+            self._notes.sort(key=lambda note: (note.entry_title.casefold(), note.entry_id))
+        else:
+            self._notes.sort(key=lambda note: (note.updated_at, note.entry_id), reverse=sort != "Oldest updated")
+        selected_id = self._current_note.entry_id if self._current_note else None
+        self._list_widget.blockSignals(True)
         self._list_widget.clear()
-        for note in self._notes:
-            label = f"{note.type_label}  {note.entry_title}"
+        for index, note in enumerate(self._notes):
+            label = f"{note.entry_title}\n{note.type_label}"
             if note.serial:
-                label += f"  [{note.serial}]"
-            self._list_widget.addItem(label)
+                label += f" • {note.serial}"
+            preview = " ".join(note.text.split())[:80]
+            if preview:
+                label += f"\n{preview}"
+            item = QListWidgetItem(label)
+            item.setToolTip(f"{note.entry_title}\nEntry ID: {note.entry_id}")
+            self._list_widget.addItem(item)
+            if note.entry_id == selected_id:
+                self._list_widget.setCurrentRow(index)
+        self._list_widget.blockSignals(False)
+        summary = f"Showing {len(self._notes)} of {len(self._all_notes)} notes."
+        if not self._all_notes:
+            summary += " Use New Note to create one."
+        elif not self._notes:
+            summary += " No matches — use Clear Filters."
+        self._summary_label.setText(summary)
+        self._sync_editor_state()
 
-        # Clear editor
-        self._title_label.setText("← Select a note or create a new one")
-        self._meta_label.setText("")
-        self._text_edit.setEnabled(False)
-        self._text_edit.clear()
-        self._save_btn.setEnabled(False)
-        self._delete_btn.setEnabled(False)
+    def _clear_filters(self):
+        self._search_edit.clear()
+        self._type_combo.setCurrentIndex(0)
+        self._apply_filters()
+
+    def _is_dirty(self):
+        return self._current_note is not None and self._text_edit.toPlainText() != self._current_note.text
+
+    def _sync_editor_state(self):
+        dirty = self._is_dirty()
+        self._save_btn.setEnabled(dirty)
+        self._revert_btn.setEnabled(dirty)
+        self._delete_btn.setEnabled(self._current_note is not None)
+        text = "Unsaved changes" if dirty else "Saved" if self._current_note else ""
+        if self._current_note and not any(note.entry_id == self._current_note.entry_id for note in self._notes):
+            text += " • Editing a note hidden by the current filters."
+        self._draft_label.setText(text)
+
+    def _show_note(self, note):
+        self._current_note = note
+        self._title_label.setText(note.entry_title if note else "← Select a note or create a new one")
+        self._meta_label.setText(
+            f"{note.type_label} • {note.serial or 'No serial'}\n"
+            f"Created: {note.created_at[:10]} • Updated: {note.updated_at[:10]}"
+            if note else ""
+        )
+        self._text_edit.blockSignals(True)
+        self._text_edit.setPlainText(note.text if note else "")
+        self._text_edit.setEnabled(note is not None)
+        self._text_edit.blockSignals(False)
+        self._sync_editor_state()
+
+    def _confirm_leave(self):
+        if self._changing_note:
+            return False
+        if not self._is_dirty():
+            return True
+        self._changing_note = True
+        try:
+            reply = QMessageBox.question(
+                self, "Unsaved Note",
+                f"Save changes to:\n{self._current_note.entry_title}?",
+                QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard |
+                QMessageBox.StandardButton.Cancel,
+                QMessageBox.StandardButton.Cancel,
+            )
+            if reply == QMessageBox.StandardButton.Save:
+                return self._save_current_note()
+            return reply == QMessageBox.StandardButton.Discard
+        finally:
+            self._changing_note = False
+
+    def done(self, result):
+        if self._confirm_leave():
+            self._search_timer.stop()
+            super().done(result)
+
+    def _on_revert(self):
+        if self._is_dirty() and QMessageBox.question(
+            self, "Revert Note", "Discard the unsaved changes to this note?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        ) == QMessageBox.StandardButton.Yes:
+            self._show_note(self._current_note)
+            self._status_label.setText("Changes reverted.")
 
     # ------------------------------------------------------------------
     def _on_selection_changed(self, row: int):
-        if row < 0 or row >= len(self._notes):
-            self._title_label.setText("← Select a note or create a new one")
-            self._meta_label.setText("")
-            self._text_edit.setEnabled(False)
-            self._text_edit.clear()
-            self._save_btn.setEnabled(False)
-            self._delete_btn.setEnabled(False)
+        if self._changing_note or row < 0 or row >= len(self._notes):
             return
-
         note = self._notes[row]
-        self._title_label.setText(note.entry_title)
-        meta_parts = [f"<b>Type:</b> {note.type_label}"]
-        if note.serial:
-            meta_parts.append(f"<b>Serial:</b> {note.serial}")
-        meta_parts.append(f"<b>Created:</b> {note.created_at[:10]}")
-        meta_parts.append(f"<b>Updated:</b> {note.updated_at[:10]}")
-        self._meta_label.setText("&nbsp;&nbsp;".join(meta_parts))
-
-        self._text_edit.setEnabled(True)
-        self._text_edit.setPlainText(note.text)
-        self._save_btn.setEnabled(True)
-        self._delete_btn.setEnabled(True)
-        # Store current note for save/delete ops
-        self._current_note = note
+        if self._current_note and note.entry_id == self._current_note.entry_id:
+            return
+        if self._confirm_leave():
+            self._show_note(note)
+            self._status_label.setText("")
+        self._apply_filters()
 
     # ------------------------------------------------------------------
     def _on_save_note(self):
-        note = getattr(self, "_current_note", None)
+        self._save_current_note()
+
+    def _save_current_note(self):
+        note = self._current_note
         if note is None:
-            return
+            return False
+        if not self._is_dirty():
+            return True
         new_text = self._text_edit.toPlainText()
         try:
             from src.core.mod_notes import upsert_note
-            upsert_note(
+            saved = upsert_note(
                 self._config,
                 entry_id    = note.entry_id,
                 entry_title = note.entry_title,
@@ -4224,10 +4349,14 @@ class ModNotesDialog(QDialog):
             )
         except Exception as exc:
             logger.warning("Could not save mod note %s: %s", note.entry_id, exc)
+            self._status_label.setText(f"Could not save note: {exc}\nYour draft is kept. Use Save Note to retry.")
             QMessageBox.critical(self, "Save Failed", str(exc))
-            return
-
-        self._refresh()
+            return False
+        self._all_notes = [saved if item.entry_id == saved.entry_id else item for item in self._all_notes]
+        self._show_note(saved)
+        self._apply_filters()
+        self._status_label.setText("Note saved.")
+        return True
 
     # ------------------------------------------------------------------
     def _on_delete_note(self):
@@ -4240,29 +4369,37 @@ class ModNotesDialog(QDialog):
             "Delete Note",
             f"Permanently delete the note for:\n\n{note.entry_title}",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
 
-        from src.core.mod_notes import delete_note
-        delete_note(self._config, note.entry_id)
-        self._current_note = None
-        self._refresh()
+        try:
+            from src.core.mod_notes import delete_note
+            delete_note(self._config, note.entry_id)
+        except Exception as exc:
+            logger.warning("Could not delete mod note %s: %s", note.entry_id, exc)
+            self._status_label.setText(f"Could not delete note: {exc}\nYour draft is kept.")
+            return
+        self._all_notes = [item for item in self._all_notes if item.entry_id != note.entry_id]
+        self._show_note(None)
+        self._apply_filters()
+        self._status_label.setText("Note deleted.")
 
     # ------------------------------------------------------------------
     def _on_new_note(self):
         """Open a small input dialog to bootstrap a new note."""
         from PyQt6.QtWidgets import QInputDialog
+        import uuid
+
+        if not self._confirm_leave():
+            return
 
         title, ok = QInputDialog.getText(
             self, "New Note", "Entry title (mod name):"
         )
         if not ok or not title.strip():
             return
-
-        # Derive a simple slug from the title
-        import re
-        slug = re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_") or "note"
 
         # Pick the current type filter or default to "other"
         type_text   = self._type_combo.currentText()
@@ -4272,21 +4409,20 @@ class ModNotesDialog(QDialog):
             from src.core.mod_notes import upsert_note
             note = upsert_note(
                 self._config,
-                entry_id    = slug,
+                entry_id    = "personal_" + uuid.uuid4().hex,
                 entry_title = title.strip(),
                 mod_type    = mod_type,
             )
         except Exception as exc:
-            logger.warning("Could not create mod note %s: %s", slug, exc)
+            logger.warning("Could not create mod note: %s", exc)
             QMessageBox.critical(self, "Error", str(exc))
             return
 
-        self._refresh()
-        # Select the newly created note
-        for i, n in enumerate(self._notes):
-            if n.entry_id == note.entry_id:
-                self._list_widget.setCurrentRow(i)
-                break
+        self._all_notes.insert(0, note)
+        self._show_note(note)
+        self._clear_filters()
+        self._text_edit.setFocus()
+        self._status_label.setText("New standalone note created. Existing catalogue notes are unchanged.")
 
     # ------------------------------------------------------------------
     def _on_clear(self):
@@ -4295,19 +4431,22 @@ class ModNotesDialog(QDialog):
             "Clear All Notes",
             "Delete ALL notes?\n\nThis cannot be undone.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
 
-        from src.core.mod_notes import clear_notes
-        count = clear_notes(self._config)
-        self._current_note = None
-        self._refresh()
-        QMessageBox.information(
-            self,
-            "✅ Notes Cleared",
-            f"Removed {count} note{'s' if count != 1 else ''}.",
-        )
+        try:
+            from src.core.mod_notes import clear_notes
+            count = clear_notes(self._config)
+        except Exception as exc:
+            logger.warning("Could not clear mod notes: %s", exc)
+            self._status_label.setText(f"Could not clear notes: {exc}\nYour draft is kept.")
+            return
+        self._all_notes = []
+        self._show_note(None)
+        self._apply_filters()
+        self._status_label.setText(f"Removed {count} note(s).")
 
     # ------------------------------------------------------------------
     def _on_export_csv(self):
@@ -4332,7 +4471,7 @@ class ModNotesDialog(QDialog):
         QMessageBox.information(
             self,
             "✅ Export Complete",
-            f"Notes exported to:\n{result}",
+            f"All saved notes exported to:\n{result}\n\nUnsaved drafts are not included.",
         )
 
 

@@ -3998,27 +3998,19 @@ class TestWidgetsLogging(unittest.TestCase):
             from src.ui.widgets import ModNotesDialog
 
             fake = SimpleNamespace(
-                _type_combo=MagicMock(),
-                _search_edit=MagicMock(),
                 _config=AppConfig(),
-                _TYPE_MAP=ModNotesDialog._TYPE_MAP,
-                _meta_label=MagicMock(),
+                _confirm_leave=MagicMock(return_value=True),
+                _status_label=MagicMock(),
                 _list_widget=MagicMock(),
-                _title_label=MagicMock(),
-                _text_edit=MagicMock(),
-                _save_btn=MagicMock(),
-                _delete_btn=MagicMock(),
             )
-            fake._type_combo.currentText.return_value = "All"
-            fake._search_edit.text.return_value = ""
 
             with patch("src.core.mod_notes.list_notes", side_effect=RuntimeError("boom")):
                 with self.assertLogs("src.ui.widgets", level="WARNING") as logs:
                     ModNotesDialog._refresh(fake)
 
         self.assertTrue(any("Could not refresh mod notes list" in msg for msg in logs.output))
-        fake._list_widget.clear.assert_called_once()
-        fake._title_label.setText.assert_called()
+        fake._list_widget.clear.assert_not_called()
+        self.assertIn("Previous results are kept", fake._status_label.setText.call_args.args[0])
 
     def test_pnach_builder_logs_invalid_custom_value_and_falls_back(self):
         import sys
