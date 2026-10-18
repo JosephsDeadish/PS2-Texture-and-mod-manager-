@@ -220,6 +220,15 @@
 - PS2 controller icon with pulsing glow ring and rotating accent arc
 - Loading progress bar
 
+### 💾 Managed-Content Backups
+- **Backup Manager** searches archive names, notes, dates, and paths locally; sort by date, name, or uncompressed size, with counts and **Clear Filters** recovery
+- Background listing, creation, restore, and deletion keep the dialog responsive; reload failures retain previous results but disable destructive actions until a successful reload
+- Selection survives search, sorting, and reloads; scrollable plain-text details and **Copy Archive Path / Copy Last Result** make recovery information easy to keep
+- Creating backups never replaces existing archives, even for repeated same-second requests; empty or partially created backups are reported explicitly
+- Restore/delete require default-No confirmation. Restore shows the exact archive and current destination settings; files match destination folder names, and unmatched or unsafe paths are skipped
+- Restore results distinguish restored, failed, and skipped files. Close PCSX2 first; existing destination files may be overwritten, with no automatic undo. Mod library flags and memory cards are not restored
+- Keep the app open until file operations finish; closing the dialog is blocked during create/restore/delete. Reading the ZIP index does not integrity-check every archived file
+
 ---
 
 ## 🖥️ Screenshots

@@ -20708,6 +20708,247 @@ class TestConflictResolver(unittest.TestCase):
 
 # ===========================================================================
 
+class TestBackupBrowser(unittest.TestCase):
+    def setUp(self):
+        from contextlib import ExitStack
+        from types import MethodType
+        from src.core.backup_manager import BackupEntry
+
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(TestWidgetsLogging()._stub_widget_modules())
+        sys.modules.pop("src.ui.widgets", None)
+        from src.ui import widgets
+        self.module = widgets
+        self.first = BackupEntry("/backups/a.zip", "backup_HD_pack.zip", "2026-01-01", 10,
+                                 "Kingdom Hearts", file_count=2)
+        self.second = BackupEntry("/backups/b.zip", "backup_codes.zip", "2026-02-01", 20,
+                                  file_count=1)
+        self.d = SimpleNamespace(
+            _config=AppConfig(textures_path="/pcsx2/textures"),
+            _entries=[self.first, self.second], _shown_entries=[], _selected_path="",
+            _row=-1, _loaded=True, _load_error="", _busy="", _confirming=False,
+            _result_text="", _operation_details="",
+        )
+        for name in (
+            "_search_timer", "_search_edit", "_sort_combo", "_list_widget",
+            "_count_label", "_clear_btn", "_detail_label", "_status_label",
+            "_restore_btn", "_delete_btn", "_copy_path_btn", "_create_btn",
+            "_note_edit", "_reload_btn", "_result_label", "_copy_result_btn",
+        ):
+            setattr(self.d, name, MagicMock())
+        self.d._search_edit.text.return_value = ""
+        self.d._sort_combo.currentData.return_value = "newest"
+        self.d._note_edit.text.return_value = "draft note"
+        self.d._list_widget.currentRow.side_effect = lambda: self.d._row
+        self.d._list_widget.setCurrentRow.side_effect = lambda row: setattr(self.d, "_row", row)
+        for name in (
+            "_apply_filters", "_selected_entry", "_on_selection_changed", "_update_actions",
+            "_set_result", "_operation_finished", "_refresh_list", "_on_create",
+            "_on_restore", "_on_delete", "_copy_path", "_copy_result",
+        ):
+            setattr(self.d, name, MethodType(getattr(widgets.BackupManagerDialog, name), self.d))
+        self.d._start_operation = MagicMock()
+        self.d._confirm_action = MagicMock(return_value=True)
+
+    def select_first(self):
+        self.d._selected_path = self.first.path
+        self.d._apply_filters()
+
+    def test_search_matches_across_fields_without_rereading_archives(self):
+        matches = self.module._backup_matches
+        self.assertTrue(matches(self.first, "kingdom HDpack 20260101"))
+        self.assertTrue(matches(self.first, "/backups a.zip"))
+        self.assertFalse(matches(self.first, "kingdom missing"))
+        self.assertFalse(matches(self.first, "!!!"))
+        with patch("src.core.backup_manager.list_backups") as load:
+            self.d._search_edit.text.return_value = "kingdom"
+            self.d._apply_filters()
+        load.assert_not_called()
+        self.assertEqual(self.d._shown_entries, [self.first])
+        self.assertEqual(self.d._entries, [self.first, self.second])
+        self.d._count_label.setText.assert_called_with("Showing 1 of 2 backups")
+
+    def test_sort_modes(self):
+        for sort, expected in (
+            ("newest", [self.second, self.first]), ("oldest", [self.first, self.second]),
+            ("name", [self.second, self.first]), ("size", [self.second, self.first]),
+        ):
+            with self.subTest(sort=sort):
+                self.d._sort_combo.currentData.return_value = sort
+                self.d._apply_filters()
+                self.assertEqual(self.d._shown_entries, expected)
+
+    def test_exact_selection_survives_filter_hiding_and_reappears(self):
+        self.select_first()
+        self.assertIs(self.d._selected_entry(), self.first)
+        self.d._search_edit.text.return_value = "codes"
+        self.d._apply_filters()
+        self.assertIsNone(self.d._selected_entry())
+        self.assertEqual(self.d._selected_path, self.first.path)
+        self.d._delete_btn.setEnabled.assert_called_with(False)
+        self.d._search_edit.text.return_value = ""
+        self.d._apply_filters()
+        self.assertIs(self.d._selected_entry(), self.first)
+
+    def test_no_match_and_empty_states_offer_recovery(self):
+        self.d._search_edit.text.return_value = "missing"
+        self.d._apply_filters()
+        self.assertIn("Clear Filters", self.d._detail_label.setPlainText.call_args.args[0])
+        self.d._entries = []
+        self.d._apply_filters()
+        self.assertIn("Create Backup", self.d._detail_label.setPlainText.call_args.args[0])
+
+    def test_details_are_plain_text_and_unreadable_archives_cannot_restore(self):
+        self.first.note = "<img src='file:///private'>"
+        self.first.inspection_error = "<bad ZIP>"
+        self.select_first()
+        text = self.d._detail_label.setPlainText.call_args.args[0]
+        self.assertIn(self.first.note, text)
+        self.assertIn("Archive on disk", text)
+        self.d._restore_btn.setEnabled.assert_called_with(False)
+        self.d._delete_btn.setEnabled.assert_called_with(True)
+        self.d._on_restore()
+        self.d._start_operation.assert_not_called()
+
+    def test_reload_failure_keeps_snapshot_selection_and_requires_success_before_delete(self):
+        self.select_first()
+        self.d._busy = "list"
+        self.d._operation_finished("list", None, "permission denied")
+        self.assertEqual(self.d._entries, [self.first, self.second])
+        self.assertIs(self.d._selected_entry(), self.first)
+        self.d._delete_btn.setEnabled.assert_called_with(False)
+        self.d._on_delete()
+        self.d._start_operation.assert_not_called()
+        self.d._operation_finished("list", [self.first], "")
+        self.d._delete_btn.setEnabled.assert_called_with(True)
+        self.assertIs(self.d._selected_entry(), self.first)
+
+    def test_reload_removes_missing_selection_without_selecting_another_archive(self):
+        self.select_first()
+        self.d._operation_finished("list", [self.second], "")
+        self.assertEqual(self.d._selected_path, "")
+        self.assertIsNone(self.d._selected_entry())
+
+    def test_create_captures_config_and_note_before_worker_runs(self):
+        with patch("src.core.backup_manager.create_backup") as create:
+            self.d._on_create()
+            kind, work = self.d._start_operation.call_args.args
+            self.assertEqual(kind, "create")
+            self.d._config.textures_path = "/changed"
+            work()
+        self.assertEqual(create.call_args.args[0].textures_path, "/pcsx2/textures")
+        self.assertEqual(create.call_args.kwargs["note"], "draft note")
+
+    def test_create_failure_preserves_note_and_success_selects_new_archive(self):
+        self.d._refresh_list = MagicMock()
+        self.d._operation_finished("create", None, "disk full")
+        self.d._note_edit.clear.assert_not_called()
+        self.assertIn("disk full", self.d._result_text)
+        self.first.failure_count = 1
+        self.d._operation_finished("create", self.first, "")
+        self.d._note_edit.clear.assert_called_once()
+        self.assertEqual(self.d._selected_path, self.first.path)
+        self.assertIn("may be incomplete", self.d._result_text)
+        self.assertIn("1 recoverable", self.d._result_text)
+
+    def test_restore_declined_never_runs_and_confirmed_uses_frozen_archive_and_destinations(self):
+        self.select_first()
+        self.d._confirm_action.return_value = False
+        self.d._on_restore()
+        self.d._start_operation.assert_not_called()
+        self.d._confirm_action.return_value = True
+        with patch("src.core.backup_manager.restore_backup") as restore:
+            self.d._on_restore()
+            kind, work, details = self.d._start_operation.call_args.args
+            self.d._config.textures_path = "/changed"
+            self.d._row = -1
+            work()
+        self.assertEqual(kind, "restore")
+        self.assertIs(restore.call_args.args[0], self.first)
+        self.assertEqual(restore.call_args.args[1].textures_path, "/pcsx2/textures")
+        self.assertEqual(restore.call_args.kwargs, {"detailed": True})
+        self.assertIn(self.first.path, details)
+        self.assertIn("no automatic undo", self.d._confirm_action.call_args.args[1])
+
+    def test_restore_result_reports_partial_outcomes_and_preserves_copyable_context(self):
+        from src.core.backup_manager import RestoreReport
+        self.d._refresh_list = MagicMock()
+        self.d._operation_details = "Archive: /backups/a.zip\nDestination: /pcsx2/textures"
+        self.d._operation_finished("restore", RestoreReport(2, 1, 3), "")
+        self.assertIn("2 restored, 1 failed, 3 skipped", self.d._result_text)
+        self.assertIn(self.d._operation_details, self.d._result_text)
+        self.d._copy_result_btn.setEnabled.assert_called_with(True)
+
+    def test_delete_is_confirmed_and_never_targets_a_new_selection(self):
+        self.select_first()
+        with patch("src.core.backup_manager.delete_backup") as delete:
+            self.d._on_delete()
+            kind, work, _ = self.d._start_operation.call_args.args
+            self.d._row = -1
+            work()
+        self.assertEqual(kind, "delete")
+        delete.assert_called_once_with(self.first)
+        self.d._confirm_action.return_value = False
+        self.select_first()
+        self.d._start_operation.reset_mock()
+        self.d._on_delete()
+        self.d._start_operation.assert_not_called()
+
+    def test_worker_blocks_overlapping_operations_and_recovers_launch_failure(self):
+        relay = MagicMock()
+        work = MagicMock(return_value=123)
+        start = self.module.BackupManagerDialog._start_operation
+        with patch.object(self.module, "_BackupOperationResult", return_value=relay):
+            with patch("threading.Thread") as thread:
+                start(self.d, "create", work)
+                start(self.d, "delete", work)
+                thread.assert_called_once()
+                thread.call_args.kwargs["target"]()
+        work.assert_called_once()
+        relay.finished.emit.assert_called_once_with("create", 123, "")
+        relay.deleteLater.assert_called_once()
+        self.d._busy = ""
+        self.d._refresh_list = MagicMock()
+        with patch.object(self.module, "_BackupOperationResult", return_value=MagicMock()):
+            with patch("threading.Thread", side_effect=RuntimeError("no thread")):
+                start(self.d, "create", work)
+        self.assertEqual(self.d._busy, "")
+        self.assertIn("no thread", self.d._result_text)
+
+    def test_confirmation_is_plain_text_and_defaults_to_no(self):
+        box = MagicMock()
+        box.exec.return_value = 2
+        self.module.QMessageBox.StandardButton = SimpleNamespace(Yes=1, No=2)
+        self.module.Qt.TextFormat.PlainText = 1
+        box_type = MagicMock(return_value=box)
+        box_type.Icon.Warning = 1
+        box_type.StandardButton = SimpleNamespace(Yes=1, No=2)
+        with patch.object(self.module, "QMessageBox", box_type):
+            confirmed = self.module.BackupManagerDialog._confirm_action(
+                self.d, "Delete", "<b>archive</b>", "/backups/a.zip"
+            )
+        self.assertFalse(confirmed)
+        box.setDefaultButton.assert_called_once_with(2)
+        box.setTextFormat.assert_called_once_with(1)
+        box.setDetailedText.assert_called_once_with("/backups/a.zip")
+        self.assertFalse(self.d._confirming)
+
+    def test_mutating_operations_block_close_and_busy_reentry(self):
+        for kind in ("create", "restore", "delete"):
+            with self.subTest(kind=kind):
+                self.d._busy = kind
+                self.select_first()
+                self.d._on_create()
+                self.d._on_restore()
+                self.d._on_delete()
+                self.d._start_operation.assert_not_called()
+                event = MagicMock()
+                self.module.BackupManagerDialog.closeEvent(self.d, event)
+                event.ignore.assert_called_once()
+                self.module.BackupManagerDialog.reject(self.d)
+
+
 class TestBackupManager(unittest.TestCase):
     """Tests for src.core.backup_manager — create / list / restore / delete."""
 
@@ -20883,6 +21124,37 @@ class TestBackupManager(unittest.TestCase):
         self.assertTrue(any("SLUS-20062.png" in n for n in names))
         self.assertFalse(any("AABBCCDD.pnach" in n for n in names))
         self.assertTrue(any("recoverable failure" in msg for msg in logs.output))
+        self.assertEqual(entry.file_count, 1)
+        self.assertEqual(entry.failure_count, 1)
+
+    def test_same_timestamp_never_overwrites_archives_or_existing_links(self):
+        from src.core.backup_manager import create_backup
+        with patch("src.core.backup_manager.datetime") as clock:
+            clock.datetime.now.return_value.strftime.return_value = "20260101_010101"
+            clock.datetime.now.return_value.isoformat.return_value = "2026-01-01T01:01:01"
+            first = create_backup(self.cfg, note="HD")
+            original = Path(first.path).read_bytes()
+            second_path = Path(first.path).with_stem(Path(first.path).stem + "_1")
+            victim = Path(self.tmpdir) / "keep.txt"
+            victim.write_text("keep")
+            second_path.symlink_to(victim)
+            second = create_backup(self.cfg, note="HD")
+        self.assertNotEqual(first.path, second.path)
+        self.assertTrue(second.path.endswith("_2.zip"))
+        self.assertEqual(Path(first.path).read_bytes(), original)
+        self.assertTrue(second_path.is_symlink())
+        self.assertEqual(victim.read_text(), "keep")
+
+    def test_failed_archive_publication_removes_only_new_reservation_and_temp_file(self):
+        from src.core.backup_manager import create_backup, get_backup_dir
+        first = create_backup(self.cfg)
+        original = Path(first.path).read_bytes()
+        with patch("src.core.backup_manager.os.replace", side_effect=OSError("denied")):
+            with self.assertLogs("src.core.backup_manager", level="WARNING"):
+                with self.assertRaises(OSError):
+                    create_backup(self.cfg)
+        self.assertEqual(list(get_backup_dir(self.cfg).iterdir()), [Path(first.path)])
+        self.assertEqual(Path(first.path).read_bytes(), original)
 
     # -----------------------------------------------------------------------
     # list_backups
@@ -20911,6 +21183,7 @@ class TestBackupManager(unittest.TestCase):
             entries = list_backups(self.cfg)
 
         self.assertEqual(len(entries), 1)
+        self.assertTrue(entries[0].inspection_error)
         self.assertTrue(any("Failed to inspect backup archive" in msg for msg in cm.output))
 
     def test_list_backups_skips_when_stat_fails(self):
@@ -21028,6 +21301,42 @@ class TestBackupManager(unittest.TestCase):
         self.assertFalse(os.path.exists(failing_dest))
         self.assertTrue(any("Failed to restore backup entry" in msg for msg in logs.output))
         self.assertTrue(any("with 1 failure(s)" in msg for msg in logs.output))
+
+    def test_detailed_restore_reports_unmatched_unsafe_and_failed_files(self):
+        import zipfile
+        from src.core.backup_manager import BackupEntry, restore_backup, get_backup_dir
+        archive = get_backup_dir(self.cfg) / "backup_report.zip"
+        with zipfile.ZipFile(archive, "w") as zf:
+            zf.writestr("cheats/ok.pnach", "good")
+            zf.writestr("cheats/fail.pnach", "bad")
+            zf.writestr("unknown/file.txt", "skip")
+            zf.writestr("root.txt", "skip")
+            zf.writestr("cheats/../escape.txt", "skip")
+        entry = BackupEntry(str(archive), archive.name, "", 0)
+        original_open = open
+
+        def failing_open(path, *args, **kwargs):
+            if str(path).endswith("fail.pnach"):
+                raise OSError("disk full")
+            return original_open(path, *args, **kwargs)
+
+        with patch("builtins.open", side_effect=failing_open):
+            with self.assertLogs("src.core.backup_manager", level="WARNING"):
+                report = restore_backup(entry, self.cfg, detailed=True)
+        self.assertEqual((report.restored, report.failed, report.skipped), (1, 1, 3))
+        self.assertFalse((Path(self.tmpdir) / "escape.txt").exists())
+        self.assertEqual(Path(self.cheats_dir, "ok.pnach").read_text(), "good")
+
+    def test_list_backups_reports_file_counts_and_propagates_directory_errors(self):
+        from src.core.backup_manager import create_backup, list_backups
+        Path(self.cheats_dir, "ok.pnach").write_text("good")
+        create_backup(self.cfg)
+        entries = list_backups(self.cfg)
+        self.assertEqual(entries[0].file_count, 1)
+        self.assertEqual(entries[0].inspection_error, "")
+        with patch.object(Path, "iterdir", side_effect=PermissionError("denied")):
+            with self.assertRaises(PermissionError):
+                list_backups(self.cfg)
 
     def test_restore_missing_archive_raises(self):
         from src.core.backup_manager import BackupEntry, restore_backup

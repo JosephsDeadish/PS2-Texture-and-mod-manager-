@@ -3416,6 +3416,21 @@ class ConflictResolverDialog(QDialog):
 # BackupManagerDialog
 # ---------------------------------------------------------------------------
 
+class _BackupOperationResult(QObject):
+    finished = pyqtSignal(str, object, str)
+
+
+def _backup_matches(entry, query):
+    values = (entry.label, entry.note, entry.path, entry.created_at)
+    compact = ["".join(ch for ch in value.casefold() if ch.isalnum()) for value in values]
+    return all(
+        any(term in value.casefold() for value in values)
+        or bool(key := "".join(ch for ch in term if ch.isalnum()))
+        and any(key in value for value in compact)
+        for term in query.casefold().split()
+    )
+
+
 class BackupManagerDialog(QDialog):
     """Create, browse, restore and delete backups of PCSX2 managed content.
 
@@ -3439,8 +3454,16 @@ class BackupManagerDialog(QDialog):
         super().__init__(parent)
         self._config  = config
         self._entries = []   # list[BackupEntry]
+        self._shown_entries = []
+        self._selected_path = ""
+        self._busy = ""
+        self._confirming = False
+        self._loaded = False
+        self._load_error = ""
+        self._result_text = ""
         self.setWindowTitle("💾  Backup Manager")
-        self.setMinimumSize(780, 480)
+        self.setMinimumSize(640, 440)
+        self.resize(900, 600)
         self._build_ui()
         self._refresh_list()
 
@@ -3456,6 +3479,45 @@ class BackupManagerDialog(QDialog):
         )
         hdr.setWordWrap(True)
         layout.addWidget(hdr)
+
+        controls = QHBoxLayout()
+        self._search_edit = QLineEdit()
+        self._search_edit.setPlaceholderText("Search archive names, notes, dates, or paths…")
+        self._search_edit.setClearButtonEnabled(True)
+        controls.addWidget(self._search_edit, 1)
+        self._sort_combo = QComboBox()
+        for label, key in (
+            ("Newest first", "newest"), ("Oldest first", "oldest"),
+            ("Name A–Z", "name"), ("Largest first", "size"),
+        ):
+            self._sort_combo.addItem(label, key)
+        self._sort_combo.currentIndexChanged.connect(self._apply_filters)
+        controls.addWidget(self._sort_combo)
+        self._clear_btn = QPushButton("Clear Filters")
+        self._clear_btn.clicked.connect(self._clear_filters)
+        controls.addWidget(self._clear_btn)
+        self._reload_btn = QPushButton("Reload Backups")
+        self._reload_btn.clicked.connect(self._refresh_list)
+        controls.addWidget(self._reload_btn)
+        layout.addLayout(controls)
+
+        from PyQt6.QtCore import QTimer
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(180)
+        self._search_timer.timeout.connect(self._apply_filters)
+        self._search_edit.textChanged.connect(lambda: self._search_timer.start())
+        self._count_label = QLabel()
+        layout.addWidget(self._count_label)
+        self._status_label = QLabel()
+        self._status_label.setWordWrap(True)
+        self._status_label.setTextFormat(Qt.TextFormat.PlainText)
+        layout.addWidget(self._status_label)
+        self._result_label = QTextEdit()
+        self._result_label.setReadOnly(True)
+        self._result_label.setMaximumHeight(110)
+        self._result_label.setVisible(False)
+        layout.addWidget(self._result_label)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
 
@@ -3475,11 +3537,11 @@ class BackupManagerDialog(QDialog):
         self._note_edit.setMaxLength(40)
         create_row.addWidget(self._note_edit, 1)
 
-        create_btn = QPushButton("➕ Create Backup")
-        create_btn.setObjectName("primary_btn")
-        create_btn.setToolTip("Create a new backup archive now")
-        create_btn.clicked.connect(self._on_create)
-        create_row.addWidget(create_btn)
+        self._create_btn = QPushButton("➕ Create Backup")
+        self._create_btn.setObjectName("primary_btn")
+        self._create_btn.setToolTip("Create a new archive without replacing existing backups")
+        self._create_btn.clicked.connect(self._on_create)
+        create_row.addWidget(self._create_btn)
 
         left_layout.addLayout(create_row)
         splitter.addWidget(left)
@@ -3489,10 +3551,8 @@ class BackupManagerDialog(QDialog):
         right_layout = QVBoxLayout(right)
         right_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._detail_label = QLabel("← Select a backup from the list")
-        self._detail_label.setWordWrap(True)
-        self._detail_label.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self._detail_label.setTextFormat(Qt.TextFormat.RichText)
+        self._detail_label = QTextEdit()
+        self._detail_label.setReadOnly(True)
         right_layout.addWidget(self._detail_label, 1)
 
         sep = QFrame()
@@ -3515,14 +3575,14 @@ class BackupManagerDialog(QDialog):
         self._delete_btn.clicked.connect(self._on_delete)
         action_row.addWidget(self._delete_btn)
 
-        action_row.addStretch()
-
         open_dir_btn = QPushButton("📂 Open Backups Folder")
         open_dir_btn.setToolTip("Open the backups folder in the file manager")
         open_dir_btn.clicked.connect(self._on_open_dir)
-        action_row.addWidget(open_dir_btn)
-
         right_layout.addLayout(action_row)
+        right_layout.addWidget(open_dir_btn)
+        self._copy_path_btn = QPushButton("Copy Archive Path")
+        self._copy_path_btn.clicked.connect(self._copy_path)
+        right_layout.addWidget(self._copy_path_btn)
         splitter.addWidget(right)
 
         splitter.setStretchFactor(0, 2)
@@ -3531,132 +3591,267 @@ class BackupManagerDialog(QDialog):
 
         # Close button
         close_row = QHBoxLayout()
+        self._copy_result_btn = QPushButton("Copy Last Result")
+        self._copy_result_btn.setEnabled(False)
+        self._copy_result_btn.clicked.connect(self._copy_result)
+        close_row.addWidget(self._copy_result_btn)
         close_row.addStretch()
         close_btn = QPushButton("Close")
-        close_btn.clicked.connect(self.accept)
+        close_btn.clicked.connect(self.reject)
         close_row.addWidget(close_btn)
         layout.addLayout(close_row)
 
     # ------------------------------------------------------------------
     def _refresh_list(self):
-        self._list_widget.clear()
+        if self._busy or self._confirming:
+            return
+        from src.core.backup_manager import list_backups
+        config = deepcopy(self._config)
+        self._start_operation("list", lambda: list_backups(config))
+
+    def _selected_entry(self):
+        row = self._list_widget.currentRow()
+        return self._shown_entries[row] if 0 <= row < len(self._shown_entries) else None
+
+    def _apply_filters(self, *_):
+        self._search_timer.stop()
+        query = self._search_edit.text().strip()
+        entries = [entry for entry in self._entries if _backup_matches(entry, query)]
+        sort = self._sort_combo.currentData()
+        if sort == "name":
+            entries.sort(key=lambda entry: (entry.label.casefold(), entry.path))
+        elif sort == "size":
+            entries.sort(key=lambda entry: (-entry.size_bytes, entry.label.casefold(), entry.path))
+        else:
+            entries.sort(key=lambda entry: (entry.created_at, entry.label, entry.path),
+                         reverse=sort != "oldest")
+        self._shown_entries = entries
+        self._list_widget.blockSignals(True)
         try:
-            from src.core.backup_manager import list_backups
-            self._entries = list_backups(self._config)
-        except Exception as exc:
-            logger.warning("Could not list backups: %s", exc)
-            self._entries = []
-            self._detail_label.setText(f"<i>Could not read backups: {exc}</i>")
-            return
+            self._list_widget.clear()
+            selected = -1
+            for row, entry in enumerate(entries):
+                state = "Unreadable ZIP" if entry.inspection_error else f"{entry.file_count} files"
+                self._list_widget.addItem(
+                    f"{entry.label}\n{entry.created_at} • {entry.size_label} • {state}"
+                )
+                if entry.path == self._selected_path:
+                    selected = row
+            self._list_widget.setCurrentRow(selected)
+        finally:
+            self._list_widget.blockSignals(False)
+        self._count_label.setText(f"Showing {len(entries)} of {len(self._entries)} backups")
+        self._clear_btn.setEnabled(bool(query) or sort != "newest")
+        self._on_selection_changed(selected)
 
-        for entry in self._entries:
-            self._list_widget.addItem(f"{entry.label}  ({entry.size_label})")
-
-        if not self._entries:
-            self._detail_label.setText("<i>No backups found.  Use ➕ Create Backup to make one.</i>")
-
-        self._restore_btn.setEnabled(False)
-        self._delete_btn.setEnabled(False)
-
-    # ------------------------------------------------------------------
     def _on_selection_changed(self, row: int):
-        if row < 0 or row >= len(self._entries):
-            self._detail_label.setText("← Select a backup from the list")
-            self._restore_btn.setEnabled(False)
-            self._delete_btn.setEnabled(False)
-            return
+        entry = self._selected_entry()
+        if entry is not None:
+            self._selected_path = entry.path
+            size_kind = "Archive on disk" if entry.inspection_error else "Uncompressed size"
+            text = (
+                f"{entry.label}\n\nDate (archive modified): {entry.created_at}\n"
+                f"{size_kind}: {entry.size_label}\nFiles listed: {entry.file_count}\n"
+                f"Note: {entry.note or '—'}\n\nArchive path:\n{entry.path}"
+            )
+            if entry.inspection_error:
+                text += f"\n\nCould not read ZIP index: {entry.inspection_error}\nReload after repairing the archive."
+            else:
+                text += "\n\nZIP index readable; file contents have not been integrity-checked."
+        elif self._entries and not self._shown_entries:
+            text = "No matching backups. Use Clear Filters to show all archives."
+        elif not self._entries and self._loaded:
+            text = "No backups found. Add an optional note and choose Create Backup."
+        else:
+            text = "Select a backup to inspect its details."
+        self._detail_label.setPlainText(text)
+        self._update_actions()
 
-        entry = self._entries[row]
-        html = (
-            f"<b>{entry.label}</b><br>"
-            f"<br>"
-            f"<b>Created:</b> {entry.created_at}<br>"
-            f"<b>Size (uncompressed):</b> {entry.size_label}<br>"
-        )
-        if entry.note:
-            html += f"<b>Note:</b> {entry.note}<br>"
-        html += f"<br><b>Archive path:</b><br><code>{entry.path}</code>"
-        self._detail_label.setText(html)
-        self._restore_btn.setEnabled(True)
-        self._delete_btn.setEnabled(True)
+    def _clear_filters(self):
+        self._search_edit.clear()
+        self._sort_combo.setCurrentIndex(0)
+        self._apply_filters()
+
+    def _update_actions(self):
+        ready = not self._busy and not self._confirming
+        entry = self._selected_entry()
+        current = ready and self._loaded and not self._load_error and entry is not None
+        self._restore_btn.setEnabled(bool(current and not entry.inspection_error and entry.file_count))
+        self._delete_btn.setEnabled(bool(current))
+        self._copy_path_btn.setEnabled(entry is not None)
+        self._create_btn.setEnabled(ready)
+        self._note_edit.setEnabled(ready)
+        self._reload_btn.setEnabled(ready)
+
+    def _set_result(self, text):
+        self._result_text = text
+        self._result_label.setPlainText(text)
+        self._result_label.setVisible(bool(text))
+        self._copy_result_btn.setEnabled(bool(text))
+
+    def _copy_path(self):
+        entry = self._selected_entry()
+        if entry is not None:
+            QApplication.clipboard().setText(entry.path)
+
+    def _copy_result(self):
+        QApplication.clipboard().setText(self._result_text)
+
+    def _start_operation(self, kind, work, details=""):
+        import threading
+        if self._busy or self._confirming:
+            return
+        relay = _BackupOperationResult()
+        relay.finished.connect(self._operation_finished)
+        self._busy = kind
+        self._operation_details = details
+        labels = {"list": "Reading backup archives…", "create": "Creating backup…",
+                  "restore": "Restoring backup…", "delete": "Deleting backup…"}
+        self._status_label.setText(labels[kind])
+        self._update_actions()
+
+        def run():
+            try:
+                result, error = work(), ""
+            except Exception as exc:
+                logger.warning("Backup %s failed: %s", kind, exc)
+                result, error = None, str(exc) or type(exc).__name__
+            relay.finished.emit(kind, result, error)
+            relay.deleteLater()
+
+        try:
+            threading.Thread(target=run, daemon=True).start()
+        except Exception as exc:
+            relay.deleteLater()
+            self._operation_finished(kind, None, str(exc) or type(exc).__name__)
+
+    @pyqtSlot(str, object, str)
+    def _operation_finished(self, kind, result, error):
+        self._busy = ""
+        if kind == "list":
+            self._load_error = error
+            if not error:
+                self._entries = result
+                self._loaded = True
+                if not any(entry.path == self._selected_path for entry in result):
+                    self._selected_path = ""
+            self._status_label.setText(
+                f"Could not read backups: {error}\nPrevious results kept. Use Reload Backups to retry."
+                if error else "Ready. Close PCSX2 before creating or restoring archives."
+            )
+            self._apply_filters()
+            return
+        if error:
+            self._set_result(
+                f"{kind.title()} failed: {error}\n"
+                + ("Some files may already have changed. Check destinations before retrying."
+                   if kind == "restore" else "Check the error and retry the action.")
+            )
+        elif kind == "create":
+            self._selected_path = result.path
+            self._note_edit.clear()
+            self._set_result(
+                f"Created {result.label}: {result.file_count} files; "
+                f"{result.failure_count} recoverable issue(s).\n{result.path}\n"
+                + ("Backup may be incomplete. See the application log for details."
+                   if result.failure_count else
+                   "Archive is empty; no source files were included." if not result.file_count else
+                   "Existing archives were not replaced.")
+            )
+        elif kind == "restore":
+            self._set_result(
+                f"Restore finished: {result.restored} restored, {result.failed} failed, "
+                f"{result.skipped} skipped.\n"
+                "Skipped files include unknown destination folders and unsafe paths. "
+                "See the application log for failures. This does not change mod enabled flags."
+            )
+        elif result:
+            self._set_result("Backup archive deleted.")
+            self._selected_path = ""
+        else:
+            self._set_result("Delete failed. The archive may be missing or inaccessible. Reload and retry.")
+        if self._operation_details:
+            self._set_result(f"{self._result_text}\n\n{self._operation_details}")
+        self._update_actions()
+        self._refresh_list()
+
+    def _confirm_action(self, title, text, details):
+        self._confirming = True
+        self._update_actions()
+        try:
+            box = QMessageBox(self)
+            box.setWindowTitle(title)
+            box.setIcon(QMessageBox.Icon.Warning)
+            box.setTextFormat(Qt.TextFormat.PlainText)
+            box.setText(text)
+            box.setDetailedText(details)
+            box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            box.setDefaultButton(QMessageBox.StandardButton.No)
+            return box.exec() == QMessageBox.StandardButton.Yes
+        finally:
+            self._confirming = False
+            self._update_actions()
 
     # ------------------------------------------------------------------
     def _on_create(self):
-        note = self._note_edit.text().strip()
-        try:
-            from src.core.backup_manager import create_backup
-            entry = create_backup(self._config, note=note)
-        except Exception as exc:
-            logger.warning("Could not create backup: %s", exc)
-            QMessageBox.critical(self, "Backup Failed", str(exc))
+        if self._busy or self._confirming:
             return
-
-        self._note_edit.clear()
-        self._refresh_list()
-        QMessageBox.information(
-            self,
-            "✅ Backup Created",
-            f"Backup created successfully.\n\nFile: {entry.label}\nSize: {entry.size_label}",
-        )
+        note = self._note_edit.text().strip()
+        from src.core.backup_manager import create_backup
+        config = deepcopy(self._config)
+        self._start_operation("create", lambda: create_backup(config, note=note))
 
     # ------------------------------------------------------------------
     def _on_restore(self):
-        row = self._list_widget.currentRow()
-        if row < 0 or row >= len(self._entries):
+        entry = self._selected_entry()
+        if (self._busy or self._confirming or self._load_error or entry is None
+                or entry.inspection_error or not entry.file_count):
             return
-
-        entry = self._entries[row]
-        reply = QMessageBox.question(
-            self,
-            "Restore Backup",
-            f"Restore backup:\n{entry.label}\n\n"
-            "This will overwrite existing files in your PCSX2 directories.\n"
-            "Proceed?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        config = deepcopy(self._config)
+        destinations = "\n".join(
+            f"{attr}: {getattr(config, attr, '') or '(not configured)'}"
+            for attr in ("pnach_path", "cheats_path", "cover_art_path", "textures_path")
         )
-        if reply != QMessageBox.StandardButton.Yes:
+        if not self._confirm_action(
+            "Restore Backup",
+            f"Restore {entry.label}?\n\nClose PCSX2 first. Existing destination files may be overwritten. "
+            "There is no automatic undo; create a backup first if needed.\n"
+            "Archive folders match the names of current destination folders; unmatched files are skipped. "
+            "Mod library flags and memory cards are not restored.",
+            f"Archive:\n{entry.path}\n\nCurrent destination settings:\n{destinations}",
+        ):
             return
-
-        try:
-            from src.core.backup_manager import restore_backup
-            count = restore_backup(entry, self._config)
-        except FileNotFoundError:
-            QMessageBox.critical(self, "Restore Failed", "Archive file not found on disk.")
-            self._refresh_list()
-            return
-        except Exception as exc:
-            logger.warning("Could not restore backup %s: %s", entry.label, exc)
-            QMessageBox.critical(self, "Restore Failed", str(exc))
-            return
-
-        QMessageBox.information(
-            self,
-            "✅ Restore Complete",
-            f"Successfully restored {count} file(s) from:\n{entry.label}",
+        from src.core.backup_manager import restore_backup
+        self._start_operation(
+            "restore", lambda: restore_backup(entry, config, detailed=True),
+            f"Archive:\n{entry.path}\n\nDestination settings used:\n{destinations}",
         )
 
     # ------------------------------------------------------------------
     def _on_delete(self):
-        row = self._list_widget.currentRow()
-        if row < 0 or row >= len(self._entries):
+        entry = self._selected_entry()
+        if self._busy or self._confirming or self._load_error or entry is None:
             return
-
-        entry = self._entries[row]
-        reply = QMessageBox.question(
-            self,
-            "Delete Backup",
-            f"Permanently delete:\n{entry.label}\n\nThis cannot be undone.",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        )
-        if reply != QMessageBox.StandardButton.Yes:
+        if not self._confirm_action(
+            "Delete Backup", f"Permanently delete {entry.label}?\n\nThis cannot be undone.",
+            f"Only this archive will be deleted:\n{entry.path}",
+        ):
             return
-
         from src.core.backup_manager import delete_backup
-        ok = delete_backup(entry)
-        if ok:
-            self._refresh_list()
+        self._start_operation("delete", lambda: delete_backup(entry), f"Archive:\n{entry.path}")
+
+    def reject(self):
+        if self._confirming or self._busy in ("create", "restore", "delete"):
+            self._status_label.setText("Please wait for the file operation to finish before closing.")
+            return
+        super().reject()
+
+    def closeEvent(self, event):
+        if self._confirming or self._busy in ("create", "restore", "delete"):
+            self._status_label.setText("Please wait for the file operation to finish before closing.")
+            event.ignore()
         else:
-            QMessageBox.warning(self, "Delete Failed", "Could not delete the backup archive.")
+            super().closeEvent(event)
 
     # ------------------------------------------------------------------
     def _on_open_dir(self):
