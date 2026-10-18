@@ -1640,7 +1640,10 @@ class _DownloadInstallResult(QObject):
                     note="" if success else message,
                 )
             except Exception as exc:
-                logger.warning("Could not record direct download history for %s: %s", state["name"], exc)
+                if success:
+                    logger.warning("Could not record browse download history for %s: %s", state["name"], exc)
+                else:
+                    logger.warning("Could not record failed browse download history for %s: %s", state["name"], exc)
                 message += "\nDownload history could not be saved."
             if success:
                 self.installed.emit()
