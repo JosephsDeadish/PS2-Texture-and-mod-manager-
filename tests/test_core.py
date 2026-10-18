@@ -9619,6 +9619,19 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             self.assertEqual(record.call_args.kwargs["status"], "failed")
             self.assertIs(dialog._prepared_download["mod"], mod)
 
+    def test_download_failure_history_has_a_name_when_optional_metadata_is_blank(self):
+        module = self._import_browse_panel()
+        for url, expected in (("https://example.com/pack.zip", "pack.zip"), ("https://example.com/", "downloaded_mod")):
+            with self.subTest(url=url):
+                dialog = self._download_dialog_fixture(module)
+                state = {**dialog._dialog_state(), "name": "", "url": url}
+                result = self._download_result_fixture(module, "id", state, ModType.PNACH, dialog.config, dialog.db)
+                with patch("src.core.download_history.record_event") as record:
+                    result._complete_install(None, "Resolving failed")
+                self.assertEqual(record.call_args.kwargs["mod_name"], expected)
+                self.assertEqual(record.call_args.kwargs["status"], "failed")
+                dialog.db.add.assert_not_called()
+
     def test_download_progress_recovers_from_unknown_total_and_handles_large_files(self):
         module = self._import_browse_panel()
         dialog = self._download_dialog_fixture(module)

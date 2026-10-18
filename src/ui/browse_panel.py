@@ -1632,7 +1632,9 @@ class _DownloadInstallResult(QObject):
             try:
                 from src.core.download_history import record_event, STATUS_SUCCESS, STATUS_FAILED
                 record_event(
-                    self._config, mod_name=payload["mod"].name if payload else state["name"],
+                    self._config, mod_name=payload["mod"].name if payload else (
+                        state["name"] or Path(urlparse(state["url"]).path).name or "downloaded_mod"
+                    ),
                     mod_type=self._mod_type.value, serial=state["game"],
                     source_url=state["source_url"] or state["url"],
                     status=STATUS_SUCCESS if success else STATUS_FAILED,
