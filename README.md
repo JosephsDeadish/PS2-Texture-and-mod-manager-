@@ -196,6 +196,9 @@
 - Downloading and installing are separate phases: a finished transfer is not yet a finished installation
 - Direct URL downloads resolve links in the background, freeze request details while running, and show retry guidance without losing your entries
 - The scrollable download dialog can **Continue in Background**: resolution, transfer, installation, history, and library refresh continue while the app stays open; closing is not cancellation
+- Files are prepared off the UI thread; library registration is serialized on the UI thread so concurrent downloads and library edits do not race database saves
+- If registration fails, **Retry Library Save** reuses the prepared files without another transfer; metadata stays frozen until saved or **New Download** is chosen
+- Closing after a save failure or choosing **New Download** keeps the prepared folder for manual Import; its path is shown in the failure and history note (when history can be saved)
 - The scrollable active list leaves history usable; active counts and **Open Source / Copy URL** provide quick access to the original HTTP(S) source
 - Search names, source URLs, and notes alongside status, type, and partial serial filters
 - Saved search and sorting: newest, oldest, name, or size; Game Save includes legacy and current records

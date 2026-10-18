@@ -13,7 +13,7 @@ from pathlib import Path, PureWindowsPath
 from typing import Dict, List, Optional, Tuple
 
 import src.core.config_manager as _cfg
-from src.core.archive import ArchiveError, extract_archive, is_archive
+from src.core.archive import extract_archive, is_archive
 from src.models.mod import ConflictInfo, ModInfo, ModStatus, ModType
 
 logger = logging.getLogger(__name__)
@@ -112,8 +112,16 @@ class ModDatabase:
     # ------------------------------------------------------------------
 
     def add(self, mod: ModInfo):
+        previous = self._mods.get(mod.id)
         self._mods[mod.id] = mod
-        self.save()
+        try:
+            self.save()
+        except Exception:
+            if previous is None:
+                self._mods.pop(mod.id, None)
+            else:
+                self._mods[mod.id] = previous
+            raise
 
     def remove(self, mod_id: str):
         self._mods.pop(mod_id, None)
@@ -251,17 +259,33 @@ class ModManager:
         game_id: str = "",
         source_url: str = "",
     ) -> ModInfo:
+        """Prepare files in managed storage, then persist their library record."""
+        mod = self.prepare_install(
+            source_path, mod_type, dest_base, name, author, version,
+            description, game_id, source_url,
+        )
+        self.db.add(mod)
+        return mod
+
+    @classmethod
+    def prepare_install(
+        cls,
+        source_path: str,
+        mod_type: ModType,
+        dest_base: str,
+        name: str = "",
+        author: str = "",
+        version: str = "",
+        description: str = "",
+        game_id: str = "",
+        source_url: str = "",
+    ) -> ModInfo:
         """
-        Copy a folder or file into managed storage and register it as a mod.
+        Prepare a mod in a fresh managed folder without accessing a database.
 
-        Archive files (.zip, .7z) are extracted automatically; their contents
-        land in the destination directory rather than the archive file itself.
-
-        If *source_path* is a directory it is copied recursively using
-        dirs_exist_ok=True, meaning any pre-existing files at the destination
-        will be overwritten by source files.  This is intentional: the dest
-        directory is a freshly-created UUID-named folder under *dest_base* so
-        overwriting only occurs on re-import of the same physical files.
+        Archive contents are extracted automatically. Failed preparation removes
+        the new folder. Successful files remain available if later registration
+        fails, so callers can retry persistence without copying/downloading again.
         """
         source = Path(source_path)
         if not source.exists():
@@ -269,53 +293,43 @@ class ModManager:
 
         mod_id = str(uuid.uuid4())
         dest_dir = Path(dest_base) / mod_id
-        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest_dir.mkdir(parents=True, exist_ok=False)
 
-        if source.is_dir():
-            shutil.copytree(str(source), str(dest_dir), dirs_exist_ok=True)
-        elif is_archive(str(source)):
-            # Extract archive contents into the destination directory
-            try:
+        try:
+            if source.is_dir():
+                shutil.copytree(str(source), str(dest_dir), dirs_exist_ok=True)
+            elif is_archive(str(source)):
                 extract_archive(str(source), str(dest_dir))
-            except ArchiveError as exc:
-                shutil.rmtree(str(dest_dir), ignore_errors=True)
-                raise
-        else:
-            shutil.copy2(str(source), str(dest_dir / source.name))
+            else:
+                shutil.copy2(str(source), str(dest_dir / source.name))
 
-        # ── Normalise texture pack folder layout ──────────────────────────
-        # Many texture packs ship with a folder named "replacement" or
-        # "replacements" rather than the PS2 disc serial.  When a game_id is
-        # known we reorganise the contents into the structure PCSX2 expects:
-        #     <dest_dir>/<SERIAL>/replacements/<texture_files>
-        if mod_type == ModType.TEXTURE_PACK and game_id:
-            self._normalize_texture_structure(dest_dir, game_id)
+            # Many packs use "replacement(s)" rather than the PS2 disc serial.
+            if mod_type == ModType.TEXTURE_PACK and game_id:
+                cls._normalize_texture_structure(dest_dir, game_id)
 
-        files = self._list_files(dest_dir)
-        size = sum(f.stat().st_size for f in dest_dir.rglob("*") if f.is_file())
+            files = cls._list_files(dest_dir)
+            size = sum(f.stat().st_size for f in dest_dir.rglob("*") if f.is_file())
 
-        # Auto-fetch thumbnail from GameTDB if a game_id is provided
-        thumbnail_path = ""
-        if game_id:
-            thumbnail_path = self._fetch_thumbnail(game_id) or ""
+            thumbnail_path = (cls._fetch_thumbnail(game_id) or "") if game_id else ""
 
-        mod = ModInfo(
-            id=mod_id,
-            name=name or source.name,
-            mod_type=mod_type,
-            path=str(dest_dir),
-            enabled=True,
-            author=author,
-            version=version or "1.0.0",
-            description=description,
-            game_id=game_id,
-            source_url=source_url,
-            thumbnail_path=thumbnail_path,
-            files=files,
-            size_bytes=size,
-        )
-        self.db.add(mod)
-        return mod
+            return ModInfo(
+                id=mod_id,
+                name=name or source.name,
+                mod_type=mod_type,
+                path=str(dest_dir),
+                enabled=True,
+                author=author,
+                version=version or "1.0.0",
+                description=description,
+                game_id=game_id,
+                source_url=source_url,
+                thumbnail_path=thumbnail_path,
+                files=files,
+                size_bytes=size,
+            )
+        except Exception:
+            shutil.rmtree(str(dest_dir), ignore_errors=True)
+            raise
 
     def remove_mod(self, mod_id: str, delete_files: bool = True):
         """Remove a mod from the database and optionally delete its files."""

@@ -1584,6 +1584,70 @@ class _DownloadInstallResult(QObject):
     progress = pyqtSignal(str, object, object)
     finished = pyqtSignal(str, bool, str)
     installed = pyqtSignal()
+    prepared = pyqtSignal(object, str)
+    registration_failed = pyqtSignal(str, object)
+
+    def __init__(self, request_id, state, mod_type, config, db):
+        from PyQt6.QtCore import QCoreApplication
+
+        super().__init__(QCoreApplication.instance())
+        self._request_id = request_id
+        self._state = state
+        self._mod_type = mod_type
+        self._config = config
+        self._db = db
+        self._completed = False
+        self.prepared.connect(self._complete_install)
+
+    @pyqtSlot(object, str)
+    def _complete_install(self, payload, error):
+        """Commit shared state on the UI thread, independently of dialog lifetime."""
+        if self._completed:
+            return
+        self._completed = True
+        state = self._state
+        success = False
+        message = error
+        try:
+            if payload is not None:
+                mod = payload["mod"]
+                try:
+                    if not Path(mod.path).is_dir():
+                        raise FileNotFoundError(f"The prepared folder is missing: {mod.path}")
+                    self._db.add(mod)
+                except Exception as exc:
+                    logger.warning("Could not register downloaded mod %s: %s", mod.name, exc)
+                    message = (
+                        f"❌  Library save failed: {exc}\n"
+                        f"Prepared folder: {mod.path}\n"
+                        "Retry Library Save reuses these files without downloading again. "
+                        "If you close this dialog, use Import with that folder to recover them."
+                    )
+                    self.registration_failed.emit(self._request_id, {
+                        **payload, "state": state, "config": self._config,
+                    })
+                else:
+                    success = True
+                    message = f"✅  Installed: {mod.name}"
+            try:
+                from src.core.download_history import record_event, STATUS_SUCCESS, STATUS_FAILED
+                record_event(
+                    self._config, mod_name=payload["mod"].name if payload else state["name"],
+                    mod_type=self._mod_type.value, serial=state["game"],
+                    source_url=state["source_url"] or state["url"],
+                    status=STATUS_SUCCESS if success else STATUS_FAILED,
+                    size_bytes=payload["size"] if payload else 0,
+                    note="" if success else message,
+                )
+            except Exception as exc:
+                logger.warning("Could not record direct download history for %s: %s", state["name"], exc)
+                message += "\nDownload history could not be saved."
+            if success:
+                self.installed.emit()
+        finally:
+            ActiveDownloads.finish(self._request_id)
+            self.finished.emit(self._request_id, success, message)
+            self.deleteLater()
 
 
 def _is_download_url(url: str) -> bool:
@@ -1594,11 +1658,13 @@ def _is_download_url(url: str) -> bool:
         return False
 
 
-def _run_direct_download(result, request_id, state, mod_type, config, db, url=None):
+def _run_direct_download(result, request_id, state, mod_type, config, url=None):
     """Run from immutable request values, never retaining a dialog or its widgets."""
     tmpdir = None
     phase = "resolving"
     source_url = state["source_url"] or state["url"]
+    payload = None
+    error = ""
     try:
         if url is None:
             url = DownloadInstallDialog._convert_url(state["url"])
@@ -1632,51 +1698,28 @@ def _run_direct_download(result, request_id, state, mod_type, config, db, url=No
         ActiveDownloads.set_installing(request_id)
         result.phase.emit(request_id, phase)
         from src.core.mod_manager import ModManager
-        mod = ModManager(db).install_from_folder(
+        mod = ModManager.prepare_install(
             source_path=dest, mod_type=mod_type, dest_base=config.mods_storage_path,
             name=state["name"] or Path(fname).stem, author=state["author"],
             game_id=state["game"], description=state["description"], source_url=source_url,
         )
-        message = f"✅  Installed: {mod.name}"
         try:
             installed_size = Path(dest).stat().st_size
         except OSError as exc:
             logger.warning("Could not determine downloaded size for %s: %s", dest, exc)
             installed_size = 0
-        try:
-            from src.core.download_history import record_event, STATUS_SUCCESS
-            record_event(
-                config, mod_name=mod.name, mod_type=mod_type.value, serial=state["game"],
-                source_url=source_url, status=STATUS_SUCCESS, size_bytes=installed_size,
-            )
-        except Exception as exc:
-            logger.warning("Could not record browse download history for %s: %s", mod.name, exc)
-            message += "\nInstallation succeeded, but history could not be saved."
-        result.installed.emit()
-        result.finished.emit(request_id, True, message)
+        payload = {"mod": mod, "size": installed_size}
     except Exception as exc:
         error = str(exc) or type(exc).__name__
         logger.warning("Direct download %s failed: %s", phase, error)
-        try:
-            from src.core.download_history import record_event, STATUS_FAILED
-            record_event(
-                config, mod_name=state["name"] or Path(urlparse(state["url"]).path).name,
-                mod_type=mod_type.value, serial=state["game"], source_url=source_url,
-                status=STATUS_FAILED, note=f"{phase}: {error}",
-            )
-        except Exception as history_exc:
-            logger.warning("Could not record failed browse download history for %s: %s", state["name"], history_exc)
-        result.finished.emit(
-            request_id, False,
+        error = (
             f"❌  {phase.capitalize()} failed: {error}\n"
-            "Your entries are preserved. Retry starts a new download; it does not resume a partial file.",
+            "Your entries are preserved. Retry starts a new download; it does not resume a partial file."
         )
     finally:
-        ActiveDownloads.finish(request_id)
         if tmpdir:
-            import shutil
             shutil.rmtree(tmpdir, ignore_errors=True)
-        result.deleteLater()
+        result.prepared.emit(payload, error)
 
 
 class DownloadInstallDialog(QDialog):
@@ -1692,6 +1735,7 @@ class DownloadInstallDialog(QDialog):
         self._busy = False
         self._closed = False
         self._request_id = ""
+        self._prepared_download = None
         self.setWindowTitle("Download & Install Mod from URL")
         self.setMinimumSize(480, 380)
         self.resize(640, 620)
@@ -1797,6 +1841,13 @@ class DownloadInstallDialog(QDialog):
         self._dl_btn.setObjectName("primary_btn")
         self._dl_btn.clicked.connect(self._download)
         btns.addWidget(self._dl_btn)
+        self._new_download_btn = QPushButton("New Download")
+        self._new_download_btn.setToolTip(
+            "Keep the prepared files for manual recovery and edit a new download request."
+        )
+        self._new_download_btn.clicked.connect(self._new_download)
+        self._new_download_btn.hide()
+        btns.addWidget(self._new_download_btn)
         self._close_btn = QPushButton("Close")
         self._close_btn.clicked.connect(self.reject)
         btns.addWidget(self._close_btn)
@@ -1940,6 +1991,9 @@ class DownloadInstallDialog(QDialog):
     def _download(self):
         if self._busy or self._closed:
             return
+        if self._prepared_download is not None:
+            self._retry_registration()
+            return
         raw_url = self._url_edit.text().strip()
         if not _is_download_url(raw_url):
             self._status.setText("⚠  Enter a complete http(s) file URL.")
@@ -1958,7 +2012,7 @@ class DownloadInstallDialog(QDialog):
 
     def _run_download(self, raw_url: str, url: Optional[str] = None):
         """Capture a request on the UI thread before any network work starts."""
-        if self._busy or self._closed:
+        if self._busy or self._closed or self._prepared_download is not None:
             return
         mod_type = self._type_combo.currentData()
         if not self.config.mods_storage_path:
@@ -1975,18 +2029,7 @@ class DownloadInstallDialog(QDialog):
         config = deepcopy(self.config)
         self._save_state("starting direct download")
         self._request_id = request_id = uuid.uuid4().hex
-        result = _DownloadInstallResult()
-        result.phase.connect(self._on_download_phase)
-        result.progress.connect(self._on_download_progress)
-        result.finished.connect(self._on_download_finished)
-        parent = self.parent()
-        while parent is not None:
-            installed_signal = getattr(parent, "mod_installed", None)
-            if installed_signal is not None:
-                # Signal-to-signal delivery survives closing/deleting this dialog.
-                result.installed.connect(installed_signal)
-                break
-            parent = parent.parent()
+        result = self._download_result(state, mod_type, config)
         self._set_download_busy(True)
         self._on_download_phase(request_id, "resolving")
         ActiveDownloads.register(
@@ -1996,22 +2039,64 @@ class DownloadInstallDialog(QDialog):
         try:
             threading.Thread(
                 target=_run_direct_download,
-                args=(result, request_id, state, mod_type, config, self.db, url),
+                args=(result, request_id, state, mod_type, config, url),
                 daemon=True,
             ).start()
         except RuntimeError as exc:
             logger.warning("Could not start direct download worker: %s", exc)
-            ActiveDownloads.finish(request_id)
-            result.deleteLater()
-            self._on_download_finished(request_id, False, f"Could not start download: {exc}\nPlease retry.")
+            result._complete_install(None, f"Could not start download: {exc}\nPlease retry.")
+
+    def _download_result(self, state, mod_type, config):
+        result = _DownloadInstallResult(self._request_id, state, mod_type, config, self.db)
+        result.phase.connect(self._on_download_phase)
+        result.progress.connect(self._on_download_progress)
+        result.finished.connect(self._on_download_finished)
+        result.registration_failed.connect(self._on_registration_failed)
+        parent = self.parent()
+        while parent is not None:
+            installed_signal = getattr(parent, "mod_installed", None)
+            if installed_signal is not None:
+                # Signal-to-signal delivery survives closing/deleting this dialog.
+                result.installed.connect(installed_signal)
+                break
+            parent = parent.parent()
+        return result
+
+    @pyqtSlot(str, object)
+    def _on_registration_failed(self, request_id, payload):
+        if not self._closed and self._busy and request_id == self._request_id:
+            self._prepared_download = payload
+
+    def _retry_registration(self):
+        payload = self._prepared_download
+        self._request_id = uuid.uuid4().hex
+        result = self._download_result(payload["state"], payload["mod"].mod_type, payload["config"])
+        self._set_download_busy(True)
+        ActiveDownloads.register(
+            self._request_id, payload["mod"].name,
+            source_url=payload["mod"].source_url, phase="installing",
+        )
+        result._complete_install(payload, "")
+
+    def _new_download(self):
+        if self._busy or self._closed or self._prepared_download is None:
+            return
+        path = self._prepared_download["mod"].path
+        self._prepared_download = None
+        self._set_download_busy(False)
+        self._dl_btn.setText("⬇ Download & Install")
+        self._status.setText(f"Previous prepared files were kept at: {path}\nEdit the fields to start a new download.")
 
     def _set_download_busy(self, busy):
         self._busy = busy
         for widget in (
             self._url_edit, self._type_combo, self._name_edit, self._author_edit,
-            self._game_edit, self._desc_edit, self._source_url_edit, self._dl_btn,
+            self._game_edit, self._desc_edit, self._source_url_edit,
         ):
-            widget.setEnabled(not busy)
+            widget.setEnabled(not busy and self._prepared_download is None)
+        self._dl_btn.setEnabled(not busy)
+        self._new_download_btn.setVisible(self._prepared_download is not None)
+        self._new_download_btn.setEnabled(not busy)
         self._close_btn.setText("Continue in Background" if busy else "Close")
 
     @pyqtSlot(str, str)
@@ -2045,8 +2130,13 @@ class DownloadInstallDialog(QDialog):
     def _on_download_finished(self, request_id, success, message):
         if self._closed or not self._busy or request_id != self._request_id:
             return
+        if success:
+            self._prepared_download = None
         self._set_download_busy(False)
-        self._dl_btn.setText("⬇ Download & Install" if success else "Retry Download")
+        self._dl_btn.setText(
+            "Retry Library Save" if self._prepared_download is not None else
+            "⬇ Download & Install" if success else "Retry Download"
+        )
         if success:
             self._progress.setRange(0, 100)
             self._progress.setValue(100)

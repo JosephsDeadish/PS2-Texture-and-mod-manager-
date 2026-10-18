@@ -408,6 +408,82 @@ class TestModManager(unittest.TestCase):
         self.assertEqual(mod.mod_type, ModType.PNACH)
         self.assertIn("hack.pnach", mod.files)
 
+    def test_prepare_install_leaves_database_untouched_until_registration(self):
+        db, mgr = self._make_manager()
+        source = Path(self.tmpdir) / "pack"
+        source.mkdir()
+        (source / "texture.png").write_bytes(b"texture")
+        with patch.object(type(mgr), "_fetch_thumbnail", return_value="/cover.jpg"):
+            mod = type(mgr).prepare_install(
+                str(source), ModType.TEXTURE_PACK, str(Path(self.tmpdir) / "storage"),
+                name="Prepared pack", author="Author", game_id="SLUS-20062",
+                source_url="https://example.com/pack",
+            )
+        self.assertEqual(db.all(), [])
+        self.assertEqual(mod.size_bytes, 7)
+        self.assertEqual(mod.thumbnail_path, "/cover.jpg")
+        self.assertTrue((Path(mod.path) / "SLUS-20062" / "replacements" / "texture.png").exists())
+        db.add(mod)
+        self.assertEqual(type(db)().get(mod.id).source_url, "https://example.com/pack")
+
+    def test_prepare_install_cleans_only_its_new_folder_after_file_failures(self):
+        from src.core.mod_manager import ModManager
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        storage = Path(self.tmpdir) / "storage"
+        existing = storage / "existing"
+        existing.mkdir(parents=True)
+        (existing / "keep").write_bytes(b"existing")
+        for failure in ("copy", "inventory", "archive", "normalization"):
+            with self.subTest(failure=failure):
+                target = {
+                    "copy": "src.core.mod_manager.shutil.copy2",
+                    "inventory": "src.core.mod_manager.ModManager._list_files",
+                    "archive": "src.core.mod_manager.extract_archive",
+                    "normalization": "src.core.mod_manager.ModManager._normalize_texture_structure",
+                }[failure]
+                with patch(target, side_effect=OSError("disk error")), patch(
+                    "src.core.mod_manager.is_archive", return_value=failure == "archive",
+                ):
+                    with self.assertRaises(OSError):
+                        ModManager.prepare_install(str(source), ModType.TEXTURE_PACK, str(storage),
+                                                   game_id="SLUS-20062")
+                self.assertEqual(list(storage.iterdir()), [existing])
+                self.assertEqual((existing / "keep").read_bytes(), b"existing")
+
+    def test_prepare_install_does_not_reuse_or_delete_colliding_folder(self):
+        from src.core.mod_manager import ModManager
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        storage = Path(self.tmpdir) / "storage"
+        existing = storage / "existing"
+        existing.mkdir(parents=True)
+        (existing / "keep").write_bytes(b"existing")
+        with patch("src.core.mod_manager.uuid.uuid4", return_value="existing"):
+            with self.assertRaises(FileExistsError):
+                ModManager.prepare_install(str(source), ModType.PNACH, str(storage))
+        self.assertEqual((existing / "keep").read_bytes(), b"existing")
+
+    def test_failed_registration_restores_database_and_preserves_prepared_files_for_retry(self):
+        db, mgr = self._make_manager()
+        existing = ModInfo(id="existing", name="Existing", mod_type=ModType.PNACH, path="/existing")
+        db.add(existing)
+        source = Path(self.tmpdir) / "hack.pnach"
+        source.write_bytes(b"patch")
+        mod = mgr.prepare_install(str(source), ModType.PNACH, str(Path(self.tmpdir) / "storage"))
+        with patch.object(db, "save", side_effect=OSError("database read-only")):
+            with self.assertRaises(OSError):
+                db.add(mod)
+            with self.assertRaises(OSError):
+                db.add(ModInfo(id="existing", name="Replacement", mod_type=ModType.CHEAT, path="/new"))
+        self.assertIs(db.get("existing"), existing)
+        self.assertIsNone(db.get(mod.id))
+        self.assertEqual(type(db)().get("existing").name, "Existing")
+        self.assertIsNone(type(db)().get(mod.id))
+        self.assertEqual((Path(mod.path) / "hack.pnach").read_bytes(), b"patch")
+        db.add(mod)
+        self.assertEqual(type(db)().get(mod.id).path, mod.path)
+
     def test_remove_mod(self):
         db, mgr = self._make_manager()
         src_dir = Path(self.tmpdir) / "src_mod2"
@@ -9212,6 +9288,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         dialog._busy = False
         dialog._closed = False
         dialog._request_id = ""
+        dialog._prepared_download = None
         dialog.parent = MagicMock(return_value=None)
         dialog._type_combo = MagicMock()
         dialog._type_combo.currentData.return_value = ModType.TEXTURE_PACK
@@ -9228,8 +9305,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         dialog._progress = MagicMock()
         dialog._dl_btn = MagicMock()
         dialog._close_btn = MagicMock()
+        dialog._new_download_btn = MagicMock()
         dialog._save_state = MagicMock()
         return dialog
+
+    def _download_result_fixture(self, module, request_id, state, mod_type, config, db, dialog=None):
+        result = module._DownloadInstallResult.__new__(module._DownloadInstallResult)
+        result._request_id, result._state, result._mod_type = request_id, state, mod_type
+        result._config, result._db, result._completed = config, db, False
+        for signal in ("prepared", "phase", "progress", "finished", "installed", "registration_failed"):
+            setattr(result, signal, MagicMock())
+        result.deleteLater = MagicMock()
+        if dialog is not None:
+            result.finished.emit.side_effect = dialog._on_download_finished
+            result.registration_failed.emit.side_effect = dialog._on_registration_failed
+        return result
 
     def test_download_worker_tracks_transfer_then_install_and_always_finishes(self):
         import types
@@ -9260,42 +9350,55 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                     self.assertEqual(entry["received"], 3)
                     if outcome == "install_error":
                         raise OSError("storage full")
-                    return types.SimpleNamespace(name="Installed pack")
+                    return types.SimpleNamespace(name="Installed pack", path=storage)
 
-                with patch.object(registry, "_entries", {}):
-                    with patch.object(module.threading, "Thread") as thread, patch.object(module, "_DownloadInstallResult") as relay:
-                        with patch.object(module, "download_file", side_effect=transfer):
-                            with patch("src.core.mod_manager.ModManager") as manager:
-                                manager.return_value.install_from_folder.side_effect = install
-                                with patch("src.core.download_history.record_event") as record:
-                                    dialog._run_download("https://example.com/shared", "https://cdn.example.com/file.zip")
-                                    self.assertEqual(registry.all()[0]["phase"], "resolving")
-                                    run = thread.call_args.kwargs["target"]
-                                    args = thread.call_args.kwargs["args"]
-                                    self.assertIs(run, module._run_direct_download)
-                                    self.assertNotIn(dialog, args)
-                                    dialog.config.mods_storage_path = "/changed"
-                                    dialog._name_edit.text.return_value = "Changed name"
-                                    if outcome == "success":
-                                        run(*args)
-                                    else:
-                                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
-                                            run(*args)
-                                    self.assertEqual(registry.all(), [])
-                                    self.assertEqual(registry.count(), 0)
-                                    self.assertFalse(Path(destinations[0]).parent.exists())
-                                    self.assertEqual(record.call_args.kwargs["status"],
-                                                     "success" if outcome == "success" else "failed")
-                                    if outcome == "download_error":
-                                        manager.return_value.install_from_folder.assert_not_called()
-                                    else:
-                                        installed = manager.return_value.install_from_folder.call_args.kwargs
-                                        self.assertEqual(installed["dest_base"], storage)
-                                        self.assertEqual(installed["name"], "Texture pack")
-                                    result = relay.return_value
-                                    self.assertEqual(result.finished.emit.call_args.args[1], outcome == "success")
-                                    self.assertEqual(result.installed.emit.call_count, int(outcome == "success"))
-                                    result.deleteLater.assert_called_once()
+                result = None
+
+                def make_result(request_id, state, mod_type, config, db):
+                    nonlocal result
+                    result = self._download_result_fixture(module, request_id, state, mod_type, config, db, dialog)
+                    return result
+
+                with patch.object(registry, "_entries", {}), patch.object(
+                    module.threading, "Thread",
+                ) as thread, patch.object(
+                    dialog, "_download_result", side_effect=lambda *args: make_result(dialog._request_id, *args, dialog.db),
+                ), patch.object(module, "download_file", side_effect=transfer), patch(
+                    "src.core.mod_manager.ModManager",
+                ) as manager, patch("src.core.download_history.record_event") as record:
+                    manager.prepare_install.side_effect = install
+                    dialog._run_download("https://example.com/shared", "https://cdn.example.com/file.zip")
+                    self.assertEqual(registry.all()[0]["phase"], "resolving")
+                    run = thread.call_args.kwargs["target"]
+                    args = thread.call_args.kwargs["args"]
+                    self.assertIs(run, module._run_direct_download)
+                    self.assertNotIn(dialog, args)
+                    self.assertNotIn(dialog.db, args)
+                    dialog.config.mods_storage_path = "/changed"
+                    dialog._name_edit.text.return_value = "Changed name"
+                    if outcome == "success":
+                        run(*args)
+                    else:
+                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                            run(*args)
+                    dialog.db.add.assert_not_called()
+                    record.assert_not_called()
+                    self.assertEqual(registry.count(), 1)
+                    result._complete_install(*result.prepared.emit.call_args.args)
+                    self.assertEqual(registry.all(), [])
+                    self.assertEqual(registry.count(), 0)
+                    self.assertFalse(Path(destinations[0]).parent.exists())
+                    self.assertEqual(record.call_args.kwargs["status"],
+                                     "success" if outcome == "success" else "failed")
+                    if outcome == "download_error":
+                        manager.prepare_install.assert_not_called()
+                    else:
+                        installed = manager.prepare_install.call_args.kwargs
+                        self.assertEqual(installed["dest_base"], storage)
+                        self.assertEqual(installed["name"], "Texture pack")
+                    self.assertEqual(result.finished.emit.call_args.args[1], outcome == "success")
+                    self.assertEqual(result.installed.emit.call_count, int(outcome == "success"))
+                    result.deleteLater.assert_called_once()
 
     def test_download_rejects_invalid_urls_without_starting_worker(self):
         module = self._import_browse_panel()
@@ -9362,16 +9465,21 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
     def test_download_thread_start_failure_restores_retry_and_cleans_registry(self):
         module = self._import_browse_panel()
         dialog = self._download_dialog_fixture(module)
-        with patch.object(module, "_DownloadInstallResult") as relay:
+        result = self._download_result_fixture(module, "id", dialog._dialog_state(), ModType.TEXTURE_PACK,
+                                               dialog.config, dialog.db, dialog)
+        with patch.object(dialog, "_download_result", return_value=result), patch.object(
+            module.uuid, "uuid4", return_value=MagicMock(hex="id"),
+        ):
             with patch.object(module.threading, "Thread") as thread:
                 thread.return_value.start.side_effect = RuntimeError("no threads")
                 with patch.object(module.ActiveDownloads, "_entries", {}):
-                    with self.assertLogs("src.ui.browse_panel", level="WARNING"):
-                        dialog._download()
+                    with patch("src.core.download_history.record_event"):
+                        with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                            dialog._download()
                     self.assertEqual(module.ActiveDownloads.all(), [])
         self.assertFalse(dialog._busy)
         dialog._dl_btn.setText.assert_called_with("Retry Download")
-        relay.return_value.deleteLater.assert_called_once()
+        result.deleteLater.assert_called_once()
 
     def test_download_completion_notification_connects_to_surviving_ancestor_signal(self):
         module = self._import_browse_panel()
@@ -9383,6 +9491,133 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
             with patch.object(module.threading, "Thread"), patch.object(module.ActiveDownloads, "_entries", {}):
                 dialog._download()
         relay.return_value.installed.connect.assert_called_once_with(ancestor.mod_installed)
+
+    def test_download_registration_failure_freezes_metadata_and_retry_reuses_prepared_files(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._busy, dialog._request_id = True, "initial"
+            mod = ModInfo("prepared", "Pack", ModType.TEXTURE_PACK, directory,
+                          game_id="SLUS-20062", source_url="https://example.com/original")
+            source = Path(directory) / "texture.png"
+            source.write_bytes(b"texture")
+            state = dialog._dialog_state()
+            config = AppConfig(mods_storage_path="/original-storage")
+            payload = {"mod": mod, "size": 100}
+            result = self._download_result_fixture(module, "initial", state, mod.mod_type, config, dialog.db, dialog)
+            dialog.db.add.side_effect = OSError("read-only database")
+            with patch("src.core.download_history.record_event") as record, patch.object(
+                module.ActiveDownloads, "_entries", {},
+            ):
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    result._complete_install(payload, "")
+                self.assertIs(dialog._prepared_download["mod"], mod)
+                self.assertFalse(dialog._busy)
+                dialog._name_edit.setEnabled.assert_called_with(False)
+                dialog._dl_btn.setText.assert_called_with("Retry Library Save")
+                dialog._new_download_btn.setVisible.assert_called_with(True)
+                self.assertIn(directory, record.call_args.kwargs["note"])
+                self.assertEqual(record.call_args.kwargs["status"], "failed")
+                result.installed.emit.assert_not_called()
+                result.deleteLater.assert_called_once()
+                dialog.config.mods_storage_path = "/changed-storage"
+                dialog._name_edit.text.return_value = "Not the prepared name"
+                retry_result = None
+
+                def make_retry(retry_state, mod_type, retry_config):
+                    nonlocal retry_result
+                    self.assertIs(retry_state, state)
+                    self.assertIs(retry_config, config)
+                    retry_result = self._download_result_fixture(
+                        module, dialog._request_id, retry_state, mod_type, retry_config, dialog.db, dialog,
+                    )
+                    return retry_result
+
+                dialog.db.add.side_effect = None
+                with patch.object(dialog, "_download_result", side_effect=make_retry), patch.object(
+                    module.threading, "Thread",
+                ) as thread, patch.object(module.DownloadInstallDialog, "_convert_url") as resolve:
+                    dialog._run_download("https://example.com/another.zip")
+                    dialog._download()
+                thread.assert_not_called()
+                resolve.assert_not_called()
+                self.assertIs(dialog.db.add.call_args.args[0], mod)
+                self.assertEqual(dialog.db.add.call_count, 2)
+                self.assertEqual(source.read_bytes(), b"texture")
+                self.assertEqual(record.call_count, 2)
+                self.assertEqual(record.call_args.kwargs["status"], "success")
+                self.assertEqual(record.call_args.kwargs["size_bytes"], 100)
+                self.assertEqual(record.call_args.args[0].mods_storage_path, "/original-storage")
+                self.assertIsNone(dialog._prepared_download)
+                self.assertFalse(dialog._busy)
+                dialog._name_edit.setEnabled.assert_called_with(True)
+                dialog._new_download_btn.setVisible.assert_called_with(False)
+                retry_result.installed.emit.assert_called_once()
+                self.assertEqual(module.ActiveDownloads.all(), [])
+
+    def test_new_download_keeps_prepared_files_and_restores_editable_form(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            source = Path(directory) / "texture.png"
+            source.write_bytes(b"texture")
+            dialog._prepared_download = {"mod": ModInfo("id", "Pack", ModType.TEXTURE_PACK, directory)}
+            for busy, closed in ((True, False), (False, True)):
+                dialog._busy, dialog._closed = busy, closed
+                dialog._new_download()
+                self.assertIsNotNone(dialog._prepared_download)
+            dialog._busy, dialog._closed = False, False
+            dialog._new_download()
+            self.assertIsNone(dialog._prepared_download)
+            dialog._name_edit.setEnabled.assert_called_with(True)
+            dialog._name_edit.setText.assert_not_called()
+            dialog._dl_btn.setText.assert_called_with("⬇ Download & Install")
+            self.assertIn(directory, dialog._status.setText.call_args.args[0])
+            self.assertEqual(source.read_bytes(), b"texture")
+            dialog.db.add.assert_not_called()
+
+    def test_download_registration_survives_closed_receiver_and_completes_only_once(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._closed = True
+            mod = ModInfo("id", "Pack", ModType.TEXTURE_PACK, directory)
+            result = self._download_result_fixture(
+                module, "id", dialog._dialog_state(), mod.mod_type, dialog.config, dialog.db, dialog,
+            )
+            with patch("src.core.download_history.record_event", side_effect=OSError("history read-only")) as record:
+                with patch.object(module.ActiveDownloads, "_entries", {}):
+                    module.ActiveDownloads.register("id", "Pack")
+                    with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                        result._complete_install({"mod": mod, "size": 10}, "")
+                    result._complete_install({"mod": mod, "size": 10}, "")
+                    self.assertEqual(module.ActiveDownloads.all(), [])
+            dialog.db.add.assert_called_once_with(mod)
+            result.installed.emit.assert_called_once()
+            result.finished.emit.assert_called_once()
+            self.assertTrue(result.finished.emit.call_args.args[1])
+            self.assertIn("history could not be saved", result.finished.emit.call_args.args[2])
+            self.assertEqual(record.call_args.kwargs["status"], "success")
+            dialog._status.setText.assert_not_called()
+            result.deleteLater.assert_called_once()
+
+    def test_download_registration_does_not_save_missing_prepared_folder(self):
+        module = self._import_browse_panel()
+        with tempfile.TemporaryDirectory() as directory:
+            dialog = self._download_dialog_fixture(module)
+            dialog._busy, dialog._request_id = True, "id"
+            mod = ModInfo("id", "Pack", ModType.TEXTURE_PACK, str(Path(directory) / "missing"))
+            result = self._download_result_fixture(
+                module, "id", dialog._dialog_state(), mod.mod_type, dialog.config, dialog.db, dialog,
+            )
+            with patch("src.core.download_history.record_event") as record:
+                with self.assertLogs("src.ui.browse_panel", level="WARNING"):
+                    result._complete_install({"mod": mod, "size": 10}, "")
+            dialog.db.add.assert_not_called()
+            result.installed.emit.assert_not_called()
+            self.assertIn("prepared folder is missing", result.finished.emit.call_args.args[2])
+            self.assertEqual(record.call_args.kwargs["status"], "failed")
+            self.assertIs(dialog._prepared_download["mod"], mod)
 
     def test_download_progress_recovers_from_unknown_total_and_handles_large_files(self):
         module = self._import_browse_panel()
@@ -9409,6 +9644,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                 dialog._on_download_phase(request_id, "installing")
                 dialog._on_download_progress(request_id, 100, 100)
                 dialog._on_download_finished(request_id, True, "Done")
+                dialog._on_registration_failed(request_id, {"mod": MagicMock()})
+                self.assertIsNone(dialog._prepared_download)
                 dialog._status.setText.assert_not_called()
                 dialog._progress.setValue.assert_not_called()
                 dialog._dl_btn.setEnabled.assert_not_called()
@@ -9434,9 +9671,9 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
         module = self._import_browse_panel()
         for failure in (None, OSError("resolver offline")):
             with self.subTest(failure=failure):
-                result = MagicMock()
                 state = {"url": "https://disk.yandex.ru/d/id", "name": "Pack", "game": "",
                          "source_url": "", "author": "", "description": ""}
+                result = self._download_result_fixture(module, "id", state, ModType.CHEAT, AppConfig(), MagicMock())
                 with patch.object(module.DownloadInstallDialog, "_convert_url",
                                   return_value=None, side_effect=failure):
                     with patch.object(module, "download_file") as transfer:
@@ -9444,7 +9681,8 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                             module.ActiveDownloads.register("id", "Pack", phase="resolving")
                             with patch("src.core.download_history.record_event", side_effect=OSError("read only")):
                                 with self.assertLogs("src.ui.browse_panel", level="WARNING"):
-                                    module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig(), MagicMock())
+                                    module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig())
+                                    result._complete_install(*result.prepared.emit.call_args.args)
                             self.assertEqual(module.ActiveDownloads.all(), [])
                 transfer.assert_not_called()
                 self.assertFalse(result.finished.emit.call_args.args[1])
@@ -9471,7 +9709,7 @@ class TestBrowsePanelStatePersistence(unittest.TestCase):
                 with patch.object(module, "download_file", side_effect=transfer):
                     with patch("src.core.mod_manager.ModManager"), patch("src.core.download_history.record_event"):
                         module._run_direct_download(result, "id", state, ModType.CHEAT, AppConfig(),
-                                                    MagicMock(), state["url"])
+                                                    state["url"])
         self.assertEqual(result.progress.emit.call_args_list, [call("id", 1, 4), call("id", 4, 4)])
 
     def test_cover_dialog_auto_fills_single_serial_match(self):
